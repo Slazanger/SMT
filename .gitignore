@@ -3,3 +3,7 @@ obj/
 bin/Debug/SMT.exe.config
 bin/Debug/SMT.vshost.exe.config
 bin/Debug/SMT.vshost.exe.manifest
+bin/Release/Newtonsoft.Json.xml
+bin/Release/SMT.exe.config
+bin/Release/SMT.vshost.exe.config
+bin/Release/SMT.vshost.exe.manifest
