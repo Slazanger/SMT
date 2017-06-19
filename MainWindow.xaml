@@ -1,0 +1,135 @@
+﻿<Window x:Class="SMT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
+        xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+        xmlns:local="clr-namespace:SMT"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="SMT" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
+
+    <Window.Resources>
+        <ContextMenu x:Key="SysRightClickContextMenu">
+
+            <ContextMenu.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="-20,0,-40,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Ident}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Description}"/>
+                    </Grid>
+                </DataTemplate>
+            </ContextMenu.ItemTemplate>
+
+
+            <MenuItem Header="{Binding Name}" FontWeight="Bold"/>
+            <Separator/>
+            <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click"/>
+            <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click"/>
+        </ContextMenu>
+        
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Panel.ZIndex="50">
+            <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Left">
+                <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" Visibility="Collapsed" />
+                <ComboBox x:Name="RegionDropDown"  Width="150"  SelectionChanged="OnRegionSelectionChanged" Margin="5,0" FontSize="12"/>
+                <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" SelectionChanged="SystemDropDownAC_SelectionChanged" FontSize="12">
+                    <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
+                </dotNetKitControls:AutoCompleteComboBox>
+            </StackPanel>
+            <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="btnHelp" Click="btnHelp_Click">
+                    <Image Source="Images/help.png"/>
+                </Button>
+            </StackPanel>
+
+        </DockPanel>
+
+        <Grid x:Name="MainContent" Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="390"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="10,0,30,0" VerticalAlignment="Top" Grid.Row="1" FontSize="30" Panel.ZIndex="50" FontWeight="Bold"/>
+            <Grid x:Name="MainCanvasGrid" Grid.Row="0" Grid.Column="0 " Grid.RowSpan="2">
+                <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800"  />
+                </Viewbox>
+
+            </Grid>
+            <GridSplitter Background="#FF575757" Width="2" Margin="1,1,1,1" Grid.RowSpan="2" Grid.Column="0"/>
+            <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
+                <GridSplitter />
+                <TabControl x:Name="tabControl" Margin="10,10,0,0">
+                    <TabItem Header="Intel">
+                        <Grid Background="#FFE5E5E5">
+                            <ListBox x:Name="RawIntelBox" Margin="0,2">
+
+
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+
+                            </ListBox>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Map Controls">
+                        <Grid Background="#FFE5E5E5">
+                            <StackPanel>
+                                
+
+                                <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
+                                    <xctk:PropertyGrid.EditorDefinitions>
+                                        <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
+                                            <xctk:EditorTemplateDefinition.EditingTemplate>
+                                                <DataTemplate>
+                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}"/>
+                                                </DataTemplate>
+                                            </xctk:EditorTemplateDefinition.EditingTemplate>
+                                        </xctk:EditorTemplateDefinition>
+                                    </xctk:PropertyGrid.EditorDefinitions>
+
+                                </xctk:PropertyGrid>
+
+                                <StackPanel>
+                                    <Separator />
+                                    <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
+                                    <Separator />
+                                    <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
+
+                                </StackPanel>
+
+
+
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
