@@ -98,8 +98,8 @@
                         </Grid>
                     </TabItem>
                     <TabItem Header="Map Controls">
-                        <Grid Background="#FFE5E5E5">
-                            <StackPanel>
+                        <ScrollViewer Background="#FFE5E5E5">
+                            <StackPanel >
                                 
 
                                 <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
@@ -126,7 +126,7 @@
 
 
                             </StackPanel>
-                        </Grid>
+                        </ScrollViewer>
                     </TabItem>
                 </TabControl>
             </Grid>

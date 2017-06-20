@@ -126,7 +126,11 @@ namespace SMT.EVEData
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    IntelFilters.Add(line);
+                    line.Trim();
+                    if(line != "")
+                    {
+                        IntelFilters.Add(line);
+                    }
                 }
             }
 

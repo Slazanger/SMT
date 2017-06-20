@@ -269,7 +269,9 @@ namespace SMT
 
                 // add circle for system
                 Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
-                highlightSystemCircle.Stroke = System.Windows.Media.Brushes.DarkOrange;
+                highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.SelectedSystemColour);
+                
+                
                 highlightSystemCircle.StrokeThickness = 3;
 
                 RotateTransform rt = new RotateTransform();
@@ -356,7 +358,8 @@ namespace SMT
 
                     // add circle for system
                     Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
-                    highlightSystemCircle.Stroke = System.Windows.Media.Brushes.SteelBlue;
+
+                    highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.CharacterHighlightColour);
                     highlightSystemCircle.StrokeThickness = 2;
 
                     RotateTransform rt = new RotateTransform();
@@ -391,7 +394,12 @@ namespace SMT
                     // also add the name of the character above the system
                     Label charText = new Label();
                     charText.Content = c.Name;
-                    charText.FontSize = 8;
+                    charText.Foreground = new SolidColorBrush(MapConf.CharacterTextColour);
+
+                    if (MapConf.CharacterTextSize > 0)
+                    {
+                        charText.FontSize = MapConf.CharacterTextSize;
+                    }
                     Canvas.SetLeft(charText, s.DotlanX + textXOffset);
                     Canvas.SetTop(charText, s.DotLanY + textYOffset);
                     Canvas.SetZIndex(charText, 20);

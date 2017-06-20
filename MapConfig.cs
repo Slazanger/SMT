@@ -84,6 +84,23 @@ namespace SMT
         public Color MapBackgroundColour { get; set; }
 
 
+        [Category("General")]
+        [DisplayName("Selected System")]
+        public Color SelectedSystemColour { get; set; }
+
+        [Category("Character")]
+        [DisplayName("Highlight")]
+        public Color CharacterHighlightColour { get; set; }
+
+        [Category("Character")]
+        [DisplayName("Text")]
+        public Color CharacterTextColour { get; set; }
+
+        [Category("Character")]
+        [DisplayName("Text Size")]
+        public int CharacterTextSize { get; set; }
+
+
 
         [Category("ESI Data")]
         [DisplayName("ESI Scale")]
@@ -175,7 +192,7 @@ namespace SMT
         }
 
         [Category("ESI Data")]
-        [DisplayName("Ship Jumps")]
+        [DisplayName("Jumps")]
         public bool ShowShipJumps
         {
             get
@@ -228,7 +245,15 @@ namespace SMT
             NormalGateColour = Color.FromRgb(255, 248, 220);
             ConstellationGateColour = Color.FromRgb(128, 128, 128);
 
-            DefaultRegion = "Heimatar";
+            SelectedSystemColour = Color.FromRgb(255, 255, 255);
+
+
+            CharacterHighlightColour = Color.FromRgb(70, 130, 180);
+            CharacterTextColour = Color.FromRgb(0, 0, 0);
+            CharacterTextSize = 8;
+
+
+            DefaultRegion = "Molden Heath";
         }
 
         public MapConfig()
