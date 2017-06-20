@@ -123,7 +123,7 @@ namespace SMT
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.StartUpdateKillsFromESI();
-
+            EVEManager.StartUpdateJumpsFromESI();
 
             AllSystems = new List<string>();
             foreach (EVEData.RegionData rd in EVEManager.Regions)
@@ -649,6 +649,13 @@ namespace SMT
                         InfoSize = 20.0f * InfoValue  * MapConf.ESIOverlayScale;
                     }
 
+                    if (MapConf.ShowShipJumps)
+                    {
+                        InfoValue = sys.JumpsLastHour;
+                        InfoSize = InfoValue * MapConf.ESIOverlayScale;
+                    }
+
+
                     if (InfoValue != -1)
                     {
 
@@ -702,6 +709,7 @@ namespace SMT
         private void refreshData_Click(object sender, RoutedEventArgs e)
         {
             EVEManager.StartUpdateKillsFromESI();
+            EVEManager.StartUpdateJumpsFromESI();
         }
 
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -42,6 +42,8 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public int ShipKillsLastHour { get; set; }
 
+        [XmlIgnoreAttribute]
+        public int JumpsLastHour { get; set; }
 
 
         public override string ToString()
@@ -68,6 +70,7 @@ namespace SMT.EVEData
             NPCKillsLastHour = -1;
             PodKillsLastHour = -1;
             ShipKillsLastHour = -1;
+            JumpsLastHour = -1;
         }
     }
 }

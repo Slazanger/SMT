@@ -694,7 +694,7 @@ namespace SMT.EVEData
         #region ESI Data
 
         /// <summary>
-        /// Start the ESI download for the 
+        /// Start the ESI download for the kill info
         /// </summary>
         public void StartUpdateKillsFromESI()
         {
@@ -754,6 +754,72 @@ namespace SMT.EVEData
                                         es.ShipKillsLastHour -= es.NPCKillsLastHour;
 
 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                /// ....
+            }
+        }
+
+
+        /// <summary>
+        /// Start the ESI download for the Jump info
+        /// </summary>
+        public void StartUpdateJumpsFromESI()
+        {
+            string url = @"https://esi.tech.ccp.is/latest/universe/system_jumps/?datasource=tranquility";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(ESIJumpsReadCallback), request);
+
+        }
+
+
+        /// <summary>
+        /// ESI Result Response 
+        /// </summary>
+        /// <param name="asyncResult"></param>
+        private void ESIJumpsReadCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        //Need to return this response 
+                        string strContent = sr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+
+                        // JSON feed is now in the format : [{ "system_id": 30035042, "ship_jumps": 103},
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                string SystemID = obj["system_id"].ToString();
+                                string ship_jumps = obj["ship_jumps"].ToString();
+
+
+                                if (SystemIDToName[SystemID] != null)
+                                {
+                                    System es = GetEveSystem(SystemIDToName[SystemID]);
+                                    if (es != null)
+                                    {
+                                        es.JumpsLastHour = int.Parse(ship_jumps);
                                     }
                                 }
                             }

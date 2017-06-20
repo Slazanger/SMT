@@ -40,7 +40,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <DockPanel Panel.ZIndex="50">
+        <DockPanel Panel.ZIndex="60">
             <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Left">
                 <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" Visibility="Collapsed" />
                 <ComboBox x:Name="RegionDropDown"  Width="150"  SelectionChanged="OnRegionSelectionChanged" Margin="5,0" FontSize="12"/>
@@ -71,7 +71,7 @@
             </Grid.RowDefinitions>
 
             <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="10,0,30,0" VerticalAlignment="Top" Grid.Row="1" FontSize="30" Panel.ZIndex="50" FontWeight="Bold"/>
-            <Grid x:Name="MainCanvasGrid" Grid.Row="0" Grid.Column="0 " Grid.RowSpan="2">
+            <Grid x:Name="MainCanvasGrid" Grid.Row="0" Grid.Column="0 " Grid.RowSpan="2" ClipToBounds="True">
                 <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800"  />
                 </Viewbox>

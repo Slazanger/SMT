@@ -21,6 +21,7 @@ namespace SMT
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
+        private bool m_ShowShipJumps;
 
         [Browsable(false)]
         public string DefaultRegion;
@@ -119,6 +120,9 @@ namespace SMT
                 {
                     ShowPodKills = false;
                     ShowShipKills = false;
+                    ShowShipJumps = false;
+
+
                 }
 
                 OnPropertyChanged("ShowNPCKills");
@@ -140,6 +144,8 @@ namespace SMT
                 {
                     ShowNPCKills = false;
                     ShowShipKills = false;
+                    ShowShipJumps = false;
+
                 }
 
                 OnPropertyChanged("ShowPodKills");
@@ -161,13 +167,36 @@ namespace SMT
                 {
                     ShowNPCKills = false;
                     ShowPodKills = false;
+                    ShowShipJumps = false;
                 }
 
                 OnPropertyChanged("ShowShipKills");
             }
         }
 
+        [Category("ESI Data")]
+        [DisplayName("Ship Jumps")]
+        public bool ShowShipJumps
+        {
+            get
+            {
+                return m_ShowShipJumps;
+            }
+            set
+            {
+                m_ShowShipJumps = value;
+                if (m_ShowShipJumps)
+                {
+                    ShowNPCKills = false;
+                    ShowPodKills = false;
+                    ShowShipKills = false;
 
+
+                }
+
+                OnPropertyChanged("ShowShipJumps");
+            }
+        }
 
 
 
