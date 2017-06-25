@@ -81,11 +81,16 @@ namespace SMT
                 catch
                 {
                     MapConf = new MapConfig();
+                    MapConf.MapColours = new List<MapColours>();
+                    MapConf.SetDefaultColours();
                 }
             }
             else
             {
                 MapConf = new MapConfig();
+                MapConf.MapColours = new List<MapColours>();
+                MapConf.SetDefaultColours();
+
             }
 
             ShowNPCKills = false;
@@ -151,8 +156,27 @@ namespace SMT
             MapControlsPropertyGrid.SelectedObject = MapConf;
             MapControlsPropertyGrid.PropertyValueChanged += MapControlsPropertyGrid_PropertyValueChanged;
 
+            ColourListDropdown.ItemsSource = MapConf.MapColours;
+
+            MapColours selectedColours  = MapConf.MapColours[0];
+            // find the matching active colour scheme
+            foreach( MapColours mc in MapConf.MapColours)
+            {
+                if(MapConf.DefaultColourSchemeName == mc.Name)
+                {
+                    selectedColours = mc;
+                }
+            }
+
+//            ColourListDropdown.SelectedItem = selectedColours;
+            ColoursPropertyGrid.SelectedObject = selectedColours;
+            MapConf.ActiveColourScheme = selectedColours;
+            ColoursPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
+
+
             ReDrawMap();
         }
+
 
         ~MainWindow()
         {
@@ -174,7 +198,12 @@ namespace SMT
             ReDrawMap();
         }
 
-       
+        private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ReDrawMap();
+        }
+
+
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
             ReDrawMap();
@@ -184,8 +213,8 @@ namespace SMT
 
         void ReDrawMap()
         {
-            MainCanvasGrid.Background = new SolidColorBrush(MapConf.MapBackgroundColour);
-            MainCanvas.Background = new SolidColorBrush(MapConf.MapBackgroundColour);
+            MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+            MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
 
             MainCanvas.Children.Clear();
             AddSystemsToMap();
@@ -293,7 +322,7 @@ namespace SMT
 
                 // add circle for system
                 Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
-                highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.SelectedSystemColour);
+                highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
                 
                 
                 highlightSystemCircle.StrokeThickness = 3;
@@ -355,7 +384,7 @@ namespace SMT
 
                         Shape intelShape = new Ellipse() { Height = radius, Width = radius };
 
-                        intelShape.Fill = new SolidColorBrush(MapConf.IntelOverlayColour);
+                        intelShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.IntelOverlayColour);
                         Canvas.SetLeft(intelShape, sys.DotlanX - circleOffset);
                         Canvas.SetTop(intelShape, sys.DotLanY - circleOffset);
                         Canvas.SetZIndex(intelShape, 15);
@@ -383,7 +412,7 @@ namespace SMT
                     // add circle for system
                     Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
 
-                    highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.CharacterHighlightColour);
+                    highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                     highlightSystemCircle.StrokeThickness = 2;
 
                     RotateTransform rt = new RotateTransform();
@@ -418,11 +447,11 @@ namespace SMT
                     // also add the name of the character above the system
                     Label charText = new Label();
                     charText.Content = c.Name;
-                    charText.Foreground = new SolidColorBrush(MapConf.CharacterTextColour);
+                    charText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
 
-                    if (MapConf.CharacterTextSize > 0)
+                    if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
                     {
-                        charText.FontSize = MapConf.CharacterTextSize;
+                        charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
                     }
                     Canvas.SetLeft(charText, s.DotlanX + textXOffset);
                     Canvas.SetTop(charText, s.DotLanY + textYOffset);
@@ -454,11 +483,11 @@ namespace SMT
 
                 if(jump.ConstelationLink)
                 {
-                    sysLink.Stroke = new SolidColorBrush(MapConf.ConstellationGateColour);
+                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
                 }
                 else
                 {
-                    sysLink.Stroke = new SolidColorBrush(MapConf.NormalGateColour);
+                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
                 }
 
                 sysLink.StrokeThickness = 1;
@@ -521,11 +550,11 @@ namespace SMT
 
                         if(jb.Friendly)
                         {
-                            path.Stroke = new SolidColorBrush(MapConf.FriendlyJumpBridgeColour);
+                            path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
                         }
                         else
                         {
-                            path.Stroke = new SolidColorBrush(MapConf.HostileJumpBridgeColour);
+                            path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
                         }
                        
                         path.StrokeThickness = 2;
@@ -568,17 +597,17 @@ namespace SMT
 
                 }
 
-                systemShape.Stroke = new SolidColorBrush(MapConf.SystemOutlineColour);
+                systemShape.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
 
 
                 if (OutofRegion)
                 {
                     
-                    systemShape.Fill = new SolidColorBrush(MapConf.OutRegionSystemColour);
+                    systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
                 }
                 else
                 {
-                    systemShape.Fill = new SolidColorBrush(MapConf.InRegionSystemColour);
+                    systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
                 }
 
                 systemShape.DataContext = sys;
@@ -597,18 +626,18 @@ namespace SMT
 
                 Label sysText = new Label();
                 sysText.Content = sys.Name;
-                if (MapConf.SystemTextSize > 0)
+                if (MapConf.ActiveColourScheme.SystemTextSize > 0)
                 {
-                    sysText.FontSize = MapConf.SystemTextSize;
+                    sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
                 }
 
                 if (OutofRegion)
                 {
-                    sysText.Foreground = new SolidColorBrush(MapConf.OutRegionSystemTextColour);
+                    sysText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
                 }
                 else
                 {
-                    sysText.Foreground = new SolidColorBrush(MapConf.InRegionSystemTextColour);
+                    sysText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
                 }
 
                 Canvas.SetLeft(sysText, sys.DotlanX + textXOffset);
@@ -663,7 +692,7 @@ namespace SMT
 
 
                     int InfoValue = -1;
-                    SolidColorBrush InfoColour = new SolidColorBrush(MapConf.ESIOverlayColour);
+                    SolidColorBrush InfoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
                     double InfoSize = 0.0;
                     if(MapConf.ShowNPCKills)
                     {
@@ -708,7 +737,7 @@ namespace SMT
                     Label sysRegionText = new Label();
                     sysRegionText.Content = "(" + sys.Region + ")";
                     sysRegionText.FontSize = 7;
-                    sysRegionText.Foreground = new SolidColorBrush(MapConf.OutRegionSystemTextColour);
+                    sysRegionText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
 
                     Canvas.SetLeft(sysRegionText, sys.DotlanX + textXOffset);
                     Canvas.SetTop(sysRegionText, sys.DotLanY + textYOffset2);
@@ -792,16 +821,36 @@ namespace SMT
 
         private void ResetColourData_Click(object sender, RoutedEventArgs e)
         {
-            MapConf.SetDefaults();
+            MapConf.MapColours = new List<MapColours>();
+            MapConf.SetDefaultColours();
+            ColourListDropdown.ItemsSource = MapConf.MapColours;
+            ColourListDropdown.SelectedItem = MapConf.MapColours[0];
+
+
             ReDrawMap();
 
-            MapControlsPropertyGrid.Update();
         }
 
         private void btnHelp_Click(object sender, RoutedEventArgs e)
         {
             About popup = new About();
             popup.ShowDialog();
+        }
+
+        private void ColourListDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MapColours newSelection = ColourListDropdown.SelectedItem as MapColours;
+            if (newSelection == null)
+            {
+                return;
+            }
+
+            MapConf.ActiveColourScheme = newSelection;
+            ColoursPropertyGrid.SelectedObject = newSelection;
+            ColoursPropertyGrid.Update();
+
+            MapConf.DefaultColourSchemeName = newSelection.Name;
+
         }
     }
 }

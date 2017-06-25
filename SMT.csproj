@@ -97,6 +97,7 @@
     <Compile Include="EVEData\RegionData.cs" />
     <Compile Include="EVEData\EveManager.cs" />
     <Compile Include="EVEData\ZKillRedisQ.cs" />
+    <Compile Include="MapColours.cs" />
     <Compile Include="MapConfig.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

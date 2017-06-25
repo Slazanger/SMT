@@ -145,8 +145,6 @@
 
                                 <StackPanel>
                                     <Separator />
-                                    <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
-                                    <Separator />
                                     <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
 
                                 </StackPanel>
@@ -154,6 +152,20 @@
 
 
                             </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                    <TabItem Header="Map Colours">
+                        <ScrollViewer Background="#FFE5E5E5">
+                            <StackPanel>
+                                <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
+                                <Separator />
+                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False"/>
+                                <Separator />
+                                <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
+
+                            </StackPanel>
+
+
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>

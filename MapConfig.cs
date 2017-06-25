@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media;
 
@@ -18,6 +19,7 @@ namespace SMT
             }
         }
 
+
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
@@ -25,6 +27,17 @@ namespace SMT
 
         [Browsable(false)]
         public string DefaultRegion;
+
+        [Browsable(false)]
+        public string DefaultColourSchemeName;
+
+
+        [Browsable(false)]
+        public List<MapColours> MapColours;
+
+        [Browsable(false)]
+        public MapColours ActiveColourScheme;
+
 
 
         [Category("Jump Bridges")]
@@ -35,97 +48,19 @@ namespace SMT
         [DisplayName("Hostile Bridges")]
         public bool ShowHostileJumpBridges { get; set; }
 
-        [Category("Jump Bridges")]
-        [DisplayName("Friendly")]
-        public Color FriendlyJumpBridgeColour { get; set; }
-
-
-        [Category("Jump Bridges")]
-        [DisplayName("Hostile ")]
-        public Color HostileJumpBridgeColour { get; set; }
-
-        [Category("Systems")]
-        [DisplayName("Name Size")]
-        public int SystemTextSize { get; set; }
-
-        [Category("Systems")]
-        [DisplayName("Outline")]
-        public Color SystemOutlineColour { get; set; }
-
-
-        [Category("Systems")]
-        [DisplayName("In Region")]
-        public Color InRegionSystemColour { get; set; }
-
-        [Category("Systems")]
-        [DisplayName("In Region Text")]
-        public Color InRegionSystemTextColour { get; set; }
-
-        [Category("Systems")]
-        [DisplayName("Out of Region")]
-        public Color OutRegionSystemColour { get; set; }
-
-        [Category("Systems")]
-        [DisplayName("Out of Region Text")]
-        public Color OutRegionSystemTextColour { get; set; }
-
-        [Category("Gates")]
-        [DisplayName("Normal")]
-        public Color NormalGateColour { get; set; }
-
-        [Category("Gates")]
-        [DisplayName("Constellation")]
-        public Color ConstellationGateColour { get; set; }
-
-
-
-        [Category("General")]
-        [DisplayName("Map Background")]
-        public Color MapBackgroundColour { get; set; }
-
-
-        [Category("General")]
-        [DisplayName("Selected System")]
-        public Color SelectedSystemColour { get; set; }
 
         [Category("General")]
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
 
 
-
-        [Category("Character")]
-        [DisplayName("Highlight")]
-        public Color CharacterHighlightColour { get; set; }
-
-        [Category("Character")]
-        [DisplayName("Text")]
-        public Color CharacterTextColour { get; set; }
-
-        [Category("Character")]
-        [DisplayName("Text Size")]
-        public int CharacterTextSize { get; set; }
-
-
-
         [Category("ESI Data")]
         [DisplayName("ESI Scale")]
         public double ESIOverlayScale { get; set; }
 
-        [Category("ESI Data")]
-        [DisplayName("Overlay")]
-        public Color ESIOverlayColour { get; set; }
-
-        [Category("Intel")]
-        [DisplayName("Overlay")]
-        public Color IntelOverlayColour { get; set; }
-
         [Category("Intel")]
         [DisplayName("Show Intel")]
         public bool ShowIntel { get; set; }
-
-
-
 
         [Category("ESI Data")]
         [DisplayName("Rat Kills")]
@@ -228,38 +163,110 @@ namespace SMT
             ShowJumpBridges = true;
             ShowHostileJumpBridges = true;
             ESIOverlayScale = 1.0f;
-            FriendlyJumpBridgeColour = Color.FromRgb(102, 205, 170);
-            HostileJumpBridgeColour = Color.FromRgb(250, 128, 114);
-
-            SystemOutlineColour = Color.FromRgb(0, 0, 0);
-            InRegionSystemColour = Color.FromRgb(255, 239, 213);
-            InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
-
-            OutRegionSystemColour = Color.FromRgb(218, 165, 32);
-            OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
-
-            MapBackgroundColour = Color.FromRgb(105, 105, 105);
-
-            ESIOverlayColour = Color.FromRgb(188, 143, 143);
-
-            IntelOverlayColour = Color.FromRgb(178, 34, 34);
-
             ShowPodKills = true;
             ShowIntel = true;
-            SystemTextSize = 12;
-
-            NormalGateColour = Color.FromRgb(255, 248, 220);
-            ConstellationGateColour = Color.FromRgb(128, 128, 128);
-
-            SelectedSystemColour = Color.FromRgb(255, 255, 255);
+            DefaultRegion = "Molden Heath";
             ShowSystemPopup = true;
 
-            CharacterHighlightColour = Color.FromRgb(70, 130, 180);
-            CharacterTextColour = Color.FromRgb(0, 0, 0);
-            CharacterTextSize = 8;
+            MapColours = new List<MapColours>();
+        }
+
+        public void SetDefaultColours()
+        {
+            // 
+            MapColours defaultColours = new MapColours();
+            defaultColours.Name = "Default";
+            defaultColours.UserEditable = false;
+            defaultColours.FriendlyJumpBridgeColour = Color.FromRgb(102, 205, 170);
+            defaultColours.HostileJumpBridgeColour = Color.FromRgb(250, 128, 114);
+            defaultColours.SystemOutlineColour = Color.FromRgb(0, 0, 0);
+            defaultColours.InRegionSystemColour = Color.FromRgb(255, 239, 213);
+            defaultColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            defaultColours.OutRegionSystemColour = Color.FromRgb(218, 165, 32);
+            defaultColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            defaultColours.MapBackgroundColour = Color.FromRgb(105, 105, 105);
+            defaultColours.ESIOverlayColour = Color.FromRgb(188, 143, 143);
+            defaultColours.IntelOverlayColour = Color.FromRgb(178, 34, 34);
+            defaultColours.NormalGateColour = Color.FromRgb(255, 248, 220);
+            defaultColours.ConstellationGateColour = Color.FromRgb(128, 128, 128);
+            defaultColours.SelectedSystemColour = Color.FromRgb(255, 255, 255);
+            defaultColours.CharacterHighlightColour = Color.FromRgb(70, 130, 180);
+            defaultColours.CharacterTextColour = Color.FromRgb(0, 0, 0);
+            defaultColours.CharacterTextSize = 8;
+            defaultColours.SystemTextSize = 12;
+            MapColours.Add(defaultColours);
+
+            MapColours blueColours = new MapColours();
+            blueColours.Name = "Blue";
+            blueColours.UserEditable = false;
+            blueColours.FriendlyJumpBridgeColour = Color.FromRgb(154, 205, 50);
+            blueColours.HostileJumpBridgeColour = Color.FromRgb(216, 191, 216);
+            blueColours.SystemOutlineColour = Color.FromRgb(0, 0, 0);
+            blueColours.InRegionSystemColour = Color.FromRgb(134, 206, 235);
+            blueColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            blueColours.OutRegionSystemColour = Color.FromRgb(112, 108, 124);
+            blueColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            blueColours.MapBackgroundColour = Color.FromRgb(245, 245, 245);
+            blueColours.ESIOverlayColour = Color.FromRgb(192, 192, 192);
+            blueColours.IntelOverlayColour = Color.FromRgb(216, 191, 216);
+            blueColours.NormalGateColour = Color.FromRgb(90, 90, 90);
+            blueColours.ConstellationGateColour = Color.FromRgb(120, 120, 120);
+            blueColours.SelectedSystemColour = Color.FromRgb(0, 0, 0);
+            blueColours.CharacterHighlightColour = Color.FromRgb(0, 0, 0);
+            blueColours.CharacterTextColour = Color.FromRgb(0, 0, 0);
+            blueColours.CharacterTextSize = 8;
+            blueColours.SystemTextSize = 12;
+            MapColours.Add(blueColours);
+
+            /*
+            MapColours asimovColours = new MapColours();
+            asimovColours.Name = "Asimov";
+            asimovColours.UserEditable = false;
+            asimovColours.FriendlyJumpBridgeColour = Color.FromRgb(105, 105, 105);
+            asimovColours.HostileJumpBridgeColour = Color.FromRgb(216, 191, 216);
+            asimovColours.SystemOutlineColour = Color.FromRgb(0, 0, 0);
+            asimovColours.InRegionSystemColour = Color.FromRgb(255, 127, 80);
+            asimovColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            asimovColours.OutRegionSystemColour = Color.FromRgb(255, 165, 0);
+            asimovColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            asimovColours.MapBackgroundColour = Color.FromRgb(245, 245, 245);
+            asimovColours.ESIOverlayColour = Color.FromRgb(0, 0, 0);
+            asimovColours.IntelOverlayColour = Color.FromRgb(255, 165, 0);
+            asimovColours.NormalGateColour = Color.FromRgb(245, 222, 179);
+            asimovColours.ConstellationGateColour = Color.FromRgb(245, 222, 179);
+            asimovColours.SelectedSystemColour = Color.FromRgb(0, 0, 0);
+            asimovColours.CharacterHighlightColour = Color.FromRgb(0, 0, 0);
+            asimovColours.CharacterTextColour = Color.FromRgb(0, 0, 0);
+            asimovColours.CharacterTextSize = 8;
+            asimovColours.SystemTextSize = 12;
+            MapColours.Add(asimovColours);
+            */
+
+            MapColours greyAndRed = new MapColours();
+            greyAndRed.Name = "Grey & Red";
+            greyAndRed.UserEditable = false;
+            greyAndRed.FriendlyJumpBridgeColour = Color.FromRgb(128, 128, 128);
+            greyAndRed.HostileJumpBridgeColour = Color.FromRgb(178, 34, 34);
+            greyAndRed.SystemOutlineColour = Color.FromRgb(0, 0, 0);
+            greyAndRed.InRegionSystemColour = Color.FromRgb(240, 248, 255);
+            greyAndRed.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            greyAndRed.OutRegionSystemColour = Color.FromRgb(128, 34, 34);
+            greyAndRed.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
+            greyAndRed.MapBackgroundColour = Color.FromRgb(245, 245, 245);
+            greyAndRed.ESIOverlayColour = Color.FromRgb(192, 192, 192);
+            greyAndRed.IntelOverlayColour = Color.FromRgb(178, 34, 34);
+            greyAndRed.NormalGateColour = Color.FromRgb(80, 80, 80);
+            greyAndRed.ConstellationGateColour = Color.FromRgb(120, 120, 120);
+            greyAndRed.SelectedSystemColour = Color.FromRgb(0, 0, 0);
+            greyAndRed.CharacterHighlightColour = Color.FromRgb(0, 0, 0);
+            greyAndRed.CharacterTextColour = Color.FromRgb(0, 0, 0);
+            greyAndRed.CharacterTextSize = 8;
+            greyAndRed.SystemTextSize = 12;
+            MapColours.Add(greyAndRed);
 
 
-            DefaultRegion = "Molden Heath";
+            ActiveColourScheme = blueColours;
+
         }
 
         public MapConfig()
