@@ -75,8 +75,36 @@
                 <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800"  />
                 </Viewbox>
-
             </Grid>
+
+            <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100">
+                <StackPanel Background="#FF959595">
+                    <Label Content="{Binding Name}" FontWeight="Bold"/>
+
+                    <StackPanel Orientation="Horizontal"  Margin="10,0,0,0">
+                        <Label Content="Jumps" Width="50" Padding="1"/>
+                        <Label Content="{Binding JumpsLastHour}" Padding="1" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"  Margin="10,0,0,0">
+                        <Label Content="Pods" Width="50" Padding="1" />
+                        <Label Content="{Binding PodKillsLastHour}" Padding="1" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                        <Label Content="Ships" Width="50" Padding="1" />
+                        <Label Content="{Binding ShipKillsLastHour}" Padding="1" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                        <Label Content="NPCs" Width="50" Padding="1" />
+                        <Label Content="{Binding NPCKillsLastHour}" Padding="1" FontWeight="Bold"/>
+                    </StackPanel>
+
+                </StackPanel>
+            </Popup>
+
+
             <GridSplitter Background="#FF575757" Width="2" Margin="1,1,1,1" Grid.RowSpan="2" Grid.Column="0"/>
             <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
                 <GridSplitter />

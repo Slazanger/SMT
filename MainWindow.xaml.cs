@@ -193,7 +193,7 @@ namespace SMT
         }
 
 
-        void ShapeMouseHandler(object sender, MouseButtonEventArgs e)
+        void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
         {
             Shape obj = sender as Shape;
             EVEData.RegionData currentRegion = RegionDropDown.SelectedItem as EVEData.RegionData;
@@ -232,6 +232,30 @@ namespace SMT
                 cm.IsOpen = true;
             }
         }
+
+        void ShapeMouseOverHandler(object sender, MouseEventArgs e)
+        {
+            Shape obj = sender as Shape;
+            EVEData.RegionData currentRegion = RegionDropDown.SelectedItem as EVEData.RegionData;
+
+            EVEData.System selectedSys = obj.DataContext as EVEData.System;
+            if(obj.IsMouseOver && MapConf.ShowSystemPopup)
+            {
+                SystemInfoPopup.PlacementTarget = obj;
+                SystemInfoPopup.VerticalOffset = 5;
+                SystemInfoPopup.HorizontalOffset = 15;
+                SystemInfoPopup.DataContext = selectedSys;
+
+                SystemInfoPopup.IsOpen = true;
+            }
+            else
+            {
+                SystemInfoPopup.IsOpen = false;
+
+            }
+        }
+
+
 
         private void SelectSystem(string name)
         {
@@ -558,7 +582,10 @@ namespace SMT
                 }
 
                 systemShape.DataContext = sys;
-                systemShape.MouseDown += ShapeMouseHandler;
+                systemShape.MouseDown += ShapeMouseDownHandler;
+                systemShape.MouseEnter += ShapeMouseOverHandler;
+                systemShape.MouseLeave += ShapeMouseOverHandler;
+
 
 
                 Canvas.SetLeft(systemShape, sys.DotlanX - circleOffset);

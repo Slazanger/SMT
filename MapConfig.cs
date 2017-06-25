@@ -88,6 +88,12 @@ namespace SMT
         [DisplayName("Selected System")]
         public Color SelectedSystemColour { get; set; }
 
+        [Category("General")]
+        [DisplayName("System Popup")]
+        public bool ShowSystemPopup { get; set; }
+
+
+
         [Category("Character")]
         [DisplayName("Highlight")]
         public Color CharacterHighlightColour { get; set; }
@@ -246,7 +252,7 @@ namespace SMT
             ConstellationGateColour = Color.FromRgb(128, 128, 128);
 
             SelectedSystemColour = Color.FromRgb(255, 255, 255);
-
+            ShowSystemPopup = true;
 
             CharacterHighlightColour = Color.FromRgb(70, 130, 180);
             CharacterTextColour = Color.FromRgb(0, 0, 0);
