@@ -254,7 +254,7 @@ namespace SMT
             greyAndRed.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
             greyAndRed.MapBackgroundColour = Color.FromRgb(245, 245, 245);
             greyAndRed.ESIOverlayColour = Color.FromRgb(192, 192, 192);
-            greyAndRed.IntelOverlayColour = Color.FromRgb(178, 34, 34);
+            greyAndRed.IntelOverlayColour = Color.FromRgb(80, 34, 34);
             greyAndRed.NormalGateColour = Color.FromRgb(80, 80, 80);
             greyAndRed.ConstellationGateColour = Color.FromRgb(120, 120, 120);
             greyAndRed.SelectedSystemColour = Color.FromRgb(0, 0, 0);
@@ -263,6 +263,30 @@ namespace SMT
             greyAndRed.CharacterTextSize = 8;
             greyAndRed.SystemTextSize = 12;
             MapColours.Add(greyAndRed);
+
+
+            MapColours dark = new MapColours();
+            dark.Name = "Dark";
+            dark.UserEditable = false;
+            dark.FriendlyJumpBridgeColour = Color.FromRgb(46, 139, 87);
+            dark.HostileJumpBridgeColour = Color.FromRgb(178, 34, 34);
+            dark.SystemOutlineColour = Color.FromRgb(0, 0, 0);
+            dark.InRegionSystemColour = Color.FromRgb(112, 128, 144);
+            dark.InRegionSystemTextColour = Color.FromRgb(128, 128, 128);
+            dark.OutRegionSystemColour = Color.FromRgb(224, 255, 255);
+            dark.OutRegionSystemTextColour = Color.FromRgb(128, 128, 128);
+            dark.MapBackgroundColour = Color.FromRgb(20, 20, 20);
+            dark.ESIOverlayColour = Color.FromRgb(209, 201, 202);
+            dark.IntelOverlayColour = Color.FromRgb(205, 92, 92);
+            dark.NormalGateColour = Color.FromRgb(192, 192, 192);
+            dark.ConstellationGateColour = Color.FromRgb(150, 150, 150);
+            dark.SelectedSystemColour = Color.FromRgb(255, 255, 255);
+            dark.CharacterHighlightColour = Color.FromRgb(255, 255, 255);
+            dark.CharacterTextColour = Color.FromRgb(255, 255, 255);
+            dark.CharacterTextSize = 8;
+            dark.SystemTextSize = 12;
+            MapColours.Add(dark);
+
 
 
             ActiveColourScheme = blueColours;
