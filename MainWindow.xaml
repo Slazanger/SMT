@@ -7,6 +7,7 @@
         xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
         xmlns:local="clr-namespace:SMT"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
         Title="SMT" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
 
@@ -32,7 +33,7 @@
             <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click"/>
             <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click"/>
         </ContextMenu>
-        
+
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -61,21 +62,103 @@
         </DockPanel>
 
         <Grid x:Name="MainContent" Grid.Row="1" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="390"/>
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
 
+            <xcad:DockingManager x:Name="dockManager" Grid.Row="0">
+                <xcad:LayoutRoot>
+                    <xcad:LayoutPanel Orientation="Horizontal">
+                        <xcad:LayoutDocumentPane>
+                            <xcad:LayoutAnchorable Title="Map" CanClose="False" CanAutoHide="False" CanFloat="False" CanHide="False">
+                                <Grid x:Name="MainCanvasGrid" ClipToBounds="True">
+                                    <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
+                                        <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800"  />
+                                    </Viewbox>
+                                </Grid>
+                            </xcad:LayoutAnchorable>
+                        </xcad:LayoutDocumentPane>
+
+
+                        <xcad:LayoutAnchorablePaneGroup DockWidth="250" Orientation="Vertical">
+
+                            <xcad:LayoutAnchorablePane>
+                                <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="False" CanHide="False">
+
+                                    <Grid Background="#FFE5E5E5">
+                                        <ListBox x:Name="RawIntelBox" Margin="0,2">
+
+
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+
+                                        </ListBox>
+                                    </Grid>
+
+                                </xcad:LayoutAnchorable>
+                            </xcad:LayoutAnchorablePane>
+
+                                <xcad:LayoutAnchorablePane>
+                                    <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="False" CanHide="False">
+                                        <ScrollViewer Background="#FFE5E5E5">
+                                            <StackPanel >
+                                                <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
+                                                    <xctk:PropertyGrid.EditorDefinitions>
+                                                        <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
+                                                            <xctk:EditorTemplateDefinition.EditingTemplate>
+                                                                <DataTemplate>
+                                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}"/>
+                                                                </DataTemplate>
+                                                            </xctk:EditorTemplateDefinition.EditingTemplate>
+                                                        </xctk:EditorTemplateDefinition>
+                                                    </xctk:PropertyGrid.EditorDefinitions>
+
+                                                </xctk:PropertyGrid>
+
+                                                <StackPanel>
+                                                    <Separator />
+                                                    <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
+
+                                                </StackPanel>
+
+
+
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                    </xcad:LayoutAnchorable>
+
+                                    <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="False" CanHide="False">
+                                        <ScrollViewer Background="#FFE5E5E5">
+                                            <StackPanel>
+                                                <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
+                                                <Separator />
+                                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False"/>
+                                                <Separator />
+                                                <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                    </xcad:LayoutAnchorable>
+                                </xcad:LayoutAnchorablePane>
+                            </xcad:LayoutAnchorablePaneGroup>
+
+
+
+
+
+
+                    </xcad:LayoutPanel>
+                </xcad:LayoutRoot>
+            </xcad:DockingManager>
+
             <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="10,0,30,0" VerticalAlignment="Top" Grid.Row="1" FontSize="30" Panel.ZIndex="50" FontWeight="Bold"/>
-            <Grid x:Name="MainCanvasGrid" Grid.Row="0" Grid.Column="0 " Grid.RowSpan="2" ClipToBounds="True">
-                <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800"  />
-                </Viewbox>
-            </Grid>
 
             <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100">
                 <StackPanel Background="#FF959595">
@@ -103,73 +186,6 @@
 
                 </StackPanel>
             </Popup>
-
-
-            <GridSplitter Background="#FF575757" Width="2" Margin="1,1,1,1" Grid.RowSpan="2" Grid.Column="0"/>
-            <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
-                <GridSplitter />
-                <TabControl x:Name="tabControl" Margin="10,10,0,0">
-                    <TabItem Header="Intel">
-                        <Grid Background="#FFE5E5E5">
-                            <ListBox x:Name="RawIntelBox" Margin="0,2">
-
-
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-
-                            </ListBox>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="Map Controls">
-                        <ScrollViewer Background="#FFE5E5E5">
-                            <StackPanel >
-                                
-
-                                <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
-                                    <xctk:PropertyGrid.EditorDefinitions>
-                                        <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
-                                            <xctk:EditorTemplateDefinition.EditingTemplate>
-                                                <DataTemplate>
-                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}"/>
-                                                </DataTemplate>
-                                            </xctk:EditorTemplateDefinition.EditingTemplate>
-                                        </xctk:EditorTemplateDefinition>
-                                    </xctk:PropertyGrid.EditorDefinitions>
-
-                                </xctk:PropertyGrid>
-
-                                <StackPanel>
-                                    <Separator />
-                                    <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
-
-                                </StackPanel>
-
-
-
-                            </StackPanel>
-                        </ScrollViewer>
-                    </TabItem>
-                    <TabItem Header="Map Colours">
-                        <ScrollViewer Background="#FFE5E5E5">
-                            <StackPanel>
-                                <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
-                                <Separator />
-                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False"/>
-                                <Separator />
-                                <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
-
-                            </StackPanel>
-
-
-                        </ScrollViewer>
-                    </TabItem>
-                </TabControl>
-            </Grid>
         </Grid>
     </Grid>
 </Window>
