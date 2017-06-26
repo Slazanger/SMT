@@ -108,7 +108,7 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="26"/>
                                             <RowDefinition Height="*"/>
-                                            <RowDefinition Height="26"/>
+                                            <RowDefinition Height="52"/>
                                         </Grid.RowDefinitions>
 
                                         <Label Content="{Binding SystemName}" Grid.Row="0"/>
@@ -119,8 +119,11 @@
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                        
-                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" Grid.Row="2"/>
+                                        <StackPanel Grid.Row="2">
+                                            <Button x:Name="btnClearAnomList" Content="Clear All" Grid.Row="2" Click="btnClearAnomList_Click"/>
+                                            <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click"/>
+
+                                        </StackPanel>
                                     </Grid>
 
                                 </xcad:LayoutAnchorable>

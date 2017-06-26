@@ -957,5 +957,18 @@ namespace SMT
             }
 
         }
+
+        private void btnClearAnomList_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.AnomData ad = MainAnomGrid.DataContext as EVEData.AnomData;
+            if (ad != null)
+            {
+                ad.Anoms.Clear();
+                AnomSigList.Items.Refresh();
+                AnomSigList.UpdateLayout();
+                CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
+            }
+
+        }
     }
 }

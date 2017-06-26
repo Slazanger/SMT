@@ -91,7 +91,8 @@ namespace SMT.EVEData
 
         public void UpdateFromPaste(string pastedText)
         {
-
+            bool validPaste = false;
+            List<string> itemsToKeep = new List<string>();
             string[] pastelines = pastedText.Split('\n');
             foreach (string Line in pastelines)
             {
@@ -101,12 +102,16 @@ namespace SMT.EVEData
                 {
                     if(words[1] == "Cosmic Signature" || words[1] == "Cosmic Anomaly")
                     {
+                        validPaste = true;
+
                         string SigID = words[0];
                         string SigType = words[2];
                         string SigName = words[3];
 
+                        itemsToKeep.Add(SigID);
+
                         // valid sig
-                        if(Anoms.Keys.Contains(SigID))
+                        if (Anoms.Keys.Contains(SigID))
                         {
                             // updating an existing one
                             Anom an = Anoms[SigID];
@@ -139,9 +144,24 @@ namespace SMT.EVEData
                     }
                 }
 
-                foreach( string Word in words)
-                {
+                
+            }
 
+            // if we had a valid paste dump any items we didnt reference, brute force scan and remove.. come back to this later..
+            if(validPaste)
+            {
+                List<string> toRemove = new List<string>();
+                foreach(string an in Anoms.Keys.ToList())
+                {
+                    if(!itemsToKeep.Contains(an))
+                    {
+                        toRemove.Add(an);
+                    }
+                }
+
+                foreach(string s in toRemove)
+                {
+                    Anoms.Remove(s);
                 }
             }
         }
