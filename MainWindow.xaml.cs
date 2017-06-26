@@ -848,6 +848,9 @@ namespace SMT
 
 
             MainContent.DataContext = RegionDropDown.SelectedItem;
+            MainAnomGrid.DataContext = null;
+            AnomSigList.ItemsSource = null;
+
             SystemDropDownAC.SelectedItem = null;
 
             List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList(); ;
