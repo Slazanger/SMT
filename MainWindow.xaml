@@ -67,7 +67,7 @@
                 <xcad:LayoutRoot>
                     <xcad:LayoutPanel Orientation="Horizontal">
                         <xcad:LayoutDocumentPane ShowHeader="False">
-                            <xcad:LayoutAnchorable Title="Map" CanClose="False" CanAutoHide="False" CanFloat="False" CanHide="False">
+                            <xcad:LayoutDocument Title="Map" CanClose="False" CanFloat="False" ContentId="MapContentID" >
                                 <Grid x:Name="MainCanvasGrid" ClipToBounds="True">
                                     <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
                                         <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800"  />
@@ -76,14 +76,14 @@
                                     <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold"/>
 
                                 </Grid>
-                            </xcad:LayoutAnchorable>
+                            </xcad:LayoutDocument>
                         </xcad:LayoutDocumentPane>
 
 
                         <xcad:LayoutAnchorablePaneGroup DockWidth="250" Orientation="Vertical">
 
                             <xcad:LayoutAnchorablePane>
-                                <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="False" CanHide="False">
+                                <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="IntelContentID">
 
                                     <Grid Background="#FFE5E5E5">
                                         <ListBox x:Name="RawIntelBox" Margin="0,2">
@@ -101,10 +101,34 @@
                                     </Grid>
 
                                 </xcad:LayoutAnchorable>
+
+                                <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="AnomsContentID">
+
+                                    <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="26"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="26"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Content="{Binding SystemName}" Grid.Row="0"/>
+                                        <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="SIG" Binding="{Binding Signature}"/>
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
+                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        
+                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" Grid.Row="2"/>
+                                    </Grid>
+
+                                </xcad:LayoutAnchorable>
+
                             </xcad:LayoutAnchorablePane>
 
                                 <xcad:LayoutAnchorablePane>
-                                    <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="False" CanHide="False">
+                                <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="MapControlsContentID">
                                         <ScrollViewer Background="#FFE5E5E5">
                                             <StackPanel >
                                                 <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
@@ -133,7 +157,7 @@
 
                                     </xcad:LayoutAnchorable>
 
-                                    <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="False" CanHide="False">
+                                <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="MapColoursContentID">
                                         <ScrollViewer Background="#FFE5E5E5">
                                             <StackPanel>
                                                 <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />

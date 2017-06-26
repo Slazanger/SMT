@@ -12,6 +12,7 @@ using System.Xml.Serialization;
 using System.Xml;
 using System.Windows.Media.Animation;
 using System.ComponentModel;
+using System.Windows.Data;
 
 namespace SMT
 {
@@ -26,6 +27,8 @@ namespace SMT
         /// </summary>
         public EVEData.EveManager EVEManager;
 
+
+        public EVEData.AnomManager ANOMManager;
 
         /// <summary>
         /// List of all systems
@@ -168,18 +171,79 @@ namespace SMT
                 }
             }
 
-//            ColourListDropdown.SelectedItem = selectedColours;
+
+            // load the dockmanager layout
+            string DockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
+            if (File.Exists(DockManagerLayoutName))
+            {
+                try
+                {
+                    Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                    using (var sr = new StreamReader(DockManagerLayoutName))
+                    {
+                        ls.Deserialize(sr);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+
+            // load the anom data
+            string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
+            if(File.Exists(anomDataFilename))
+            {
+                try
+                {
+                    XmlSerializer xms = new XmlSerializer(typeof(EVEData.AnomManager));
+
+                    FileStream fs = new FileStream(anomDataFilename, FileMode.Open);
+                    XmlReader xmlr = XmlReader.Create(fs);
+
+                    ANOMManager = (EVEData.AnomManager)xms.Deserialize(xmlr);
+
+                }
+
+                catch
+                {
+                    ANOMManager = new EVEData.AnomManager();
+                }
+
+            }
+            else
+            {
+                ANOMManager = new EVEData.AnomManager();
+            }
+
+
+
+
+            // ColourListDropdown.SelectedItem = selectedColours;
             ColoursPropertyGrid.SelectedObject = selectedColours;
             MapConf.ActiveColourScheme = selectedColours;
             ColoursPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
-
-
             ReDrawMap();
+
+            Closed += MainWindow_Closed;
         }
 
-
-        ~MainWindow()
+        private void MainWindow_Closed(object sender, EventArgs e)
         {
+            // save off the dockmanager layout
+            string DockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
+            try
+            {
+                Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                using (var sw = new StreamWriter(DockManagerLayoutName))
+                {
+                    ls.Serialize(sw);
+                }
+            }
+            catch
+            {
+            }
+
 
             // Save the Map Colours
             string MapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
@@ -190,6 +254,22 @@ namespace SMT
             {
                 xms.Serialize(tw, MapConf);
             }
+
+
+            // save the Anom Data
+            // now serialise the class to disk
+            XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
+            string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
+
+
+            using (TextWriter tw = new StreamWriter(anomDataFilename))
+            {
+                anomxms.Serialize(tw, ANOMManager);
+            }
+        }
+
+        ~MainWindow()
+        {
 
         }
 
@@ -302,6 +382,12 @@ namespace SMT
                     break;
                 }
             }
+
+            // now setup the anom data
+
+            EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
+            MainAnomGrid.DataContext = system;
+            AnomSigList.ItemsSource = system.Anoms.Values;
         }
 
         private void AddHighlightToSystem(string name)
@@ -850,6 +936,25 @@ namespace SMT
             ColoursPropertyGrid.Update();
 
             MapConf.DefaultColourSchemeName = newSelection.Name;
+
+        }
+
+        private void btnUpdateAnomList_Click(object sender, RoutedEventArgs e)
+        {
+            string pasteData = Clipboard.GetText();
+
+            if(pasteData != null || pasteData != "")
+            {
+                EVEData.AnomData ad = MainAnomGrid.DataContext as EVEData.AnomData;
+
+                if(ad != null)
+                {
+                    ad.UpdateFromPaste(pasteData);
+                    AnomSigList.Items.Refresh();
+                    AnomSigList.UpdateLayout();
+                    CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
+                }
+            }
 
         }
     }

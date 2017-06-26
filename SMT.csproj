@@ -106,6 +106,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EVEData\Anoms.cs" />
     <Compile Include="EVEData\Character.cs" />
     <Compile Include="EVEData\IntelData.cs" />
     <Compile Include="EVEData\JumpBridge.cs" />
