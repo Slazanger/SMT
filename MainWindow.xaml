@@ -43,7 +43,10 @@
 
         <DockPanel Panel.ZIndex="60">
             <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Left">
-                <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" Visibility="Collapsed" />
+                <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" DropDownClosed="CharacterDropDown_DropDownClosed"  />
+                <CheckBox x:Name="FollowCharacters" Content="Follow?" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                
+                
                 <ComboBox x:Name="RegionDropDown"  Width="150"  SelectionChanged="OnRegionSelectionChanged" Margin="5,0" FontSize="12"/>
                 <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" SelectionChanged="SystemDropDownAC_SelectionChanged" FontSize="12">
                     <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
@@ -113,8 +116,25 @@
 
                                         <Label Content="{Binding SystemName}" Grid.Row="0"/>
                                         <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False">
+
+                                            <DataGrid.RowStyle>
+                                                <Style TargetType="DataGridRow">
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Type}" Value="Unknown">
+                                                            <Setter Property="Background" Value="Red"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding State}" Value="State2">
+                                                            <Setter Property="Background" Value="Green"></Setter>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGrid.RowStyle>
+                                            
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="SIG" Binding="{Binding Signature}"/>
+
+
                                                 <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                                             </DataGrid.Columns>

@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Collections.ObjectModel;
 
 namespace SMT.EVEData
 {
@@ -38,7 +39,7 @@ namespace SMT.EVEData
         public string DataCacheFolder;
 
         [XmlIgnoreAttribute]
-        public List<Character> LocalCharacters;
+        public ObservableCollection<Character> LocalCharacters;
 
 
         #region JumpBridges
@@ -281,7 +282,11 @@ namespace SMT.EVEData
                                 }
                                 if (AddChar)
                                 {
-                                    LocalCharacters.Add(new EVEData.Character(CharacterName, ChangedFile, System));
+                                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                                    {
+                                        LocalCharacters.Add(new EVEData.Character(CharacterName, ChangedFile, System));
+                                    }));
+
                                 }
 
                                 break;
@@ -843,7 +848,7 @@ namespace SMT.EVEData
 
         public EveManager()
         {
-            LocalCharacters = new List<Character>();
+            LocalCharacters = new ObservableCollection<Character>();
         }
     }
 }

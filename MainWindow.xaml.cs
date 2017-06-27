@@ -293,6 +293,12 @@ namespace SMT
 
         void ReDrawMap()
         {
+            if(CharacterDropDown.SelectedItem != null && FollowCharacters.IsChecked == true)
+            {
+                HandleCharacterSelectionChange();
+            }
+
+
             MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
             MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
 
@@ -369,6 +375,7 @@ namespace SMT
         private void SelectSystem(string name)
         {
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+
             
             foreach (EVEData.System es in rd.Systems.Values.ToList() )
             {
@@ -857,6 +864,19 @@ namespace SMT
             SystemDropDownAC.ItemsSource = newList;
         }
 
+        private void SelectRegion(string RegionName)
+        {
+            foreach (EVEData.RegionData rd in EVEManager.Regions)
+            {
+                if (rd.Name == RegionName)
+                {
+                    RegionDropDown.SelectedItem = rd;
+                    List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList(); ;
+                    SystemDropDownAC.ItemsSource = newList;
+                }
+            }
+        }
+
 
         
         private void refreshData_Click(object sender, RoutedEventArgs e)
@@ -874,11 +894,9 @@ namespace SMT
                 SelectedSystem = sd.Name;
                 // string SystemName = object
 
-                MainCanvas.Children.Clear();
-                AddSystemsToMap();
-                AddHighlightToSystem(sd.Name);
-
                 MainContent.DataContext = RegionDropDown.SelectedItem;
+
+                ReDrawMap();
 
             }
 
@@ -903,10 +921,37 @@ namespace SMT
 
         }
 
-        private void CharacterDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void HandleCharacterSelectionChange()
         {
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+
+            if (c != null)
+            {
+                EVEData.System s = EVEManager.GetEveSystem(c.Location);
+                if (s != null)
+                {
+                    if (s.Region != rd.Name)
+                    {
+                        // change region
+                        SelectRegion(s.Region);
+                    }
+                    SelectSystem(c.Location);
+
+                }
+            }
 
         }
+        private void CharacterDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            HandleCharacterSelectionChange();
+        }
+
+        private void CharacterDropDown_DropDownClosed(object sender, EventArgs e)
+        {
+            HandleCharacterSelectionChange();
+        }
+
 
         private void ResetColourData_Click(object sender, RoutedEventArgs e)
         {
@@ -973,5 +1018,6 @@ namespace SMT
             }
 
         }
+
     }
 }
