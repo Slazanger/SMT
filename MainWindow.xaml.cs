@@ -293,7 +293,7 @@ namespace SMT
 
         void ReDrawMap()
         {
-            if(CharacterDropDown.SelectedItem != null && FollowCharacters.IsChecked == true)
+            if(CharacterDropDown.SelectedItem != null)
             {
                 HandleCharacterSelectionChange();
             }
@@ -319,6 +319,15 @@ namespace SMT
             {
                 if (e.ClickCount == 1)
                 {
+                    EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+                    if(c != null)
+                    {
+                        if(selectedSys.Name != c.Location )
+                        {
+                            CharacterDropDown.SelectedItem = null;
+                        }
+                    }
+
                     ReDrawMap();
                     SelectSystem(selectedSys.Name);
                 }
@@ -848,6 +857,9 @@ namespace SMT
 
         private void OnRegionSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // clear the character selection
+            CharacterDropDown.SelectedItem = null;
+
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
 
             ReDrawMap();
@@ -887,6 +899,10 @@ namespace SMT
 
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // clear the character selection
+            CharacterDropDown.SelectedItem = null;
+
+
             EVEData.System sd = SystemDropDownAC.SelectedItem as EVEData.System;
 
             if (sd != null)
@@ -938,6 +954,7 @@ namespace SMT
                     }
                     SelectSystem(c.Location);
 
+                    CharacterDropDown.SelectedItem = c;
                 }
             }
 

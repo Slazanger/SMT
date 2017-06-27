@@ -37,24 +37,22 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="26"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <DockPanel Panel.ZIndex="60">
-            <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Left">
-                <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" DropDownClosed="CharacterDropDown_DropDownClosed"  />
-                <CheckBox x:Name="FollowCharacters" Content="Follow?" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,20,0"/>
-                
-                
+            <StackPanel Margin="4,2,1,2"  Orientation="Horizontal" HorizontalAlignment="Left">
                 <ComboBox x:Name="RegionDropDown"  Width="150"  SelectionChanged="OnRegionSelectionChanged" Margin="5,0" FontSize="12"/>
-                <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" SelectionChanged="SystemDropDownAC_SelectionChanged" FontSize="12">
+                <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" SelectionChanged="SystemDropDownAC_SelectionChanged" FontSize="12" Margin="5,0">
                     <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel />
                         </ItemsPanelTemplate>
                     </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                 </dotNetKitControls:AutoCompleteComboBox>
+                <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" DropDownClosed="CharacterDropDown_DropDownClosed"  />
+
             </StackPanel>
             <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="btnHelp" Click="btnHelp_Click">
@@ -87,11 +85,8 @@
 
                             <xcad:LayoutAnchorablePane>
                                 <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="IntelContentID">
-
                                     <Grid Background="#FFE5E5E5">
                                         <ListBox x:Name="RawIntelBox" Margin="0,2">
-
-
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <Grid>
@@ -99,22 +94,23 @@
                                                     </Grid>
                                                 </DataTemplate>
                                             </ListBox.ItemTemplate>
-
                                         </ListBox>
                                     </Grid>
-
                                 </xcad:LayoutAnchorable>
 
+                                
                                 <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="AnomsContentID">
-
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="26"/>
+                                            <RowDefinition Height="60"/>
                                             <RowDefinition Height="*"/>
-                                            <RowDefinition Height="52"/>
+                                            <RowDefinition Height="26"/>
                                         </Grid.RowDefinitions>
+                                        <StackPanel Grid.Row="0">
+                                            <Button x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click"/>
+                                            <Label Content="{Binding SystemName}" FontSize="18" FontWeight="Bold" />
+                                        </StackPanel>
 
-                                        <Label Content="{Binding SystemName}" Grid.Row="0"/>
                                         <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False">
 
                                             <DataGrid.RowStyle>
@@ -140,9 +136,7 @@
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Grid.Row="2">
-                                            <Button x:Name="btnClearAnomList" Content="Clear All" Grid.Row="2" Click="btnClearAnomList_Click"/>
                                             <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click"/>
-
                                         </StackPanel>
                                     </Grid>
 

@@ -63,7 +63,7 @@ namespace SMT.EVEData
             {
                 return AnomType.Data;
             }
-            else if (text == "Worm Hole")
+            else if (text == "Wormhole")
             {
                 return AnomType.WormHole;
             }
