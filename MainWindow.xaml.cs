@@ -905,15 +905,11 @@ namespace SMT
 
             EVEData.System sd = SystemDropDownAC.SelectedItem as EVEData.System;
 
+
             if (sd != null)
             {
-                SelectedSystem = sd.Name;
-                // string SystemName = object
-
-                MainContent.DataContext = RegionDropDown.SelectedItem;
-
+                SelectSystem(sd.Name);
                 ReDrawMap();
-
             }
 
         }

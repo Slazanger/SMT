@@ -646,7 +646,7 @@ namespace SMT.EVEData
 
 
                 // now serialise the class to disk
-                XmlSerializer xms = new XmlSerializer(typeof(EveManager));
+            XmlSerializer xms = new XmlSerializer(typeof(EveManager));
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\RegionInfo.dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
