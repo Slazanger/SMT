@@ -13,6 +13,14 @@ namespace SMT.EVEData
 
         public string Location { get; set; }
 
+        public bool ESILinked { get; set; }
+
+        public string ESIAuthCode { get; set; }
+
+        public string  ESIAccessToken { get; set; }
+
+        public string ESIRefreshToken { get; set; }
+
         public override string ToString()
         {
             return Name;
@@ -27,6 +35,11 @@ namespace SMT.EVEData
             Name = name;
             LocalChatFile = lcf;
             Location = location;
+
+            ESILinked = false;
+            ESIAuthCode = "";
+            ESIAccessToken = "";
+            ESIRefreshToken = "";
         }
 
     }

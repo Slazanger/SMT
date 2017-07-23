@@ -37,6 +37,9 @@
   <PropertyGroup>
     <ApplicationIcon>smt_icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetKit.Wpf.AutoCompleteComboBox, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DotNetKit.Wpf.AutoCompleteComboBox.1.2.0\lib\net45\DotNetKit.Wpf.AutoCompleteComboBox.dll</HintPath>
@@ -49,6 +52,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -108,6 +113,7 @@
     </Compile>
     <Compile Include="EVEData\Anoms.cs" />
     <Compile Include="EVEData\Character.cs" />
+    <Compile Include="EVEData\ESIHandler.cs" />
     <Compile Include="EVEData\IntelData.cs" />
     <Compile Include="EVEData\JumpBridge.cs" />
     <Compile Include="EVEData\Link.cs" />
@@ -141,6 +147,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

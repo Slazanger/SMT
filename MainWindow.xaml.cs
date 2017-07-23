@@ -1032,5 +1032,9 @@ namespace SMT
 
         }
 
+        private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.InitiateESILogon();
+        }
     }
 }

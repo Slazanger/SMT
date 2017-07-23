@@ -186,7 +186,18 @@
                                         </ScrollViewer>
 
                                     </xcad:LayoutAnchorable>
-                                </xcad:LayoutAnchorablePane>
+
+
+                                <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="CharactersContentID">
+                                    <ScrollViewer Background="#FFE5E5E5">
+                                        <StackPanel>
+                                            <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character"/>
+                                        </StackPanel>
+                                    </ScrollViewer>
+
+                                </xcad:LayoutAnchorable>
+
+                            </xcad:LayoutAnchorablePane>
                             </xcad:LayoutAnchorablePaneGroup>
 
 

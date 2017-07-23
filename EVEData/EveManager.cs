@@ -11,6 +11,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
+using System.Web;
+using System.Diagnostics;
 
 namespace SMT.EVEData
 {
@@ -379,6 +382,7 @@ namespace SMT.EVEData
         #endregion
 
 
+        #region Dotlan Init Stuff
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotland
         /// </summary>
@@ -655,8 +659,8 @@ namespace SMT.EVEData
             }
         }
 
+        #endregion
 
- 
 
 
         /// <summary>
@@ -701,6 +705,56 @@ namespace SMT.EVEData
 
 
         #region ESI Data
+
+
+        public void RegisterESIProtocolHandler()
+        {
+            string ProtocolURL = "eveauth-smt";
+
+            string ProtocolURLHandler = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
+
+            if (Debugger.IsAttached)
+            {
+                // strip out the vshost bit for registration otherwise its impossible to debug the callbacks
+                ProtocolURLHandler = AppDomain.CurrentDomain.BaseDirectory + "SMT.exe";
+            }
+
+
+            RegistryKey ProtocolRoot = Registry.ClassesRoot.CreateSubKey(ProtocolURL);
+            ProtocolRoot.SetValue("", "URL:Eve Online SMT Auth Protocol");
+            ProtocolRoot.SetValue("URL Protocol", "");
+
+            RegistryKey DefaultIcon = ProtocolRoot.CreateSubKey("DefaultIcon");
+            DefaultIcon.SetValue("", ProtocolURLHandler+",0");
+
+            RegistryKey Shell = ProtocolRoot.CreateSubKey("Shell");
+            RegistryKey Open = Shell.CreateSubKey("Open");
+            RegistryKey Command = Open.CreateSubKey("Command");
+            Command.SetValue("", "\"" + ProtocolURLHandler +  "\" \"%1\"");
+
+        }
+
+
+        public void InitiateESILogon()
+        {
+            UriBuilder esiLogonBuilder = new UriBuilder("https://login.eveonline.com/oauth/authorize/");
+
+            var esiQuery = HttpUtility.ParseQueryString(esiLogonBuilder.Query);
+            esiQuery["response_type"] = "code";
+            esiQuery["client_id"] = "ace68fde71fc4749bb27f33e8aad0b70";
+            esiQuery["redirect_uri"] = @"eveauth-smt://callback";
+            esiQuery["scode"] = "publicData characterLocationRead characterNavigationWrite remoteClientUI";
+            esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
+
+            esiLogonBuilder.Query = esiQuery.ToString();
+            Process.Start(esiLogonBuilder.ToString());
+
+
+        }
+
+
+
+
 
         /// <summary>
         /// Start the ESI download for the kill info
@@ -849,6 +903,10 @@ namespace SMT.EVEData
         public EveManager()
         {
             LocalCharacters = new ObservableCollection<Character>();
+
+            // Ensure we have the protocol's registered
+            RegisterESIProtocolHandler();
+            ESIURIHandler.Register();
         }
     }
 }
