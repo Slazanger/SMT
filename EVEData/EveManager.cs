@@ -748,13 +748,10 @@ namespace SMT.EVEData
 
             esiLogonBuilder.Query = esiQuery.ToString();
             Process.Start(esiLogonBuilder.ToString());
-
-
         }
 
 
-
-
+        
 
         /// <summary>
         /// Start the ESI download for the kill info
@@ -906,7 +903,7 @@ namespace SMT.EVEData
 
             // Ensure we have the protocol's registered
             RegisterESIProtocolHandler();
-            ESIURIHandler.Register();
+            ESIAuthURIHandler.Register();
         }
     }
 }

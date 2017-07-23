@@ -32,7 +32,7 @@ namespace SMT
                     {
                     }
 
-                    EVEData.IUriHandler handler = EVEData.ESIURIHandler.GetHandler();
+                    EVEData.IUriHandler handler = EVEData.ESIAuthURIHandler.GetHandler();
                     if (handler != null && uri !=null)
                     {
                         handler.HandleUri(uri);
