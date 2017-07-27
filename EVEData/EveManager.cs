@@ -14,11 +14,34 @@ using System.Collections.ObjectModel;
 using Microsoft.Win32;
 using System.Web;
 using System.Diagnostics;
+using System.Text;
 
 namespace SMT.EVEData
 {
     public class EveManager
     {
+
+        static EveManager s_Instance;
+
+        public static void SetInstance(EveManager instance)
+        {
+                s_Instance = instance;
+        }
+
+
+
+        public static EveManager GetInstance()
+        {
+            if (s_Instance == null)
+            {
+                s_Instance = new EveManager();
+            }
+
+            return s_Instance;
+        }
+
+
+
         /// <summary>
         /// Master List of Regions
         /// </summary>
@@ -707,35 +730,8 @@ namespace SMT.EVEData
         #region ESI Data
 
 
-        public void RegisterESIProtocolHandler()
-        {
-            string ProtocolURL = "eveauth-smt";
 
-            string ProtocolURLHandler = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
-
-            if (Debugger.IsAttached)
-            {
-                // strip out the vshost bit for registration otherwise its impossible to debug the callbacks
-                ProtocolURLHandler = AppDomain.CurrentDomain.BaseDirectory + "SMT.exe";
-            }
-
-
-            RegistryKey ProtocolRoot = Registry.ClassesRoot.CreateSubKey(ProtocolURL);
-            ProtocolRoot.SetValue("", "URL:Eve Online SMT Auth Protocol");
-            ProtocolRoot.SetValue("URL Protocol", "");
-
-            RegistryKey DefaultIcon = ProtocolRoot.CreateSubKey("DefaultIcon");
-            DefaultIcon.SetValue("", ProtocolURLHandler+",0");
-
-            RegistryKey Shell = ProtocolRoot.CreateSubKey("Shell");
-            RegistryKey Open = Shell.CreateSubKey("Open");
-            RegistryKey Command = Open.CreateSubKey("Command");
-            Command.SetValue("", "\"" + ProtocolURLHandler +  "\" \"%1\"");
-
-        }
-
-
-        public void InitiateESILogon()
+        public string GetESILogonURL()
         {
             UriBuilder esiLogonBuilder = new UriBuilder("https://login.eveonline.com/oauth/authorize/");
 
@@ -747,11 +743,96 @@ namespace SMT.EVEData
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
 
             esiLogonBuilder.Query = esiQuery.ToString();
-            Process.Start(esiLogonBuilder.ToString());
+            // old way... Process.Start();
+
+            return esiLogonBuilder.ToString();
+
+
+        }
+
+        public bool HandleEveAuthSMTUri(Uri uri)
+        {
+            // parse the uri
+            var Query = HttpUtility.ParseQueryString(uri.Query);
+
+            if (Query["state"] == null || Int32.Parse(Query["state"]) != Process.GetCurrentProcess().Id)
+            {
+                // this query isnt for us..
+                return false;
+            }
+
+            if (Query["code"] == null)
+            {
+                // we're missing a query code
+                return false;
+            }
+
+
+            // now we have the initial uri call back we can verify the auth code
+
+            string url = @"https://login.eveonline.com/oauth/token";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Post;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            string code = Query["code"];
+            string clientID = "ace68fde71fc4749bb27f33e8aad0b70";
+            string secretKey = "kT7fsRg8WiRb9lujedQVyKEPgaJr40hevUdTdKaF";
+            string authHeader = clientID + ":" + secretKey;
+            string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
+
+            request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
+
+            var httpData = HttpUtility.ParseQueryString(string.Empty); ;
+            httpData["grant_type"] = "authorization_code";
+            httpData["code"] = code;
+
+            string httpDataStr = httpData.ToString();
+            byte[] data = UTF8Encoding.UTF8.GetBytes(httpDataStr);
+            request.ContentLength = data.Length;
+            request.ContentType = "application/x-www-form-urlencoded";
+
+            var stream = request.GetRequestStream();
+            stream.Write(data, 0, data.Length);
+
+
+
+
+
+
+            request.BeginGetResponse(new AsyncCallback(ESIValidateAuthCodeCallback), request);
+
+
+
+
+
+            return true;
+        }
+
+        private void ESIValidateAuthCodeCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        //Need to return this response 
+                        string strContent = sr.ReadToEnd();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                /// ....
+            }
         }
 
 
-        
 
         /// <summary>
         /// Start the ESI download for the kill info
@@ -902,8 +983,8 @@ namespace SMT.EVEData
             LocalCharacters = new ObservableCollection<Character>();
 
             // Ensure we have the protocol's registered
-            RegisterESIProtocolHandler();
-            ESIAuthURIHandler.Register();
+//            RegisterESIProtocolHandler();
+//            ESIAuthURIHandler.Register();
         }
     }
 }

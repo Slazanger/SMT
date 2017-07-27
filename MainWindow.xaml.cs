@@ -14,6 +14,7 @@ using System.Windows.Media.Animation;
 using System.ComponentModel;
 using System.Windows.Data;
 
+
 namespace SMT
 {
     /// <summary>
@@ -105,10 +106,10 @@ namespace SMT
 
 
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromDotlan = false;
+            bool initFromDotlan = true;
             if(initFromDotlan)
             {
-                EVEManager = new EVEData.EveManager();
+                EVEManager = EVEData.EveManager.GetInstance();
                 EVEManager.InitFromDotLAN();
             }
             else
@@ -120,6 +121,7 @@ namespace SMT
                 XmlReader xmlr = XmlReader.Create(fs);
 
                 EVEManager = (EVEData.EveManager)xms.Deserialize(xmlr);
+                EVEData.EveManager.SetInstance(EVEManager);
             }
 
             RegionDropDown.ItemsSource = EVEManager.Regions;
@@ -226,6 +228,11 @@ namespace SMT
             ReDrawMap();
 
             Closed += MainWindow_Closed;
+
+
+            // hack bind the handler
+            LogonWindow.InitCef();
+
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -1034,7 +1041,11 @@ namespace SMT
 
         private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
         {
-            EVEManager.InitiateESILogon();
+            string ESILogonURL = EVEManager.GetESILogonURL();
+
+            LogonWindow LogonBrowserWindow = new LogonWindow();
+            LogonBrowserWindow.logonBrowser.Address = ESILogonURL;
+            LogonBrowserWindow.ShowDialog();
         }
     }
 }
