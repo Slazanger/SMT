@@ -739,7 +739,8 @@ namespace SMT.EVEData
             esiQuery["response_type"] = "code";
             esiQuery["client_id"] = "ace68fde71fc4749bb27f33e8aad0b70";
             esiQuery["redirect_uri"] = @"eveauth-smt://callback";
-            esiQuery["scode"] = "publicData characterLocationRead characterNavigationWrite remoteClientUI";
+            esiQuery["scope"] = "publicData characterLocationRead characterNavigationWrite remoteClientUI esi-location.read_ship_type.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1";
+
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
 
             esiLogonBuilder.Query = esiQuery.ToString();
@@ -798,18 +799,16 @@ namespace SMT.EVEData
             stream.Write(data, 0, data.Length);
 
 
-
-
-
-
             request.BeginGetResponse(new AsyncCallback(ESIValidateAuthCodeCallback), request);
-
-
-
-
 
             return true;
         }
+
+        // since we dont know what character these tokens belong too until we check just store them..
+        private string PendingAccessToken;
+        private string PendingTokenType;
+        private string PendingExpiresIn;
+        private string PendingRefreshToken;
 
         private void ESIValidateAuthCodeCallback(IAsyncResult asyncResult)
         {
@@ -823,14 +822,72 @@ namespace SMT.EVEData
                     {
                         //Need to return this response 
                         string strContent = sr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                PendingAccessToken = obj["access_token"].ToString();
+                                PendingTokenType = obj["token_type"].ToString();
+                                PendingExpiresIn = obj["expires_in"].ToString();
+                                PendingRefreshToken = obj["refresh_token"].ToString();
+
+                                // now requests the character information
+
+                                string url = @"https://login.eveonline.com/oauth/verify";
+                                HttpWebRequest verifyRequest = (HttpWebRequest)WebRequest.Create(url);
+                                verifyRequest.ContentType = 
+                                verifyRequest.Method = WebRequestMethods.Http.Get;
+                                verifyRequest.Timeout = 20000;
+                                verifyRequest.Proxy = null;
+                                string authHeader = "Bearer " + PendingAccessToken;
+
+                                verifyRequest.Headers[HttpRequestHeader.Authorization] = authHeader;
+
+
+                                verifyRequest.BeginGetResponse(new AsyncCallback(ESIVerifyAccessCodeCallback), verifyRequest);
+
+
+
+
+
+                            }
+                        }
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 /// ....
             }
         }
+        private void ESIVerifyAccessCodeCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+
+                    Stream verifyStream = response.GetResponseStream();
+                    using (StreamReader srr = new StreamReader(verifyStream))
+                    {
+                        string verifyResult = srr.ReadToEnd();
+                    }
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                /// ....
+            }
+
+        }
+        
 
 
 

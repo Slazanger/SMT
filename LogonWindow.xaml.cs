@@ -89,12 +89,13 @@ namespace SMT
         {
             string smtauthURL = request.Url;
 
+            // issue the close after the esi auth event has finished
             Application.Current.Dispatcher.Invoke(() =>
             {
                 EVEData.EveManager.GetInstance().HandleEveAuthSMTUri(new Uri(smtauthURL));
                 ActiveLogonWindow.Close();
             });
-            return ResourceHandler.FromString("Please Close Window", ".html");
+            return null;
         }
     }
 }

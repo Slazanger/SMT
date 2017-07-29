@@ -106,7 +106,7 @@ namespace SMT
 
 
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromDotlan = true;
+            bool initFromDotlan = false;
             if(initFromDotlan)
             {
                 EVEManager = EVEData.EveManager.GetInstance();
