@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SMT"
-        xmlns:cefwpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
         mc:Ignorable="d"
         Title="Auth.." Height="600" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Grid>
@@ -13,6 +12,6 @@
             <RowDefinition Height="540"/>
         </Grid.RowDefinitions>
         <TextBox x:Name="URLName" Grid.Row="0" IsReadOnly="True" BorderThickness="2"/>
-        <cefwpf:ChromiumWebBrowser x:Name="logonBrowser" Grid.Row="1" />
+        <WebBrowser x:Name="logonBrowser" Grid.Row="1" Navigating="logonBrowser_Navigating"/>
     </Grid>
 </Window>

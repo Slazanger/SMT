@@ -915,7 +915,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 /// ....
             }
@@ -978,7 +978,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 /// ....
             }
@@ -1137,12 +1137,14 @@ namespace SMT.EVEData
                 // loop forever
                 while (true)
                 {
-                    foreach (Character c in LocalCharacters)
+
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
-                        c.Update();
-                    }
-
-
+                        foreach (Character c in LocalCharacters)
+                        {
+                            c.Update();
+                        }
+                    }));
                     Thread.Sleep(5000);
                 }
             }).Start();

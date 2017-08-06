@@ -1,5 +1,4 @@
-﻿using CefSharp;
-using System;
+﻿using System;
 using System.Windows;
 
 namespace SMT
@@ -10,36 +9,9 @@ namespace SMT
     public partial class LogonWindow : Window
     {
 
-        static EveAuthSMTSchemeFactory eveAuthSchemeHandlerFactory; 
-
-        static public void InitCef()
-        {
-            eveAuthSchemeHandlerFactory = new EveAuthSMTSchemeFactory();
-
-            // setup Cef
-            CefSettings settings = new CefSettings();
-            settings.RegisterScheme(new CefCustomScheme
-            {
-                SchemeName = EveAuthSMTSchemeFactory.SchemeName,
-                SchemeHandlerFactory = eveAuthSchemeHandlerFactory,
-            });
-
-            settings.CachePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache\\WebCache"; 
-
-            Cef.Initialize(settings);
-        }
-
-
         public LogonWindow()
         {
             InitializeComponent();
-
-            // stop the right click menus
-            logonBrowser.MenuHandler = new CustomMenuHandler();
-
-            // capture the current instance so we can close it on the call backs when needed
-            eveAuthSchemeHandlerFactory.ActiveLogonWindow = this;
-
         }
 
 
@@ -49,56 +21,22 @@ namespace SMT
         ~LogonWindow()
         {
         }
-    }
 
 
-    public class CustomMenuHandler : IContextMenuHandler
-    {
-        public void OnBeforeContextMenu(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model)
+        private void logonBrowser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
         {
-            model.Clear();
-        }
+            // Catch any custom auth schemes and pass onto the
 
-        public bool OnContextMenuCommand(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, CefMenuCommand commandId, CefEventFlags eventFlags)
-        {
-            return false;
-        }
-
-        public void OnContextMenuDismissed(IWebBrowser browserControl, IBrowser browser, IFrame frame)
-        {
-
-        }
-
-        public bool RunContextMenu(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model, IRunContextMenuCallback callback)
-        {
-            return false;
-        }
-    }
-
-
-
-
-
-    public class EveAuthSMTSchemeFactory : ISchemeHandlerFactory
-    {
-        public const string SchemeName = "eveauth-smt";
-
-        // hacky way to get back to the orig window so we can close it
-        public LogonWindow ActiveLogonWindow;
-
-
-
-        public IResourceHandler Create(IBrowser browser, IFrame frame, string schemeName, IRequest request)
-        {
-            string smtauthURL = request.Url;
-
-            // issue the close after the esi auth event has finished
-            Application.Current.Dispatcher.Invoke(() =>
+            string scheme = e.Uri.Scheme;
+            if(scheme == "eveauth-smt")
             {
-                EVEData.EveManager.GetInstance().HandleEveAuthSMTUri(new Uri(smtauthURL));
-                ActiveLogonWindow.Close();
-            });
-            return null;
+                // issue the close after the esi auth event has finished
+                EVEData.EveManager.GetInstance().HandleEveAuthSMTUri(new Uri(e.Uri.AbsoluteUri));
+                e.Cancel = true;
+                Close();
+
+            }
         }
     }
+
 }

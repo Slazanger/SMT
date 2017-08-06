@@ -109,7 +109,7 @@ namespace SMT
 
 
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromDotlan = false;
+            bool initFromDotlan = true;
             if(initFromDotlan)
             {
                 EVEManager = EVEData.EveManager.GetInstance();
@@ -231,10 +231,6 @@ namespace SMT
             ReDrawMap();
 
             Closed += MainWindow_Closed;
-
-
-            // hack bind the handler
-            LogonWindow.InitCef();
 
         }
 
@@ -1025,7 +1021,7 @@ namespace SMT
             string ESILogonURL = EVEManager.GetESILogonURL();
 
             LogonWindow LogonBrowserWindow = new LogonWindow();
-            LogonBrowserWindow.logonBrowser.Address = ESILogonURL;
+            LogonBrowserWindow.logonBrowser.Navigate(ESILogonURL);
 
 
             LogonBrowserWindow.URLName.Text = ESILogonURL;
