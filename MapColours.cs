@@ -94,7 +94,81 @@ namespace SMT
         [DisplayName("Overlay")]
         public Color IntelOverlayColour { get; set; }
 
+     
         
+        static public Color GetSecStatusColour(double SecStatus)
+        {
+            /*
+                #FF2FEFEF	1.0
+                #FF48F0C0	0.9
+                #FF00EF47	0.8
+                #FF00F000	0.7
+                #FF8FEF2F	0.6
+                #FFEFEF00	0.5
+                #FFD77700	0.4
+                #FFF06000	0.3
+                #FFF04800	0.2
+                #FFD73000	0.1
+                #FFF00000	0.0
+            */
+
+
+            Color secCol = (Color)ColorConverter.ConvertFromString("#FFF00000");
+
+            if (SecStatus > 0.1)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFD73000");
+            }
+
+            if (SecStatus > 0.2)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFF04800");
+            }
+
+            if (SecStatus > 0.3)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFF06000");
+            }
+
+            if (SecStatus > 0.4)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFD77700");
+            }
+
+            if (SecStatus > 0.5)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFEFEF00");
+            }
+
+            if (SecStatus > 0.6)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF8FEF2F");
+            }
+
+            if (SecStatus > 0.7)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF00F000");
+            }
+
+            if (SecStatus > 0.8)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF00EF47");
+            }
+
+            if (SecStatus > 0.9)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF48F0C0");
+            }
+
+            if (SecStatus > 0.99)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF2FEFEF");
+            }
+
+
+            return secCol;
+
+        }
 
     }
 }

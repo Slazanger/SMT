@@ -731,6 +731,20 @@ namespace SMT.EVEData
                         Console.WriteLine("Failed to Find System {0}", SystemName);
                     }
                 }
+
+                // patch up the out of region data
+                foreach (RegionData rr in Regions)
+                {
+                    foreach(System ss in rr.Systems.Values.ToList())
+                    {
+                        if(ss.Name!= rr.Name)
+                        {
+                            System actual = GetEveSystem(ss.Name);
+                            ss.Security = actual.Security;
+                        }
+                    }
+                }
+
             }
 
 

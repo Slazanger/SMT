@@ -54,6 +54,10 @@ namespace SMT
         public bool ShowSystemPopup { get; set; }
 
 
+        [Category("General")]
+        [DisplayName("Show Security")]
+        public bool ShowSystemSecurity { get; set; }
+
         [Category("ESI Data")]
         [DisplayName("ESI Scale")]
         public double ESIOverlayScale { get; set; }
@@ -167,6 +171,7 @@ namespace SMT
             ShowIntel = true;
             DefaultRegion = "Molden Heath";
             ShowSystemPopup = true;
+            ShowSystemSecurity = true;
 
             MapColours = new List<MapColours>();
         }

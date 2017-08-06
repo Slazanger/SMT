@@ -374,6 +374,13 @@ namespace SMT
             EVEData.RegionData currentRegion = RegionDropDown.SelectedItem as EVEData.RegionData;
 
             EVEData.System selectedSys = obj.DataContext as EVEData.System;
+
+            if(selectedSys.Region != currentRegion.Name)
+            {
+                // out of region, pull the data from the actual
+                selectedSys = EVEManager.GetEveSystem(selectedSys.Name);
+            }
+
             if(obj.IsMouseOver && MapConf.ShowSystemPopup)
             {
                 SystemInfoPopup.PlacementTarget = obj;
@@ -715,13 +722,22 @@ namespace SMT
 
                 if (OutofRegion)
                 {
-                    
+
                     systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
+
                 }
                 else
                 {
                     systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
                 }
+
+                // override with sec status colours
+                if (MapConf.ShowSystemSecurity)
+                {
+                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(sys.Security));
+
+                }
+
 
                 systemShape.DataContext = sys;
                 systemShape.MouseDown += ShapeMouseDownHandler;
@@ -758,6 +774,10 @@ namespace SMT
                 Canvas.SetZIndex(sysText, 20);
                 
                 MainCanvas.Children.Add(sysText);
+
+
+
+
 
 
                 int NPCKillsLastHour = sys.NPCKillsLastHour;
