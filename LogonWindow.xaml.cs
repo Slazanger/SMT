@@ -24,6 +24,8 @@ namespace SMT
                 SchemeHandlerFactory = eveAuthSchemeHandlerFactory,
             });
 
+            settings.CachePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache\\WebCache"; 
+
             Cef.Initialize(settings);
         }
 
@@ -35,6 +37,7 @@ namespace SMT
             // stop the right click menus
             logonBrowser.MenuHandler = new CustomMenuHandler();
 
+            // capture the current instance so we can close it on the call backs when needed
             eveAuthSchemeHandlerFactory.ActiveLogonWindow = this;
 
         }

@@ -21,6 +21,11 @@ namespace SMT.EVEData
     public class EveManager
     {
 
+        public const string CLIENT_ID = "ace68fde71fc4749bb27f33e8aad0b70";
+        public const string SECRET_KEY = "kT7fsRg8WiRb9lujedQVyKEPgaJr40hevUdTdKaF";
+
+
+
         static EveManager s_Instance;
 
         public static void SetInstance(EveManager instance)
@@ -64,8 +69,71 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public string DataCacheFolder;
 
+
+        #region Characters
         [XmlIgnoreAttribute]
         public ObservableCollection<Character> LocalCharacters;
+
+        public void LoadCharacters()
+        {
+            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
+            if(!File.Exists(dataFilename))
+            {
+                return;
+            }
+
+            try
+            {
+                ObservableCollection<Character> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
+
+                FileStream fs = new FileStream(dataFilename, FileMode.Open);
+                XmlReader xmlr = XmlReader.Create(fs);
+
+                loadList = (ObservableCollection<Character>)xms.Deserialize(xmlr);
+
+                foreach (Character c in loadList)
+                {
+                    c.ESIAccessToken = "";
+                    c.ESIAccessTokenExpiry = DateTime.MinValue;
+                    c.LocalChatFile = "";
+                    c.Location = "";
+
+                    c.Update();
+
+                    LocalCharacters.Add(c);
+                }
+            }
+            catch { }
+        }
+
+        public void SaveCharacters()
+        {
+            // save off only the ESI authenticated Characters so create a new copy to serialise from..
+
+            ObservableCollection<Character> saveList = new ObservableCollection<Character>();
+
+            foreach(Character c in LocalCharacters)
+            {
+                if(c.ESIRefreshToken != "")
+                {
+                    saveList.Add(c);
+                }
+            }
+
+            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
+            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
+
+            using (TextWriter tw = new StreamWriter(dataFilename))
+            {
+                xms.Serialize(tw, saveList);
+            }
+
+
+        }
+
+        #endregion
+
 
 
         #region JumpBridges
@@ -482,12 +550,6 @@ namespace SMT.EVEData
             SystemIDToName = new SerializableDictionary<string, string>();
 
             // create folder cache
-            DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\TMTCache";
-            if (!Directory.Exists(DataCacheFolder))
-            {
-                Directory.CreateDirectory(DataCacheFolder);
-            }
-
             WebClient webClient = new WebClient();
 
 
@@ -737,9 +799,10 @@ namespace SMT.EVEData
 
             var esiQuery = HttpUtility.ParseQueryString(esiLogonBuilder.Query);
             esiQuery["response_type"] = "code";
-            esiQuery["client_id"] = "ace68fde71fc4749bb27f33e8aad0b70";
+            esiQuery["client_id"] = CLIENT_ID;
             esiQuery["redirect_uri"] = @"eveauth-smt://callback";
-            esiQuery["scope"] = "publicData characterLocationRead characterNavigationWrite remoteClientUI esi-location.read_ship_type.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1";
+            esiQuery["scope"] = "publicData characterLocationRead characterNavigationWrite remoteClientUI esi-location.read_location.v1 esi-location.read_ship_type.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1";
+
 
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
 
@@ -779,9 +842,7 @@ namespace SMT.EVEData
             request.Proxy = null;
 
             string code = Query["code"];
-            string clientID = "ace68fde71fc4749bb27f33e8aad0b70";
-            string secretKey = "kT7fsRg8WiRb9lujedQVyKEPgaJr40hevUdTdKaF";
-            string authHeader = clientID + ":" + secretKey;
+            string authHeader = CLIENT_ID + ":" + SECRET_KEY;
             string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
             request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
@@ -849,10 +910,6 @@ namespace SMT.EVEData
 
                                 verifyRequest.BeginGetResponse(new AsyncCallback(ESIVerifyAccessCodeCallback), verifyRequest);
 
-
-
-
-
                             }
                         }
                     }
@@ -875,11 +932,51 @@ namespace SMT.EVEData
                     using (StreamReader srr = new StreamReader(verifyStream))
                     {
                         string verifyResult = srr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(verifyResult));
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                string CharacterID = obj["CharacterID"].ToString();
+                                string CharacterName = obj["CharacterName"].ToString();
+                                string TokenType = obj["TokenType"].ToString();
+                                string CharacterOwnerHash = obj["CharacterOwnerHash"].ToString();
+                                string ExpiresOn = obj["ExpiresOn"].ToString();
+
+                                // now find the matching character and update..
+                                Character esiChar = null;
+                                foreach(Character c in LocalCharacters)
+                                {
+                                    if(c.Name == CharacterName)
+                                    {
+                                        esiChar = c;
+                                    }
+                                }
+
+                                if(esiChar == null)
+                                {
+                                    esiChar = new Character(CharacterName, "", "");
+
+
+                                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                                    {
+                                        LocalCharacters.Add(esiChar);
+                                    }));
+
+                                }
+
+                                esiChar.ESIRefreshToken = PendingRefreshToken;
+                                esiChar.ESILinked = true;
+                                esiChar.ESIAccessToken = PendingAccessToken;
+                                esiChar.ESIAccessTokenExpiry = DateTime.Parse(ExpiresOn);
+                                esiChar.ID = CharacterID;
+
+                            }
+                        }
                     }
-
-
                 }
-
             }
             catch (Exception ex)
             {
@@ -947,10 +1044,6 @@ namespace SMT.EVEData
                                         es.ShipKillsLastHour = int.Parse(ShipKills);
                                         es.PodKillsLastHour = int.Parse(PodKills);
                                         es.NPCKillsLastHour = int.Parse(NPCKills);
-
-                                        // Player ships killed
-                                        es.ShipKillsLastHour -= es.NPCKillsLastHour;
-
 
                                     }
                                 }
@@ -1035,13 +1128,65 @@ namespace SMT.EVEData
         #endregion
 
 
+        public void StartUpdateCharacterThread()
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                // loop forever
+                while (true)
+                {
+                    foreach (Character c in LocalCharacters)
+                    {
+                        c.Update();
+                    }
+
+
+                    Thread.Sleep(5000);
+                }
+            }).Start();
+        }
+
+
+
         public EveManager()
         {
             LocalCharacters = new ObservableCollection<Character>();
+            LoadCharacters();
 
-            // Ensure we have the protocol's registered
-//            RegisterESIProtocolHandler();
-//            ESIAuthURIHandler.Register();
+            // ensure we have the cache folder setup
+            DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";
+            if (!Directory.Exists(DataCacheFolder))
+            {
+                Directory.CreateDirectory(DataCacheFolder);
+            }
+            string WebCacheFoilder = DataCacheFolder + "\\WebCache"; 
+            if (!Directory.Exists(WebCacheFoilder))
+            {
+                Directory.CreateDirectory(WebCacheFoilder);
+            }
+
+            string PortraitCacheFoilder = DataCacheFolder + "\\Portraits";
+            if (!Directory.Exists(PortraitCacheFoilder))
+            {
+                Directory.CreateDirectory(PortraitCacheFoilder);
+            }
+
+            string LogosFoilder = DataCacheFolder + "\\Logos";
+            if (!Directory.Exists(LogosFoilder))
+            {
+                Directory.CreateDirectory(LogosFoilder);
+            }
+
+
+
+
+            // start the character update thread
+            StartUpdateCharacterThread();
         }
+
+        
+
     }
 }

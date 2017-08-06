@@ -22,7 +22,6 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-
         /// <summary>
         /// Main Region Manager
         /// </summary>
@@ -57,12 +56,16 @@ namespace SMT
         public bool ShowJumps { get; set; }
 
 
+        public bool FollowCharacter { get; set; }
+
         public string SelectedSystem { get; set; }
 
 
         MapConfig MapConf;
 
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
+
+
 
         public MainWindow()
         {
@@ -273,6 +276,10 @@ namespace SMT
             {
                 anomxms.Serialize(tw, ANOMManager);
             }
+
+
+            // save the character data
+            EVEManager.SaveCharacters();
         }
 
         ~MainWindow()
@@ -300,7 +307,7 @@ namespace SMT
 
         void ReDrawMap()
         {
-            if(CharacterDropDown.SelectedItem != null)
+            if(CharacterDropDown.SelectedItem != null && FollowCharacter == true)
             {
                 HandleCharacterSelectionChange();
             }
@@ -331,7 +338,8 @@ namespace SMT
                     {
                         if(selectedSys.Name != c.Location )
                         {
-                            CharacterDropDown.SelectedItem = null;
+                            //CharacterDropDown.SelectedItem = null;
+                            FollowCharacter = false;
                         }
                     }
 
@@ -755,93 +763,63 @@ namespace SMT
                 
                 MainCanvas.Children.Add(sysText);
 
-                if (!OutofRegion)
+
+                int NPCKillsLastHour = sys.NPCKillsLastHour;
+                int PodKillsLastHour = sys.PodKillsLastHour;
+                int ShipKillsLastHour = sys.ShipKillsLastHour;
+                int JumpsLastHour = sys.JumpsLastHour;
+
+                // if we're out of region pull the statistics from the other item
+                if (OutofRegion)
                 {
-                    bool renderInfoText = false;
-
-                    if(renderInfoText)
-                    {
-                        double dataTextOffset = 12;
-                        double dataTextOffsetIncrement = 8;
-                        if (sys.ShipKillsLastHour > 0)
-                        {
-                            Label shipText = new Label();
-                            shipText.FontSize = 6;
-                            shipText.Content = "Ship Kills :" + sys.ShipKillsLastHour;
-                            Canvas.SetLeft(shipText, sys.DotlanX + textXOffset);
-                            Canvas.SetTop(shipText, sys.DotLanY + textYOffset + dataTextOffset);
-                            dataTextOffset += dataTextOffsetIncrement;
-                            MainCanvas.Children.Add(shipText);
-                        }
-
-
-                        if (sys.PodKillsLastHour > 0)
-                        {
-                            Label podText = new Label();
-                            podText.FontSize = 6;
-                            podText.Content = "POD Kills :" + sys.PodKillsLastHour;
-                            Canvas.SetLeft(podText, sys.DotlanX + textXOffset);
-                            Canvas.SetTop(podText, sys.DotLanY + textYOffset + dataTextOffset);
-                            dataTextOffset += dataTextOffsetIncrement;
-                            MainCanvas.Children.Add(podText);
-                        }
-
-
-                        if (sys.NPCKillsLastHour > 0)
-                        {
-                            Label npcText = new Label();
-                            npcText.FontSize = 6;
-                            npcText.Content = "NPC Kills :" + sys.NPCKillsLastHour;
-                            Canvas.SetLeft(npcText, sys.DotlanX + textXOffset);
-                            Canvas.SetTop(npcText, sys.DotLanY + textYOffset + dataTextOffset);
-                            dataTextOffset += dataTextOffsetIncrement;
-                            MainCanvas.Children.Add(npcText);
-                        }
-                    }
-
-
-                    int InfoValue = -1;
-                    SolidColorBrush InfoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
-                    double InfoSize = 0.0;
-                    if(MapConf.ShowNPCKills)
-                    {
-                        InfoValue = sys.NPCKillsLastHour;
-                        InfoSize = 0.15f * InfoValue * MapConf.ESIOverlayScale;
-                    }
-
-                    if (MapConf.ShowPodKills)
-                    {
-                        InfoValue = sys.PodKillsLastHour;
-                        InfoSize = 20.0f * InfoValue * MapConf.ESIOverlayScale;
-
-                    }
-
-                    if (MapConf.ShowShipKills)
-                    {
-                        InfoValue = sys.ShipKillsLastHour;
-                        InfoSize = 20.0f * InfoValue  * MapConf.ESIOverlayScale;
-                    }
-
-                    if (MapConf.ShowShipJumps)
-                    {
-                        InfoValue = sys.JumpsLastHour;
-                        InfoSize = InfoValue * MapConf.ESIOverlayScale;
-                    }
-
-
-                    if (InfoValue != -1)
-                    {
-
-                        Shape infoCircle = new Ellipse() { Height = InfoSize, Width = InfoSize };
-                        infoCircle.Fill = InfoColour;
-
-                        Canvas.SetZIndex(infoCircle, 10);
-                        Canvas.SetLeft(infoCircle, sys.DotlanX - (InfoSize / 2));
-                        Canvas.SetTop(infoCircle, sys.DotLanY - (InfoSize / 2));
-                        MainCanvas.Children.Add(infoCircle);
-                    }
+                    EVEData.System actual = EVEManager.GetEveSystem(sys.Name);
+                    NPCKillsLastHour = actual.NPCKillsLastHour;
+                    PodKillsLastHour = actual.PodKillsLastHour;
+                    ShipKillsLastHour = actual.ShipKillsLastHour;
+                    JumpsLastHour = actual.JumpsLastHour;
                 }
-                else
+
+                int InfoValue = -1;
+                SolidColorBrush InfoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
+                double InfoSize = 0.0;
+                if(MapConf.ShowNPCKills)
+                {
+                    InfoValue = NPCKillsLastHour;
+                    InfoSize = 0.15f * InfoValue * MapConf.ESIOverlayScale;
+                }
+
+                if (MapConf.ShowPodKills)
+                {
+                    InfoValue = PodKillsLastHour;
+                    InfoSize = 20.0f * InfoValue * MapConf.ESIOverlayScale;
+
+                }
+
+                if (MapConf.ShowShipKills)
+                {
+                    InfoValue = ShipKillsLastHour;
+                    InfoSize = 20.0f * InfoValue  * MapConf.ESIOverlayScale;
+                }
+
+                if (MapConf.ShowShipJumps)
+                {
+                    InfoValue = sys.JumpsLastHour;
+                    InfoSize = InfoValue * MapConf.ESIOverlayScale;
+                }
+
+
+                if (InfoValue != -1)
+                {
+
+                    Shape infoCircle = new Ellipse() { Height = InfoSize, Width = InfoSize };
+                    infoCircle.Fill = InfoColour;
+
+                    Canvas.SetZIndex(infoCircle, 10);
+                    Canvas.SetLeft(infoCircle, sys.DotlanX - (InfoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.DotLanY - (InfoSize / 2));
+                    MainCanvas.Children.Add(infoCircle);
+                }
+                if(OutofRegion)
                 {
                     Label sysRegionText = new Label();
                     sysRegionText.Content = "(" + sys.Region + ")";
@@ -865,7 +843,8 @@ namespace SMT
         private void OnRegionSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // clear the character selection
-            CharacterDropDown.SelectedItem = null;
+            //CharacterDropDown.SelectedItem = null;
+            FollowCharacter = false;
 
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
 
@@ -907,7 +886,9 @@ namespace SMT
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // clear the character selection
-            CharacterDropDown.SelectedItem = null;
+            // CharacterDropDown.SelectedItem = null;
+            FollowCharacter = false;
+
 
 
             EVEData.System sd = SystemDropDownAC.SelectedItem as EVEData.System;
@@ -1045,7 +1026,15 @@ namespace SMT
 
             LogonWindow LogonBrowserWindow = new LogonWindow();
             LogonBrowserWindow.logonBrowser.Address = ESILogonURL;
+
+
+            LogonBrowserWindow.URLName.Text = ESILogonURL;
             LogonBrowserWindow.ShowDialog();
+        }
+
+        private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)
+        {
+            HandleCharacterSelectionChange();
         }
     }
 }

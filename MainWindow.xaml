@@ -52,6 +52,7 @@
                     </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                 </dotNetKitControls:AutoCompleteComboBox>
                 <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" DropDownClosed="CharacterDropDown_DropDownClosed"  />
+                <CheckBox x:Name="FollowCharacterChk" Checked="FollowCharacterChk_Checked" Margin="5,0" Content="Follow?" IsChecked="{Binding Path=FollowCharacter, Mode=TwoWay}"/>
 
             </StackPanel>
             <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Right">
