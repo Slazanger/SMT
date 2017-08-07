@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 [XmlRoot("dictionary")]
 public class SerializableDictionary<TKey, TValue>
     : Dictionary<TKey, TValue>, IXmlSerializable
 {
-    #region IXmlSerializable Members
     public System.Xml.Schema.XmlSchema GetSchema()
     {
         return null;
@@ -22,7 +19,9 @@ public class SerializableDictionary<TKey, TValue>
         reader.Read();
 
         if (wasEmpty)
+        {
             return;
+        }
 
         while (reader.NodeType != System.Xml.XmlNodeType.EndElement)
         {
@@ -41,6 +40,7 @@ public class SerializableDictionary<TKey, TValue>
             reader.ReadEndElement();
             reader.MoveToContent();
         }
+
         reader.ReadEndElement();
     }
 
@@ -65,5 +65,4 @@ public class SerializableDictionary<TKey, TValue>
             writer.WriteEndElement();
         }
     }
-    #endregion
 }

@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
-
-using System.IO;
-using System.Xml.Serialization;
-using System.Xml;
 using System.Windows.Media.Animation;
-using System.ComponentModel;
-using System.Windows.Data;
-
+using System.Windows.Shapes;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace SMT
 {
@@ -25,15 +23,14 @@ namespace SMT
         /// <summary>
         /// Main Region Manager
         /// </summary>
-        public EVEData.EveManager EVEManager;
+        public EVEData.EveManager EVEManager { get; set; }
 
-
-        public EVEData.AnomManager ANOMManager;
+        public EVEData.AnomManager ANOMManager { get; set; }
 
         /// <summary>
         /// List of all systems
         /// </summary>
-        public List<string> AllSystems;
+        public List<string> AllSystems { get; set; }
 
         /// <summary>
         /// Show the NPC kills in the last hour on the map
@@ -43,7 +40,7 @@ namespace SMT
         /// <summary>
         /// Show the Pod Kills in the last hour on the map
         /// </summary>
-        public bool ShowPodKills { get; set; } 
+        public bool ShowPodKills { get; set; }
 
         /// <summary>
         /// Show the Ship Kills in the last hour on the map
@@ -55,35 +52,29 @@ namespace SMT
         /// </summary>
         public bool ShowJumps { get; set; }
 
-
         public bool FollowCharacter { get; set; }
 
         public string SelectedSystem { get; set; }
 
-
-        MapConfig MapConf;
+        private MapConfig MapConf;
 
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
-
-
 
         public MainWindow()
         {
             InitializeComponent();
 
-
             // load any custom map settings off disk
-            string MapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
-            if(File.Exists(MapConfigFileName))
+            string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
+            if (File.Exists(mapConfigFileName))
             {
                 try
                 {
                     XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
-                    FileStream fs = new FileStream(MapConfigFileName, FileMode.Open);
+                    FileStream fs = new FileStream(mapConfigFileName, FileMode.Open);
                     XmlReader xmlr = XmlReader.Create(fs);
 
                     MapConf = (MapConfig)xms.Deserialize(xmlr);
-
                 }
                 catch
                 {
@@ -97,7 +88,6 @@ namespace SMT
                 MapConf = new MapConfig();
                 MapConf.MapColours = new List<MapColours>();
                 MapConf.SetDefaultColours();
-
             }
 
             ShowNPCKills = false;
@@ -105,12 +95,11 @@ namespace SMT
             ShowShipKills = false;
             ShowJumps = false;
 
-            SelectedSystem = "";
-
+            SelectedSystem = string.Empty;
 
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
             bool initFromDotlan = true;
-            if(initFromDotlan)
+            if (initFromDotlan)
             {
                 EVEManager = EVEData.EveManager.GetInstance();
                 EVEManager.InitFromDotLAN();
@@ -129,7 +118,6 @@ namespace SMT
 
             RegionDropDown.ItemsSource = EVEManager.Regions;
 
-
             EVEManager.SetupIntelWatcher();
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
 
@@ -141,15 +129,14 @@ namespace SMT
             AllSystems = new List<string>();
             foreach (EVEData.RegionData rd in EVEManager.Regions)
             {
-                if (rd.Name == MapConf.DefaultRegion )
+                if (rd.Name == MapConf.DefaultRegion)
                 {
                     RegionDropDown.SelectedItem = rd;
-                    List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList(); ;
+                    List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList();
                     SystemDropDownAC.ItemsSource = newList;
                 }
 
                 AllSystems.AddRange(rd.Systems.Keys.ToList());
-
             }
 
             AllSystems.Sort();
@@ -166,25 +153,25 @@ namespace SMT
 
             ColourListDropdown.ItemsSource = MapConf.MapColours;
 
-            MapColours selectedColours  = MapConf.MapColours[0];
+            MapColours selectedColours = MapConf.MapColours[0];
+
             // find the matching active colour scheme
-            foreach( MapColours mc in MapConf.MapColours)
+            foreach (MapColours mc in MapConf.MapColours)
             {
-                if(MapConf.DefaultColourSchemeName == mc.Name)
+                if (MapConf.DefaultColourSchemeName == mc.Name)
                 {
                     selectedColours = mc;
                 }
             }
 
-
             // load the dockmanager layout
-            string DockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
-            if (File.Exists(DockManagerLayoutName))
+            string dockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
+            if (File.Exists(dockManagerLayoutName))
             {
                 try
                 {
                     Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
-                    using (var sr = new StreamReader(DockManagerLayoutName))
+                    using (var sr = new StreamReader(dockManagerLayoutName))
                     {
                         ls.Deserialize(sr);
                     }
@@ -194,10 +181,9 @@ namespace SMT
                 }
             }
 
-
             // load the anom data
             string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
-            if(File.Exists(anomDataFilename))
+            if (File.Exists(anomDataFilename))
             {
                 try
                 {
@@ -207,22 +193,16 @@ namespace SMT
                     XmlReader xmlr = XmlReader.Create(fs);
 
                     ANOMManager = (EVEData.AnomManager)xms.Deserialize(xmlr);
-
                 }
-
                 catch
                 {
                     ANOMManager = new EVEData.AnomManager();
                 }
-
             }
             else
             {
                 ANOMManager = new EVEData.AnomManager();
             }
-
-
-
 
             // ColourListDropdown.SelectedItem = selectedColours;
             ColoursPropertyGrid.SelectedObject = selectedColours;
@@ -231,17 +211,16 @@ namespace SMT
             ReDrawMap();
 
             Closed += MainWindow_Closed;
-
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             // save off the dockmanager layout
-            string DockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
+            string dockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
             try
             {
                 Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
-                using (var sw = new StreamWriter(DockManagerLayoutName))
+                using (var sw = new StreamWriter(dockManagerLayoutName))
                 {
                     ls.Serialize(sw);
                 }
@@ -250,37 +229,28 @@ namespace SMT
             {
             }
 
-
             // Save the Map Colours
-            string MapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
+            string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
 
             // now serialise the class to disk
             XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
-            using (TextWriter tw = new StreamWriter(MapConfigFileName))
+            using (TextWriter tw = new StreamWriter(mapConfigFileName))
             {
                 xms.Serialize(tw, MapConf);
             }
-
 
             // save the Anom Data
             // now serialise the class to disk
             XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
             string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
 
-
             using (TextWriter tw = new StreamWriter(anomDataFilename))
             {
                 anomxms.Serialize(tw, ANOMManager);
             }
 
-
             // save the character data
             EVEManager.SaveCharacters();
-        }
-
-        ~MainWindow()
-        {
-
         }
 
         private void MapControlsPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
@@ -293,21 +263,17 @@ namespace SMT
             ReDrawMap();
         }
 
-
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
             ReDrawMap();
         }
 
-
-
-        void ReDrawMap()
+        private void ReDrawMap()
         {
-            if(CharacterDropDown.SelectedItem != null && FollowCharacter == true)
+            if (CharacterDropDown.SelectedItem != null && FollowCharacter == true)
             {
                 HandleCharacterSelectionChange();
             }
-
 
             MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
             MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
@@ -317,24 +283,23 @@ namespace SMT
             AddHighlightToSystem(SelectedSystem);
         }
 
-
-        void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
+        private void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
         {
             Shape obj = sender as Shape;
             EVEData.RegionData currentRegion = RegionDropDown.SelectedItem as EVEData.RegionData;
 
             EVEData.System selectedSys = obj.DataContext as EVEData.System;
 
-            if(e.ChangedButton == MouseButton.Left)
+            if (e.ChangedButton == MouseButton.Left)
             {
                 if (e.ClickCount == 1)
                 {
                     EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-                    if(c != null)
+                    if (c != null)
                     {
-                        if(selectedSys.Name != c.Location )
+                        if (selectedSys.Name != c.Location)
                         {
-                            //CharacterDropDown.SelectedItem = null;
+                            // CharacterDropDown.SelectedItem = null;
                             FollowCharacter = false;
                         }
                     }
@@ -368,20 +333,20 @@ namespace SMT
             }
         }
 
-        void ShapeMouseOverHandler(object sender, MouseEventArgs e)
+        private void ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
             Shape obj = sender as Shape;
             EVEData.RegionData currentRegion = RegionDropDown.SelectedItem as EVEData.RegionData;
 
             EVEData.System selectedSys = obj.DataContext as EVEData.System;
 
-            if(selectedSys.Region != currentRegion.Name)
+            if (selectedSys.Region != currentRegion.Name)
             {
                 // out of region, pull the data from the actual
                 selectedSys = EVEManager.GetEveSystem(selectedSys.Name);
             }
 
-            if(obj.IsMouseOver && MapConf.ShowSystemPopup)
+            if (obj.IsMouseOver && MapConf.ShowSystemPopup)
             {
                 SystemInfoPopup.PlacementTarget = obj;
                 SystemInfoPopup.VerticalOffset = 5;
@@ -393,22 +358,17 @@ namespace SMT
             else
             {
                 SystemInfoPopup.IsOpen = false;
-
             }
         }
-
-
 
         private void SelectSystem(string name)
         {
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
 
-            
-            foreach (EVEData.System es in rd.Systems.Values.ToList() )
+            foreach (EVEData.System es in rd.Systems.Values.ToList())
             {
-                if(es.Name == name)
+                if (es.Name == name)
                 {
-
                     SystemDropDownAC.SelectedItem = es;
                     SelectedSystem = es.Name;
                     AddHighlightToSystem(name);
@@ -418,7 +378,6 @@ namespace SMT
             }
 
             // now setup the anom data
-
             EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
             MainAnomGrid.DataContext = system;
             AnomSigList.ItemsSource = system.Anoms.Values;
@@ -427,11 +386,10 @@ namespace SMT
         private void AddHighlightToSystem(string name)
         {
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
-            if(!rd.Systems.Keys.Contains(name))
+            if (!rd.Systems.Keys.Contains(name))
             {
                 return;
             }
-
 
             EVEData.System selectedSys = rd.Systems[name];
             if (selectedSys != null)
@@ -439,12 +397,10 @@ namespace SMT
                 double circleSize = 30;
                 double circleOffset = circleSize / 2;
 
-
                 // add circle for system
                 Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
                 highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
-                
-                
+
                 highlightSystemCircle.StrokeThickness = 3;
 
                 RotateTransform rt = new RotateTransform();
@@ -476,7 +432,7 @@ namespace SMT
 
         private void AddSystemIntelOverlay()
         {
-            if(!MapConf.ShowIntel)
+            if (!MapConf.ShowIntel)
             {
                 return;
             }
@@ -485,7 +441,7 @@ namespace SMT
 
             foreach (EVEData.IntelData id in EVEManager.IntelDataList)
             {
-                foreach(string sysStr in id.Systems)
+                foreach (string sysStr in id.Systems)
                 {
                     if (rd.IsSystemOnMap(sysStr))
                     {
@@ -493,7 +449,7 @@ namespace SMT
 
                         double radiusScale = (DateTime.Now - id.IntelTime).TotalSeconds / 120.0;
 
-                        if(radiusScale < 0.0 || radiusScale >=1.0 )
+                        if (radiusScale < 0.0 || radiusScale >= 1.0)
                         {
                             continue;
                         }
@@ -518,16 +474,14 @@ namespace SMT
         {
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
 
-            foreach(EVEData.Character c in EVEManager.LocalCharacters)
+            foreach (EVEData.Character c in EVEManager.LocalCharacters)
             {
                 EVEData.System s = EVEManager.GetEveSystem(c.Location);
-                if (s != null && EVEManager.GetRegion(s.Region) == rd )
+                if (s != null && EVEManager.GetRegion(s.Region) == rd)
                 {
                     // add the character to
-
                     double circleSize = 26;
                     double circleOffset = circleSize / 2;
-
 
                     // add circle for system
                     Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
@@ -552,7 +506,7 @@ namespace SMT
 
                     MainCanvas.Children.Add(highlightSystemCircle);
 
-                    //               Storyboard s = new Storyboard();
+                    // Storyboard s = new Storyboard();
                     DoubleAnimation da = new DoubleAnimation();
                     da.From = 360;
                     da.To = 0;
@@ -573,6 +527,7 @@ namespace SMT
                     {
                         charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
                     }
+
                     Canvas.SetLeft(charText, s.DotlanX + textXOffset);
                     Canvas.SetTop(charText, s.DotLanY + textYOffset);
                     Canvas.SetZIndex(charText, 20);
@@ -581,13 +536,11 @@ namespace SMT
             }
         }
 
-
         private void AddSystemsToMap()
         {
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
 
             AddSystemIntelOverlay();
-
 
             foreach (EVEData.Link jump in rd.Jumps)
             {
@@ -601,7 +554,7 @@ namespace SMT
                 sysLink.X2 = to.DotlanX;
                 sysLink.Y2 = to.DotLanY;
 
-                if(jump.ConstelationLink)
+                if (jump.ConstelationLink)
                 {
                     sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
                 }
@@ -617,47 +570,38 @@ namespace SMT
                 MainCanvas.Children.Add(sysLink);
             }
 
-            if(MapConf.ShowJumpBridges || MapConf.ShowHostileJumpBridges)
+            if (MapConf.ShowJumpBridges || MapConf.ShowHostileJumpBridges)
             {
                 foreach (EVEData.JumpBridge jb in EVEManager.JumpBridges)
                 {
                     if (rd.IsSystemOnMap(jb.From) && rd.IsSystemOnMap(jb.To))
                     {
-                        if((jb.Friendly && !MapConf.ShowJumpBridges) || (!jb.Friendly && !MapConf.ShowHostileJumpBridges))
+                        if ((jb.Friendly && !MapConf.ShowJumpBridges) || (!jb.Friendly && !MapConf.ShowHostileJumpBridges))
                         {
                             continue;
                         }
-
 
                         // jbLink.Data
                         EVEData.System from = rd.Systems[jb.From];
                         EVEData.System to = rd.Systems[jb.To];
 
+                        Point startPoint = new Point(from.DotlanX, from.DotLanY);
+                        Point endPoint = new Point(to.DotlanX, to.DotLanY);
 
+                        Vector dir = Point.Subtract(startPoint, endPoint);
 
-
-                        Point StartPoint = new Point(from.DotlanX, from.DotLanY);
-                        Point EndPoint = new Point(to.DotlanX, to.DotLanY);
-
-                        Vector Dir = Point.Subtract(StartPoint, EndPoint);
-
-
-                        double jbDistance = Point.Subtract(StartPoint, EndPoint).Length;
+                        double jbDistance = Point.Subtract(startPoint, endPoint).Length;
 
                         Size arcSize = new Size(jbDistance + 50, jbDistance + 50);
 
-
-                        ArcSegment arcseg = new ArcSegment(EndPoint, arcSize, 100, false, SweepDirection.Clockwise, true);
+                        ArcSegment arcseg = new ArcSegment(endPoint, arcSize, 100, false, SweepDirection.Clockwise, true);
 
                         PathSegmentCollection pscollection = new PathSegmentCollection();
                         pscollection.Add(arcseg);
 
-
                         PathFigure pf = new PathFigure();
                         pf.Segments = pscollection;
-                        pf.StartPoint = StartPoint;
-
-
+                        pf.StartPoint = startPoint;
 
                         PathFigureCollection pfcollection = new PathFigureCollection();
                         pfcollection.Add(pf);
@@ -668,7 +612,7 @@ namespace SMT
                         System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
                         path.Data = pathGeometry;
 
-                        if(jb.Friendly)
+                        if (jb.Friendly)
                         {
                             path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
                         }
@@ -676,7 +620,7 @@ namespace SMT
                         {
                             path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
                         }
-                       
+
                         path.StrokeThickness = 2;
 
                         DoubleCollection dashes = new DoubleCollection();
@@ -688,7 +632,6 @@ namespace SMT
                         Canvas.SetZIndex(path, 19);
 
                         MainCanvas.Children.Add(path);
-
                     }
                 }
             }
@@ -701,10 +644,9 @@ namespace SMT
                 double textYOffset = -8;
                 double textYOffset2 = 4;
 
-                bool OutofRegion = sys.Region != rd.Name;
+                bool outofRegion = sys.Region != rd.Name;
 
                 // add circle for system
-
                 Shape systemShape;
 
                 if (sys.HasNPCStation)
@@ -714,17 +656,13 @@ namespace SMT
                 else
                 {
                     systemShape = new Ellipse() { Height = circleSize, Width = circleSize };
-
                 }
 
                 systemShape.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
 
-
-                if (OutofRegion)
+                if (outofRegion)
                 {
-
                     systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
-
                 }
                 else
                 {
@@ -735,16 +673,12 @@ namespace SMT
                 if (MapConf.ShowSystemSecurity)
                 {
                     systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(sys.Security));
-
                 }
-
 
                 systemShape.DataContext = sys;
                 systemShape.MouseDown += ShapeMouseDownHandler;
                 systemShape.MouseEnter += ShapeMouseOverHandler;
                 systemShape.MouseLeave += ShapeMouseOverHandler;
-
-
 
                 Canvas.SetLeft(systemShape, sys.DotlanX - circleOffset);
                 Canvas.SetTop(systemShape, sys.DotLanY - circleOffset);
@@ -752,7 +686,6 @@ namespace SMT
                 MainCanvas.Children.Add(systemShape);
 
                 // add text
-
                 Label sysText = new Label();
                 sysText.Content = sys.Name;
                 if (MapConf.ActiveColourScheme.SystemTextSize > 0)
@@ -760,7 +693,7 @@ namespace SMT
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
                 }
 
-                if (OutofRegion)
+                if (outofRegion)
                 {
                     sysText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
                 }
@@ -772,70 +705,63 @@ namespace SMT
                 Canvas.SetLeft(sysText, sys.DotlanX + textXOffset);
                 Canvas.SetTop(sysText, sys.DotLanY + textYOffset);
                 Canvas.SetZIndex(sysText, 20);
-                
+
                 MainCanvas.Children.Add(sysText);
 
-
-
-
-
-
-                int NPCKillsLastHour = sys.NPCKillsLastHour;
-                int PodKillsLastHour = sys.PodKillsLastHour;
-                int ShipKillsLastHour = sys.ShipKillsLastHour;
-                int JumpsLastHour = sys.JumpsLastHour;
+                int nPCKillsLastHour = sys.NPCKillsLastHour;
+                int podKillsLastHour = sys.PodKillsLastHour;
+                int shipKillsLastHour = sys.ShipKillsLastHour;
+                int jumpsLastHour = sys.JumpsLastHour;
 
                 // if we're out of region pull the statistics from the other item
-                if (OutofRegion)
+                if (outofRegion)
                 {
                     EVEData.System actual = EVEManager.GetEveSystem(sys.Name);
-                    NPCKillsLastHour = actual.NPCKillsLastHour;
-                    PodKillsLastHour = actual.PodKillsLastHour;
-                    ShipKillsLastHour = actual.ShipKillsLastHour;
-                    JumpsLastHour = actual.JumpsLastHour;
+                    nPCKillsLastHour = actual.NPCKillsLastHour;
+                    podKillsLastHour = actual.PodKillsLastHour;
+                    shipKillsLastHour = actual.ShipKillsLastHour;
+                    jumpsLastHour = actual.JumpsLastHour;
                 }
 
-                int InfoValue = -1;
-                SolidColorBrush InfoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
-                double InfoSize = 0.0;
-                if(MapConf.ShowNPCKills)
+                int infoValue = -1;
+                SolidColorBrush infoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
+                double infoSize = 0.0;
+                if (MapConf.ShowNPCKills)
                 {
-                    InfoValue = NPCKillsLastHour;
-                    InfoSize = 0.15f * InfoValue * MapConf.ESIOverlayScale;
+                    infoValue = nPCKillsLastHour;
+                    infoSize = 0.15f * infoValue * MapConf.ESIOverlayScale;
                 }
 
                 if (MapConf.ShowPodKills)
                 {
-                    InfoValue = PodKillsLastHour;
-                    InfoSize = 20.0f * InfoValue * MapConf.ESIOverlayScale;
-
+                    infoValue = podKillsLastHour;
+                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
                 }
 
                 if (MapConf.ShowShipKills)
                 {
-                    InfoValue = ShipKillsLastHour;
-                    InfoSize = 20.0f * InfoValue  * MapConf.ESIOverlayScale;
+                    infoValue = shipKillsLastHour;
+                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
                 }
 
                 if (MapConf.ShowShipJumps)
                 {
-                    InfoValue = sys.JumpsLastHour;
-                    InfoSize = InfoValue * MapConf.ESIOverlayScale;
+                    infoValue = sys.JumpsLastHour;
+                    infoSize = infoValue * MapConf.ESIOverlayScale;
                 }
 
-
-                if (InfoValue != -1)
+                if (infoValue != -1)
                 {
-
-                    Shape infoCircle = new Ellipse() { Height = InfoSize, Width = InfoSize };
-                    infoCircle.Fill = InfoColour;
+                    Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
+                    infoCircle.Fill = infoColour;
 
                     Canvas.SetZIndex(infoCircle, 10);
-                    Canvas.SetLeft(infoCircle, sys.DotlanX - (InfoSize / 2));
-                    Canvas.SetTop(infoCircle, sys.DotLanY - (InfoSize / 2));
+                    Canvas.SetLeft(infoCircle, sys.DotlanX - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.DotLanY - (infoSize / 2));
                     MainCanvas.Children.Add(infoCircle);
                 }
-                if(OutofRegion)
+
+                if (outofRegion)
                 {
                     Label sysRegionText = new Label();
                     sysRegionText.Content = "(" + sys.Region + ")";
@@ -847,19 +773,16 @@ namespace SMT
                     Canvas.SetZIndex(sysRegionText, 20);
 
                     MainCanvas.Children.Add(sysRegionText);
-
                 }
             }
 
             AddCharactersToMap();
-
         }
-
 
         private void OnRegionSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // clear the character selection
-            //CharacterDropDown.SelectedItem = null;
+            // CharacterDropDown.SelectedItem = null;
             FollowCharacter = false;
 
             EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
@@ -867,32 +790,29 @@ namespace SMT
             ReDrawMap();
             MapConf.DefaultRegion = rd.Name;
 
-
             MainContent.DataContext = RegionDropDown.SelectedItem;
             MainAnomGrid.DataContext = null;
             AnomSigList.ItemsSource = null;
 
             SystemDropDownAC.SelectedItem = null;
 
-            List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList(); ;
+            List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
         }
 
-        private void SelectRegion(string RegionName)
+        private void SelectRegion(string regionName)
         {
             foreach (EVEData.RegionData rd in EVEManager.Regions)
             {
-                if (rd.Name == RegionName)
+                if (rd.Name == regionName)
                 {
                     RegionDropDown.SelectedItem = rd;
-                    List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList(); ;
+                    List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList();
                     SystemDropDownAC.ItemsSource = newList;
                 }
             }
         }
 
-
-        
         private void refreshData_Click(object sender, RoutedEventArgs e)
         {
             EVEManager.StartUpdateKillsFromESI();
@@ -905,17 +825,13 @@ namespace SMT
             // CharacterDropDown.SelectedItem = null;
             FollowCharacter = false;
 
-
-
             EVEData.System sd = SystemDropDownAC.SelectedItem as EVEData.System;
-
 
             if (sd != null)
             {
                 SelectSystem(sd.Name);
                 ReDrawMap();
             }
-
         }
 
         private void SysContexMenuItemDotlan_Click(object sender, RoutedEventArgs e)
@@ -923,8 +839,8 @@ namespace SMT
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
             EVEData.RegionData rd = EVEManager.GetRegion(eveSys.Region);
 
-            string URL = String.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
-            System.Diagnostics.Process.Start(URL);
+            string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
+            System.Diagnostics.Process.Start(uRL);
         }
 
         private void SysContexMenuItemZKB_Click(object sender, RoutedEventArgs e)
@@ -932,9 +848,8 @@ namespace SMT
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
             EVEData.RegionData rd = EVEManager.GetRegion(eveSys.Region);
 
-            string URL = String.Format("https://zkillboard.com/system/{0}", eveSys.ID);
-            System.Diagnostics.Process.Start(URL);
-
+            string uRL = string.Format("https://zkillboard.com/system/{0}", eveSys.ID);
+            System.Diagnostics.Process.Start(uRL);
         }
 
         private void HandleCharacterSelectionChange()
@@ -952,13 +867,14 @@ namespace SMT
                         // change region
                         SelectRegion(s.Region);
                     }
+
                     SelectSystem(c.Location);
 
                     CharacterDropDown.SelectedItem = c;
                 }
             }
-
         }
+
         private void CharacterDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             HandleCharacterSelectionChange();
@@ -969,7 +885,6 @@ namespace SMT
             HandleCharacterSelectionChange();
         }
 
-
         private void ResetColourData_Click(object sender, RoutedEventArgs e)
         {
             MapConf.MapColours = new List<MapColours>();
@@ -977,9 +892,7 @@ namespace SMT
             ColourListDropdown.ItemsSource = MapConf.MapColours;
             ColourListDropdown.SelectedItem = MapConf.MapColours[0];
 
-
             ReDrawMap();
-
         }
 
         private void btnHelp_Click(object sender, RoutedEventArgs e)
@@ -1001,18 +914,17 @@ namespace SMT
             ColoursPropertyGrid.Update();
 
             MapConf.DefaultColourSchemeName = newSelection.Name;
-
         }
 
         private void btnUpdateAnomList_Click(object sender, RoutedEventArgs e)
         {
             string pasteData = Clipboard.GetText();
 
-            if(pasteData != null || pasteData != "")
+            if (pasteData != null || pasteData != string.Empty)
             {
                 EVEData.AnomData ad = MainAnomGrid.DataContext as EVEData.AnomData;
 
-                if(ad != null)
+                if (ad != null)
                 {
                     ad.UpdateFromPaste(pasteData);
                     AnomSigList.Items.Refresh();
@@ -1020,7 +932,6 @@ namespace SMT
                     CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
                 }
             }
-
         }
 
         private void btnClearAnomList_Click(object sender, RoutedEventArgs e)
@@ -1033,19 +944,17 @@ namespace SMT
                 AnomSigList.UpdateLayout();
                 CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
             }
-
         }
 
         private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
         {
-            string ESILogonURL = EVEManager.GetESILogonURL();
+            string eSILogonURL = EVEManager.GetESILogonURL();
 
-            LogonWindow LogonBrowserWindow = new LogonWindow();
-            LogonBrowserWindow.logonBrowser.Navigate(ESILogonURL);
+            LogonWindow logonBrowserWindow = new LogonWindow();
+            logonBrowserWindow.logonBrowser.Navigate(eSILogonURL);
 
-
-            LogonBrowserWindow.URLName.Text = ESILogonURL;
-            LogonBrowserWindow.ShowDialog();
+            logonBrowserWindow.URLName.Text = eSILogonURL;
+            logonBrowserWindow.ShowDialog();
         }
 
         private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)

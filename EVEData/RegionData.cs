@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-
-
 namespace SMT.EVEData
 {
     public class RegionData
@@ -17,17 +15,15 @@ namespace SMT.EVEData
         /// </summary>
         public string DotLanRef { get; set; }
 
-
         /// <summary>
         /// Systems in this Region
         /// </summary>
-        public SerializableDictionary<string, System> Systems;
+        public SerializableDictionary<string, System> Systems { get; set; }
 
         /// <summary>
         ///  Jumps/Links between systems
         /// </summary>
-        public List<Link> Jumps;
-
+        public List<Link> Jumps { get; set; }
 
         public RegionData()
         {
@@ -43,15 +39,14 @@ namespace SMT.EVEData
             Jumps = new List<Link>();
         }
 
-
         /// <summary>
         /// Is the system within this region
         /// </summary>
         public bool DoesSystemExist(string name)
         {
-            foreach(System sys in Systems.Values.ToList())
+            foreach (System sys in Systems.Values.ToList())
             {
-                if(sys.Name == name && Name == sys.Region )
+                if (sys.Name == name && Name == sys.Region)
                 {
                     return true;
                 }
@@ -59,7 +54,6 @@ namespace SMT.EVEData
 
             return false;
         }
-
 
         /// <summary>
         /// Is the System on this region map : note as we're using the dotlan layout we have out of region systems on the map for navigability reasons
@@ -74,6 +68,7 @@ namespace SMT.EVEData
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -81,7 +76,5 @@ namespace SMT.EVEData
         {
             return Name;
         }
-
-
     }
 }

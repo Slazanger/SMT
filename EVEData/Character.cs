@@ -1,12 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Serialization;
 
@@ -15,7 +12,9 @@ namespace SMT.EVEData
     public class Character
     {
         public string Name { get; set; }
+
         public string ID { get; set; }
+
         public string LocalChatFile { get; set; }
 
         public string Location { get; set; }
@@ -25,7 +24,7 @@ namespace SMT.EVEData
         public string ESIAuthCode { get; set; }
 
         [XmlIgnoreAttribute]
-        public string  ESIAccessToken { get; set; }
+        public string ESIAccessToken { get; set; }
 
         public DateTime ESIAccessTokenExpiry { get; set; }
 
@@ -43,20 +42,17 @@ namespace SMT.EVEData
         public void Update()
         {
             TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
-            if(ts.Minutes < 0)
+            if (ts.Minutes < 0)
             {
                 RefreshAccessToken();
             }
 
-
             UpdatePositionFromESI();
-
-
         }
 
         public bool RefreshAccessToken()
         {
-            if(ESIRefreshToken == "" || ESIRefreshToken == null)
+            if (ESIRefreshToken == string.Empty || ESIRefreshToken == null)
             {
                 return false;
             }
@@ -68,13 +64,12 @@ namespace SMT.EVEData
             request.Timeout = 20000;
             request.Proxy = null;
 
-            
             string authHeader = EveManager.CLIENT_ID + ":" + EveManager.SECRET_KEY;
             string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
             request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
 
-            var httpData = HttpUtility.ParseQueryString(string.Empty); ;
+            var httpData = HttpUtility.ParseQueryString(string.Empty);
             httpData["grant_type"] = "refresh_token";
             httpData["refresh_token"] = ESIRefreshToken;
 
@@ -86,14 +81,12 @@ namespace SMT.EVEData
             var stream = request.GetRequestStream();
             stream.Write(data, 0, data.Length);
 
-
-            WebResponse refreshResult =  request.GetResponse();
-
+            WebResponse refreshResult = request.GetResponse();
 
             Stream responseStream = refreshResult.GetResponseStream();
             using (StreamReader sr = new StreamReader(responseStream))
             {
-                //Need to return this response 
+                // Need to return this response
                 string strContent = sr.ReadToEnd();
 
                 JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
@@ -101,26 +94,23 @@ namespace SMT.EVEData
                 {
                     if (jsr.TokenType == JsonToken.StartObject)
                     {
-
                         JObject obj = JObject.Load(jsr);
-                        string AccessToken = obj["access_token"].ToString();
-                        string TokenType = obj["token_type"].ToString();
-                        string ExpiresIn = obj["expires_in"].ToString();
-                        string RefreshToken = obj["refresh_token"].ToString();
-                        double ExpiryMinutes = double.Parse(ExpiresIn);
-                        ExpiryMinutes -= 5.0; // chop down 5 minutes to give us a buffer
-                        ESIAccessToken = AccessToken;
-                        ESIAccessTokenExpiry = DateTime.Now.AddSeconds(ExpiryMinutes);
+                        string accessToken = obj["access_token"].ToString();
+                        string tokenType = obj["token_type"].ToString();
+                        string expiresIn = obj["expires_in"].ToString();
+                        string refreshToken = obj["refresh_token"].ToString();
+                        double expiryMinutes = double.Parse(expiresIn);
+                        expiryMinutes -= 5.0; // chop down 5 minutes to give us a buffer
+                        ESIAccessToken = accessToken;
+                        ESIAccessTokenExpiry = DateTime.Now.AddSeconds(expiryMinutes);
                     }
                 }
             }
 
-
             return true;
         }
 
-
-        void UpdatePositionFromESI()
+        private void UpdatePositionFromESI()
         {
             UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/latest/characters/" + ID + "/location");
 
@@ -136,11 +126,9 @@ namespace SMT.EVEData
             request.Timeout = 20000;
             request.Proxy = null;
 
-
             try
             {
                 HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
 
                 if (esiResult.StatusCode != HttpStatusCode.OK)
                 {
@@ -150,7 +138,7 @@ namespace SMT.EVEData
                 Stream responseStream = esiResult.GetResponseStream();
                 using (StreamReader sr = new StreamReader(responseStream))
                 {
-                    //Need to return this response 
+                    // Need to return this response
                     string strContent = sr.ReadToEnd();
 
                     JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
@@ -158,33 +146,27 @@ namespace SMT.EVEData
                     {
                         if (jsr.TokenType == JsonToken.StartObject)
                         {
-
                             JObject obj = JObject.Load(jsr);
-                            string SysID = obj["solar_system_id"].ToString();
+                            string sysID = obj["solar_system_id"].ToString();
 
-                            Location = EveManager.GetInstance().SystemIDToName[SysID];
+                            Location = EveManager.GetInstance().SystemIDToName[sysID];
                         }
                     }
                 }
             }
             catch { }
-
         }
 
-
-
-
-        public Character(string name, string lcf, string location )
+        public Character(string name, string lcf, string location)
         {
             Name = name;
             LocalChatFile = lcf;
             Location = location;
 
             ESILinked = false;
-            ESIAuthCode = "";
-            ESIAccessToken = "";
-            ESIRefreshToken = "";
+            ESIAuthCode = string.Empty;
+            ESIAccessToken = string.Empty;
+            ESIRefreshToken = string.Empty;
         }
-
     }
 }

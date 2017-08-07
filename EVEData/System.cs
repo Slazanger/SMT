@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-
+﻿using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
@@ -20,9 +14,11 @@ namespace SMT.EVEData
         public string ID { get; set; }
 
         public double DotlanX { get; set; }
+
         public double DotLanY { get; set; }
-    
+
         public double ActualX { get; set; }
+
         public double ActualY { get; set; }
 
         public double ActualZ { get; set; }
@@ -31,30 +27,25 @@ namespace SMT.EVEData
 
         public bool HasNPCStation { get; set; }
 
-
-  
-
-
         [XmlIgnoreAttribute]
         public int NPCKillsLastHour { get; set; }
+
         [XmlIgnoreAttribute]
         public int PodKillsLastHour { get; set; }
+
         [XmlIgnoreAttribute]
         public int ShipKillsLastHour { get; set; }
 
         [XmlIgnoreAttribute]
         public int JumpsLastHour { get; set; }
 
-
         public override string ToString()
         {
             return Name;
         }
 
-
         public System()
         {
-
         }
 
         public System(string name, string id, double x, double y, string region, bool station)
@@ -65,7 +56,6 @@ namespace SMT.EVEData
             DotLanY = y;
             Region = region;
             HasNPCStation = station;
-
 
             NPCKillsLastHour = -1;
             PodKillsLastHour = -1;

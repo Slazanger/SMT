@@ -11,16 +11,14 @@ namespace SMT
         }
 
         [Browsable(false)]
-        public string Name;
+        public string Name { get; set; }
 
         [Browsable(false)]
-        public bool UserEditable ;
-
+        public bool UserEditable { get; set; }
 
         [Category("Jump Bridges")]
         [DisplayName("Friendly")]
         public Color FriendlyJumpBridgeColour { get; set; }
-
 
         [Category("Jump Bridges")]
         [DisplayName("Hostile ")]
@@ -33,7 +31,6 @@ namespace SMT
         [Category("Systems")]
         [DisplayName("Outline")]
         public Color SystemOutlineColour { get; set; }
-
 
         [Category("Systems")]
         [DisplayName("In Region")]
@@ -63,7 +60,6 @@ namespace SMT
         [DisplayName("Map Background")]
         public Color MapBackgroundColour { get; set; }
 
-
         [Category("General")]
         [DisplayName("Selected System")]
         public Color SelectedSystemColour { get; set; }
@@ -71,8 +67,6 @@ namespace SMT
         [Category("General")]
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
-
-
 
         [Category("Character")]
         [DisplayName("Highlight")]
@@ -94,9 +88,7 @@ namespace SMT
         [DisplayName("Overlay")]
         public Color IntelOverlayColour { get; set; }
 
-     
-        
-        static public Color GetSecStatusColour(double SecStatus)
+        static public Color GetSecStatusColour(double secStatus)
         {
             /*
                 #FF2FEFEF	1.0
@@ -112,63 +104,59 @@ namespace SMT
                 #FFF00000	0.0
             */
 
-
             Color secCol = (Color)ColorConverter.ConvertFromString("#FFF00000");
 
-            if (SecStatus > 0.1)
+            if (secStatus > 0.1)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFD73000");
             }
 
-            if (SecStatus > 0.2)
+            if (secStatus > 0.2)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFF04800");
             }
 
-            if (SecStatus > 0.3)
+            if (secStatus > 0.3)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFF06000");
             }
 
-            if (SecStatus > 0.4)
+            if (secStatus > 0.4)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFD77700");
             }
 
-            if (SecStatus > 0.5)
+            if (secStatus > 0.5)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFEFEF00");
             }
 
-            if (SecStatus > 0.6)
+            if (secStatus > 0.6)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF8FEF2F");
             }
 
-            if (SecStatus > 0.7)
+            if (secStatus > 0.7)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF00F000");
             }
 
-            if (SecStatus > 0.8)
+            if (secStatus > 0.8)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF00EF47");
             }
 
-            if (SecStatus > 0.9)
+            if (secStatus > 0.9)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF48F0C0");
             }
 
-            if (SecStatus > 0.99)
+            if (secStatus > 0.99)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF2FEFEF");
             }
 
-
             return secCol;
-
         }
-
     }
 }

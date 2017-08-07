@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Slazangers Map Tool (SMT)" Height="200" Width="400" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Grid>
-        <Image x:Name="image" HorizontalAlignment="Left" Height="149" Margin="10,10,0,0" VerticalAlignment="Top" Width="172" Source="Images/Slazanger.png" RenderTransformOrigin="0.695,0.632"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="168,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="149" Width="214"><Run Text="Version "/><Run Text="0.28"/><LineBreak/><Run/><LineBreak/><Run Text="Created By "/><Hyperlink x:Name="SlazLink" NavigateUri="https://evewho.com/pilot/Slazanger" RequestNavigate="SlazLink_RequestNavigate"><Run Text="Slazanger"/></Hyperlink><LineBreak/><LineBreak/><Run Text="All Donations, feedback and "/><Run Text="f"/><Run Text="eature requests welcome.. feel free to evemail in game."/></TextBlock>
+        <Image x:Name="image" HorizontalAlignment="Left" Height="149" Margin="10,10,0,0" VerticalAlignment="Top" Width="172" Source="Images/Slazanger.png" RenderTransformOrigin="0.695,0.632" />
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="168,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="149" Width="214"><Run Text="Version " /><Run Text="0.28" /><LineBreak /><Run /><LineBreak /><Run Text="Created By " /><Hyperlink x:Name="SlazLink" NavigateUri="https://evewho.com/pilot/Slazanger" RequestNavigate="SlazLink_RequestNavigate"><Run Text="Slazanger" /></Hyperlink><LineBreak /><LineBreak /><Run Text="All Donations, feedback and " /><Run Text="f" /><Run Text="eature requests welcome.. feel free to evemail in game." /></TextBlock>
     </Grid>
 </Window>

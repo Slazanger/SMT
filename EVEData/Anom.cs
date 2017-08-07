@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMT.EVEData
 {
-
     public enum AnomType
     {
         Unknown,
@@ -22,24 +19,24 @@ namespace SMT.EVEData
     {
         public Anom()
         {
-            Name = "";
+            Name = string.Empty;
             Type = AnomType.Unknown;
 
             TimeFound = DateTime.Now;
         }
 
         public string Signature { get; set; }
+
         public AnomType Type { get; set; }
+
         public string Name { get; set; }
 
         public DateTime TimeFound { get; set; }
-
 
         public override string ToString()
         {
             return Signature + " " + Type + " " + Name;
         }
-
 
         public static AnomType GetTypeFromString(string text)
         {
@@ -72,95 +69,90 @@ namespace SMT.EVEData
                 return AnomType.Unknown;
             }
         }
-
     }
 
     public class AnomData
     {
-        public string SystemName { get; set; } 
+        public string SystemName { get; set; }
 
         public SerializableDictionary<string, Anom> Anoms { get; set; }
-
-
 
         public AnomData()
         {
             Anoms = new SerializableDictionary<string, Anom>();
         }
 
-
         public void UpdateFromPaste(string pastedText)
         {
             bool validPaste = false;
             List<string> itemsToKeep = new List<string>();
             string[] pastelines = pastedText.Split('\n');
-            foreach (string Line in pastelines)
+            foreach (string line in pastelines)
             {
                 // split on tabs
-                string[] words = Line.Split('\t');
-                if(words.Length == 6)
+                string[] words = line.Split('\t');
+                if (words.Length == 6)
                 {
                     // filter out "Cosmic Anomaly"
                     if (words[1] == "Cosmic Signature")
                     {
                         validPaste = true;
 
-                        string SigID = words[0];
-                        string SigType = words[2];
-                        string SigName = words[3];
+                        string sigID = words[0];
+                        string sigType = words[2];
+                        string sigName = words[3];
 
-                        itemsToKeep.Add(SigID);
+                        itemsToKeep.Add(sigID);
 
                         // valid sig
-                        if (Anoms.Keys.Contains(SigID))
+                        if (Anoms.Keys.Contains(sigID))
                         {
                             // updating an existing one
-                            Anom an = Anoms[SigID];
+                            Anom an = Anoms[sigID];
                             if (an.Type == AnomType.Unknown)
                             {
-                                an.Type = Anom.GetTypeFromString(SigType);
+                                an.Type = Anom.GetTypeFromString(sigType);
                             }
 
-                            if(SigName != "")
+                            if (sigName != string.Empty)
                             {
-                                an.Name = SigName;
+                                an.Name = sigName;
                             }
-
                         }
                         else
                         {
                             Anom an = new Anom();
-                            an.Signature = SigID;                           
-                           
-                            if(SigType != "")
+                            an.Signature = sigID;
+
+                            if (sigType != string.Empty)
                             {
-                                an.Type = Anom.GetTypeFromString(SigType);
+                                an.Type = Anom.GetTypeFromString(sigType);
                             }
-                            if(SigName != "")
+
+                            if (sigName != string.Empty)
                             {
-                                an.Name = SigName;
+                                an.Name = sigName;
                             }
-                            Anoms.Add(SigID, an);
+
+                            Anoms.Add(sigID, an);
                         }
                     }
                 }
-
-                
             }
 
             // if we had a valid paste dump any items we didnt reference, brute force scan and remove.. come back to this later..
-            if(validPaste)
+            if (validPaste)
             {
                 List<string> toRemove = new List<string>();
-                foreach(string an in Anoms.Keys.ToList())
+                foreach (string an in Anoms.Keys.ToList())
                 {
-                    if(!itemsToKeep.Contains(an))
+                    if (!itemsToKeep.Contains(an))
                     {
                         toRemove.Add(an);
                     }
                 }
 
-                foreach(string s in toRemove)
+                foreach (string s in toRemove)
                 {
                     Anoms.Remove(s);
                 }
@@ -172,7 +164,6 @@ namespace SMT.EVEData
     {
         public SerializableDictionary<string, AnomData> Systems { get; set; }
 
-
         public AnomManager()
         {
             Systems = new SerializableDictionary<string, AnomData>();
@@ -181,7 +172,7 @@ namespace SMT.EVEData
         public AnomData GetSystemAnomData(string sysName)
         {
             AnomData ret;
-            if(Systems.Keys.Contains(sysName))
+            if (Systems.Keys.Contains(sysName))
             {
                 ret = Systems[sysName];
             }
@@ -194,8 +185,5 @@ namespace SMT.EVEData
 
             return ret;
         }
-
     }
-
-
 }

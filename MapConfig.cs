@@ -1,15 +1,13 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media;
 
-
 namespace SMT
 {
-
     public class MapConfig : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -19,26 +17,22 @@ namespace SMT
             }
         }
 
-
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
         private bool m_ShowShipJumps;
 
         [Browsable(false)]
-        public string DefaultRegion;
+        public string DefaultRegion { get; set; }
 
         [Browsable(false)]
-        public string DefaultColourSchemeName;
-
+        public string DefaultColourSchemeName { get; set; }
 
         [Browsable(false)]
-        public List<MapColours> MapColours;
+        public List<MapColours> MapColours { get; set; }
 
         [Browsable(false)]
         public MapColours ActiveColourScheme;
-
-
 
         [Category("Jump Bridges")]
         [DisplayName("Friendly Bridges")]
@@ -48,11 +42,9 @@ namespace SMT
         [DisplayName("Hostile Bridges")]
         public bool ShowHostileJumpBridges { get; set; }
 
-
         [Category("General")]
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
-
 
         [Category("General")]
         [DisplayName("Show Security")]
@@ -74,6 +66,7 @@ namespace SMT
             {
                 return m_ShowNPCKills;
             }
+
             set
             {
                 m_ShowNPCKills = value;
@@ -83,8 +76,6 @@ namespace SMT
                     ShowPodKills = false;
                     ShowShipKills = false;
                     ShowShipJumps = false;
-
-
                 }
 
                 OnPropertyChanged("ShowNPCKills");
@@ -99,6 +90,7 @@ namespace SMT
             {
                 return m_ShowPodKills;
             }
+
             set
             {
                 m_ShowPodKills = value;
@@ -107,7 +99,6 @@ namespace SMT
                     ShowNPCKills = false;
                     ShowShipKills = false;
                     ShowShipJumps = false;
-
                 }
 
                 OnPropertyChanged("ShowPodKills");
@@ -122,6 +113,7 @@ namespace SMT
             {
                 return m_ShowShipKills;
             }
+
             set
             {
                 m_ShowShipKills = value;
@@ -144,6 +136,7 @@ namespace SMT
             {
                 return m_ShowShipJumps;
             }
+
             set
             {
                 m_ShowShipJumps = value;
@@ -152,15 +145,11 @@ namespace SMT
                     ShowNPCKills = false;
                     ShowPodKills = false;
                     ShowShipKills = false;
-
-
                 }
 
                 OnPropertyChanged("ShowShipJumps");
             }
         }
-
-
 
         public void SetDefaults()
         {
@@ -178,7 +167,6 @@ namespace SMT
 
         public void SetDefaultColours()
         {
-            // 
             MapColours defaultColours = new MapColours();
             defaultColours.Name = "Default";
             defaultColours.UserEditable = false;
@@ -269,7 +257,6 @@ namespace SMT
             greyAndRed.SystemTextSize = 12;
             MapColours.Add(greyAndRed);
 
-
             MapColours dark = new MapColours();
             dark.Name = "Dark";
             dark.UserEditable = false;
@@ -292,10 +279,7 @@ namespace SMT
             dark.SystemTextSize = 12;
             MapColours.Add(dark);
 
-
-
             ActiveColourScheme = blueColours;
-
         }
 
         public MapConfig()
@@ -303,7 +287,4 @@ namespace SMT
             SetDefaults();
         }
     }
-
-
-
 }

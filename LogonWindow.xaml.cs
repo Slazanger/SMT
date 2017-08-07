@@ -8,35 +8,22 @@ namespace SMT
     /// </summary>
     public partial class LogonWindow : Window
     {
-
         public LogonWindow()
         {
             InitializeComponent();
         }
 
-
-        
-
-
-        ~LogonWindow()
-        {
-        }
-
-
-        private void logonBrowser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        private void LogonBrowser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
         {
             // Catch any custom auth schemes and pass onto the
-
             string scheme = e.Uri.Scheme;
-            if(scheme == "eveauth-smt")
+            if (scheme == "eveauth-smt")
             {
                 // issue the close after the esi auth event has finished
                 EVEData.EveManager.GetInstance().HandleEveAuthSMTUri(new Uri(e.Uri.AbsoluteUri));
                 e.Cancel = true;
                 Close();
-
             }
         }
     }
-
 }

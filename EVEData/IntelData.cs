@@ -8,17 +8,17 @@ namespace SMT.EVEData
         /// <summary>
         /// Time we parsed the intel (note this is not in eve time)
         /// </summary>
-        public DateTime IntelTime;
+        public DateTime IntelTime { get; set; }
 
         /// <summary>
         /// The intel substring (minus time stamp and character name)
         /// </summary>
-        public string IntelString;
+        public string IntelString { get; set; }
 
         /// <summary>
         /// The raw line of text (incase we need to do anything else with it)
         /// </summary>
-        public string RawIntelString;
+        public string RawIntelString { get; set; }
 
         /// <summary>
         /// The list of systems we matched when parsing this string

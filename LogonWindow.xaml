@@ -8,10 +8,10 @@
         Title="Auth.." Height="600" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="540"/>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="540" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="URLName" Grid.Row="0" IsReadOnly="True" BorderThickness="2"/>
-        <WebBrowser x:Name="logonBrowser" Grid.Row="1" Navigating="logonBrowser_Navigating"/>
+        <TextBox x:Name="URLName" Grid.Row="0" IsReadOnly="True" BorderThickness="2" />
+        <WebBrowser x:Name="logonBrowser" Grid.Row="1" Navigating="LogonBrowser_Navigating" />
     </Grid>
 </Window>

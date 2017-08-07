@@ -1,39 +1,33 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
+using System.Web;
+using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows;
-using System.Collections.ObjectModel;
-using Microsoft.Win32;
-using System.Web;
-using System.Diagnostics;
-using System.Text;
 
 namespace SMT.EVEData
 {
     public class EveManager
     {
-
         public const string CLIENT_ID = "ace68fde71fc4749bb27f33e8aad0b70";
         public const string SECRET_KEY = "kT7fsRg8WiRb9lujedQVyKEPgaJr40hevUdTdKaF";
 
-
-
-        static EveManager s_Instance;
+        private static EveManager s_Instance;
 
         public static void SetInstance(EveManager instance)
         {
-                s_Instance = instance;
+            s_Instance = instance;
         }
-
-
 
         public static EveManager GetInstance()
         {
@@ -45,39 +39,33 @@ namespace SMT.EVEData
             return s_Instance;
         }
 
-
-
         /// <summary>
         /// Master List of Regions
         /// </summary>
-        public List<RegionData> Regions;
+        public List<RegionData> Regions { get; set; }
 
         /// <summary>
         /// Lookup from Internal ID to Name
         /// </summary>
-        public SerializableDictionary<String, String> SystemIDToName;
-
+        public SerializableDictionary<string, string> SystemIDToName { get; set; }
 
         /// <summary>
         /// List of Jumb bridoges
         /// </summary>
 
-
         /// <summary>
         /// Folder to cache dotland svg's etc to
         /// </summary>
         [XmlIgnoreAttribute]
-        public string DataCacheFolder;
+        public string DataCacheFolder { get; set; }
 
-
-        #region Characters
         [XmlIgnoreAttribute]
-        public ObservableCollection<Character> LocalCharacters;
+        public ObservableCollection<Character> LocalCharacters { get; set; }
 
         public void LoadCharacters()
         {
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
-            if(!File.Exists(dataFilename))
+            if (!File.Exists(dataFilename))
             {
                 return;
             }
@@ -94,10 +82,10 @@ namespace SMT.EVEData
 
                 foreach (Character c in loadList)
                 {
-                    c.ESIAccessToken = "";
+                    c.ESIAccessToken = string.Empty;
                     c.ESIAccessTokenExpiry = DateTime.MinValue;
-                    c.LocalChatFile = "";
-                    c.Location = "";
+                    c.LocalChatFile = string.Empty;
+                    c.Location = string.Empty;
 
                     c.Update();
 
@@ -110,12 +98,11 @@ namespace SMT.EVEData
         public void SaveCharacters()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
-
             ObservableCollection<Character> saveList = new ObservableCollection<Character>();
 
-            foreach(Character c in LocalCharacters)
+            foreach (Character c in LocalCharacters)
             {
-                if(c.ESIRefreshToken != "")
+                if (c.ESIRefreshToken != string.Empty)
                 {
                     saveList.Add(c);
                 }
@@ -128,17 +115,10 @@ namespace SMT.EVEData
             {
                 xms.Serialize(tw, saveList);
             }
-
-
         }
 
-        #endregion
-
-
-
-        #region JumpBridges
         [XmlIgnoreAttribute]
-        public List<JumpBridge> JumpBridges;
+        public List<JumpBridge> JumpBridges { get; set; }
 
         /// <summary>
         /// Load the jump bridge data from disk
@@ -146,27 +126,27 @@ namespace SMT.EVEData
         public void LoadJumpBridgeData()
         {
             JumpBridges = new List<JumpBridge>();
-            string JumpBridgeData = AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.txt";
+            string jumpBridgeData = AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.txt";
 
-            bool Friendly = true;
+            bool friendly = true;
 
-            if (File.Exists(JumpBridgeData))
+            if (File.Exists(jumpBridgeData))
             {
-                StreamReader file = new StreamReader(JumpBridgeData);
+                StreamReader file = new StreamReader(jumpBridgeData);
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-
                     if (line.StartsWith("---HOSTILE---"))
                     {
-                        Friendly = false;
+                        friendly = false;
                     }
 
-                    // Skip comments 
+                    // Skip comments
                     if (line.StartsWith("#"))
                     {
                         continue;
                     }
+
                     string[] jbbits = line.Split(' ');
 
                     // malformed line
@@ -177,26 +157,20 @@ namespace SMT.EVEData
 
                     // in the form :
                     // FromSystem FromPlanetMoon <-> ToSystem ToPlanetMoon
+                    string from = jbbits[0];
+                    string fromData = jbbits[1];
 
-                    string From = jbbits[0];
-                    string FromData = jbbits[1];
+                    string to = jbbits[3];
+                    string toData = jbbits[4];
 
-                    string To = jbbits[3];
-                    string ToData = jbbits[4];
-
-                    if (DoesSystemExist(From) && DoesSystemExist(To))
+                    if (DoesSystemExist(from) && DoesSystemExist(to))
                     {
-                        JumpBridges.Add(new JumpBridge(From, FromData, To, ToData, Friendly));
+                        JumpBridges.Add(new JumpBridge(from, fromData, to, toData, friendly));
                     }
                 }
             }
-
         }
 
-        #endregion
-
-
-        #region IntelData
         [XmlIgnoreAttribute]
         private FileSystemWatcher IntelFileWatcher;
 
@@ -204,53 +178,50 @@ namespace SMT.EVEData
         private Dictionary<string, int> IntelFileReadPos;
 
         [XmlIgnoreAttribute]
-        public BindingList<EVEData.IntelData> IntelDataList;
+        public BindingList<EVEData.IntelData> IntelDataList { get; set; }
 
         [XmlIgnoreAttribute]
-        public List<string> IntelFilters;
-
+        public List<string> IntelFilters { get; set; }
 
         public void SetupIntelWatcher()
         {
             IntelFilters = new List<string>();
             IntelDataList = new BindingList<IntelData>();
-            string IntelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
-            if (File.Exists(IntelFileFilter))
+            string intelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
+            if (File.Exists(intelFileFilter))
             {
-                StreamReader file = new StreamReader(IntelFileFilter);
+                StreamReader file = new StreamReader(intelFileFilter);
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
                     line.Trim();
-                    if(line != "")
+                    if (line != string.Empty)
                     {
                         IntelFilters.Add(line);
                     }
                 }
             }
 
-
             IntelFileReadPos = new Dictionary<string, int>();
 
-            string EveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
+            string eveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
 
-            if (Directory.Exists(EveLogFolder))
+            if (Directory.Exists(eveLogFolder))
             {
-                IntelFileWatcher = new FileSystemWatcher(EveLogFolder);
+                IntelFileWatcher = new FileSystemWatcher(eveLogFolder);
                 IntelFileWatcher.Filter = "*.txt";
                 IntelFileWatcher.EnableRaisingEvents = true;
                 IntelFileWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
                 IntelFileWatcher.Changed += IntelFileWatcher_Changed;
             }
 
-
-            /// -----------------------------------------------------------------
-            /// SUPER HACK WARNING....
-            /// 
-            /// Start up a thread which just reads the text files in the eve log folder
-            /// by opening and closing them it updates the sytem meta files which 
-            /// causes the file watcher to operate correctly otherwise this data
-            /// doesnt get updated until something other than the eve client reads these files
+            // -----------------------------------------------------------------
+            // SUPER HACK WARNING....
+            //
+            // Start up a thread which just reads the text files in the eve log folder
+            // by opening and closing them it updates the sytem meta files which
+            // causes the file watcher to operate correctly otherwise this data
+            // doesnt get updated until something other than the eve client reads these files
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
@@ -258,15 +229,14 @@ namespace SMT.EVEData
                 // loop forever
                 while (true)
                 {
-
-                    DirectoryInfo di = new DirectoryInfo(EveLogFolder);
-                    FileInfo[] Files = di.GetFiles("*.txt");
-                    foreach (FileInfo file in Files)
+                    DirectoryInfo di = new DirectoryInfo(eveLogFolder);
+                    FileInfo[] files = di.GetFiles("*.txt");
+                    foreach (FileInfo file in files)
                     {
                         bool readFile = false;
-                        foreach (string IntelFilterStr in IntelFilters)
+                        foreach (string intelFilterStr in IntelFilters)
                         {
-                            if (file.Name.Contains(IntelFilterStr))
+                            if (file.Name.Contains(intelFilterStr))
                             {
                                 readFile = true;
                                 break;
@@ -278,8 +248,6 @@ namespace SMT.EVEData
                         {
                             readFile = true;
                         }
-
-
 
                         // only read files from the last day
                         if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
@@ -296,109 +264,104 @@ namespace SMT.EVEData
             }).Start();
             /// END SUPERHACK
             /// -----------------------------------------------------------------
-
-
         }
 
         private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            string ChangedFile = e.FullPath;
+            string changedFile = e.FullPath;
 
-            bool ProcessFile = false;
-            bool LocalChat = false;
+            bool processFile = false;
+            bool localChat = false;
 
-            foreach (string IntelFilterStr in IntelFilters)
+            foreach (string intelFilterStr in IntelFilters)
             {
-                if (ChangedFile.Contains(IntelFilterStr))
+                if (changedFile.Contains(intelFilterStr))
                 {
-                    ProcessFile = true;
+                    processFile = true;
                     break;
                 }
             }
 
-            if (ChangedFile.Contains("Local_"))
+            if (changedFile.Contains("Local_"))
             {
-                LocalChat = true;
-                ProcessFile = true;
+                localChat = true;
+                processFile = true;
             }
 
-
-            if (ProcessFile)
+            if (processFile)
             {
-                FileStream ifs = new FileStream(ChangedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 StreamReader file = new StreamReader(ifs);
 
-                int FileReadFrom = 0;
+                int fileReadFrom = 0;
 
                 // have we seen this file before
-                if (IntelFileReadPos.Keys.Contains<string>(ChangedFile))
+                if (IntelFileReadPos.Keys.Contains<string>(changedFile))
                 {
-                    FileReadFrom = IntelFileReadPos[ChangedFile];
+                    fileReadFrom = IntelFileReadPos[changedFile];
                 }
                 else
                 {
-                    if (LocalChat)
+                    if (localChat)
                     {
-                        string System = "";
-                        string CharacterName = "";
-
+                        string system = string.Empty;
+                        string characterName = string.Empty;
 
                         // read the iniital block
                         while (!file.EndOfStream)
                         {
                             string l = file.ReadLine();
-                            FileReadFrom++;
+                            fileReadFrom++;
 
                             if (l.Contains("Channel ID"))
                             {
                                 string temp = l.Split(',')[1].Split(')')[0].Trim();
                                 if (SystemIDToName.Keys.Contains(temp))
                                 {
-                                    System = SystemIDToName[temp];
+                                    system = SystemIDToName[temp];
                                 }
 
                                 // now can read the next line
                                 l = file.ReadLine(); // should be the "Channel Name : Local"
                                 l = file.ReadLine();
 
-                                CharacterName = l.Split(':')[1].Trim();
+                                characterName = l.Split(':')[1].Trim();
 
-                                bool AddChar = true;
+                                bool addChar = true;
                                 foreach (EVEData.Character c in LocalCharacters)
                                 {
-                                    if (CharacterName == c.Name)
+                                    if (characterName == c.Name)
                                     {
-                                        c.Location = System;
-                                        c.LocalChatFile = ChangedFile;
-                                        AddChar = false;
+                                        c.Location = system;
+                                        c.LocalChatFile = changedFile;
+                                        addChar = false;
                                     }
                                 }
-                                if (AddChar)
+
+                                if (addChar)
                                 {
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
-                                        LocalCharacters.Add(new EVEData.Character(CharacterName, ChangedFile, System));
+                                        LocalCharacters.Add(new EVEData.Character(characterName, changedFile, system));
                                     }));
-
                                 }
 
                                 break;
                             }
                         }
-
                     }
 
                     while (file.ReadLine() != null)
                     {
-                        FileReadFrom++;
+                        fileReadFrom++;
                     }
-                    FileReadFrom--;
+
+                    fileReadFrom--;
                     file.BaseStream.Seek(0, SeekOrigin.Begin);
                 }
 
-
-                for (int i = 0; i < FileReadFrom; i++)
+                for (int i = 0; i < fileReadFrom; i++)
                 {
                     file.ReadLine();
                 }
@@ -406,25 +369,24 @@ namespace SMT.EVEData
                 string line = file.ReadLine();
                 while (line != null)
                 {
-                    FileReadFrom++;
+                    fileReadFrom++;
 
-                    if (LocalChat)
+                    if (localChat)
                     {
                         if (line.StartsWith("[") && line.Contains("EVE System > Channel changed to Local"))
                         {
-                            string System = line.Split(':').Last().Trim();
+                            string system = line.Split(':').Last().Trim();
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
                                 foreach (EVEData.Character c in LocalCharacters)
                                 {
-                                    if (c.LocalChatFile == ChangedFile)
+                                    if (c.LocalChatFile == changedFile)
                                     {
-                                        c.Location = System;
+                                        c.Location = system;
                                     }
                                 }
                             }));
                         }
-
                     }
                     else
                     {
@@ -434,16 +396,16 @@ namespace SMT.EVEData
                             {
                                 // check if it is in the intel list already (ie if you have multiple clients running)
                                 bool addToIntel = true;
-                                foreach(EVEData.IntelData idl in IntelDataList)
+                                foreach (EVEData.IntelData idl in IntelDataList)
                                 {
-                                    if(idl.RawIntelString == line)
+                                    if (idl.RawIntelString == line)
                                     {
                                         addToIntel = false;
                                         break;
                                     }
                                 }
 
-                                if(addToIntel)
+                                if (addToIntel)
                                 {
                                     EVEData.IntelData id = new EVEData.IntelData(line);
 
@@ -456,7 +418,6 @@ namespace SMT.EVEData
                                     }
                                     IntelDataList.Insert(0, id);
                                 }
-
                             }));
                         }
                     }
@@ -464,22 +425,15 @@ namespace SMT.EVEData
                     line = file.ReadLine();
                 }
 
-                IntelFileReadPos[ChangedFile] = FileReadFrom;
+                IntelFileReadPos[changedFile] = fileReadFrom;
             }
-
         }
 
-
-        #endregion
-
-
-        #region Dotlan Init Stuff
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotland
         /// </summary>
         public void InitFromDotLAN()
         {
-
             Regions = new List<RegionData>();
 
             Regions.Add(new RegionData("Aridia"));
@@ -552,36 +506,32 @@ namespace SMT.EVEData
             // create folder cache
             WebClient webClient = new WebClient();
 
-
-
             // update the region cache
             foreach (RegionData rd in Regions)
             {
                 string localSVG = DataCacheFolder + @"\" + rd.DotLanRef + ".svg";
-                string RemoteSVG = @"http://evemaps.dotlan.net/svg/" + rd.DotLanRef + ".svg";
+                string remoteSVG = @"http://evemaps.dotlan.net/svg/" + rd.DotLanRef + ".svg";
 
-                bool NeedsDownload = true;
+                bool needsDownload = true;
 
                 if (File.Exists(localSVG))
                 {
-                    NeedsDownload = false;
+                    needsDownload = false;
                 }
 
-                if (NeedsDownload)
+                if (needsDownload)
                 {
-                    webClient.DownloadFile(RemoteSVG, localSVG);
+                    webClient.DownloadFile(remoteSVG, localSVG);
 
                     // throttle so we dont hammer the server
                     Thread.Sleep(100);
                 }
-
 
                 // parse the svg as xml
                 XmlDocument xmldoc = new XmlDocument();
                 xmldoc.XmlResolver = null;
                 FileStream fs = new FileStream(localSVG, FileMode.Open, FileAccess.Read);
                 xmldoc.Load(fs);
-
 
                 // get the svg/g/g sys use child nodes
                 string systemsXpath = @"//*[@id='sysuse']";
@@ -591,41 +541,37 @@ namespace SMT.EVEData
                 foreach (XmlNode system in sysUseNode.ChildNodes)
                 {
                     // extact the base from info from the g
-                    string SystemID = system.Attributes["id"].Value.Substring(3);
-                    float X = float.Parse(system.Attributes["x"].Value) + (float.Parse(system.Attributes["width"].Value) / 2.0f);
-                    float Y = float.Parse(system.Attributes["y"].Value) + (float.Parse(system.Attributes["height"].Value) / 2.0f);
+                    string systemID = system.Attributes["id"].Value.Substring(3);
+                    float x = float.Parse(system.Attributes["x"].Value) + (float.Parse(system.Attributes["width"].Value) / 2.0f);
+                    float y = float.Parse(system.Attributes["y"].Value) + (float.Parse(system.Attributes["height"].Value) / 2.0f);
 
-
-                    string systemnodepath = @"//*[@id='def" + SystemID + "']";
+                    string systemnodepath = @"//*[@id='def" + systemID + "']";
                     XmlNodeList snl = xmldoc.SelectNodes(systemnodepath);
                     XmlNode sysdefNode = snl[0];
 
                     XmlNode aNode = sysdefNode.ChildNodes[0];
 
-
                     string name;
-                    bool HasStation = false;
-
+                    bool hasStation = false;
 
                     // scan for <polygon> nodes as these are the npc station nodes
-                    foreach( XmlNode sxn in sysdefNode.ChildNodes)
+                    foreach (XmlNode sxn in sysdefNode.ChildNodes)
                     {
-                        if(sxn.Name == "polygon")
+                        if (sxn.Name == "polygon")
                         {
-                            HasStation = true;
+                            hasStation = true;
                             break;
                         }
                     }
-
 
                     // SS Nodes for system nodes
                     XmlNodeList ssNodes = aNode.SelectNodes(@".//*[@class='ss']");
                     if (ssNodes[0] != null)
                     {
                         name = ssNodes[0].InnerText;
-                        rd.Systems[name] = new System(name, SystemID, X, Y, rd.Name, HasStation);
+                        rd.Systems[name] = new System(name, systemID, x, y, rd.Name, hasStation);
 
-                        SystemIDToName[SystemID] = name;
+                        SystemIDToName[systemID] = name;
                     }
                     else
                     {
@@ -635,14 +581,12 @@ namespace SMT.EVEData
 
                         if (esNodes[0] != null && erNodes[0] != null)
                         {
-
                             name = esNodes[0].InnerText;
                             string regionLinkName = erNodes[0].InnerText;
 
-                            rd.Systems[name] = new System(name, SystemID, X, Y, regionLinkName, HasStation);
+                            rd.Systems[name] = new System(name, systemID, x, y, regionLinkName, hasStation);
 
-                            SystemIDToName[SystemID] = name;
-
+                            SystemIDToName[systemID] = name;
                         }
                     }
                 }
@@ -662,7 +606,6 @@ namespace SMT.EVEData
                     rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], false));
                 }
 
-
                 // now catch the constellation links - jc
                 string jcXpath = @"//*[@class='jc']";
                 xn = xmldoc.SelectNodes(jcXpath);
@@ -677,7 +620,6 @@ namespace SMT.EVEData
 
                     rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
                 }
-
 
                 // now catch the region links - jr
                 string jrXpath = @"//*[@class='jr']";
@@ -696,59 +638,55 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string EveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystems.csv";
-            if (File.Exists(EveStaticDataSolarSystemFile))
+            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystems.csv";
+            if (File.Exists(eveStaticDataSolarSystemFile))
             {
-                StreamReader file = new StreamReader(EveStaticDataSolarSystemFile);
+                StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
+
                 // read the headers..
                 string line;
                 line = file.ReadLine();
                 while ((line = file.ReadLine()) != null)
                 {
-
                     string[] bits = line.Split(',');
 
+                    string systemID = bits[2];
+                    string systemName = bits[3]; // SystemIDToName[SystemID];
 
+                    double x = Convert.ToDouble(bits[4]);
+                    double y = Convert.ToDouble(bits[5]);
+                    double z = Convert.ToDouble(bits[6]);
+                    double security = Convert.ToDouble(bits[21]);
 
-                    string SystemID = bits[2];
-                    string SystemName =  bits[3]; // SystemIDToName[SystemID];
-
-                    double X = Convert.ToDouble(bits[4]);
-                    double Y = Convert.ToDouble(bits[5]);
-                    double Z = Convert.ToDouble(bits[6]);
-                    double Security = Convert.ToDouble(bits[21]);
-
-                    System s = GetEveSystem(SystemName);
-                    if(s != null)
+                    System s = GetEveSystem(systemName);
+                    if (s != null)
                     {
-                        s.ActualX = X;
-                        s.ActualY = Y;
-                        s.ActualZ = Z;
-                        s.Security = Security;
+                        s.ActualX = x;
+                        s.ActualY = y;
+                        s.ActualZ = z;
+                        s.Security = security;
                     }
                     else
                     {
-                        Console.WriteLine("Failed to Find System {0}", SystemName);
+                        Console.WriteLine("Failed to Find System {0}", systemName);
                     }
                 }
 
                 // patch up the out of region data
                 foreach (RegionData rr in Regions)
                 {
-                    foreach(System ss in rr.Systems.Values.ToList())
+                    foreach (System ss in rr.Systems.Values.ToList())
                     {
-                        if(ss.Name!= rr.Name)
+                        if (ss.Name != rr.Name)
                         {
                             System actual = GetEveSystem(ss.Name);
                             ss.Security = actual.Security;
                         }
                     }
                 }
-
             }
 
-
-                // now serialise the class to disk
+            // now serialise the class to disk
             XmlSerializer xms = new XmlSerializer(typeof(EveManager));
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\RegionInfo.dat";
 
@@ -758,22 +696,17 @@ namespace SMT.EVEData
             }
         }
 
-        #endregion
-
-
-
         /// <summary>
         /// Does the System Exist ?
         /// </summary>
         /// <param name="name">Name (not ID) of the system</param>
         public bool DoesSystemExist(string name)
         {
-            return (GetEveSystem(name) != null);
+            return GetEveSystem(name) != null;
         }
 
-
         /// <summary>
-        /// Get a System object from the name, note : for regions which have other region systems in it wont return 
+        /// Get a System object from the name, note : for regions which have other region systems in it wont return
         /// them.. eg TR07-s is on the esoteria map, but the object corresponding to the feythabolis map will be returned
         /// </summary>
         /// <param name="name">Name (not ID) of the system</param>
@@ -787,7 +720,7 @@ namespace SMT.EVEData
                 }
             }
 
-            return null ;
+            return null;
         }
 
         public RegionData GetRegion(string name)
@@ -799,13 +732,9 @@ namespace SMT.EVEData
                     return reg;
                 }
             }
+
             return null;
         }
-
-
-        #region ESI Data
-
-
 
         public string GetESILogonURL()
         {
@@ -817,37 +746,32 @@ namespace SMT.EVEData
             esiQuery["redirect_uri"] = @"eveauth-smt://callback";
             esiQuery["scope"] = "publicData characterLocationRead characterNavigationWrite remoteClientUI esi-location.read_location.v1 esi-location.read_ship_type.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1";
 
-
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
 
             esiLogonBuilder.Query = esiQuery.ToString();
+
             // old way... Process.Start();
-
             return esiLogonBuilder.ToString();
-
-
         }
 
         public bool HandleEveAuthSMTUri(Uri uri)
         {
             // parse the uri
-            var Query = HttpUtility.ParseQueryString(uri.Query);
+            var query = HttpUtility.ParseQueryString(uri.Query);
 
-            if (Query["state"] == null || Int32.Parse(Query["state"]) != Process.GetCurrentProcess().Id)
+            if (query["state"] == null || int.Parse(query["state"]) != Process.GetCurrentProcess().Id)
             {
                 // this query isnt for us..
                 return false;
             }
 
-            if (Query["code"] == null)
+            if (query["code"] == null)
             {
                 // we're missing a query code
                 return false;
             }
 
-
             // now we have the initial uri call back we can verify the auth code
-
             string url = @"https://login.eveonline.com/oauth/token";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
@@ -855,13 +779,13 @@ namespace SMT.EVEData
             request.Timeout = 20000;
             request.Proxy = null;
 
-            string code = Query["code"];
+            string code = query["code"];
             string authHeader = CLIENT_ID + ":" + SECRET_KEY;
             string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
             request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
 
-            var httpData = HttpUtility.ParseQueryString(string.Empty); ;
+            var httpData = HttpUtility.ParseQueryString(string.Empty);
             httpData["grant_type"] = "authorization_code";
             httpData["code"] = code;
 
@@ -873,7 +797,6 @@ namespace SMT.EVEData
             var stream = request.GetRequestStream();
             stream.Write(data, 0, data.Length);
 
-
             request.BeginGetResponse(new AsyncCallback(ESIValidateAuthCodeCallback), request);
 
             return true;
@@ -881,6 +804,7 @@ namespace SMT.EVEData
 
         // since we dont know what character these tokens belong too until we check just store them..
         private string PendingAccessToken;
+
         private string PendingTokenType;
         private string PendingExpiresIn;
         private string PendingRefreshToken;
@@ -895,7 +819,7 @@ namespace SMT.EVEData
                     Stream responseStream = response.GetResponseStream();
                     using (StreamReader sr = new StreamReader(responseStream))
                     {
-                        //Need to return this response 
+                        // Need to return this response
                         string strContent = sr.ReadToEnd();
 
                         JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
@@ -910,10 +834,9 @@ namespace SMT.EVEData
                                 PendingRefreshToken = obj["refresh_token"].ToString();
 
                                 // now requests the character information
-
                                 string url = @"https://login.eveonline.com/oauth/verify";
                                 HttpWebRequest verifyRequest = (HttpWebRequest)WebRequest.Create(url);
-                                verifyRequest.ContentType = 
+                                verifyRequest.ContentType =
                                 verifyRequest.Method = WebRequestMethods.Http.Get;
                                 verifyRequest.Timeout = 20000;
                                 verifyRequest.Proxy = null;
@@ -921,9 +844,7 @@ namespace SMT.EVEData
 
                                 verifyRequest.Headers[HttpRequestHeader.Authorization] = authHeader;
 
-
                                 verifyRequest.BeginGetResponse(new AsyncCallback(ESIVerifyAccessCodeCallback), verifyRequest);
-
                             }
                         }
                     }
@@ -934,6 +855,7 @@ namespace SMT.EVEData
                 /// ....
             }
         }
+
         private void ESIVerifyAccessCodeCallback(IAsyncResult asyncResult)
         {
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
@@ -941,7 +863,6 @@ namespace SMT.EVEData
             {
                 using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
                 {
-
                     Stream verifyStream = response.GetResponseStream();
                     using (StreamReader srr = new StreamReader(verifyStream))
                     {
@@ -953,40 +874,37 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string CharacterID = obj["CharacterID"].ToString();
-                                string CharacterName = obj["CharacterName"].ToString();
-                                string TokenType = obj["TokenType"].ToString();
-                                string CharacterOwnerHash = obj["CharacterOwnerHash"].ToString();
-                                string ExpiresOn = obj["ExpiresOn"].ToString();
+                                string characterID = obj["CharacterID"].ToString();
+                                string characterName = obj["CharacterName"].ToString();
+                                string tokenType = obj["TokenType"].ToString();
+                                string characterOwnerHash = obj["CharacterOwnerHash"].ToString();
+                                string expiresOn = obj["ExpiresOn"].ToString();
 
                                 // now find the matching character and update..
                                 Character esiChar = null;
-                                foreach(Character c in LocalCharacters)
+                                foreach (Character c in LocalCharacters)
                                 {
-                                    if(c.Name == CharacterName)
+                                    if (c.Name == characterName)
                                     {
                                         esiChar = c;
                                     }
                                 }
 
-                                if(esiChar == null)
+                                if (esiChar == null)
                                 {
-                                    esiChar = new Character(CharacterName, "", "");
-
+                                    esiChar = new Character(characterName, string.Empty, string.Empty);
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
                                         LocalCharacters.Add(esiChar);
                                     }));
-
                                 }
 
                                 esiChar.ESIRefreshToken = PendingRefreshToken;
                                 esiChar.ESILinked = true;
                                 esiChar.ESIAccessToken = PendingAccessToken;
-                                esiChar.ESIAccessTokenExpiry = DateTime.Parse(ExpiresOn);
-                                esiChar.ID = CharacterID;
-
+                                esiChar.ESIAccessTokenExpiry = DateTime.Parse(expiresOn);
+                                esiChar.ID = characterID;
                             }
                         }
                     }
@@ -996,11 +914,7 @@ namespace SMT.EVEData
             {
                 /// ....
             }
-
         }
-        
-
-
 
         /// <summary>
         /// Start the ESI download for the kill info
@@ -1015,12 +929,10 @@ namespace SMT.EVEData
             request.Proxy = null;
 
             request.BeginGetResponse(new AsyncCallback(ESIKillsReadCallback), request);
-
         }
 
-
         /// <summary>
-        /// ESI Result Response 
+        /// ESI Result Response
         /// </summary>
         /// <param name="asyncResult"></param>
         private void ESIKillsReadCallback(IAsyncResult asyncResult)
@@ -1033,7 +945,7 @@ namespace SMT.EVEData
                     Stream responseStream = response.GetResponseStream();
                     using (StreamReader sr = new StreamReader(responseStream))
                     {
-                        //Need to return this response 
+                        // Need to return this response
                         string strContent = sr.ReadToEnd();
 
                         JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
@@ -1044,21 +956,19 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string SystemID = obj["system_id"].ToString();
-                                string ShipKills = obj["ship_kills"].ToString();
-                                string NPCKills = obj["npc_kills"].ToString();
-                                string PodKills = obj["pod_kills"].ToString();
+                                string systemID = obj["system_id"].ToString();
+                                string shipKills = obj["ship_kills"].ToString();
+                                string nPCKills = obj["npc_kills"].ToString();
+                                string podKills = obj["pod_kills"].ToString();
 
-
-                                if(SystemIDToName[SystemID] != null)
+                                if (SystemIDToName[systemID] != null)
                                 {
-                                    System es = GetEveSystem(SystemIDToName[SystemID]);
-                                    if(es != null)
+                                    System es = GetEveSystem(SystemIDToName[systemID]);
+                                    if (es != null)
                                     {
-                                        es.ShipKillsLastHour = int.Parse(ShipKills);
-                                        es.PodKillsLastHour = int.Parse(PodKills);
-                                        es.NPCKillsLastHour = int.Parse(NPCKills);
-
+                                        es.ShipKillsLastHour = int.Parse(shipKills);
+                                        es.PodKillsLastHour = int.Parse(podKills);
+                                        es.NPCKillsLastHour = int.Parse(nPCKills);
                                     }
                                 }
                             }
@@ -1071,7 +981,6 @@ namespace SMT.EVEData
                 /// ....
             }
         }
-
 
         /// <summary>
         /// Start the ESI download for the Jump info
@@ -1086,12 +995,10 @@ namespace SMT.EVEData
             request.Proxy = null;
 
             request.BeginGetResponse(new AsyncCallback(ESIJumpsReadCallback), request);
-
         }
 
-
         /// <summary>
-        /// ESI Result Response 
+        /// ESI Result Response
         /// </summary>
         /// <param name="asyncResult"></param>
         private void ESIJumpsReadCallback(IAsyncResult asyncResult)
@@ -1104,7 +1011,7 @@ namespace SMT.EVEData
                     Stream responseStream = response.GetResponseStream();
                     using (StreamReader sr = new StreamReader(responseStream))
                     {
-                        //Need to return this response 
+                        // Need to return this response
                         string strContent = sr.ReadToEnd();
 
                         JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
@@ -1115,13 +1022,12 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string SystemID = obj["system_id"].ToString();
+                                string systemID = obj["system_id"].ToString();
                                 string ship_jumps = obj["ship_jumps"].ToString();
 
-
-                                if (SystemIDToName[SystemID] != null)
+                                if (SystemIDToName[systemID] != null)
                                 {
-                                    System es = GetEveSystem(SystemIDToName[SystemID]);
+                                    System es = GetEveSystem(SystemIDToName[systemID]);
                                     if (es != null)
                                     {
                                         es.JumpsLastHour = int.Parse(ship_jumps);
@@ -1138,10 +1044,6 @@ namespace SMT.EVEData
             }
         }
 
-
-        #endregion
-
-
         public void StartUpdateCharacterThread()
         {
             new Thread(() =>
@@ -1151,7 +1053,6 @@ namespace SMT.EVEData
                 // loop forever
                 while (true)
                 {
-
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         foreach (Character c in LocalCharacters)
@@ -1164,8 +1065,6 @@ namespace SMT.EVEData
             }).Start();
         }
 
-
-
         public EveManager()
         {
             LocalCharacters = new ObservableCollection<Character>();
@@ -1177,32 +1076,27 @@ namespace SMT.EVEData
             {
                 Directory.CreateDirectory(DataCacheFolder);
             }
-            string WebCacheFoilder = DataCacheFolder + "\\WebCache"; 
-            if (!Directory.Exists(WebCacheFoilder))
+
+            string webCacheFoilder = DataCacheFolder + "\\WebCache";
+            if (!Directory.Exists(webCacheFoilder))
             {
-                Directory.CreateDirectory(WebCacheFoilder);
+                Directory.CreateDirectory(webCacheFoilder);
             }
 
-            string PortraitCacheFoilder = DataCacheFolder + "\\Portraits";
-            if (!Directory.Exists(PortraitCacheFoilder))
+            string portraitCacheFoilder = DataCacheFolder + "\\Portraits";
+            if (!Directory.Exists(portraitCacheFoilder))
             {
-                Directory.CreateDirectory(PortraitCacheFoilder);
+                Directory.CreateDirectory(portraitCacheFoilder);
             }
 
-            string LogosFoilder = DataCacheFolder + "\\Logos";
-            if (!Directory.Exists(LogosFoilder))
+            string logosFoilder = DataCacheFolder + "\\Logos";
+            if (!Directory.Exists(logosFoilder))
             {
-                Directory.CreateDirectory(LogosFoilder);
+                Directory.CreateDirectory(logosFoilder);
             }
-
-
-
 
             // start the character update thread
             StartUpdateCharacterThread();
         }
-
-        
-
     }
 }

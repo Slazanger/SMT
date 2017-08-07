@@ -18,32 +18,30 @@
                 <DataTemplate>
                     <Grid Margin="-20,0,-40,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="1*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Ident}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Description}"/>
+                        <TextBlock Grid.Column="0" Text="{Binding Ident}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Description}" />
                     </Grid>
                 </DataTemplate>
             </ContextMenu.ItemTemplate>
 
-
-            <MenuItem Header="{Binding Name}" FontWeight="Bold"/>
-            <Separator/>
-            <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click"/>
-            <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click"/>
+            <MenuItem Header="{Binding Name}" FontWeight="Bold" />
+            <Separator />
+            <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
+            <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
         </ContextMenu>
-
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <DockPanel Panel.ZIndex="60">
             <StackPanel Margin="4,2,1,2"  Orientation="Horizontal" HorizontalAlignment="Left">
-                <ComboBox x:Name="RegionDropDown"  Width="150"  SelectionChanged="OnRegionSelectionChanged" Margin="5,0" FontSize="12"/>
+                <ComboBox x:Name="RegionDropDown"  Width="150"  SelectionChanged="OnRegionSelectionChanged" Margin="5,0" FontSize="12" />
                 <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" SelectionChanged="SystemDropDownAC_SelectionChanged" FontSize="12" Margin="5,0">
                     <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -51,36 +49,32 @@
                         </ItemsPanelTemplate>
                     </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                 </dotNetKitControls:AutoCompleteComboBox>
-                <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" DropDownClosed="CharacterDropDown_DropDownClosed"  />
-                <CheckBox x:Name="FollowCharacterChk" Checked="FollowCharacterChk_Checked" Margin="5,0" Content="Follow?" IsChecked="{Binding Path=FollowCharacter, Mode=TwoWay}"/>
-
+                <ComboBox x:Name="CharacterDropDown"  Width="150"  SelectionChanged="CharacterDropDown_SelectionChanged" Margin="5,0" HorizontalAlignment="Center" DropDownClosed="CharacterDropDown_DropDownClosed" />
+                <CheckBox x:Name="FollowCharacterChk" Checked="FollowCharacterChk_Checked" Margin="5,0" Content="Follow?" IsChecked="{Binding Path=FollowCharacter, Mode=TwoWay}" />
             </StackPanel>
             <StackPanel Margin="4,1,1,0"  Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="btnHelp" Click="btnHelp_Click">
-                    <Image Source="Images/help.png"/>
+                    <Image Source="Images/help.png" />
                 </Button>
             </StackPanel>
-
         </DockPanel>
 
-        <Grid x:Name="MainContent" Grid.Row="1" >
+        <Grid x:Name="MainContent" Grid.Row="1">
 
             <xcad:DockingManager x:Name="dockManager" Grid.Row="0">
                 <xcad:LayoutRoot>
                     <xcad:LayoutPanel Orientation="Horizontal">
                         <xcad:LayoutDocumentPane ShowHeader="False">
-                            <xcad:LayoutDocument Title="Map" CanClose="False" CanFloat="False" ContentId="MapContentID" >
+                            <xcad:LayoutDocument Title="Map" CanClose="False" CanFloat="False" ContentId="MapContentID">
                                 <Grid x:Name="MainCanvasGrid" ClipToBounds="True">
                                     <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
-                                        <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800"  />
+                                        <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
                                     </Viewbox>
 
-                                    <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold"/>
-
+                                    <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
                                 </Grid>
                             </xcad:LayoutDocument>
                         </xcad:LayoutDocumentPane>
-
 
                         <xcad:LayoutAnchorablePaneGroup DockWidth="250" Orientation="Vertical">
 
@@ -91,7 +85,7 @@
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <Grid>
-                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10"/>
+                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10" />
                                                     </Grid>
                                                 </DataTemplate>
                                             </ListBox.ItemTemplate>
@@ -99,16 +93,15 @@
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 
-                                
                                 <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="AnomsContentID">
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="60"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="26"/>
+                                            <RowDefinition Height="60" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="26" />
                                         </Grid.RowDefinitions>
                                         <StackPanel Grid.Row="0">
-                                            <Button x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click"/>
+                                            <Button x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" />
                                             <Label Content="{Binding SystemName}" FontSize="18" FontWeight="Bold" />
                                         </StackPanel>
 
@@ -127,52 +120,43 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </DataGrid.RowStyle>
-                                            
+
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="SIG" Binding="{Binding Signature}"/>
+                                                <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" />
 
-
-                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
-                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
+                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Grid.Row="2">
-                                            <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click"/>
+                                            <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" />
                                         </StackPanel>
                                     </Grid>
-
                                 </xcad:LayoutAnchorable>
-
                             </xcad:LayoutAnchorablePane>
 
                                 <xcad:LayoutAnchorablePane>
                                 <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="MapControlsContentID">
                                         <ScrollViewer Background="#FFE5E5E5">
-                                            <StackPanel >
+                                            <StackPanel>
                                                 <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
                                                     <xctk:PropertyGrid.EditorDefinitions>
                                                         <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
                                                             <xctk:EditorTemplateDefinition.EditingTemplate>
                                                                 <DataTemplate>
-                                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}"/>
+                                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
                                                                 </DataTemplate>
                                                             </xctk:EditorTemplateDefinition.EditingTemplate>
                                                         </xctk:EditorTemplateDefinition>
                                                     </xctk:PropertyGrid.EditorDefinitions>
-
                                                 </xctk:PropertyGrid>
 
                                                 <StackPanel>
                                                     <Separator />
                                                     <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
-
                                                 </StackPanel>
-
-
-
                                             </StackPanel>
                                         </ScrollViewer>
-
                                     </xcad:LayoutAnchorable>
 
                                 <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="MapColoursContentID">
@@ -180,61 +164,49 @@
                                             <StackPanel>
                                                 <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
                                                 <Separator />
-                                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False"/>
+                                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
                                                 <Separator />
                                                 <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
                                             </StackPanel>
                                         </ScrollViewer>
-
                                     </xcad:LayoutAnchorable>
-
 
                                 <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="CharactersContentID">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
-                                            <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character"/>
+                                            <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
                                         </StackPanel>
                                     </ScrollViewer>
-
                                 </xcad:LayoutAnchorable>
-
                             </xcad:LayoutAnchorablePane>
                             </xcad:LayoutAnchorablePaneGroup>
-
-
-
-
-
-
                     </xcad:LayoutPanel>
                 </xcad:LayoutRoot>
             </xcad:DockingManager>
 
-
             <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100">
                 <StackPanel Background="#FF959595">
-                    <Label Content="{Binding Name}" FontWeight="Bold"/>
+                    <Label Content="{Binding Name}" FontWeight="Bold" />
 
                     <StackPanel Orientation="Horizontal"  Margin="10,0,0,0">
-                        <Label Content="Jumps" Width="50" Padding="1"/>
-                        <Label Content="{Binding JumpsLastHour}" Padding="1" FontWeight="Bold"/>
+                        <Label Content="Jumps" Width="50" Padding="1" />
+                        <Label Content="{Binding JumpsLastHour}" Padding="1" FontWeight="Bold" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal"  Margin="10,0,0,0">
                         <Label Content="Pods" Width="50" Padding="1" />
-                        <Label Content="{Binding PodKillsLastHour}" Padding="1" FontWeight="Bold"/>
+                        <Label Content="{Binding PodKillsLastHour}" Padding="1" FontWeight="Bold" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                         <Label Content="Ships" Width="50" Padding="1" />
-                        <Label Content="{Binding ShipKillsLastHour}" Padding="1" FontWeight="Bold"/>
+                        <Label Content="{Binding ShipKillsLastHour}" Padding="1" FontWeight="Bold" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                         <Label Content="NPCs" Width="50" Padding="1" />
-                        <Label Content="{Binding NPCKillsLastHour}" Padding="1" FontWeight="Bold"/>
+                        <Label Content="{Binding NPCKillsLastHour}" Padding="1" FontWeight="Bold" />
                     </StackPanel>
-
                 </StackPanel>
             </Popup>
         </Grid>
