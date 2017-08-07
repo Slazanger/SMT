@@ -28,11 +28,6 @@ namespace SMT
         public EVEData.AnomManager ANOMManager { get; set; }
 
         /// <summary>
-        /// List of all systems
-        /// </summary>
-        public List<string> AllSystems { get; set; }
-
-        /// <summary>
         /// Show the NPC kills in the last hour on the map
         /// </summary>
         public bool ShowNPCKills { get; set; }
@@ -97,24 +92,20 @@ namespace SMT
 
             SelectedSystem = string.Empty;
 
+            EVEManager = new EVEData.EveManager();
+            EVEData.EveManager.SetInstance(EVEManager);
+
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromDotlan = true;
-            if (initFromDotlan)
+            bool initFromScratch = false;
+            if (initFromScratch)
             {
-                EVEManager = EVEData.EveManager.GetInstance();
-                EVEManager.InitFromDotLAN();
+                EVEManager.CreateFromScratch();
             }
             else
             {
-                XmlSerializer xms = new XmlSerializer(typeof(EVEData.EveManager));
-                string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\RegionInfo.dat";
-
-                FileStream fs = new FileStream(dataFilename, FileMode.Open);
-                XmlReader xmlr = XmlReader.Create(fs);
-
-                EVEManager = (EVEData.EveManager)xms.Deserialize(xmlr);
-                EVEData.EveManager.SetInstance(EVEManager);
+                EVEManager.LoadFromDisk();
             }
+
 
             RegionDropDown.ItemsSource = EVEManager.Regions;
 
@@ -126,20 +117,16 @@ namespace SMT
             EVEManager.StartUpdateKillsFromESI();
             EVEManager.StartUpdateJumpsFromESI();
 
-            AllSystems = new List<string>();
-            foreach (EVEData.RegionData rd in EVEManager.Regions)
+            foreach (EVEData.MapRegion rd in EVEManager.Regions)
             {
                 if (rd.Name == MapConf.DefaultRegion)
                 {
                     RegionDropDown.SelectedItem = rd;
-                    List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList();
+                    List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
                     SystemDropDownAC.ItemsSource = newList;
                 }
-
-                AllSystems.AddRange(rd.Systems.Keys.ToList());
             }
 
-            AllSystems.Sort();
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
@@ -286,9 +273,9 @@ namespace SMT
         private void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
         {
             Shape obj = sender as Shape;
-            EVEData.RegionData currentRegion = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion currentRegion = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
-            EVEData.System selectedSys = obj.DataContext as EVEData.System;
+            EVEData.MapSystem selectedSys = obj.DataContext as EVEData.MapSystem;
 
             if (e.ChangedButton == MouseButton.Left)
             {
@@ -310,7 +297,7 @@ namespace SMT
 
                 if (e.ClickCount == 2 && selectedSys.Region != currentRegion.Name)
                 {
-                    foreach (EVEData.RegionData rd in EVEManager.Regions)
+                    foreach (EVEData.MapRegion rd in EVEManager.Regions)
                     {
                         if (rd.Name == selectedSys.Region)
                         {
@@ -336,22 +323,16 @@ namespace SMT
         private void ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
             Shape obj = sender as Shape;
-            EVEData.RegionData currentRegion = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion currentRegion = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
-            EVEData.System selectedSys = obj.DataContext as EVEData.System;
-
-            if (selectedSys.Region != currentRegion.Name)
-            {
-                // out of region, pull the data from the actual
-                selectedSys = EVEManager.GetEveSystem(selectedSys.Name);
-            }
+            EVEData.MapSystem selectedSys = obj.DataContext as EVEData.MapSystem;
 
             if (obj.IsMouseOver && MapConf.ShowSystemPopup)
             {
                 SystemInfoPopup.PlacementTarget = obj;
                 SystemInfoPopup.VerticalOffset = 5;
                 SystemInfoPopup.HorizontalOffset = 15;
-                SystemInfoPopup.DataContext = selectedSys;
+                SystemInfoPopup.DataContext = selectedSys.ActualSystem;
 
                 SystemInfoPopup.IsOpen = true;
             }
@@ -363,9 +344,9 @@ namespace SMT
 
         private void SelectSystem(string name)
         {
-            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
-            foreach (EVEData.System es in rd.Systems.Values.ToList())
+            foreach (EVEData.MapSystem es in rd.MapSystems.Values.ToList())
             {
                 if (es.Name == name)
                 {
@@ -385,13 +366,13 @@ namespace SMT
 
         private void AddHighlightToSystem(string name)
         {
-            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
-            if (!rd.Systems.Keys.Contains(name))
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+            if (!rd.MapSystems.Keys.Contains(name))
             {
                 return;
             }
 
-            EVEData.System selectedSys = rd.Systems[name];
+            EVEData.MapSystem selectedSys = rd.MapSystems[name];
             if (selectedSys != null)
             {
                 double circleSize = 30;
@@ -414,8 +395,8 @@ namespace SMT
 
                 highlightSystemCircle.StrokeDashArray = dashes;
 
-                Canvas.SetLeft(highlightSystemCircle, selectedSys.DotlanX - circleOffset);
-                Canvas.SetTop(highlightSystemCircle, selectedSys.DotLanY - circleOffset);
+                Canvas.SetLeft(highlightSystemCircle, selectedSys.LayoutX - circleOffset);
+                Canvas.SetTop(highlightSystemCircle, selectedSys.LayoutY - circleOffset);
                 Canvas.SetZIndex(highlightSystemCircle, 19);
 
                 MainCanvas.Children.Add(highlightSystemCircle);
@@ -437,7 +418,7 @@ namespace SMT
                 return;
             }
 
-            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
             foreach (EVEData.IntelData id in EVEManager.IntelDataList)
             {
@@ -445,7 +426,7 @@ namespace SMT
                 {
                     if (rd.IsSystemOnMap(sysStr))
                     {
-                        EVEData.System sys = rd.Systems[sysStr];
+                        EVEData.MapSystem sys = rd.MapSystems[sysStr];
 
                         double radiusScale = (DateTime.Now - id.IntelTime).TotalSeconds / 120.0;
 
@@ -461,8 +442,8 @@ namespace SMT
                         Shape intelShape = new Ellipse() { Height = radius, Width = radius };
 
                         intelShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.IntelOverlayColour);
-                        Canvas.SetLeft(intelShape, sys.DotlanX - circleOffset);
-                        Canvas.SetTop(intelShape, sys.DotLanY - circleOffset);
+                        Canvas.SetLeft(intelShape, sys.LayoutX - circleOffset);
+                        Canvas.SetTop(intelShape, sys.LayoutY - circleOffset);
                         Canvas.SetZIndex(intelShape, 15);
                         MainCanvas.Children.Add(intelShape);
                     }
@@ -472,13 +453,15 @@ namespace SMT
 
         private void AddCharactersToMap()
         {
-            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
             foreach (EVEData.Character c in EVEManager.LocalCharacters)
             {
                 EVEData.System s = EVEManager.GetEveSystem(c.Location);
                 if (s != null && EVEManager.GetRegion(s.Region) == rd)
                 {
+                    EVEData.MapSystem ms = rd.MapSystems[s.Name];
+
                     // add the character to
                     double circleSize = 26;
                     double circleOffset = circleSize / 2;
@@ -500,8 +483,8 @@ namespace SMT
 
                     highlightSystemCircle.StrokeDashArray = dashes;
 
-                    Canvas.SetLeft(highlightSystemCircle, s.DotlanX - circleOffset);
-                    Canvas.SetTop(highlightSystemCircle, s.DotLanY - circleOffset);
+                    Canvas.SetLeft(highlightSystemCircle, ms.LayoutX - circleOffset);
+                    Canvas.SetTop(highlightSystemCircle, ms.LayoutY - circleOffset);
                     Canvas.SetZIndex(highlightSystemCircle, 19);
 
                     MainCanvas.Children.Add(highlightSystemCircle);
@@ -528,8 +511,8 @@ namespace SMT
                         charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
                     }
 
-                    Canvas.SetLeft(charText, s.DotlanX + textXOffset);
-                    Canvas.SetTop(charText, s.DotLanY + textYOffset);
+                    Canvas.SetLeft(charText, ms.LayoutX+ textXOffset);
+                    Canvas.SetTop(charText, ms.LayoutY + textYOffset);
                     Canvas.SetZIndex(charText, 20);
                     MainCanvas.Children.Add(charText);
                 }
@@ -538,7 +521,7 @@ namespace SMT
 
         private void AddSystemsToMap()
         {
-            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
             AddSystemIntelOverlay();
 
@@ -546,13 +529,13 @@ namespace SMT
             {
                 Line sysLink = new Line();
 
-                EVEData.System from = rd.Systems[jump.From];
-                EVEData.System to = rd.Systems[jump.To];
-                sysLink.X1 = from.DotlanX;
-                sysLink.Y1 = from.DotLanY;
+                EVEData.MapSystem from = rd.MapSystems[jump.From];
+                EVEData.MapSystem to = rd.MapSystems[jump.To];
+                sysLink.X1 = from.LayoutX;
+                sysLink.Y1 = from.LayoutY;
 
-                sysLink.X2 = to.DotlanX;
-                sysLink.Y2 = to.DotLanY;
+                sysLink.X2 = to.LayoutX;
+                sysLink.Y2 = to.LayoutY;
 
                 if (jump.ConstelationLink)
                 {
@@ -582,11 +565,11 @@ namespace SMT
                         }
 
                         // jbLink.Data
-                        EVEData.System from = rd.Systems[jb.From];
-                        EVEData.System to = rd.Systems[jb.To];
+                        EVEData.MapSystem from = rd.MapSystems[jb.From];
+                        EVEData.MapSystem to = rd.MapSystems[jb.To];
 
-                        Point startPoint = new Point(from.DotlanX, from.DotLanY);
-                        Point endPoint = new Point(to.DotlanX, to.DotLanY);
+                        Point startPoint = new Point(from.LayoutX, from.LayoutY);
+                        Point endPoint = new Point(to.LayoutX, to.LayoutY);
 
                         Vector dir = Point.Subtract(startPoint, endPoint);
 
@@ -636,7 +619,7 @@ namespace SMT
                 }
             }
 
-            foreach (EVEData.System sys in rd.Systems.Values.ToList())
+            foreach (EVEData.MapSystem sys in rd.MapSystems.Values.ToList())
             {
                 double circleSize = 15;
                 double circleOffset = circleSize / 2;
@@ -644,12 +627,11 @@ namespace SMT
                 double textYOffset = -8;
                 double textYOffset2 = 4;
 
-                bool outofRegion = sys.Region != rd.Name;
 
                 // add circle for system
                 Shape systemShape;
 
-                if (sys.HasNPCStation)
+                if (sys.ActualSystem.HasNPCStation)
                 {
                     systemShape = new Rectangle() { Height = circleSize, Width = circleSize };
                 }
@@ -660,7 +642,7 @@ namespace SMT
 
                 systemShape.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
 
-                if (outofRegion)
+                if (sys.OutOfRegion)
                 {
                     systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
                 }
@@ -672,7 +654,7 @@ namespace SMT
                 // override with sec status colours
                 if (MapConf.ShowSystemSecurity)
                 {
-                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(sys.Security));
+                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(sys.ActualSystem.Security));
                 }
 
                 systemShape.DataContext = sys;
@@ -680,8 +662,8 @@ namespace SMT
                 systemShape.MouseEnter += ShapeMouseOverHandler;
                 systemShape.MouseLeave += ShapeMouseOverHandler;
 
-                Canvas.SetLeft(systemShape, sys.DotlanX - circleOffset);
-                Canvas.SetTop(systemShape, sys.DotLanY - circleOffset);
+                Canvas.SetLeft(systemShape, sys.LayoutX - circleOffset);
+                Canvas.SetTop(systemShape, sys.LayoutY - circleOffset);
                 Canvas.SetZIndex(systemShape, 20);
                 MainCanvas.Children.Add(systemShape);
 
@@ -693,7 +675,7 @@ namespace SMT
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
                 }
 
-                if (outofRegion)
+                if (sys.OutOfRegion)
                 {
                     sysText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
                 }
@@ -702,26 +684,16 @@ namespace SMT
                     sysText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
                 }
 
-                Canvas.SetLeft(sysText, sys.DotlanX + textXOffset);
-                Canvas.SetTop(sysText, sys.DotLanY + textYOffset);
+                Canvas.SetLeft(sysText, sys.LayoutX + textXOffset);
+                Canvas.SetTop(sysText, sys.LayoutY + textYOffset);
                 Canvas.SetZIndex(sysText, 20);
 
                 MainCanvas.Children.Add(sysText);
 
-                int nPCKillsLastHour = sys.NPCKillsLastHour;
-                int podKillsLastHour = sys.PodKillsLastHour;
-                int shipKillsLastHour = sys.ShipKillsLastHour;
-                int jumpsLastHour = sys.JumpsLastHour;
-
-                // if we're out of region pull the statistics from the other item
-                if (outofRegion)
-                {
-                    EVEData.System actual = EVEManager.GetEveSystem(sys.Name);
-                    nPCKillsLastHour = actual.NPCKillsLastHour;
-                    podKillsLastHour = actual.PodKillsLastHour;
-                    shipKillsLastHour = actual.ShipKillsLastHour;
-                    jumpsLastHour = actual.JumpsLastHour;
-                }
+                int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
+                int podKillsLastHour = sys.ActualSystem.PodKillsLastHour;
+                int shipKillsLastHour = sys.ActualSystem.ShipKillsLastHour;
+                int jumpsLastHour = sys.ActualSystem.JumpsLastHour;
 
                 int infoValue = -1;
                 SolidColorBrush infoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
@@ -746,7 +718,7 @@ namespace SMT
 
                 if (MapConf.ShowShipJumps)
                 {
-                    infoValue = sys.JumpsLastHour;
+                    infoValue = sys.ActualSystem.JumpsLastHour;
                     infoSize = infoValue * MapConf.ESIOverlayScale;
                 }
 
@@ -756,20 +728,20 @@ namespace SMT
                     infoCircle.Fill = infoColour;
 
                     Canvas.SetZIndex(infoCircle, 10);
-                    Canvas.SetLeft(infoCircle, sys.DotlanX - (infoSize / 2));
-                    Canvas.SetTop(infoCircle, sys.DotLanY - (infoSize / 2));
+                    Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
                     MainCanvas.Children.Add(infoCircle);
                 }
 
-                if (outofRegion)
+                if (sys.OutOfRegion)
                 {
                     Label sysRegionText = new Label();
                     sysRegionText.Content = "(" + sys.Region + ")";
                     sysRegionText.FontSize = 7;
                     sysRegionText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
 
-                    Canvas.SetLeft(sysRegionText, sys.DotlanX + textXOffset);
-                    Canvas.SetTop(sysRegionText, sys.DotLanY + textYOffset2);
+                    Canvas.SetLeft(sysRegionText, sys.LayoutX + textXOffset);
+                    Canvas.SetTop(sysRegionText, sys.LayoutY + textYOffset2);
                     Canvas.SetZIndex(sysRegionText, 20);
 
                     MainCanvas.Children.Add(sysRegionText);
@@ -785,7 +757,7 @@ namespace SMT
             // CharacterDropDown.SelectedItem = null;
             FollowCharacter = false;
 
-            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
             ReDrawMap();
             MapConf.DefaultRegion = rd.Name;
@@ -796,18 +768,18 @@ namespace SMT
 
             SystemDropDownAC.SelectedItem = null;
 
-            List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList();
+            List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
         }
 
         private void SelectRegion(string regionName)
         {
-            foreach (EVEData.RegionData rd in EVEManager.Regions)
+            foreach (EVEData.MapRegion rd in EVEManager.Regions)
             {
                 if (rd.Name == regionName)
                 {
                     RegionDropDown.SelectedItem = rd;
-                    List<EVEData.System> newList = rd.Systems.Values.ToList().OrderBy(o => o.Name).ToList();
+                    List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
                     SystemDropDownAC.ItemsSource = newList;
                 }
             }
@@ -825,7 +797,7 @@ namespace SMT
             // CharacterDropDown.SelectedItem = null;
             FollowCharacter = false;
 
-            EVEData.System sd = SystemDropDownAC.SelectedItem as EVEData.System;
+            EVEData.MapSystem sd = SystemDropDownAC.SelectedItem as EVEData.MapSystem;
 
             if (sd != null)
             {
@@ -837,7 +809,7 @@ namespace SMT
         private void SysContexMenuItemDotlan_Click(object sender, RoutedEventArgs e)
         {
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
-            EVEData.RegionData rd = EVEManager.GetRegion(eveSys.Region);
+            EVEData.MapRegion rd = EVEManager.GetRegion(eveSys.Region);
 
             string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
             System.Diagnostics.Process.Start(uRL);
@@ -846,7 +818,7 @@ namespace SMT
         private void SysContexMenuItemZKB_Click(object sender, RoutedEventArgs e)
         {
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
-            EVEData.RegionData rd = EVEManager.GetRegion(eveSys.Region);
+            EVEData.MapRegion rd = EVEManager.GetRegion(eveSys.Region);
 
             string uRL = string.Format("https://zkillboard.com/system/{0}", eveSys.ID);
             System.Diagnostics.Process.Start(uRL);
@@ -855,7 +827,7 @@ namespace SMT
         private void HandleCharacterSelectionChange()
         {
             EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-            EVEData.RegionData rd = RegionDropDown.SelectedItem as EVEData.RegionData;
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
             if (c != null)
             {

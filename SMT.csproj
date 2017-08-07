@@ -138,7 +138,8 @@
     <Compile Include="EVEData\IntelData.cs" />
     <Compile Include="EVEData\JumpBridge.cs" />
     <Compile Include="EVEData\Link.cs" />
-    <Compile Include="EVEData\RegionData.cs" />
+    <Compile Include="EVEData\MapSystem.cs" />
+    <Compile Include="EVEData\MapRegion.cs" />
     <Compile Include="EVEData\EveManager.cs" />
     <Compile Include="EVEData\ZKillRedisQ.cs" />
     <Compile Include="LogonWindow.xaml.cs">

@@ -13,10 +13,6 @@ namespace SMT.EVEData
         /// </summary>
         public string ID { get; set; }
 
-        public double DotlanX { get; set; }
-
-        public double DotLanY { get; set; }
-
         public double ActualX { get; set; }
 
         public double ActualY { get; set; }
@@ -48,12 +44,10 @@ namespace SMT.EVEData
         {
         }
 
-        public System(string name, string id, double x, double y, string region, bool station)
+        public System(string name, string id, string region, bool station)
         {
             Name = name;
             ID = id;
-            DotlanX = x;
-            DotLanY = y;
             Region = region;
             HasNPCStation = station;
 

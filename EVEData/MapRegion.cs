@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SMT.EVEData
 {
-    public class RegionData
+    public class MapRegion
     {
         /// <summary>
         ///  English Name of this region
@@ -15,45 +15,29 @@ namespace SMT.EVEData
         /// </summary>
         public string DotLanRef { get; set; }
 
-        /// <summary>
-        /// Systems in this Region
-        /// </summary>
-        public SerializableDictionary<string, System> Systems { get; set; }
+        public SerializableDictionary<string, MapSystem> MapSystems { get; set; }
+
 
         /// <summary>
         ///  Jumps/Links between systems
         /// </summary>
         public List<Link> Jumps { get; set; }
 
-        public RegionData()
+        public MapRegion()
         {
-            Systems = new SerializableDictionary<string, System>();
+            MapSystems = new SerializableDictionary<string, MapSystem>();
         }
 
-        public RegionData(string name)
+        public MapRegion(string name)
         {
             Name = name;
             DotLanRef = name.Replace(" ", "_");
 
-            Systems = new SerializableDictionary<string, System>();
+            MapSystems = new SerializableDictionary<string, MapSystem>();
+
             Jumps = new List<Link>();
         }
 
-        /// <summary>
-        /// Is the system within this region
-        /// </summary>
-        public bool DoesSystemExist(string name)
-        {
-            foreach (System sys in Systems.Values.ToList())
-            {
-                if (sys.Name == name && Name == sys.Region)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         /// <summary>
         /// Is the System on this region map : note as we're using the dotlan layout we have out of region systems on the map for navigability reasons
@@ -61,7 +45,7 @@ namespace SMT.EVEData
         public bool IsSystemOnMap(string name)
         {
             // to catch out of region systems on the current map, ie region boundaries or strange intra-region settings
-            foreach (System sys in Systems.Values.ToList())
+            foreach (MapSystem sys in MapSystems.Values.ToList())
             {
                 if (sys.Name == name)
                 {

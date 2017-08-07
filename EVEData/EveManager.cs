@@ -31,18 +31,15 @@ namespace SMT.EVEData
 
         public static EveManager GetInstance()
         {
-            if (s_Instance == null)
-            {
-                s_Instance = new EveManager();
-            }
-
-            return s_Instance;
+             return s_Instance;
         }
 
         /// <summary>
         /// Master List of Regions
         /// </summary>
-        public List<RegionData> Regions { get; set; }
+        public List<MapRegion> Regions { get; set; }
+
+        public SerializableDictionary<string, System> Systems { get; set; }
 
         /// <summary>
         /// Lookup from Internal ID to Name
@@ -56,7 +53,6 @@ namespace SMT.EVEData
         /// <summary>
         /// Folder to cache dotland svg's etc to
         /// </summary>
-        [XmlIgnoreAttribute]
         public string DataCacheFolder { get; set; }
 
         [XmlIgnoreAttribute]
@@ -75,7 +71,7 @@ namespace SMT.EVEData
                 ObservableCollection<Character> loadList;
                 XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
 
-                FileStream fs = new FileStream(dataFilename, FileMode.Open);
+                FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
                 loadList = (ObservableCollection<Character>)xms.Deserialize(xmlr);
@@ -86,7 +82,6 @@ namespace SMT.EVEData
                     c.ESIAccessTokenExpiry = DateTime.MinValue;
                     c.LocalChatFile = string.Empty;
                     c.Location = string.Empty;
-
                     c.Update();
 
                     LocalCharacters.Add(c);
@@ -117,7 +112,6 @@ namespace SMT.EVEData
             }
         }
 
-        [XmlIgnoreAttribute]
         public List<JumpBridge> JumpBridges { get; set; }
 
         /// <summary>
@@ -171,16 +165,12 @@ namespace SMT.EVEData
             }
         }
 
-        [XmlIgnoreAttribute]
         private FileSystemWatcher IntelFileWatcher;
 
-        [XmlIgnoreAttribute]
         private Dictionary<string, int> IntelFileReadPos;
 
-        [XmlIgnoreAttribute]
         public BindingList<EVEData.IntelData> IntelDataList { get; set; }
 
-        [XmlIgnoreAttribute]
         public List<string> IntelFilters { get; set; }
 
         public void SetupIntelWatcher()
@@ -432,82 +422,86 @@ namespace SMT.EVEData
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotland
         /// </summary>
-        public void InitFromDotLAN()
+        public void CreateFromScratch()
         {
-            Regions = new List<RegionData>();
 
-            Regions.Add(new RegionData("Aridia"));
-            Regions.Add(new RegionData("Black Rise"));
-            Regions.Add(new RegionData("The Bleak Lands"));
-            Regions.Add(new RegionData("Branch"));
-            Regions.Add(new RegionData("Cache"));
-            Regions.Add(new RegionData("Catch"));
-            Regions.Add(new RegionData("The Citadel"));
-            Regions.Add(new RegionData("Cloud Ring"));
-            Regions.Add(new RegionData("Cobalt Edge"));
-            Regions.Add(new RegionData("Curse"));
-            Regions.Add(new RegionData("Deklein"));
-            Regions.Add(new RegionData("Delve"));
-            Regions.Add(new RegionData("Derelik"));
-            Regions.Add(new RegionData("Detorid"));
-            Regions.Add(new RegionData("Devoid"));
-            Regions.Add(new RegionData("Domain"));
-            Regions.Add(new RegionData("Esoteria"));
-            Regions.Add(new RegionData("Essence"));
-            Regions.Add(new RegionData("Etherium Reach"));
-            Regions.Add(new RegionData("Everyshore"));
-            Regions.Add(new RegionData("Fade"));
-            Regions.Add(new RegionData("Feythabolis"));
-            Regions.Add(new RegionData("The Forge"));
-            Regions.Add(new RegionData("Fountain"));
-            Regions.Add(new RegionData("Geminate"));
-            Regions.Add(new RegionData("Genesis"));
-            Regions.Add(new RegionData("Great Wildlands"));
-            Regions.Add(new RegionData("Heimatar"));
-            Regions.Add(new RegionData("Immensea"));
-            Regions.Add(new RegionData("Impass"));
-            Regions.Add(new RegionData("Insmother"));
-            Regions.Add(new RegionData("Kador"));
-            Regions.Add(new RegionData("The Kalevala Expanse"));
-            Regions.Add(new RegionData("Khanid"));
-            Regions.Add(new RegionData("Kor-Azor"));
-            Regions.Add(new RegionData("Lonetrek"));
-            Regions.Add(new RegionData("Malpais"));
-            Regions.Add(new RegionData("Metropolis"));
-            Regions.Add(new RegionData("Molden Heath"));
-            Regions.Add(new RegionData("Oasa"));
-            Regions.Add(new RegionData("Omist"));
-            Regions.Add(new RegionData("Outer Passage"));
-            Regions.Add(new RegionData("Outer Ring"));
-            Regions.Add(new RegionData("Paragon Soul"));
-            Regions.Add(new RegionData("Period Basis"));
-            Regions.Add(new RegionData("Perrigen Falls"));
-            Regions.Add(new RegionData("Placid"));
-            Regions.Add(new RegionData("Providence"));
-            Regions.Add(new RegionData("Pure Blind"));
-            Regions.Add(new RegionData("Querious"));
-            Regions.Add(new RegionData("Scalding Pass"));
-            Regions.Add(new RegionData("Sinq Laison"));
-            Regions.Add(new RegionData("Solitude"));
-            Regions.Add(new RegionData("The Spire"));
-            Regions.Add(new RegionData("Stain"));
-            Regions.Add(new RegionData("Syndicate"));
-            Regions.Add(new RegionData("Tash-Murkon"));
-            Regions.Add(new RegionData("Tenal"));
-            Regions.Add(new RegionData("Tenerifis"));
-            Regions.Add(new RegionData("Tribute"));
-            Regions.Add(new RegionData("Vale of the Silent"));
-            Regions.Add(new RegionData("Venal"));
-            Regions.Add(new RegionData("Verge Vendor"));
-            Regions.Add(new RegionData("Wicked Creek"));
+            Regions = new List<MapRegion>();
+
+            // manually add the regions we care about
+            Regions.Add(new MapRegion("Aridia"));
+            Regions.Add(new MapRegion("Black Rise"));
+            Regions.Add(new MapRegion("The Bleak Lands"));
+            Regions.Add(new MapRegion("Branch"));
+            Regions.Add(new MapRegion("Cache"));
+            Regions.Add(new MapRegion("Catch"));
+            Regions.Add(new MapRegion("The Citadel"));
+            Regions.Add(new MapRegion("Cloud Ring"));
+            Regions.Add(new MapRegion("Cobalt Edge"));
+            Regions.Add(new MapRegion("Curse"));
+            Regions.Add(new MapRegion("Deklein"));
+            Regions.Add(new MapRegion("Delve"));
+            Regions.Add(new MapRegion("Derelik"));
+            Regions.Add(new MapRegion("Detorid"));
+            Regions.Add(new MapRegion("Devoid"));
+            Regions.Add(new MapRegion("Domain"));
+            Regions.Add(new MapRegion("Esoteria"));
+            Regions.Add(new MapRegion("Essence"));
+            Regions.Add(new MapRegion("Etherium Reach"));
+            Regions.Add(new MapRegion("Everyshore"));
+            Regions.Add(new MapRegion("Fade"));
+            Regions.Add(new MapRegion("Feythabolis"));
+            Regions.Add(new MapRegion("The Forge"));
+            Regions.Add(new MapRegion("Fountain"));
+            Regions.Add(new MapRegion("Geminate"));
+            Regions.Add(new MapRegion("Genesis"));
+            Regions.Add(new MapRegion("Great Wildlands"));
+            Regions.Add(new MapRegion("Heimatar"));
+            Regions.Add(new MapRegion("Immensea"));
+            Regions.Add(new MapRegion("Impass"));
+            Regions.Add(new MapRegion("Insmother"));
+            Regions.Add(new MapRegion("Kador"));
+            Regions.Add(new MapRegion("The Kalevala Expanse"));
+            Regions.Add(new MapRegion("Khanid"));
+            Regions.Add(new MapRegion("Kor-Azor"));
+            Regions.Add(new MapRegion("Lonetrek"));
+            Regions.Add(new MapRegion("Malpais"));
+            Regions.Add(new MapRegion("Metropolis"));
+            Regions.Add(new MapRegion("Molden Heath"));
+            Regions.Add(new MapRegion("Oasa"));
+            Regions.Add(new MapRegion("Omist"));
+            Regions.Add(new MapRegion("Outer Passage"));
+            Regions.Add(new MapRegion("Outer Ring"));
+            Regions.Add(new MapRegion("Paragon Soul"));
+            Regions.Add(new MapRegion("Period Basis"));
+            Regions.Add(new MapRegion("Perrigen Falls"));
+            Regions.Add(new MapRegion("Placid"));
+            Regions.Add(new MapRegion("Providence"));
+            Regions.Add(new MapRegion("Pure Blind"));
+            Regions.Add(new MapRegion("Querious"));
+            Regions.Add(new MapRegion("Scalding Pass"));
+            Regions.Add(new MapRegion("Sinq Laison"));
+            Regions.Add(new MapRegion("Solitude"));
+            Regions.Add(new MapRegion("The Spire"));
+            Regions.Add(new MapRegion("Stain"));
+            Regions.Add(new MapRegion("Syndicate"));
+            Regions.Add(new MapRegion("Tash-Murkon"));
+            Regions.Add(new MapRegion("Tenal"));
+            Regions.Add(new MapRegion("Tenerifis"));
+            Regions.Add(new MapRegion("Tribute"));
+            Regions.Add(new MapRegion("Vale of the Silent"));
+            Regions.Add(new MapRegion("Venal"));
+            Regions.Add(new MapRegion("Verge Vendor"));
+            Regions.Add(new MapRegion("Wicked Creek"));
 
             SystemIDToName = new SerializableDictionary<string, string>();
+
+            Systems = new SerializableDictionary<string, System>();
 
             // create folder cache
             WebClient webClient = new WebClient();
 
             // update the region cache
-            foreach (RegionData rd in Regions)
+            foreach (MapRegion rd in Regions)
             {
                 string localSVG = DataCacheFolder + @"\" + rd.DotLanRef + ".svg";
                 string remoteSVG = @"http://evemaps.dotlan.net/svg/" + rd.DotLanRef + ".svg";
@@ -569,7 +563,19 @@ namespace SMT.EVEData
                     if (ssNodes[0] != null)
                     {
                         name = ssNodes[0].InnerText;
-                        rd.Systems[name] = new System(name, systemID, x, y, rd.Name, hasStation);
+
+                        // create and add the system
+                        Systems[name] = new System(name, systemID, rd.Name, hasStation);
+
+                        // create and add the map version 
+                        rd.MapSystems[name] = new MapSystem
+                        {
+                            Name = name,
+                            LayoutX = x,
+                            LayoutY = y,
+                            Region = rd.Name,
+                            OutOfRegion = false,
+                        };
 
                         SystemIDToName[systemID] = name;
                     }
@@ -584,9 +590,15 @@ namespace SMT.EVEData
                             name = esNodes[0].InnerText;
                             string regionLinkName = erNodes[0].InnerText;
 
-                            rd.Systems[name] = new System(name, systemID, x, y, regionLinkName, hasStation);
-
                             SystemIDToName[systemID] = name;
+                            rd.MapSystems[name] = new MapSystem
+                            {
+                                Name = name,
+                                LayoutX = x,
+                                LayoutY = y,
+                                Region = regionLinkName,
+                                OutOfRegion = true,
+                            };
                         }
                     }
                 }
@@ -666,35 +678,78 @@ namespace SMT.EVEData
                         s.ActualZ = z;
                         s.Security = security;
                     }
-                    else
-                    {
-                        Console.WriteLine("Failed to Find System {0}", systemName);
-                    }
                 }
 
-                // patch up the out of region data
-                foreach (RegionData rr in Regions)
-                {
-                    foreach (System ss in rr.Systems.Values.ToList())
-                    {
-                        if (ss.Name != rr.Name)
-                        {
-                            System actual = GetEveSystem(ss.Name);
-                            ss.Security = actual.Security;
-                        }
-                    }
-                }
             }
 
-            // now serialise the class to disk
-            XmlSerializer xms = new XmlSerializer(typeof(EveManager));
-            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\RegionInfo.dat";
+            // now serialise the classes to disk
+            SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
+            SerializToDisk<SerializableDictionary<string, System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
-            using (TextWriter tw = new StreamWriter(dataFilename))
+            Init();
+        }
+
+
+        public void LoadFromDisk()
+        {
+            SystemIDToName = new SerializableDictionary<string, string>();
+
+            Regions = DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
+            Systems = DeserializeFromDisk<SerializableDictionary<string, System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+
+            foreach(System s in Systems.Values.ToList())
             {
-                xms.Serialize(tw, this);
+                SystemIDToName[s.ID] = s.Name;
+            }
+
+            Init();
+        }
+
+        private void SerializToDisk<T>( T obj, string Filename)
+        {
+            XmlSerializer xms = new XmlSerializer(typeof(T));
+
+            using (TextWriter tw = new StreamWriter(Filename))
+            {
+                xms.Serialize(tw, obj);
             }
         }
+
+        private T DeserializeFromDisk<T>(string Filename)
+        {
+            XmlSerializer xms = new XmlSerializer(typeof(T));
+
+            FileStream fs = new FileStream(Filename, FileMode.Open);
+            XmlReader xmlr = XmlReader.Create(fs);
+
+            return (T)xms.Deserialize(xmlr);
+        }
+
+
+
+        /// <summary>
+        /// Initialise
+        /// </summary>
+        private void Init()
+        {
+            // patch up any links
+
+            foreach (MapRegion rr in Regions)
+            {
+                // link to the real systems
+                foreach (MapSystem ms in rr.MapSystems.Values.ToList())
+                {
+                    ms.ActualSystem = Systems[ms.Name];
+                }
+            }
+
+            LoadCharacters();
+
+            // start the character update thread
+            StartUpdateCharacterThread();
+
+        }
+
 
         /// <summary>
         /// Does the System Exist ?
@@ -712,20 +767,16 @@ namespace SMT.EVEData
         /// <param name="name">Name (not ID) of the system</param>
         public System GetEveSystem(string name)
         {
-            foreach (RegionData reg in Regions)
+            if(Systems.Keys.Contains(name))
             {
-                if (reg.DoesSystemExist(name))
-                {
-                    return reg.Systems[name];
-                }
+                return Systems[name];
             }
-
             return null;
         }
 
-        public RegionData GetRegion(string name)
+        public MapRegion GetRegion(string name)
         {
-            foreach (RegionData reg in Regions)
+            foreach (MapRegion reg in Regions)
             {
                 if (reg.Name == name)
                 {
@@ -1068,7 +1119,6 @@ namespace SMT.EVEData
         public EveManager()
         {
             LocalCharacters = new ObservableCollection<Character>();
-            LoadCharacters();
 
             // ensure we have the cache folder setup
             DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";
@@ -1094,9 +1144,6 @@ namespace SMT.EVEData
             {
                 Directory.CreateDirectory(logosFoilder);
             }
-
-            // start the character update thread
-            StartUpdateCharacterThread();
         }
     }
 }
