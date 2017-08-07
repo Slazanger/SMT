@@ -47,7 +47,17 @@ namespace SMT
         /// </summary>
         public bool ShowJumps { get; set; }
 
-        public bool FollowCharacter { get; set; }
+        public bool FollowCharacter
+        {
+            get
+            {
+                return FollowCharacterChk.IsChecked.Value;
+            }
+            set
+            {
+                FollowCharacterChk.IsChecked = value;
+            }
+        }
 
         public string SelectedSystem { get; set; }
 
@@ -281,16 +291,6 @@ namespace SMT
             {
                 if (e.ClickCount == 1)
                 {
-                    EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-                    if (c != null)
-                    {
-                        if (selectedSys.Name != c.Location)
-                        {
-                            // CharacterDropDown.SelectedItem = null;
-                            FollowCharacter = false;
-                        }
-                    }
-
                     ReDrawMap();
                     SelectSystem(selectedSys.Name);
                 }
@@ -457,10 +457,9 @@ namespace SMT
 
             foreach (EVEData.Character c in EVEManager.LocalCharacters)
             {
-                EVEData.System s = EVEManager.GetEveSystem(c.Location);
-                if (s != null && EVEManager.GetRegion(s.Region) == rd)
+                if(rd.IsSystemOnMap(c.Location))
                 {
-                    EVEData.MapSystem ms = rd.MapSystems[s.Name];
+                    EVEData.MapSystem ms = rd.MapSystems[c.Location];
 
                     // add the character to
                     double circleSize = 26;
@@ -793,10 +792,6 @@ namespace SMT
 
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // clear the character selection
-            // CharacterDropDown.SelectedItem = null;
-            FollowCharacter = false;
-
             EVEData.MapSystem sd = SystemDropDownAC.SelectedItem as EVEData.MapSystem;
 
             if (sd != null)
@@ -829,7 +824,7 @@ namespace SMT
             EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
-            if (c != null)
+            if (c != null && FollowCharacter)
             {
                 EVEData.System s = EVEManager.GetEveSystem(c.Location);
                 if (s != null)
@@ -838,11 +833,16 @@ namespace SMT
                     {
                         // change region
                         SelectRegion(s.Region);
+
                     }
 
                     SelectSystem(c.Location);
 
                     CharacterDropDown.SelectedItem = c;
+
+                    // force the follow as this will be reset by the region change
+                    FollowCharacter = true;
+
                 }
             }
         }
