@@ -795,7 +795,8 @@ namespace SMT.EVEData
             esiQuery["response_type"] = "code";
             esiQuery["client_id"] = CLIENT_ID;
             esiQuery["redirect_uri"] = @"eveauth-smt://callback";
-            esiQuery["scope"] = "publicData characterLocationRead characterNavigationWrite remoteClientUI esi-location.read_location.v1 esi-location.read_ship_type.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1";
+            esiQuery["scope"] = "            publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1";
+
 
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
 
@@ -887,7 +888,6 @@ namespace SMT.EVEData
                                 // now requests the character information
                                 string url = @"https://login.eveonline.com/oauth/verify";
                                 HttpWebRequest verifyRequest = (HttpWebRequest)WebRequest.Create(url);
-                                verifyRequest.ContentType =
                                 verifyRequest.Method = WebRequestMethods.Http.Get;
                                 verifyRequest.Timeout = 20000;
                                 verifyRequest.Proxy = null;

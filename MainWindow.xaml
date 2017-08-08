@@ -12,6 +12,9 @@
         Title="SMT" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
 
     <Window.Resources>
+        
+        
+
         <ContextMenu x:Key="SysRightClickContextMenu">
 
             <ContextMenu.ItemTemplate>
@@ -28,6 +31,9 @@
             </ContextMenu.ItemTemplate>
 
             <MenuItem Header="{Binding Name}" FontWeight="Bold" />
+            <Separator />
+            <MenuItem Header="Set Destination" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
+            <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
             <Separator />
             <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
             <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />

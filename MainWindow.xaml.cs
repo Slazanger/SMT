@@ -316,6 +316,23 @@ namespace SMT
                 ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
                 cm.PlacementTarget = obj;
                 cm.DataContext = selectedSys;
+
+                MenuItem setDesto = cm.Items[2] as MenuItem;
+                MenuItem addWaypoint = cm.Items[3] as MenuItem;
+
+
+                setDesto.IsEnabled = false;
+                addWaypoint.IsEnabled = false;
+
+                EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+                if(c != null && c.ESILinked)
+                {
+                    setDesto.IsEnabled = true;
+                    //addWaypoint.IsEnabled = true;
+                }
+
+            
+
                 cm.IsOpen = true;
             }
         }
@@ -801,9 +818,35 @@ namespace SMT
             }
         }
 
+        private void SysContexMenuItemAddWaypoint_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            if(c != null)
+            {
+                c.AddDestination(eveSys.ActualSystem.ID, false);
+            }
+
+        }
+
+        private void SysContexMenuItemSetDestination_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            if (c != null)
+            {
+                c.AddDestination(eveSys.ActualSystem.ID, true);
+            }
+
+        }
+
+
+
         private void SysContexMenuItemDotlan_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
             EVEData.MapRegion rd = EVEManager.GetRegion(eveSys.Region);
 
             string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
@@ -812,10 +855,10 @@ namespace SMT
 
         private void SysContexMenuItemZKB_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
             EVEData.MapRegion rd = EVEManager.GetRegion(eveSys.Region);
 
-            string uRL = string.Format("https://zkillboard.com/system/{0}", eveSys.ID);
+            string uRL = string.Format("https://zkillboard.com/system/{0}", eveSys.ActualSystem.ID);
             System.Diagnostics.Process.Start(uRL);
         }
 
