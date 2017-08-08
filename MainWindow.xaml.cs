@@ -106,7 +106,7 @@ namespace SMT
             EVEData.EveManager.SetInstance(EVEManager);
 
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -328,7 +328,7 @@ namespace SMT
                 if(c != null && c.ESILinked)
                 {
                     setDesto.IsEnabled = true;
-                    //addWaypoint.IsEnabled = true;
+                    addWaypoint.IsEnabled = true;
                 }
 
             
