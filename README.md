@@ -8,6 +8,7 @@ The following main features are currently supported
 + Jump Bridges
 + Map Colours
 + Character Tracking
++ In-game Waypoint manipulation
 
 
 See the Wiki for more info
