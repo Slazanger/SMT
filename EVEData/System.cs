@@ -35,6 +35,17 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public int JumpsLastHour { get; set; }
 
+        [XmlIgnoreAttribute]
+        public string SOVAlliance { get; set; }
+
+        [XmlIgnoreAttribute]
+        public string SOVCorp { get; set; }
+
+        [XmlIgnoreAttribute]
+        public string SOVFaction { get; set; }
+
+
+
         public override string ToString()
         {
             return Name;

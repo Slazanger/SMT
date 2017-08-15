@@ -46,6 +46,12 @@ namespace SMT.EVEData
         /// </summary>
         public SerializableDictionary<string, string> SystemIDToName { get; set; }
 
+
+        public SerializableDictionary<string, string> AllianceIDToName { get; set; }
+
+        public SerializableDictionary<string, string> AllianceIDToTicker { get; set; }
+
+
         /// <summary>
         /// List of Jumb bridoges
         /// </summary>
@@ -686,6 +692,81 @@ namespace SMT.EVEData
             SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
             SerializToDisk<SerializableDictionary<string, System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
+
+
+
+            // now create all of the alliance/corp DB's
+
+
+            string url = @"https://esi.tech.ccp.is/latest/alliances/?datasource=tranquility";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            WebResponse  wr = request.GetResponse();
+
+            Stream responseStream = wr.GetResponseStream();
+            using (StreamReader sr = new StreamReader(responseStream))
+            {
+                string strContent = sr.ReadToEnd();
+
+                JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+
+                // JSON feed is now in the format : [{ "system_id": 30035042,  and then optionally alliance_id, corporation_id and corporation_id, faction_id },
+                while (jsr.Read())
+                {
+                    if(jsr.TokenType == JsonToken.Integer)
+                    {
+                        string allianceID = jsr.Value.ToString();
+                        string allianceUrl = @"https://esi.tech.ccp.is/latest/alliances/" + allianceID +  "/?datasource=tranquility";
+
+                        HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
+                        allianceRequest.Method = WebRequestMethods.Http.Get;
+                        allianceRequest.Timeout = 20000;
+                        allianceRequest.Proxy = null;
+
+                        WebResponse alWR = allianceRequest.GetResponse();
+
+                        Stream alStream = alWR.GetResponseStream();
+                        using (StreamReader alSR = new StreamReader(alStream))
+                        {
+                            // Need to return this response
+                            string alStrContent = alSR.ReadToEnd();
+
+                            JsonTextReader jobj = new JsonTextReader(new StringReader(alStrContent));
+                            while (jobj.Read())
+                            {
+                                if (jobj.TokenType == JsonToken.StartObject)
+                                {
+                                    JObject obj = JObject.Load(jobj);
+                                    string AllianceName = obj["alliance_name"].ToString();
+                                    string AllianceTicker = obj["ticker"].ToString();
+
+                                    AllianceIDToName[allianceID] = AllianceName;
+                                    AllianceIDToTicker[allianceID] = AllianceTicker;
+
+                                }
+                            }
+                        }
+
+
+                    }
+
+                    Thread.Sleep(100);
+
+                }
+            }
+
+            // now serialise the caches to disk
+            SerializToDisk< SerializableDictionary <string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+            SerializToDisk< SerializableDictionary <string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+
+
+
+
+
             Init();
         }
 
@@ -701,6 +782,11 @@ namespace SMT.EVEData
             {
                 SystemIDToName[s.ID] = s.Name;
             }
+
+            AllianceIDToName = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+            AllianceIDToTicker = DeserializeFromDisk< SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+
+
 
             Init();
         }
@@ -747,6 +833,8 @@ namespace SMT.EVEData
 
             // start the character update thread
             StartUpdateCharacterThread();
+
+
 
         }
 
@@ -1116,6 +1204,165 @@ namespace SMT.EVEData
             }).Start();
         }
 
+
+        /// <summary>
+        /// Start the ESI download for the kill info
+        /// </summary>
+        public void StartUpdateSOVFromESI()
+        {
+            string url = @"https://esi.tech.ccp.is/latest/sovereignty/map/?datasource=tranquility";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(ESIUpdateSovCallback), request);
+        }
+
+        /// <summary>
+        /// ESI Result Response
+        /// </summary>
+        /// <param name="asyncResult"></param>
+        private void ESIUpdateSovCallback(IAsyncResult asyncResult)
+        {
+            string AlliancesToResolve = "";
+
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+
+                        // JSON feed is now in the format : [{ "system_id": 30035042,  and then optionally alliance_id, corporation_id and corporation_id, faction_id },
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                string systemID = obj["system_id"].ToString();
+
+                                if (SystemIDToName.Keys.Contains(systemID))
+                                {
+                                    System es = GetEveSystem(SystemIDToName[systemID]);
+                                    if (es != null)
+                                    {
+                                        if(obj["alliance_id"] != null)
+                                        {
+                                            es.SOVAlliance = obj["alliance_id"].ToString() ;
+
+                                            AlliancesToResolve += es.SOVAlliance + ",";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                /// ....
+            }
+
+
+            // now that we have the list of alliances we need to resolve those into Names
+
+
+        }
+
+
+        public void UpdateIDsForMapRegion(string name)
+        {
+            MapRegion r = GetRegion(name);
+            if (r == null)
+            {
+                return;
+            }
+
+            string AllianceList = string.Empty;
+            foreach(MapSystem s in r.MapSystems.Values.ToList())
+            {
+                if(s.ActualSystem.SOVAlliance != null && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !AllianceList.Contains(s.ActualSystem.SOVAlliance) )
+                {
+                    AllianceList += s.ActualSystem.SOVAlliance + ",";
+                }
+            }
+
+            if (AllianceList != string.Empty)
+            {
+                AllianceList += "0";
+                string url = @"https://esi.tech.ccp.is/latest/alliances/names/?datasource=tranquility";
+
+                url += "&alliance_ids=" + Uri.EscapeUriString(AllianceList);
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.Method = WebRequestMethods.Http.Get;
+                request.Timeout = 20000;
+                request.Proxy = null;
+                request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
+            }
+            else
+            {
+                // we've cached every known system on the map already
+            }
+
+        }
+
+        /// <summary>
+        /// ESI Result Response
+        /// </summary>
+        /// <param name="asyncResult"></param>
+        private void ESIUpdateAllianceIDCallback(IAsyncResult asyncResult)
+        {
+
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+
+                        // JSON feed is now in the format : [{ "system_id": 30035042,  and then optionally alliance_id, corporation_id and corporation_id, faction_id },
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                string Name = obj["alliance_name"].ToString();
+                                string ID = obj["alliance_id"].ToString();
+                                AllianceIDToName[ID] = Name;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                /// ....
+            }
+        }
+
+
+
+
         public EveManager()
         {
             LocalCharacters = new ObservableCollection<Character>();
@@ -1144,6 +1391,13 @@ namespace SMT.EVEData
             {
                 Directory.CreateDirectory(logosFoilder);
             }
+
+            AllianceIDToName = new SerializableDictionary<string, string>();
+            AllianceIDToTicker = new SerializableDictionary<string, string>();
+
+
         }
     }
+
+
 }

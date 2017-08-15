@@ -106,7 +106,7 @@ namespace SMT
             EVEData.EveManager.SetInstance(EVEManager);
 
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromScratch = true;
+            bool initFromScratch = false;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -126,6 +126,7 @@ namespace SMT
             EVEManager.LoadJumpBridgeData();
             EVEManager.StartUpdateKillsFromESI();
             EVEManager.StartUpdateJumpsFromESI();
+            EVEManager.StartUpdateSOVFromESI();
 
             foreach (EVEData.MapRegion rd in EVEManager.Regions)
             {
@@ -641,7 +642,7 @@ namespace SMT
                 double circleOffset = circleSize / 2;
                 double textXOffset = 5;
                 double textYOffset = -8;
-                double textYOffset2 = 4;
+                double textYOffset2 = 6;
 
 
                 // add circle for system
@@ -738,6 +739,16 @@ namespace SMT
                     infoSize = infoValue * MapConf.ESIOverlayScale;
                 }
 
+                if(MapConf.ColourBySov)
+                {
+                    if(sys.ActualSystem.SOVAlliance != null)
+                    {
+                        infoValue = 1;
+                        infoSize = 60.0f * MapConf.ESIOverlayScale;
+                        infoColour = new SolidColorBrush(stringToColour(sys.ActualSystem.SOVAlliance));
+                    }
+                }
+
                 if (infoValue != -1)
                 {
                     Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
@@ -749,10 +760,32 @@ namespace SMT
                     MainCanvas.Children.Add(infoCircle);
                 }
 
-                if (sys.OutOfRegion)
+                double regionMarkerOffset = textYOffset2;
+
+                if ( ( MapConf.ShowSystemSovName | MapConf.ShowSystemSovTicker) && sys.ActualSystem.SOVAlliance != null && EVEManager.AllianceIDToName.Keys.Contains(sys.ActualSystem.SOVAlliance))
                 {
                     Label sysRegionText = new Label();
-                    sysRegionText.Content = "(" + sys.Region + ")";
+
+                    string content = "";
+                    if(MapConf.ShowSystemSovName)
+                    {
+                        content = EVEManager.AllianceIDToName[sys.ActualSystem.SOVAlliance];
+                    }
+
+                    if (MapConf.ShowSystemSovTicker)
+                    {
+                        content = EVEManager.AllianceIDToTicker[sys.ActualSystem.SOVAlliance];
+
+                    }
+
+                    if (MapConf.ShowSystemSovTicker && MapConf.ShowSystemSovName )
+                    {
+                        content = EVEManager.AllianceIDToName[sys.ActualSystem.SOVAlliance] + " (" + EVEManager.AllianceIDToTicker[sys.ActualSystem.SOVAlliance] + ")";
+                    }
+
+
+
+                    sysRegionText.Content = content;
                     sysRegionText.FontSize = 7;
                     sysRegionText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
 
@@ -761,7 +794,26 @@ namespace SMT
                     Canvas.SetZIndex(sysRegionText, 20);
 
                     MainCanvas.Children.Add(sysRegionText);
+
+                    regionMarkerOffset += 8;
                 }
+
+                if (sys.OutOfRegion)
+                {
+                    Label sysRegionText = new Label();
+                    sysRegionText.Content = "(" + sys.Region + ")";
+                    sysRegionText.FontSize = 7;
+                    sysRegionText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+
+                    Canvas.SetLeft(sysRegionText, sys.LayoutX + textXOffset);
+                    Canvas.SetTop(sysRegionText, sys.LayoutY + regionMarkerOffset);
+                    Canvas.SetZIndex(sysRegionText, 20);
+
+                    MainCanvas.Children.Add(sysRegionText);
+
+                }
+
+
             }
 
             AddCharactersToMap();
@@ -774,6 +826,8 @@ namespace SMT
             FollowCharacter = false;
 
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+
+            EVEManager.UpdateIDsForMapRegion(rd.Name);
 
             ReDrawMap();
             MapConf.DefaultRegion = rd.Name;
@@ -797,6 +851,8 @@ namespace SMT
                     RegionDropDown.SelectedItem = rd;
                     List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
                     SystemDropDownAC.ItemsSource = newList;
+
+                    EVEManager.UpdateIDsForMapRegion(rd.Name);
                 }
             }
         }
@@ -976,5 +1032,27 @@ namespace SMT
         {
             HandleCharacterSelectionChange();
         }
+
+        public Color stringToColour(string str)
+        {
+            int hash = 34516912;
+            foreach (char c in str.ToCharArray())
+            {
+                hash = c + ((hash << 5) - hash);
+            }
+
+            byte R = (byte) (hash & 0xff);
+            byte G = (byte) ((hash >> 8) & 0xff);
+            byte B = (byte) ((hash >> 16) & 0xff);
+
+            return Color.FromRgb(R, G, B);
+
+        }
+
     }
+
+
+
+
+
 }

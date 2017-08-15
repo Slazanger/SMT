@@ -17,6 +17,7 @@ namespace SMT
             }
         }
 
+        private bool m_ColourBySov;
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
@@ -50,6 +51,17 @@ namespace SMT
         [DisplayName("Show Security")]
         public bool ShowSystemSecurity { get; set; }
 
+        [Category("General")]
+        [DisplayName("Show SOV Ticker")]
+
+        public bool ShowSystemSovTicker { get; set; }
+
+        [Category("General")]
+        [DisplayName("Show SOV Name")]
+
+        public bool ShowSystemSovName { get; set; }
+
+
         [Category("ESI Data")]
         [DisplayName("ESI Scale")]
         public double ESIOverlayScale { get; set; }
@@ -57,6 +69,32 @@ namespace SMT
         [Category("Intel")]
         [DisplayName("Show Intel")]
         public bool ShowIntel { get; set; }
+
+        [Category("General")]
+        [DisplayName("Colour By Sov")]
+        public bool ColourBySov
+        {
+            get
+            {
+                return m_ColourBySov;
+            }
+
+            set
+            {
+                m_ColourBySov = value;
+
+                if (m_ColourBySov)
+                {
+                    ShowPodKills = false;
+                    ShowShipKills = false;
+                    ShowShipJumps = false;
+                    ShowNPCKills = false;
+                }
+
+                OnPropertyChanged("ColourBySov");
+            }
+        }
+
 
         [Category("ESI Data")]
         [DisplayName("Rat Kills")]
@@ -76,6 +114,7 @@ namespace SMT
                     ShowPodKills = false;
                     ShowShipKills = false;
                     ShowShipJumps = false;
+                    ColourBySov = false;
                 }
 
                 OnPropertyChanged("ShowNPCKills");
@@ -99,6 +138,7 @@ namespace SMT
                     ShowNPCKills = false;
                     ShowShipKills = false;
                     ShowShipJumps = false;
+                    ColourBySov = false;
                 }
 
                 OnPropertyChanged("ShowPodKills");
@@ -122,6 +162,7 @@ namespace SMT
                     ShowNPCKills = false;
                     ShowPodKills = false;
                     ShowShipJumps = false;
+                    ColourBySov = false;
                 }
 
                 OnPropertyChanged("ShowShipKills");
@@ -145,6 +186,7 @@ namespace SMT
                     ShowNPCKills = false;
                     ShowPodKills = false;
                     ShowShipKills = false;
+                    ColourBySov = false;
                 }
 
                 OnPropertyChanged("ShowShipJumps");

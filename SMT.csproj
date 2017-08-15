@@ -133,6 +133,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EVEData\Alliance.cs" />
     <Compile Include="EVEData\Anom.cs" />
     <Compile Include="EVEData\Character.cs" />
     <Compile Include="EVEData\IntelData.cs" />
