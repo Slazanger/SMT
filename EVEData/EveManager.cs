@@ -688,6 +688,45 @@ namespace SMT.EVEData
 
             }
 
+
+            // now create the voronoi regions
+            foreach ( MapRegion mr in Regions)
+            {
+
+                // collect the system points to generate them from 
+                List<Vector2f> points = new List<Vector2f>();
+
+
+                foreach ( MapSystem ms in mr.MapSystems.Values.ToList())
+                {
+                    points.Add(new Vector2f(ms.LayoutX, ms.LayoutY));
+                }
+
+                // create the voronoi
+                csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, new Rectf(0,0, 1050, 800));
+
+
+                // extract the points from the graph for each cell
+
+                foreach (MapSystem ms in mr.MapSystems.Values.ToList())
+                {
+                    List<Vector2f> cellList = v.Region(new Vector2f(ms.LayoutX, ms.LayoutY));
+                    ms.CellPoints = new List<Point>();
+                                        
+                    foreach(Vector2f vc in cellList)
+                    {
+                        ms.CellPoints.Add(new Point(vc.x, vc.y));
+                    }
+
+                }
+
+
+
+
+            }
+
+
+
             // now serialise the classes to disk
             SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
             SerializToDisk<SerializableDictionary<string, System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
@@ -754,7 +793,7 @@ namespace SMT.EVEData
 
                     }
 
-                    Thread.Sleep(100);
+                    Thread.Sleep(50);
 
                 }
             }

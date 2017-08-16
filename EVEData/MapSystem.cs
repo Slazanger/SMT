@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Windows;
+using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
@@ -20,6 +22,8 @@ namespace SMT.EVEData
         public double LayoutX { get; set; }
 
         public double LayoutY { get; set; }
+
+        public List<Point> CellPoints { get; set; }
 
         /// <summary>
         ///  the main data store for the actual eve system data

@@ -739,7 +739,7 @@ namespace SMT
                     infoSize = infoValue * MapConf.ESIOverlayScale;
                 }
 
-                if(MapConf.ColourBySov)
+/*                if(MapConf.ColourBySov)
                 {
                     if(sys.ActualSystem.SOVAlliance != null)
                     {
@@ -748,7 +748,8 @@ namespace SMT
                         infoColour = new SolidColorBrush(stringToColour(sys.ActualSystem.SOVAlliance));
                     }
                 }
-
+                
+*/
                 if (infoValue != -1)
                 {
                     Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
@@ -759,6 +760,26 @@ namespace SMT
                     Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
                     MainCanvas.Children.Add(infoCircle);
                 }
+
+
+                if (MapConf.ColourBySov && sys.ActualSystem.SOVAlliance != null)
+                {
+                    Polygon poly = new Polygon();
+
+                    foreach(Point p in sys.CellPoints)
+                    {
+                        poly.Points.Add(p);
+                    }
+
+                    Color c = stringToColour(sys.ActualSystem.SOVAlliance);
+                    c.A = 75;
+                    poly.Fill = new SolidColorBrush(c);
+                    poly.Stroke = poly.Fill;
+                    poly.StrokeThickness = 0.5;
+                    MainCanvas.Children.Add(poly);
+
+                }
+
 
                 double regionMarkerOffset = textYOffset2;
 
@@ -1035,7 +1056,7 @@ namespace SMT
 
         public Color stringToColour(string str)
         {
-            int hash = 34516912;
+            int hash = 18721340;
             foreach (char c in str.ToCharArray())
             {
                 hash = c + ((hash << 5) - hash);

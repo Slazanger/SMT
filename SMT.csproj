@@ -143,6 +143,24 @@
     <Compile Include="EVEData\MapRegion.cs" />
     <Compile Include="EVEData\EveManager.cs" />
     <Compile Include="EVEData\ZKillRedisQ.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\Edge.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\EdgeList.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\EdgeReorderer.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\Halfedge.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\HalfedgePriorityQueue.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\ICoord.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\LR.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\Site.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\SiteList.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\Triangle.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\Vertex.cs" />
+    <Compile Include="External\csDelaunay\Delaunay\Voronoi.cs" />
+    <Compile Include="External\csDelaunay\Geom\Circle.cs" />
+    <Compile Include="External\csDelaunay\Geom\LineSegment.cs" />
+    <Compile Include="External\csDelaunay\Geom\Polygon.cs" />
+    <Compile Include="External\csDelaunay\Geom\Rectf.cs" />
+    <Compile Include="External\csDelaunay\Geom\Vector2f.cs" />
+    <Compile Include="External\csDelaunay\Geom\Winding.cs" />
     <Compile Include="LogonWindow.xaml.cs">
       <DependentUpon>LogonWindow.xaml</DependentUpon>
     </Compile>
@@ -176,6 +194,8 @@
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="External\csDelaunay\LICENSE" />
+    <None Include="External\csDelaunay\README.md" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
