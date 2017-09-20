@@ -106,7 +106,7 @@ namespace SMT
             EVEData.EveManager.SetInstance(EVEManager);
 
             // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -674,6 +674,36 @@ namespace SMT
                     systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(sys.ActualSystem.Security));
                 }
 
+                if(MapConf.ShowJumpDistance)
+                {
+                    double Distance = EVEManager.GetRange(SelectedSystem, sys.Name);
+                    Distance = Distance / 9460730472580800.0;
+
+                    double Max = 0.1f;
+
+                    switch (MapConf.JumpShipType)
+                    {
+                        case MapConfig.JumpShip.Super: { Max = 6.0; } break;
+                        case MapConfig.JumpShip.Titan: { Max = 6.0; } break;
+
+                        case MapConfig.JumpShip.Dread:      { Max = 7.0; } break;
+                        case MapConfig.JumpShip.Carrier:    { Max = 7.0; } break;
+                        case MapConfig.JumpShip.FAX:        { Max = 7.0; } break;
+                        case MapConfig.JumpShip.Blops:      { Max = 8.0; } break;
+                        case MapConfig.JumpShip.JF:         { Max = 10.0; } break;
+                    }
+
+                    if (Distance < Max)
+                    {
+                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+                    }
+                    else
+                    {
+                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
+                    }
+                }
+
+
                 systemShape.DataContext = sys;
                 systemShape.MouseDown += ShapeMouseDownHandler;
                 systemShape.MouseEnter += ShapeMouseOverHandler;
@@ -739,17 +769,7 @@ namespace SMT
                     infoSize = infoValue * MapConf.ESIOverlayScale;
                 }
 
-/*                if(MapConf.ColourBySov)
-                {
-                    if(sys.ActualSystem.SOVAlliance != null)
-                    {
-                        infoValue = 1;
-                        infoSize = 60.0f * MapConf.ESIOverlayScale;
-                        infoColour = new SolidColorBrush(stringToColour(sys.ActualSystem.SOVAlliance));
-                    }
-                }
-                
-*/
+
                 if (infoValue != -1)
                 {
                     Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
@@ -781,6 +801,8 @@ namespace SMT
                 }
 
 
+
+
                 double regionMarkerOffset = textYOffset2;
 
                 if ( ( MapConf.ShowSystemSovName | MapConf.ShowSystemSovTicker) && sys.ActualSystem.SOVAlliance != null && EVEManager.AllianceIDToName.Keys.Contains(sys.ActualSystem.SOVAlliance))
@@ -788,20 +810,23 @@ namespace SMT
                     Label sysRegionText = new Label();
 
                     string content = "";
-                    if(MapConf.ShowSystemSovName)
+                    string allianceName = EVEManager.GetAllianceName(sys.ActualSystem.SOVAlliance);
+                    string allianceTicker = EVEManager.GetAllianceTicker(sys.ActualSystem.SOVAlliance);
+
+                    if (MapConf.ShowSystemSovName)
                     {
-                        content = EVEManager.AllianceIDToName[sys.ActualSystem.SOVAlliance];
+                        content = allianceName;
                     }
 
                     if (MapConf.ShowSystemSovTicker)
                     {
-                        content = EVEManager.AllianceIDToTicker[sys.ActualSystem.SOVAlliance];
+                        content = allianceTicker;
 
                     }
 
-                    if (MapConf.ShowSystemSovTicker && MapConf.ShowSystemSovName )
+                    if (MapConf.ShowSystemSovTicker && MapConf.ShowSystemSovName && allianceName != string.Empty && allianceTicker != String.Empty )
                     {
-                        content = EVEManager.AllianceIDToName[sys.ActualSystem.SOVAlliance] + " (" + EVEManager.AllianceIDToTicker[sys.ActualSystem.SOVAlliance] + ")";
+                        content = allianceName + " (" + allianceTicker + ")";
                     }
 
 
@@ -819,6 +844,34 @@ namespace SMT
                     regionMarkerOffset += 8;
                 }
 
+                /*
+
+                if( MapConf.ShowJumpDistance && SelectedSystem != null && sys.Name != SelectedSystem)
+                {
+                    double Distance = EVEManager.GetRange(SelectedSystem, sys.Name);
+                    Distance = Distance / 9460730472580800.0;
+                    string JD = "Jump Distance " + Distance.ToString("0.00") + " LY";
+
+                    Label DistanceText = new Label();
+
+                    DistanceText.Content = JD;
+                    DistanceText.FontSize = 7;
+                    DistanceText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+
+                    Canvas.SetLeft(DistanceText, sys.LayoutX + textXOffset);
+                    Canvas.SetTop(DistanceText, sys.LayoutY + textYOffset2);
+
+
+                    Canvas.SetZIndex(DistanceText, 20);
+                    MainCanvas.Children.Add(DistanceText);
+
+
+                    regionMarkerOffset += 8;
+                }
+
+                */
+
+
                 if (sys.OutOfRegion)
                 {
                     Label sysRegionText = new Label();
@@ -833,6 +886,8 @@ namespace SMT
                     MainCanvas.Children.Add(sysRegionText);
 
                 }
+
+
 
 
             }

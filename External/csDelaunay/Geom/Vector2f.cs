@@ -1,6 +1,6 @@
 ﻿using System;
 
-// Recreation of the UnityEngine.Vector3, so it can be used in other thread
+// Recreation of the UnityEngine.Vector2, so it can be used in other thread
 public struct Vector2f {
 	
 	public float x, y;

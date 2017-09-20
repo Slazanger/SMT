@@ -88,6 +88,17 @@ namespace SMT
         [DisplayName("Overlay")]
         public Color IntelOverlayColour { get; set; }
 
+        [Category("Navigation")]
+        [DisplayName("In Range")]
+        public Color JumpRangeInColour { get; set; }
+
+        [Category("Navigation")]
+        [DisplayName("Out of Range")]
+        public Color JumpRangeOutColour { get; set; }
+
+
+
+
         static public Color GetSecStatusColour(double secStatus)
         {
             /*

@@ -8,6 +8,19 @@ namespace SMT
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public enum JumpShip
+        {
+            Dread,
+            Carrier,
+            FAX,
+            Super,
+            Titan,
+            Blops,
+            JF,
+        } 
+
+
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -61,6 +74,14 @@ namespace SMT
 
         public bool ShowSystemSovName { get; set; }
 
+
+        [Category("Navigation")]
+        [DisplayName("Show Jump Distance")]
+        public bool ShowJumpDistance { get; set; }
+
+        [Category("Navigation")]
+        [DisplayName("Ship Type")]
+        public JumpShip JumpShipType { get; set; }
 
         [Category("ESI Data")]
         [DisplayName("ESI Scale")]
@@ -229,6 +250,12 @@ namespace SMT
             defaultColours.CharacterTextColour = Color.FromRgb(0, 0, 0);
             defaultColours.CharacterTextSize = 8;
             defaultColours.SystemTextSize = 12;
+
+            defaultColours.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            defaultColours.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
+
+
+
             MapColours.Add(defaultColours);
 
             MapColours blueColours = new MapColours();
@@ -251,31 +278,10 @@ namespace SMT
             blueColours.CharacterTextColour = Color.FromRgb(0, 0, 0);
             blueColours.CharacterTextSize = 8;
             blueColours.SystemTextSize = 12;
-            MapColours.Add(blueColours);
+            blueColours.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            blueColours.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
 
-            /*
-            MapColours asimovColours = new MapColours();
-            asimovColours.Name = "Asimov";
-            asimovColours.UserEditable = false;
-            asimovColours.FriendlyJumpBridgeColour = Color.FromRgb(105, 105, 105);
-            asimovColours.HostileJumpBridgeColour = Color.FromRgb(216, 191, 216);
-            asimovColours.SystemOutlineColour = Color.FromRgb(0, 0, 0);
-            asimovColours.InRegionSystemColour = Color.FromRgb(255, 127, 80);
-            asimovColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
-            asimovColours.OutRegionSystemColour = Color.FromRgb(255, 165, 0);
-            asimovColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
-            asimovColours.MapBackgroundColour = Color.FromRgb(245, 245, 245);
-            asimovColours.ESIOverlayColour = Color.FromRgb(0, 0, 0);
-            asimovColours.IntelOverlayColour = Color.FromRgb(255, 165, 0);
-            asimovColours.NormalGateColour = Color.FromRgb(245, 222, 179);
-            asimovColours.ConstellationGateColour = Color.FromRgb(245, 222, 179);
-            asimovColours.SelectedSystemColour = Color.FromRgb(0, 0, 0);
-            asimovColours.CharacterHighlightColour = Color.FromRgb(0, 0, 0);
-            asimovColours.CharacterTextColour = Color.FromRgb(0, 0, 0);
-            asimovColours.CharacterTextSize = 8;
-            asimovColours.SystemTextSize = 12;
-            MapColours.Add(asimovColours);
-            */
+            MapColours.Add(blueColours);
 
             MapColours greyAndRed = new MapColours();
             greyAndRed.Name = "Grey & Red";
@@ -297,6 +303,9 @@ namespace SMT
             greyAndRed.CharacterTextColour = Color.FromRgb(0, 0, 0);
             greyAndRed.CharacterTextSize = 8;
             greyAndRed.SystemTextSize = 12;
+            greyAndRed.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            greyAndRed.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
+
             MapColours.Add(greyAndRed);
 
             MapColours dark = new MapColours();
@@ -319,9 +328,37 @@ namespace SMT
             dark.CharacterTextColour = Color.FromRgb(255, 255, 255);
             dark.CharacterTextSize = 8;
             dark.SystemTextSize = 12;
+            dark.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            dark.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
+
             MapColours.Add(dark);
 
-            ActiveColourScheme = blueColours;
+            MapColours lateNight = new MapColours();
+            lateNight.Name = "Modern Dark";
+            lateNight.UserEditable = false;
+            lateNight.FriendlyJumpBridgeColour = Color.FromRgb(102, 205, 170);
+            lateNight.HostileJumpBridgeColour = Color.FromRgb(250, 128, 114);
+            lateNight.SystemOutlineColour = Color.FromRgb(0, 0, 0);
+            lateNight.InRegionSystemColour = Color.FromRgb(255, 239, 213);
+            lateNight.InRegionSystemTextColour = Color.FromRgb(245, 245, 245);
+            lateNight.OutRegionSystemColour = Color.FromRgb(218, 165, 32);
+            lateNight.OutRegionSystemTextColour = Color.FromRgb(218, 165, 32);
+            lateNight.MapBackgroundColour = Color.FromRgb(32, 32, 32);
+            lateNight.ESIOverlayColour = Color.FromRgb(81, 81, 81);
+            lateNight.IntelOverlayColour = Color.FromRgb(178, 34, 34);
+            lateNight.NormalGateColour = Color.FromRgb(255, 248, 220);
+            lateNight.ConstellationGateColour = Color.FromRgb(128, 128, 128);
+            lateNight.SelectedSystemColour = Color.FromRgb(173, 255, 47);
+            lateNight.CharacterHighlightColour = Color.FromRgb(173, 255, 47);
+            lateNight.CharacterTextColour = Color.FromRgb(127, 255, 0);
+            lateNight.CharacterTextSize = 8;
+            lateNight.SystemTextSize = 13;
+            lateNight.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            lateNight.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
+
+            MapColours.Add(lateNight);
+
+            ActiveColourScheme = defaultColours;
         }
 
         public MapConfig()

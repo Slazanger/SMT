@@ -52,6 +52,28 @@ namespace SMT.EVEData
         public SerializableDictionary<string, string> AllianceIDToTicker { get; set; }
 
 
+        public string GetAllianceName( string ID )
+        {
+            string Name = String.Empty;
+            if (AllianceIDToName.Keys.Contains(ID)) 
+            {
+                Name = AllianceIDToName[ID];
+            }
+            return Name;
+        }
+
+        public string GetAllianceTicker(string ID)
+        {
+            string Ticker = String.Empty;
+            if (AllianceIDToTicker.Keys.Contains(ID))
+            {
+                Ticker = AllianceIDToTicker[ID];
+            }
+            return Ticker;
+        }
+
+
+
         /// <summary>
         /// List of Jumb bridoges
         /// </summary>
@@ -735,7 +757,8 @@ namespace SMT.EVEData
 
 
             // now create all of the alliance/corp DB's
-
+            
+            /*
 
             string url = @"https://esi.tech.ccp.is/latest/alliances/?datasource=tranquility";
 
@@ -797,7 +820,8 @@ namespace SMT.EVEData
 
                 }
             }
-
+            */
+            
             // now serialise the caches to disk
             SerializToDisk< SerializableDictionary <string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
             SerializToDisk< SerializableDictionary <string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
@@ -1375,8 +1399,6 @@ namespace SMT.EVEData
                         // Need to return this response
                         string strContent = sr.ReadToEnd();
 
-
-
                         JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
 
                         // JSON feed is now in the format : [{ "system_id": 30035042,  and then optionally alliance_id, corporation_id and corporation_id, faction_id },
@@ -1388,6 +1410,36 @@ namespace SMT.EVEData
                                 string Name = obj["alliance_name"].ToString();
                                 string ID = obj["alliance_id"].ToString();
                                 AllianceIDToName[ID] = Name;
+                               
+                                string allianceUrl = @"https://esi.tech.ccp.is/latest/alliances/" + ID + "/?datasource=tranquility";
+
+                                HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
+                                allianceRequest.Method = WebRequestMethods.Http.Get;
+                                allianceRequest.Timeout = 20000;
+                                allianceRequest.Proxy = null;
+
+                                WebResponse alWR = allianceRequest.GetResponse();
+
+                                Stream alStream = alWR.GetResponseStream();
+                                using (StreamReader alSR = new StreamReader(alStream))
+                                {
+                                    // Need to return this response
+                                    string alStrContent = alSR.ReadToEnd();
+
+                                    JsonTextReader jobj = new JsonTextReader(new StringReader(alStrContent));
+                                    while (jobj.Read())
+                                    {
+                                        if (jobj.TokenType == JsonToken.StartObject)
+                                        {
+                                            JObject aobj = JObject.Load(jobj);
+                                            string AllianceName = aobj["alliance_name"].ToString();
+                                            string AllianceTicker = aobj["ticker"].ToString();
+
+                                            AllianceIDToTicker[ID] = AllianceTicker;
+
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -1398,6 +1450,28 @@ namespace SMT.EVEData
                 /// ....
             }
         }
+
+
+        public double GetRange(string From, string To)
+        {
+            System A = GetEveSystem(From);
+            System B = GetEveSystem(To);
+
+            if(A == null || B == null )
+            {
+                return 0.0;
+            }
+
+            double X = A.ActualX - B.ActualX;
+            double Y = A.ActualY - B.ActualY;
+            double Z = A.ActualZ - B.ActualZ;
+
+            double Length = Math.Sqrt(X * X + Y * Y + Z * Z);
+
+            return Length; 
+
+        }
+
 
 
 
@@ -1436,6 +1510,10 @@ namespace SMT.EVEData
 
 
         }
+
+
+
+
     }
 
 
