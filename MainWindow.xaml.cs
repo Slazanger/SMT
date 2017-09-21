@@ -446,7 +446,7 @@ namespace SMT
                     {
                         EVEData.MapSystem sys = rd.MapSystems[sysStr];
 
-                        double radiusScale = (DateTime.Now - id.IntelTime).TotalSeconds / 120.0;
+                        double radiusScale = (DateTime.Now - id.IntelTime).TotalSeconds / (double)MapConf.MaxIntelSeconds;
 
                         if (radiusScale < 0.0 || radiusScale >= 1.0)
                         {
@@ -676,31 +676,7 @@ namespace SMT
 
                 if(MapConf.ShowJumpDistance)
                 {
-                    double Distance = EVEManager.GetRange(SelectedSystem, sys.Name);
-                    Distance = Distance / 9460730472580800.0;
-
-                    double Max = 0.1f;
-
-                    switch (MapConf.JumpShipType)
-                    {
-                        case MapConfig.JumpShip.Super: { Max = 6.0; } break;
-                        case MapConfig.JumpShip.Titan: { Max = 6.0; } break;
-
-                        case MapConfig.JumpShip.Dread:      { Max = 7.0; } break;
-                        case MapConfig.JumpShip.Carrier:    { Max = 7.0; } break;
-                        case MapConfig.JumpShip.FAX:        { Max = 7.0; } break;
-                        case MapConfig.JumpShip.Blops:      { Max = 8.0; } break;
-                        case MapConfig.JumpShip.JF:         { Max = 10.0; } break;
-                    }
-
-                    if (Distance < Max)
-                    {
-                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
-                    }
-                    else
-                    {
-                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
-                    }
+ 
                 }
 
 
@@ -844,32 +820,61 @@ namespace SMT
                     regionMarkerOffset += 8;
                 }
 
-                /*
+                
 
                 if( MapConf.ShowJumpDistance && SelectedSystem != null && sys.Name != SelectedSystem)
                 {
+
                     double Distance = EVEManager.GetRange(SelectedSystem, sys.Name);
                     Distance = Distance / 9460730472580800.0;
-                    string JD = "Jump Distance " + Distance.ToString("0.00") + " LY";
 
-                    Label DistanceText = new Label();
+                    double Max = 0.1f;
 
-                    DistanceText.Content = JD;
-                    DistanceText.FontSize = 7;
-                    DistanceText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+                    switch (MapConf.JumpShipType)
+                    {
+                        case MapConfig.JumpShip.Super: { Max = 6.0; } break;
+                        case MapConfig.JumpShip.Titan: { Max = 6.0; } break;
 
-                    Canvas.SetLeft(DistanceText, sys.LayoutX + textXOffset);
-                    Canvas.SetTop(DistanceText, sys.LayoutY + textYOffset2);
+                        case MapConfig.JumpShip.Dread: { Max = 7.0; } break;
+                        case MapConfig.JumpShip.Carrier: { Max = 7.0; } break;
+                        case MapConfig.JumpShip.FAX: { Max = 7.0; } break;
+                        case MapConfig.JumpShip.Blops: { Max = 8.0; } break;
+                        case MapConfig.JumpShip.JF: { Max = 10.0; } break;
+                    }
+
+                    if (Distance < Max)
+                    {
+                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+
+                        string JD = "Distance " + Distance.ToString("0.00") + " LY";
+
+                        Label DistanceText = new Label();
+
+                        DistanceText.Content = JD;
+                        DistanceText.FontSize = 9;
+                        DistanceText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+                        regionMarkerOffset += 8;
+
+                        Canvas.SetLeft(DistanceText, sys.LayoutX + textXOffset);
+                        Canvas.SetTop(DistanceText, sys.LayoutY + textYOffset2);
 
 
-                    Canvas.SetZIndex(DistanceText, 20);
-                    MainCanvas.Children.Add(DistanceText);
+                        Canvas.SetZIndex(DistanceText, 20);
+                        MainCanvas.Children.Add(DistanceText);
+
+                    }
+                    else
+                    {
+                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
+                    }
 
 
-                    regionMarkerOffset += 8;
+
+             
+
                 }
 
-                */
+                
 
 
                 if (sys.OutOfRegion)

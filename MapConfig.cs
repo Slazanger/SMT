@@ -35,6 +35,7 @@ namespace SMT
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
         private bool m_ShowShipJumps;
+        private int m_MaxIntelSeconds;
 
         [Browsable(false)]
         public string DefaultRegion { get; set; }
@@ -90,6 +91,31 @@ namespace SMT
         [Category("Intel")]
         [DisplayName("Show Intel")]
         public bool ShowIntel { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Max Intel Time (s)")]
+        public int MaxIntelSeconds
+        {
+            get
+            {
+                return m_MaxIntelSeconds;
+            }
+            set
+            {
+                // clamp to 30s miniumum
+                if(value > 30)
+                {
+                    m_MaxIntelSeconds = value;
+                }
+                else
+                {
+                    m_MaxIntelSeconds = 30;
+                }
+            }
+
+        }
+
+
 
         [Category("General")]
         [DisplayName("Colour By Sov")]
@@ -224,6 +250,8 @@ namespace SMT
             DefaultRegion = "Molden Heath";
             ShowSystemPopup = true;
             ShowSystemSecurity = true;
+
+            MaxIntelSeconds = 120;
 
             MapColours = new List<MapColours>();
         }
