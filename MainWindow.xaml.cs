@@ -134,6 +134,9 @@ namespace SMT
 
             ColourListDropdown.ItemsSource = MapConf.MapColours;
 
+            CharacterList.ItemsSource = EVEManager.LocalCharacters;
+
+
             MapColours selectedColours = MapConf.MapColours[0];
 
             // find the matching active colour scheme
@@ -232,8 +235,12 @@ namespace SMT
                 anomxms.Serialize(tw, ANOMManager);
             }
 
+
+
+
+
             // save the character data
-            EVEManager.SaveCharacters();
+            EVEManager.SaveData();
         }
 
         private void MapControlsPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
@@ -282,8 +289,6 @@ namespace SMT
 
         private void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
         {
-            OnIntelAdded();
-
             Shape obj = sender as Shape;
             EVEData.MapRegion currentRegion = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
@@ -293,8 +298,15 @@ namespace SMT
             {
                 if (e.ClickCount == 1)
                 {
-                    ReDrawMap(false);
+                    bool redraw = false;
+                    if(MapConf.ShowJumpDistance)
+                    {
+                        redraw = true;
+                    }
                     SelectSystem(selectedSys.Name);
+
+                    ReDrawMap(redraw);
+
                 }
 
                 if (e.ClickCount == 2 && selectedSys.Region != currentRegion.Name)
@@ -711,11 +723,11 @@ namespace SMT
                         case MapConfig.JumpShip.JF: { Max = 10.0; } break;
                     }
 
-                    if (Distance < Max)
+                    if (Distance < Max && Distance > 0.0)
                     {
                         systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
 
-                        string JD = "Distance " + Distance.ToString("0.00") + " LY";
+                        string JD = Distance.ToString("0.00") + " LY";
 
                         Label DistanceText = new Label();
 

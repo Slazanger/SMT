@@ -118,7 +118,7 @@ namespace SMT.EVEData
             catch { }
         }
 
-        public void SaveCharacters()
+        public void SaveData()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
             ObservableCollection<Character> saveList = new ObservableCollection<Character>();
@@ -138,6 +138,15 @@ namespace SMT.EVEData
             {
                 xms.Serialize(tw, saveList);
             }
+
+
+
+
+            // now serialise the caches to disk
+            SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+            SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+
+
         }
 
         public List<JumpBridge> JumpBridges { get; set; }
@@ -830,14 +839,6 @@ namespace SMT.EVEData
             }
             */
             
-            // now serialise the caches to disk
-            SerializToDisk< SerializableDictionary <string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
-            SerializToDisk< SerializableDictionary <string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
-
-
-
-
-
             Init();
         }
 
