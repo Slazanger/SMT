@@ -87,7 +87,7 @@
                             <xcad:LayoutAnchorablePane>
                                 <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="IntelContentID">
                                     <Grid Background="#FFE5E5E5">
-                                        <ListBox x:Name="RawIntelBox" Margin="0,2">
+                                        <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <Grid>

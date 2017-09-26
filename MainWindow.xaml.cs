@@ -285,6 +285,8 @@ namespace SMT
             AddDataToMap();
             AddHighlightToSystem(SelectedSystem);
             AddSystemIntelOverlay();
+            AddCharactersToMap();
+
         }
 
         private void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
@@ -773,7 +775,6 @@ namespace SMT
 
             }
 
-            AddCharactersToMap();
         }
 
 
@@ -825,6 +826,7 @@ namespace SMT
                     Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
                     Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
                     MainCanvas.Children.Add(infoCircle);
+                    DynamicMapElements.Add(infoCircle);
                 }
 
 
@@ -890,6 +892,7 @@ namespace SMT
                     Canvas.SetZIndex(highlightSystemCircle, 19);
 
                     MainCanvas.Children.Add(highlightSystemCircle);
+                    DynamicMapElements.Add(highlightSystemCircle);
 
                     // Storyboard s = new Storyboard();
                     DoubleAnimation da = new DoubleAnimation();
@@ -917,6 +920,9 @@ namespace SMT
                     Canvas.SetTop(charText, ms.LayoutY + textYOffset);
                     Canvas.SetZIndex(charText, 20);
                     MainCanvas.Children.Add(charText);
+                    DynamicMapElements.Add(charText);
+
+
                 }
             }
         }
@@ -1166,6 +1172,38 @@ namespace SMT
 
         }
 
+        private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if(RawIntelBox.SelectedItem == null)
+            {
+                return;
+            }
+           
+            EVEData.IntelData intel = RawIntelBox.SelectedItem as EVEData.IntelData;
+
+            foreach(string s in intel.IntelString.Split(' '))
+            {
+                if(EVEManager.Systems.Keys.Contains(s, StringComparer.OrdinalIgnoreCase))
+                {
+                    EVEData.System sys = EVEManager.GetEveSystem(s);
+                    if (sys == null)
+                    {
+                        return;
+                    }
+
+                    EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+                    if(rd.Name != sys.Region)
+                    {
+                        SelectRegion(sys.Region);
+                    }
+
+
+                    SelectSystem(s);
+                    return;
+                }
+            }
+
+        }
     }
 
 
