@@ -93,6 +93,11 @@ namespace SMT
         public bool ShowIntel { get; set; }
 
         [Category("Intel")]
+        [DisplayName("Warning Sound")]
+        public bool PlayIntelSound { get; set; }
+
+
+        [Category("Intel")]
         [DisplayName("Max Intel Time (s)")]
         public int MaxIntelSeconds
         {

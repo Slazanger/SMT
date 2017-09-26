@@ -201,6 +201,13 @@ namespace SMT.EVEData
 
         public List<string> IntelFilters { get; set; }
 
+
+
+        public delegate void IntelAddedEventHandler();
+
+        public event IntelAddedEventHandler IntelAddedEvent;
+
+
         public void SetupIntelWatcher()
         {
             IntelFilters = new List<string>();
@@ -435,6 +442,11 @@ namespace SMT.EVEData
                                         }
                                     }
                                     IntelDataList.Insert(0, id);
+
+                                    if(IntelAddedEvent != null)
+                                    {
+                                        IntelAddedEvent();
+                                    }
                                 }
                             }));
                         }

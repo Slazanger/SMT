@@ -192,6 +192,8 @@ namespace SMT
             ReDrawMap();
 
             Closed += MainWindow_Closed;
+
+            EVEManager.IntelAddedEvent += OnIntelAdded;
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -275,10 +277,13 @@ namespace SMT
 
             AddDataToMap();
             AddHighlightToSystem(SelectedSystem);
+            AddSystemIntelOverlay();
         }
 
         private void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
         {
+            OnIntelAdded();
+
             Shape obj = sender as Shape;
             EVEData.MapRegion currentRegion = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
@@ -472,8 +477,6 @@ namespace SMT
         private void AddSystemsToMap()
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
-
-            AddSystemIntelOverlay();
 
             foreach (EVEData.Link jump in rd.Jumps)
             {
@@ -906,6 +909,18 @@ namespace SMT
             }
         }
 
+
+
+        private void OnIntelAdded()
+        {
+            if(MapConf.PlayIntelSound)
+            {
+                Uri uri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                var player = new MediaPlayer();
+                player.Open(uri);
+                player.Play();
+            }
+        }
 
 
 
