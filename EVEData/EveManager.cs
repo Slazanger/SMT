@@ -741,10 +741,6 @@ namespace SMT.EVEData
                     }
 
                 }
-
-
-
-
             }
 
 

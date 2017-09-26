@@ -27,25 +27,7 @@ namespace SMT
 
         public EVEData.AnomManager ANOMManager { get; set; }
 
-        /// <summary>
-        /// Show the NPC kills in the last hour on the map
-        /// </summary>
-        public bool ShowNPCKills { get; set; }
 
-        /// <summary>
-        /// Show the Pod Kills in the last hour on the map
-        /// </summary>
-        public bool ShowPodKills { get; set; }
-
-        /// <summary>
-        /// Show the Ship Kills in the last hour on the map
-        /// </summary>
-        public bool ShowShipKills { get; set; }
-
-        /// <summary>
-        /// Show the number of jumps on the mapo
-        /// </summary>
-        public bool ShowJumps { get; set; }
 
         public bool FollowCharacter
         {
@@ -61,6 +43,8 @@ namespace SMT
 
         public string SelectedSystem { get; set; }
 
+        private List<System.Windows.UIElement> DynamicMapElements;
+
         private MapConfig MapConf;
 
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
@@ -68,6 +52,9 @@ namespace SMT
         public MainWindow()
         {
             InitializeComponent();
+
+            DynamicMapElements = new List<UIElement>();
+
 
             // load any custom map settings off disk
             string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
@@ -95,18 +82,14 @@ namespace SMT
                 MapConf.SetDefaultColours();
             }
 
-            ShowNPCKills = false;
-            ShowPodKills = true;
-            ShowShipKills = false;
-            ShowJumps = false;
 
             SelectedSystem = string.Empty;
 
             EVEManager = new EVEData.EveManager();
             EVEData.EveManager.SetInstance(EVEManager);
 
-            // if we want to re-build the data as we've changed the format, recreate it all from DOTLAN
-            bool initFromScratch = true;
+            // if we want to re-build the data as we've changed the format, recreate it all from scratch
+            bool initFromScratch = false;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -263,10 +246,10 @@ namespace SMT
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            ReDrawMap();
+            ReDrawMap(false);
         }
 
-        private void ReDrawMap()
+        private void ReDrawMap(bool fullRedraw = true)
         {
             if (CharacterDropDown.SelectedItem != null && FollowCharacter == true)
             {
@@ -276,8 +259,21 @@ namespace SMT
             MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
             MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
 
-            MainCanvas.Children.Clear();
-            AddSystemsToMap();
+            if(fullRedraw)
+            {
+                MainCanvas.Children.Clear();
+                AddSystemsToMap();
+            }
+            else
+            {
+                foreach(UIElement uie in DynamicMapElements)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElements.Clear();
+            }
+
+            AddDataToMap();
             AddHighlightToSystem(SelectedSystem);
         }
 
@@ -292,7 +288,7 @@ namespace SMT
             {
                 if (e.ClickCount == 1)
                 {
-                    ReDrawMap();
+                    ReDrawMap(false);
                     SelectSystem(selectedSys.Name);
                 }
 
@@ -418,6 +414,7 @@ namespace SMT
                 Canvas.SetZIndex(highlightSystemCircle, 19);
 
                 MainCanvas.Children.Add(highlightSystemCircle);
+                DynamicMapElements.Add(highlightSystemCircle);
 
                 DoubleAnimation da = new DoubleAnimation();
                 da.From = 0;
@@ -464,77 +461,13 @@ namespace SMT
                         Canvas.SetTop(intelShape, sys.LayoutY - circleOffset);
                         Canvas.SetZIndex(intelShape, 15);
                         MainCanvas.Children.Add(intelShape);
+
+                        DynamicMapElements.Add(intelShape);
                     }
                 }
             }
         }
 
-        private void AddCharactersToMap()
-        {
-            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
-
-            foreach (EVEData.Character c in EVEManager.LocalCharacters)
-            {
-                if(rd.IsSystemOnMap(c.Location))
-                {
-                    EVEData.MapSystem ms = rd.MapSystems[c.Location];
-
-                    // add the character to
-                    double circleSize = 26;
-                    double circleOffset = circleSize / 2;
-
-                    // add circle for system
-                    Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
-
-                    highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
-                    highlightSystemCircle.StrokeThickness = 2;
-
-                    RotateTransform rt = new RotateTransform();
-                    rt.CenterX = circleSize / 2;
-                    rt.CenterY = circleSize / 2;
-                    highlightSystemCircle.RenderTransform = rt;
-
-                    DoubleCollection dashes = new DoubleCollection();
-                    dashes.Add(1.0);
-                    dashes.Add(1.0);
-
-                    highlightSystemCircle.StrokeDashArray = dashes;
-
-                    Canvas.SetLeft(highlightSystemCircle, ms.LayoutX - circleOffset);
-                    Canvas.SetTop(highlightSystemCircle, ms.LayoutY - circleOffset);
-                    Canvas.SetZIndex(highlightSystemCircle, 19);
-
-                    MainCanvas.Children.Add(highlightSystemCircle);
-
-                    // Storyboard s = new Storyboard();
-                    DoubleAnimation da = new DoubleAnimation();
-                    da.From = 360;
-                    da.To = 0;
-                    da.Duration = new Duration(TimeSpan.FromSeconds(12));
-
-                    RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
-                    eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
-
-                    double textYOffset = -24;
-                    double textXOffset = 6;
-
-                    // also add the name of the character above the system
-                    Label charText = new Label();
-                    charText.Content = c.Name;
-                    charText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
-
-                    if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
-                    {
-                        charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
-                    }
-
-                    Canvas.SetLeft(charText, ms.LayoutX+ textXOffset);
-                    Canvas.SetTop(charText, ms.LayoutY + textYOffset);
-                    Canvas.SetZIndex(charText, 20);
-                    MainCanvas.Children.Add(charText);
-                }
-            }
-        }
 
         private void AddSystemsToMap()
         {
@@ -674,11 +607,6 @@ namespace SMT
                     systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(sys.ActualSystem.Security));
                 }
 
-                if(MapConf.ShowJumpDistance)
-                {
- 
-                }
-
 
                 systemShape.DataContext = sys;
                 systemShape.MouseDown += ShapeMouseDownHandler;
@@ -713,68 +641,6 @@ namespace SMT
 
                 MainCanvas.Children.Add(sysText);
 
-                int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
-                int podKillsLastHour = sys.ActualSystem.PodKillsLastHour;
-                int shipKillsLastHour = sys.ActualSystem.ShipKillsLastHour;
-                int jumpsLastHour = sys.ActualSystem.JumpsLastHour;
-
-                int infoValue = -1;
-                SolidColorBrush infoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
-                double infoSize = 0.0;
-                if (MapConf.ShowNPCKills)
-                {
-                    infoValue = nPCKillsLastHour;
-                    infoSize = 0.15f * infoValue * MapConf.ESIOverlayScale;
-                }
-
-                if (MapConf.ShowPodKills)
-                {
-                    infoValue = podKillsLastHour;
-                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
-                }
-
-                if (MapConf.ShowShipKills)
-                {
-                    infoValue = shipKillsLastHour;
-                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
-                }
-
-                if (MapConf.ShowShipJumps)
-                {
-                    infoValue = sys.ActualSystem.JumpsLastHour;
-                    infoSize = infoValue * MapConf.ESIOverlayScale;
-                }
-
-
-                if (infoValue != -1)
-                {
-                    Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
-                    infoCircle.Fill = infoColour;
-
-                    Canvas.SetZIndex(infoCircle, 10);
-                    Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
-                    Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
-                    MainCanvas.Children.Add(infoCircle);
-                }
-
-
-                if (MapConf.ColourBySov && sys.ActualSystem.SOVAlliance != null)
-                {
-                    Polygon poly = new Polygon();
-
-                    foreach(Point p in sys.CellPoints)
-                    {
-                        poly.Points.Add(p);
-                    }
-
-                    Color c = stringToColour(sys.ActualSystem.SOVAlliance);
-                    c.A = 75;
-                    poly.Fill = new SolidColorBrush(c);
-                    poly.Stroke = poly.Fill;
-                    poly.StrokeThickness = 0.5;
-                    MainCanvas.Children.Add(poly);
-
-                }
 
 
 
@@ -867,11 +733,6 @@ namespace SMT
                     {
                         systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
                     }
-
-
-
-             
-
                 }
 
                 
@@ -899,6 +760,154 @@ namespace SMT
 
             AddCharactersToMap();
         }
+
+
+        private void AddDataToMap()
+        {
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+
+            foreach (EVEData.MapSystem sys in rd.MapSystems.Values.ToList())
+            {
+                int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
+                int podKillsLastHour = sys.ActualSystem.PodKillsLastHour;
+                int shipKillsLastHour = sys.ActualSystem.ShipKillsLastHour;
+                int jumpsLastHour = sys.ActualSystem.JumpsLastHour;
+
+                int infoValue = -1;
+                SolidColorBrush infoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
+                double infoSize = 0.0;
+                if (MapConf.ShowNPCKills)
+                {
+                    infoValue = nPCKillsLastHour;
+                    infoSize = 0.15f * infoValue * MapConf.ESIOverlayScale;
+                }
+
+                if (MapConf.ShowPodKills)
+                {
+                    infoValue = podKillsLastHour;
+                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
+                }
+
+                if (MapConf.ShowShipKills)
+                {
+                    infoValue = shipKillsLastHour;
+                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
+                }
+
+                if (MapConf.ShowShipJumps)
+                {
+                    infoValue = sys.ActualSystem.JumpsLastHour;
+                    infoSize = infoValue * MapConf.ESIOverlayScale;
+                }
+
+
+                if (infoValue != -1)
+                {
+                    Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
+                    infoCircle.Fill = infoColour;
+
+                    Canvas.SetZIndex(infoCircle, 10);
+                    Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
+                    MainCanvas.Children.Add(infoCircle);
+                }
+
+
+                if (MapConf.ColourBySov && sys.ActualSystem.SOVAlliance != null)
+                {
+                    Polygon poly = new Polygon();
+
+                    foreach (Point p in sys.CellPoints)
+                    {
+                        poly.Points.Add(p);
+                    }
+
+                    Color c = stringToColour(sys.ActualSystem.SOVAlliance);
+                    c.A = 75;
+                    poly.Fill = new SolidColorBrush(c);
+                    poly.Stroke = poly.Fill;
+                    poly.StrokeThickness = 0.5;
+                    MainCanvas.Children.Add(poly);
+
+                    // save the dynamic map elements
+                    DynamicMapElements.Add(poly);
+
+                }
+
+
+            }
+        }
+
+
+        private void AddCharactersToMap()
+        {
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+
+            foreach (EVEData.Character c in EVEManager.LocalCharacters)
+            {
+                if (rd.IsSystemOnMap(c.Location))
+                {
+                    EVEData.MapSystem ms = rd.MapSystems[c.Location];
+
+                    // add the character to
+                    double circleSize = 26;
+                    double circleOffset = circleSize / 2;
+
+                    // add circle for system
+                    Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
+
+                    highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+                    highlightSystemCircle.StrokeThickness = 2;
+
+                    RotateTransform rt = new RotateTransform();
+                    rt.CenterX = circleSize / 2;
+                    rt.CenterY = circleSize / 2;
+                    highlightSystemCircle.RenderTransform = rt;
+
+                    DoubleCollection dashes = new DoubleCollection();
+                    dashes.Add(1.0);
+                    dashes.Add(1.0);
+
+                    highlightSystemCircle.StrokeDashArray = dashes;
+
+                    Canvas.SetLeft(highlightSystemCircle, ms.LayoutX - circleOffset);
+                    Canvas.SetTop(highlightSystemCircle, ms.LayoutY - circleOffset);
+                    Canvas.SetZIndex(highlightSystemCircle, 19);
+
+                    MainCanvas.Children.Add(highlightSystemCircle);
+
+                    // Storyboard s = new Storyboard();
+                    DoubleAnimation da = new DoubleAnimation();
+                    da.From = 360;
+                    da.To = 0;
+                    da.Duration = new Duration(TimeSpan.FromSeconds(12));
+
+                    RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
+                    eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+
+                    double textYOffset = -24;
+                    double textXOffset = 6;
+
+                    // also add the name of the character above the system
+                    Label charText = new Label();
+                    charText.Content = c.Name;
+                    charText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+
+                    if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                    {
+                        charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
+                    }
+
+                    Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
+                    Canvas.SetTop(charText, ms.LayoutY + textYOffset);
+                    Canvas.SetZIndex(charText, 20);
+                    MainCanvas.Children.Add(charText);
+                }
+            }
+        }
+
+
+
 
         private void OnRegionSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -951,7 +960,7 @@ namespace SMT
             if (sd != null)
             {
                 SelectSystem(sd.Name);
-                ReDrawMap();
+                ReDrawMap(false);
             }
         }
 
