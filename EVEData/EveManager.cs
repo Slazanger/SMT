@@ -730,6 +730,10 @@ namespace SMT.EVEData
                 }
 
             }
+            else
+            {
+
+            }
 
 
             // now create the voronoi regions
