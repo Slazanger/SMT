@@ -1,0 +1,67 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:editableLabel1="clr-namespace:WpfHelpers.WpfControls.EditableLabel">
+    <ControlTemplate x:Key="EditableDecimalTemplate" TargetType="{x:Type editableLabel1:EditableLabel}">
+        <ContentPresenter Name="contentHolder"
+                          Width="{TemplateBinding Width}"
+                          Height="{TemplateBinding Height}"
+                          Margin="{TemplateBinding Margin}"
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          RecognizesAccessKey="True"
+                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+            <ContentPresenter.Content>
+                <Grid Margin="0" Name="PART_mainGrid" FocusManager.FocusedElement="{Binding ElementName=PART_mainLabel}">
+                    <Border Name="nonFocusedBorder"
+                            Grid.ZIndex="3" IsHitTestVisible="False"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                            Background="{TemplateBinding Background}" />
+                    <DockPanel LastChildFill="True">
+                        <ToggleButton Visibility="Collapsed" Name="onOffBtn" Margin="0,5,5,5" Padding="5" Width="Auto"
+                                      Focusable="False" 
+                                      FontSize="{TemplateBinding FontSize}"
+                                      Height="Auto" DockPanel.Dock="Right"
+                                      IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableEditing, Mode=TwoWay}"
+                                      Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EditButtonContent, Mode=TwoWay}" />
+
+                        <TextBox Name="PART_mainLabel" 
+                                 Focusable="True"
+                                 FontSize="{TemplateBinding FontSize}"
+                                 IsEnabled="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableEditing, Mode=TwoWay}"
+                                 Grid.ZIndex="4" Margin="0" Padding="{TemplateBinding Padding}"
+                                 HorizontalAlignment="Left" VerticalAlignment="Center"
+                                 Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 BorderThickness="{TemplateBinding BorderThickness}" />
+                    </DockPanel>
+                    <Border />
+                </Grid>
+            </ContentPresenter.Content>
+        </ContentPresenter>
+        <ControlTemplate.Triggers>
+            <!--<MultiDataTrigger  >
+                <MultiDataTrigger.Setters>
+                    <Setter TargetName="onOffBtn" Property="Visibility" Value="Visible" />
+                </MultiDataTrigger.Setters>
+                <MultiDataTrigger.Conditions>
+                    <Condition SourceName="mainGrid" Property="IsMouseOver" Value="True" ></Condition>
+                    <Condition SourceName="mainGrid" Property="IsMouseOver" Value="True" ></Condition>
+                </MultiDataTrigger.Conditions>
+            </MultiDataTrigger>-->
+            <Trigger SourceName="PART_mainGrid" Property="IsMouseOver" Value="True">
+                <Setter TargetName="onOffBtn" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger SourceName="onOffBtn" Property="IsChecked" Value="True">
+                <Setter TargetName="onOffBtn" Property="BorderThickness" Value="3" />
+            </Trigger>
+            <Trigger Property="EnableEditing" Value="True">
+                <Setter TargetName="onOffBtn" Property="Visibility" Value="Visible" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="editableLabel1:EditableLabel">
+        <Setter Property="Template" Value="{StaticResource EditableDecimalTemplate}" />
+        <Setter Property="BorderBrush" Value="Black" />
+    </Style>
+</ResourceDictionary>

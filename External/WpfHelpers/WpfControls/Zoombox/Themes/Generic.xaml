@@ -1,0 +1,159 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox"
+                    xmlns:xamlConverters="clr-namespace:WpfHelpers.WpfDataManipulation.XamlConverters">
+
+    <xamlConverters:DoubleToLog10Converter x:Key="log10Converter" />
+    <xamlConverters:EqualityToBooleanConverter x:Key="equalityConverter" />
+
+    <Style TargetType="{x:Type zoombox1:ZoomControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type zoombox1:ZoomControl}">
+                    <Grid>
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                ClipToBounds="{TemplateBinding ClipToBounds}">
+                            <zoombox1:ZoomContentPresenter x:Name="PART_Presenter"
+                                                           ClipToBounds="False" />
+                        </Border>
+                        <Canvas Visibility="{TemplateBinding ZoomBoxVisibility}">
+
+                            <!-- Controls -->
+                            <Border Padding="5"
+                                    CornerRadius="5"
+                                    Background="#664B4B4B"
+                                    Canvas.Left="20"
+                                    Canvas.Top="20"
+                                    ToolTipService.InitialShowDelay="0">
+                                <Border.ToolTip>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock><Run FontWeight="Bold">CTRL + Mouse wheel:</Run>  Zoom In / Out </TextBlock>
+                                        <TextBlock><Run FontWeight="Bold">ALT + Select:</Run> Zoom to selection </TextBlock>
+                                        <TextBlock><Run FontWeight="Bold">LMC + Mouse Click :</Run> Move </TextBlock>
+                                    </StackPanel>
+                                </Border.ToolTip>
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="{x:Type RadioButton}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                                                        <Border x:Name="border"
+                                                                BorderBrush="Black"
+                                                                Background="#FF747474"
+                                                                BorderThickness="1"
+                                                                CornerRadius="5"
+                                                                Width="40"
+                                                                Height="40"
+                                                                Margin="2"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center">
+                                                            <ContentPresenter HorizontalAlignment="Center"
+                                                                              VerticalAlignment="Center" />
+                                                        </Border>
+
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver"
+                                                                     Value="True">
+                                                                <Setter TargetName="border"
+                                                                        Property="Background"
+                                                                        Value="LightGray" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsChecked"
+                                                                     Value="True">
+                                                                <Setter TargetName="border"
+                                                                        Property="Background"
+                                                                        Value="DarkGray" />
+                                                                <Setter TargetName="border"
+                                                                        Property="TextBlock.FontWeight"
+                                                                        Value="Bold" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <Slider Height="150"
+                                            Minimum="{TemplateBinding MinZoom,Converter={StaticResource log10Converter}}"
+                                            Maximum="{TemplateBinding MaxZoom,Converter={StaticResource log10Converter}}"
+                                            Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,Mode=TwoWay,Converter={StaticResource log10Converter}}"
+                                            HorizontalAlignment="Center"
+                                            Ticks="0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2"
+                                            AutoToolTipPlacement="BottomRight"
+                                            AutoToolTipPrecision="1"
+                                            TickPlacement="BottomRight"
+                                            TickFrequency="1"
+                                            LargeChange="1"
+                                            SmallChange="0.1"
+                                            Orientation="Vertical" />
+                                    <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='{}{0:F2}x'}"
+                                               HorizontalAlignment="Center"
+                                               FontWeight="Bold" />
+                                    <RadioButton Content="1:1"     
+                                                 IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},
+                                        Path=Mode,Converter={StaticResource equalityConverter},ConverterParameter={x:Static zoombox1:ZoomControlModes.Original}}" />
+                                    <RadioButton
+                                                 IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},
+                                        Path=Mode,Converter={StaticResource equalityConverter},ConverterParameter={x:Static zoombox1:ZoomControlModes.Fill}}">
+                                        <RadioButton.Content>
+                                            <Viewbox Margin="10">
+                                                <Path Data="M11.585977,18.999021L12.999977,20.41302 3.4147511,30.000045 9.999999,30.000045 9.999999,32.000045 0,32.000045 0,22.000045 2,22.000045 2,28.586798z M20.414059,18.998996L29.999999,28.586804 29.999999,22.000045 31.999999,22.000045 31.999999,32.000045 21.999999,32.000045 21.999999,30.000045 28.585288,30.000045 18.999996,20.412996z M21.999999,0L31.999999,0 31.999999,9.999999 29.999999,9.999999 29.999999,3.4131746 20.413977,13.001045 18.999977,11.587039 28.585168,2 21.999999,2z M0,0L9.999999,0 9.999999,2 3.4148293,2 13.000021,11.587039 11.586021,13.001045 2,3.4131756 2,9.999999 0,9.999999z" 
+                                                      Stretch="Uniform" Fill="Black"  Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" />
+                                            </Viewbox>
+                                                <!--<TextBlock TextAlignment="Center" FontSize="8pt"><Run>Запол</Run><LineBreak /><Run>нить</Run></TextBlock>-->
+                                        </RadioButton.Content>
+                                    </RadioButton>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ZoomBox -->
+                            <Border BorderBrush="{TemplateBinding ZoomBoxBorderBrush}"
+                                    BorderThickness="{TemplateBinding ZoomBoxBorderThickness}"
+                                    Canvas.Left="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ZoomBox.X}"
+                                    Canvas.Top="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ZoomBox.Y}"
+                                    Opacity="{TemplateBinding ZoomBoxOpacity}"
+                                    Background="{TemplateBinding ZoomBoxBackground}"
+                                    Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ZoomBox.Width}"
+                                    Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ZoomBox.Height}" />
+                        </Canvas>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background"
+                Value="White" />
+        <Setter Property="ZoomBoxBackground">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0.0, 0.0"
+                                     EndPoint="1.0, 1.0">
+                    <GradientStop Color="Silver"
+                                  Offset="0.0" />
+                    <GradientStop Color="DarkGray"
+                                  Offset="1.0" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ZoomBoxBorderBrush"
+                Value="Black" />
+        <Setter Property="ZoomBoxBorderThickness"
+                Value="1" />
+        <Setter Property="ClipToBounds"
+                Value="True" />
+        <Style.Triggers>
+            <Trigger Property="ModifierMode"
+                     Value="Pan">
+                <Setter Property="Cursor"
+                        Value="SizeAll" />
+            </Trigger>
+            <Trigger Property="ModifierMode"
+                     Value="ZoomBox">
+                <Setter Property="Cursor"
+                        Value="Hand" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

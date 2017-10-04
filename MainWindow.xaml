@@ -8,6 +8,7 @@
         xmlns:local="clr-namespace:SMT"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         mc:Ignorable="d"
         Title="SMT" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
 
@@ -73,11 +74,11 @@
                         <xcad:LayoutDocumentPane ShowHeader="False">
                             <xcad:LayoutDocument Title="Map" CanClose="False" CanFloat="False" ContentId="MapContentID">
                                 <Grid x:Name="MainCanvasGrid" ClipToBounds="True">
-                                    <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top">
+                                    <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" >
                                         <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
-                                    </Viewbox>
-
+                                    </zoombox1:ZoomControl>
                                     <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
+
                                 </Grid>
                             </xcad:LayoutDocument>
                         </xcad:LayoutDocumentPane>

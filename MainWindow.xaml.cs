@@ -28,6 +28,8 @@ namespace SMT
         public EVEData.AnomManager ANOMManager { get; set; }
 
 
+        private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
+
 
         public bool FollowCharacter
         {
@@ -51,13 +53,19 @@ namespace SMT
 
         public MainWindow()
         {
+            OutputLog.Info("Starting App..");
+
             InitializeComponent();
 
             DynamicMapElements = new List<UIElement>();
 
 
+
             // load any custom map settings off disk
             string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
+            OutputLog.Info("Loading Map config from {0}", mapConfigFileName);
+
+
             if (File.Exists(mapConfigFileName))
             {
                 try
@@ -105,6 +113,7 @@ namespace SMT
             EVEManager.SetupIntelWatcher();
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
 
+            
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.StartUpdateKillsFromESI();
@@ -267,8 +276,10 @@ namespace SMT
 
             MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
             MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+            MainZoomControl.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
 
-            if(fullRedraw)
+
+            if (fullRedraw)
             {
                 MainCanvas.Children.Clear();
                 AddSystemsToMap();

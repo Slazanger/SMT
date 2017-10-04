@@ -4,7 +4,6 @@
              xmlns:local="clr-namespace:SMT"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <ResourceDictionary>
-        </ResourceDictionary>
+        <ResourceDictionary Source="pack://application:,,,/WpfHelpers;component/WpfControls/Zoombox/Themes/Generic.xaml"/>
     </Application.Resources>
 </Application>
