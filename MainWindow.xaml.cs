@@ -793,6 +793,8 @@ namespace SMT
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
+            Dictionary<string, List<Polygon>> mergedOverlay = new Dictionary<string, List<Polygon>>();
+
             foreach (EVEData.MapSystem sys in rd.MapSystems.Values.ToList())
             {
                 int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
@@ -841,6 +843,7 @@ namespace SMT
                 }
 
 
+
                 if (MapConf.ColourBySov && sys.ActualSystem.SOVAlliance != null)
                 {
                     Polygon poly = new Polygon();
@@ -851,19 +854,98 @@ namespace SMT
                     }
 
                     Color c = stringToColour(sys.ActualSystem.SOVAlliance);
-                    c.A = 75;
+                    //c.A = 75;
                     poly.Fill = new SolidColorBrush(c);
+                    poly.SnapsToDevicePixels = true;
                     poly.Stroke = poly.Fill;
                     poly.StrokeThickness = 0.5;
+                    poly.StrokeDashCap = PenLineCap.Round;
+                    poly.StrokeLineJoin = PenLineJoin.Round;
+
+
+                    //MainCanvas.Children.Add(poly);
+
+                    // save the dynamic map elements
+                    //DynamicMapElements.Add(poly);
+
+                    if (!mergedOverlay.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                    {
+                        mergedOverlay[sys.ActualSystem.SOVAlliance] = new List<Polygon>();
+                    }
+
+                    mergedOverlay[sys.ActualSystem.SOVAlliance].Add(poly);
+
+                }
+
+            }
+
+
+            if(MapConf.ColourBySov)
+            {
+                List<Shape> mergedGeom = new List<Shape>();
+                foreach (List<Polygon> pl in mergedOverlay.Values)
+                {
+                    CombinedGeometry c = new CombinedGeometry();
+                    // quick and dirty recursive geometry combine
+
+                    if (pl.Count >= 2)
+                    {
+                        Rect r = new Rect(MainCanvas.RenderSize);
+
+                        foreach (Polygon pg in pl)
+                        {
+                            pg.Measure(MainCanvas.RenderSize);
+                            pg.Arrange(r);
+
+
+                            if (c.Geometry1 == null)
+                            {
+                                c.Geometry1 = pg.RenderedGeometry;
+
+                                continue;
+                            }
+
+                            c.Geometry2 = pg.RenderedGeometry;
+                            c.GeometryCombineMode = GeometryCombineMode.Union;
+
+                            CombinedGeometry temp = c;
+                            c = new CombinedGeometry();
+                            c.Geometry1 = temp;
+                        }
+
+                        System.Windows.Shapes.Path p = new System.Windows.Shapes.Path();
+                        p.Data = c;
+                        p.Stroke = System.Windows.Media.Brushes.Black;
+                        p.StrokeThickness = 1;
+                        p.Fill = pl[0].Fill;
+                        p.SnapsToDevicePixels = true;
+                        mergedGeom.Add(p);
+                      
+                    }
+
+                    else
+                    {
+                        pl[0].Stroke = System.Windows.Media.Brushes.Black;
+                        pl[0].StrokeThickness = 1;
+
+                        mergedGeom.Add(pl[0]);
+                    }
+                }
+
+
+                foreach(Shape poly in mergedGeom)
+                {
                     MainCanvas.Children.Add(poly);
 
                     // save the dynamic map elements
                     DynamicMapElements.Add(poly);
-
                 }
 
-
             }
+        
+
+
+
         }
 
 
@@ -1169,17 +1251,21 @@ namespace SMT
 
         public Color stringToColour(string str)
         {
-            int hash = 18721340;
+            int hash = 0;
+
+
             foreach (char c in str.ToCharArray())
             {
                 hash = c + ((hash << 5) - hash);
             }
 
-            byte R = (byte) (hash & 0xff);
-            byte G = (byte) ((hash >> 8) & 0xff);
-            byte B = (byte) ((hash >> 16) & 0xff);
+            double R = (((byte) (hash & 0xff) / 255.0) * 80.0 ) + 127.0 ;
+            double G = (((byte) ((hash >> 8) & 0xff) / 255.0 ) * 80.0 ) + 127.0;
+            double B = (((byte) ((hash >> 16) & 0xff) / 255.0)* 80.0) + 127.0;
 
-            return Color.FromRgb(R, G, B);
+            
+
+            return Color.FromRgb((byte)R, (byte)G, (byte)B);
 
         }
 

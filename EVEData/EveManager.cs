@@ -828,6 +828,7 @@ namespace SMT.EVEData
                 csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, new Rectf(0,0, 1050, 800));
 
 
+
                 // extract the points from the graph for each cell
 
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
@@ -837,7 +838,7 @@ namespace SMT.EVEData
                                         
                     foreach(Vector2f vc in cellList)
                     {
-                        ms.CellPoints.Add(new Point(vc.x, vc.y));
+                        ms.CellPoints.Add(new Point(Math.Round(vc.x*4.0)/4.0, Math.Round(vc.y*4.0)/4.0));
                     }
 
                 }
