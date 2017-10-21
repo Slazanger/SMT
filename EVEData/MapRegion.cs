@@ -18,10 +18,6 @@ namespace SMT.EVEData
         public SerializableDictionary<string, MapSystem> MapSystems { get; set; }
 
 
-        /// <summary>
-        ///  Jumps/Links between systems
-        /// </summary>
-        public List<Link> Jumps { get; set; }
 
         public MapRegion()
         {
@@ -34,8 +30,6 @@ namespace SMT.EVEData
             DotLanRef = name.Replace(" ", "_");
 
             MapSystems = new SerializableDictionary<string, MapSystem>();
-
-            Jumps = new List<Link>();
         }
 
 

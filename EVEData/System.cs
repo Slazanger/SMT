@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
@@ -12,6 +13,8 @@ namespace SMT.EVEData
         /// Eve's internal ID for this System
         /// </summary>
         public string ID { get; set; }
+
+        public string ConstellationID { get; set; }
 
         public double ActualX { get; set; }
 
@@ -45,6 +48,8 @@ namespace SMT.EVEData
         public string SOVFaction { get; set; }
 
 
+        public List<string> Jumps { get; set; }
+
 
         public override string ToString()
         {
@@ -53,6 +58,7 @@ namespace SMT.EVEData
 
         public System()
         {
+            Jumps = new List<string>();
         }
 
         public System(string name, string id, string region, bool station)
@@ -66,6 +72,8 @@ namespace SMT.EVEData
             PodKillsLastHour = -1;
             ShipKillsLastHour = -1;
             JumpsLastHour = -1;
+
+            Jumps = new List<string>();
         }
     }
 }

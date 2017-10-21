@@ -139,10 +139,10 @@
     </Compile>
     <Compile Include="EVEData\Alliance.cs" />
     <Compile Include="EVEData\Anom.cs" />
-    <Compile Include="EVEData\Character.cs" />
+    <Compile Include="EVEData\EsiCharacter.cs" />
+    <Compile Include="EVEData\EveAppConfig.cs" />
     <Compile Include="EVEData\IntelData.cs" />
     <Compile Include="EVEData\JumpBridge.cs" />
-    <Compile Include="EVEData\Link.cs" />
     <Compile Include="EVEData\MapSystem.cs" />
     <Compile Include="EVEData\MapRegion.cs" />
     <Compile Include="EVEData\EveManager.cs" />

@@ -19,8 +19,7 @@ namespace SMT.EVEData
 {
     public class EveManager
     {
-        public const string CLIENT_ID = "ace68fde71fc4749bb27f33e8aad0b70";
-        public const string SECRET_KEY = "kT7fsRg8WiRb9lujedQVyKEPgaJr40hevUdTdKaF";
+
 
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
@@ -87,7 +86,7 @@ namespace SMT.EVEData
         public string DataCacheFolder { get; set; }
 
         [XmlIgnoreAttribute]
-        public ObservableCollection<Character> LocalCharacters { get; set; }
+        public ObservableCollection<EsiCharacter> LocalCharacters { get; set; }
 
         public void LoadCharacters()
         {
@@ -99,15 +98,15 @@ namespace SMT.EVEData
 
             try
             {
-                ObservableCollection<Character> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
+                ObservableCollection<EsiCharacter> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<EsiCharacter>));
 
                 FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
-                loadList = (ObservableCollection<Character>)xms.Deserialize(xmlr);
+                loadList = (ObservableCollection<EsiCharacter>)xms.Deserialize(xmlr);
 
-                foreach (Character c in loadList)
+                foreach (EsiCharacter c in loadList)
                 {
                     c.ESIAccessToken = string.Empty;
                     c.ESIAccessTokenExpiry = DateTime.MinValue;
@@ -124,9 +123,9 @@ namespace SMT.EVEData
         public void SaveData()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
-            ObservableCollection<Character> saveList = new ObservableCollection<Character>();
+            ObservableCollection<EsiCharacter> saveList = new ObservableCollection<EsiCharacter>();
 
-            foreach (Character c in LocalCharacters)
+            foreach (EsiCharacter c in LocalCharacters)
             {
                 if (c.ESIRefreshToken != string.Empty)
                 {
@@ -134,7 +133,7 @@ namespace SMT.EVEData
                 }
             }
 
-            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
+            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<EsiCharacter>));
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
@@ -402,7 +401,7 @@ namespace SMT.EVEData
                                     characterName = l.Split(':')[1].Trim();
 
                                     bool addChar = true;
-                                    foreach (EVEData.Character c in LocalCharacters)
+                                    foreach (EVEData.EsiCharacter c in LocalCharacters)
                                     {
                                         if (characterName == c.Name)
                                         {
@@ -416,7 +415,7 @@ namespace SMT.EVEData
                                     {
                                         Application.Current.Dispatcher.Invoke((Action)(() =>
                                         {
-                                            LocalCharacters.Add(new EVEData.Character(characterName, changedFile, system));
+                                            LocalCharacters.Add(new EVEData.EsiCharacter(characterName, changedFile, system));
                                         }));
                                     }
 
@@ -459,7 +458,7 @@ namespace SMT.EVEData
                                 string system = line.Split(':').Last().Trim();
                                 Application.Current.Dispatcher.Invoke((Action)(() =>
                                 {
-                                    foreach (EVEData.Character c in LocalCharacters)
+                                    foreach (EVEData.EsiCharacter c in LocalCharacters)
                                     {
                                         if (c.LocalChatFile == changedFile)
                                         {
@@ -727,7 +726,7 @@ namespace SMT.EVEData
                     }
                 }
 
-                // now catch the links - j
+/*                // now catch the links - j
                 string jXpath = @"//*[@class='j']";
                 xn = xmldoc.SelectNodes(jXpath);
 
@@ -771,6 +770,7 @@ namespace SMT.EVEData
 
                     rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
                 }
+*/
             }
 
             // now open up the eve static data export and extract some info from it
@@ -786,6 +786,7 @@ namespace SMT.EVEData
                 {
                     string[] bits = line.Split(',');
 
+                    string constID = bits[1];
                     string systemID = bits[2];
                     string systemName = bits[3]; // SystemIDToName[SystemID];
 
@@ -801,14 +802,42 @@ namespace SMT.EVEData
                         s.ActualY = y;
                         s.ActualZ = z;
                         s.Security = security;
+                        s.ConstellationID = constID;
                     }
                 }
 
             }
             else
             {
-
+                // Error
             }
+
+            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystemJumps.csv";
+            if(File.Exists(eveStaticDataJumpsFile))
+            {
+                StreamReader file = new StreamReader(eveStaticDataJumpsFile);
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] bits = line.Split(',');
+
+                    string fromID = bits[2];
+                    string toID = bits[3];
+
+                    System from = GetEveSystemFromID(fromID);
+                    System to = GetEveSystemFromID(toID);
+
+                    if(from != null && to != null)
+                    {
+                        from.Jumps.Add(to.Name);
+                        to.Jumps.Add(from.Name);
+                    }
+                }
+            }
+
 
 
             // now create the voronoi regions
@@ -1014,6 +1043,24 @@ namespace SMT.EVEData
             return null;
         }
 
+        /// <summary>
+        /// Get a System object from the name, note : for regions which have other region systems in it wont return
+        /// them.. eg TR07-s is on the esoteria map, but the object corresponding to the feythabolis map will be returned
+        /// </summary>
+        /// <param name="name">ID of the system</param>
+        public System GetEveSystemFromID(string ID)
+        {
+            if(!SystemIDToName.Keys.Contains(ID))
+            {
+                return null;
+            }
+
+            string name = SystemIDToName[ID];
+            return GetEveSystem(name);
+        }
+
+
+
         public MapRegion GetRegion(string name)
         {
             foreach (MapRegion reg in Regions)
@@ -1033,9 +1080,9 @@ namespace SMT.EVEData
 
             var esiQuery = HttpUtility.ParseQueryString(esiLogonBuilder.Query);
             esiQuery["response_type"] = "code";
-            esiQuery["client_id"] = CLIENT_ID;
-            esiQuery["redirect_uri"] = @"eveauth-smt://callback";
-            esiQuery["scope"] = "            publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1";
+            esiQuery["client_id"] = EveAppConfig.CLIENT_ID;
+            esiQuery["redirect_uri"] = EveAppConfig.CALLBACK_URL;
+            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1";
 
 
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
@@ -1072,7 +1119,7 @@ namespace SMT.EVEData
             request.Proxy = null;
 
             string code = query["code"];
-            string authHeader = CLIENT_ID + ":" + SECRET_KEY;
+            string authHeader = EveAppConfig.CLIENT_ID + ":" + EveAppConfig.SECRET_KEY;
             string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
             request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
@@ -1172,8 +1219,8 @@ namespace SMT.EVEData
                                 string expiresOn = obj["ExpiresOn"].ToString();
 
                                 // now find the matching character and update..
-                                Character esiChar = null;
-                                foreach (Character c in LocalCharacters)
+                                EsiCharacter esiChar = null;
+                                foreach (EsiCharacter c in LocalCharacters)
                                 {
                                     if (c.Name == characterName)
                                     {
@@ -1183,7 +1230,7 @@ namespace SMT.EVEData
 
                                 if (esiChar == null)
                                 {
-                                    esiChar = new Character(characterName, string.Empty, string.Empty);
+                                    esiChar = new EsiCharacter(characterName, string.Empty, string.Empty);
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
@@ -1346,7 +1393,7 @@ namespace SMT.EVEData
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
-                        foreach (Character c in LocalCharacters)
+                        foreach (EsiCharacter c in LocalCharacters)
                         {
                             c.Update();
                         }
@@ -1567,7 +1614,7 @@ namespace SMT.EVEData
 
         public EveManager()
         {
-            LocalCharacters = new ObservableCollection<Character>();
+            LocalCharacters = new ObservableCollection<EsiCharacter>();
 
             // ensure we have the cache folder setup
             DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";

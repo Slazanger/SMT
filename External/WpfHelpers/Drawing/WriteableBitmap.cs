@@ -62,7 +62,7 @@ namespace WpfHelpers.Drawing
             {
                 writeableBitmap.AddDirtyRect(new Int32Rect(left, top, width, height));
             }
-            catch (Exception e)
+            catch
             {
             }
         }

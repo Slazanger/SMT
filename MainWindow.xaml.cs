@@ -97,7 +97,7 @@ namespace SMT
             EVEData.EveManager.SetInstance(EVEManager);
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -351,7 +351,7 @@ namespace SMT
                 setDesto.IsEnabled = false;
                 addWaypoint.IsEnabled = false;
 
-                EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+                EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
                 if(c != null && c.ESILinked)
                 {
                     setDesto.IsEnabled = true;
@@ -503,6 +503,7 @@ namespace SMT
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
+            /*
             foreach (EVEData.Link jump in rd.Jumps)
             {
                 Line sysLink = new Line();
@@ -530,6 +531,7 @@ namespace SMT
                 Canvas.SetZIndex(sysLink, 19);
                 MainCanvas.Children.Add(sysLink);
             }
+            */
 
             if (MapConf.ShowJumpBridges || MapConf.ShowHostileJumpBridges)
             {
@@ -670,6 +672,40 @@ namespace SMT
                 MainCanvas.Children.Add(sysText);
 
 
+                // now add any jumps (todo : this will duplicate, eg, D-P will link to E1 and E1 will link to D-P
+
+                foreach(string jumpTo in sys.ActualSystem.Jumps)
+                {
+                    if(rd.IsSystemOnMap(jumpTo))
+                    {
+                        Line sysLink = new Line();
+
+                        EVEData.MapSystem to = rd.MapSystems[jumpTo];
+                        
+
+                        sysLink.X1 = sys.LayoutX;
+                        sysLink.Y1 = sys.LayoutY;
+
+                        sysLink.X2 = to.LayoutX;
+                        sysLink.Y2 = to.LayoutY;
+
+                        if (sys.ActualSystem.Region != to.ActualSystem.Region || sys.ActualSystem.ConstellationID != to.ActualSystem.ConstellationID)
+                        {
+                            sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+                        }
+                        else
+                        {
+                            sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+                        }
+
+                        sysLink.StrokeThickness = 1;
+                        sysLink.Visibility = Visibility.Visible;
+
+                        Canvas.SetZIndex(sysLink, 19);
+                        MainCanvas.Children.Add(sysLink);
+
+                    }
+                }
 
 
 
@@ -953,7 +989,7 @@ namespace SMT
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
-            foreach (EVEData.Character c in EVEManager.LocalCharacters)
+            foreach (EVEData.EsiCharacter c in EVEManager.LocalCharacters)
             {
                 if (rd.IsSystemOnMap(c.Location))
                 {
@@ -1094,7 +1130,7 @@ namespace SMT
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
 
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
             if(c != null)
             {
                 c.AddDestination(eveSys.ActualSystem.ID, false);
@@ -1106,7 +1142,7 @@ namespace SMT
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
 
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
             if (c != null)
             {
                 c.AddDestination(eveSys.ActualSystem.ID, true);
@@ -1136,7 +1172,7 @@ namespace SMT
 
         private void HandleCharacterSelectionChange()
         {
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
             if (c != null && FollowCharacter)

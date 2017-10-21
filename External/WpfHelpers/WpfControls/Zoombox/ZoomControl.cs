@@ -459,6 +459,12 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         private void OnMouseDown(MouseButtonEventArgs e, bool isPreview)
         {
+            // ignore right mouse
+            if(e.RightButton == MouseButtonState.Pressed)
+            {
+                return;
+            }
+
             if (ModifierMode != ZoomViewModifierMode.None)
                 return;
 

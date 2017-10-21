@@ -64,7 +64,7 @@ namespace SMT.EVEData
             request.Timeout = 20000;
             request.Proxy = null;
 
-            string authHeader = EveManager.CLIENT_ID + ":" + EveManager.SECRET_KEY;
+            string authHeader = EveAppConfig.CLIENT_ID + ":" + EveAppConfig.SECRET_KEY;
             string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
             request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
@@ -201,9 +201,8 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                /// ....
             }
         }
 

@@ -94,8 +94,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         private Brush m_StrokeBrushSelection;
 
-        private ToolTip popup;
-
         private int _cornerRadius = 1;
 
 
