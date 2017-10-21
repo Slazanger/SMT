@@ -8,3 +8,4 @@ bin/Release/SMT.exe.config
 bin/Release/SMT.vshost.exe.config
 bin/Release/SMT.vshost.exe.manifest
 bin/Release/RegionInfo.dat
+bin/
