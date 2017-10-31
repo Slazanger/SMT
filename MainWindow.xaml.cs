@@ -97,7 +97,7 @@ namespace SMT
             EVEData.EveManager.SetInstance(EVEManager);
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = true;
+            bool initFromScratch = false;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -266,6 +266,8 @@ namespace SMT
         {
             ReDrawMap(false);
         }
+
+
 
         private void ReDrawMap(bool fullRedraw = true)
         {
@@ -499,39 +501,17 @@ namespace SMT
         }
 
 
+        private struct GateHelper
+        {
+            public EVEData.MapSystem from { get; set; }
+            public EVEData.MapSystem to { get; set; }
+        }
+
+
+
         private void AddSystemsToMap()
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
-
-            /*
-            foreach (EVEData.Link jump in rd.Jumps)
-            {
-                Line sysLink = new Line();
-
-                EVEData.MapSystem from = rd.MapSystems[jump.From];
-                EVEData.MapSystem to = rd.MapSystems[jump.To];
-                sysLink.X1 = from.LayoutX;
-                sysLink.Y1 = from.LayoutY;
-
-                sysLink.X2 = to.LayoutX;
-                sysLink.Y2 = to.LayoutY;
-
-                if (jump.ConstelationLink)
-                {
-                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
-                }
-                else
-                {
-                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
-                }
-
-                sysLink.StrokeThickness = 1;
-                sysLink.Visibility = Visibility.Visible;
-
-                Canvas.SetZIndex(sysLink, 19);
-                MainCanvas.Children.Add(sysLink);
-            }
-            */
 
             if (MapConf.ShowJumpBridges || MapConf.ShowHostileJumpBridges)
             {
@@ -598,6 +578,9 @@ namespace SMT
                     }
                 }
             }
+
+            List<GateHelper> sysLinks = new List<GateHelper>();
+
 
             foreach (EVEData.MapSystem sys in rd.MapSystems.Values.ToList())
             {
@@ -674,36 +657,32 @@ namespace SMT
 
                 // now add any jumps (todo : this will duplicate, eg, D-P will link to E1 and E1 will link to D-P
 
-                foreach(string jumpTo in sys.ActualSystem.Jumps)
+
+
+                foreach (string jumpTo in sys.ActualSystem.Jumps)
                 {
                     if(rd.IsSystemOnMap(jumpTo))
                     {
-                        Line sysLink = new Line();
 
                         EVEData.MapSystem to = rd.MapSystems[jumpTo];
-                        
 
-                        sysLink.X1 = sys.LayoutX;
-                        sysLink.Y1 = sys.LayoutY;
-
-                        sysLink.X2 = to.LayoutX;
-                        sysLink.Y2 = to.LayoutY;
-
-                        if (sys.ActualSystem.Region != to.ActualSystem.Region || sys.ActualSystem.ConstellationID != to.ActualSystem.ConstellationID)
+                        bool NeedsAdd = true;
+                        foreach(GateHelper gh in sysLinks)
                         {
-                            sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
-                        }
-                        else
-                        {
-                            sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+                           if( ((gh.from == sys) || (gh.to == sys)) &&  ( (gh.from == to) || (gh.to == to) ))
+                            {
+                                NeedsAdd = false;
+                                break;
+                            } 
                         }
 
-                        sysLink.StrokeThickness = 1;
-                        sysLink.Visibility = Visibility.Visible;
-
-                        Canvas.SetZIndex(sysLink, 19);
-                        MainCanvas.Children.Add(sysLink);
-
+                        if(NeedsAdd)
+                        {
+                            GateHelper g = new GateHelper();
+                            g.from = sys;
+                            g.to = to;
+                            sysLinks.Add(g);
+                        }
                     }
                 }
 
@@ -820,6 +799,33 @@ namespace SMT
 
 
 
+            }
+
+            foreach(GateHelper gh in sysLinks)
+            {
+                Line sysLink = new Line();
+
+
+                sysLink.X1 = gh.from.LayoutX;
+                sysLink.Y1 = gh.from.LayoutY;
+
+                sysLink.X2 = gh.to.LayoutX;
+                sysLink.Y2 = gh.to.LayoutY;
+
+                if (gh.from.ActualSystem.Region != gh.to.ActualSystem.Region || gh.from.ActualSystem.ConstellationID != gh.to.ActualSystem.ConstellationID)
+                {
+                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+                }
+                else
+                {
+                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+                }
+
+                sysLink.StrokeThickness = 1;
+                sysLink.Visibility = Visibility.Visible;
+
+                Canvas.SetZIndex(sysLink, 19);
+                MainCanvas.Children.Add(sysLink);
             }
 
         }
