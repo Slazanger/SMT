@@ -1342,6 +1342,10 @@ namespace SMT
 
             foreach(string s in intel.IntelString.Split(' '))
             {
+                if(s=="")
+                {
+                    continue;
+                }
                 if (EVEManager.Systems.Any(x => (x.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)))
                 {
                     EVEData.System sys = EVEManager.GetEveSystem(s);
