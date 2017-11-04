@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using System.Windows;
+using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -33,7 +34,7 @@ namespace SMT.EVEData
 
         public static EveManager GetInstance()
         {
-             return s_Instance;
+            return s_Instance;
         }
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace SMT.EVEData
         /// </summary>
         public List<MapRegion> Regions { get; set; }
 
-        public SerializableDictionary<string, System> Systems { get; set; }
+        public List<System> Systems { get; set; }
 
         /// <summary>
         /// Lookup from Internal ID to Name
@@ -54,10 +55,13 @@ namespace SMT.EVEData
         public SerializableDictionary<string, string> AllianceIDToTicker { get; set; }
 
 
-        public string GetAllianceName( string ID )
+        private Dictionary<string, System> NameToSystem { get; set; }
+
+
+        public string GetAllianceName(string ID)
         {
             string Name = String.Empty;
-            if (AllianceIDToName.Keys.Contains(ID)) 
+            if (AllianceIDToName.Keys.Contains(ID))
             {
                 Name = AllianceIDToName[ID];
             }
@@ -300,7 +304,7 @@ namespace SMT.EVEData
                             Thread.Sleep(200);
                         }
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                 }
             }).Start();
             /// END SUPERHACK
@@ -416,7 +420,7 @@ namespace SMT.EVEData
                                         Application.Current.Dispatcher.Invoke((Action)(() =>
                                         {
                                             LocalCharacters.Add(new EVEData.EsiCharacter(characterName, changedFile, system));
-                                        }));
+                                        }), DispatcherPriority.ApplicationIdle);
                                     }
 
                                     break;
@@ -468,56 +472,49 @@ namespace SMT.EVEData
 
                                         }
                                     }
-                                }));
+                                }), DispatcherPriority.ApplicationIdle);
                             }
                         }
                         else
                         {
-                            //if (line.StartsWith("["))
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                // check if it is in the intel list already (ie if you have multiple clients running)
+                                bool addToIntel = true;
+                                foreach (EVEData.IntelData idl in IntelDataList)
                                 {
-                                    // check if it is in the intel list already (ie if you have multiple clients running)
-                                    bool addToIntel = true;
-                                    foreach (EVEData.IntelData idl in IntelDataList)
+                                    if (idl.RawIntelString == line)
                                     {
-                                        if (idl.RawIntelString == line)
+                                        addToIntel = false;
+                                        break;
+                                    }
+                                }
+
+                                if (addToIntel)
+                                {
+                                    EVEData.IntelData id = new EVEData.IntelData(line);
+
+                                    foreach (string s in id.IntelString.Split(' '))
+                                    {
+                                        if (DoesSystemExist(s))
                                         {
-                                            addToIntel = false;
-                                            break;
+                                            OutputLog.Info("Adding Intel Line : {0} ", line);
+                                            id.Systems.Add(s);
                                         }
                                     }
+                                    IntelDataList.Insert(0, id);
 
-                                    if (addToIntel)
+
+                                    if (IntelAddedEvent != null)
                                     {
-                                        EVEData.IntelData id = new EVEData.IntelData(line);
-
-                                        foreach (string s in id.IntelString.Split(' '))
-                                        {
-                                            if (DoesSystemExist(s))
-                                            {
-                                                OutputLog.Info("Adding Intel Line : {0} ", line);
-                                                id.Systems.Add(s);
-                                            }
-                                        }
-                                        IntelDataList.Insert(0, id);
-
-
-                                        if (IntelAddedEvent != null)
-                                        {
-                                            IntelAddedEvent();
-                                        }
+                                        IntelAddedEvent();
                                     }
-                                    else
-                                    {
-                                        OutputLog.Info("Already have Line : {0} ", line);
-                                    }
-                                }));
-                            }
-                            //else
-                            //{
-                            //   OutputLog.Info("Rejecting Line : {0} ", line);
-                            //}
+                                }
+                                else
+                                {
+                                    OutputLog.Info("Already have Line : {0} ", line);
+                                }
+                            }), DispatcherPriority.ApplicationIdle);
                         }
 
                         line = file.ReadLine();
@@ -529,7 +526,7 @@ namespace SMT.EVEData
                     OutputLog.Info("File Read pos : {0} {1}", changedFile, fileReadFrom);
 
                 }
-                catch ( Exception ex)
+                catch (Exception ex)
                 {
                     OutputLog.Info("Intel Process Failed : {0}", ex.ToString());
                 }
@@ -618,7 +615,7 @@ namespace SMT.EVEData
 
             SystemIDToName = new SerializableDictionary<string, string>();
 
-            Systems = new SerializableDictionary<string, System>();
+            Systems = new List<System>();
 
             // create folder cache
             WebClient webClient = new WebClient();
@@ -688,7 +685,7 @@ namespace SMT.EVEData
                         name = ssNodes[0].InnerText;
 
                         // create and add the system
-                        Systems[name] = new System(name, systemID, rd.Name, hasStation);
+                        Systems.Add(new System(name, systemID, rd.Name, hasStation));
 
                         // create and add the map version 
                         rd.MapSystems[name] = new MapSystem
@@ -726,51 +723,51 @@ namespace SMT.EVEData
                     }
                 }
 
-/*                // now catch the links - j
-                string jXpath = @"//*[@class='j']";
-                xn = xmldoc.SelectNodes(jXpath);
+                /*                // now catch the links - j
+                                string jXpath = @"//*[@class='j']";
+                                xn = xmldoc.SelectNodes(jXpath);
 
-                foreach (XmlNode jump in xn)
-                {
-                    // will be in the format j-XXXXXXXX-YYYYYYYY
-                    string id = jump.Attributes["id"].Value.Substring(2);
+                                foreach (XmlNode jump in xn)
+                                {
+                                    // will be in the format j-XXXXXXXX-YYYYYYYY
+                                    string id = jump.Attributes["id"].Value.Substring(2);
 
-                    string systemOneID = id.Substring(0, 8);
-                    string systemTwoID = id.Substring(9);
+                                    string systemOneID = id.Substring(0, 8);
+                                    string systemTwoID = id.Substring(9);
 
-                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], false));
-                }
+                                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], false));
+                                }
 
-                // now catch the constellation links - jc
-                string jcXpath = @"//*[@class='jc']";
-                xn = xmldoc.SelectNodes(jcXpath);
+                                // now catch the constellation links - jc
+                                string jcXpath = @"//*[@class='jc']";
+                                xn = xmldoc.SelectNodes(jcXpath);
 
-                foreach (XmlNode jump in xn)
-                {
-                    // will be in the format j-XXXXXXXX-YYYYYYYY
-                    string id = jump.Attributes["id"].Value.Substring(2);
+                                foreach (XmlNode jump in xn)
+                                {
+                                    // will be in the format j-XXXXXXXX-YYYYYYYY
+                                    string id = jump.Attributes["id"].Value.Substring(2);
 
-                    string systemOneID = id.Substring(0, 8);
-                    string systemTwoID = id.Substring(9);
+                                    string systemOneID = id.Substring(0, 8);
+                                    string systemTwoID = id.Substring(9);
 
-                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
-                }
+                                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
+                                }
 
-                // now catch the region links - jr
-                string jrXpath = @"//*[@class='jr']";
-                xn = xmldoc.SelectNodes(jrXpath);
+                                // now catch the region links - jr
+                                string jrXpath = @"//*[@class='jr']";
+                                xn = xmldoc.SelectNodes(jrXpath);
 
-                foreach (XmlNode jump in xn)
-                {
-                    // will be in the format j-XXXXXXXX-YYYYYYYY
-                    string id = jump.Attributes["id"].Value.Substring(2);
+                                foreach (XmlNode jump in xn)
+                                {
+                                    // will be in the format j-XXXXXXXX-YYYYYYYY
+                                    string id = jump.Attributes["id"].Value.Substring(2);
 
-                    string systemOneID = id.Substring(0, 8);
-                    string systemTwoID = id.Substring(9);
+                                    string systemOneID = id.Substring(0, 8);
+                                    string systemTwoID = id.Substring(9);
 
-                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
-                }
-*/
+                                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
+                                }
+                */
             }
 
             // now open up the eve static data export and extract some info from it
@@ -813,7 +810,7 @@ namespace SMT.EVEData
             }
 
             string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystemJumps.csv";
-            if(File.Exists(eveStaticDataJumpsFile))
+            if (File.Exists(eveStaticDataJumpsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsFile);
 
@@ -830,7 +827,7 @@ namespace SMT.EVEData
                     System from = GetEveSystemFromID(fromID);
                     System to = GetEveSystemFromID(toID);
 
-                    if(from != null && to != null)
+                    if (from != null && to != null)
                     {
                         from.Jumps.Add(to.Name);
                         to.Jumps.Add(from.Name);
@@ -841,20 +838,20 @@ namespace SMT.EVEData
 
 
             // now create the voronoi regions
-            foreach ( MapRegion mr in Regions)
+            foreach (MapRegion mr in Regions)
             {
 
                 // collect the system points to generate them from 
                 List<Vector2f> points = new List<Vector2f>();
 
 
-                foreach ( MapSystem ms in mr.MapSystems.Values.ToList())
+                foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                 {
                     points.Add(new Vector2f(ms.LayoutX, ms.LayoutY));
                 }
 
                 // create the voronoi
-                csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, new Rectf(0,0, 1050, 800));
+                csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, new Rectf(0, 0, 1050, 800));
 
 
 
@@ -864,10 +861,10 @@ namespace SMT.EVEData
                 {
                     List<Vector2f> cellList = v.Region(new Vector2f(ms.LayoutX, ms.LayoutY));
                     ms.CellPoints = new List<Point>();
-                                        
-                    foreach(Vector2f vc in cellList)
+
+                    foreach (Vector2f vc in cellList)
                     {
-                        ms.CellPoints.Add(new Point(Math.Round(vc.x*4.0)/4.0, Math.Round(vc.y*4.0)/4.0));
+                        ms.CellPoints.Add(new Point(Math.Round(vc.x * 4.0) / 4.0, Math.Round(vc.y * 4.0) / 4.0));
                     }
 
                 }
@@ -877,77 +874,8 @@ namespace SMT.EVEData
 
             // now serialise the classes to disk
             SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            SerializToDisk<SerializableDictionary<string, System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            SerializToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
-
-
-
-            // now create all of the alliance/corp DB's
-            
-            /*
-
-            string url = @"https://esi.tech.ccp.is/latest/alliances/?datasource=tranquility";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            WebResponse  wr = request.GetResponse();
-
-            Stream responseStream = wr.GetResponseStream();
-            using (StreamReader sr = new StreamReader(responseStream))
-            {
-                string strContent = sr.ReadToEnd();
-
-                JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-
-                // JSON feed is now in the format : [{ "system_id": 30035042,  and then optionally alliance_id, corporation_id and corporation_id, faction_id },
-                while (jsr.Read())
-                {
-                    if(jsr.TokenType == JsonToken.Integer)
-                    {
-                        string allianceID = jsr.Value.ToString();
-                        string allianceUrl = @"https://esi.tech.ccp.is/latest/alliances/" + allianceID +  "/?datasource=tranquility";
-
-                        HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
-                        allianceRequest.Method = WebRequestMethods.Http.Get;
-                        allianceRequest.Timeout = 20000;
-                        allianceRequest.Proxy = null;
-
-                        WebResponse alWR = allianceRequest.GetResponse();
-
-                        Stream alStream = alWR.GetResponseStream();
-                        using (StreamReader alSR = new StreamReader(alStream))
-                        {
-                            // Need to return this response
-                            string alStrContent = alSR.ReadToEnd();
-
-                            JsonTextReader jobj = new JsonTextReader(new StringReader(alStrContent));
-                            while (jobj.Read())
-                            {
-                                if (jobj.TokenType == JsonToken.StartObject)
-                                {
-                                    JObject obj = JObject.Load(jobj);
-                                    string AllianceName = obj["alliance_name"].ToString();
-                                    string AllianceTicker = obj["ticker"].ToString();
-
-                                    AllianceIDToName[allianceID] = AllianceName;
-                                    AllianceIDToTicker[allianceID] = AllianceTicker;
-
-                                }
-                            }
-                        }
-
-
-                    }
-
-                    Thread.Sleep(50);
-
-                }
-            }
-            */
-            
             Init();
         }
 
@@ -957,22 +885,22 @@ namespace SMT.EVEData
             SystemIDToName = new SerializableDictionary<string, string>();
 
             Regions = DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            Systems = DeserializeFromDisk<SerializableDictionary<string, System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            Systems = DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
-            foreach(System s in Systems.Values.ToList())
+            foreach (System s in Systems)
             {
                 SystemIDToName[s.ID] = s.Name;
             }
 
             AllianceIDToName = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
-            AllianceIDToTicker = DeserializeFromDisk< SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+            AllianceIDToTicker = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
 
 
 
             Init();
         }
 
-        private void SerializToDisk<T>( T obj, string Filename)
+        private void SerializToDisk<T>(T obj, string Filename)
         {
             XmlSerializer xms = new XmlSerializer(typeof(T));
 
@@ -1001,12 +929,19 @@ namespace SMT.EVEData
         {
             // patch up any links
 
+
+            foreach (System s in Systems)
+            {
+                NameToSystem[s.Name] = s;
+            }
+
+
             foreach (MapRegion rr in Regions)
             {
                 // link to the real systems
                 foreach (MapSystem ms in rr.MapSystems.Values.ToList())
                 {
-                    ms.ActualSystem = Systems[ms.Name];
+                    ms.ActualSystem = GetEveSystem(ms.Name);
                 }
             }
 
@@ -1036,9 +971,10 @@ namespace SMT.EVEData
         /// <param name="name">Name (not ID) of the system</param>
         public System GetEveSystem(string name)
         {
-            if(Systems.Keys.Contains(name))
+            if (NameToSystem.ContainsKey(name))
             {
-                return Systems[name];
+                return NameToSystem[name];
+
             }
             return null;
         }
@@ -1050,13 +986,15 @@ namespace SMT.EVEData
         /// <param name="name">ID of the system</param>
         public System GetEveSystemFromID(string ID)
         {
-            if(!SystemIDToName.Keys.Contains(ID))
-            {
-                return null;
-            }
 
-            string name = SystemIDToName[ID];
-            return GetEveSystem(name);
+            foreach (System s in Systems)
+            {
+                if (s.ID == ID)
+                {
+                    return s;
+                }
+            }
+            return null;
         }
 
 
@@ -1235,7 +1173,7 @@ namespace SMT.EVEData
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
                                         LocalCharacters.Add(esiChar);
-                                    }));
+                                    }), DispatcherPriority.ApplicationIdle);
                                 }
 
                                 esiChar.ESIRefreshToken = PendingRefreshToken;
@@ -1391,13 +1329,12 @@ namespace SMT.EVEData
                 // loop forever
                 while (true)
                 {
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         foreach (EsiCharacter c in LocalCharacters)
                         {
                             c.Update();
                         }
-                    }));
+                    }
                     Thread.Sleep(5000);
                 }
             }).Start();
@@ -1455,9 +1392,9 @@ namespace SMT.EVEData
                                     System es = GetEveSystem(SystemIDToName[systemID]);
                                     if (es != null)
                                     {
-                                        if(obj["alliance_id"] != null)
+                                        if (obj["alliance_id"] != null)
                                         {
-                                            es.SOVAlliance = obj["alliance_id"].ToString() ;
+                                            es.SOVAlliance = obj["alliance_id"].ToString();
 
                                             AlliancesToResolve += es.SOVAlliance + ",";
                                         }
@@ -1489,9 +1426,9 @@ namespace SMT.EVEData
             }
 
             string AllianceList = string.Empty;
-            foreach(MapSystem s in r.MapSystems.Values.ToList())
+            foreach (MapSystem s in r.MapSystems.Values.ToList())
             {
-                if(s.ActualSystem.SOVAlliance != null && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !AllianceList.Contains(s.ActualSystem.SOVAlliance) )
+                if (s.ActualSystem.SOVAlliance != null && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !AllianceList.Contains(s.ActualSystem.SOVAlliance))
                 {
                     AllianceList += s.ActualSystem.SOVAlliance + ",";
                 }
@@ -1546,7 +1483,7 @@ namespace SMT.EVEData
                                 string Name = obj["alliance_name"].ToString();
                                 string ID = obj["alliance_id"].ToString();
                                 AllianceIDToName[ID] = Name;
-                               
+
                                 string allianceUrl = @"https://esi.tech.ccp.is/latest/alliances/" + ID + "/?datasource=tranquility";
 
                                 HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
@@ -1593,7 +1530,7 @@ namespace SMT.EVEData
             System A = GetEveSystem(From);
             System B = GetEveSystem(To);
 
-            if(A == null || B == null )
+            if (A == null || B == null)
             {
                 return 0.0;
             }
@@ -1604,7 +1541,7 @@ namespace SMT.EVEData
 
             double Length = Math.Sqrt(X * X + Y * Y + Z * Z);
 
-            return Length; 
+            return Length;
 
         }
 
@@ -1643,13 +1580,9 @@ namespace SMT.EVEData
 
             AllianceIDToName = new SerializableDictionary<string, string>();
             AllianceIDToTicker = new SerializableDictionary<string, string>();
-
+            NameToSystem = new Dictionary<string, System>();
 
         }
-
-
-
-
     }
 
 

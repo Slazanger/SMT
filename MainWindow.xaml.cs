@@ -97,7 +97,7 @@ namespace SMT
             EVEData.EveManager.SetInstance(EVEManager);
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -127,6 +127,7 @@ namespace SMT
                     RegionDropDown.SelectedItem = rd;
                     List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
                     SystemDropDownAC.ItemsSource = newList;
+                    MapDocument.Title = rd.Name;
                 }
             }
 
@@ -581,6 +582,19 @@ namespace SMT
 
             List<GateHelper> sysLinks = new List<GateHelper>();
 
+            Brush SysOutline = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            Brush SysInRegion = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
+            Brush SysOutRegion = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
+            Brush SysInRegionText = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+            Brush SysOutRegionText = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+
+            Brush NormalGate = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+            Brush ConstellationGate = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+
+            Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+            Brush JumpOutRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
+
+
 
             foreach (EVEData.MapSystem sys in rd.MapSystems.Values.ToList())
             {
@@ -603,15 +617,17 @@ namespace SMT
                     systemShape = new Ellipse() { Height = circleSize, Width = circleSize };
                 }
 
-                systemShape.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+
+                systemShape.Stroke = SysOutline;
+
 
                 if (sys.OutOfRegion)
                 {
-                    systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
+                    systemShape.Fill = SysOutRegion;
                 }
                 else
                 {
-                    systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
+                    systemShape.Fill = SysInRegion;
                 }
 
                 // override with sec status colours
@@ -641,11 +657,11 @@ namespace SMT
 
                 if (sys.OutOfRegion)
                 {
-                    sysText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+                    sysText.Foreground = SysOutRegionText;
                 }
                 else
                 {
-                    sysText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+                    sysText.Foreground = SysInRegionText;
                 }
 
                 Canvas.SetLeft(sysText, sys.LayoutX + textXOffset);
@@ -718,7 +734,8 @@ namespace SMT
 
                     sysRegionText.Content = content;
                     sysRegionText.FontSize = 7;
-                    sysRegionText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+                    sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
+
 
                     Canvas.SetLeft(sysRegionText, sys.LayoutX + textXOffset);
                     Canvas.SetTop(sysRegionText, sys.LayoutY + textYOffset2);
@@ -753,7 +770,7 @@ namespace SMT
 
                     if (Distance < Max && Distance > 0.0)
                     {
-                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+                        systemShape.Fill = JumpInRange;
 
                         string JD = Distance.ToString("0.00") + " LY";
 
@@ -761,7 +778,7 @@ namespace SMT
 
                         DistanceText.Content = JD;
                         DistanceText.FontSize = 9;
-                        DistanceText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+                        DistanceText.Foreground = SysOutRegionText;
                         regionMarkerOffset += 8;
 
                         Canvas.SetLeft(DistanceText, sys.LayoutX + textXOffset);
@@ -774,7 +791,7 @@ namespace SMT
                     }
                     else
                     {
-                        systemShape.Fill = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
+                        systemShape.Fill = JumpOutRange;
                     }
                 }
 
@@ -814,11 +831,11 @@ namespace SMT
 
                 if (gh.from.ActualSystem.Region != gh.to.ActualSystem.Region || gh.from.ActualSystem.ConstellationID != gh.to.ActualSystem.ConstellationID)
                 {
-                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+                    sysLink.Stroke = ConstellationGate;
                 }
                 else
                 {
-                    sysLink.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+                    sysLink.Stroke = NormalGate;
                 }
 
                 sysLink.StrokeThickness = 1;
@@ -1098,6 +1115,7 @@ namespace SMT
 
             List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
+            MapDocument.Title = rd.Name;
         }
 
         private void SelectRegion(string regionName)
@@ -1109,6 +1127,8 @@ namespace SMT
                     RegionDropDown.SelectedItem = rd;
                     List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
                     SystemDropDownAC.ItemsSource = newList;
+
+                    MapDocument.Title = regionName;
 
                     EVEManager.UpdateIDsForMapRegion(rd.Name);
                 }
@@ -1322,7 +1342,7 @@ namespace SMT
 
             foreach(string s in intel.IntelString.Split(' '))
             {
-                if(EVEManager.Systems.Keys.Contains(s, StringComparer.OrdinalIgnoreCase))
+                if (EVEManager.Systems.Any(x => (x.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)))
                 {
                     EVEData.System sys = EVEManager.GetEveSystem(s);
                     if (sys == null)
