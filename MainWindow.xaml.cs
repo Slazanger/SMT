@@ -140,7 +140,6 @@ namespace SMT
             CharacterDropDown.ItemsSource = EVEManager.LocalCharacters;
 
             MapControlsPropertyGrid.SelectedObject = MapConf;
-            MapControlsPropertyGrid.PropertyValueChanged += MapControlsPropertyGrid_PropertyValueChanged;
 
             ColourListDropdown.ItemsSource = MapConf.MapColours;
 
@@ -210,6 +209,10 @@ namespace SMT
 
 
             ToolBoxCanvas.DataContext = MapConf;
+
+            MapConf.PropertyChanged += MapObjectChanged;
+            
+
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -249,17 +252,10 @@ namespace SMT
             }
 
 
-
-
-
             // save the character data
             EVEManager.SaveData();
         }
 
-        private void MapControlsPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
-        {
-            ReDrawMap();
-        }
 
         private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -271,6 +267,10 @@ namespace SMT
             ReDrawMap(false);
         }
 
+        private void MapObjectChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ReDrawMap();
+        }
 
 
         private void ReDrawMap(bool fullRedraw = true)
@@ -1004,10 +1004,6 @@ namespace SMT
                 }
 
             }
-        
-
-
-
         }
 
 
