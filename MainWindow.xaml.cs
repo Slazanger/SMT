@@ -97,7 +97,7 @@ namespace SMT
             EVEData.EveManager.SetInstance(EVEManager);
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = true;
+            bool initFromScratch = false;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -575,6 +575,19 @@ namespace SMT
                         dashes.Add(1.0);
 
                         path.StrokeDashArray = dashes;
+
+                        // animate the jump bridges
+                        DoubleAnimation da = new DoubleAnimation();
+                        da.From = 0;
+                        da.To = 200;
+                        da.By = 2;
+                        da.Duration = new Duration(TimeSpan.FromSeconds(40));
+                        da.RepeatBehavior = RepeatBehavior.Forever;
+
+                        path.StrokeDashArray = dashes;
+                        path.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+
 
                         Canvas.SetZIndex(path, 19);
 

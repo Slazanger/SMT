@@ -685,7 +685,11 @@ namespace SMT.EVEData
                         name = ssNodes[0].InnerText;
 
                         // create and add the system
-                        Systems.Add(new System(name, systemID, rd.Name, hasStation));
+                        System s = new System(name, systemID, rd.Name, hasStation);
+                        Systems.Add(s);
+
+                        NameToSystem[name] = s;
+
 
                         // create and add the map version 
                         rd.MapSystems[name] = new MapSystem
@@ -711,6 +715,8 @@ namespace SMT.EVEData
                             string regionLinkName = erNodes[0].InnerText;
 
                             SystemIDToName[systemID] = name;
+                            
+
                             rd.MapSystems[name] = new MapSystem
                             {
                                 Name = name,
@@ -719,6 +725,8 @@ namespace SMT.EVEData
                                 Region = regionLinkName,
                                 OutOfRegion = true,
                             };
+
+
                         }
                     }
                 }
