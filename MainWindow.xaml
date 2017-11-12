@@ -70,22 +70,124 @@
 
             <xcad:DockingManager x:Name="dockManager" Grid.Row="0">
                 <xcad:LayoutRoot>
-                    <xcad:LayoutPanel Orientation="Horizontal" >
-                        <xcad:LayoutDocumentPane ShowHeader="True">
-                            <xcad:LayoutDocument x:Name="MapDocument" Title="Map" CanClose="False" CanFloat="False" ContentId="MapContentID">
-                                <Grid x:Name="MainCanvasGrid" ClipToBounds="True">
-                                    <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" >
-                                        <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
-                                    </zoombox1:ZoomControl>
-                                    <Label x:Name="label" Content="{Binding Name}" HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
+                    <xcad:LayoutRoot.RootPanel>
+                        <xcad:LayoutPanel>
+                            <xcad:LayoutDocumentPane>
+                                <xcad:LayoutDocument x:Name="MapDocument" Title="Map" CanClose="False" CanFloat="False" ContentId="MapContentID">
+                                    <Grid x:Name="MainCanvasGrid" ClipToBounds="True">
+                                        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="10,10,-10,-10" >
+                                            <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
+                                        </zoombox1:ZoomControl>
+                                        <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
 
-                                </Grid>
-                            </xcad:LayoutDocument>
-                        </xcad:LayoutDocumentPane>
+                                        <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="200" Height="110" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1" >
+                                            <Canvas x:Name="ToolBoxCanvas">
+                                                <Grid Canvas.Left="0" Canvas.Top="2" Width="200" >
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="30"/>
+                                                        <RowDefinition Height="45"/>
+                                                        <RowDefinition Height="30"/>
 
-                        <xcad:LayoutAnchorablePaneGroup DockWidth="250" Orientation="Vertical">
+                                                    </Grid.RowDefinitions>
 
-                            <xcad:LayoutAnchorablePane>
+                                                    <Label x:Name="RegionNameLabel" Content="{Binding DefaultRegion}" Grid.Row="0" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Consolas"/>
+                                                    
+                                                    <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" >
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="/Images/Gate.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="/Images/Gate Inactive.png" />
+                                                                            </DataTrigger>
+
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+                                                        </ToggleButton>
+
+                                                        <ToggleButton x:Name="ToggleRatKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}">
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="/Images/Rat.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="/Images/Rat Inactive.png" />
+                                                                            </DataTrigger>
+
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+
+
+                                                        </ToggleButton>
+
+                                                        <ToggleButton x:Name="TogglePodKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" >
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="/Images/Pod.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="/Images/Pod Inactive.png" />
+                                                                            </DataTrigger>
+
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+                                                        </ToggleButton>
+
+                                                        <ToggleButton x:Name="ToggleShipKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}">
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="/Images/Ship.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="/Images/Ship Inactive.png" />
+                                                                            </DataTrigger>
+
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+
+                                                        </ToggleButton>
+                                                    </StackPanel>
+                                                    <Slider Grid.Row="2" Width="190" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}"/>
+
+                                                </Grid>
+                                            </Canvas>
+                                        </Border>
+
+
+                                    </Grid>
+                                </xcad:LayoutDocument>
+                            </xcad:LayoutDocumentPane>
+                        </xcad:LayoutPanel>
+                    </xcad:LayoutRoot.RootPanel>
+
+                    <xcad:LayoutRoot.RightSide>
+                        <xcad:LayoutAnchorSide>
+                            <xcad:LayoutAnchorGroup>
                                 <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="IntelContentID">
                                     <Grid Background="#FFE5E5E5">
                                         <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
@@ -140,43 +242,40 @@
                                         </StackPanel>
                                     </Grid>
                                 </xcad:LayoutAnchorable>
-                            </xcad:LayoutAnchorablePane>
-
-                                <xcad:LayoutAnchorablePane>
                                 <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapControlsContentID">
-                                        <ScrollViewer Background="#FFE5E5E5">
-                                            <StackPanel>
-                                                <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
-                                                    <xctk:PropertyGrid.EditorDefinitions>
-                                                        <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
-                                                            <xctk:EditorTemplateDefinition.EditingTemplate>
-                                                                <DataTemplate>
-                                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
-                                                                </DataTemplate>
-                                                            </xctk:EditorTemplateDefinition.EditingTemplate>
-                                                        </xctk:EditorTemplateDefinition>
-                                                    </xctk:PropertyGrid.EditorDefinitions>
-                                                </xctk:PropertyGrid>
+                                    <ScrollViewer Background="#FFE5E5E5">
+                                        <StackPanel>
+                                            <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
+                                                <xctk:PropertyGrid.EditorDefinitions>
+                                                    <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
+                                                        <xctk:EditorTemplateDefinition.EditingTemplate>
+                                                            <DataTemplate>
+                                                                <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
+                                                            </DataTemplate>
+                                                        </xctk:EditorTemplateDefinition.EditingTemplate>
+                                                    </xctk:EditorTemplateDefinition>
+                                                </xctk:PropertyGrid.EditorDefinitions>
+                                            </xctk:PropertyGrid>
 
-                                                <StackPanel>
-                                                    <Separator />
-                                                    <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
-                                                </StackPanel>
+                                            <StackPanel>
+                                                <Separator />
+                                                <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
                                             </StackPanel>
-                                        </ScrollViewer>
-                                    </xcad:LayoutAnchorable>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </xcad:LayoutAnchorable>
 
                                 <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapColoursContentID">
-                                        <ScrollViewer Background="#FFE5E5E5">
-                                            <StackPanel>
-                                                <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
-                                                <Separator />
-                                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
-                                                <Separator />
-                                                <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
-                                            </StackPanel>
-                                        </ScrollViewer>
-                                    </xcad:LayoutAnchorable>
+                                    <ScrollViewer Background="#FFE5E5E5">
+                                        <StackPanel>
+                                            <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
+                                            <Separator />
+                                            <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
+                                            <Separator />
+                                            <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </xcad:LayoutAnchorable>
 
                                 <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="CharactersContentID">
                                     <ScrollViewer Background="#FFE5E5E5">
@@ -186,10 +285,13 @@
                                         </StackPanel>
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
-                            </xcad:LayoutAnchorablePane>
-                            </xcad:LayoutAnchorablePaneGroup>
-                    </xcad:LayoutPanel>
+                            </xcad:LayoutAnchorGroup>
+
+                        </xcad:LayoutAnchorSide>
+                    </xcad:LayoutRoot.RightSide>
+                    
                 </xcad:LayoutRoot>
+                
             </xcad:DockingManager>
 
             <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100">

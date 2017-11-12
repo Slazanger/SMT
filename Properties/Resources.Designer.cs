@@ -59,25 +59,5 @@ namespace SMT.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap dotlanbmp {
-            get {
-                object obj = ResourceManager.GetObject("dotlanbmp", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon zkb {
-            get {
-                object obj = ResourceManager.GetObject("zkb", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
     }
 }

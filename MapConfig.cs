@@ -36,9 +36,22 @@ namespace SMT
         private bool m_ShowShipKills;
         private bool m_ShowShipJumps;
         private int m_MaxIntelSeconds;
+        private string m_DefaultRegion;
+        private double m_ESIOverlayScale;
 
         [Browsable(false)]
-        public string DefaultRegion { get; set; }
+        public string DefaultRegion
+        {
+            get
+            {
+                return m_DefaultRegion;
+            }
+            set
+            {
+                m_DefaultRegion = value;
+                OnPropertyChanged("DefaultRegion");
+            }
+        }
 
         [Browsable(false)]
         public string DefaultColourSchemeName { get; set; }
@@ -86,7 +99,18 @@ namespace SMT
 
         [Category("ESI Data")]
         [DisplayName("ESI Scale")]
-        public double ESIOverlayScale { get; set; }
+        public double ESIOverlayScale
+        {
+            get
+            {
+                return m_ESIOverlayScale;
+            }
+            set
+            {
+                m_ESIOverlayScale = value;
+                OnPropertyChanged("ESIOverlayScale");
+            }
+        }
 
         [Category("Intel")]
         [DisplayName("Show Intel")]

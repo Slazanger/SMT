@@ -194,12 +194,23 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
     <None Include="External\csDelaunay\LICENSE" />
     <None Include="External\csDelaunay\README.md" />
+    <Resource Include="Images\dotlan.png" />
+    <Resource Include="Images\Gate Inactive.png" />
+    <Resource Include="Images\Gate.png" />
+    <Resource Include="Images\Pod Inactive.png" />
+    <Resource Include="Images\Pod.png" />
+    <Resource Include="Images\Rat Inactive.png" />
+    <Resource Include="Images\Rat.png" />
+    <Resource Include="Images\Ship Inactive.png" />
+    <Resource Include="Images\Ship.png" />
+    <Resource Include="Images\zkb.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -219,12 +230,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dotlan.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Images\dotlan.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Images\zkb.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dotlanbmp.bmp" />

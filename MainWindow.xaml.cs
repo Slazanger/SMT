@@ -207,6 +207,9 @@ namespace SMT
             Closed += MainWindow_Closed;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
+
+
+            ToolBoxCanvas.DataContext = MapConf;
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -1116,6 +1119,10 @@ namespace SMT
             List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
             MapDocument.Title = rd.Name;
+
+            // reset any custom zoom as we're changing region
+            MainZoomControl.Zoom = 1.0f;
+            MainZoomControl.Mode = WpfHelpers.WpfControls.Zoombox.ZoomControlModes.Fill;
         }
 
         private void SelectRegion(string regionName)
