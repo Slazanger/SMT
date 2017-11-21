@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
-    public class EsiCharacter
+    public class Character
     {
         public string Name { get; set; }
 
@@ -35,7 +35,7 @@ namespace SMT.EVEData
             return Name;
         }
 
-        public EsiCharacter()
+        public Character()
         {
         }
 
@@ -207,7 +207,7 @@ namespace SMT.EVEData
         }
 
 
-        public EsiCharacter(string name, string lcf, string location)
+        public Character(string name, string lcf, string location)
         {
             Name = name;
             LocalChatFile = lcf;

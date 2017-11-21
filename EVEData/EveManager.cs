@@ -90,7 +90,7 @@ namespace SMT.EVEData
         public string DataCacheFolder { get; set; }
 
         [XmlIgnoreAttribute]
-        public ObservableCollection<EsiCharacter> LocalCharacters { get; set; }
+        public ObservableCollection<Character> LocalCharacters { get; set; }
 
         public void LoadCharacters()
         {
@@ -102,15 +102,15 @@ namespace SMT.EVEData
 
             try
             {
-                ObservableCollection<EsiCharacter> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<EsiCharacter>));
+                ObservableCollection<Character> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
 
                 FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
-                loadList = (ObservableCollection<EsiCharacter>)xms.Deserialize(xmlr);
+                loadList = (ObservableCollection<Character>)xms.Deserialize(xmlr);
 
-                foreach (EsiCharacter c in loadList)
+                foreach (Character c in loadList)
                 {
                     c.ESIAccessToken = string.Empty;
                     c.ESIAccessTokenExpiry = DateTime.MinValue;
@@ -127,9 +127,9 @@ namespace SMT.EVEData
         public void SaveData()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
-            ObservableCollection<EsiCharacter> saveList = new ObservableCollection<EsiCharacter>();
+            ObservableCollection<Character> saveList = new ObservableCollection<Character>();
 
-            foreach (EsiCharacter c in LocalCharacters)
+            foreach (Character c in LocalCharacters)
             {
                 if (c.ESIRefreshToken != string.Empty)
                 {
@@ -137,7 +137,7 @@ namespace SMT.EVEData
                 }
             }
 
-            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<EsiCharacter>));
+            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
@@ -405,7 +405,7 @@ namespace SMT.EVEData
                                     characterName = l.Split(':')[1].Trim();
 
                                     bool addChar = true;
-                                    foreach (EVEData.EsiCharacter c in LocalCharacters)
+                                    foreach (EVEData.Character c in LocalCharacters)
                                     {
                                         if (characterName == c.Name)
                                         {
@@ -419,7 +419,7 @@ namespace SMT.EVEData
                                     {
                                         Application.Current.Dispatcher.Invoke((Action)(() =>
                                         {
-                                            LocalCharacters.Add(new EVEData.EsiCharacter(characterName, changedFile, system));
+                                            LocalCharacters.Add(new EVEData.Character(characterName, changedFile, system));
                                         }), DispatcherPriority.ApplicationIdle);
                                     }
 
@@ -462,7 +462,7 @@ namespace SMT.EVEData
                                 string system = line.Split(':').Last().Trim();
                                 Application.Current.Dispatcher.Invoke((Action)(() =>
                                 {
-                                    foreach (EVEData.EsiCharacter c in LocalCharacters)
+                                    foreach (EVEData.Character c in LocalCharacters)
                                     {
                                         if (c.LocalChatFile == changedFile)
                                         {
@@ -1165,8 +1165,8 @@ namespace SMT.EVEData
                                 string expiresOn = obj["ExpiresOn"].ToString();
 
                                 // now find the matching character and update..
-                                EsiCharacter esiChar = null;
-                                foreach (EsiCharacter c in LocalCharacters)
+                                Character esiChar = null;
+                                foreach (Character c in LocalCharacters)
                                 {
                                     if (c.Name == characterName)
                                     {
@@ -1176,7 +1176,7 @@ namespace SMT.EVEData
 
                                 if (esiChar == null)
                                 {
-                                    esiChar = new EsiCharacter(characterName, string.Empty, string.Empty);
+                                    esiChar = new Character(characterName, string.Empty, string.Empty);
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
@@ -1338,7 +1338,7 @@ namespace SMT.EVEData
                 while (true)
                 {
                     {
-                        foreach (EsiCharacter c in LocalCharacters)
+                        foreach (Character c in LocalCharacters)
                         {
                             c.Update();
                         }
@@ -1559,7 +1559,7 @@ namespace SMT.EVEData
 
         public EveManager()
         {
-            LocalCharacters = new ObservableCollection<EsiCharacter>();
+            LocalCharacters = new ObservableCollection<Character>();
 
             // ensure we have the cache folder setup
             DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";

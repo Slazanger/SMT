@@ -357,7 +357,7 @@ namespace SMT
                 setDesto.IsEnabled = false;
                 addWaypoint.IsEnabled = false;
 
-                EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
+                EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
                 if(c != null && c.ESILinked)
                 {
                     setDesto.IsEnabled = true;
@@ -1024,7 +1024,7 @@ namespace SMT
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
-            foreach (EVEData.EsiCharacter c in EVEManager.LocalCharacters)
+            foreach (EVEData.Character c in EVEManager.LocalCharacters)
             {
                 if (rd.IsSystemOnMap(c.Location))
                 {
@@ -1172,7 +1172,7 @@ namespace SMT
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
 
-            EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
             if(c != null)
             {
                 c.AddDestination(eveSys.ActualSystem.ID, false);
@@ -1184,7 +1184,7 @@ namespace SMT
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
 
-            EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
             if (c != null)
             {
                 c.AddDestination(eveSys.ActualSystem.ID, true);
@@ -1214,7 +1214,7 @@ namespace SMT
 
         private void HandleCharacterSelectionChange()
         {
-            EVEData.EsiCharacter c = CharacterDropDown.SelectedItem as EVEData.EsiCharacter;
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
             if (c != null && FollowCharacter)
