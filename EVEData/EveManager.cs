@@ -443,15 +443,15 @@ namespace SMT.EVEData
                     }
 
                     string line = file.ReadLine();
-                    // trim any items off the front
-                    if (line.Contains("[") && line.Contains("]"))
-                    {
-                        line = line.Substring(line.IndexOf("["));
-                    }
 
 
                     while (line != null)
-                    {
+                    {                    // trim any items off the front
+                        if (line.Contains("[") && line.Contains("]"))
+                        {
+                            line = line.Substring(line.IndexOf("["));
+                        }
+
                         fileReadFrom++;
 
                         if (localChat)
