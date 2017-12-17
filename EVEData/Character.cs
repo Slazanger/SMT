@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -14,6 +15,10 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         public string ID { get; set; }
+
+        public string CorporationID { get; set; }
+
+        public string AllianceID { get; set; }
 
         public string LocalChatFile { get; set; }
 
@@ -32,11 +37,24 @@ namespace SMT.EVEData
 
         public override string ToString()
         {
-            return Name;
+            string toStr = Name;
+            if(ESILinked)
+            {
+                toStr += " (ESI)";
+            }
+            return toStr;
         }
+
+        [XmlIgnoreAttribute]
+        public Dictionary<string, float> Standings;
+
+
 
         public Character()
         {
+            Standings = new Dictionary<string, float>();
+            CorporationID = string.Empty;
+            AllianceID = string.Empty;
         }
 
         public void Update()
@@ -45,6 +63,7 @@ namespace SMT.EVEData
             if (ts.Minutes < 0)
             {
                 RefreshAccessToken();
+                UpdateInfoFromESI();
             }
 
             UpdatePositionFromESI();
@@ -157,6 +176,170 @@ namespace SMT.EVEData
             catch { }
         }
 
+        public void UpdateInfoFromESI()
+        {
+            if (string.IsNullOrEmpty(ID) || !ESILinked)
+            {
+                return;
+            }
+
+            try
+            {
+                if (string.IsNullOrEmpty(CorporationID))
+                {
+                    string url = @"https://esi.tech.ccp.is/latest/characters/" + ID + "/?datasource=tranquility";
+
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                    request.Method = WebRequestMethods.Http.Get;
+                    request.Timeout = 20000;
+                    request.Proxy = null;
+
+                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+                    if (esiResult.StatusCode != HttpStatusCode.OK)
+                    {
+                        return;
+                    }
+
+                    Stream responseStream = esiResult.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                string corpID = obj["corporation_id"].ToString();
+                                CorporationID = corpID;
+                            }
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(AllianceID) && !string.IsNullOrEmpty(CorporationID))
+                {
+                    string url = @"https://esi.tech.ccp.is/latest/corporations/" + CorporationID + "/?datasource=tranquility";
+
+
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                    request.Method = WebRequestMethods.Http.Get;
+                    request.Timeout = 20000;
+                    request.Proxy = null;
+
+                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+                    if (esiResult.StatusCode != HttpStatusCode.OK)
+                    {
+                        return;
+                    }
+
+                    Stream responseStream = esiResult.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                string allianceID = obj["alliance_id"].ToString();
+                                AllianceID = allianceID;
+                            }
+                        }
+                    }
+                }
+
+
+
+                if (!string.IsNullOrEmpty(AllianceID))
+                {
+                    int page = 0;
+                    int maxPageCount = 1;
+                    do
+                    {
+                        page++;
+                        //
+
+                        //string url = @"https://esi.tech.ccp.is/latest/alliances/" + AllianceID + "/contacts/?datasource=tranquility&page=" + page;
+
+                        UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/latest/alliances/" + AllianceID + "/contacts/");
+                        var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
+                        esiQuery["page"] = page.ToString();
+                        esiQuery["datasource"] = "tranquility";
+                        esiQuery["token"] = ESIAccessToken;
+
+
+                        urlBuilder.Query = esiQuery.ToString();
+
+                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
+                        request.Method = WebRequestMethods.Http.Get;
+                        request.ContentType = "application/json";
+                        request.Timeout = 20000;
+                        request.Proxy = null;
+
+                        try
+                        {
+                            HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+                            maxPageCount = int.Parse(esiResult.Headers["X-Pages"].ToString());
+
+
+                            if (esiResult.StatusCode != HttpStatusCode.OK)
+                            {
+                                return;
+                            }
+
+                            Stream responseStream = esiResult.GetResponseStream();
+                            using (StreamReader sr = new StreamReader(responseStream))
+                            {
+                                // Need to return this response
+                                string strContent = sr.ReadToEnd();
+
+                                JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                                while (jsr.Read())
+                                {
+                                    if (jsr.TokenType == JsonToken.StartObject)
+                                    {
+                                        JObject obj = JObject.Load(jsr);
+                                        string contactID = obj["contact_id"].ToString();
+                                        string contactType = obj["contact_type"].ToString();
+                                        float standing = float.Parse(obj["standing"].ToString());
+
+                                        Standings[contactID] = standing;
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                        
+                        }
+
+
+
+                    } while (page < maxPageCount);
+
+
+
+
+                }
+
+                if (!string.IsNullOrEmpty(AllianceID) && !string.IsNullOrEmpty(CorporationID))
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
 
         public void AddDestination(string SystemID, bool Clear)
         {
@@ -217,6 +400,8 @@ namespace SMT.EVEData
             ESIAuthCode = string.Empty;
             ESIAccessToken = string.Empty;
             ESIRefreshToken = string.Empty;
+
+            Standings = new Dictionary<string, float>();
         }
     }
 }

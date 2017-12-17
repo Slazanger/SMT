@@ -72,7 +72,7 @@
                 <xcad:LayoutRoot>
                     <xcad:LayoutRoot.RootPanel>
                         <xcad:LayoutPanel>
-                            <xcad:LayoutDocumentPane>
+                            <xcad:LayoutDocumentPane ShowHeader="False">
                                 <xcad:LayoutDocument x:Name="MapDocument" Title="Map" CanClose="False" CanFloat="False" ContentId="MapContentID">
                                     <Grid x:Name="MainCanvasGrid" ClipToBounds="True">
                                         <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="10,10,-10,-10" >

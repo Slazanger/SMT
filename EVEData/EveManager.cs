@@ -1028,7 +1028,7 @@ namespace SMT.EVEData
             esiQuery["response_type"] = "code";
             esiQuery["client_id"] = EveAppConfig.CLIENT_ID;
             esiQuery["redirect_uri"] = EveAppConfig.CALLBACK_URL;
-            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1";
+            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1 esi-alliances.read_contacts.v1";
 
 
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
@@ -1343,7 +1343,7 @@ namespace SMT.EVEData
                             c.Update();
                         }
                     }
-                    Thread.Sleep(5000);
+                    Thread.Sleep(8000);
                 }
             }).Start();
         }

@@ -59,8 +59,6 @@ namespace SMT
 
             DynamicMapElements = new List<UIElement>();
 
-
-
             // load any custom map settings off disk
             string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
             OutputLog.Info("Loading Map config from {0}", mapConfigFileName);
@@ -516,6 +514,7 @@ namespace SMT
         private void AddSystemsToMap()
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
 
             if (MapConf.ShowJumpBridges || MapConf.ShowHostileJumpBridges)
             {
@@ -610,7 +609,12 @@ namespace SMT
             Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
             Brush JumpOutRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
 
-
+            
+            Brush StandingVBad = new SolidColorBrush(Color.FromRgb(148, 5, 5));
+            Brush StandingBad = new SolidColorBrush(Color.FromRgb(196, 72, 6));
+            Brush StandingNeut = new SolidColorBrush(Color.FromRgb(140, 140, 140));
+            Brush StandingGood = new SolidColorBrush(Color.FromRgb(43, 101, 196));
+            Brush StandingVGood = new SolidColorBrush(Color.FromRgb(5, 34, 120));
 
             foreach (EVEData.MapSystem sys in rd.MapSystems.Values.ToList())
             {
@@ -651,6 +655,53 @@ namespace SMT
                 {
                     systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(sys.ActualSystem.Security));
                 }
+
+
+                /*
+                // override with sec status colours
+                if (MapConf.ShowSystemSovStanding && c!=null &&  c.ESILinked)
+                {
+                    float Standing = 0.0f;
+
+                    if(c.AllianceID != null && c.AllianceID == sys.ActualSystem.SOVAlliance)
+                    {
+                        Standing = 10.0f;
+                    }
+
+                    if(sys.ActualSystem.SOVCorp != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
+                    {
+                        Standing = c.Standings[sys.ActualSystem.SOVCorp];
+                    }
+
+                    if (sys.ActualSystem.SOVAlliance != null &&  c.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                    {
+                        Standing = c.Standings[sys.ActualSystem.SOVAlliance];
+                    }
+
+                    systemShape.Fill = StandingNeut;
+
+                    if (Standing == -10.0)
+                    {
+                        systemShape.Fill = StandingVBad;
+                    }
+
+                    if (Standing == -5.0)
+                    {
+                        systemShape.Fill = StandingBad;
+                    }
+
+                    if (Standing == 5.0)
+                    {
+                        systemShape.Fill = StandingGood;
+                    }
+
+                    if (Standing == 10.0)
+                    {
+                        systemShape.Fill = StandingVGood;
+                    }
+                }
+                */
+
 
 
                 systemShape.DataContext = sys;
@@ -867,8 +918,15 @@ namespace SMT
         private void AddDataToMap()
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
 
-            Dictionary<string, List<Polygon>> mergedOverlay = new Dictionary<string, List<Polygon>>();
+
+            Brush StandingVBad = new SolidColorBrush(Color.FromArgb(100,148, 5, 5));
+            Brush StandingBad = new SolidColorBrush(Color.FromArgb(100,196, 72, 6));
+            Brush StandingNeut = new SolidColorBrush(Color.FromArgb(100, 140, 140, 140));
+            Brush StandingGood = new SolidColorBrush(Color.FromArgb(100, 43, 101, 196));
+            Brush StandingVGood = new SolidColorBrush(Color.FromArgb(100, 5, 34, 120));
+
 
             foreach (EVEData.MapSystem sys in rd.MapSystems.Values.ToList())
             {
@@ -919,7 +977,7 @@ namespace SMT
 
 
 
-                if (MapConf.ColourBySov && sys.ActualSystem.SOVAlliance != null)
+                if ((MapConf.ColourBySov || MapConf.ShowSystemSovStanding) && sys.ActualSystem.SOVAlliance != null)
                 {
                     Polygon poly = new Polygon();
 
@@ -928,94 +986,82 @@ namespace SMT
                         poly.Points.Add(p);
                     }
 
-                    Color c = stringToColour(sys.ActualSystem.SOVAlliance);
-                    //c.A = 75;
-                    poly.Fill = new SolidColorBrush(c);
+                    bool addToMap = true;
+                    Brush br = new SolidColorBrush(stringToColour(sys.ActualSystem.SOVAlliance));
+
+                    if(MapConf.ShowSystemSovStanding) 
+                    {
+                        if(c != null && c.ESILinked)
+                        {
+                            float Standing = 0.0f;
+
+                            if (c.AllianceID != null && c.AllianceID == sys.ActualSystem.SOVAlliance)
+                            {
+                                Standing = 10.0f;
+                            }
+
+                            if (sys.ActualSystem.SOVCorp != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
+                            {
+                                Standing = c.Standings[sys.ActualSystem.SOVCorp];
+                            }
+
+                            if (sys.ActualSystem.SOVAlliance != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                            {
+                                Standing = c.Standings[sys.ActualSystem.SOVAlliance];
+                            }
+
+                            if (Standing == 0.0f)
+                            {
+                                addToMap = false;
+                            }
+
+
+
+                            br = StandingNeut;
+
+                            if (Standing == -10.0)
+                            {
+                                br = StandingVBad;
+                            }
+
+                            if (Standing == -5.0)
+                            {
+                                br = StandingBad;
+                            }
+
+                            if (Standing == 5.0)
+                            {
+                                br = StandingGood;
+                            }
+
+                            if (Standing == 10.0)
+                            {
+                                br = StandingVGood;
+                            }
+                        }
+                        else
+                        {
+                            // enabled but not linked
+                            addToMap = false;
+                        }
+                    }
+
+
+                    poly.Fill = br;
                     poly.SnapsToDevicePixels = true;
                     poly.Stroke = poly.Fill;
                     poly.StrokeThickness = 0.5;
                     poly.StrokeDashCap = PenLineCap.Round;
                     poly.StrokeLineJoin = PenLineJoin.Round;
 
-
-                    //MainCanvas.Children.Add(poly);
-
-                    // save the dynamic map elements
-                    //DynamicMapElements.Add(poly);
-
-                    if (!mergedOverlay.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                    if(addToMap)
                     {
-                        mergedOverlay[sys.ActualSystem.SOVAlliance] = new List<Polygon>();
-                    }
+                        MainCanvas.Children.Add(poly);
 
-                    mergedOverlay[sys.ActualSystem.SOVAlliance].Add(poly);
-
-                }
-
-            }
-
-
-            if(MapConf.ColourBySov)
-            {
-                List<Shape> mergedGeom = new List<Shape>();
-                foreach (List<Polygon> pl in mergedOverlay.Values)
-                {
-                    CombinedGeometry c = new CombinedGeometry();
-                    // quick and dirty recursive geometry combine
-
-                    if (pl.Count >= 2)
-                    {
-                        Rect r = new Rect(MainCanvas.RenderSize);
-
-                        foreach (Polygon pg in pl)
-                        {
-                            pg.Measure(MainCanvas.RenderSize);
-                            pg.Arrange(r);
-
-
-                            if (c.Geometry1 == null)
-                            {
-                                c.Geometry1 = pg.RenderedGeometry;
-
-                                continue;
-                            }
-
-                            c.Geometry2 = pg.RenderedGeometry;
-                            c.GeometryCombineMode = GeometryCombineMode.Union;
-
-                            CombinedGeometry temp = c;
-                            c = new CombinedGeometry();
-                            c.Geometry1 = temp;
-                        }
-
-                        System.Windows.Shapes.Path p = new System.Windows.Shapes.Path();
-                        p.Data = c;
-                        p.Stroke = System.Windows.Media.Brushes.Black;
-                        p.StrokeThickness = 1;
-                        p.Fill = pl[0].Fill;
-                        p.SnapsToDevicePixels = true;
-                        mergedGeom.Add(p);
-                      
-                    }
-
-                    else
-                    {
-                        pl[0].Stroke = System.Windows.Media.Brushes.Black;
-                        pl[0].StrokeThickness = 1;
-
-                        mergedGeom.Add(pl[0]);
+                        // save the dynamic map elements
+                        DynamicMapElements.Add(poly);
                     }
                 }
-
-
-                foreach(Shape poly in mergedGeom)
-                {
-                    MainCanvas.Children.Add(poly);
-
-                    // save the dynamic map elements
-                    DynamicMapElements.Add(poly);
-                }
-
             }
         }
 
@@ -1331,7 +1377,6 @@ namespace SMT
         {
             int hash = 0;
 
-
             foreach (char c in str.ToCharArray())
             {
                 hash = c + ((hash << 5) - hash);
@@ -1340,11 +1385,8 @@ namespace SMT
             double R = (((byte) (hash & 0xff) / 255.0) * 80.0 ) + 127.0 ;
             double G = (((byte) ((hash >> 8) & 0xff) / 255.0 ) * 80.0 ) + 127.0;
             double B = (((byte) ((hash >> 16) & 0xff) / 255.0)* 80.0) + 127.0;
-
-            
-
-            return Color.FromRgb((byte)R, (byte)G, (byte)B);
-
+           
+            return Color.FromArgb(100,(byte)R, (byte)G, (byte)B);
         }
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

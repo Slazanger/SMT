@@ -31,6 +31,16 @@ namespace SMT
         }
 
         private bool m_ColourBySov;
+
+        private bool m_ShowJumpBridges;
+        private bool m_ShowHostileJumpBridges;
+
+        private bool m_ShowSystemSovTicker;
+        private bool m_ShowSystemSovName;
+
+        private bool m_ShowSystemSecurity;
+        private bool m_ShowSystemSovStanding;
+
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
@@ -38,6 +48,8 @@ namespace SMT
         private int m_MaxIntelSeconds;
         private string m_DefaultRegion;
         private double m_ESIOverlayScale;
+
+
 
         [Browsable(false)]
         public string DefaultRegion
@@ -64,11 +76,35 @@ namespace SMT
 
         [Category("Jump Bridges")]
         [DisplayName("Friendly Bridges")]
-        public bool ShowJumpBridges { get; set; }
+        public bool ShowJumpBridges
+        {
+            get
+            {
+                return m_ShowJumpBridges;
+            }
+            set
+            {
+                m_ShowJumpBridges = value;
+
+                OnPropertyChanged("ShowJumpBridges");
+            }
+        }
 
         [Category("Jump Bridges")]
         [DisplayName("Hostile Bridges")]
-        public bool ShowHostileJumpBridges { get; set; }
+        public bool ShowHostileJumpBridges
+        {
+            get
+            {
+                return m_ShowHostileJumpBridges;
+            }
+            set
+            {
+                m_ShowHostileJumpBridges = value;
+
+                OnPropertyChanged("ShowHostileJumpBridges");
+            }
+        }
 
         [Category("General")]
         [DisplayName("System Popup")]
@@ -76,17 +112,79 @@ namespace SMT
 
         [Category("General")]
         [DisplayName("Show Security")]
-        public bool ShowSystemSecurity { get; set; }
+        public bool ShowSystemSecurity
+        {
+            get
+            {
+                return m_ShowSystemSecurity;
+            }
+            set
+            {
+                m_ShowSystemSecurity = value;
+
+                if (m_ShowSystemSecurity)
+                {
+                    ShowSystemSovStanding = false;
+                }
+
+                OnPropertyChanged("ShowSystemSecurity");
+            }
+        }
+
+        [Category("General")]
+        [DisplayName("Show SOV Standing")]
+        public bool ShowSystemSovStanding
+        {
+            get
+            {
+                return m_ShowSystemSovStanding;
+            }
+            set
+            {
+                m_ShowSystemSovStanding = value;
+
+                if (m_ShowSystemSovStanding)
+                {
+                    ShowSystemSecurity = false;
+                }
+
+                OnPropertyChanged("ShowSystemSovStanding");
+            }
+        }
+
+
 
         [Category("General")]
         [DisplayName("Show SOV Ticker")]
-
-        public bool ShowSystemSovTicker { get; set; }
+        public bool ShowSystemSovTicker
+        {
+            get
+            {
+                return m_ShowSystemSovTicker;
+            }
+            set
+            {
+                m_ShowSystemSovTicker = value;
+                OnPropertyChanged("ShowSystemSovTicker");
+            }
+        }
 
         [Category("General")]
         [DisplayName("Show SOV Name")]
+        public bool ShowSystemSovName
+        {
+            get
+            {
+                return m_ShowSystemSovName;
+            }
+            set
+            {
+                m_ShowSystemSovName = value;
+                OnPropertyChanged("ShowSystemSovName");
+            }
+        }
 
-        public bool ShowSystemSovName { get; set; }
+
 
 
         [Category("Navigation")]
