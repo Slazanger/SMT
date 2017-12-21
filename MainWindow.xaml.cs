@@ -1238,6 +1238,17 @@ namespace SMT
 
         }
 
+        private void SysContexMenuItemCopy_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+            if(eveSys !=null)
+            {
+                Clipboard.SetText(eveSys.Name);
+            }
+        }
+
+
 
 
         private void SysContexMenuItemDotlan_Click(object sender, RoutedEventArgs e)
@@ -1425,6 +1436,8 @@ namespace SMT
             }
 
         }
+
+
     }
 
 

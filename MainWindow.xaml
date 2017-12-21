@@ -38,6 +38,7 @@
             <Separator />
             <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
             <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
+            <MenuItem Header="Copy Name" Click="SysContexMenuItemCopy_Click" />
         </ContextMenu>
     </Window.Resources>
     <Grid>
