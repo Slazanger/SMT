@@ -92,7 +92,7 @@
                                                     </Grid.RowDefinitions>
 
                                                     <Label x:Name="RegionNameLabel" Content="{Binding DefaultRegion}" Grid.Row="0" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Consolas"/>
-                                                    
+
                                                     <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                         <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" >
                                                             <Image>
@@ -286,13 +286,20 @@
                                         </StackPanel>
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
+
+                                <xcad:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="FleetContentID">
+                                    <ScrollViewer Background="#FFE5E5E5">
+                                        <StackPanel>
+                                            <ListBox x:Name="FleetMembersList"/>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </xcad:LayoutAnchorable>
                             </xcad:LayoutAnchorGroup>
 
                         </xcad:LayoutAnchorSide>
                     </xcad:LayoutRoot.RightSide>
-                    
+
                 </xcad:LayoutRoot>
-                
             </xcad:DockingManager>
 
             <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100">

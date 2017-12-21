@@ -1070,51 +1070,73 @@ namespace SMT
         {
             EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
 
+            Dictionary<string, List<EVEData.Character>> charLocationMap = new Dictionary<string, List<EVEData.Character>>();
+
             foreach (EVEData.Character c in EVEManager.LocalCharacters)
             {
-                if (rd.IsSystemOnMap(c.Location))
+                if(!charLocationMap.Keys.Contains(c.Location))
                 {
-                    EVEData.MapSystem ms = rd.MapSystems[c.Location];
+                    charLocationMap[c.Location] = new List<EVEData.Character>();
+                }
+                charLocationMap[c.Location].Add(c);
+            }
 
+            foreach(List<EVEData.Character> lc in charLocationMap.Values)
+            {
+                if (!rd.IsSystemOnMap(lc[0].Location))
+                {
+                    continue;
+                }
+
+                double textYOffset = -24;
+                double textXOffset = 6;
+
+
+                EVEData.MapSystem ms = rd.MapSystems[lc[0].Location];
+
+                // add circle for system
+
+                double circleSize = 26;
+                double circleOffset = circleSize / 2;
+
+                Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
+
+                highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+                highlightSystemCircle.StrokeThickness = 2;
+
+                RotateTransform rt = new RotateTransform();
+                rt.CenterX = circleSize / 2;
+                rt.CenterY = circleSize / 2;
+                highlightSystemCircle.RenderTransform = rt;
+
+                DoubleCollection dashes = new DoubleCollection();
+                dashes.Add(1.0);
+                dashes.Add(1.0);
+
+                highlightSystemCircle.StrokeDashArray = dashes;
+
+                Canvas.SetLeft(highlightSystemCircle, ms.LayoutX - circleOffset);
+                Canvas.SetTop(highlightSystemCircle, ms.LayoutY - circleOffset);
+                Canvas.SetZIndex(highlightSystemCircle, 19);
+
+                MainCanvas.Children.Add(highlightSystemCircle);
+                DynamicMapElements.Add(highlightSystemCircle);
+
+                // Storyboard s = new Storyboard();
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 360;
+                da.To = 0;
+                da.Duration = new Duration(TimeSpan.FromSeconds(12));
+
+                RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
+                eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+
+
+                foreach (EVEData.Character c in lc)
+                {
                     // add the character to
-                    double circleSize = 26;
-                    double circleOffset = circleSize / 2;
 
-                    // add circle for system
-                    Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
 
-                    highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
-                    highlightSystemCircle.StrokeThickness = 2;
-
-                    RotateTransform rt = new RotateTransform();
-                    rt.CenterX = circleSize / 2;
-                    rt.CenterY = circleSize / 2;
-                    highlightSystemCircle.RenderTransform = rt;
-
-                    DoubleCollection dashes = new DoubleCollection();
-                    dashes.Add(1.0);
-                    dashes.Add(1.0);
-
-                    highlightSystemCircle.StrokeDashArray = dashes;
-
-                    Canvas.SetLeft(highlightSystemCircle, ms.LayoutX - circleOffset);
-                    Canvas.SetTop(highlightSystemCircle, ms.LayoutY - circleOffset);
-                    Canvas.SetZIndex(highlightSystemCircle, 19);
-
-                    MainCanvas.Children.Add(highlightSystemCircle);
-                    DynamicMapElements.Add(highlightSystemCircle);
-
-                    // Storyboard s = new Storyboard();
-                    DoubleAnimation da = new DoubleAnimation();
-                    da.From = 360;
-                    da.To = 0;
-                    da.Duration = new Duration(TimeSpan.FromSeconds(12));
-
-                    RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
-                    eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
-
-                    double textYOffset = -24;
-                    double textXOffset = 6;
 
                     // also add the name of the character above the system
                     Label charText = new Label();
@@ -1132,8 +1154,12 @@ namespace SMT
                     MainCanvas.Children.Add(charText);
                     DynamicMapElements.Add(charText);
 
-
+                    textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
                 }
+            }
+
+            foreach (EVEData.Character c in EVEManager.LocalCharacters)
+            {
             }
         }
 
