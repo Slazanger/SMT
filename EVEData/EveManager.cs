@@ -20,9 +20,6 @@ namespace SMT.EVEData
 {
     public class EveManager
     {
-
-
-
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
         private static EveManager s_Instance;
@@ -89,6 +86,7 @@ namespace SMT.EVEData
         /// </summary>
         public string DataCacheFolder { get; set; }
 
+        
         [XmlIgnoreAttribute]
         public ObservableCollection<Character> LocalCharacters { get; set; }
 
@@ -900,8 +898,27 @@ namespace SMT.EVEData
                 SystemIDToName[s.ID] = s.Name;
             }
 
-            AllianceIDToName = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
-            AllianceIDToTicker = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+            if(File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat"))
+            {
+                AllianceIDToName = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+            }
+            else
+            {
+                AllianceIDToName = new SerializableDictionary<string, string>();
+            }
+
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat"))
+            {
+                AllianceIDToTicker = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+            }
+            else
+            {
+                AllianceIDToTicker = new SerializableDictionary<string, string>();
+            }
+
+
+
+
 
 
 
@@ -1028,8 +1045,7 @@ namespace SMT.EVEData
             esiQuery["response_type"] = "code";
             esiQuery["client_id"] = EveAppConfig.CLIENT_ID;
             esiQuery["redirect_uri"] = EveAppConfig.CALLBACK_URL;
-            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1 esi-alliances.read_contacts.v1";
-
+            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1 esi-alliances.read_contacts.v1 esi-fleets.read_fleet.v1 fleetRead";
 
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
 
@@ -1205,7 +1221,7 @@ namespace SMT.EVEData
         /// </summary>
         public void StartUpdateKillsFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/latest/universe/system_kills/?datasource=tranquility";
+            string url = @"https://esi.tech.ccp.is/v2/universe/system_kills/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1271,7 +1287,7 @@ namespace SMT.EVEData
         /// </summary>
         public void StartUpdateJumpsFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/latest/universe/system_jumps/?datasource=tranquility";
+            string url = @"https://esi.tech.ccp.is/latest/v1/system_jumps/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1337,16 +1353,15 @@ namespace SMT.EVEData
                 // loop forever
                 while (true)
                 {
+                    foreach (Character c in LocalCharacters)
                     {
-                        foreach (Character c in LocalCharacters)
-                        {
-                            c.Update();
-                        }
+                        c.Update();
                     }
-                    Thread.Sleep(8000);
+                    Thread.Sleep(5000);
                 }
             }).Start();
         }
+
 
 
         /// <summary>
@@ -1354,7 +1369,7 @@ namespace SMT.EVEData
         /// </summary>
         public void StartUpdateSOVFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/latest/sovereignty/map/?datasource=tranquility";
+            string url = @"https://esi.tech.ccp.is/v1/sovereignty/map/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1445,7 +1460,7 @@ namespace SMT.EVEData
             if (AllianceList != string.Empty)
             {
                 AllianceList += "0";
-                string url = @"https://esi.tech.ccp.is/latest/alliances/names/?datasource=tranquility";
+                string url = @"https://esi.tech.ccp.is/v2/alliances/names/?datasource=tranquility";
 
                 url += "&alliance_ids=" + Uri.EscapeUriString(AllianceList);
 
@@ -1492,7 +1507,7 @@ namespace SMT.EVEData
                                 string ID = obj["alliance_id"].ToString();
                                 AllianceIDToName[ID] = Name;
 
-                                string allianceUrl = @"https://esi.tech.ccp.is/latest/alliances/" + ID + "/?datasource=tranquility";
+                                string allianceUrl = @"https://esi.tech.ccp.is/v3/alliances/" + ID + "/?datasource=tranquility";
 
                                 HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
                                 allianceRequest.Method = WebRequestMethods.Http.Get;
@@ -1513,7 +1528,7 @@ namespace SMT.EVEData
                                         if (jobj.TokenType == JsonToken.StartObject)
                                         {
                                             JObject aobj = JObject.Load(jobj);
-                                            string AllianceName = aobj["alliance_name"].ToString();
+                                            string AllianceName = aobj["name"].ToString();
                                             string AllianceTicker = aobj["ticker"].ToString();
 
                                             AllianceIDToTicker[ID] = AllianceTicker;
@@ -1589,7 +1604,6 @@ namespace SMT.EVEData
             AllianceIDToName = new SerializableDictionary<string, string>();
             AllianceIDToTicker = new SerializableDictionary<string, string>();
             NameToSystem = new Dictionary<string, System>();
-
         }
     }
 

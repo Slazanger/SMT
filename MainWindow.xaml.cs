@@ -301,6 +301,7 @@ namespace SMT
             AddHighlightToSystem(SelectedSystem);
             AddSystemIntelOverlay();
             AddCharactersToMap();
+            AddRouteToMap();
 
         }
 
@@ -457,6 +458,89 @@ namespace SMT
 
                 RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
                 eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+            }
+        }
+
+        private void AddRouteToMap()
+        {
+
+            EVEData.MapRegion rd = RegionDropDown.SelectedItem as EVEData.MapRegion;
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+
+
+            if (c == null)
+                return;
+
+            Brush RouteBrush = new SolidColorBrush(Colors.Yellow);
+            Brush WaypointBrush = new SolidColorBrush(Colors.DarkGray);
+
+            foreach (string s in c.Waypoints)
+            {
+
+            }
+
+
+            // no active route
+            if (c.ActiveRoute.Count == 0)
+            {
+                return;
+            }
+
+            string Start = "";
+            string End = c.Location;
+
+
+
+            for (int i = 0; i < c.ActiveRoute.Count; i++)
+            {
+                Start = End;
+                End = c.ActiveRoute[i];
+
+                if (!(rd.IsSystemOnMap(Start) && rd.IsSystemOnMap(End)))
+                {
+                    continue;
+                }
+
+                EVEData.MapSystem from = rd.MapSystems[Start];
+                EVEData.MapSystem to = rd.MapSystems[End];
+
+
+                Line routeLine = new Line();
+
+
+                routeLine.X1 = from.LayoutX;
+                routeLine.Y1 = from.LayoutY;
+
+                routeLine.X2 = to.LayoutX;
+                routeLine.Y2 = to.LayoutY;
+
+                routeLine.StrokeThickness = 5;
+                routeLine.Visibility = Visibility.Visible;
+                routeLine.Stroke = RouteBrush;
+
+                DoubleCollection dashes = new DoubleCollection();
+                dashes.Add(1.0);
+                dashes.Add(1.0);
+
+                routeLine.StrokeDashArray = dashes;
+
+                // animate the jump bridges
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 200;
+                da.To = 0;
+                da.By = 2;
+                da.Duration = new Duration(TimeSpan.FromSeconds(40));
+                da.RepeatBehavior = RepeatBehavior.Forever;
+
+                routeLine.StrokeDashArray = dashes;
+                routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+
+
+                Canvas.SetZIndex(routeLine, 18);
+                MainCanvas.Children.Add(routeLine);
+
+                DynamicMapElements.Add(routeLine);
             }
         }
 
@@ -1157,10 +1241,6 @@ namespace SMT
                     textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
                 }
             }
-
-            foreach (EVEData.Character c in EVEManager.LocalCharacters)
-            {
-            }
         }
 
 
@@ -1321,6 +1401,15 @@ namespace SMT
 
                 }
             }
+
+            if(c != null)
+            {
+                MainRouteGrid.DataContext = c;
+            }
+            else
+            {
+                MainRouteGrid.DataContext = null;
+            }
         }
 
         private void CharacterDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1463,7 +1552,15 @@ namespace SMT
 
         }
 
-
+        private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            if(c!=null)
+            {
+                c.ActiveRoute.Clear();
+                c.Waypoints.Clear();
+            }
+        }
     }
 
 

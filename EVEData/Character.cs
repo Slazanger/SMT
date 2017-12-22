@@ -2,10 +2,13 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Web;
+using System.Windows;
+using System.Windows.Threading;
 using System.Xml.Serialization;
 
 namespace SMT.EVEData
@@ -22,7 +25,25 @@ namespace SMT.EVEData
 
         public string LocalChatFile { get; set; }
 
-        public string Location { get; set; }
+        private string m_Location;
+        private bool m_RouteNeedsUpdate = false;
+        public string Location
+        {
+            get
+            {
+                return m_Location;
+            }
+            set
+            {
+                if(m_Location == value)
+                {
+                    return;
+                }
+                
+                m_Location = value;
+                m_RouteNeedsUpdate = true;
+            }
+        }
 
         public bool ESILinked { get; set; }
 
@@ -49,12 +70,19 @@ namespace SMT.EVEData
         public Dictionary<string, float> Standings;
 
 
+        [XmlIgnoreAttribute]
+        public Fleet FleetInfo;
+
 
         public Character()
         {
             Standings = new Dictionary<string, float>();
             CorporationID = string.Empty;
             AllianceID = string.Empty;
+            FleetInfo = new Fleet();
+            Waypoints = new ObservableCollection<string>();
+            ActiveRoute = new ObservableCollection<string>();
+
         }
 
         public void Update()
@@ -67,7 +95,116 @@ namespace SMT.EVEData
             }
 
             UpdatePositionFromESI();
+
+            // TODO : 
+            //UpdateFleetIDFromESI();
+            //UpdateFleetInfoFromESI();
+            //UpdateFleetMembersFromESI();
+
+            if(m_RouteNeedsUpdate)
+            {
+                m_RouteNeedsUpdate = false;
+                UpdateActiveRoute();
+            }
+
         }
+
+        [XmlIgnoreAttribute]
+        public ObservableCollection<String> Waypoints { get; set; }
+
+        [XmlIgnoreAttribute]
+        public ObservableCollection<String> ActiveRoute { get; set; }
+
+
+        void UpdateActiveRoute()
+        {
+            if (Waypoints.Count == 0)
+            {
+                return;
+            }
+
+            string Start = "";
+            string End = Location;
+
+
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                if (Location == Waypoints[0])
+                {
+                    Waypoints.RemoveAt(0);
+                }
+
+
+                ActiveRoute.Clear();
+            }), DispatcherPriority.ApplicationIdle);
+
+
+
+            for (int i = 0; i < Waypoints.Count; i++)
+            {
+                Start = End;
+                End = Waypoints[i];
+
+                EVEData.System StartSys = EveManager.GetInstance().GetEveSystem(Start);
+                EVEData.System EndSys = EveManager.GetInstance().GetEveSystem(End);
+
+
+                UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/route/" + StartSys.ID + "/" + EndSys.ID + "/" );
+
+                var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
+                esiQuery["datasource"] = "tranquility";
+
+                urlBuilder.Query = esiQuery.ToString();
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
+                request.Method = WebRequestMethods.Http.Get;
+                request.Timeout = 20000;
+                request.Proxy = null;
+
+                try
+                {
+                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+                    if (esiResult.StatusCode != HttpStatusCode.OK)
+                    {
+                        return;
+                    }
+
+                    Stream responseStream = esiResult.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartArray)
+                            {
+                                JArray obj = JArray.Load(jsr);
+                                string[] Systems = obj.ToObject<string[]>();
+                                
+                                for(int j=1; j< Systems.Length; j++)
+                                {
+                                    string sysName = EveManager.GetInstance().SystemIDToName[Systems[j]];
+
+                                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                                    {
+                                        ActiveRoute.Add(sysName);
+                                    }), DispatcherPriority.ApplicationIdle);
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+
+        }
+
 
         public bool RefreshAccessToken()
         {
@@ -131,7 +268,7 @@ namespace SMT.EVEData
 
         private void UpdatePositionFromESI()
         {
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/latest/characters/" + ID + "/location");
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/characters/" + ID + "/location");
 
             var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
             esiQuery["character_id"] = ID;
@@ -176,6 +313,166 @@ namespace SMT.EVEData
             catch { }
         }
 
+        private void UpdateFleetIDFromESI()
+        {
+
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/characters/" + ID + "/fleet");
+
+            var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
+            esiQuery["character_id"] = ID;
+            esiQuery["datasource"] = "tranquility";
+            esiQuery["token"] = ESIAccessToken;
+
+            urlBuilder.Query = esiQuery.ToString();
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            try
+            {
+                HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+                if (esiResult.StatusCode != HttpStatusCode.OK)
+                {
+                    return;
+                }
+
+                Stream responseStream = esiResult.GetResponseStream();
+                using (StreamReader sr = new StreamReader(responseStream))
+                {
+                    // Need to return this response
+                    string strContent = sr.ReadToEnd();
+
+                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                    while (jsr.Read())
+                    {
+                        if (jsr.TokenType == JsonToken.StartObject)
+                        {
+                            JObject obj = JObject.Load(jsr);
+                            string fleetID = obj["fleet_id"].ToString();
+
+                            if (fleetID == "-1")
+                            {
+                                FleetInfo.FleetID = Fleet.NO_FLEET;
+                            }
+                            else
+                            {
+                                FleetInfo.FleetID = fleetID;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void UpdateFleetInfoFromESI()
+        {
+            if (FleetInfo.FleetID == Fleet.NO_FLEET)
+                return;
+
+
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/fleets/" + FleetInfo.FleetID + "/");
+
+            var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
+
+            esiQuery["datasource"] = "tranquility";
+            esiQuery["token"] = ESIAccessToken;
+
+            urlBuilder.Query = esiQuery.ToString();
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            try
+            {
+                HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+                if (esiResult.StatusCode != HttpStatusCode.OK)
+                {
+                    return;
+                }
+
+                Stream responseStream = esiResult.GetResponseStream();
+                using (StreamReader sr = new StreamReader(responseStream))
+                {
+                    // Need to return this response
+                    string strContent = sr.ReadToEnd();
+
+                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                    while (jsr.Read())
+                    {
+                        if (jsr.TokenType == JsonToken.StartObject)
+                        {
+                            JObject obj = JObject.Load(jsr);
+                            string MOTD = obj["motd"].ToString();
+
+                            FleetInfo.FleetMOTD = MOTD;
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void UpdateFleetMembersFromESI()
+        {
+            if (FleetInfo.FleetID == Fleet.NO_FLEET)
+                return;
+
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/fleets/" + FleetInfo.FleetID + "/members/");
+
+            var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
+
+            esiQuery["datasource"] = "tranquility";
+            esiQuery["token"] = ESIAccessToken;
+
+            urlBuilder.Query = esiQuery.ToString();
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            try
+            {
+                HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+                if (esiResult.StatusCode != HttpStatusCode.OK)
+                {
+                    return;
+                }
+
+                Stream responseStream = esiResult.GetResponseStream();
+                using (StreamReader sr = new StreamReader(responseStream))
+                {
+                    // Need to return this response
+                    string strContent = sr.ReadToEnd();
+
+                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+                    while (jsr.Read())
+                    {
+                        if (jsr.TokenType == JsonToken.StartObject)
+                        {
+                            JObject obj = JObject.Load(jsr);
+                            string charID = obj["character_id"].ToString();
+                            string ShipType = obj["ship_type_id"].ToString();
+                            string locationID = obj["solar_system_id"].ToString();
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+
+
+
+
         public void UpdateInfoFromESI()
         {
             if (string.IsNullOrEmpty(ID) || !ESILinked)
@@ -187,7 +484,7 @@ namespace SMT.EVEData
             {
                 if (string.IsNullOrEmpty(CorporationID))
                 {
-                    string url = @"https://esi.tech.ccp.is/latest/characters/" + ID + "/?datasource=tranquility";
+                    string url = @"https://esi.tech.ccp.is/v4/characters/" + ID + "/?datasource=tranquility";
 
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                     request.Method = WebRequestMethods.Http.Get;
@@ -222,7 +519,7 @@ namespace SMT.EVEData
 
                 if (string.IsNullOrEmpty(AllianceID) && !string.IsNullOrEmpty(CorporationID))
                 {
-                    string url = @"https://esi.tech.ccp.is/latest/corporations/" + CorporationID + "/?datasource=tranquility";
+                    string url = @"https://esi.tech.ccp.is/v4/corporations/" + CorporationID + "/?datasource=tranquility";
 
 
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
@@ -267,9 +564,9 @@ namespace SMT.EVEData
                         page++;
                         //
 
-                        //string url = @"https://esi.tech.ccp.is/latest/alliances/" + AllianceID + "/contacts/?datasource=tranquility&page=" + page;
+                        //string url = @"https://esi.tech.ccp.is/v1/alliances/" + AllianceID + "/contacts/?datasource=tranquility&page=" + page;
 
-                        UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/latest/alliances/" + AllianceID + "/contacts/");
+                        UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/alliances/" + AllianceID + "/contacts/");
                         var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
                         esiQuery["page"] = page.ToString();
                         esiQuery["datasource"] = "tranquility";
@@ -343,7 +640,18 @@ namespace SMT.EVEData
 
         public void AddDestination(string SystemID, bool Clear)
         {
-            string url = @"https://esi.tech.ccp.is/latest/ui/autopilot/waypoint/?";
+            if(Clear)
+            {
+                Waypoints.Clear();
+                ActiveRoute.Clear();
+            }
+
+            Waypoints.Add(EveManager.GetInstance().SystemIDToName[SystemID]);
+
+            m_RouteNeedsUpdate = true;
+
+
+            string url = @"https://esi.tech.ccp.is/v2/ui/autopilot/waypoint/?";
 
             var httpData = HttpUtility.ParseQueryString(string.Empty);
 
@@ -402,6 +710,11 @@ namespace SMT.EVEData
             ESIRefreshToken = string.Empty;
 
             Standings = new Dictionary<string, float>();
+            FleetInfo = new Fleet();
+
+            Waypoints = new ObservableCollection<string>();
+            ActiveRoute = new ObservableCollection<string>();
+
         }
     }
 }

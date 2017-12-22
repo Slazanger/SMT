@@ -9,6 +9,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
         Title="SMT" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
 
@@ -189,7 +190,7 @@
                     <xcad:LayoutRoot.RightSide>
                         <xcad:LayoutAnchorSide>
                             <xcad:LayoutAnchorGroup>
-                                <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="IntelContentID">
+                                <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid Background="#FFE5E5E5">
                                         <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
                                             <ListBox.ItemTemplate>
@@ -203,7 +204,7 @@
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="AnomsContentID">
+                                <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="60" />
@@ -243,7 +244,7 @@
                                         </StackPanel>
                                     </Grid>
                                 </xcad:LayoutAnchorable>
-                                <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapControlsContentID">
+                                <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapControlsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
                                             <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
@@ -266,7 +267,7 @@
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapColoursContentID">
+                                <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
                                             <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
@@ -278,7 +279,7 @@
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="CharactersContentID">
+                                <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
                                             <ListBox x:Name="CharacterList"/>
@@ -287,12 +288,21 @@
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="FleetContentID">
-                                    <ScrollViewer Background="#FFE5E5E5">
-                                        <StackPanel>
-                                            <ListBox x:Name="FleetMembersList"/>
-                                        </StackPanel>
-                                    </ScrollViewer>
+                                <xcad:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                    <Grid x:Name="MainRouteGrid">
+                                        <ScrollViewer Background="#FFE5E5E5">
+                                            <StackPanel>
+                                                <Label Content="Waypoints"/>
+                                                <ListBox ItemsSource="{Binding Waypoints, diag:PresentationTraceSources.TraceLevel=High}" />
+                                                <Separator/>
+                                                <Label Content="Route"/>
+                                                <ListBox ItemsSource="{Binding ActiveRoute}"/>
+                                                <Separator/>
+                                                <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear"/>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                    </Grid>
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutAnchorGroup>
 
