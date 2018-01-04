@@ -73,6 +73,7 @@ namespace SMT
                     XmlReader xmlr = XmlReader.Create(fs);
 
                     MapConf = (MapConfig)xms.Deserialize(xmlr);
+                    fs.Close();
                 }
                 catch
                 {
@@ -118,18 +119,6 @@ namespace SMT
             EVEManager.StartUpdateJumpsFromESI();
             EVEManager.StartUpdateSOVFromESI();
 
-            foreach (EVEData.MapRegion rd in EVEManager.Regions)
-            {
-                if (rd.Name == MapConf.DefaultRegion)
-                {
-                    RegionDropDown.SelectedItem = rd;
-                    List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
-                    SystemDropDownAC.ItemsSource = newList;
-                    MapDocument.Title = rd.Name;
-                }
-            }
-
-
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
             uiRefreshTimer.Interval = new TimeSpan(0, 0, 5);
@@ -172,6 +161,11 @@ namespace SMT
                 }
             }
 
+
+            SelectRegion(MapConf.DefaultRegion);
+
+
+
             // load the anom data
             string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
             if (File.Exists(anomDataFilename))
@@ -184,6 +178,7 @@ namespace SMT
                     XmlReader xmlr = XmlReader.Create(fs);
 
                     ANOMManager = (EVEData.AnomManager)xms.Deserialize(xmlr);
+                    fs.Close();
                 }
                 catch
                 {
@@ -229,25 +224,38 @@ namespace SMT
             {
             }
 
-            // Save the Map Colours
-            string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
 
-            // now serialise the class to disk
-            XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
-            using (TextWriter tw = new StreamWriter(mapConfigFileName))
+            try
             {
-                xms.Serialize(tw, MapConf);
+                // Save the Map Colours
+                string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
+
+                // now serialise the class to disk
+                XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
+                using (TextWriter tw = new StreamWriter(mapConfigFileName))
+                {
+                    xms.Serialize(tw, MapConf);
+                }
+            }
+            catch
+            {
             }
 
-            // save the Anom Data
-            // now serialise the class to disk
-            XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
-            string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
 
-            using (TextWriter tw = new StreamWriter(anomDataFilename))
+            try
             {
-                anomxms.Serialize(tw, ANOMManager);
+                // save the Anom Data
+                // now serialise the class to disk
+                XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
+                string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
+
+                using (TextWriter tw = new StreamWriter(anomDataFilename))
+                {
+                    anomxms.Serialize(tw, ANOMManager);
+                }
             }
+            catch
+            { }
 
 
             // save the character data
@@ -1280,6 +1288,8 @@ namespace SMT
             List<EVEData.MapSystem> newList = rd.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
             MapDocument.Title = rd.Name;
+            MapDocument.ToolTip = rd.Name;
+
 
             // reset any custom zoom as we're changing region
             MainZoomControl.Zoom = 1.0f;
