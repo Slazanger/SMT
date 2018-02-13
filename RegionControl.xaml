@@ -1,0 +1,199 @@
+﻿<UserControl x:Class="SMT.RegionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+             xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
+             xmlns:local="clr-namespace:SMT"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ContextMenu x:Key="SysRightClickContextMenu">
+
+            <ContextMenu.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="-20,0,-40,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Ident}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Description}" />
+                    </Grid>
+                </DataTemplate>
+            </ContextMenu.ItemTemplate>
+
+            <MenuItem Header="{Binding Name}" FontWeight="Bold" />
+            <Separator />
+            <MenuItem Header="Set Destination" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
+            <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
+            <Separator />
+            <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
+            <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
+            <MenuItem Header="Copy Name" Click="SysContexMenuItemCopy_Click" />
+        </ContextMenu>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="4,2,1,2"  Orientation="Horizontal" HorizontalAlignment="Left">
+            <ComboBox x:Name="RegionSelectCB"  Width="150" Margin="5,0" FontSize="12" SelectionChanged="RegionSelectCB_SelectionChanged" />
+            <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" FontSize="12" Margin="5,0">
+                <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
+            </dotNetKitControls:AutoCompleteComboBox>
+            <ComboBox x:Name="CharacterDropDown"  Width="150"  Margin="5,0" HorizontalAlignment="Center" />
+            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" IsChecked="False" HorizontalAlignment="Left" VerticalAlignment="Center" />
+        </StackPanel>
+
+
+        <Grid x:Name="MainCanvasGrid" ClipToBounds="True" Grid.Row="1">
+            <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" >
+                <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
+            </zoombox1:ZoomControl>
+            <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
+
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="200" Height="110" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1" >
+                <Canvas x:Name="ToolBoxCanvas">
+                    <Grid Canvas.Left="0" Canvas.Top="2" Width="200" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="45"/>
+                            <RowDefinition Height="30"/>
+
+                        </Grid.RowDefinitions>
+
+                        <Label x:Name="RegionNameLabel" Content="{Binding CurrentRegion.Name}" Grid.Row="0" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" >
+                                <Image>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="True">
+                                                    <Setter Property="Image.Source" Value="/Images/Gate.png" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="false">
+                                                    <Setter Property="Image.Source" Value="/Images/Gate Inactive.png" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </ToggleButton>
+
+                            <ToggleButton x:Name="ToggleRatKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour">
+                                <Image>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="True">
+                                                    <Setter Property="Image.Source" Value="/Images/Rat.png" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="false">
+                                                    <Setter Property="Image.Source" Value="/Images/Rat Inactive.png" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+
+
+                            </ToggleButton>
+
+                            <ToggleButton x:Name="TogglePodKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour">
+                                <Image>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="True">
+                                                    <Setter Property="Image.Source" Value="/Images/Pod.png" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="false">
+                                                    <Setter Property="Image.Source" Value="/Images/Pod Inactive.png" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </ToggleButton>
+
+                            <ToggleButton x:Name="ToggleShipKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour">
+                                <Image>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="True">
+                                                    <Setter Property="Image.Source" Value="/Images/Ship.png" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="false">
+                                                    <Setter Property="Image.Source" Value="/Images/Ship Inactive.png" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+
+                            </ToggleButton>
+                        </StackPanel>
+                        <Slider Grid.Row="2" Width="190" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}"/>
+
+                    </Grid>
+                </Canvas>
+            </Border>
+
+
+        </Grid>
+
+        <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Margin="5">
+            <StackPanel Background="#FF959595" Margin="2">
+                <Label Content="{Binding Name}" FontWeight="Bold" />
+                <Separator Background="#FF3E3E3E" />
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Jumps" Width="50" Padding="5,1" />
+                    <Label Content="{Binding JumpsLastHour}" Padding="5,1" FontWeight="Bold" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Pods" Width="50" Padding="5,1" />
+                    <Label Content="{Binding PodKillsLastHour}" Padding="5,1" FontWeight="Bold" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Ships" Width="50" Padding="5,1" />
+                    <Label Content="{Binding ShipKillsLastHour}" Padding="5,1" FontWeight="Bold" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="NPCs" Width="50" Padding="5,1" />
+                    <Label Content="{Binding NPCKillsLastHour}" Padding="5,1" FontWeight="Bold" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="SystemInfoPopup_JBInfo" Content="" Padding="5,1" FontWeight="Bold" />
+                </StackPanel>
+
+            </StackPanel>
+        </Popup>
+
+
+    </Grid>
+</UserControl>

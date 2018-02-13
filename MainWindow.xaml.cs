@@ -107,6 +107,8 @@ namespace SMT
             }
 
 
+
+
             RegionDropDown.ItemsSource = EVEManager.Regions;
 
             EVEManager.SetupIntelWatcher();
@@ -161,6 +163,8 @@ namespace SMT
                 }
             }
 
+            RegionRC.MapConf = MapConf;
+            RegionRC.Init();
 
             SelectRegion(MapConf.DefaultRegion);
 
@@ -390,7 +394,6 @@ namespace SMT
                 SystemInfoPopup.VerticalOffset = 5;
                 SystemInfoPopup.HorizontalOffset = 15;
                 SystemInfoPopup.DataContext = selectedSys.ActualSystem;
-
                 SystemInfoPopup.IsOpen = true;
             }
             else
@@ -1309,6 +1312,8 @@ namespace SMT
                     MapDocument.Title = regionName;
 
                     EVEManager.UpdateIDsForMapRegion(rd.Name);
+//                    RegionRC.Region = rd;
+//                    RegionRC.ReDrawMap(true);
                 }
             }
         }

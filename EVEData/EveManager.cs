@@ -728,52 +728,6 @@ namespace SMT.EVEData
                         }
                     }
                 }
-
-                /*                // now catch the links - j
-                                string jXpath = @"//*[@class='j']";
-                                xn = xmldoc.SelectNodes(jXpath);
-
-                                foreach (XmlNode jump in xn)
-                                {
-                                    // will be in the format j-XXXXXXXX-YYYYYYYY
-                                    string id = jump.Attributes["id"].Value.Substring(2);
-
-                                    string systemOneID = id.Substring(0, 8);
-                                    string systemTwoID = id.Substring(9);
-
-                                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], false));
-                                }
-
-                                // now catch the constellation links - jc
-                                string jcXpath = @"//*[@class='jc']";
-                                xn = xmldoc.SelectNodes(jcXpath);
-
-                                foreach (XmlNode jump in xn)
-                                {
-                                    // will be in the format j-XXXXXXXX-YYYYYYYY
-                                    string id = jump.Attributes["id"].Value.Substring(2);
-
-                                    string systemOneID = id.Substring(0, 8);
-                                    string systemTwoID = id.Substring(9);
-
-                                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
-                                }
-
-                                // now catch the region links - jr
-                                string jrXpath = @"//*[@class='jr']";
-                                xn = xmldoc.SelectNodes(jrXpath);
-
-                                foreach (XmlNode jump in xn)
-                                {
-                                    // will be in the format j-XXXXXXXX-YYYYYYYY
-                                    string id = jump.Attributes["id"].Value.Substring(2);
-
-                                    string systemOneID = id.Substring(0, 8);
-                                    string systemTwoID = id.Substring(9);
-
-                                    rd.Jumps.Add(new Link(SystemIDToName[systemOneID], SystemIDToName[systemTwoID], true));
-                                }
-                */
             }
 
             // now open up the eve static data export and extract some info from it

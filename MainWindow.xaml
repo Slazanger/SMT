@@ -69,13 +69,6 @@
 
             <xcad:DockingManager x:Name="dockManager" Grid.Row="0" >
 
-                <xcad:DockingManager.DocumentHeaderTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Content.DataContext.Name}" />
-                    </DataTemplate>
-                </xcad:DockingManager.DocumentHeaderTemplate>
-
-
                 <xcad:LayoutRoot>
                     <xcad:LayoutRoot.RootPanel>
                         <xcad:LayoutPanel>
@@ -187,6 +180,9 @@
 
 
                                     </Grid>
+                                </xcad:LayoutDocument>
+                                <xcad:LayoutDocument Title="Region" CanClose="False" CanFloat="True" ContentId="MapRegionContentID">
+                                    <local:RegionControl x:Name="RegionRC" />
                                 </xcad:LayoutDocument>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutPanel>
