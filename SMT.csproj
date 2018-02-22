@@ -219,6 +219,12 @@
     <Resource Include="Images\Ship Inactive.png" />
     <Resource Include="Images\Ship.png" />
     <Resource Include="Images\zkb.png" />
+    <Resource Include="Images\JumpPortal Inactive.png" />
+    <Resource Include="Images\JumpPortal.png" />
+    <Resource Include="Images\Standings Inactive.png" />
+    <Resource Include="Images\Standings.png" />
+    <Resource Include="Images\TCU Inactive.png" />
+    <Resource Include="Images\TCU.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>

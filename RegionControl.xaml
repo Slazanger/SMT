@@ -62,9 +62,9 @@
             </zoombox1:ZoomControl>
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
 
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="200" Height="110" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1" >
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="320" Height="110" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1" >
                 <Canvas x:Name="ToolBoxCanvas">
-                    <Grid Canvas.Left="0" Canvas.Top="2" Width="200" >
+                    <Grid Canvas.Left="0" Canvas.Top="2" Width="320" >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                             <RowDefinition Height="45"/>
@@ -75,6 +75,67 @@
                         <Label x:Name="RegionNameLabel" Content="{Binding Region.Name}" Grid.Row="0" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
 
                         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                            <ToggleButton x:Name="ToggleSOVBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSOV}" ToolTip="Show Jump Bridges" >
+                                <Image>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="True">
+                                                    <Setter Property="Image.Source" Value="/Images/TCU.png" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="false">
+                                                    <Setter Property="Image.Source" Value="/Images/TCU Inactive.png" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </ToggleButton>
+
+
+                            <ToggleButton x:Name="ToggleStandingsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Jump Bridges" >
+                                <Image>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="True">
+                                                    <Setter Property="Image.Source" Value="/Images/Standings.png" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="false">
+                                                    <Setter Property="Image.Source" Value="/Images/Standings Inactive.png" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </ToggleButton>
+
+
+                            <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" >
+                                <Image>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="True">
+                                                    <Setter Property="Image.Source" Value="/Images/JumpPortal.png" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="false">
+                                                    <Setter Property="Image.Source" Value="/Images/JumpPortal Inactive.png" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </ToggleButton>
+
+
                             <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" >
                                 <Image>
                                     <Image.Style>

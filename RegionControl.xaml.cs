@@ -31,6 +31,8 @@ namespace SMT
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
 
 
+
+
         // Store the Dynamic Map elements so they can seperately be cleared
         private List<System.Windows.UIElement> DynamicMapElements;
 
@@ -44,6 +46,54 @@ namespace SMT
         private bool m_ShowPodKills = false;
         private bool m_ShowShipKills = false;
         private bool m_ShowShipJumps = false;
+        private bool m_ShowJumpBridges = true;
+        private bool m_ShowStandings = false;
+        private bool m_ShowSov = false;
+
+
+        public bool ShowStandings
+        {
+            get
+            {
+                return m_ShowStandings;
+            }
+            set
+            {
+                m_ShowStandings = value;
+                OnPropertyChanged("ShowStandings");
+            }
+        }
+
+        public bool ShowSov
+        {
+            get
+            {
+                return m_ShowSov;
+            }
+            set
+            {
+                ShowSov = value;
+                OnPropertyChanged("ShowSov");
+            }
+        }
+
+
+
+
+
+
+        public bool ShowJumpBridges
+        {
+            get
+            {
+                return m_ShowJumpBridges;
+            }
+            set
+            {
+                m_ShowJumpBridges = value;
+                OnPropertyChanged("ShowJumpBridges");
+            }
+        }
 
 
         public double ESIOverlayScale
@@ -313,7 +363,10 @@ namespace SMT
 
             // update the selected region
             Region = mr;
-            SystemDropDownAC.ItemsSource = Region.MapSystems.Keys.ToList();
+            
+
+            List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
+            SystemDropDownAC.ItemsSource = newList;
 
             ReDrawMap(true);
 
@@ -524,7 +577,7 @@ namespace SMT
                 MainCanvas.Children.Add(sysLink);
             }
 
-            if (MapConf.ShowJumpBridges || MapConf.ShowHostileJumpBridges && EM.JumpBridges != null)
+            if (ShowJumpBridges && EM.JumpBridges != null)
             {
                 foreach (EVEData.JumpBridge jb in EM.JumpBridges)
                 {
@@ -548,10 +601,31 @@ namespace SMT
 
                         Point startPoint = new Point(from.LayoutX, from.LayoutY);
                         Point endPoint;
-
+                        
                         if (!Region.IsSystemOnMap(jb.To))
                         {
                             endPoint = new Point(from.LayoutX - 20, from.LayoutY - 40);
+
+                            Shape jbOutofSystemBlob = new Ellipse() { Height = 6, Width = 6 };
+                            Canvas.SetLeft(jbOutofSystemBlob, endPoint.X - 3 );
+                            Canvas.SetTop(jbOutofSystemBlob, endPoint.Y - 3 );
+                            Canvas.SetZIndex(jbOutofSystemBlob, 19);
+
+                            MainCanvas.Children.Add(jbOutofSystemBlob);
+
+
+                            if (jb.Friendly)
+                            {
+                                jbOutofSystemBlob.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+                                jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
+                            }
+                            else
+                            {
+                                jbOutofSystemBlob.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
+                                jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
+                            }
+
+
                         }
                         else
                         {
@@ -1209,7 +1283,7 @@ namespace SMT
 
         private void MapObjectChanged(object sender, PropertyChangedEventArgs e)
         {
-            ReDrawMap();
+            ReDrawMap(true);
         }
     }
 }
