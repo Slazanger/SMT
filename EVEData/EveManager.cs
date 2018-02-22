@@ -1241,7 +1241,7 @@ namespace SMT.EVEData
         /// </summary>
         public void StartUpdateJumpsFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/latest/v1/system_jumps/?datasource=tranquility";
+            string url = @"https://esi.tech.ccp.is/v1/universe/system_jumps/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1292,7 +1292,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 /// ....
             }
@@ -1307,8 +1307,9 @@ namespace SMT.EVEData
                 // loop forever
                 while (true)
                 {
-                    foreach (Character c in LocalCharacters)
+                    for(int i = 0; i < LocalCharacters.Count; i++ )
                     {
+                        Character c = LocalCharacters.ElementAt(i);
                         c.Update();
                     }
                     Thread.Sleep(5000);

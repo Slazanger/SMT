@@ -44,15 +44,15 @@
 
         <StackPanel Margin="4,2,1,2"  Orientation="Horizontal" HorizontalAlignment="Left">
             <ComboBox x:Name="RegionSelectCB"  Width="150" Margin="5,0" FontSize="12" SelectionChanged="RegionSelectCB_SelectionChanged" />
-            <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" FontSize="12" Margin="5,0">
+            <dotNetKitControls:AutoCompleteComboBox x:Name="SystemDropDownAC" Width="150" FontSize="12" Margin="5,0" SelectionChanged="SystemDropDownAC_SelectionChanged">
                 <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
                     </ItemsPanelTemplate>
                 </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
             </dotNetKitControls:AutoCompleteComboBox>
-            <ComboBox x:Name="CharacterDropDown"  Width="150"  Margin="5,0" HorizontalAlignment="Center" />
-            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" IsChecked="False" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <ComboBox x:Name="CharacterDropDown"  Width="150"  Margin="5,0" HorizontalAlignment="Center" SelectionChanged="CharacterDropDown_SelectionChanged" DropDownClosed="CharacterDropDown_DropDownClosed" />
+            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" IsChecked="False" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="FollowCharacterChk_Checked" />
         </StackPanel>
 
 
@@ -72,7 +72,7 @@
 
                         </Grid.RowDefinitions>
 
-                        <Label x:Name="RegionNameLabel" Content="{Binding CurrentRegion.Name}" Grid.Row="0" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
+                        <Label x:Name="RegionNameLabel" Content="{Binding Region.Name}" Grid.Row="0" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
 
                         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" >

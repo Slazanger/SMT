@@ -1,6 +1,7 @@
 ﻿using SMT.EVEData;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,18 +15,20 @@ namespace SMT
     /// <summary>
     /// Interaction logic for RegionControl.xaml
     /// </summary>
-    public partial class RegionControl : UserControl
+    public partial class RegionControl : UserControl, INotifyPropertyChanged
     {
         public EVEData.MapRegion Region { get; set; }
         public MapConfig MapConf { get; set; }
         public EveManager EM { get; set; }
 
+        public string SelectedSystem { get; set; }
+
         // Constant Colours
-        private Brush StandingVBadBrush  = new SolidColorBrush(Color.FromRgb(148, 5, 5));
-        private Brush StandingBadBrush   = new SolidColorBrush(Color.FromRgb(196, 72, 6));
-        private Brush StandingNeutBrush  = new SolidColorBrush(Color.FromRgb(140, 140, 140));
-        private Brush StandingGoodBrush  = new SolidColorBrush(Color.FromRgb(43, 101, 196));
-        private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromRgb(5, 34, 120));
+        private Brush StandingVBadBrush  = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
+        private Brush StandingBadBrush   = new SolidColorBrush(Color.FromArgb(110, 196, 72, 6));
+        private Brush StandingNeutBrush  = new SolidColorBrush(Color.FromArgb(110, 140, 140, 140));
+        private Brush StandingGoodBrush  = new SolidColorBrush(Color.FromArgb(110, 43, 101, 196));
+        private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
 
 
         // Store the Dynamic Map elements so they can seperately be cleared
@@ -33,6 +36,144 @@ namespace SMT
 
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
+
+
+        // Map Controls
+        private double m_ESIOverlayScale = 1.0f;
+        private bool m_ShowNPCKills = false;
+        private bool m_ShowPodKills = false;
+        private bool m_ShowShipKills = false;
+        private bool m_ShowShipJumps = false;
+
+
+        public double ESIOverlayScale
+        {
+            get
+            {
+                return m_ESIOverlayScale;
+            }
+            set
+            {
+                m_ESIOverlayScale = value;
+                OnPropertyChanged("ESIOverlayScale");
+            }
+        }
+
+
+        public bool ShowNPCKills
+        {
+            get
+            {
+                return m_ShowNPCKills;
+            }
+
+            set
+            {
+                m_ShowNPCKills = value;
+
+                if (m_ShowNPCKills)
+                {
+                    ShowPodKills = false;
+                    ShowShipKills = false;
+                    ShowShipJumps = false;
+                }
+
+                OnPropertyChanged("ShowNPCKills");
+            }
+        }
+
+        public bool ShowPodKills
+        {
+            get
+            {
+                return m_ShowPodKills;
+            }
+
+            set
+            {
+                m_ShowPodKills = value;
+                if (m_ShowPodKills)
+                {
+                    ShowNPCKills = false;
+                    ShowShipKills = false;
+                    ShowShipJumps = false;
+                }
+
+                OnPropertyChanged("ShowPodKills");
+            }
+        }
+
+        public bool ShowShipKills
+        {
+            get
+            {
+                return m_ShowShipKills;
+            }
+
+            set
+            {
+                m_ShowShipKills = value;
+                if (m_ShowShipKills)
+                {
+                    ShowNPCKills = false;
+                    ShowPodKills = false;
+                    ShowShipJumps = false;
+                }
+
+                OnPropertyChanged("ShowShipKills");
+            }
+        }
+
+        public bool ShowShipJumps
+        {
+            get
+            {
+                return m_ShowShipJumps;
+            }
+
+            set
+            {
+                m_ShowShipJumps = value;
+                if (m_ShowShipJumps)
+                {
+                    ShowNPCKills = false;
+                    ShowPodKills = false;
+                    ShowShipKills = false;
+                }
+
+                OnPropertyChanged("ShowShipJumps");
+            }
+        }
+
+        public bool FollowCharacter
+        {
+            get
+            {
+                return FollowCharacterChk.IsChecked.Value;
+            }
+            set
+            {
+                FollowCharacterChk.IsChecked = value;
+            }
+        }
+
+
+
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+
+
 
         /// <summary>
         /// Redraw the map
@@ -63,6 +204,8 @@ namespace SMT
             }
 
             AddCharactersToMap();
+            AddDataToMap();
+            AddHighlightToSystem(SelectedSystem);
         }
 
 
@@ -81,7 +224,6 @@ namespace SMT
         private const double SYSTEM_REGION_TEXT_X_OFFSET = 5;
         private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 2;
 
-
         private const int SYSTEM_Z_INDEX = 20;
         private const int SYSTEM_LINK_INDEX = 19;
 
@@ -91,22 +233,64 @@ namespace SMT
         public void Init()
         {
             EM = EVEData.EveManager.GetInstance();
+            SelectedSystem = string.Empty;
 
             DynamicMapElements = new List<UIElement>();
 
+            CharacterDropDown.ItemsSource = EM.LocalCharacters;
+
+            EM.LocalCharacters.Add(new Character("TestChar1", "", "D-PNP9"));
+            EM.LocalCharacters.Add(new Character("TestChar2", "", "D-PNP9"));
+            EM.LocalCharacters.Add(new Character("TestChar3", "", "D-PNP9"));
+            EM.LocalCharacters.Add(new Character("TestChar4", "", "D-PNP9"));
+
             RegionSelectCB.ItemsSource = EM.Regions;
             SelectRegion(MapConf.DefaultRegion);
+
+
+
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick; ;
             uiRefreshTimer.Interval = new TimeSpan(0, 0, 5);
             uiRefreshTimer.Start();
+
+            ToolBoxCanvas.DataContext = this;
+
+            PropertyChanged += MapObjectChanged;
         }
 
+        /// <summary>
+        /// UI Refresh Timer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
             ReDrawMap(false);
         }
+
+        private void SelectSystem(string name)
+        {
+            foreach (EVEData.MapSystem es in Region.MapSystems.Values.ToList())
+            {
+                if (es.Name == name)
+                {
+                    SystemDropDownAC.SelectedItem = es;
+                    SelectedSystem = es.Name;
+                    AddHighlightToSystem(name);
+
+                    break;
+                }
+            }
+// TODO :
+//            // now setup the anom data
+//            EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
+//            MainAnomGrid.DataContext = system;
+//            AnomSigList.ItemsSource = system.Anoms.Values;
+        }
+
+
 
         /// <summary>
         /// Select A Region
@@ -132,6 +316,9 @@ namespace SMT
             SystemDropDownAC.ItemsSource = Region.MapSystems.Keys.ToList();
 
             ReDrawMap(true);
+
+            // select the item in the dropdown
+            RegionSelectCB.SelectedItem = Region;
         }
 
         /// <summary>
@@ -193,6 +380,7 @@ namespace SMT
                     systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.Security));
                 }
 
+                // add the hover over and click handlers
                 systemShape.DataContext = system;
                 systemShape.MouseDown += ShapeMouseDownHandler;
                 systemShape.MouseEnter += ShapeMouseOverHandler;
@@ -222,7 +410,6 @@ namespace SMT
 
                 sysText.Padding = border;
                 sysText.Margin = border;
-                sysText.Background = SysTextBackgroundBrush;
 
                 Canvas.SetLeft(sysText, system.LayoutX + SYSTEM_TEXT_X_OFFSET);
                 Canvas.SetTop(sysText, system.LayoutY + SYSTEM_TEXT_Y_OFFSET);
@@ -350,9 +537,6 @@ namespace SMT
 
                         EVEData.MapSystem from;
 
-
-
-                        // swap as we'll be discarding from
                         if (!Region.IsSystemOnMap(jb.From))
                         {
                             from = Region.MapSystems[jb.To];
@@ -374,8 +558,6 @@ namespace SMT
                             EVEData.MapSystem to = Region.MapSystems[jb.To];
                             endPoint = new Point(to.LayoutX, to.LayoutY);
                         }
-
-                        
 
                         Vector dir = Point.Subtract(startPoint, endPoint);
 
@@ -437,6 +619,54 @@ namespace SMT
             }
 
 
+        }
+
+
+        private void AddHighlightToSystem(string name)
+        {
+            if (!Region.MapSystems.Keys.Contains(name))
+            {
+                return;
+            }
+
+            EVEData.MapSystem selectedSys = Region.MapSystems[name];
+            if (selectedSys != null)
+            {
+                double circleSize = 30;
+                double circleOffset = circleSize / 2;
+
+                // add circle for system
+                Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
+                highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
+
+                highlightSystemCircle.StrokeThickness = 3;
+
+                RotateTransform rt = new RotateTransform();
+                rt.CenterX = circleSize / 2;
+                rt.CenterY = circleSize / 2;
+                highlightSystemCircle.RenderTransform = rt;
+
+                DoubleCollection dashes = new DoubleCollection();
+                dashes.Add(1.0);
+                dashes.Add(1.0);
+
+                highlightSystemCircle.StrokeDashArray = dashes;
+
+                Canvas.SetLeft(highlightSystemCircle, selectedSys.LayoutX - circleOffset);
+                Canvas.SetTop(highlightSystemCircle, selectedSys.LayoutY - circleOffset);
+                Canvas.SetZIndex(highlightSystemCircle, 19);
+
+                MainCanvas.Children.Add(highlightSystemCircle);
+                DynamicMapElements.Add(highlightSystemCircle);
+
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 0;
+                da.To = 360;
+                da.Duration = new Duration(TimeSpan.FromSeconds(12));
+
+                RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
+                eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+            }
         }
 
 
@@ -551,6 +781,17 @@ namespace SMT
         {
             EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
 
+            Color DataColor = MapConf.ActiveColourScheme.ESIOverlayColour;
+            Color DataLargeColor = MapConf.ActiveColourScheme.ESIOverlayColour;
+
+            DataLargeColor.R = (byte)(DataLargeColor.R * 0.75);
+            DataLargeColor.G = (byte)(DataLargeColor.G * 0.75);
+            DataLargeColor.B = (byte)(DataLargeColor.B * 0.75);
+
+
+            SolidColorBrush infoColour = new SolidColorBrush(DataColor);
+            SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
+
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
                 int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
@@ -559,36 +800,40 @@ namespace SMT
                 int jumpsLastHour = sys.ActualSystem.JumpsLastHour;
 
                 int infoValue = -1;
-                SolidColorBrush infoColour = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
                 double infoSize = 0.0;
 
-                if (MapConf.ShowNPCKills)
+                if (ShowNPCKills)
                 {
                     infoValue = nPCKillsLastHour;
-                    infoSize = 0.15f * infoValue * MapConf.ESIOverlayScale;
+                    infoSize = 0.15f * infoValue * ESIOverlayScale;
                 }
 
-                if (MapConf.ShowPodKills)
+                if (ShowPodKills)
                 {
                     infoValue = podKillsLastHour;
-                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
+                    infoSize = 20.0f * infoValue * ESIOverlayScale;
                 }
 
-                if (MapConf.ShowShipKills)
+                if (ShowShipKills)
                 {
                     infoValue = shipKillsLastHour;
-                    infoSize = 20.0f * infoValue * MapConf.ESIOverlayScale;
+                    infoSize = 20.0f * infoValue * ESIOverlayScale;
                 }
 
-                if (MapConf.ShowShipJumps)
+                if (ShowShipJumps)
                 {
                     infoValue = sys.ActualSystem.JumpsLastHour;
-                    infoSize = infoValue * MapConf.ESIOverlayScale;
+                    infoSize = infoValue * ESIOverlayScale;
                 }
 
 
-                if (infoValue != -1)
+                if (infoValue > 0)
                 {
+                    // clamp to a minimum
+                    if (infoSize < 24)
+                        infoSize = 24;
+
+
                     Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
                     infoCircle.Fill = infoColour;
 
@@ -599,7 +844,18 @@ namespace SMT
                     DynamicMapElements.Add(infoCircle);
                 }
 
+                if(infoSize > 60)
+                {
+                    Shape infoCircle = new Ellipse() { Height = 30, Width = 30 };
+                    infoCircle.Fill = infoLargeColour;
 
+                    Canvas.SetZIndex(infoCircle, 11);
+                    Canvas.SetLeft(infoCircle, sys.LayoutX - (15));
+                    Canvas.SetTop(infoCircle, sys.LayoutY - (15));
+                    MainCanvas.Children.Add(infoCircle);
+                    DynamicMapElements.Add(infoCircle);
+
+                }
 
                 if ((MapConf.ColourBySov || MapConf.ShowSystemSovStanding) && sys.ActualSystem.SOVAlliance != null)
                 {
@@ -638,8 +894,6 @@ namespace SMT
                             {
                                 addToMap = false;
                             }
-
-
 
                             br = StandingNeutBrush;
 
@@ -689,12 +943,20 @@ namespace SMT
             }
         }
 
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public RegionControl()
         {
             InitializeComponent();
         }
 
+
+        /// <summary>
+        /// Region Selection Changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RegionSelectCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             EVEData.MapRegion rd = RegionSelectCB.SelectedItem as EVEData.MapRegion;
@@ -706,7 +968,11 @@ namespace SMT
             SelectRegion(rd.Name);
         }
 
-
+        /// <summary>
+        /// Add Waypoint Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SysContexMenuItemAddWaypoint_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
@@ -719,6 +985,11 @@ namespace SMT
 
         }
 
+        /// <summary>
+        /// Set Destination Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SysContexMenuItemSetDestination_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
@@ -729,6 +1000,11 @@ namespace SMT
             }
         }
 
+        /// <summary>
+        /// Copy Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SysContexMenuItemCopy_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
@@ -743,6 +1019,11 @@ namespace SMT
             catch { }
         }
 
+        /// <summary>
+        /// Dotlan Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SysContexMenuItemDotlan_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
@@ -752,6 +1033,11 @@ namespace SMT
             System.Diagnostics.Process.Start(uRL);
         }
 
+        /// <summary>
+        /// ZKillboard Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SysContexMenuItemZKB_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
@@ -762,6 +1048,11 @@ namespace SMT
         }
 
 
+        /// <summary>
+        /// Shape (ie System) MouseDown handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShapeMouseDownHandler(object sender, MouseButtonEventArgs e)
         {
             Shape obj = sender as Shape;
@@ -777,7 +1068,7 @@ namespace SMT
                     {
                         redraw = true;
                     }
-                    // TODO: SelectSystem(selectedSys.Name);
+                    SelectSystem(selectedSys.Name);
 
                     ReDrawMap(redraw);
 
@@ -792,7 +1083,7 @@ namespace SMT
                             RegionSelectCB.SelectedItem = rd;
 
                             ReDrawMap();
-                            // TODO:  SelectSystem(selectedSys.Name);
+                            SelectSystem(selectedSys.Name);
                             break;
                         }
                     }
@@ -825,6 +1116,11 @@ namespace SMT
             }
         }
 
+        /// <summary>
+        /// Shape (ie System) Mouse over handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
             Shape obj = sender as Shape;
@@ -851,11 +1147,7 @@ namespace SMT
                     {
                         SystemInfoPopup_JBInfo.Content = "JB (" + jb.ToInfo + ") to " + jb.From;
                     }
-
                 }
-
-
-
                 SystemInfoPopup.IsOpen = true;
             }
             else
@@ -864,7 +1156,60 @@ namespace SMT
             }
         }
 
+        private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)
+        {
 
+        }
 
+        private void HandleCharacterSelectionChange()
+        {
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+
+            if (c != null && FollowCharacter)
+            {
+                EVEData.System s = EM.GetEveSystem(c.Location);
+                if (s != null)
+                {
+                    if (s.Region != Region.Name)
+                    {
+                        // change region
+                        SelectRegion(s.Region);
+                    }
+
+                    SelectSystem(c.Location);
+
+                    CharacterDropDown.SelectedItem = c;
+
+                    // force the follow as this will be reset by the region change
+                    FollowCharacter = true;
+                }
+            }
+        }
+
+        private void CharacterDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            HandleCharacterSelectionChange();
+        }
+
+        private void CharacterDropDown_DropDownClosed(object sender, EventArgs e)
+        {
+            HandleCharacterSelectionChange();
+        }
+
+        private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EVEData.MapSystem sd = SystemDropDownAC.SelectedItem as EVEData.MapSystem;
+
+            if (sd != null)
+            {
+                SelectSystem(sd.Name);
+                ReDrawMap(false);
+            }
+        }
+
+        private void MapObjectChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ReDrawMap();
+        }
     }
 }
