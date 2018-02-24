@@ -33,8 +33,6 @@ namespace SMT
 
         private MapConfig MapConf;
 
-        private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
-
         public MainWindow()
         {
             OutputLog.Info("Starting App..");

@@ -30,26 +30,8 @@ namespace SMT
             }
         }
 
-        private bool m_ColourBySov;
-
-        private bool m_ShowJumpBridges;
-        private bool m_ShowHostileJumpBridges;
-
-        private bool m_ShowSystemSovTicker;
-        private bool m_ShowSystemSovName;
-
-        private bool m_ShowSystemSecurity;
-        private bool m_ShowSystemSovStanding;
-
-        private bool m_ShowNPCKills;
-        private bool m_ShowPodKills;
-        private bool m_ShowShipKills;
-        private bool m_ShowShipJumps;
         private int m_MaxIntelSeconds;
         private string m_DefaultRegion;
-        private double m_ESIOverlayScale;
-
-
 
         [Browsable(false)]
         public string DefaultRegion
@@ -74,117 +56,10 @@ namespace SMT
         [Browsable(false)]
         public MapColours ActiveColourScheme;
 
-        [Category("Jump Bridges")]
-        [DisplayName("Friendly Bridges")]
-        public bool ShowJumpBridges
-        {
-            get
-            {
-                return m_ShowJumpBridges;
-            }
-            set
-            {
-                m_ShowJumpBridges = value;
-
-                OnPropertyChanged("ShowJumpBridges");
-            }
-        }
-
-        [Category("Jump Bridges")]
-        [DisplayName("Hostile Bridges")]
-        public bool ShowHostileJumpBridges
-        {
-            get
-            {
-                return m_ShowHostileJumpBridges;
-            }
-            set
-            {
-                m_ShowHostileJumpBridges = value;
-
-                OnPropertyChanged("ShowHostileJumpBridges");
-            }
-        }
 
         [Category("General")]
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
-
-        [Category("General")]
-        [DisplayName("Show Security")]
-        public bool ShowSystemSecurity
-        {
-            get
-            {
-                return m_ShowSystemSecurity;
-            }
-            set
-            {
-                m_ShowSystemSecurity = value;
-
-                if (m_ShowSystemSecurity)
-                {
-                    ShowSystemSovStanding = false;
-                }
-
-                OnPropertyChanged("ShowSystemSecurity");
-            }
-        }
-
-        [Category("General")]
-        [DisplayName("Show SOV Standing")]
-        public bool ShowSystemSovStanding
-        {
-            get
-            {
-                return m_ShowSystemSovStanding;
-            }
-            set
-            {
-                m_ShowSystemSovStanding = value;
-
-                if (m_ShowSystemSovStanding)
-                {
-                    ShowSystemSecurity = false;
-                }
-
-                OnPropertyChanged("ShowSystemSovStanding");
-            }
-        }
-
-
-
-        [Category("General")]
-        [DisplayName("Show SOV Ticker")]
-        public bool ShowSystemSovTicker
-        {
-            get
-            {
-                return m_ShowSystemSovTicker;
-            }
-            set
-            {
-                m_ShowSystemSovTicker = value;
-                OnPropertyChanged("ShowSystemSovTicker");
-            }
-        }
-
-        [Category("General")]
-        [DisplayName("Show SOV Name")]
-        public bool ShowSystemSovName
-        {
-            get
-            {
-                return m_ShowSystemSovName;
-            }
-            set
-            {
-                m_ShowSystemSovName = value;
-                OnPropertyChanged("ShowSystemSovName");
-            }
-        }
-
-
 
 
         [Category("Navigation")]
@@ -195,29 +70,9 @@ namespace SMT
         [DisplayName("Ship Type")]
         public JumpShip JumpShipType { get; set; }
 
-        [Category("ESI Data")]
-        [DisplayName("ESI Scale")]
-        public double ESIOverlayScale
-        {
-            get
-            {
-                return m_ESIOverlayScale;
-            }
-            set
-            {
-                m_ESIOverlayScale = value;
-                OnPropertyChanged("ESIOverlayScale");
-            }
-        }
-
-        [Category("Intel")]
-        [DisplayName("Show Intel")]
-        public bool ShowIntel { get; set; }
-
         [Category("Intel")]
         [DisplayName("Warning Sound")]
         public bool PlayIntelSound { get; set; }
-
 
         [Category("Intel")]
         [DisplayName("Max Intel Time (s)")]
@@ -244,142 +99,12 @@ namespace SMT
 
 
 
-        [Category("General")]
-        [DisplayName("Colour By Sov")]
-        public bool ColourBySov
-        {
-            get
-            {
-                return m_ColourBySov;
-            }
-
-            set
-            {
-                m_ColourBySov = value;
-
-                if (m_ColourBySov)
-                {
-                    ShowPodKills = false;
-                    ShowShipKills = false;
-                    ShowShipJumps = false;
-                    ShowNPCKills = false;
-                }
-
-                OnPropertyChanged("ColourBySov");
-            }
-        }
-
-
-        [Category("ESI Data")]
-        [DisplayName("Rat Kills")]
-        public bool ShowNPCKills
-        {
-            get
-            {
-                return m_ShowNPCKills;
-            }
-
-            set
-            {
-                m_ShowNPCKills = value;
-
-                if (m_ShowNPCKills)
-                {
-                    ShowPodKills = false;
-                    ShowShipKills = false;
-                    ShowShipJumps = false;
-                    ColourBySov = false;
-                }
-
-                OnPropertyChanged("ShowNPCKills");
-            }
-        }
-
-        [Category("ESI Data")]
-        [DisplayName("Pod Kills")]
-        public bool ShowPodKills
-        {
-            get
-            {
-                return m_ShowPodKills;
-            }
-
-            set
-            {
-                m_ShowPodKills = value;
-                if (m_ShowPodKills)
-                {
-                    ShowNPCKills = false;
-                    ShowShipKills = false;
-                    ShowShipJumps = false;
-                    ColourBySov = false;
-                }
-
-                OnPropertyChanged("ShowPodKills");
-            }
-        }
-
-        [Category("ESI Data")]
-        [DisplayName("Ship Kills")]
-        public bool ShowShipKills
-        {
-            get
-            {
-                return m_ShowShipKills;
-            }
-
-            set
-            {
-                m_ShowShipKills = value;
-                if (m_ShowShipKills)
-                {
-                    ShowNPCKills = false;
-                    ShowPodKills = false;
-                    ShowShipJumps = false;
-                    ColourBySov = false;
-                }
-
-                OnPropertyChanged("ShowShipKills");
-            }
-        }
-
-        [Category("ESI Data")]
-        [DisplayName("Jumps")]
-        public bool ShowShipJumps
-        {
-            get
-            {
-                return m_ShowShipJumps;
-            }
-
-            set
-            {
-                m_ShowShipJumps = value;
-                if (m_ShowShipJumps)
-                {
-                    ShowNPCKills = false;
-                    ShowPodKills = false;
-                    ShowShipKills = false;
-                    ColourBySov = false;
-                }
-
-                OnPropertyChanged("ShowShipJumps");
-            }
-        }
 
         public void SetDefaults()
         {
-            ShowJumpBridges = true;
-            ShowHostileJumpBridges = true;
-            ESIOverlayScale = 1.0f;
-            ShowPodKills = true;
-            ShowIntel = true;
             DefaultRegion = "Molden Heath";
             ShowSystemPopup = true;
-            ShowSystemSecurity = true;
-
             MaxIntelSeconds = 120;
-
             MapColours = new List<MapColours>();
         }
 

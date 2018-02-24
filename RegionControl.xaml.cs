@@ -31,6 +31,7 @@ namespace SMT
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
 
 
+
         private Character m_ActiveCharacter;
         public Character ActiveCharacter
         {
@@ -432,6 +433,8 @@ namespace SMT
             Brush FriendlyJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
             Brush HostileJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
 
+            Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+            Brush JumpOutRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
 
             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
@@ -563,6 +566,55 @@ namespace SMT
 
                     regionMarkerOffset += SYSTEM_TEXT_TEXT_SIZE;
                 }
+
+
+                if (MapConf.ShowJumpDistance && SelectedSystem != null && system.Name != SelectedSystem)
+                {
+
+                    double Distance = EM.GetRange(SelectedSystem, system.Name);
+                    Distance = Distance / 9460730472580800.0;
+
+                    double Max = 0.1f;
+
+                    switch (MapConf.JumpShipType)
+                    {
+                        case MapConfig.JumpShip.Super: { Max = 6.0; } break;
+                        case MapConfig.JumpShip.Titan: { Max = 6.0; } break;
+
+                        case MapConfig.JumpShip.Dread: { Max = 7.0; } break;
+                        case MapConfig.JumpShip.Carrier: { Max = 7.0; } break;
+                        case MapConfig.JumpShip.FAX: { Max = 7.0; } break;
+                        case MapConfig.JumpShip.Blops: { Max = 8.0; } break;
+                        case MapConfig.JumpShip.JF: { Max = 10.0; } break;
+                    }
+
+                    if (Distance < Max && Distance > 0.0)
+                    {
+                        systemShape.Fill = JumpInRange;
+
+                        string JD = Distance.ToString("0.00") + " LY";
+
+                        Label DistanceText = new Label();
+
+                        DistanceText.Content = JD;
+                        DistanceText.FontSize = 9;
+                        regionMarkerOffset += 8;
+
+                        Canvas.SetLeft(DistanceText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
+                        Canvas.SetTop(DistanceText, system.LayoutY + SYSTEM_REGION_TEXT_Y_OFFSET);
+
+
+                        Canvas.SetZIndex(DistanceText, 20);
+                        MainCanvas.Children.Add(DistanceText);
+
+                    }
+                    else
+                    {
+                        systemShape.Fill = JumpOutRange;
+                    }
+                }
+
+
 
                 if (system.OutOfRegion)
                 {

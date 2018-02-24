@@ -96,9 +96,17 @@
                                         </StackPanel>
                                     </Grid>
                                 </xcad:LayoutAnchorable>
-                                <xcad:LayoutAnchorable Title="Map Controls" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapControlsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+
+                                <xcad:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
+                                            <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
+                                            <Separator />
+                                            <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
+                                            <Separator />
+                                            <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
+                                            <Separator />
+
                                             <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
                                                 <xctk:PropertyGrid.EditorDefinitions>
                                                     <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
@@ -115,18 +123,7 @@
                                                 <Separator />
                                                 <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
                                             </StackPanel>
-                                        </StackPanel>
-                                    </ScrollViewer>
-                                </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <ScrollViewer Background="#FFE5E5E5">
-                                        <StackPanel>
-                                            <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
-                                            <Separator />
-                                            <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
-                                            <Separator />
-                                            <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
                                         </StackPanel>
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
