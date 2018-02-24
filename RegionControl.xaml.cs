@@ -327,16 +327,8 @@ namespace SMT
             CharacterDropDown.ItemsSource = EM.LocalCharacters;
             ActiveCharacter = null;
 
-            EM.LocalCharacters.Add(new Character("TestChar1", "", "IPAY-2"));
-            EM.LocalCharacters.Add(new Character("TestChar2", "", "IPAY-2"));
-            EM.LocalCharacters.Add(new Character("TestChar3", "", "IPAY-2"));
-            EM.LocalCharacters.Add(new Character("TestChar4", "", "IPAY-2"));
-
             RegionSelectCB.ItemsSource = EM.Regions;
             SelectRegion(MapConf.DefaultRegion);
-
-
-
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick; ;
