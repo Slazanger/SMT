@@ -159,6 +159,8 @@ namespace SMT
             MainAnomGrid.DataContext = ANOMManager;
             RegionRC.ANOMManager = ANOMManager;
 
+            MainRouteGrid.DataContext = RegionRC;
+
 
             // ColourListDropdown.SelectedItem = selectedColours;
             ColoursPropertyGrid.SelectedObject = selectedColours;
@@ -375,7 +377,7 @@ namespace SMT
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.Character c = RegionRC.CharacterDropDown.SelectedItem as EVEData.Character;
+            EVEData.Character c = RegionRC.ActiveCharacter as EVEData.Character;
             if(c!=null)
             {
                 c.ActiveRoute.Clear();

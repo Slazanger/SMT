@@ -1312,7 +1312,7 @@ namespace SMT.EVEData
                         Character c = LocalCharacters.ElementAt(i);
                         c.Update();
                     }
-                    Thread.Sleep(5000);
+                    Thread.Sleep(1000);
                 }
             }).Start();
         }

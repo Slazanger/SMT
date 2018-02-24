@@ -31,6 +31,19 @@ namespace SMT
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
 
 
+        private Character m_ActiveCharacter;
+        public Character ActiveCharacter
+        {
+            get
+            {
+                return m_ActiveCharacter;
+            }
+            set
+            {
+                m_ActiveCharacter = value;
+                OnPropertyChanged("ActiveCharacter");
+            }
+        }
 
 
         // Store the Dynamic Map elements so they can seperately be cleared
@@ -245,7 +258,7 @@ namespace SMT
         /// <param name="FullRedraw">Clear all the static items or not</param>
         public void ReDrawMap(bool FullRedraw = false)
         {
-            if (CharacterDropDown.SelectedItem != null && FollowCharacter == true)
+            if (ActiveCharacter != null && FollowCharacter == true)
             {
                 HandleCharacterSelectionChange();
             }
@@ -311,6 +324,7 @@ namespace SMT
             DynamicMapElements = new List<UIElement>();
 
             CharacterDropDown.ItemsSource = EM.LocalCharacters;
+            ActiveCharacter = null;
 
             EM.LocalCharacters.Add(new Character("TestChar1", "", "IPAY-2"));
             EM.LocalCharacters.Add(new Character("TestChar2", "", "IPAY-2"));
@@ -325,7 +339,7 @@ namespace SMT
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick; ;
-            uiRefreshTimer.Interval = new TimeSpan(0, 0, 5);
+            uiRefreshTimer.Interval = new TimeSpan(0, 0, 2);
             uiRefreshTimer.Start();
 
             ToolBoxCanvas.DataContext = this;
@@ -881,36 +895,27 @@ namespace SMT
 
         private void AddRouteToMap()
         {
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
 
 
-            if (c == null)
+            if (ActiveCharacter == null)
                 return;
 
             Brush RouteBrush = new SolidColorBrush(Colors.Yellow);
             Brush WaypointBrush = new SolidColorBrush(Colors.DarkGray);
 
-            foreach (string s in c.Waypoints)
-            {
-
-            }
-
-
             // no active route
-            if (c.ActiveRoute.Count == 0)
+            if (ActiveCharacter.ActiveRoute.Count == 0)
             {
                 return;
             }
 
             string Start = "";
-            string End = c.Location;
+            string End = ActiveCharacter.Location;
 
-
-
-            for (int i = 0; i < c.ActiveRoute.Count; i++)
+            for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
             {
                 Start = End;
-                End = c.ActiveRoute[i];
+                End = ActiveCharacter.ActiveRoute[i];
 
                 if (!(Region.IsSystemOnMap(Start) && Region.IsSystemOnMap(End)))
                 {
@@ -981,8 +986,6 @@ namespace SMT
 
         private void AddDataToMap()
         {
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-
             Color DataColor = MapConf.ActiveColourScheme.ESIOverlayColour;
             Color DataLargeColor = MapConf.ActiveColourScheme.ESIOverlayColour;
 
@@ -1071,23 +1074,23 @@ namespace SMT
                     bool addToMap = true;
                     Brush br = null;
                     
-                    if (c != null && c.ESILinked)
+                    if (ActiveCharacter != null && ActiveCharacter.ESILinked)
                     {
                         float Standing = 0.0f;
 
-                        if (c.AllianceID != null && c.AllianceID == sys.ActualSystem.SOVAlliance)
+                        if (ActiveCharacter.AllianceID != null && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAlliance)
                         {
                             Standing = 10.0f;
                         }
 
-                        if (sys.ActualSystem.SOVCorp != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
+                        if (sys.ActualSystem.SOVCorp != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
                         {
-                            Standing = c.Standings[sys.ActualSystem.SOVCorp];
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
                         }
 
-                        if (sys.ActualSystem.SOVAlliance != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                        if (sys.ActualSystem.SOVAlliance != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
                         {
-                            Standing = c.Standings[sys.ActualSystem.SOVAlliance];
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAlliance];
                         }
 
                         if (Standing == 0.0f)
@@ -1177,11 +1180,9 @@ namespace SMT
         private void SysContexMenuItemAddWaypoint_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
-
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-            if (c != null)
+            if (ActiveCharacter != null)
             {
-                c.AddDestination(eveSys.ActualSystem.ID, false);
+                ActiveCharacter.AddDestination(eveSys.ActualSystem.ID, false);
             }
 
         }
@@ -1194,10 +1195,9 @@ namespace SMT
         private void SysContexMenuItemSetDestination_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-            if (c != null)
+            if (ActiveCharacter != null)
             {
-                c.AddDestination(eveSys.ActualSystem.ID, true);
+                ActiveCharacter.AddDestination(eveSys.ActualSystem.ID, true);
             }
         }
 
@@ -1305,8 +1305,8 @@ namespace SMT
                 setDesto.IsEnabled = false;
                 addWaypoint.IsEnabled = false;
 
-                EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-                if (c != null && c.ESILinked)
+
+                if (ActiveCharacter != null && ActiveCharacter.ESILinked)
                 {
                     setDesto.IsEnabled = true;
                     addWaypoint.IsEnabled = true;
@@ -1361,6 +1361,7 @@ namespace SMT
         private void HandleCharacterSelectionChange()
         {
             EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            ActiveCharacter = c;
 
             if (c != null && FollowCharacter)
             {
@@ -1413,7 +1414,5 @@ namespace SMT
         {
             ReDrawMap(true);
         }
-
-
     }
 }

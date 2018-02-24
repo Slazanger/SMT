@@ -25,6 +25,8 @@ namespace SMT.EVEData
 
         public string LocalChatFile { get; set; }
 
+        public bool RouteUpdate { get; set; }
+
         private string m_Location;
         private bool m_RouteNeedsUpdate = false;
         public string Location
@@ -203,6 +205,7 @@ namespace SMT.EVEData
             }
 
 
+            RouteUpdate = true;
         }
 
 

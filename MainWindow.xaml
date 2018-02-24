@@ -145,10 +145,10 @@
                                         <ScrollViewer Background="#FFE5E5E5">
                                             <StackPanel>
                                                 <Label Content="Waypoints"/>
-                                                <ListBox ItemsSource="{Binding Waypoints, diag:PresentationTraceSources.TraceLevel=High}" />
+                                                <ListBox ItemsSource="{Binding Path=ActiveCharacter.Waypoints}" />
                                                 <Separator/>
                                                 <Label Content="Route"/>
-                                                <ListBox ItemsSource="{Binding ActiveRoute}"/>
+                                                <ListBox ItemsSource="{Binding Path=ActiveCharacter.ActiveRoute}"/>
                                                 <Separator/>
                                                 <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear"/>
                                             </StackPanel>
