@@ -343,7 +343,7 @@ namespace SMT
             ReDrawMap(false);
         }
 
-        private void SelectSystem(string name)
+        public void SelectSystem(string name)
         {
             foreach (EVEData.MapSystem es in Region.MapSystems.Values.ToList())
             {

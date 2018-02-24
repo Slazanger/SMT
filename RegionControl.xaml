@@ -78,11 +78,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=ToggleSecurityBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/Security.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Security.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=ToggleSecurityBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/Security Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Security Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
@@ -98,11 +98,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/TCU.png" />
+                                                        <Setter Property="Image.Source" Value="Images/TCU.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/TCU Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/TCU Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
@@ -118,11 +118,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/Standings.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Standings.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/Standings Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Standings Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
@@ -138,11 +138,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/JumpPortal.png" />
+                                                        <Setter Property="Image.Source" Value="Images/JumpPortal.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/JumpPortal Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/JumpPortal Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
@@ -170,11 +170,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/Gate.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Gate.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/Gate Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Gate Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
@@ -191,11 +191,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/Pod.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Pod.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/Pod Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Pod Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
@@ -210,11 +210,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/Ship.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Ship.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/Ship Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Ship Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
@@ -230,11 +230,11 @@
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="True">
-                                                        <Setter Property="Image.Source" Value="/Images/Rat.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Rat.png" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="false">
-                                                        <Setter Property="Image.Source" Value="/Images/Rat Inactive.png" />
+                                                        <Setter Property="Image.Source" Value="Images/Rat Inactive.png" />
                                                     </DataTrigger>
 
                                                 </Style.Triggers>
