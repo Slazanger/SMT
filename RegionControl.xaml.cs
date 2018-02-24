@@ -1413,7 +1413,11 @@ namespace SMT
         private void HandleCharacterSelectionChange()
         {
             EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
-            ActiveCharacter = c;
+            if(ActiveCharacter != c)
+            {
+                ActiveCharacter = c;
+            }
+
 
             if (c != null && FollowCharacter)
             {
