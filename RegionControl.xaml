@@ -62,160 +62,195 @@
             </zoombox1:ZoomControl>
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
 
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="320" Height="110" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1" >
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="210" Height="160" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1" >
                 <Canvas x:Name="ToolBoxCanvas">
-                    <Grid Canvas.Left="0" Canvas.Top="2" Width="320" >
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="45"/>
-                            <RowDefinition Height="30"/>
-
-                        </Grid.RowDefinitions>
-
-                        <Label x:Name="RegionNameLabel" Content="{Binding Region.Name}" Grid.Row="0" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
-
-                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
-
-                            <ToggleButton x:Name="ToggleSOVBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSOV}" ToolTip="Show Jump Bridges" >
-                                <Image>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="True">
-                                                    <Setter Property="Image.Source" Value="/Images/TCU.png" />
-                                                </DataTrigger>
-
-                                                <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="false">
-                                                    <Setter Property="Image.Source" Value="/Images/TCU Inactive.png" />
-                                                </DataTrigger>
-
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </ToggleButton>
+                    <Grid Canvas.Left="0" Canvas.Top="2" Width="210" >
 
 
-                            <ToggleButton x:Name="ToggleStandingsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Jump Bridges" >
-                                <Image>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="True">
-                                                    <Setter Property="Image.Source" Value="/Images/Standings.png" />
-                                                </DataTrigger>
+                        <StackPanel Orientation="Vertical">
+                            <Label x:Name="RegionNameLabel" Content="{Binding Region.Name}" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
 
-                                                <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="false">
-                                                    <Setter Property="Image.Source" Value="/Images/Standings Inactive.png" />
-                                                </DataTrigger>
+                            <StackPanel Orientation="Horizontal" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </ToggleButton>
+                                <ToggleButton x:Name="ToggleSecurityBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemSecurity}" ToolTip="Show System Security Owners" >
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleSecurityBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/Security.png" />
+                                                    </DataTrigger>
 
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleSecurityBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/Security Inactive.png" />
+                                                    </DataTrigger>
 
-                            <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" >
-                                <Image>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="True">
-                                                    <Setter Property="Image.Source" Value="/Images/JumpPortal.png" />
-                                                </DataTrigger>
-
-                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="false">
-                                                    <Setter Property="Image.Source" Value="/Images/JumpPortal Inactive.png" />
-                                                </DataTrigger>
-
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </ToggleButton>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
 
 
-                            <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" >
-                                <Image>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="True">
-                                                    <Setter Property="Image.Source" Value="/Images/Gate.png" />
-                                                </DataTrigger>
+                                <ToggleButton x:Name="ToggleSOVBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSov}" ToolTip="Show Sov Owners" >
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/TCU.png" />
+                                                    </DataTrigger>
 
-                                                <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="false">
-                                                    <Setter Property="Image.Source" Value="/Images/Gate Inactive.png" />
-                                                </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleSOVBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/TCU Inactive.png" />
+                                                    </DataTrigger>
 
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </ToggleButton>
-
-                            <ToggleButton x:Name="ToggleRatKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour">
-                                <Image>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="True">
-                                                    <Setter Property="Image.Source" Value="/Images/Rat.png" />
-                                                </DataTrigger>
-
-                                                <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="false">
-                                                    <Setter Property="Image.Source" Value="/Images/Rat Inactive.png" />
-                                                </DataTrigger>
-
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
 
 
-                            </ToggleButton>
+                                <ToggleButton x:Name="ToggleStandingsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Standings" >
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/Standings.png" />
+                                                    </DataTrigger>
 
-                            <ToggleButton x:Name="TogglePodKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour">
-                                <Image>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="True">
-                                                    <Setter Property="Image.Source" Value="/Images/Pod.png" />
-                                                </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/Standings Inactive.png" />
+                                                    </DataTrigger>
 
-                                                <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="false">
-                                                    <Setter Property="Image.Source" Value="/Images/Pod Inactive.png" />
-                                                </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
 
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </ToggleButton>
 
-                            <ToggleButton x:Name="ToggleShipKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour">
-                                <Image>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="True">
-                                                    <Setter Property="Image.Source" Value="/Images/Ship.png" />
-                                                </DataTrigger>
+                                <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" >
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/JumpPortal.png" />
+                                                    </DataTrigger>
 
-                                                <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="false">
-                                                    <Setter Property="Image.Source" Value="/Images/Ship Inactive.png" />
-                                                </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleJumpBridgesBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/JumpPortal Inactive.png" />
+                                                    </DataTrigger>
 
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
 
-                            </ToggleButton>
+
+
+
+
+
+
+
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+
+
+                                <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" >
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/Gate.png" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleJumpsBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/Gate Inactive.png" />
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
+
+
+
+                                <ToggleButton x:Name="TogglePodKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour">
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/Pod.png" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/Pod Inactive.png" />
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
+
+                                <ToggleButton x:Name="ToggleShipKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour">
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/Ship.png" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/Ship Inactive.png" />
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+
+                                </ToggleButton>
+
+                                <ToggleButton x:Name="ToggleRatKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour">
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="/Images/Rat.png" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="/Images/Rat Inactive.png" />
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+
+
+                                </ToggleButton>
+
+                            </StackPanel>
+
+
+                            <Slider  Width="190" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}"/>
                         </StackPanel>
-                        <Slider Grid.Row="2" Width="190" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}"/>
+                        
 
                     </Grid>
                 </Canvas>

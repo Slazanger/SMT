@@ -49,6 +49,7 @@ namespace SMT
         private bool m_ShowJumpBridges = true;
         private bool m_ShowStandings = false;
         private bool m_ShowSov = false;
+        private bool m_ShowSystemSecurity = false;
 
 
         public bool ShowStandings
@@ -72,12 +73,24 @@ namespace SMT
             }
             set
             {
-                ShowSov = value;
+                m_ShowSov = value;
                 OnPropertyChanged("ShowSov");
             }
         }
 
 
+        public bool ShowSystemSecurity
+        {
+            get
+            {
+                return m_ShowSystemSecurity;
+            }
+            set
+            {
+                m_ShowSystemSecurity = value;
+                OnPropertyChanged("ShowSystemSecurity");
+            }
+        }
 
 
 
@@ -255,6 +268,7 @@ namespace SMT
 
             AddCharactersToMap();
             AddDataToMap();
+            AddSystemIntelOverlay();
             AddHighlightToSystem(SelectedSystem);
         }
 
@@ -428,7 +442,7 @@ namespace SMT
                 }
 
                 // override with sec status colours
-                if (MapConf.ShowSystemSecurity)
+                if (ShowSystemSecurity)
                 {
                     systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.Security));
                 }
@@ -499,28 +513,14 @@ namespace SMT
 
                 double regionMarkerOffset = SYSTEM_REGION_TEXT_Y_OFFSET ;
 
-                if ((MapConf.ShowSystemSovName | MapConf.ShowSystemSovTicker) && system.ActualSystem.SOVAlliance != null && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
+                if ((ShowSov) && system.ActualSystem.SOVAlliance != null && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
                 {
                     Label sysRegionText = new Label();
 
                     string content = "";
                     string allianceName = EM.GetAllianceName(system.ActualSystem.SOVAlliance);
                     string allianceTicker = EM.GetAllianceTicker(system.ActualSystem.SOVAlliance);
-
-                    if (MapConf.ShowSystemSovName)
-                    {
-                        content = allianceName;
-                    }
-
-                    if (MapConf.ShowSystemSovTicker)
-                    {
-                        content = allianceTicker;
-                    }
-
-                    if (MapConf.ShowSystemSovTicker && MapConf.ShowSystemSovName && allianceName != string.Empty && allianceTicker != String.Empty)
-                    {
-                        content = allianceName + " (" + allianceTicker + ")";
-                    }
+                    content = allianceTicker;
 
                     sysRegionText.Content = content;
                     sysRegionText.FontSize = SYSTEM_TEXT_TEXT_SIZE;
@@ -583,11 +583,6 @@ namespace SMT
                 {
                     if (Region.IsSystemOnMap(jb.From) || Region.IsSystemOnMap(jb.To))
                     {
-                        if ((jb.Friendly && !MapConf.ShowJumpBridges) || (!jb.Friendly && !MapConf.ShowHostileJumpBridges))
-                        {
-                            continue;
-                        }
-
                         EVEData.MapSystem from;
 
                         if (!Region.IsSystemOnMap(jb.From))
@@ -691,8 +686,6 @@ namespace SMT
                     }
                 }
             }
-
-
         }
 
 
@@ -835,6 +828,44 @@ namespace SMT
             }
         }
 
+        private void AddSystemIntelOverlay()
+        {
+            Brush intelBlobBrush = new SolidColorBrush(MapConf.ActiveColourScheme.IntelOverlayColour);
+            foreach (EVEData.IntelData id in EM.IntelDataList)
+            {
+                foreach (string sysStr in id.Systems)
+                {
+                    if (Region.IsSystemOnMap(sysStr))
+                    {
+                        EVEData.MapSystem sys = Region.MapSystems[sysStr];
+
+                        double radiusScale = (DateTime.Now - id.IntelTime).TotalSeconds / (double)MapConf.MaxIntelSeconds;
+
+                        if (radiusScale < 0.0 || radiusScale >= 1.0)
+                        {
+                            continue;
+                        }
+
+                        // add circle to the map
+                        double radius = 24 + (100 * (1.0 - radiusScale));
+                        double circleOffset = radius / 2;
+
+                        Shape intelShape = new Ellipse() { Height = radius, Width = radius };
+
+                        intelShape.Fill = intelBlobBrush;
+                        Canvas.SetLeft(intelShape, sys.LayoutX - circleOffset);
+                        Canvas.SetTop(intelShape, sys.LayoutY - circleOffset);
+                        Canvas.SetZIndex(intelShape, 15);
+                        MainCanvas.Children.Add(intelShape);
+
+                        DynamicMapElements.Add(intelShape);
+                    }
+                }
+            }
+        }
+
+
+
         public Color stringToColour(string str)
         {
             int hash = 0;
@@ -931,7 +962,7 @@ namespace SMT
 
                 }
 
-                if ((MapConf.ColourBySov || MapConf.ShowSystemSovStanding) && sys.ActualSystem.SOVAlliance != null)
+                if ( sys.ActualSystem.SOVAlliance != null && ShowStandings)
                 {
                     Polygon poly = new Polygon();
 
@@ -941,61 +972,58 @@ namespace SMT
                     }
 
                     bool addToMap = true;
-                    Brush br = new SolidColorBrush(stringToColour(sys.ActualSystem.SOVAlliance));
-
-                    if (MapConf.ShowSystemSovStanding)
+                    Brush br = null;
+                    
+                    if (c != null && c.ESILinked)
                     {
-                        if (c != null && c.ESILinked)
+                        float Standing = 0.0f;
+
+                        if (c.AllianceID != null && c.AllianceID == sys.ActualSystem.SOVAlliance)
                         {
-                            float Standing = 0.0f;
-
-                            if (c.AllianceID != null && c.AllianceID == sys.ActualSystem.SOVAlliance)
-                            {
-                                Standing = 10.0f;
-                            }
-
-                            if (sys.ActualSystem.SOVCorp != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
-                            {
-                                Standing = c.Standings[sys.ActualSystem.SOVCorp];
-                            }
-
-                            if (sys.ActualSystem.SOVAlliance != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
-                            {
-                                Standing = c.Standings[sys.ActualSystem.SOVAlliance];
-                            }
-
-                            if (Standing == 0.0f)
-                            {
-                                addToMap = false;
-                            }
-
-                            br = StandingNeutBrush;
-
-                            if (Standing == -10.0)
-                            {
-                                br = StandingVBadBrush;
-                            }
-
-                            if (Standing == -5.0)
-                            {
-                                br = StandingBadBrush;
-                            }
-
-                            if (Standing == 5.0)
-                            {
-                                br = StandingGoodBrush;
-                            }
-
-                            if (Standing == 10.0)
-                            {
-                                br = StandingVGoodBrush;
-                            }
+                            Standing = 10.0f;
                         }
-                        else
+
+                        if (sys.ActualSystem.SOVCorp != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
                         {
-                            // enabled but not linked
+                            Standing = c.Standings[sys.ActualSystem.SOVCorp];
+                        }
+
+                        if (sys.ActualSystem.SOVAlliance != null && c.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                        {
+                            Standing = c.Standings[sys.ActualSystem.SOVAlliance];
+                        }
+
+                        if (Standing == 0.0f)
+                        {
                             addToMap = false;
                         }
+
+                        br = StandingNeutBrush;
+
+                        if (Standing == -10.0)
+                        {
+                            br = StandingVBadBrush;
+                        }
+
+                        if (Standing == -5.0)
+                        {
+                            br = StandingBadBrush;
+                        }
+
+                        if (Standing == 5.0)
+                        {
+                            br = StandingGoodBrush;
+                        }
+
+                        if (Standing == 10.0)
+                        {
+                            br = StandingVGoodBrush;
+                        }
+                    }
+                    else
+                    {
+                        // enabled but not linked
+                        addToMap = false;
                     }
 
 

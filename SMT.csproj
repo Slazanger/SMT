@@ -225,6 +225,8 @@
     <Resource Include="Images\Standings.png" />
     <Resource Include="Images\TCU Inactive.png" />
     <Resource Include="Images\TCU.png" />
+    <Resource Include="Images\Security Inactive.png" />
+    <Resource Include="Images\Security.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
