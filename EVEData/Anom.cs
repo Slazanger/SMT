@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace SMT.EVEData
@@ -160,13 +161,41 @@ namespace SMT.EVEData
         }
     }
 
-    public class AnomManager
+    public class AnomManager : INotifyPropertyChanged
     {
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
         public SerializableDictionary<string, AnomData> Systems { get; set; }
+
+
+        private AnomData m_ActiveSystem;
+        public AnomData ActiveSystem
+        {
+            get
+            {
+                return m_ActiveSystem;
+            }
+            set
+            {
+                m_ActiveSystem = value;
+                OnPropertyChanged("ActiveSystem");
+            }
+        }
 
         public AnomManager()
         {
             Systems = new SerializableDictionary<string, AnomData>();
+            ActiveSystem = null;
         }
 
         public AnomData GetSystemAnomData(string sysName)

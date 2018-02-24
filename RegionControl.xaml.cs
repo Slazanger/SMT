@@ -20,7 +20,7 @@ namespace SMT
         public EVEData.MapRegion Region { get; set; }
         public MapConfig MapConf { get; set; }
         public EveManager EM { get; set; }
-
+        public AnomManager ANOMManager { get; set; }
         public string SelectedSystem { get; set; }
 
         // Constant Colours
@@ -50,6 +50,7 @@ namespace SMT
         private bool m_ShowStandings = false;
         private bool m_ShowSov = false;
         private bool m_ShowSystemSecurity = false;
+
 
 
         public bool ShowStandings
@@ -244,6 +245,13 @@ namespace SMT
         /// <param name="FullRedraw">Clear all the static items or not</param>
         public void ReDrawMap(bool FullRedraw = false)
         {
+            if (CharacterDropDown.SelectedItem != null && FollowCharacter == true)
+            {
+                HandleCharacterSelectionChange();
+            }
+
+
+
             if (FullRedraw)
             {
                 // reset the background
@@ -270,6 +278,7 @@ namespace SMT
             AddDataToMap();
             AddSystemIntelOverlay();
             AddHighlightToSystem(SelectedSystem);
+            AddRouteToMap();
         }
 
 
@@ -303,10 +312,10 @@ namespace SMT
 
             CharacterDropDown.ItemsSource = EM.LocalCharacters;
 
-            EM.LocalCharacters.Add(new Character("TestChar1", "", "D-PNP9"));
-            EM.LocalCharacters.Add(new Character("TestChar2", "", "D-PNP9"));
-            EM.LocalCharacters.Add(new Character("TestChar3", "", "D-PNP9"));
-            EM.LocalCharacters.Add(new Character("TestChar4", "", "D-PNP9"));
+            EM.LocalCharacters.Add(new Character("TestChar1", "", "IPAY-2"));
+            EM.LocalCharacters.Add(new Character("TestChar2", "", "IPAY-2"));
+            EM.LocalCharacters.Add(new Character("TestChar3", "", "IPAY-2"));
+            EM.LocalCharacters.Add(new Character("TestChar4", "", "IPAY-2"));
 
             RegionSelectCB.ItemsSource = EM.Regions;
             SelectRegion(MapConf.DefaultRegion);
@@ -347,11 +356,17 @@ namespace SMT
                     break;
                 }
             }
-// TODO :
-//            // now setup the anom data
-//            EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
-//            MainAnomGrid.DataContext = system;
-//            AnomSigList.ItemsSource = system.Anoms.Values;
+
+
+            // now setup the anom data
+
+
+            EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
+            ANOMManager.ActiveSystem = system;
+
+            ///AnomSigList.ItemsSource = system.Anoms.Values;
+
+
         }
 
 
@@ -864,6 +879,88 @@ namespace SMT
             }
         }
 
+        private void AddRouteToMap()
+        {
+            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+
+
+            if (c == null)
+                return;
+
+            Brush RouteBrush = new SolidColorBrush(Colors.Yellow);
+            Brush WaypointBrush = new SolidColorBrush(Colors.DarkGray);
+
+            foreach (string s in c.Waypoints)
+            {
+
+            }
+
+
+            // no active route
+            if (c.ActiveRoute.Count == 0)
+            {
+                return;
+            }
+
+            string Start = "";
+            string End = c.Location;
+
+
+
+            for (int i = 0; i < c.ActiveRoute.Count; i++)
+            {
+                Start = End;
+                End = c.ActiveRoute[i];
+
+                if (!(Region.IsSystemOnMap(Start) && Region.IsSystemOnMap(End)))
+                {
+                    continue;
+                }
+
+                EVEData.MapSystem from = Region.MapSystems[Start];
+                EVEData.MapSystem to = Region.MapSystems[End];
+
+
+                Line routeLine = new Line();
+
+
+                routeLine.X1 = from.LayoutX;
+                routeLine.Y1 = from.LayoutY;
+
+                routeLine.X2 = to.LayoutX;
+                routeLine.Y2 = to.LayoutY;
+
+                routeLine.StrokeThickness = 5;
+                routeLine.Visibility = Visibility.Visible;
+                routeLine.Stroke = RouteBrush;
+
+                DoubleCollection dashes = new DoubleCollection();
+                dashes.Add(1.0);
+                dashes.Add(1.0);
+
+                routeLine.StrokeDashArray = dashes;
+
+                // animate the jump bridges
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 200;
+                da.To = 0;
+                da.By = 2;
+                da.Duration = new Duration(TimeSpan.FromSeconds(40));
+                da.RepeatBehavior = RepeatBehavior.Forever;
+
+                routeLine.StrokeDashArray = dashes;
+                routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+
+
+                Canvas.SetZIndex(routeLine, 18);
+                MainCanvas.Children.Add(routeLine);
+
+                DynamicMapElements.Add(routeLine);
+            }
+        }
+
+
 
 
         public Color stringToColour(string str)
@@ -1061,6 +1158,8 @@ namespace SMT
         /// <param name="e"></param>
         private void RegionSelectCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            FollowCharacter = false;
+
             EVEData.MapRegion rd = RegionSelectCB.SelectedItem as EVEData.MapRegion;
             if(rd == null)
             {
@@ -1170,6 +1269,7 @@ namespace SMT
                     {
                         redraw = true;
                     }
+                    FollowCharacter = false;
                     SelectSystem(selectedSys.Name);
 
                     ReDrawMap(redraw);
@@ -1258,11 +1358,6 @@ namespace SMT
             }
         }
 
-        private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void HandleCharacterSelectionChange()
         {
             EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
@@ -1298,6 +1393,11 @@ namespace SMT
             HandleCharacterSelectionChange();
         }
 
+        private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)
+        {
+            HandleCharacterSelectionChange();
+        }
+
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             EVEData.MapSystem sd = SystemDropDownAC.SelectedItem as EVEData.MapSystem;
@@ -1313,5 +1413,7 @@ namespace SMT
         {
             ReDrawMap(true);
         }
+
+
     }
 }

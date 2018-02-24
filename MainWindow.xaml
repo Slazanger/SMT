@@ -214,10 +214,10 @@
                                         </Grid.RowDefinitions>
                                         <StackPanel Grid.Row="0">
                                             <Button x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" />
-                                            <Label Content="{Binding SystemName}" FontSize="18" FontWeight="Bold" />
+                                            <Label Content="{Binding Path=ActiveSystem.SystemName}" FontSize="18" FontWeight="Bold" />
                                         </StackPanel>
 
-                                        <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False">
+                                        <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ActiveSystem.Anoms.Values, diag:PresentationTraceSources.TraceLevel=High}">
 
                                             <DataGrid.RowStyle>
                                                 <Style TargetType="DataGridRow">

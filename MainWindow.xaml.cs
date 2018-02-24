@@ -166,6 +166,8 @@ namespace SMT
             RegionRC.MapConf = MapConf;
             RegionRC.Init();
 
+
+
             SelectRegion(MapConf.DefaultRegion);
 
 
@@ -193,6 +195,12 @@ namespace SMT
             {
                 ANOMManager = new EVEData.AnomManager();
             }
+
+
+            MainAnomGrid.DataContext = ANOMManager;
+            RegionRC.ANOMManager = ANOMManager;
+
+
 
             // ColourListDropdown.SelectedItem = selectedColours;
             ColoursPropertyGrid.SelectedObject = selectedColours;
@@ -419,9 +427,8 @@ namespace SMT
             }
 
             // now setup the anom data
-            EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
-            MainAnomGrid.DataContext = system;
-            AnomSigList.ItemsSource = system.Anoms.Values;
+//            EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
+//            AnomSigList.ItemsSource = system.Anoms.Values;
         }
 
         private void AddHighlightToSystem(string name)
@@ -1283,8 +1290,9 @@ namespace SMT
             MapConf.DefaultRegion = rd.Name;
 
             MainContent.DataContext = RegionDropDown.SelectedItem;
-            MainAnomGrid.DataContext = null;
-            AnomSigList.ItemsSource = null;
+            //MainAnomGrid.DataContext = null;
+            //AnomSigList.ItemsSource = null;
+
 
             SystemDropDownAC.SelectedItem = null;
 
@@ -1474,7 +1482,7 @@ namespace SMT
 
             if (pasteData != null || pasteData != string.Empty)
             {
-                EVEData.AnomData ad = MainAnomGrid.DataContext as EVEData.AnomData;
+                EVEData.AnomData ad = ANOMManager.ActiveSystem;
 
                 if (ad != null)
                 {
@@ -1488,7 +1496,7 @@ namespace SMT
 
         private void btnClearAnomList_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.AnomData ad = MainAnomGrid.DataContext as EVEData.AnomData;
+            EVEData.AnomData ad = ANOMManager.ActiveSystem;
             if (ad != null)
             {
                 ad.Anoms.Clear();
