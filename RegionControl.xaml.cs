@@ -293,6 +293,7 @@ namespace SMT
             AddSystemIntelOverlay();
             AddHighlightToSystem(SelectedSystem);
             AddRouteToMap();
+            AddTheraSystemsToMap();
         }
 
 
@@ -350,8 +351,21 @@ namespace SMT
             ReDrawMap(false);
         }
 
-        public void SelectSystem(string name)
+        public void SelectSystem(string name, bool changeRegion = false)
         {
+            EVEData.System sys = EM.GetEveSystem(name);
+
+            if(sys == null)
+            {
+                return;
+            }
+
+            if(changeRegion && !Region.IsSystemOnMap(name))
+            {
+                SelectRegion(sys.Region);
+            }
+
+
             foreach (EVEData.MapSystem es in Region.MapSystems.Values.ToList())
             {
                 if (es.Name == name)
@@ -1009,7 +1023,43 @@ namespace SMT
             }
         }
 
+        public void AddTheraSystemsToMap()
+        {
+            Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
 
+            foreach(TheraConnection tc in EM.TheraConnections)
+            {
+                if(Region.IsSystemOnMap(tc.System))
+                {
+                    MapSystem ms = Region.MapSystems[tc.System];
+
+                    Shape TheraShape;
+                    if (ms.ActualSystem.HasNPCStation)
+                    {
+                        TheraShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE+6, Width = SYSTEM_SHAPE_SIZE+6 };
+                    }
+                    else
+                    {
+                        TheraShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE+6, Width = SYSTEM_SHAPE_SIZE+6 };
+                    }
+
+                    TheraShape.Stroke = TheraBrush;
+                    TheraShape.StrokeThickness = 1.5;
+                    TheraShape.StrokeLineJoin = PenLineJoin.Round;
+                    TheraShape.Fill = TheraBrush;
+
+                    // add the hover over and click handlers
+
+
+                    Canvas.SetLeft(TheraShape, ms.LayoutX - (SYSTEM_SHAPE_OFFSET +3 ));
+                    Canvas.SetTop(TheraShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET +3));
+                    Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX -3);
+                    MainCanvas.Children.Add(TheraShape);
+
+      
+                }
+            }
+        }
 
 
         public Color stringToColour(string str)

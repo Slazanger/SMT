@@ -89,7 +89,6 @@ namespace SMT.EVEData
         
         [XmlIgnoreAttribute]
         public ObservableCollection<Character> LocalCharacters { get; set; }
-
         public void LoadCharacters()
         {
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
@@ -925,6 +924,7 @@ namespace SMT.EVEData
             StartUpdateCharacterThread();
 
 
+            InitTheraConnections();
 
         }
 
@@ -1517,6 +1517,85 @@ namespace SMT.EVEData
             return Length;
 
         }
+
+
+        // thera
+        public ObservableCollection<TheraConnection> TheraConnections;
+
+        public void InitTheraConnections()
+        {
+            TheraConnections = new ObservableCollection<TheraConnection>();
+            UpdateTheraConnections();
+        }
+
+        public void UpdateTheraConnections()
+        {
+            string URL = "https://www.eve-scout.com/api/wormholes";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
+
+            TheraConnections.Clear();
+
+        }
+
+
+        private void UpdateTheraConnectionsCallback(IAsyncResult asyncResult)
+        {
+
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+
+                        // JSON feed is now in the format : {"id":38199,"signatureId":"QRQ","type":"wormhole","status":"scanned","wormholeMass":"stable","wormholeEol":"critical","wormholeEstimatedEol":"2018-02-25T20:41:21.000Z","wormholeDestinationSignatureId":"VHT","createdAt":"2018-02-25T04:41:21.000Z","updatedAt":"2018-02-25T16:41:46.000Z","deletedAt":null,"statusUpdatedAt":"2018-02-25T04:41:44.000Z","createdBy":"Erik Holden","createdById":"95598233","deletedBy":null,"deletedById":null,"wormholeSourceWormholeTypeId":91,"wormholeDestinationWormholeTypeId":140,"solarSystemId":31000005,"wormholeDestinationSolarSystemId":30001175,"sourceWormholeType":
+                        while (jsr.Read())
+                        {
+                            if (jsr.TokenType == JsonToken.StartObject)
+                            {
+                                JObject obj = JObject.Load(jsr);
+                                string SignatureId = obj["signatureId"].ToString();
+                                string SolarSystemId = obj["wormholeDestinationSolarSystemId"].ToString();
+                                string WormHoleEOL = obj["wormholeEol"].ToString();
+                                string Type = obj["type"].ToString();
+
+                                if(Type != null && Type == "wormhole" && SolarSystemId != null && WormHoleEOL != null && SystemIDToName.Keys.Contains(SolarSystemId))
+                                {
+                                    System TheraConnectionSystem = GetEveSystemFromID(SolarSystemId);
+
+                                    TheraConnection tc = new TheraConnection(TheraConnectionSystem.Name, TheraConnectionSystem.Region, SignatureId, WormHoleEOL);
+
+                                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                                    {
+                                        TheraConnections.Add(tc);
+                                    }), DispatcherPriority.ApplicationIdle);
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                /// ....
+            }
+        }
+
+
 
 
 

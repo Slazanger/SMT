@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.37" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
+        Title="Slazanger's Map Tool 0.38" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
 
     <Window.Resources>
     </Window.Resources>
@@ -153,6 +153,39 @@
 
                                     </Grid>
                                 </xcad:LayoutAnchorable>
+
+                                <xcad:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                    <ScrollViewer Background="#FFE5E5E5">
+                                        <StackPanel>
+
+                                            <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick">
+
+                                                <DataGrid.RowStyle>
+                                                <Style TargetType="DataGridRow">
+
+                                                    <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
+                                                                <Setter Property="Background" Value="Red"/>
+                                                            </DataTrigger>
+                                                </Style.Triggers>
+                                                </Style>
+                                                </DataGrid.RowStyle>
+
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="System" Binding="{Binding System}" />
+                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" />
+                                                    <DataGridTextColumn Header="Sig" Binding="{Binding SignatureID}" />
+                                                    <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" />
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+
+                                            <Button x:Name="btn_UpdateThera" Click="btn_UpdateThera_Click"  Content="Update Connections" />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </xcad:LayoutAnchorable>
+
+
+
                             </xcad:LayoutAnchorGroup>
 
                         </xcad:LayoutAnchorSide>

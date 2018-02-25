@@ -98,6 +98,8 @@ namespace SMT
             ColourListDropdown.ItemsSource = MapConf.MapColours;
             CharacterList.ItemsSource = EVEManager.LocalCharacters;
 
+            TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
+
             MapColours selectedColours = MapConf.MapColours[0];
 
             // find the matching active colour scheme
@@ -397,6 +399,29 @@ namespace SMT
                 c.ActiveRoute.Clear();
                 c.Waypoints.Clear();
             }
+        }
+
+        private void TheraConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    EVEData.TheraConnection tc = dgr.Item as EVEData.TheraConnection;
+
+                    if(tc != null)
+                    {
+                        RegionRC.SelectSystem(tc.System, true);
+                    }
+                }
+            }
+        }
+
+        private void btn_UpdateThera_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.UpdateTheraConnections();
         }
     }
 
