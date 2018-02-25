@@ -404,6 +404,8 @@ namespace SMT
                 return;
             }
 
+            EM.UpdateIDsForMapRegion(regionName);
+
             // check its a valid system
             EVEData.MapRegion mr = EM.GetRegion(regionName);
             if(mr == null)
