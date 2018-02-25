@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.36" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
+        Title="Slazanger's Map Tool 0.37" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
 
     <Window.Resources>
     </Window.Resources>
@@ -68,7 +68,7 @@
                                             <Label Content="{Binding Path=ActiveSystem.SystemName}" FontSize="18" FontWeight="Bold" />
                                         </StackPanel>
 
-                                        <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ActiveSystem.Anoms.Values, diag:PresentationTraceSources.TraceLevel=High}">
+                                        <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ActiveSystem.Anoms.Values}">
 
                                             <DataGrid.RowStyle>
                                                 <Style TargetType="DataGridRow">

@@ -94,8 +94,24 @@ namespace SMT
                     m_MaxIntelSeconds = 30;
                 }
             }
-
         }
+
+        private bool m_AlwaysOnTop;
+        [Category("General")]
+        [DisplayName("Always on top")]
+        public bool AlwaysOnTop
+        {
+            get
+            {
+                return m_AlwaysOnTop;
+            }
+            set
+            {
+                m_AlwaysOnTop = value;
+                OnPropertyChanged("AlwaysOnTop");
+            }
+        }
+
 
 
 
@@ -105,6 +121,7 @@ namespace SMT
             DefaultRegion = "Molden Heath";
             ShowSystemPopup = true;
             MaxIntelSeconds = 120;
+            AlwaysOnTop = false;
             MapColours = new List<MapColours>();
         }
 

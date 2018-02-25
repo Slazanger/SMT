@@ -164,11 +164,27 @@ namespace SMT
             ColoursPropertyGrid.SelectedObject = selectedColours;
             MapConf.ActiveColourScheme = selectedColours;
             ColoursPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
+            MapConf.PropertyChanged += MapConf_PropertyChanged;
 
             Closed += MainWindow_Closed;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
             //MapConf.PropertyChanged += RegionRC.MapObjectChanged;
+        }
+
+        private void MapConf_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == "AlwaysOnTop")
+            {
+                if(MapConf.AlwaysOnTop)
+                {
+                    this.Topmost = true;
+                }
+                else
+                {
+                    this.Topmost = false;
+                }
+            }
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)

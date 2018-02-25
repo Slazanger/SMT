@@ -871,11 +871,6 @@ namespace SMT.EVEData
             }
 
 
-
-
-
-
-
             Init();
         }
 
@@ -1312,7 +1307,7 @@ namespace SMT.EVEData
                         Character c = LocalCharacters.ElementAt(i);
                         c.Update();
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                 }
             }).Start();
         }
