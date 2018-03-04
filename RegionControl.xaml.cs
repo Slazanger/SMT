@@ -336,7 +336,9 @@ namespace SMT
             uiRefreshTimer.Interval = new TimeSpan(0, 0, 2);
             uiRefreshTimer.Start();
 
-            ToolBoxCanvas.DataContext = this;
+            DataContext = this;
+
+            //ToolBoxCanvas.DataContext = this;
 
             PropertyChanged += MapObjectChanged;
         }

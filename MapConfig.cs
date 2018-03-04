@@ -112,6 +112,21 @@ namespace SMT
             }
         }
 
+        private bool m_ShowToolBox = true;
+        [Category("General")]
+        [DisplayName("Show Toolbox")]
+        public bool ShowToolBox
+        {
+            get
+            {
+                return m_ShowToolBox;
+            }
+            set
+            {
+                m_ShowToolBox = value;
+                OnPropertyChanged("ShowToolBox");
+            }
+        }
 
 
 
@@ -122,6 +137,7 @@ namespace SMT
             ShowSystemPopup = true;
             MaxIntelSeconds = 120;
             AlwaysOnTop = false;
+            ShowToolBox = true;
             MapColours = new List<MapColours>();
         }
 

@@ -6,10 +6,12 @@
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
              xmlns:local="clr-namespace:SMT"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <ContextMenu x:Key="SysRightClickContextMenu">
 
             <ContextMenu.ItemTemplate>
@@ -52,17 +54,17 @@
                 </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
             </dotNetKitControls:AutoCompleteComboBox>
             <ComboBox x:Name="CharacterDropDown"  Width="150"  Margin="5,0" HorizontalAlignment="Center" SelectionChanged="CharacterDropDown_SelectionChanged" DropDownClosed="CharacterDropDown_DropDownClosed" />
-            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding FollowCharacter}" Checked="FollowCharacterChk_Checked" />
+            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
         </StackPanel>
 
 
-        <Grid x:Name="MainCanvasGrid" ClipToBounds="True" Grid.Row="1">
+        <Grid x:Name="MainCanvasGrid" ClipToBounds="True" Grid.Row="1" >
             <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" >
                 <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
             </zoombox1:ZoomControl>
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
 
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="210" Height="160" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1" >
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="210" Height="160" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis},  diag:PresentationTraceSources.TraceLevel=High}" >
                 <Canvas x:Name="ToolBoxCanvas">
                     <Grid Canvas.Left="0" Canvas.Top="2" Width="210" >
 

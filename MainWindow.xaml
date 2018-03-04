@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.38" Height="800" Width="1024" Background="#FFEEEEEE" WindowState="Maximized" Icon="Images/smt_icon.ico">
+        Title="Slazanger's Map Tool 0.39" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico">
 
     <Window.Resources>
     </Window.Resources>
@@ -24,13 +24,29 @@
         </StackPanel>
 
         <Grid x:Name="MainContent" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <xcad:DockingManager x:Name="dockManager" Grid.Row="0" >
+            <Menu DockPanel.Dock="Top" Grid.Row="0" IsEnabled="False">
+                <MenuItem Header="_File">
+                    <MenuItem>
+
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="View">
+                    <MenuItem Header="Intel" IsCheckable="True" IsChecked="{Binding IntelLayoutAnchorable.IsVisible}" Click="MenuItem_ViewIntelClick"/>
+                </MenuItem>
+            </Menu>
+
+
+            <xcad:DockingManager x:Name="dockManager" Grid.Row="1" Grid.RowSpan="1" >
 
                 <xcad:LayoutRoot>
                     <xcad:LayoutRoot.RootPanel>
                         <xcad:LayoutPanel>
-                            <xcad:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False">
+                            <xcad:LayoutDocumentPane ShowHeader="False" AllowDuplicateContent="False">
 
                                 <xcad:LayoutDocument Title="Region" CanClose="False" CanFloat="True" ContentId="MapRegionContentID">
                                     <local:RegionControl x:Name="RegionRC" />
@@ -42,7 +58,7 @@
                     <xcad:LayoutRoot.RightSide>
                         <xcad:LayoutAnchorSide>
                             <xcad:LayoutAnchorGroup>
-                                <xcad:LayoutAnchorable Title="Intel" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <xcad:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid Background="#FFE5E5E5">
                                         <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
                                             <ListBox.ItemTemplate>
@@ -56,7 +72,7 @@
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="60" />
@@ -97,7 +113,7 @@
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <xcad:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
                                             <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
@@ -128,7 +144,7 @@
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
                                             <ListBox x:Name="CharacterList"/>
@@ -137,7 +153,7 @@
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <xcad:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainRouteGrid">
                                         <ScrollViewer Background="#FFE5E5E5">
                                             <StackPanel>
@@ -154,21 +170,21 @@
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="True" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <xcad:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
 
                                             <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick">
 
                                                 <DataGrid.RowStyle>
-                                                <Style TargetType="DataGridRow">
+                                                    <Style TargetType="DataGridRow">
 
-                                                    <Style.Triggers>
+                                                        <Style.Triggers>
                                                             <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
                                                                 <Setter Property="Background" Value="Red"/>
                                                             </DataTrigger>
-                                                </Style.Triggers>
-                                                </Style>
+                                                        </Style.Triggers>
+                                                    </Style>
                                                 </DataGrid.RowStyle>
 
                                                 <DataGrid.Columns>
@@ -194,7 +210,7 @@
                 </xcad:LayoutRoot>
             </xcad:DockingManager>
 
-            <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100">
+            <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100" Margin="458,0" Grid.RowSpan="2">
                 <StackPanel Background="#FF959595">
                     <Label Content="{Binding Name}" FontWeight="Bold" />
 

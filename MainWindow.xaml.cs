@@ -31,7 +31,7 @@ namespace SMT
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
-        private MapConfig MapConf;
+        private MapConfig MapConf { get; set; }
 
         public MainWindow()
         {
@@ -423,6 +423,13 @@ namespace SMT
         {
             EVEManager.UpdateTheraConnections();
         }
+
+
+        private void MenuItem_ViewIntelClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
     }
 
 }
