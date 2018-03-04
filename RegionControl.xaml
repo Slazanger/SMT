@@ -68,7 +68,7 @@
 
 
                         <StackPanel Orientation="Vertical">
-                            <Label x:Name="RegionNameLabel" Content="{Binding Region.Name}" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
+                            <Label x:Name="RegionNameLabel" Content="Region" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
 
                             <StackPanel Orientation="Horizontal" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
 

@@ -415,7 +415,8 @@ namespace SMT
 
             // update the selected region
             Region = mr;
-            
+            RegionNameLabel.Content = mr.Name;
+            MapConf.DefaultRegion = mr.Name;
 
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
