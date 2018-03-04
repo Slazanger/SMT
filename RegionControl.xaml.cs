@@ -1435,16 +1435,19 @@ namespace SMT
 
                 // check JB Info
                 SystemInfoPopup_JBInfo.Content = "";
-                foreach (EVEData.JumpBridge jb in EM.JumpBridges)
+                if(ShowJumpBridges)
                 {
-                    if(selectedSys.Name == jb.From)
+                    foreach (EVEData.JumpBridge jb in EM.JumpBridges)
                     {
-                        SystemInfoPopup_JBInfo.Content = "JB (" + jb.FromInfo + ") to " + jb.To;
-                    }
+                        if (selectedSys.Name == jb.From)
+                        {
+                            SystemInfoPopup_JBInfo.Content = "JB (" + jb.FromInfo + ") to " + jb.To;
+                        }
 
-                    if (selectedSys.Name == jb.To)
-                    {
-                        SystemInfoPopup_JBInfo.Content = "JB (" + jb.ToInfo + ") to " + jb.From;
+                        if (selectedSys.Name == jb.To)
+                        {
+                            SystemInfoPopup_JBInfo.Content = "JB (" + jb.ToInfo + ") to " + jb.From;
+                        }
                     }
                 }
                 SystemInfoPopup.IsOpen = true;
