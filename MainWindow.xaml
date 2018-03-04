@@ -190,7 +190,8 @@
                                                 <DataGrid.Columns>
                                                     <DataGridTextColumn Header="System" Binding="{Binding System}" />
                                                     <DataGridTextColumn Header="Region" Binding="{Binding Region}" />
-                                                    <DataGridTextColumn Header="Sig" Binding="{Binding SignatureID}" />
+                                                    <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" />
+                                                    <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" />
                                                     <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" />
                                                 </DataGrid.Columns>
                                             </DataGrid>

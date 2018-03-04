@@ -10,14 +10,16 @@ namespace SMT.EVEData
     {
         public string System { get; set; }
         public string Region { get; set; }
-        public string SignatureID { get; set; }
+        public string InSignatureID { get; set; }
+        public string OutSignatureID { get; set; }
         public string EstimatedEOL { get; set; }
 
-        public TheraConnection(string sys, string region, string id, string eol)
+        public TheraConnection(string sys, string region, string inID, string outID, string eol)
         {
             Region = region;
             System = sys;
-            SignatureID = id;
+            InSignatureID = inID;
+            OutSignatureID = outID;
             EstimatedEOL = eol;
         }
     }

@@ -1566,7 +1566,8 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string SignatureId = obj["signatureId"].ToString();
+                                string inSignatureId = obj["wormholeDestinationSignatureId"].ToString();
+                                string outSignatureId = obj["signatureId"].ToString(); ;
                                 string SolarSystemId = obj["wormholeDestinationSolarSystemId"].ToString();
                                 string WormHoleEOL = obj["wormholeEol"].ToString();
                                 string Type = obj["type"].ToString();
@@ -1575,7 +1576,7 @@ namespace SMT.EVEData
                                 {
                                     System TheraConnectionSystem = GetEveSystemFromID(SolarSystemId);
 
-                                    TheraConnection tc = new TheraConnection(TheraConnectionSystem.Name, TheraConnectionSystem.Region, SignatureId, WormHoleEOL);
+                                    TheraConnection tc = new TheraConnection(TheraConnectionSystem.Name, TheraConnectionSystem.Region, inSignatureId, outSignatureId, WormHoleEOL);
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
