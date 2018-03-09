@@ -10,8 +10,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+
 
 namespace SMT
 {
@@ -33,11 +35,52 @@ namespace SMT
 
         private MapConfig MapConf { get; set; }
 
+        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get;set; }
+
+
+        // Timer to Re-draw the map
+        private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
+
+
         public MainWindow()
         {
             OutputLog.Info("Starting App..");
 
             InitializeComponent();
+
+
+            string dockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
+            if (File.Exists(dockManagerLayoutName))
+            {
+                try
+                {
+                    Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                    using (var sr = new StreamReader(dockManagerLayoutName))
+                    {
+                        ls.Deserialize(sr);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            RegionLayoutDoc = null;
+            
+            // now update the RegionLayoutDoc because the layout loading breaks the binding
+            foreach (Xceed.Wpf.AvalonDock.Layout.LayoutPanel ldc in dockManager.Layout.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutPanel>())
+            {
+                foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane ldp in ldc.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane>())
+                {
+                    foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocument ld in ldp.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocument>())
+                    {
+                        if (ld.ContentId == "MapRegionContentID")
+                        {
+                            RegionLayoutDoc = ld;
+                        }
+                    }
+                }
+            }
 
             // load any custom map settings off disk
             string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
@@ -111,22 +154,9 @@ namespace SMT
                 }
             }
 
-            // load the dockmanager layout
-            string dockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
-            if (File.Exists(dockManagerLayoutName))
-            {
-                try
-                {
-                    Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
-                    using (var sr = new StreamReader(dockManagerLayoutName))
-                    {
-                        ls.Deserialize(sr);
-                    }
-                }
-                catch
-                {
-                }
-            }
+            RegionRC.RegionChanged += RegionRC_RegionChanged;
+
+
 
             RegionRC.MapConf = MapConf;
             RegionRC.Init();
@@ -162,16 +192,38 @@ namespace SMT
             MainRouteGrid.DataContext = RegionRC;
 
 
+
             // ColourListDropdown.SelectedItem = selectedColours;
             ColoursPropertyGrid.SelectedObject = selectedColours;
             MapConf.ActiveColourScheme = selectedColours;
             ColoursPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
+            
             Closed += MainWindow_Closed;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
             //MapConf.PropertyChanged += RegionRC.MapObjectChanged;
+
+            AddRegionsToUniverse();
+
+
+            uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
+            uiRefreshTimer.Tick += UiRefreshTimer_Tick;
+            uiRefreshTimer.Interval = new TimeSpan(0, 0, 4);
+            uiRefreshTimer.Start();
+
+
+        }
+
+        private void UiRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            RedrawUniverse();
+        }
+
+        private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
+        {
+            RegionLayoutDoc.Title = "Region : " + RegionRC.Region.Name;
         }
 
         private void MapConf_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -241,6 +293,12 @@ namespace SMT
 
             // save the character data
             EVEManager.SaveData();
+        }
+
+        private void RedrawUniverse()
+        {
+            MainUniverseCanvas.Children.Clear();
+            AddRegionsToUniverse();
         }
 
 
@@ -430,6 +488,177 @@ namespace SMT
 
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+ 
+        }
+
+        private void AddRegionsToUniverse()
+        {
+            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            Brush SysInRegionBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
+            Brush BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+
+            Brush AmarrBg = new SolidColorBrush(Color.FromArgb(255, 126, 110, 95));
+            Brush MinmatarBg = new SolidColorBrush(Color.FromArgb(255, 143, 120, 120));
+            Brush GallenteBg = new SolidColorBrush(Color.FromArgb(255, 127, 139, 137));
+            Brush CaldariBg = new SolidColorBrush(Color.FromArgb(255, 149, 159, 171));
+
+            Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
+
+            MainUniverseCanvas.Background = BackgroundColourBrush;
+            MainUniverseGrid.Background = BackgroundColourBrush;
+
+            foreach (EVEData.MapRegion mr in EVEManager.Regions)
+            {
+                // add circle for system
+                Rectangle RegionShape = new Rectangle() { Height = 30, Width = 80 };
+                RegionShape.Stroke = SysOutlineBrush;
+                RegionShape.StrokeThickness = 1.5;
+                RegionShape.StrokeLineJoin = PenLineJoin.Round;
+                RegionShape.RadiusX = 5;
+                RegionShape.RadiusY = 5;
+                RegionShape.Fill = SysInRegionBrush;
+                RegionShape.MouseDown += RegionShape_MouseDown;
+                RegionShape.DataContext = mr;
+
+                if (mr.Faction == "Amarr")
+                {
+                    RegionShape.Fill = AmarrBg;
+                }
+                if (mr.Faction == "Gallente")
+                {
+                    RegionShape.Fill = GallenteBg;
+                }
+                if (mr.Faction == "Minmatar")
+                {
+                    RegionShape.Fill = MinmatarBg;
+                }
+                if (mr.Faction == "Caldari")
+                {
+                    RegionShape.Fill = CaldariBg;
+                }
+
+
+                Canvas.SetLeft(RegionShape, mr.RegionX - 40);
+                Canvas.SetTop(RegionShape, mr.RegionY - 15);
+                Canvas.SetZIndex(RegionShape, 22);
+                MainUniverseCanvas.Children.Add(RegionShape);
+
+                Label RegionText = new Label();
+                RegionText.Width = 80;
+                RegionText.Height = 27;
+                RegionText.Content = mr.Name;
+                RegionText.Foreground = SysOutlineBrush;
+                RegionText.FontSize = 10;
+                RegionText.HorizontalAlignment = HorizontalAlignment.Center;
+                RegionText.VerticalAlignment = VerticalAlignment.Center;
+                RegionText.IsHitTestVisible = false;
+
+                RegionText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                RegionText.VerticalContentAlignment = VerticalAlignment.Center;
+
+
+                Canvas.SetLeft(RegionText, mr.RegionX - 40);
+                Canvas.SetTop(RegionText, mr.RegionY - 15);
+                Canvas.SetZIndex(RegionText, 23);
+                MainUniverseCanvas.Children.Add(RegionText);
+
+
+                if(mr.Faction != "")
+                {
+
+                    Label FactionText = new Label();
+                    FactionText.Width = 80;
+                    FactionText.Height = 30;
+                    FactionText.Content = mr.Faction;
+                    FactionText.Foreground = SysOutlineBrush;
+                    FactionText.FontSize = 5;
+                    FactionText.HorizontalAlignment = HorizontalAlignment.Center;
+                    FactionText.VerticalAlignment = VerticalAlignment.Center;
+                    FactionText.IsHitTestVisible = false;
+
+                    FactionText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    FactionText.VerticalContentAlignment = VerticalAlignment.Bottom;
+
+                    Canvas.SetLeft(FactionText, mr.RegionX - 40);
+                    Canvas.SetTop(FactionText, mr.RegionY - 15);
+                    Canvas.SetZIndex(FactionText, 23);
+                    MainUniverseCanvas.Children.Add(FactionText);
+
+
+                }
+
+
+                // now add all the region links
+                foreach (string s in mr.RegionLinks)
+                {
+                    EVEData.MapRegion or = EVEManager.GetRegion(s);
+                    Line regionLink = new Line();
+
+                    regionLink.X1 = mr.RegionX;
+                    regionLink.Y1 = mr.RegionY;
+
+                    regionLink.X2 = or.RegionX;
+                    regionLink.Y2 = or.RegionY;
+
+                    regionLink.Stroke = SysOutlineBrush;
+                    regionLink.StrokeThickness = 1.2;
+                    regionLink.Visibility = Visibility.Visible;
+
+                    Canvas.SetZIndex(regionLink, 21);
+                    MainUniverseCanvas.Children.Add(regionLink);
+                }
+
+                bool AddTheraConnection = false;
+                foreach(EVEData.TheraConnection tc in EVEManager.TheraConnections)
+                {
+                    if(string.Compare(tc.Region, mr.Name, true) == 0)
+                    {
+                        AddTheraConnection = true;
+                        break;
+                    }
+                }
+
+                if(AddTheraConnection)
+                {
+                    Rectangle TheraShape = new Rectangle() { Width = 8, Height = 8 };
+
+                    TheraShape.Stroke = SysOutlineBrush;
+                    TheraShape.StrokeThickness = 1;
+                    TheraShape.StrokeLineJoin = PenLineJoin.Round;
+                    TheraShape.RadiusX = 2;
+                    TheraShape.RadiusY = 2;
+                    TheraShape.Fill = TheraBrush;
+                    TheraShape.IsHitTestVisible = false;
+
+                    Canvas.SetLeft(TheraShape, mr.RegionX + 28);
+                    Canvas.SetTop(TheraShape, mr.RegionY + 3);
+                    Canvas.SetZIndex(TheraShape, 22);
+                    MainUniverseCanvas.Children.Add(TheraShape);
+
+
+                }
+
+            }
+        }
+
+        private void RegionShape_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Shape obj = sender as Shape;
+            EVEData.MapRegion mr = obj.DataContext as EVEData.MapRegion;
+            if(mr == null)
+            {
+                return;
+            }
+
+            if(e.ClickCount == 2)
+            {
+                RegionRC.SelectRegion(mr.Name);
+                RegionLayoutDoc.IsSelected = true;
+            }
+
+        }
     }
 
 }

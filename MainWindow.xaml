@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.39" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico">
+        Title="Slazanger's Map Tool 0.40" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico" Loaded="Window_Loaded">
 
     <Window.Resources>
     </Window.Resources>
@@ -46,13 +46,24 @@
                 <xcad:LayoutRoot>
                     <xcad:LayoutRoot.RootPanel>
                         <xcad:LayoutPanel>
-                            <xcad:LayoutDocumentPane ShowHeader="False" AllowDuplicateContent="False">
-
-                                <xcad:LayoutDocument Title="Region" CanClose="False" CanFloat="True" ContentId="MapRegionContentID">
+                            <xcad:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False" >
+                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
                                     <local:RegionControl x:Name="RegionRC" />
                                 </xcad:LayoutDocument>
+                            
+                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Universe">
+                                    <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1" >
+                                        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Canvas x:Name="MainUniverseCanvas"   Margin="5" Width="1050" Height="800" HorizontalAlignment="Stretch" />
+                                        </Viewbox>
+
+                                    </Grid>
+                               </xcad:LayoutDocument>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutPanel>
+
+                        
+                        
                     </xcad:LayoutRoot.RootPanel>
 
                     <xcad:LayoutRoot.RightSide>

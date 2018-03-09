@@ -250,6 +250,18 @@ namespace SMT
             }
         }
 
+        public event PropertyChangedEventHandler RegionChanged;
+
+        protected void OnRegionChanged(string name)
+        {
+            PropertyChangedEventHandler handler = RegionChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+
 
 
 
@@ -330,6 +342,7 @@ namespace SMT
 
             RegionSelectCB.ItemsSource = EM.Regions;
             SelectRegion(MapConf.DefaultRegion);
+
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick; ;
@@ -427,6 +440,8 @@ namespace SMT
 
             // select the item in the dropdown
             RegionSelectCB.SelectedItem = Region;
+
+            OnRegionChanged(regionName);
         }
 
         /// <summary>
@@ -903,6 +918,7 @@ namespace SMT
                     Label charText = new Label();
                     charText.Content = c.Name;
                     charText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+                    charText.IsHitTestVisible = false;
 
                     if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
                     {

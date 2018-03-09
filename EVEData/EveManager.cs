@@ -545,70 +545,70 @@ namespace SMT.EVEData
             Regions = new List<MapRegion>();
 
             // manually add the regions we care about
-            Regions.Add(new MapRegion("Aridia"));
-            Regions.Add(new MapRegion("Black Rise"));
-            Regions.Add(new MapRegion("The Bleak Lands"));
-            Regions.Add(new MapRegion("Branch"));
-            Regions.Add(new MapRegion("Cache"));
-            Regions.Add(new MapRegion("Catch"));
-            Regions.Add(new MapRegion("The Citadel"));
-            Regions.Add(new MapRegion("Cloud Ring"));
-            Regions.Add(new MapRegion("Cobalt Edge"));
-            Regions.Add(new MapRegion("Curse"));
-            Regions.Add(new MapRegion("Deklein"));
-            Regions.Add(new MapRegion("Delve"));
-            Regions.Add(new MapRegion("Derelik"));
-            Regions.Add(new MapRegion("Detorid"));
-            Regions.Add(new MapRegion("Devoid"));
-            Regions.Add(new MapRegion("Domain"));
-            Regions.Add(new MapRegion("Esoteria"));
-            Regions.Add(new MapRegion("Essence"));
-            Regions.Add(new MapRegion("Etherium Reach"));
-            Regions.Add(new MapRegion("Everyshore"));
-            Regions.Add(new MapRegion("Fade"));
-            Regions.Add(new MapRegion("Feythabolis"));
-            Regions.Add(new MapRegion("The Forge"));
-            Regions.Add(new MapRegion("Fountain"));
-            Regions.Add(new MapRegion("Geminate"));
-            Regions.Add(new MapRegion("Genesis"));
-            Regions.Add(new MapRegion("Great Wildlands"));
-            Regions.Add(new MapRegion("Heimatar"));
-            Regions.Add(new MapRegion("Immensea"));
-            Regions.Add(new MapRegion("Impass"));
-            Regions.Add(new MapRegion("Insmother"));
-            Regions.Add(new MapRegion("Kador"));
-            Regions.Add(new MapRegion("The Kalevala Expanse"));
-            Regions.Add(new MapRegion("Khanid"));
-            Regions.Add(new MapRegion("Kor-Azor"));
-            Regions.Add(new MapRegion("Lonetrek"));
-            Regions.Add(new MapRegion("Malpais"));
-            Regions.Add(new MapRegion("Metropolis"));
-            Regions.Add(new MapRegion("Molden Heath"));
-            Regions.Add(new MapRegion("Oasa"));
-            Regions.Add(new MapRegion("Omist"));
-            Regions.Add(new MapRegion("Outer Passage"));
-            Regions.Add(new MapRegion("Outer Ring"));
-            Regions.Add(new MapRegion("Paragon Soul"));
-            Regions.Add(new MapRegion("Period Basis"));
-            Regions.Add(new MapRegion("Perrigen Falls"));
-            Regions.Add(new MapRegion("Placid"));
-            Regions.Add(new MapRegion("Providence"));
-            Regions.Add(new MapRegion("Pure Blind"));
-            Regions.Add(new MapRegion("Querious"));
-            Regions.Add(new MapRegion("Scalding Pass"));
-            Regions.Add(new MapRegion("Sinq Laison"));
-            Regions.Add(new MapRegion("Solitude"));
-            Regions.Add(new MapRegion("The Spire"));
-            Regions.Add(new MapRegion("Stain"));
-            Regions.Add(new MapRegion("Syndicate"));
-            Regions.Add(new MapRegion("Tash-Murkon"));
-            Regions.Add(new MapRegion("Tenal"));
-            Regions.Add(new MapRegion("Tenerifis"));
-            Regions.Add(new MapRegion("Tribute"));
-            Regions.Add(new MapRegion("Vale of the Silent"));
-            Regions.Add(new MapRegion("Venal"));
-            Regions.Add(new MapRegion("Verge Vendor"));
-            Regions.Add(new MapRegion("Wicked Creek"));
+            Regions.Add(new MapRegion("Aridia", "Amarr", 140, 405));
+            Regions.Add(new MapRegion("Black Rise", "Caldari", 450, 250));
+            Regions.Add(new MapRegion("The Bleak Lands", "Amarr", 500, 460));
+            Regions.Add(new MapRegion("Branch", "", 520, 50));
+            Regions.Add(new MapRegion("Cache", "", 965, 400));
+            Regions.Add(new MapRegion("Catch", "", 555, 640));
+            Regions.Add(new MapRegion("The Citadel", "Caldari", 505, 310));
+            Regions.Add(new MapRegion("Cloud Ring", "", 250, 120));
+            Regions.Add(new MapRegion("Cobalt Edge", "", 950, 65));
+            Regions.Add(new MapRegion("Curse", "Angel Cartel", 675, 560 ));
+            Regions.Add(new MapRegion("Deklein", "", 410, 75));
+            Regions.Add(new MapRegion("Delve", "Blood Raider", 115, 605));
+            Regions.Add(new MapRegion("Derelik", "Ammatar", 650,485));
+            Regions.Add(new MapRegion("Detorid", "", 880, 700));
+            Regions.Add(new MapRegion("Devoid", "Amarr", 495, 530));
+            Regions.Add(new MapRegion("Domain", "Amarr", 405, 480));
+            Regions.Add(new MapRegion("Esoteria", "", 440, 725));
+            Regions.Add(new MapRegion("Essence", "Gallente",370, 290 ));
+            Regions.Add(new MapRegion("Etherium Reach", "", 785, 310));
+            Regions.Add(new MapRegion("Everyshore", "Gallente", 330, 365));
+            Regions.Add(new MapRegion("Fade", "", 360, 130));
+            Regions.Add(new MapRegion("Feythabolis", "", 535,755 ));
+            Regions.Add(new MapRegion("The Forge", "Caldari", 600, 300));
+            Regions.Add(new MapRegion("Fountain", "", 60, 250));
+            Regions.Add(new MapRegion("Geminate", "The Society", 665, 245));
+            Regions.Add(new MapRegion("Genesis", "", 240, 430));
+            Regions.Add(new MapRegion("Great Wildlands", "Thukker Tribe", 815, 460));
+            Regions.Add(new MapRegion("Heimatar", "Minmatar", 610, 430));
+            Regions.Add(new MapRegion("Immensea", "", 675, 615));
+            Regions.Add(new MapRegion("Impass", "", 600, 695));
+            Regions.Add(new MapRegion("Insmother", "", 945, 580));
+            Regions.Add(new MapRegion("Kador", "Amarr", 330, 440));
+            Regions.Add(new MapRegion("The Kalevala Expanse", "", 745, 185));
+            Regions.Add(new MapRegion("Khanid", "Khanid", 235, 570));
+            Regions.Add(new MapRegion("Kor-Azor", "Amarr", 250, 505));
+            Regions.Add(new MapRegion("Lonetrek", "Caldari", 550, 230));
+            Regions.Add(new MapRegion("Malpais", "", 885, 260));
+            Regions.Add(new MapRegion("Metropolis", "Minmatar", 665, 365));
+            Regions.Add(new MapRegion("Molden Heath", "Minmatar", 730, 430));
+            Regions.Add(new MapRegion("Oasa", "", 945, 160));
+            Regions.Add(new MapRegion("Omist", "", 720, 740));
+            Regions.Add(new MapRegion("Outer Passage", "", 965, 230));
+            Regions.Add(new MapRegion("Outer Ring", "ORE", 120, 140));
+            Regions.Add(new MapRegion("Paragon Soul", "", 320, 740));
+            Regions.Add(new MapRegion("Period Basis", "", 220, 700));
+            Regions.Add(new MapRegion("Perrigen Falls", "", 800, 130));
+            Regions.Add(new MapRegion("Placid", "Gallente", 300, 220));
+            Regions.Add(new MapRegion("Providence", "", 505, 585));
+            Regions.Add(new MapRegion("Pure Blind", "", 435, 190));
+            Regions.Add(new MapRegion("Querious", "", 340, 640));
+            Regions.Add(new MapRegion("Scalding Pass", "", 800, 540));
+            Regions.Add(new MapRegion("Sinq Laison", "Gallente", 420, 375));
+            Regions.Add(new MapRegion("Solitude", "Gallente", 155, 335));
+            Regions.Add(new MapRegion("The Spire", "", 860, 350));
+            Regions.Add(new MapRegion("Stain", "Sansha", 450, 675));
+            Regions.Add(new MapRegion("Syndicate", "Syndicate", 180, 250));
+            Regions.Add(new MapRegion("Tash-Murkon", "Amarr", 365, 545));
+            Regions.Add(new MapRegion("Tenal", "", 700, 70));
+            Regions.Add(new MapRegion("Tenerifis", "", 715, 675));
+            Regions.Add(new MapRegion("Tribute", "", 535, 145));
+            Regions.Add(new MapRegion("Vale of the Silent", "", 615, 190));
+            Regions.Add(new MapRegion("Venal", "Guristas", 570, 105 ));
+            Regions.Add(new MapRegion("Verge Vendor", "Gallente", 245, 330));
+            Regions.Add(new MapRegion("Wicked Creek", "", 790, 615));
 
             SystemIDToName = new SerializableDictionary<string, string>();
 
@@ -829,6 +829,54 @@ namespace SMT.EVEData
                 }
             }
 
+            foreach (System s in Systems)
+            {
+                NameToSystem[s.Name] = s;
+            }
+
+
+            foreach (MapRegion rr in Regions)
+            {
+                // link to the real systems
+                foreach (MapSystem ms in rr.MapSystems.Values.ToList())
+                {
+                    ms.ActualSystem = GetEveSystem(ms.Name);
+                }
+            }
+
+            // collect the system points to generate them from 
+            List<Vector2f> regionpoints = new List<Vector2f>();
+
+
+
+
+            // now Generate the region links
+            foreach (MapRegion mr in Regions)
+            {
+                mr.RegionLinks = new List<string>();
+
+                regionpoints.Add(new Vector2f(mr.RegionX, mr.RegionY));
+
+                foreach (MapSystem ms in mr.MapSystems.Values.ToList())
+                {
+                    // only check systems in the region
+                    if(ms.ActualSystem.Region == mr.Name)
+                    {
+                        foreach(string s in ms.ActualSystem.Jumps)
+                        {
+                            System sys = GetEveSystem(s);
+                            // we have link to another region
+                            if(sys.Region != mr.Name)
+                            {
+                                if(!mr.RegionLinks.Contains(sys.Region))
+                                {
+                                    mr.RegionLinks.Add(sys.Region);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
 
             // now serialise the classes to disk

@@ -10,6 +10,12 @@ namespace SMT.EVEData
         /// </summary>
         public string Name { get; set; }
 
+        public string Faction { get; set; }
+
+        public double RegionX { get; set; }
+
+        public double RegionY { get; set; }
+
         /// <summary>
         /// "Name" on Dotlan, used in URL's etc
         /// </summary>
@@ -17,19 +23,27 @@ namespace SMT.EVEData
 
         public SerializableDictionary<string, MapSystem> MapSystems { get; set; }
 
-
+        public List<string> RegionLinks { get; set; }
 
         public MapRegion()
         {
             MapSystems = new SerializableDictionary<string, MapSystem>();
+            RegionLinks = new List<string>();
         }
 
-        public MapRegion(string name)
+        public MapRegion(string name, string faction, double regionX, double regionY)
         {
             Name = name;
             DotLanRef = name.Replace(" ", "_");
 
+            Faction = faction;
+            RegionX = regionX;
+            RegionY = regionY;
+
+
+
             MapSystems = new SerializableDictionary<string, MapSystem>();
+            RegionLinks = new List<string>();
         }
 
 
