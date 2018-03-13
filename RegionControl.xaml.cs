@@ -1110,6 +1110,8 @@ namespace SMT
 
 
             SolidColorBrush infoColour = new SolidColorBrush(DataColor);
+            SolidColorBrush zkbColour = new SolidColorBrush(Colors.Purple);
+
             SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
@@ -1258,6 +1260,42 @@ namespace SMT
                     }
                 }
             }
+
+            Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
+            {
+                foreach (EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream)
+                {
+                    if (ZKBBaseFeed.Keys.Contains(zs.SystemID))
+                    {
+                        ZKBBaseFeed[zs.SystemID]++;
+                    }
+                    else
+                    {
+                        ZKBBaseFeed[zs.SystemID] = 1;
+                    }
+                }
+
+
+                foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
+                {
+                    if (ZKBBaseFeed.Keys.Contains(sys.ActualSystem.ID))
+                    {
+                        double ZKBValue = 24 + ((double)ZKBBaseFeed[sys.ActualSystem.ID] * ESIOverlayScale * 2);
+
+                        Shape infoCircle = new Ellipse() { Height = ZKBValue, Width = ZKBValue };
+                        infoCircle.Fill = zkbColour;
+
+                        Canvas.SetZIndex(infoCircle, 11);
+                        Canvas.SetLeft(infoCircle, sys.LayoutX - (ZKBValue / 2));
+                        Canvas.SetTop(infoCircle, sys.LayoutY - (ZKBValue / 2));
+                        MainCanvas.Children.Add(infoCircle);
+                        DynamicMapElements.Add(infoCircle);
+
+
+                    }
+                }
+            }
+
         }
 
         /// <summary>

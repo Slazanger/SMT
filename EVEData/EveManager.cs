@@ -536,8 +536,12 @@ namespace SMT.EVEData
             }
         }
 
+
+
+
+
         /// <summary>
-        /// Scrape the maps from dotlan and initialise the region data from dotland
+        /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
         public void CreateFromScratch()
         {
@@ -973,6 +977,8 @@ namespace SMT.EVEData
 
 
             InitTheraConnections();
+
+            InitZKillFeed();
 
         }
 
@@ -1644,6 +1650,15 @@ namespace SMT.EVEData
             }
         }
 
+
+
+        public ZKillRedisQ ZKillFeed { get; set; }
+
+        public void InitZKillFeed()
+        {
+            ZKillFeed = new ZKillRedisQ();
+            ZKillFeed.Initialise();
+        }
 
 
 

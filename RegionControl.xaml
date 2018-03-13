@@ -64,17 +64,17 @@
             </zoombox1:ZoomControl>
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
 
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="210" Height="160" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis},  diag:PresentationTraceSources.TraceLevel=High}" >
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="190" Height="140" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis},  diag:PresentationTraceSources.TraceLevel=High}" >
                 <Canvas x:Name="ToolBoxCanvas">
                     <Grid Canvas.Left="0" Canvas.Top="2" Width="210" >
 
 
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0" Width="190">
                             <Label x:Name="RegionNameLabel" Content="Region" FontSize="16" Grid.Column="1" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima"/>
 
-                            <StackPanel Orientation="Horizontal" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                                <ToggleButton x:Name="ToggleSecurityBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemSecurity}" ToolTip="Show System Security Owners" >
+                                <ToggleButton x:Name="ToggleSecurityBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemSecurity}" ToolTip="Show System Security Owners" Width="36" Height="36" >
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -94,7 +94,7 @@
                                 </ToggleButton>
 
 
-                                <ToggleButton x:Name="ToggleSOVBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSov}" ToolTip="Show Sov Owners" >
+                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSov}" ToolTip="Show Sov Owners" Width="36" Height="36">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -114,7 +114,7 @@
                                 </ToggleButton>
 
 
-                                <ToggleButton x:Name="ToggleStandingsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Standings" >
+                                <ToggleButton x:Name="ToggleStandingsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Standings" Width="36" Height="36" >
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -134,7 +134,7 @@
                                 </ToggleButton>
 
 
-                                <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" >
+                                <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" Width="36" Height="36" >
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -162,11 +162,11 @@
 
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Margin="2,2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
 
 
-                                <ToggleButton x:Name="ToggleJumpsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" >
+                                <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="36" Height="36" >
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -187,7 +187,7 @@
 
 
 
-                                <ToggleButton x:Name="TogglePodKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour">
+                                <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour" Width="36" Height="36">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -206,7 +206,7 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleShipKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour">
+                                <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour" Width="36" Height="36">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -226,7 +226,7 @@
 
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleRatKillsBtn" Margin="2,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour">
+                                <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour" Width="36" Height="36">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -250,7 +250,7 @@
                             </StackPanel>
 
 
-                            <Slider  Width="190" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}"/>
+                            <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18"/>
                         </StackPanel>
                         
 

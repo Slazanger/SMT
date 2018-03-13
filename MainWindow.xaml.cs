@@ -154,13 +154,16 @@ namespace SMT
                 }
             }
 
-            RegionRC.RegionChanged += RegionRC_RegionChanged;
 
 
 
             RegionRC.MapConf = MapConf;
             RegionRC.Init();
             RegionRC.SelectRegion(MapConf.DefaultRegion);
+
+
+            RegionRC.RegionChanged += RegionRC_RegionChanged;
+
 
             // load the anom data
             string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
@@ -213,6 +216,9 @@ namespace SMT
             uiRefreshTimer.Interval = new TimeSpan(0, 0, 4);
             uiRefreshTimer.Start();
 
+
+
+            ZKBFeed.ItemsSource = EVEManager.ZKillFeed.KillStream;
 
         }
 
@@ -657,6 +663,11 @@ namespace SMT
                 RegionRC.SelectRegion(mr.Name);
                 RegionLayoutDoc.IsSelected = true;
             }
+
+        }
+
+        private void ZKBFeed_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
 
         }
     }

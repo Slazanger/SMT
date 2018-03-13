@@ -148,6 +148,7 @@
     <Compile Include="EVEData\MapRegion.cs" />
     <Compile Include="EVEData\EveManager.cs" />
     <Compile Include="EVEData\Thera.cs" />
+    <Compile Include="EVEData\ZKBData.cs" />
     <Compile Include="EVEData\ZKillRedisQ.cs" />
     <Compile Include="External\csDelaunay\Delaunay\Edge.cs" />
     <Compile Include="External\csDelaunay\Delaunay\EdgeList.cs" />

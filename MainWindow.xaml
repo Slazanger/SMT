@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.40" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico" Loaded="Window_Loaded">
+        Title="Slazanger's Map Tool 0.41" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico" Loaded="Window_Loaded">
 
     <Window.Resources>
     </Window.Resources>
@@ -82,6 +82,21 @@
                                         </ListBox>
                                     </Grid>
                                 </xcad:LayoutAnchorable>
+
+                                <xcad:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                    <Grid Background="#FFE5E5E5">
+                                        <ListBox x:Name="ZKBFeed" Margin="0,2" MouseDoubleClick="ZKBFeed_MouseDoubleClick">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+                                </xcad:LayoutAnchorable>
+
 
                                 <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
