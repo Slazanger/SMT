@@ -5,10 +5,7 @@ namespace SMT
 {
     public class MapColours
     {
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
 
         [Browsable(false)]
         public string Name { get; set; }

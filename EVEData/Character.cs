@@ -218,7 +218,7 @@ namespace SMT.EVEData
                 ActiveRoute.Clear();
             }
 
-            Waypoints.Add(EveManager.GetInstance().SystemIDToName[systemID]);
+            Waypoints.Add(EveManager.Instance.SystemIDToName[systemID]);
 
             routeNeedsUpdate = true;
 
@@ -273,8 +273,8 @@ namespace SMT.EVEData
                 start = end;
                 end = Waypoints[i];
 
-                EVEData.System startSys = EveManager.GetInstance().GetEveSystem(start);
-                EVEData.System endSys = EveManager.GetInstance().GetEveSystem(end);
+                EVEData.System startSys = EveManager.Instance.GetEveSystem(start);
+                EVEData.System endSys = EveManager.Instance.GetEveSystem(end);
 
                 UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/route/" + startSys.ID + "/" + endSys.ID + "/");
 
@@ -313,7 +313,7 @@ namespace SMT.EVEData
 
                                 for (int j = 1; j < systems.Length; j++)
                                 {
-                                    string sysName = EveManager.GetInstance().SystemIDToName[systems[j]];
+                                    string sysName = EveManager.Instance.SystemIDToName[systems[j]];
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
@@ -435,7 +435,7 @@ namespace SMT.EVEData
                             JObject obj = JObject.Load(jsr);
                             string sysID = obj["solar_system_id"].ToString();
 
-                            Location = EveManager.GetInstance().SystemIDToName[sysID];
+                            Location = EveManager.Instance.SystemIDToName[sysID];
                         }
                     }
                 }

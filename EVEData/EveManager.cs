@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿//-----------------------------------------------------------------------
+// EVE Manager
+//-----------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,112 +16,220 @@ using System.Windows;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SMT.EVEData
 {
+    /// <summary>
+    /// The main EVE Manager
+    /// </summary>
     public class EveManager
     {
-        private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
+        /// <summary>
+        /// Debug output log
+        /// </summary>
+        private static NLog.Logger outputLog = NLog.LogManager.GetCurrentClassLogger();
 
-        private static EveManager s_Instance;
+        /// <summary>
+        /// singleton instance of this class
+        /// </summary>
+        private static EveManager instance;
 
-        public static void SetInstance(EveManager instance)
+        /// <summary>
+        /// File system watcher
+        /// </summary>
+        private FileSystemWatcher intelFileWatcher;
+
+        /// <summary>
+        /// Read position map for the intel files
+        /// </summary>
+        private Dictionary<string, int> intelFileReadPos;
+
+        /// <summary>
+        /// Pending Access token 
+        /// </summary>
+        private string pendingAccessToken;
+
+        /// <summary>
+        /// Pending Token Type
+        /// </summary>
+        private string pendingTokenType;
+
+        /// <summary>
+        /// Pending Token Expiry
+        /// </summary>
+        private string pendingExpiresIn;
+
+        /// <summary>
+        /// Pending Refresh Token
+        /// </summary>
+        private string pendingRefreshToken;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EveManager" /> class
+        /// </summary>
+        public EveManager()
         {
-            s_Instance = instance;
-        }
+            LocalCharacters = new ObservableCollection<Character>();
 
-        public static EveManager GetInstance()
-        {
-            return s_Instance;
+            // ensure we have the cache folder setup
+            DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";
+            if (!Directory.Exists(DataCacheFolder))
+            {
+                Directory.CreateDirectory(DataCacheFolder);
+            }
+
+            string webCacheFoilder = DataCacheFolder + "\\WebCache";
+            if (!Directory.Exists(webCacheFoilder))
+            {
+                Directory.CreateDirectory(webCacheFoilder);
+            }
+
+            string portraitCacheFoilder = DataCacheFolder + "\\Portraits";
+            if (!Directory.Exists(portraitCacheFoilder))
+            {
+                Directory.CreateDirectory(portraitCacheFoilder);
+            }
+
+            string logosFoilder = DataCacheFolder + "\\Logos";
+            if (!Directory.Exists(logosFoilder))
+            {
+                Directory.CreateDirectory(logosFoilder);
+            }
+
+            AllianceIDToName = new SerializableDictionary<string, string>();
+            AllianceIDToTicker = new SerializableDictionary<string, string>();
+            NameToSystem = new Dictionary<string, System>();
         }
 
         /// <summary>
-        /// Master List of Regions
+        /// Intel Added Event Handler
+        /// </summary>
+        public delegate void IntelAddedEventHandler();
+
+        /// <summary>
+        /// Intel Added Event
+        /// </summary>
+        public event IntelAddedEventHandler IntelAddedEvent;
+
+        /// <summary>
+        /// Gets or sets the Singleton Instance of the EVEManager
+        /// </summary>
+        public static EveManager Instance
+        {
+            get
+            {
+                return instance;
+            }
+
+            set
+            {
+                EveManager.instance = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the master list of Regions
         /// </summary>
         public List<MapRegion> Regions { get; set; }
 
+        /// <summary>
+        /// Gets or sets the master List of Systems
+        /// </summary>
         public List<System> Systems { get; set; }
 
         /// <summary>
-        /// Lookup from Internal ID to Name
+        /// Gets or sets the System ID to Name dictionary
         /// </summary>
         public SerializableDictionary<string, string> SystemIDToName { get; set; }
 
-
+        /// <summary>
+        /// Gets or sets the Alliance ID to Name dictionary
+        /// </summary>
         public SerializableDictionary<string, string> AllianceIDToName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Alliance ID to Alliance Ticker dictionary
+        /// </summary>
         public SerializableDictionary<string, string> AllianceIDToTicker { get; set; }
 
-
-        private Dictionary<string, System> NameToSystem { get; set; }
-
-
-        public string GetAllianceName(string ID)
-        {
-            string Name = String.Empty;
-            if (AllianceIDToName.Keys.Contains(ID))
-            {
-                Name = AllianceIDToName[ID];
-            }
-            return Name;
-        }
-
-        public string GetAllianceTicker(string ID)
-        {
-            string Ticker = String.Empty;
-            if (AllianceIDToTicker.Keys.Contains(ID))
-            {
-                Ticker = AllianceIDToTicker[ID];
-            }
-            return Ticker;
-        }
-
-
-
         /// <summary>
-        /// List of Jumb bridoges
+        /// Gets or sets the Intel List
         /// </summary>
+        public BindingList<EVEData.IntelData> IntelDataList { get; set; }
 
         /// <summary>
-        /// Folder to cache dotland svg's etc to
+        /// Gets or sets the list of Characters we are tracking
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public ObservableCollection<Character> LocalCharacters { get; set; }
+
+        /// <summary>
+        /// Gets or sets the folder to cache dotland svg's etc to
         /// </summary>
         public string DataCacheFolder { get; set; }
 
-        
-        [XmlIgnoreAttribute]
-        public ObservableCollection<Character> LocalCharacters { get; set; }
-        public void LoadCharacters()
+        /// <summary>
+        /// Gets or sets the current list of thera connections
+        /// </summary>
+        public ObservableCollection<TheraConnection> TheraConnections { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current list of ZKillData
+        /// </summary>
+        public ZKillRedisQ ZKillFeed { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current list of Jump Bridges
+        /// </summary>
+        public List<JumpBridge> JumpBridges { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Name to System dictionary
+        /// </summary>
+        private Dictionary<string, System> NameToSystem { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current list of intel filters used to monitor the local log files
+        /// </summary>
+        private List<string> IntelFilters { get; set; }
+
+        /// <summary>
+        /// Get the alliance name from the alliance ID
+        /// </summary>
+        /// <param name="id">Alliance ID</param>
+        /// <returns>Alliance Name</returns>
+        public string GetAllianceName(string id)
         {
-            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
-            if (!File.Exists(dataFilename))
+            string name = string.Empty;
+            if (AllianceIDToName.Keys.Contains(id))
             {
-                return;
+                name = AllianceIDToName[id];
             }
 
-            try
-            {
-                ObservableCollection<Character> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
-
-                FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
-                XmlReader xmlr = XmlReader.Create(fs);
-
-                loadList = (ObservableCollection<Character>)xms.Deserialize(xmlr);
-
-                foreach (Character c in loadList)
-                {
-                    c.ESIAccessToken = string.Empty;
-                    c.ESIAccessTokenExpiry = DateTime.MinValue;
-                    c.LocalChatFile = string.Empty;
-                    c.Location = string.Empty;
-                    c.Update();
-
-                    LocalCharacters.Add(c);
-                }
-            }
-            catch { }
+            return name;
         }
 
+        /// <summary>
+        /// Gets the alliance ticker eg "TEST" from the alliance ID
+        /// </summary>
+        /// <param name="id">Alliance ID</param>
+        /// <returns>Alliance Ticker</returns>
+        public string GetAllianceTicker(string id)
+        {
+            string ticker = string.Empty;
+            if (AllianceIDToTicker.Keys.Contains(id))
+            {
+                ticker = AllianceIDToTicker[id];
+            }
+
+            return ticker;
+        }
+
+        /// <summary>
+        /// Save the Data to disk
+        /// </summary>
         public void SaveData()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
@@ -142,17 +251,10 @@ namespace SMT.EVEData
                 xms.Serialize(tw, saveList);
             }
 
-
-
-
             // now serialise the caches to disk
-            SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
-            SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
-
-
+            Utils.SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+            Utils.SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
         }
-
-        public List<JumpBridge> JumpBridges { get; set; }
 
         /// <summary>
         /// Load the jump bridge data from disk
@@ -205,28 +307,16 @@ namespace SMT.EVEData
             }
         }
 
-        private FileSystemWatcher IntelFileWatcher;
-
-        private Dictionary<string, int> IntelFileReadPos;
-
-        public BindingList<EVEData.IntelData> IntelDataList { get; set; }
-
-        public List<string> IntelFilters { get; set; }
-
-
-
-        public delegate void IntelAddedEventHandler();
-
-        public event IntelAddedEventHandler IntelAddedEvent;
-
-
+        /// <summary>
+        /// Setup the intel watcher;  Loads the intel channel filter list and creates the file system watchers
+        /// </summary>
         public void SetupIntelWatcher()
         {
             IntelFilters = new List<string>();
             IntelDataList = new BindingList<IntelData>();
             string intelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
 
-            OutputLog.Info("Loading Intel File Filer from  {0}", intelFileFilter);
+            outputLog.Info("Loading Intel File Filer from  {0}", intelFileFilter);
             if (File.Exists(intelFileFilter))
             {
                 StreamReader file = new StreamReader(intelFileFilter);
@@ -236,25 +326,24 @@ namespace SMT.EVEData
                     line.Trim();
                     if (line != string.Empty)
                     {
-
-                        OutputLog.Info("adding intel filer : {0}", line);
+                        outputLog.Info("adding intel filer : {0}", line);
                         IntelFilters.Add(line);
                     }
                 }
             }
 
-            IntelFileReadPos = new Dictionary<string, int>();
+            intelFileReadPos = new Dictionary<string, int>();
 
             string eveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
             if (Directory.Exists(eveLogFolder))
             {
-                OutputLog.Info("adding file watcher to : {0}", eveLogFolder);
+                outputLog.Info("adding file watcher to : {0}", eveLogFolder);
 
-                IntelFileWatcher = new FileSystemWatcher(eveLogFolder);
-                IntelFileWatcher.Filter = "*.txt";
-                IntelFileWatcher.EnableRaisingEvents = true;
-                IntelFileWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
-                IntelFileWatcher.Changed += IntelFileWatcher_Changed;
+                intelFileWatcher = new FileSystemWatcher(eveLogFolder);
+                intelFileWatcher.Filter = "*.txt";
+                intelFileWatcher.EnableRaisingEvents = true;
+                intelFileWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
+                intelFileWatcher.Changed += IntelFileWatcher_Changed;
             }
 
             // -----------------------------------------------------------------
@@ -301,318 +390,97 @@ namespace SMT.EVEData
                             Thread.Sleep(200);
                         }
                     }
+
                     Thread.Sleep(2000);
                 }
             }).Start();
-            /// END SUPERHACK
-            /// -----------------------------------------------------------------
+
+            // END SUPERHACK
+            // -----------------------------------------------------------------
         }
 
-        public static Encoding GetEncoding(string filename)
+        /// <summary>
+        /// Updaate The Universe Data from the various ESI end points
+        /// </summary>
+        public void UpdateESIUniverseData()
         {
-            // Read the BOM
-            var bom = new byte[4];
-            using (var file = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                file.Read(bom, 0, 4);
-            }
-
-            // Analyze the BOM
-            if (bom[0] == 0x2b && bom[1] == 0x2f && bom[2] == 0x76) return Encoding.UTF7;
-            if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf) return Encoding.UTF8;
-            if (bom[0] == 0xff && bom[1] == 0xfe) return Encoding.Unicode; //UTF-16LE
-            if (bom[0] == 0xfe && bom[1] == 0xff) return Encoding.BigEndianUnicode; //UTF-16BE
-            if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff) return Encoding.UTF32;
-            return Encoding.Default;
+            StartUpdateKillsFromESI();
+            StartUpdateJumpsFromESI();
+            StartUpdateSOVFromESI();
         }
-
-        private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            string changedFile = e.FullPath;
-
-            OutputLog.Info("File Watcher triggered : {0}", changedFile);
-
-            bool processFile = false;
-            bool localChat = false;
-
-            foreach (string intelFilterStr in IntelFilters)
-            {
-                if (changedFile.Contains(intelFilterStr))
-                {
-                    processFile = true;
-                    break;
-                }
-            }
-
-            if (changedFile.Contains("Local_"))
-            {
-                localChat = true;
-                processFile = true;
-            }
-
-            if (processFile)
-            {
-
-                try
-                {
-                    Encoding fe = GetEncoding(changedFile);
-
-
-                    FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-
-                    OutputLog.Info("Log File Encoding : {0}", fe.ToString());
-
-
-                    StreamReader file = new StreamReader(ifs, fe);
-
-                    int fileReadFrom = 0;
-
-                    // have we seen this file before
-                    if (IntelFileReadPos.Keys.Contains<string>(changedFile))
-                    {
-                        fileReadFrom = IntelFileReadPos[changedFile];
-                    }
-                    else
-                    {
-                        if (localChat)
-                        {
-                            OutputLog.Info("Processing file : {0}", changedFile);
-                            string system = string.Empty;
-                            string characterName = string.Empty;
-
-                            // read the iniital block
-                            while (!file.EndOfStream)
-                            {
-                                string l = file.ReadLine();
-                                fileReadFrom++;
-
-                                if (l.Contains("Channel ID"))
-                                {
-                                    string temp = l.Split(',')[1].Split(')')[0].Trim();
-                                    if (SystemIDToName.Keys.Contains(temp))
-                                    {
-                                        system = SystemIDToName[temp];
-                                    }
-
-                                    // now can read the next line
-                                    l = file.ReadLine(); // should be the "Channel Name : Local"
-                                    l = file.ReadLine();
-
-                                    characterName = l.Split(':')[1].Trim();
-
-                                    bool addChar = true;
-                                    foreach (EVEData.Character c in LocalCharacters)
-                                    {
-                                        if (characterName == c.Name)
-                                        {
-                                            c.Location = system;
-                                            c.LocalChatFile = changedFile;
-                                            addChar = false;
-                                        }
-                                    }
-
-                                    if (addChar)
-                                    {
-                                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                                        {
-                                            LocalCharacters.Add(new EVEData.Character(characterName, changedFile, system));
-                                        }), DispatcherPriority.ApplicationIdle);
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-
-                        while (file.ReadLine() != null)
-                        {
-                            fileReadFrom++;
-                        }
-
-                        fileReadFrom--;
-                        file.BaseStream.Seek(0, SeekOrigin.Begin);
-                    }
-
-                    for (int i = 0; i < fileReadFrom; i++)
-                    {
-                        file.ReadLine();
-                    }
-
-                    string line = file.ReadLine();
-
-
-                    while (line != null)
-                    {                    // trim any items off the front
-                        if (line.Contains("[") && line.Contains("]"))
-                        {
-                            line = line.Substring(line.IndexOf("["));
-                        }
-
-                        fileReadFrom++;
-
-                        if (localChat)
-                        {
-
-                            if (line.StartsWith("[") && line.Contains("EVE System > Channel changed to Local"))
-                            {
-                                string system = line.Split(':').Last().Trim();
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
-                                {
-                                    foreach (EVEData.Character c in LocalCharacters)
-                                    {
-                                        if (c.LocalChatFile == changedFile)
-                                        {
-                                            OutputLog.Info("Character {0} moved from {1} to {2}", c.Name, c.Location, system);
-
-                                            c.Location = system;
-
-                                        }
-                                    }
-                                }), DispatcherPriority.ApplicationIdle);
-                            }
-                        }
-                        else
-                        {
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                // check if it is in the intel list already (ie if you have multiple clients running)
-                                bool addToIntel = true;
-                                foreach (EVEData.IntelData idl in IntelDataList)
-                                {
-                                    if (idl.RawIntelString == line)
-                                    {
-                                        addToIntel = false;
-                                        break;
-                                    }
-                                }
-
-                                if (addToIntel)
-                                {
-                                    EVEData.IntelData id = new EVEData.IntelData(line);
-
-                                    foreach (string s in id.IntelString.Split(' '))
-                                    {
-                                        if (DoesSystemExist(s))
-                                        {
-                                            OutputLog.Info("Adding Intel Line : {0} ", line);
-                                            id.Systems.Add(s);
-                                        }
-                                    }
-                                    IntelDataList.Insert(0, id);
-
-
-                                    if (IntelAddedEvent != null)
-                                    {
-                                        IntelAddedEvent();
-                                    }
-                                }
-                                else
-                                {
-                                    OutputLog.Info("Already have Line : {0} ", line);
-                                }
-                            }), DispatcherPriority.ApplicationIdle);
-                        }
-
-                        line = file.ReadLine();
-                    }
-
-                    ifs.Close();
-
-                    IntelFileReadPos[changedFile] = fileReadFrom;
-                    OutputLog.Info("File Read pos : {0} {1}", changedFile, fileReadFrom);
-
-                }
-                catch (Exception ex)
-                {
-                    OutputLog.Info("Intel Process Failed : {0}", ex.ToString());
-                }
-
-            }
-            else
-            {
-                OutputLog.Info("Skipping File : {0}", changedFile);
-
-            }
-        }
-
-
-
-
 
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
         public void CreateFromScratch()
         {
-
             Regions = new List<MapRegion>();
 
             // manually add the regions we care about
             Regions.Add(new MapRegion("Aridia", "Amarr", 140, 405));
             Regions.Add(new MapRegion("Black Rise", "Caldari", 450, 250));
             Regions.Add(new MapRegion("The Bleak Lands", "Amarr", 500, 460));
-            Regions.Add(new MapRegion("Branch", "", 520, 50));
-            Regions.Add(new MapRegion("Cache", "", 965, 400));
-            Regions.Add(new MapRegion("Catch", "", 555, 640));
+            Regions.Add(new MapRegion("Branch", string.Empty, 520, 50));
+            Regions.Add(new MapRegion("Cache", string.Empty, 965, 400));
+            Regions.Add(new MapRegion("Catch", string.Empty, 555, 640));
             Regions.Add(new MapRegion("The Citadel", "Caldari", 505, 310));
-            Regions.Add(new MapRegion("Cloud Ring", "", 250, 120));
-            Regions.Add(new MapRegion("Cobalt Edge", "", 950, 65));
-            Regions.Add(new MapRegion("Curse", "Angel Cartel", 675, 560 ));
-            Regions.Add(new MapRegion("Deklein", "", 410, 75));
+            Regions.Add(new MapRegion("Cloud Ring", string.Empty, 250, 120));
+            Regions.Add(new MapRegion("Cobalt Edge", string.Empty, 950, 65));
+            Regions.Add(new MapRegion("Curse", "Angel Cartel", 675, 560));
+            Regions.Add(new MapRegion("Deklein", string.Empty, 410, 75));
             Regions.Add(new MapRegion("Delve", "Blood Raider", 115, 605));
-            Regions.Add(new MapRegion("Derelik", "Ammatar", 650,485));
-            Regions.Add(new MapRegion("Detorid", "", 880, 700));
+            Regions.Add(new MapRegion("Derelik", "Ammatar", 650, 485));
+            Regions.Add(new MapRegion("Detorid", string.Empty, 880, 700));
             Regions.Add(new MapRegion("Devoid", "Amarr", 495, 530));
             Regions.Add(new MapRegion("Domain", "Amarr", 405, 480));
-            Regions.Add(new MapRegion("Esoteria", "", 440, 725));
-            Regions.Add(new MapRegion("Essence", "Gallente",370, 290 ));
-            Regions.Add(new MapRegion("Etherium Reach", "", 785, 310));
+            Regions.Add(new MapRegion("Esoteria", string.Empty, 440, 725));
+            Regions.Add(new MapRegion("Essence", "Gallente", 370, 290));
+            Regions.Add(new MapRegion("Etherium Reach", string.Empty, 785, 310));
             Regions.Add(new MapRegion("Everyshore", "Gallente", 330, 365));
-            Regions.Add(new MapRegion("Fade", "", 360, 130));
-            Regions.Add(new MapRegion("Feythabolis", "", 535,755 ));
+            Regions.Add(new MapRegion("Fade", string.Empty, 360, 130));
+            Regions.Add(new MapRegion("Feythabolis", string.Empty, 535, 755));
             Regions.Add(new MapRegion("The Forge", "Caldari", 600, 300));
-            Regions.Add(new MapRegion("Fountain", "", 60, 250));
+            Regions.Add(new MapRegion("Fountain", string.Empty, 60, 250));
             Regions.Add(new MapRegion("Geminate", "The Society", 665, 245));
-            Regions.Add(new MapRegion("Genesis", "", 240, 430));
+            Regions.Add(new MapRegion("Genesis", string.Empty, 240, 430));
             Regions.Add(new MapRegion("Great Wildlands", "Thukker Tribe", 815, 460));
             Regions.Add(new MapRegion("Heimatar", "Minmatar", 610, 430));
-            Regions.Add(new MapRegion("Immensea", "", 675, 615));
-            Regions.Add(new MapRegion("Impass", "", 600, 695));
-            Regions.Add(new MapRegion("Insmother", "", 945, 580));
+            Regions.Add(new MapRegion("Immensea", string.Empty, 675, 615));
+            Regions.Add(new MapRegion("Impass", string.Empty, 600, 695));
+            Regions.Add(new MapRegion("Insmother", string.Empty, 945, 580));
             Regions.Add(new MapRegion("Kador", "Amarr", 330, 440));
-            Regions.Add(new MapRegion("The Kalevala Expanse", "", 745, 185));
+            Regions.Add(new MapRegion("The Kalevala Expanse", string.Empty, 745, 185));
             Regions.Add(new MapRegion("Khanid", "Khanid", 235, 570));
             Regions.Add(new MapRegion("Kor-Azor", "Amarr", 250, 505));
             Regions.Add(new MapRegion("Lonetrek", "Caldari", 550, 230));
-            Regions.Add(new MapRegion("Malpais", "", 885, 260));
+            Regions.Add(new MapRegion("Malpais", string.Empty, 885, 260));
             Regions.Add(new MapRegion("Metropolis", "Minmatar", 665, 365));
             Regions.Add(new MapRegion("Molden Heath", "Minmatar", 730, 430));
-            Regions.Add(new MapRegion("Oasa", "", 945, 160));
-            Regions.Add(new MapRegion("Omist", "", 720, 740));
-            Regions.Add(new MapRegion("Outer Passage", "", 965, 230));
+            Regions.Add(new MapRegion("Oasa", string.Empty, 945, 160));
+            Regions.Add(new MapRegion("Omist", string.Empty, 720, 740));
+            Regions.Add(new MapRegion("Outer Passage", string.Empty, 965, 230));
             Regions.Add(new MapRegion("Outer Ring", "ORE", 120, 140));
-            Regions.Add(new MapRegion("Paragon Soul", "", 320, 740));
-            Regions.Add(new MapRegion("Period Basis", "", 220, 700));
-            Regions.Add(new MapRegion("Perrigen Falls", "", 800, 130));
+            Regions.Add(new MapRegion("Paragon Soul", string.Empty, 320, 740));
+            Regions.Add(new MapRegion("Period Basis", string.Empty, 220, 700));
+            Regions.Add(new MapRegion("Perrigen Falls", string.Empty, 800, 130));
             Regions.Add(new MapRegion("Placid", "Gallente", 300, 220));
-            Regions.Add(new MapRegion("Providence", "", 505, 585));
-            Regions.Add(new MapRegion("Pure Blind", "", 435, 190));
-            Regions.Add(new MapRegion("Querious", "", 340, 640));
-            Regions.Add(new MapRegion("Scalding Pass", "", 800, 540));
+            Regions.Add(new MapRegion("Providence", string.Empty, 505, 585));
+            Regions.Add(new MapRegion("Pure Blind", string.Empty, 435, 190));
+            Regions.Add(new MapRegion("Querious", string.Empty, 340, 640));
+            Regions.Add(new MapRegion("Scalding Pass", string.Empty, 800, 540));
             Regions.Add(new MapRegion("Sinq Laison", "Gallente", 420, 375));
             Regions.Add(new MapRegion("Solitude", "Gallente", 155, 335));
-            Regions.Add(new MapRegion("The Spire", "", 860, 350));
+            Regions.Add(new MapRegion("The Spire", string.Empty, 860, 350));
             Regions.Add(new MapRegion("Stain", "Sansha", 450, 675));
             Regions.Add(new MapRegion("Syndicate", "Syndicate", 180, 250));
             Regions.Add(new MapRegion("Tash-Murkon", "Amarr", 365, 545));
-            Regions.Add(new MapRegion("Tenal", "", 700, 70));
-            Regions.Add(new MapRegion("Tenerifis", "", 715, 675));
-            Regions.Add(new MapRegion("Tribute", "", 535, 145));
-            Regions.Add(new MapRegion("Vale of the Silent", "", 615, 190));
-            Regions.Add(new MapRegion("Venal", "Guristas", 570, 105 ));
+            Regions.Add(new MapRegion("Tenal", string.Empty, 700, 70));
+            Regions.Add(new MapRegion("Tenerifis", string.Empty, 715, 675));
+            Regions.Add(new MapRegion("Tribute", string.Empty, 535, 145));
+            Regions.Add(new MapRegion("Vale of the Silent", string.Empty, 615, 190));
+            Regions.Add(new MapRegion("Venal", "Guristas", 570, 105));
             Regions.Add(new MapRegion("Verge Vendor", "Gallente", 245, 330));
-            Regions.Add(new MapRegion("Wicked Creek", "", 790, 615));
+            Regions.Add(new MapRegion("Wicked Creek", string.Empty, 790, 615));
 
             SystemIDToName = new SerializableDictionary<string, string>();
 
@@ -691,7 +559,6 @@ namespace SMT.EVEData
 
                         NameToSystem[name] = s;
 
-
                         // create and add the map version 
                         rd.MapSystems[name] = new MapSystem
                         {
@@ -716,7 +583,6 @@ namespace SMT.EVEData
                             string regionLinkName = erNodes[0].InnerText;
 
                             SystemIDToName[systemID] = name;
-                            
 
                             rd.MapSystems[name] = new MapSystem
                             {
@@ -726,8 +592,6 @@ namespace SMT.EVEData
                                 Region = regionLinkName,
                                 OutOfRegion = true,
                             };
-
-
                         }
                     }
                 }
@@ -765,7 +629,6 @@ namespace SMT.EVEData
                         s.ConstellationID = constID;
                     }
                 }
-
             }
             else
             {
@@ -798,15 +661,11 @@ namespace SMT.EVEData
                 }
             }
 
-
-
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
             {
-
                 // collect the system points to generate them from 
                 List<Vector2f> points = new List<Vector2f>();
-
 
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                 {
@@ -816,10 +675,7 @@ namespace SMT.EVEData
                 // create the voronoi
                 csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, new Rectf(0, 0, 1050, 800));
 
-
-
                 // extract the points from the graph for each cell
-
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                 {
                     List<Vector2f> cellList = v.Region(new Vector2f(ms.LayoutX, ms.LayoutY));
@@ -829,7 +685,6 @@ namespace SMT.EVEData
                     {
                         ms.CellPoints.Add(new Point(Math.Round(vc.x * 4.0) / 4.0, Math.Round(vc.y * 4.0) / 4.0));
                     }
-
                 }
             }
 
@@ -837,7 +692,6 @@ namespace SMT.EVEData
             {
                 NameToSystem[s.Name] = s;
             }
-
 
             foreach (MapRegion rr in Regions)
             {
@@ -851,9 +705,6 @@ namespace SMT.EVEData
             // collect the system points to generate them from 
             List<Vector2f> regionpoints = new List<Vector2f>();
 
-
-
-
             // now Generate the region links
             foreach (MapRegion mr in Regions)
             {
@@ -864,15 +715,16 @@ namespace SMT.EVEData
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                 {
                     // only check systems in the region
-                    if(ms.ActualSystem.Region == mr.Name)
+                    if (ms.ActualSystem.Region == mr.Name)
                     {
-                        foreach(string s in ms.ActualSystem.Jumps)
+                        foreach (string s in ms.ActualSystem.Jumps)
                         {
                             System sys = GetEveSystem(s);
+
                             // we have link to another region
-                            if(sys.Region != mr.Name)
+                            if (sys.Region != mr.Name)
                             {
-                                if(!mr.RegionLinks.Contains(sys.Region))
+                                if (!mr.RegionLinks.Contains(sys.Region))
                                 {
                                     mr.RegionLinks.Add(sys.Region);
                                 }
@@ -882,30 +734,31 @@ namespace SMT.EVEData
                 }
             }
 
-
             // now serialise the classes to disk
-            SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            SerializToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            Utils.SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
+            Utils.SerializToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
             Init();
         }
 
-
+        /// <summary>
+        /// Load the EVE Manager Data from Disk
+        /// </summary>
         public void LoadFromDisk()
         {
             SystemIDToName = new SerializableDictionary<string, string>();
 
-            Regions = DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            Systems = DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            Regions = Utils.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
+            Systems = Utils.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
             foreach (System s in Systems)
             {
                 SystemIDToName[s.ID] = s.Name;
             }
 
-            if(File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat"))
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat"))
             {
-                AllianceIDToName = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+                AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
             }
             else
             {
@@ -914,74 +767,15 @@ namespace SMT.EVEData
 
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat"))
             {
-                AllianceIDToTicker = DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+                AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
             }
             else
             {
                 AllianceIDToTicker = new SerializableDictionary<string, string>();
             }
 
-
             Init();
         }
-
-        private void SerializToDisk<T>(T obj, string Filename)
-        {
-            XmlSerializer xms = new XmlSerializer(typeof(T));
-
-            using (TextWriter tw = new StreamWriter(Filename))
-            {
-                xms.Serialize(tw, obj);
-            }
-        }
-
-        private T DeserializeFromDisk<T>(string Filename)
-        {
-            XmlSerializer xms = new XmlSerializer(typeof(T));
-
-            FileStream fs = new FileStream(Filename, FileMode.Open);
-            XmlReader xmlr = XmlReader.Create(fs);
-
-            return (T)xms.Deserialize(xmlr);
-        }
-
-
-
-        /// <summary>
-        /// Initialise
-        /// </summary>
-        private void Init()
-        {
-            // patch up any links
-
-
-            foreach (System s in Systems)
-            {
-                NameToSystem[s.Name] = s;
-            }
-
-
-            foreach (MapRegion rr in Regions)
-            {
-                // link to the real systems
-                foreach (MapSystem ms in rr.MapSystems.Values.ToList())
-                {
-                    ms.ActualSystem = GetEveSystem(ms.Name);
-                }
-            }
-
-            LoadCharacters();
-
-            // start the character update thread
-            StartUpdateCharacterThread();
-
-
-            InitTheraConnections();
-
-            InitZKillFeed();
-
-        }
-
 
         /// <summary>
         /// Does the System Exist ?
@@ -1002,31 +796,33 @@ namespace SMT.EVEData
             if (NameToSystem.ContainsKey(name))
             {
                 return NameToSystem[name];
-
             }
+
             return null;
         }
 
         /// <summary>
-        /// Get a System object from the name, note : for regions which have other region systems in it wont return
-        /// them.. eg TR07-s is on the esoteria map, but the object corresponding to the feythabolis map will be returned
+        /// Get a System object from the ID
         /// </summary>
-        /// <param name="name">ID of the system</param>
-        public System GetEveSystemFromID(string ID)
+        /// <param name="id">ID of the system</param>
+        public System GetEveSystemFromID(string id)
         {
-
             foreach (System s in Systems)
             {
-                if (s.ID == ID)
+                if (s.ID == id)
                 {
                     return s;
                 }
             }
+
             return null;
         }
 
-
-
+        /// <summary>
+        /// Get the MapRegion from the name
+        /// </summary>
+        /// <param name="name">Name of the Region</param>
+        /// <returns>Region Object</returns>
         public MapRegion GetRegion(string name)
         {
             foreach (MapRegion reg in Regions)
@@ -1040,6 +836,9 @@ namespace SMT.EVEData
             return null;
         }
 
+        /// <summary>
+        /// Get the ESI Logon URL String
+        /// </summary>
         public string GetESILogonURL()
         {
             UriBuilder esiLogonBuilder = new UriBuilder("https://login.eveonline.com/oauth/authorize/");
@@ -1058,6 +857,9 @@ namespace SMT.EVEData
             return esiLogonBuilder.ToString();
         }
 
+        /// <summary>
+        /// Hand the custom smtauth- url we get back from the logon screen
+        /// </summary>
         public bool HandleEveAuthSMTUri(Uri uri)
         {
             // parse the uri
@@ -1106,13 +908,357 @@ namespace SMT.EVEData
             return true;
         }
 
-        // since we dont know what character these tokens belong too until we check just store them..
-        private string PendingAccessToken;
+        /// <summary>
+        /// Update the Alliance and Ticker data for all SOV owners in the specified region
+        /// </summary>
+        public void UpdateIDsForMapRegion(string name)
+        {
+            MapRegion r = GetRegion(name);
+            if (r == null)
+            {
+                return;
+            }
 
-        private string PendingTokenType;
-        private string PendingExpiresIn;
-        private string PendingRefreshToken;
+            string allianceList = string.Empty;
+            foreach (MapSystem s in r.MapSystems.Values.ToList())
+            {
+                if (s.ActualSystem.SOVAlliance != null && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !allianceList.Contains(s.ActualSystem.SOVAlliance))
+                {
+                    allianceList += s.ActualSystem.SOVAlliance + ",";
+                }
+            }
 
+            if (allianceList != string.Empty)
+            {
+                allianceList += "0";
+                string url = @"https://esi.tech.ccp.is/v2/alliances/names/?datasource=tranquility";
+
+                url += "&alliance_ids=" + Uri.EscapeUriString(allianceList);
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.Method = WebRequestMethods.Http.Get;
+                request.Timeout = 20000;
+                request.Proxy = null;
+                request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
+            }
+            else
+            {
+                // we've cached every known system on the map already
+            }
+        }
+
+        /// <summary>
+        /// Update the current Thera Connections from EVE-Scout
+        /// </summary>
+        public void UpdateTheraConnections()
+        {
+            string theraApiURL = "https://www.eve-scout.com/api/wormholes";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(theraApiURL);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
+
+            TheraConnections.Clear();
+        }
+
+        /// <summary>
+        /// Calculate the range between the two systems
+        /// </summary>
+        public double GetRangeBetweenSystems(string from, string to)
+        {
+            System systemFrom = GetEveSystem(from);
+            System systemTo = GetEveSystem(to);
+
+            if (systemFrom == null || systemTo == null)
+            {
+                return 0.0;
+            }
+
+            double x = systemFrom.ActualX - systemTo.ActualX;
+            double y = systemFrom.ActualY - systemTo.ActualY;
+            double z = systemFrom.ActualZ - systemTo.ActualZ;
+
+            double length = Math.Sqrt((x * x) + (y * y) + (z * z));
+
+            return length;
+        }
+
+        /// <summary>
+        /// Initialise the eve manager
+        /// </summary>
+        private void Init()
+        {
+            // patch up any links
+            foreach (System s in Systems)
+            {
+                NameToSystem[s.Name] = s;
+            }
+
+            foreach (MapRegion rr in Regions)
+            {
+                // link to the real systems
+                foreach (MapSystem ms in rr.MapSystems.Values.ToList())
+                {
+                    ms.ActualSystem = GetEveSystem(ms.Name);
+                }
+            }
+
+            LoadCharacters();
+
+            // start the character update thread
+            StartUpdateCharacterThread();
+
+            InitTheraConnections();
+
+            InitZKillFeed();
+        }
+
+        /// <summary>
+        /// Load the character data from disk
+        /// </summary>
+        private void LoadCharacters()
+        {
+            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
+            if (!File.Exists(dataFilename))
+            {
+                return;
+            }
+
+            try
+            {
+                ObservableCollection<Character> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
+
+                FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
+                XmlReader xmlr = XmlReader.Create(fs);
+
+                loadList = (ObservableCollection<Character>)xms.Deserialize(xmlr);
+
+                foreach (Character c in loadList)
+                {
+                    c.ESIAccessToken = string.Empty;
+                    c.ESIAccessTokenExpiry = DateTime.MinValue;
+                    c.LocalChatFile = string.Empty;
+                    c.Location = string.Empty;
+                    c.Update();
+
+                    LocalCharacters.Add(c);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// Intel File watcher changed handler
+        /// </summary>
+        private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            string changedFile = e.FullPath;
+
+            outputLog.Info("File Watcher triggered : {0}", changedFile);
+
+            bool processFile = false;
+            bool localChat = false;
+
+            foreach (string intelFilterStr in IntelFilters)
+            {
+                if (changedFile.Contains(intelFilterStr))
+                {
+                    processFile = true;
+                    break;
+                }
+            }
+
+            if (changedFile.Contains("Local_"))
+            {
+                localChat = true;
+                processFile = true;
+            }
+
+            if (processFile)
+            {
+                try
+                {
+                    Encoding fe = Utils.GetEncoding(changedFile);
+                    FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                    outputLog.Info("Log File Encoding : {0}", fe.ToString());
+
+                    StreamReader file = new StreamReader(ifs, fe);
+
+                    int fileReadFrom = 0;
+
+                    // have we seen this file before
+                    if (intelFileReadPos.Keys.Contains<string>(changedFile))
+                    {
+                        fileReadFrom = intelFileReadPos[changedFile];
+                    }
+                    else
+                    {
+                        if (localChat)
+                        {
+                            outputLog.Info("Processing file : {0}", changedFile);
+                            string system = string.Empty;
+                            string characterName = string.Empty;
+
+                            // read the iniital block
+                            while (!file.EndOfStream)
+                            {
+                                string l = file.ReadLine();
+                                fileReadFrom++;
+
+                                if (l.Contains("Channel ID"))
+                                {
+                                    string temp = l.Split(',')[1].Split(')')[0].Trim();
+                                    if (SystemIDToName.Keys.Contains(temp))
+                                    {
+                                        system = SystemIDToName[temp];
+                                    }
+
+                                    // now can read the next line
+                                    l = file.ReadLine(); // should be the "Channel Name : Local"
+                                    l = file.ReadLine();
+
+                                    characterName = l.Split(':')[1].Trim();
+
+                                    bool addChar = true;
+                                    foreach (EVEData.Character c in LocalCharacters)
+                                    {
+                                        if (characterName == c.Name)
+                                        {
+                                            c.Location = system;
+                                            c.LocalChatFile = changedFile;
+                                            addChar = false;
+                                        }
+                                    }
+
+                                    if (addChar)
+                                    {
+                                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                                        {
+                                            LocalCharacters.Add(new EVEData.Character(characterName, changedFile, system));
+                                        }), DispatcherPriority.ApplicationIdle);
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+
+                        while (file.ReadLine() != null)
+                        {
+                            fileReadFrom++;
+                        }
+
+                        fileReadFrom--;
+                        file.BaseStream.Seek(0, SeekOrigin.Begin);
+                    }
+
+                    for (int i = 0; i < fileReadFrom; i++)
+                    {
+                        file.ReadLine();
+                    }
+
+                    string line = file.ReadLine();
+
+                    while (line != null)
+                    {                    // trim any items off the front
+                        if (line.Contains("[") && line.Contains("]"))
+                        {
+                            line = line.Substring(line.IndexOf("["));
+                        }
+
+                        fileReadFrom++;
+
+                        if (localChat)
+                        {
+                            if (line.StartsWith("[") && line.Contains("EVE System > Channel changed to Local"))
+                            {
+                                string system = line.Split(':').Last().Trim();
+
+                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                {
+                                    foreach (EVEData.Character c in LocalCharacters)
+                                    {
+                                        if (c.LocalChatFile == changedFile)
+                                        {
+                                            outputLog.Info("Character {0} moved from {1} to {2}", c.Name, c.Location, system);
+
+                                            c.Location = system;
+                                        }
+                                    }
+                                }), DispatcherPriority.ApplicationIdle);
+                            }
+                        }
+                        else
+                        {
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                // check if it is in the intel list already (ie if you have multiple clients running)
+                                bool addToIntel = true;
+                                foreach (EVEData.IntelData idl in IntelDataList)
+                                {
+                                    if (idl.RawIntelString == line)
+                                    {
+                                        addToIntel = false;
+                                        break;
+                                    }
+                                }
+
+                                if (addToIntel)
+                                {
+                                    EVEData.IntelData id = new EVEData.IntelData(line);
+
+                                    foreach (string s in id.IntelString.Split(' '))
+                                    {
+                                        if (DoesSystemExist(s))
+                                        {
+                                            outputLog.Info("Adding Intel Line : {0} ", line);
+                                            id.Systems.Add(s);
+                                        }
+                                    }
+
+                                    IntelDataList.Insert(0, id);
+
+                                    if (IntelAddedEvent != null)
+                                    {
+                                        IntelAddedEvent();
+                                    }
+                                }
+                                else
+                                {
+                                    outputLog.Info("Already have Line : {0} ", line);
+                                }
+                            }), DispatcherPriority.ApplicationIdle);
+                        }
+
+                        line = file.ReadLine();
+                    }
+
+                    ifs.Close();
+
+                    intelFileReadPos[changedFile] = fileReadFrom;
+                    outputLog.Info("File Read pos : {0} {1}", changedFile, fileReadFrom);
+                }
+                catch (Exception ex)
+                {
+                    outputLog.Info("Intel Process Failed : {0}", ex.ToString());
+                }
+            }
+            else
+            {
+                outputLog.Info("Skipping File : {0}", changedFile);
+            }
+        }
+
+        /// <summary>
+        /// ESI Validate Auth Code Callback
+        /// </summary>
         private void ESIValidateAuthCodeCallback(IAsyncResult asyncResult)
         {
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
@@ -1132,10 +1278,10 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                PendingAccessToken = obj["access_token"].ToString();
-                                PendingTokenType = obj["token_type"].ToString();
-                                PendingExpiresIn = obj["expires_in"].ToString();
-                                PendingRefreshToken = obj["refresh_token"].ToString();
+                                pendingAccessToken = obj["access_token"].ToString();
+                                pendingTokenType = obj["token_type"].ToString();
+                                pendingExpiresIn = obj["expires_in"].ToString();
+                                pendingRefreshToken = obj["refresh_token"].ToString();
 
                                 // now requests the character information
                                 string url = @"https://login.eveonline.com/oauth/verify";
@@ -1143,7 +1289,7 @@ namespace SMT.EVEData
                                 verifyRequest.Method = WebRequestMethods.Http.Get;
                                 verifyRequest.Timeout = 20000;
                                 verifyRequest.Proxy = null;
-                                string authHeader = "Bearer " + PendingAccessToken;
+                                string authHeader = "Bearer " + pendingAccessToken;
 
                                 verifyRequest.Headers[HttpRequestHeader.Authorization] = authHeader;
 
@@ -1155,10 +1301,12 @@ namespace SMT.EVEData
             }
             catch (Exception)
             {
-                /// ....
             }
         }
 
+        /// <summary>
+        /// ESI Verify Access Code Callback
+        /// </summary>
         private void ESIVerifyAccessCodeCallback(IAsyncResult asyncResult)
         {
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
@@ -1203,9 +1351,9 @@ namespace SMT.EVEData
                                     }), DispatcherPriority.ApplicationIdle);
                                 }
 
-                                esiChar.ESIRefreshToken = PendingRefreshToken;
+                                esiChar.ESIRefreshToken = pendingRefreshToken;
                                 esiChar.ESILinked = true;
-                                esiChar.ESIAccessToken = PendingAccessToken;
+                                esiChar.ESIAccessToken = pendingAccessToken;
                                 esiChar.ESIAccessTokenExpiry = DateTime.Parse(expiresOn);
                                 esiChar.ID = characterID;
                             }
@@ -1215,14 +1363,13 @@ namespace SMT.EVEData
             }
             catch (Exception)
             {
-                /// ....
             }
         }
 
         /// <summary>
         /// Start the ESI download for the kill info
         /// </summary>
-        public void StartUpdateKillsFromESI()
+        private void StartUpdateKillsFromESI()
         {
             string url = @"https://esi.tech.ccp.is/v2/universe/system_kills/?datasource=tranquility";
 
@@ -1237,7 +1384,6 @@ namespace SMT.EVEData
         /// <summary>
         /// ESI Result Response
         /// </summary>
-        /// <param name="asyncResult"></param>
         private void ESIKillsReadCallback(IAsyncResult asyncResult)
         {
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
@@ -1261,7 +1407,7 @@ namespace SMT.EVEData
                                 JObject obj = JObject.Load(jsr);
                                 string systemID = obj["system_id"].ToString();
                                 string shipKills = obj["ship_kills"].ToString();
-                                string nPCKills = obj["npc_kills"].ToString();
+                                string npcKills = obj["npc_kills"].ToString();
                                 string podKills = obj["pod_kills"].ToString();
 
                                 if (SystemIDToName[systemID] != null)
@@ -1271,7 +1417,7 @@ namespace SMT.EVEData
                                     {
                                         es.ShipKillsLastHour = int.Parse(shipKills);
                                         es.PodKillsLastHour = int.Parse(podKills);
-                                        es.NPCKillsLastHour = int.Parse(nPCKills);
+                                        es.NPCKillsLastHour = int.Parse(npcKills);
                                     }
                                 }
                             }
@@ -1281,14 +1427,13 @@ namespace SMT.EVEData
             }
             catch (Exception)
             {
-                /// ....
             }
         }
 
         /// <summary>
         /// Start the ESI download for the Jump info
         /// </summary>
-        public void StartUpdateJumpsFromESI()
+        private void StartUpdateJumpsFromESI()
         {
             string url = @"https://esi.tech.ccp.is/v1/universe/system_jumps/?datasource=tranquility";
 
@@ -1303,7 +1448,6 @@ namespace SMT.EVEData
         /// <summary>
         /// ESI Result Response
         /// </summary>
-        /// <param name="asyncResult"></param>
         private void ESIJumpsReadCallback(IAsyncResult asyncResult)
         {
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
@@ -1341,13 +1485,15 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                /// ....
             }
         }
 
-        public void StartUpdateCharacterThread()
+        /// <summary>
+        /// Start the Character Update Thread
+        /// </summary>
+        private void StartUpdateCharacterThread()
         {
             new Thread(() =>
             {
@@ -1356,22 +1502,21 @@ namespace SMT.EVEData
                 // loop forever
                 while (true)
                 {
-                    for(int i = 0; i < LocalCharacters.Count; i++ )
+                    for (int i = 0; i < LocalCharacters.Count; i++)
                     {
                         Character c = LocalCharacters.ElementAt(i);
                         c.Update();
                     }
+
                     Thread.Sleep(2000);
                 }
             }).Start();
         }
 
-
-
         /// <summary>
         /// Start the ESI download for the kill info
         /// </summary>
-        public void StartUpdateSOVFromESI()
+        private void StartUpdateSOVFromESI()
         {
             string url = @"https://esi.tech.ccp.is/v1/sovereignty/map/?datasource=tranquility";
 
@@ -1386,10 +1531,9 @@ namespace SMT.EVEData
         /// <summary>
         /// ESI Result Response
         /// </summary>
-        /// <param name="asyncResult"></param>
         private void ESIUpdateSovCallback(IAsyncResult asyncResult)
         {
-            string AlliancesToResolve = "";
+            string alliancesToResolve = string.Empty;
 
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
             try
@@ -1401,9 +1545,6 @@ namespace SMT.EVEData
                     {
                         // Need to return this response
                         string strContent = sr.ReadToEnd();
-
-
-
                         JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
 
                         // JSON feed is now in the format : [{ "system_id": 30035042,  and then optionally alliance_id, corporation_id and corporation_id, faction_id },
@@ -1423,7 +1564,7 @@ namespace SMT.EVEData
                                         {
                                             es.SOVAlliance = obj["alliance_id"].ToString();
 
-                                            AlliancesToResolve += es.SOVAlliance + ",";
+                                            alliancesToResolve += es.SOVAlliance + ",";
                                         }
                                     }
                                 }
@@ -1434,60 +1575,14 @@ namespace SMT.EVEData
             }
             catch (Exception)
             {
-                /// ....
             }
-
-
-            // now that we have the list of alliances we need to resolve those into Names
-
-
-        }
-
-
-        public void UpdateIDsForMapRegion(string name)
-        {
-            MapRegion r = GetRegion(name);
-            if (r == null)
-            {
-                return;
-            }
-
-            string AllianceList = string.Empty;
-            foreach (MapSystem s in r.MapSystems.Values.ToList())
-            {
-                if (s.ActualSystem.SOVAlliance != null && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !AllianceList.Contains(s.ActualSystem.SOVAlliance))
-                {
-                    AllianceList += s.ActualSystem.SOVAlliance + ",";
-                }
-            }
-
-            if (AllianceList != string.Empty)
-            {
-                AllianceList += "0";
-                string url = @"https://esi.tech.ccp.is/v2/alliances/names/?datasource=tranquility";
-
-                url += "&alliance_ids=" + Uri.EscapeUriString(AllianceList);
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = WebRequestMethods.Http.Get;
-                request.Timeout = 20000;
-                request.Proxy = null;
-                request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
-            }
-            else
-            {
-                // we've cached every known system on the map already
-            }
-
         }
 
         /// <summary>
         /// ESI Result Response
         /// </summary>
-        /// <param name="asyncResult"></param>
         private void ESIUpdateAllianceIDCallback(IAsyncResult asyncResult)
         {
-
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
             try
             {
@@ -1507,36 +1602,34 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string Name = obj["alliance_name"].ToString();
-                                string ID = obj["alliance_id"].ToString();
-                                AllianceIDToName[ID] = Name;
+                                string allianceName = obj["alliance_name"].ToString();
+                                string allianceId = obj["alliance_id"].ToString();
+                                AllianceIDToName[allianceId] = allianceName;
 
-                                string allianceUrl = @"https://esi.tech.ccp.is/v3/alliances/" + ID + "/?datasource=tranquility";
+                                string allianceUrl = @"https://esi.tech.ccp.is/v3/alliances/" + allianceId + "/?datasource=tranquility";
 
                                 HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
                                 allianceRequest.Method = WebRequestMethods.Http.Get;
                                 allianceRequest.Timeout = 20000;
                                 allianceRequest.Proxy = null;
 
-                                WebResponse alWR = allianceRequest.GetResponse();
+                                WebResponse allianceRequestWebResponse = allianceRequest.GetResponse();
 
-                                Stream alStream = alWR.GetResponseStream();
-                                using (StreamReader alSR = new StreamReader(alStream))
+                                Stream allianceRequestResponeStream = allianceRequestWebResponse.GetResponseStream();
+                                using (StreamReader allianceRequestResponseStreamReader = new StreamReader(allianceRequestResponeStream))
                                 {
                                     // Need to return this response
-                                    string alStrContent = alSR.ReadToEnd();
+                                    string allianceRequestString = allianceRequestResponseStreamReader.ReadToEnd();
 
-                                    JsonTextReader jobj = new JsonTextReader(new StringReader(alStrContent));
+                                    JsonTextReader jobj = new JsonTextReader(new StringReader(allianceRequestString));
                                     while (jobj.Read())
                                     {
                                         if (jobj.TokenType == JsonToken.StartObject)
                                         {
                                             JObject aobj = JObject.Load(jobj);
-                                            string AllianceName = aobj["name"].ToString();
-                                            string AllianceTicker = aobj["ticker"].ToString();
-
-                                            AllianceIDToTicker[ID] = AllianceTicker;
-
+                                            allianceName = aobj["name"].ToString();
+                                            string allianceTicker = aobj["ticker"].ToString();
+                                            AllianceIDToTicker[allianceId] = allianceTicker;
                                         }
                                     }
                                 }
@@ -1547,60 +1640,23 @@ namespace SMT.EVEData
             }
             catch (Exception)
             {
-                /// ....
             }
         }
 
-
-        public double GetRange(string From, string To)
-        {
-            System A = GetEveSystem(From);
-            System B = GetEveSystem(To);
-
-            if (A == null || B == null)
-            {
-                return 0.0;
-            }
-
-            double X = A.ActualX - B.ActualX;
-            double Y = A.ActualY - B.ActualY;
-            double Z = A.ActualZ - B.ActualZ;
-
-            double Length = Math.Sqrt(X * X + Y * Y + Z * Z);
-
-            return Length;
-
-        }
-
-
-        // thera
-        public ObservableCollection<TheraConnection> TheraConnections;
-
-        public void InitTheraConnections()
+        /// <summary>
+        /// Initialise the Thera Connection Data from EVE-Scout
+        /// </summary>
+        private void InitTheraConnections()
         {
             TheraConnections = new ObservableCollection<TheraConnection>();
             UpdateTheraConnections();
         }
 
-        public void UpdateTheraConnections()
-        {
-            string URL = "https://www.eve-scout.com/api/wormholes";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
-
-            TheraConnections.Clear();
-
-        }
-
-
+        /// <summary>
+        ///  Update Thera Connections Callback
+        /// </summary>
         private void UpdateTheraConnectionsCallback(IAsyncResult asyncResult)
         {
-
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
             try
             {
@@ -1621,24 +1677,22 @@ namespace SMT.EVEData
                             {
                                 JObject obj = JObject.Load(jsr);
                                 string inSignatureId = obj["wormholeDestinationSignatureId"].ToString();
-                                string outSignatureId = obj["signatureId"].ToString(); ;
-                                string SolarSystemId = obj["wormholeDestinationSolarSystemId"].ToString();
-                                string WormHoleEOL = obj["wormholeEol"].ToString();
-                                string Type = obj["type"].ToString();
+                                string outSignatureId = obj["signatureId"].ToString();
+                                string solarSystemId = obj["wormholeDestinationSolarSystemId"].ToString();
+                                string wormHoleEOL = obj["wormholeEol"].ToString();
+                                string type = obj["type"].ToString();
 
-                                if(Type != null && Type == "wormhole" && SolarSystemId != null && WormHoleEOL != null && SystemIDToName.Keys.Contains(SolarSystemId))
+                                if (type != null && type == "wormhole" && solarSystemId != null && wormHoleEOL != null && SystemIDToName.Keys.Contains(solarSystemId))
                                 {
-                                    System TheraConnectionSystem = GetEveSystemFromID(SolarSystemId);
+                                    System theraConnectionSystem = GetEveSystemFromID(solarSystemId);
 
-                                    TheraConnection tc = new TheraConnection(TheraConnectionSystem.Name, TheraConnectionSystem.Region, inSignatureId, outSignatureId, WormHoleEOL);
+                                    TheraConnection tc = new TheraConnection(theraConnectionSystem.Name, theraConnectionSystem.Region, inSignatureId, outSignatureId, wormHoleEOL);
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
                                         TheraConnections.Add(tc);
                                     }), DispatcherPriority.ApplicationIdle);
-
                                 }
-
                             }
                         }
                     }
@@ -1646,59 +1700,16 @@ namespace SMT.EVEData
             }
             catch (Exception)
             {
-                /// ....
             }
         }
 
-
-
-        public ZKillRedisQ ZKillFeed { get; set; }
-
-        public void InitZKillFeed()
+        /// <summary>
+        /// Initialise the ZKillBoard Feed
+        /// </summary>
+        private void InitZKillFeed()
         {
             ZKillFeed = new ZKillRedisQ();
             ZKillFeed.Initialise();
-        }
-
-
-
-
-
-
-        public EveManager()
-        {
-            LocalCharacters = new ObservableCollection<Character>();
-
-            // ensure we have the cache folder setup
-            DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";
-            if (!Directory.Exists(DataCacheFolder))
-            {
-                Directory.CreateDirectory(DataCacheFolder);
-            }
-
-            string webCacheFoilder = DataCacheFolder + "\\WebCache";
-            if (!Directory.Exists(webCacheFoilder))
-            {
-                Directory.CreateDirectory(webCacheFoilder);
-            }
-
-            string portraitCacheFoilder = DataCacheFolder + "\\Portraits";
-            if (!Directory.Exists(portraitCacheFoilder))
-            {
-                Directory.CreateDirectory(portraitCacheFoilder);
-            }
-
-            string logosFoilder = DataCacheFolder + "\\Logos";
-            if (!Directory.Exists(logosFoilder))
-            {
-                Directory.CreateDirectory(logosFoilder);
-            }
-
-            AllianceIDToName = new SerializableDictionary<string, string>();
-            AllianceIDToTicker = new SerializableDictionary<string, string>();
-            NameToSystem = new Dictionary<string, System>();
-        }
+        }      
     }
-
-
 }

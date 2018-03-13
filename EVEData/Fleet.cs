@@ -20,10 +20,7 @@ namespace SMT.EVEData
             public string Name { get; set; }
             public string Location { get; set; }
 
-            public override string ToString()
-            {
-                return Name;
-            }
+            public override string ToString() => Name;
         }
 
         public ObservableCollection<FleetMember> Members;

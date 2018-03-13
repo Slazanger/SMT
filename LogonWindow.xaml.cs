@@ -20,7 +20,7 @@ namespace SMT
             if (scheme == "eveauth-smt")
             {
                 // issue the close after the esi auth event has finished
-                EVEData.EveManager.GetInstance().HandleEveAuthSMTUri(new Uri(e.Uri.AbsoluteUri));
+                EVEData.EveManager.Instance.HandleEveAuthSMTUri(new Uri(e.Uri.AbsoluteUri));
                 e.Cancel = true;
                 Close();
             }

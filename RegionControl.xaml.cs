@@ -332,7 +332,7 @@ namespace SMT
         /// </summary>
         public void Init()
         {
-            EM = EVEData.EveManager.GetInstance();
+            EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
 
             DynamicMapElements = new List<UIElement>();
@@ -597,7 +597,7 @@ namespace SMT
                 if (MapConf.ShowJumpDistance && SelectedSystem != null && system.Name != SelectedSystem)
                 {
 
-                    double Distance = EM.GetRange(SelectedSystem, system.Name);
+                    double Distance = EM.GetRangeBetweenSystems(SelectedSystem, system.Name);
                     Distance = Distance / 9460730472580800.0;
 
                     double Max = 0.1f;

@@ -113,7 +113,7 @@ namespace SMT
             }
 
             EVEManager = new EVEData.EveManager();
-            EVEData.EveManager.SetInstance(EVEManager);
+            EVEData.EveManager.Instance = EVEManager;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
             bool initFromScratch = false;
@@ -132,9 +132,7 @@ namespace SMT
             
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
-            EVEManager.StartUpdateKillsFromESI();
-            EVEManager.StartUpdateJumpsFromESI();
-            EVEManager.StartUpdateSOVFromESI();
+            EVEManager.UpdateESIUniverseData();
 
             MapControlsPropertyGrid.SelectedObject = MapConf;
 
@@ -327,8 +325,7 @@ namespace SMT
 
         private void refreshData_Click(object sender, RoutedEventArgs e)
         {
-            EVEManager.StartUpdateKillsFromESI();
-            EVEManager.StartUpdateJumpsFromESI();
+            EVEManager.UpdateESIUniverseData();
         }
          
         private void ResetColourData_Click(object sender, RoutedEventArgs e)

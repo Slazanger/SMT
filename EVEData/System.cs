@@ -51,10 +51,7 @@ namespace SMT.EVEData
         public List<string> Jumps { get; set; }
 
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
 
         public System()
         {

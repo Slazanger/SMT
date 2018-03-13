@@ -121,9 +121,6 @@ namespace SMT.EVEData
         /// <summary>
         /// To String
         /// </summary>
-        public override string ToString()
-        {
-            return Signature + " " + Type + " " + Name;
-        }
+        public override string ToString() => Signature + " " + Type + " " + Name;
     }
 }

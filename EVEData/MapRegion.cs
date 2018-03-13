@@ -64,9 +64,6 @@ namespace SMT.EVEData
             return false;
         }
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
 }
