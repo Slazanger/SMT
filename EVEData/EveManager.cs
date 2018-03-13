@@ -1046,8 +1046,8 @@ namespace SMT.EVEData
 
             var esiQuery = HttpUtility.ParseQueryString(esiLogonBuilder.Query);
             esiQuery["response_type"] = "code";
-            esiQuery["client_id"] = EveAppConfig.CLIENT_ID;
-            esiQuery["redirect_uri"] = EveAppConfig.CALLBACK_URL;
+            esiQuery["client_id"] = EveAppConfig.ClientID;
+            esiQuery["redirect_uri"] = EveAppConfig.CallbackURL;
             esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1 esi-alliances.read_contacts.v1 esi-fleets.read_fleet.v1 fleetRead";
 
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
@@ -1084,7 +1084,7 @@ namespace SMT.EVEData
             request.Proxy = null;
 
             string code = query["code"];
-            string authHeader = EveAppConfig.CLIENT_ID + ":" + EveAppConfig.SECRET_KEY;
+            string authHeader = EveAppConfig.ClientID + ":" + EveAppConfig.SecretKey;
             string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
             request.Headers[HttpRequestHeader.Authorization] = authHeader_64;

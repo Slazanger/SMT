@@ -1,22 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//-----------------------------------------------------------------------
+// EVE Alliance
+//-----------------------------------------------------------------------
 
 namespace SMT.EVEData
 {
+    /// <summary>
+    /// A simple container for Alliance items
+    /// </summary>
     public class Alliance
     {
-        public string ID { get; set; }
-        public string Name { get; set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Alliance"/> class.
+        /// </summary>
         public Alliance()
         {
             ID = string.Empty;
             Name = string.Empty;
         }
+
+        /// <summary>
+        /// Gets or sets the ID of Alliance
+        /// </summary>
+        public string ID { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Resolved Name of Alliance
+        /// </summary>
+        public string Name { get; set; }
     }
-
-
 }
