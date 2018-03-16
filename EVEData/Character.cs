@@ -489,7 +489,7 @@ namespace SMT.EVEData
 
                             if (fleetID == "-1")
                             {
-                                FleetInfo.FleetID = Fleet.NO_FLEET;
+                                FleetInfo.FleetID = Fleet.NoFleet;
                             }
                             else
                             {
@@ -509,7 +509,7 @@ namespace SMT.EVEData
         /// </summary>
         private void UpdateFleetInfoFromESI()
         {
-            if (FleetInfo.FleetID == Fleet.NO_FLEET)
+            if (FleetInfo.FleetID == Fleet.NoFleet)
             {
                 return;
             }
@@ -566,7 +566,7 @@ namespace SMT.EVEData
         /// </summary>
         private void UpdateFleetMembersFromESI()
         {
-            if (FleetInfo.FleetID == Fleet.NO_FLEET)
+            if (FleetInfo.FleetID == Fleet.NoFleet)
             {
                 return;
             }
@@ -753,7 +753,7 @@ namespace SMT.EVEData
                                 }
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                         }
                     }

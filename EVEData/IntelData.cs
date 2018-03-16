@@ -1,30 +1,19 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// Intel Data
+//-----------------------------------------------------------------------
+using System;
 using System.Collections.Generic;
 
 namespace SMT.EVEData
 {
+    /// <summary>
+    /// Intel Data, Represents a single line of intel data
+    /// </summary>
     public class IntelData
     {
         /// <summary>
-        /// Time we parsed the intel (note this is not in eve time)
+        /// Initializes a new instance of the <see cref="IntelData" /> class
         /// </summary>
-        public DateTime IntelTime { get; set; }
-
-        /// <summary>
-        /// The intel substring (minus time stamp and character name)
-        /// </summary>
-        public string IntelString { get; set; }
-
-        /// <summary>
-        /// The raw line of text (incase we need to do anything else with it)
-        /// </summary>
-        public string RawIntelString { get; set; }
-
-        /// <summary>
-        /// The list of systems we matched when parsing this string
-        /// </summary>
-        public List<string> Systems;
-
         public IntelData(string intelText)
         {
             RawIntelString = intelText;
@@ -35,6 +24,26 @@ namespace SMT.EVEData
             IntelTime = DateTime.Now;
             Systems = new List<string>();
         }
+
+        /// <summary>
+        /// Gets or sets the time we parsed the intel (note this is not in eve time)
+        /// </summary>
+        public DateTime IntelTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the intel substring (minus time stamp and character name)
+        /// </summary>
+        public string IntelString { get; set; }
+
+        /// <summary>
+        /// Gets or sets the raw line of text (incase we need to do anything else with it)
+        /// </summary>
+        public string RawIntelString { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of systems we matched when parsing this string
+        /// </summary>
+        public List<string> Systems { get; set; }
 
         public override string ToString()
         {

@@ -5,6 +5,19 @@
     /// </summary>
     public class JumpBridge
     {
+        public JumpBridge()
+        {
+        }
+
+        public JumpBridge(string f, string fi, string t, string ti, bool friend)
+        {
+            From = f;
+            FromInfo = fi;
+            To = t;
+            ToInfo = ti;
+            Friendly = friend;
+        }
+
         /// <summary>
         /// Starting System
         /// </summary>
@@ -30,17 +43,5 @@
         /// </summary>
         public bool Friendly { get; set; }
 
-        public JumpBridge()
-        {
-        }
-
-        public JumpBridge(string f, string fi, string t, string ti, bool friend)
-        {
-            From = f;
-            FromInfo = fi;
-            To = t;
-            ToInfo = ti;
-            Friendly = friend;
-        }
     }
 }

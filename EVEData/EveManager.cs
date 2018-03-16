@@ -400,7 +400,7 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Updaate The Universe Data from the various ESI end points
+        /// Update The Universe Data from the various ESI end points
         /// </summary>
         public void UpdateESIUniverseData()
         {
