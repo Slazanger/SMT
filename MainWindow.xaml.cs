@@ -302,6 +302,7 @@ namespace SMT
 
             // save the character data
             EVEManager.SaveData();
+            EVEManager.ShutDown();
         }
 
         private void RedrawUniverse()

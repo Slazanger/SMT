@@ -44,7 +44,13 @@ namespace SMT.EVEData
 
             ThreadStart ts = new ThreadStart(UpdateThreadFunc);
             updateThread = new Thread(ts);
+            updateThread.Name = "ZkillRedisQ Update";
             updateThread.Start();
+        }
+
+        public void ShutDown()
+        {
+            updateThreadRunning = false;
         }
 
         /// <summary>
@@ -65,7 +71,7 @@ namespace SMT.EVEData
                         Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
                             KillStream.Clear();
-                        }), DispatcherPriority.ApplicationIdle);
+                        }), DispatcherPriority.Normal);
 
                     }
 
@@ -113,7 +119,7 @@ namespace SMT.EVEData
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
                                 KillStream.Insert(0,zs);
-                            }), DispatcherPriority.ApplicationIdle);
+                            }), DispatcherPriority.Normal);
                         }
                         else
                         {
@@ -135,7 +141,7 @@ namespace SMT.EVEData
                                         KillStream.RemoveAt(i);
                                     }
                                 }
-                            }), DispatcherPriority.ApplicationIdle);
+                            }), DispatcherPriority.Normal);
 
                             cleanupCounter = 0;
                         }

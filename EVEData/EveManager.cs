@@ -167,6 +167,12 @@ namespace SMT.EVEData
         public ObservableCollection<Character> LocalCharacters { get; set; }
 
         /// <summary>
+        /// Gets or sets the character cache
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public SerializableDictionary<string, Character> CharacterCache { get; set; }
+
+        /// <summary>
         /// Gets or sets the folder to cache dotland svg's etc to
         /// </summary>
         public string DataCacheFolder { get; set; }
@@ -272,6 +278,12 @@ namespace SMT.EVEData
             Utils.SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
             Utils.SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
         }
+
+        public void ShutDown()
+        {
+            ZKillFeed.ShutDown();
+        }
+
 
         /// <summary>
         /// Load the jump bridge data from disk
