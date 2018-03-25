@@ -33,9 +33,9 @@ namespace SMT
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
-        private MapConfig MapConf { get; set; }
+        private MapConfig MapConf { get; }
 
-        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get;set; }
+        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
 
 
         // Timer to Re-draw the map
@@ -242,6 +242,11 @@ namespace SMT
                 {
                     this.Topmost = false;
                 }
+            }
+
+            if(e.PropertyName == "ShowZKillData")
+            {
+                EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData; 
             }
         }
 
@@ -665,8 +670,56 @@ namespace SMT
 
         private void ZKBFeed_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (ZKBFeed.SelectedIndex == -1)
+            {
+                return;
+            }
 
+            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+
+            if (zkbs != null)
+            {
+                string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
+                System.Diagnostics.Process.Start(KillURL);
+            }
         }
+
+        private void ZKBContexMenu_ShowSystem_Click(object sender, RoutedEventArgs e)
+        {
+            if (ZKBFeed.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+
+            if (zkbs != null)
+            {
+                string systemName = EVEManager.GetSystemNameFromSystemID(zkbs.SystemID);
+                if (systemName != "")
+                {
+                    RegionRC.SelectSystem(systemName, true);
+                }
+            }
+        }
+
+        private void ZKBContexMenu_ShowZKB_Click(object sender, RoutedEventArgs e)
+        {
+            if (ZKBFeed.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+
+            if(zkbs != null)
+            {
+                string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
+                System.Diagnostics.Process.Start(KillURL);
+            }
+        }
+
+
     }
 
 }

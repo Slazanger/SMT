@@ -149,9 +149,11 @@
     <Compile Include="EVEData\JumpBridge.cs" />
     <Compile Include="EVEData\MapSystem.cs" />
     <Compile Include="EVEData\MapRegion.cs" />
-    <Compile Include="EVEData\EveManager.cs" />
-    <Compile Include="EVEData\Thera.cs" />
-    <Compile Include="EVEData\ZKBData.cs" />
+    <Compile Include="EVEData\EveManager.cs">
+      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
+    </Compile>
+    <Compile Include="EVEData\TheraConnection.cs" />
+    <Compile Include="EVEData\ESI\ZKBData.cs" />
     <Compile Include="EVEData\ZKillRedisQ.cs" />
     <Compile Include="External\csDelaunay\Delaunay\Edge.cs" />
     <Compile Include="External\csDelaunay\Delaunay\EdgeList.cs" />

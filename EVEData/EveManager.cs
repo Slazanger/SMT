@@ -1,6 +1,7 @@
 ﻿//-----------------------------------------------------------------------
 // EVE Manager
 //-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -188,12 +189,28 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Name to System dictionary
         /// </summary>
-        private Dictionary<string, System> NameToSystem { get; set; }
+        private Dictionary<string, System> NameToSystem { get; }
 
         /// <summary>
         /// Gets or sets the current list of intel filters used to monitor the local log files
         /// </summary>
         private List<string> IntelFilters { get; set; }
+
+        /// <summary>
+        /// Get the System name from the System ID
+        /// </summary>
+        /// <param name="id">System ID</param>
+        /// <returns>System Name</returns>
+        public string GetSystemNameFromSystemID(string id)
+        {
+            string name = string.Empty;
+            if (SystemIDToName.Keys.Contains(id))
+            {
+                name = SystemIDToName[id];
+            }
+
+            return name;
+        }
 
         /// <summary>
         /// Get the alliance name from the alliance ID
@@ -625,7 +642,7 @@ namespace SMT.EVEData
                         s.ActualX = x;
                         s.ActualY = y;
                         s.ActualZ = z;
-                        s.Security = security;
+                        s.TrueSec = security;
                         s.ConstellationID = constID;
                     }
                 }
@@ -781,10 +798,7 @@ namespace SMT.EVEData
         /// Does the System Exist ?
         /// </summary>
         /// <param name="name">Name (not ID) of the system</param>
-        public bool DoesSystemExist(string name)
-        {
-            return GetEveSystem(name) != null;
-        }
+        public bool DoesSystemExist(string name) => GetEveSystem(name) != null;
 
         /// <summary>
         /// Get a System object from the name, note : for regions which have other region systems in it wont return
@@ -1112,17 +1126,12 @@ namespace SMT.EVEData
                                 string l = file.ReadLine();
                                 fileReadFrom++;
 
-                                if (l.Contains("Channel ID"))
+                                // explicitly skip just "local"
+                                if(l.Contains("Channel Name:    Local"))
                                 {
-                                    string temp = l.Split(',')[1].Split(')')[0].Trim();
-                                    if (SystemIDToName.Keys.Contains(temp))
-                                    {
-                                        system = SystemIDToName[temp];
-                                    }
-
                                     // now can read the next line
-                                    l = file.ReadLine(); // should be the "Channel Name : Local"
-                                    l = file.ReadLine();
+                                    l = file.ReadLine(); // should be the "Listener : <CharName>"
+                                    fileReadFrom++;
 
                                     characterName = l.Split(':')[1].Trim();
 
@@ -1143,6 +1152,8 @@ namespace SMT.EVEData
                                         {
                                             LocalCharacters.Add(new EVEData.Character(characterName, changedFile, system));
                                         }), DispatcherPriority.ApplicationIdle);
+
+
                                     }
 
                                     break;
@@ -1171,6 +1182,12 @@ namespace SMT.EVEData
                         if (line.Contains("[") && line.Contains("]"))
                         {
                             line = line.Substring(line.IndexOf("["));
+                        }
+
+                        if(line == "")
+                        {
+                            line = file.ReadLine();
+                            continue;
                         }
 
                         fileReadFrom++;

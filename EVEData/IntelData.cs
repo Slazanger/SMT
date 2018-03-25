@@ -1,6 +1,7 @@
 ﻿//-----------------------------------------------------------------------
 // Intel Data
 //-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 
@@ -12,8 +13,9 @@ namespace SMT.EVEData
     public class IntelData
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntelData" /> class
+        ///  Initializes a new instance of the <see cref="IntelData" /> class
         /// </summary>
+        /// <param name="intelText">the raw line of text from the log file</param>
         public IntelData(string intelText)
         {
             RawIntelString = intelText;
@@ -45,9 +47,6 @@ namespace SMT.EVEData
         /// </summary>
         public List<string> Systems { get; set; }
 
-        public override string ToString()
-        {
-            return "[" + IntelTime.ToString("HH:mm") + "] " + IntelString;
-        }
+        public override string ToString() => "[" + IntelTime.ToString("HH:mm") + "] " + IntelString;
     }
 }

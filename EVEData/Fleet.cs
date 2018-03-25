@@ -1,6 +1,7 @@
 ﻿//-----------------------------------------------------------------------
 // Fleet
 //-----------------------------------------------------------------------
+
 using System.Collections.ObjectModel;
 
 namespace SMT.EVEData
@@ -49,14 +50,15 @@ namespace SMT.EVEData
         public struct FleetMember
         {
             /// <summary>
-            /// Fleet Member Character name
+            /// Gets or sets Fleet Member Character name
             /// </summary>
             public string Name { get; set; }
 
             /// <summary>
-            /// Fleet member Location
+            /// Gets or sets Fleet member Location
             /// </summary>
             public string Location { get; set; }
+
             public override string ToString() => Name;
         }
     }

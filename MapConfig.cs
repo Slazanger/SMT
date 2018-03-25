@@ -56,6 +56,21 @@ namespace SMT
         [Browsable(false)]
         public MapColours ActiveColourScheme;
 
+        private bool m_ShowZKillData;
+        [Category("General")]
+        [DisplayName("Show ZKillData")]
+        public bool ShowZKillData
+        {
+            get
+            {
+                return m_ShowZKillData;
+            }
+            set
+            {
+                m_ShowZKillData = value;
+                OnPropertyChanged("ShowZKillData");
+            }
+        }
 
         [Category("General")]
         [DisplayName("System Popup")]
@@ -138,6 +153,7 @@ namespace SMT
             MaxIntelSeconds = 120;
             AlwaysOnTop = false;
             ShowToolBox = true;
+            ShowZKillData = true;
             MapColours = new List<MapColours>();
         }
 

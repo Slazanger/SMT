@@ -99,6 +99,8 @@ namespace SMT
         static public Color GetSecStatusColour(double secStatus)
         {
             /*
+               Note : these are rounded to the nearest 0.1..
+
                 #FF2FEFEF	1.0
                 #FF48F0C0	0.9
                 #FF00EF47	0.8
@@ -114,52 +116,52 @@ namespace SMT
 
             Color secCol = (Color)ColorConverter.ConvertFromString("#FFF00000");
 
-            if (secStatus > 0.1)
+            if (secStatus > 0.05)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFD73000");
             }
 
-            if (secStatus > 0.2)
+            if (secStatus > 0.15)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFF04800");
             }
 
-            if (secStatus > 0.3)
+            if (secStatus > 0.25)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFF06000");
             }
 
-            if (secStatus > 0.4)
+            if (secStatus > 0.35)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFD77700");
             }
 
-            if (secStatus > 0.5)
+            if (secStatus > 0.45)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFEFEF00");
             }
 
-            if (secStatus > 0.6)
+            if (secStatus > 0.55)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF8FEF2F");
             }
 
-            if (secStatus > 0.7)
+            if (secStatus > 0.65)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF00F000");
             }
 
-            if (secStatus > 0.8)
+            if (secStatus > 0.75)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF00EF47");
             }
 
-            if (secStatus > 0.9)
+            if (secStatus > 0.85)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF48F0C0");
             }
 
-            if (secStatus > 0.99)
+            if (secStatus > 0.95)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF2FEFEF");
             }

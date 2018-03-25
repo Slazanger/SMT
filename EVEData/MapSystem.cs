@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿//-----------------------------------------------------------------------
+// Map System
+//-----------------------------------------------------------------------
+
+using System.Collections.Generic;
 using System.Windows;
 using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
-
     /// <summary>
     /// This is a representation of a System on a map.. usually these would be in the same region, however 
     /// these will be duplicated in the case of the inter-region link systems and in regions where it makes
@@ -12,30 +15,42 @@ namespace SMT.EVEData
     /// </summary>
     public class MapSystem
     {
+        /// <summary>
+        /// Gets or sets the Name of the system
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the region this system belongs to
+        /// </summary>
         public string Region { get; set; }
 
+        /// <summary>
+        /// Gets or sets if this system is considered out of region for layout purposes
+        /// </summary>
         public bool OutOfRegion { get; set; }
 
-
+        /// <summary>
+        /// Gets or sets the X Coordinate for the layout
+        /// </summary>
         public double LayoutX { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Y Coordinate for the layout
+        /// </summary>
         public double LayoutY { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of points defining the cell around this system
+        /// </summary>
         public List<Point> CellPoints { get; set; }
 
         /// <summary>
-        ///  the main data store for the actual eve system data
+        ///  Gets or sets the actual actual eve system
         /// </summary>
         [XmlIgnoreAttribute]
-        public System ActualSystem;
+        public System ActualSystem { get; set; }
 
-
-        public override string ToString()
-        {
-            return Name;
-        }
-
+        public override string ToString() => Name;
     }
 }

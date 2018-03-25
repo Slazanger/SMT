@@ -502,7 +502,7 @@ namespace SMT
                 // override with sec status colours
                 if (ShowSystemSecurity)
                 {
-                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.Security));
+                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec));
                 }
 
                 // add the hover over and click handlers

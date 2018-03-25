@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿//-----------------------------------------------------------------------
+// ZKillboard ReDisQ feed
+//-----------------------------------------------------------------------
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
@@ -11,64 +11,96 @@ using System.Windows.Threading;
 
 namespace SMT.EVEData
 {
+    /// <summary>
+    /// The ZKillboard RedisQ representation
+    /// </summary>
     public class ZKillRedisQ
     {
-        public class ZKBDataSimple
-        {
-            public string KillID { get; set; }
-            public string VictimCharacterID { get; set; }
-            public string VictimCorpID { get; set; }
-            public string VictimAllianceID { get; set; }
-            public string SystemID { get; set; }
-            public DateTimeOffset KillTime { get; set; }
+        private bool updateThreadRunning = true;
+        private Thread updateThread;
 
-            public override string ToString()
-            {
-                return "KillID:" + KillID + " SystemID:" + SystemID + " Victim:" + VictimCharacterID ;
-            }
+        ~ZKillRedisQ()
+        {
+            updateThreadRunning = false;
+            updateThread.Join();
         }
 
-        public ObservableCollection<ZKBDataSimple> KillStream { get; set;}
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool PauseUpdate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Stream of the last few kills from ZKillBoard
+        /// </summary>
+        public ObservableCollection<ZKBDataSimple> KillStream { get; set; }
+
+        /// <summary>
+        /// Initialise the ZKB feed system
+        /// </summary>
         public void Initialise()
         {
             KillStream = new ObservableCollection<ZKBDataSimple>();
 
-            new Thread(() =>
-            {
-                UpdateThreadFunc();
-            }).Start();
-    }
+            ThreadStart ts = new ThreadStart(UpdateThreadFunc);
+            updateThread = new Thread(ts);
+            updateThread.Start();
+        }
 
-        public void UpdateThreadFunc()
+        /// <summary>
+        /// The main update function
+        /// </summary>
+        private void UpdateThreadFunc()
         {
-            bool running = true;
-
             string redistURL = @"https://redisq.zkillboard.com/listen.php";
 
             int cleanupCounter = 0;
 
-            while (running)
+            while (updateThreadRunning)
             {
+                if(PauseUpdate)
+                {
+                    if(KillStream.Count > 0)
+                    {
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        {
+                            KillStream.Clear();
+                        }), DispatcherPriority.ApplicationIdle);
+
+                    }
+
+                    Thread.Sleep(5000);
+                    continue;
+                }
+
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(redistURL);
                 request.Method = WebRequestMethods.Http.Get;
-                request.Timeout = 20000;
+                request.Timeout = 10000;
                 request.Proxy = null;
 
-                WebResponse response = request.GetResponse();
+                HttpWebResponse response;
+
+                try
+                {
+                    response = request.GetResponse() as HttpWebResponse;
+                }
+                catch
+                {
+                    Thread.Sleep(1000);
+                    continue;
+                }
 
                 Stream responseStream = response.GetResponseStream();
+
                 using (StreamReader sr = new StreamReader(responseStream))
                 {
                     // Need to return this response
                     string strContent = sr.ReadToEnd();
 
-//                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-
                     try
                     {
                         ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
-                        if(z.Package != null)
+                        if (z.Package != null)
                         {
                             ZKBDataSimple zs = new ZKBDataSimple();
                             zs.KillID = z.Package.KillId.ToString();
@@ -80,19 +112,19 @@ namespace SMT.EVEData
 
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
-                                KillStream.Add(zs);
+                                KillStream.Insert(0,zs);
                             }), DispatcherPriority.ApplicationIdle);
                         }
                         else
                         {
+                            // nothing was returned by the request; rather than spam the server just wait 5 seconds
                             Thread.Sleep(5000);
                         }
 
                         cleanupCounter++;
 
                         // now clean up the list
-
-                        if(cleanupCounter > 100)
+                        if (cleanupCounter > 10)
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
@@ -103,23 +135,64 @@ namespace SMT.EVEData
                                         KillStream.RemoveAt(i);
                                     }
                                 }
-
                             }), DispatcherPriority.ApplicationIdle);
 
                             cleanupCounter = 0;
                         }
-
-
                     }
                     catch
                     {
                     }
-
-
                 }
 
-                // wait 1 seconds for the next request
+                // wait for the next request
                 Thread.Sleep(100);
+            }
+        }
+
+        /// <summary>
+        /// A simple class with the Kill Highlights
+        /// </summary>
+        public class ZKBDataSimple
+        {
+            /// <summary>
+            /// Gets or sets the ZKillboard Kill ID
+            /// </summary>
+            public string KillID { get; set; }
+
+            /// <summary>
+            /// Gets or sets the character ID of the victim
+            /// </summary>
+            public string VictimCharacterID { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Victim's corp ID
+            /// </summary>
+            public string VictimCorpID { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Victims Alliance ID
+            /// </summary>
+            public string VictimAllianceID { get; set; }
+
+            /// <summary>
+            /// Gets or sets the System ID the kill was in
+            /// </summary>
+            public string SystemID { get; set; }
+
+            /// <summary>
+            /// Gets or sets the time of the kill
+            /// </summary>
+            public DateTimeOffset KillTime { get; set; }
+
+            public override string ToString()
+            {
+                string systemName = EVEData.EveManager.Instance.GetSystemNameFromSystemID(SystemID);
+                if(systemName == string.Empty)
+                {
+                    systemName = SystemID;
+                }
+                return "KillID:" + KillID + " System:" + systemName + " Victim:" + VictimCharacterID;
             }
         }
     }

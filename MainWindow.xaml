@@ -93,6 +93,13 @@
                                                     </Grid>
                                                 </DataTemplate>
                                             </ListBox.ItemTemplate>
+
+                                            <ListBox.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
+                                                    <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
+                                                </ContextMenu>
+                                            </ListBox.ContextMenu>
                                         </ListBox>
                                     </Grid>
                                 </xcad:LayoutAnchorable>
