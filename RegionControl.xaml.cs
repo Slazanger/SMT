@@ -704,7 +704,7 @@ namespace SMT
                         Point startPoint = new Point(from.LayoutX, from.LayoutY);
                         Point endPoint;
                         
-                        if (!Region.IsSystemOnMap(jb.To))
+                        if (!Region.IsSystemOnMap(jb.To) || !Region.IsSystemOnMap(jb.From))
                         {
                             endPoint = new Point(from.LayoutX - 20, from.LayoutY - 40);
 
