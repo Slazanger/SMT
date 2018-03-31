@@ -131,6 +131,12 @@ namespace SMT.EVEData
         }
 
         /// <summary>
+        /// Gets or sets the ShipTypes ID to Name dictionary
+        /// </summary>
+        public SerializableDictionary<string, string> ShipTypes { get; set; }
+
+
+        /// <summary>
         /// Gets or sets the master list of Regions
         /// </summary>
         public List<MapRegion> Regions { get; set; }
@@ -763,7 +769,93 @@ namespace SMT.EVEData
                 }
             }
 
+            // now get the ships
+            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\invTypes.csv";
+            if (File.Exists(eveStaticDataItemTypesFile))
+            {
+                ShipTypes = new SerializableDictionary<string, string>();
+
+                List<string> ValidShipGroupIDs = new List<string>();
+
+                ValidShipGroupIDs.Add("25"); //  Frigate
+                ValidShipGroupIDs.Add("26"); //  Cruiser
+                ValidShipGroupIDs.Add("27"); //  Battleship
+                ValidShipGroupIDs.Add("28"); //  Industrial
+                ValidShipGroupIDs.Add("29"); //  Capsule
+                ValidShipGroupIDs.Add("30"); //  Titan
+                ValidShipGroupIDs.Add("31"); //  Shuttle
+                ValidShipGroupIDs.Add("237"); //  Corvette
+                ValidShipGroupIDs.Add("324"); //  Assault Frigate
+                ValidShipGroupIDs.Add("358"); //  Heavy Assault Cruiser
+                ValidShipGroupIDs.Add("380"); //  Deep Space Transport
+                ValidShipGroupIDs.Add("381"); //  Elite Battleship
+                ValidShipGroupIDs.Add("419"); //  Combat Battlecruiser
+                ValidShipGroupIDs.Add("420"); //  Destroyer
+                ValidShipGroupIDs.Add("463"); //  Mining Barge
+                ValidShipGroupIDs.Add("485"); //  Dreadnought
+                ValidShipGroupIDs.Add("513"); //  Freighter
+                ValidShipGroupIDs.Add("540"); //  Command Ship
+                ValidShipGroupIDs.Add("541"); //  Interdictor
+                ValidShipGroupIDs.Add("543"); //  Exhumer
+                ValidShipGroupIDs.Add("547"); //  Carrier
+                ValidShipGroupIDs.Add("659"); //  Supercarrier
+                ValidShipGroupIDs.Add("830"); //  Covert Ops
+                ValidShipGroupIDs.Add("831"); //  Interceptor
+                ValidShipGroupIDs.Add("832"); //  Logistics
+                ValidShipGroupIDs.Add("833"); //  Force Recon Ship
+                ValidShipGroupIDs.Add("834"); //  Stealth Bomber
+                ValidShipGroupIDs.Add("883"); //  Capital Industrial Ship
+                ValidShipGroupIDs.Add("893"); //  Electronic Attack Ship
+                ValidShipGroupIDs.Add("894"); //  Heavy Interdiction Cruiser
+                ValidShipGroupIDs.Add("898"); //  Black Ops
+                ValidShipGroupIDs.Add("900"); //  Marauder
+                ValidShipGroupIDs.Add("902"); //  Jump Freighter
+                ValidShipGroupIDs.Add("906"); //  Combat Recon Ship
+                ValidShipGroupIDs.Add("941"); //  Industrial Command Ship
+                ValidShipGroupIDs.Add("963"); //  Strategic Cruiser
+                ValidShipGroupIDs.Add("1022"); //  Prototype Exploration Ship
+                ValidShipGroupIDs.Add("1201"); //  Attack Battlecruiser
+                ValidShipGroupIDs.Add("1202"); //  Blockade Runner
+                ValidShipGroupIDs.Add("1283"); //  Expedition Frigate
+                ValidShipGroupIDs.Add("1305"); //  Tactical Destroyer
+                ValidShipGroupIDs.Add("1527"); //  Logistics Frigate
+                ValidShipGroupIDs.Add("1534"); //  Command Destroyer
+                ValidShipGroupIDs.Add("1538"); //  Force Auxiliary
+                ValidShipGroupIDs.Add("1972"); //  Flag Cruiser
+
+                StreamReader file = new StreamReader(eveStaticDataItemTypesFile);
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    if(line == string.Empty)
+                    {
+                        continue;
+                    }
+                    string[] bits = line.Split(',');
+
+                    if(bits.Length < 3)
+                    {
+                        continue;
+                    } 
+
+
+                    string typeID = bits[0];
+                    string groupID = bits[1];
+                    string ItemName = bits[2];
+
+                    if (ValidShipGroupIDs.Contains(groupID))
+                    {
+                        ShipTypes.Add(typeID, ItemName);
+                    }
+
+                }
+            }
+
             // now serialise the classes to disk
+            Utils.SerializToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
             Utils.SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
             Utils.SerializToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
@@ -779,6 +871,7 @@ namespace SMT.EVEData
 
             Regions = Utils.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
             Systems = Utils.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            ShipTypes = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
 
             foreach (System s in Systems)
             {
@@ -843,6 +936,24 @@ namespace SMT.EVEData
 
             return null;
         }
+
+        /// <summary>
+        /// Get a System name from the ID
+        /// </summary>
+        /// <param name="id">ID of the system</param>
+        public string GetEveSystemNameFromID(string id)
+        {
+            foreach (System s in Systems)
+            {
+                if (s.ID == id)
+                {
+                    return s.Name;
+                }
+            }
+
+            return string.Empty;
+        }
+
 
         /// <summary>
         /// Get the MapRegion from the name
@@ -972,6 +1083,42 @@ namespace SMT.EVEData
                 // we've cached every known system on the map already
             }
         }
+
+        /// <summary>
+        /// Update the Alliance and Ticker data for specified list
+        /// </summary>
+        public void ResolveAllianceIDs(List<string> IDs)
+        {
+            string allianceList = string.Empty;
+            foreach (string s in IDs)
+            {
+                if (!AllianceIDToName.Keys.Contains(s) && !allianceList.Contains(s))
+                {
+                    allianceList += s + ",";
+                }
+            }
+
+            if (allianceList != string.Empty)
+            {
+                allianceList += "0";
+                string url = @"https://esi.tech.ccp.is/v2/alliances/names/?datasource=tranquility";
+
+                url += "&alliance_ids=" + Uri.EscapeUriString(allianceList);
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.Method = WebRequestMethods.Http.Get;
+                request.Timeout = 20000;
+                request.Proxy = null;
+                request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
+            }
+            else
+            {
+                // we've cached every known system on the map already
+            }
+        }
+
+
+
 
         /// <summary>
         /// Update the current Thera Connections from EVE-Scout

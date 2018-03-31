@@ -14,6 +14,7 @@
         Title="Slazanger's Map Tool 0.41" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico" Loaded="Window_Loaded">
 
     <Window.Resources>
+        <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
     </Window.Resources>
     <Grid>
 
@@ -85,22 +86,35 @@
 
                                 <xcad:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid Background="#FFE5E5E5">
-                                        <ListBox x:Name="ZKBFeed" Margin="0,2" MouseDoubleClick="ZKBFeed_MouseDoubleClick">
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid>
-                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
+                                        <StackPanel>
+                                            <CheckBox Content="Current Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
 
-                                            <ListBox.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
-                                                    <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
-                                                </ContextMenu>
-                                            </ListBox.ContextMenu>
-                                        </ListBox>
+                                            <DataGrid  x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" >
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" />
+                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*"/>
+                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*"/>
+                                                </DataGrid.Columns>
+                                                <DataGrid.RowStyle>
+                                                    <Style TargetType="DataGridRow">
+                                                        <Style.Setters>
+                                                            <Setter Property="Background">
+                                                                <Setter.Value>
+                                                                    <Binding Converter="{StaticResource zkbBGConverter}" />
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style.Setters>
+                                                    </Style>
+                                                </DataGrid.RowStyle>
+                                                
+                                                <DataGrid.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
+                                                        <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
+                                                    </ContextMenu>
+                                                </DataGrid.ContextMenu>
+                                            </DataGrid>
+                                        </StackPanel>
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 

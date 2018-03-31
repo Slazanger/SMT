@@ -262,6 +262,17 @@ namespace SMT
         }
 
 
+        public event PropertyChangedEventHandler CharacterSelectionChanged;
+
+        protected void OnCharacterSelectionChanged(string name)
+        {
+            PropertyChangedEventHandler handler = CharacterSelectionChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
 
 
 
@@ -1265,22 +1276,22 @@ namespace SMT
             {
                 foreach (EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream)
                 {
-                    if (ZKBBaseFeed.Keys.Contains(zs.SystemID))
+                    if (ZKBBaseFeed.Keys.Contains(zs.SystemName))
                     {
-                        ZKBBaseFeed[zs.SystemID]++;
+                        ZKBBaseFeed[zs.SystemName]++;
                     }
                     else
                     {
-                        ZKBBaseFeed[zs.SystemID] = 1;
+                        ZKBBaseFeed[zs.SystemName] = 1;
                     }
                 }
 
 
                 foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
                 {
-                    if (ZKBBaseFeed.Keys.Contains(sys.ActualSystem.ID))
+                    if (ZKBBaseFeed.Keys.Contains(sys.ActualSystem.Name))
                     {
-                        double ZKBValue = 24 + ((double)ZKBBaseFeed[sys.ActualSystem.ID] * ESIOverlayScale * 2);
+                        double ZKBValue = 24 + ((double)ZKBBaseFeed[sys.ActualSystem.Name] * ESIOverlayScale * 2);
 
                         Shape infoCircle = new Ellipse() { Height = ZKBValue, Width = ZKBValue };
                         infoCircle.Fill = zkbColour;
@@ -1290,8 +1301,6 @@ namespace SMT
                         Canvas.SetTop(infoCircle, sys.LayoutY - (ZKBValue / 2));
                         MainCanvas.Children.Add(infoCircle);
                         DynamicMapElements.Add(infoCircle);
-
-
                     }
                 }
             }
@@ -1520,6 +1529,7 @@ namespace SMT
             if(ActiveCharacter != c)
             {
                 ActiveCharacter = c;
+                OnCharacterSelectionChanged(c.Name);
             }
 
 

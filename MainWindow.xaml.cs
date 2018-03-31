@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -30,6 +31,9 @@ namespace SMT
 
         public EVEData.AnomManager ANOMManager { get; set; }
 
+        public static MainWindow AppWindow;
+
+
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
@@ -45,6 +49,7 @@ namespace SMT
         public MainWindow()
         {
             OutputLog.Info("Starting App..");
+            AppWindow = this;
 
             InitializeComponent();
 
@@ -161,6 +166,7 @@ namespace SMT
 
 
             RegionRC.RegionChanged += RegionRC_RegionChanged;
+            RegionRC.CharacterSelectionChanged += RegionRC_CharacterSelectionChanged;
 
 
             // load the anom data
@@ -218,6 +224,16 @@ namespace SMT
 
             ZKBFeed.ItemsSource = EVEManager.ZKillFeed.KillStream;
 
+
+            CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
+            zKBFeedview.Filter = ZKBFeedFilter;
+
+
+        }
+
+        private void RegionRC_CharacterSelectionChanged(object sender, PropertyChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
         }
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
@@ -228,6 +244,8 @@ namespace SMT
         private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
         {
             RegionLayoutDoc.Title = "Region : " + RegionRC.Region.Name;
+
+            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
         }
 
         private void MapConf_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -696,11 +714,7 @@ namespace SMT
 
             if (zkbs != null)
             {
-                string systemName = EVEManager.GetSystemNameFromSystemID(zkbs.SystemID);
-                if (systemName != "")
-                {
-                    RegionRC.SelectSystem(systemName, true);
-                }
+                RegionRC.SelectSystem(zkbs.SystemName, true);
             }
         }
 
@@ -720,7 +734,107 @@ namespace SMT
             }
         }
 
+        private bool FilterByRegion = true;
 
+        private bool ZKBFeedFilter(object item)
+        {
+
+            if(FilterByRegion == false)
+            {
+                return true;
+            }
+
+            EVEData.ZKillRedisQ.ZKBDataSimple zs = item as EVEData.ZKillRedisQ.ZKBDataSimple;
+            if(zs == null)
+            {
+                return false;
+            }
+
+            if(RegionRC.Region.IsSystemOnMap(zs.SystemName))
+            {
+                return true;
+            }
+
+            return false;
+
+        }
+
+        private void ZKBFeedFilterViewChk_Checked(object sender, RoutedEventArgs e)
+        {
+            FilterByRegion = (bool) ZKBFeedFilterViewChk.IsChecked; 
+
+            if (ZKBFeed != null)
+            {
+                try
+                {
+                    CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+                }
+                catch
+                {
+
+                }
+                
+            }
+        }
+
+    }
+
+
+    public class ZKBBackgroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            EVEData.ZKillRedisQ.ZKBDataSimple zs = value as EVEData.ZKillRedisQ.ZKBDataSimple;
+            Color rowCol = Colors.WhiteSmoke;
+            if (zs != null)
+            {
+                float Standing = 0.0f;
+
+                EVEData.Character c = MainWindow.AppWindow.RegionRC.ActiveCharacter;
+                if (c != null && c.ESILinked)
+                {
+                    if (c.AllianceID != null && c.AllianceID == zs.VictimAllianceID)
+                    {
+                        Standing = 10.0f;
+                    }
+
+                    if (c.Standings.Keys.Contains(zs.VictimAllianceID))
+                    {
+                        Standing = c.Standings[zs.VictimAllianceID];
+                    }
+
+                    if (Standing == -10.0)
+                    {
+                        rowCol = Colors.Red;
+                    }
+
+                    if (Standing == -5.0)
+                    {
+                        rowCol = Colors.Orange;
+                    }
+
+                    if (Standing == 5.0)
+                    {
+                        rowCol = Colors.LightBlue;
+                    }
+
+                    if (Standing == 10.0)
+                    {
+                        rowCol = Colors.Blue;
+                    }
+                }
+
+
+                // Do the conversion from bool to visibility
+            }
+
+            return new SolidColorBrush(rowCol);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
     }
 
 }

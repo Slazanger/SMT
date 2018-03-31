@@ -2,8 +2,11 @@
 // ZKillboard ReDisQ feed
 //-----------------------------------------------------------------------
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Windows;
@@ -113,8 +116,26 @@ namespace SMT.EVEData
                             zs.VictimAllianceID = z.Package.Killmail.Victim.AllianceId.ToString();
                             zs.VictimCharacterID = z.Package.Killmail.Victim.CharacterId.ToString();
                             zs.VictimCorpID = z.Package.Killmail.Victim.CharacterId.ToString();
-                            zs.SystemID = z.Package.Killmail.SolarSystemId.ToString();
+                            zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId.ToString());
+                            if(zs.SystemName == string.Empty)
+                            {
+                                zs.SystemName = z.Package.Killmail.SolarSystemId.ToString();
+                            }
+
                             zs.KillTime = z.Package.Killmail.KillmailTime;
+                            string shipID = z.Package.Killmail.Victim.ShipTypeId.ToString();
+                            if (EveManager.Instance.ShipTypes.Keys.Contains(shipID))
+                            {
+                                zs.ShipType = EveManager.Instance.ShipTypes[shipID];
+                            }
+                            else
+                            {
+                                zs.ShipType = "Unknown (" + shipID + ")";
+                            }
+
+
+
+                            zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);                            
 
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
@@ -129,18 +150,39 @@ namespace SMT.EVEData
 
                         cleanupCounter++;
 
+
                         // now clean up the list
-                        if (cleanupCounter > 10)
+                        if (cleanupCounter > 5)
                         {
+
+                            List<string> AllianceIDs = new List<string>();
+
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
                                 for (int i = KillStream.Count - 1; i >= 0; i--)
                                 {
+                                    if(KillStream[i].VictimAllianceName == string.Empty)
+                                    {
+                                        if (!EveManager.Instance.AllianceIDToTicker.Keys.Contains(KillStream[i].VictimAllianceID))
+                                        {
+                                            AllianceIDs.Add(KillStream[i].VictimAllianceID);
+                                        }
+                                        else
+                                        {
+                                            KillStream[i].VictimAllianceName = EveManager.Instance.GetAllianceName(KillStream[i].VictimAllianceID);
+                                        }
+                                    }
+
                                     if (KillStream[i].KillTime + TimeSpan.FromMinutes(30) < DateTimeOffset.Now)
                                     {
                                         KillStream.RemoveAt(i);
                                     }
                                 }
+                                if(AllianceIDs.Count > 0)
+                                {
+                                    EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
+                                }
+
                             }), DispatcherPriority.Normal);
 
                             cleanupCounter = 0;
@@ -159,8 +201,11 @@ namespace SMT.EVEData
         /// <summary>
         /// A simple class with the Kill Highlights
         /// </summary>
-        public class ZKBDataSimple
+        public class ZKBDataSimple : INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged;
+
+
             /// <summary>
             /// Gets or sets the ZKillboard Kill ID
             /// </summary>
@@ -181,24 +226,66 @@ namespace SMT.EVEData
             /// </summary>
             public string VictimAllianceID { get; set; }
 
+
+            private string m_victimAllianceName;
+            /// <summary>
+            /// Gets or sets the Victims Alliance Name
+            /// </summary>
+            public string VictimAllianceName
+            {
+                get
+                {
+                    return m_victimAllianceName;
+                }
+                set
+                {
+                    m_victimAllianceName = value;
+                    OnPropertyChanged("VictimAllianceName");
+                }
+            }
+
+
             /// <summary>
             /// Gets or sets the System ID the kill was in
             /// </summary>
-            public string SystemID { get; set; }
+            public string SystemName { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Ship Lost in this kill
+            /// </summary>
+            public string ShipType { get; set; }
 
             /// <summary>
             /// Gets or sets the time of the kill
             /// </summary>
             public DateTimeOffset KillTime { get; set; }
 
+
+
+            protected void OnPropertyChanged(string name)
+            {
+                PropertyChangedEventHandler handler = PropertyChanged;
+                if (handler != null)
+                {
+                    handler(this, new PropertyChangedEventArgs(name));
+                }
+            }
+
+
             public override string ToString()
             {
-                string systemName = EVEData.EveManager.Instance.GetSystemNameFromSystemID(SystemID);
-                if(systemName == string.Empty)
+                string systemName = EVEData.EveManager.Instance.GetSystemNameFromSystemID(SystemName);
+                string allianceTicker = EVEData.EveManager.Instance.GetAllianceTicker(VictimAllianceID);
+                if (systemName == string.Empty)
                 {
-                    systemName = SystemID;
+                    systemName = SystemName;
                 }
-                return "KillID:" + KillID + " System:" + systemName + " Victim:" + VictimCharacterID;
+                if(allianceTicker == string.Empty)
+                {
+                    allianceTicker = VictimAllianceID; 
+                }
+
+                return string.Format("System: {0}, Alliance: {1}, Ship {2}", systemName, allianceTicker,  ShipType);
             }
         }
     }
