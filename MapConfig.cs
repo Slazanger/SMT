@@ -127,6 +127,24 @@ namespace SMT
             }
         }
 
+
+        private bool m_ShowTrueSec;
+        [Category("General")]
+        [DisplayName("Show TrueSec")]
+        public bool ShowTrueSec
+        {
+            get
+            {
+                return m_ShowTrueSec;
+            }
+            set
+            {
+                m_ShowTrueSec = value;
+                OnPropertyChanged("ShowTrueSec");
+            }
+        }
+
+
         private bool m_ShowToolBox = true;
         [Category("General")]
         [DisplayName("Show Toolbox")]
@@ -154,7 +172,9 @@ namespace SMT
             AlwaysOnTop = false;
             ShowToolBox = true;
             ShowZKillData = true;
+            ShowTrueSec = true;
             MapColours = new List<MapColours>();
+            
         }
 
         public void SetDefaultColours()

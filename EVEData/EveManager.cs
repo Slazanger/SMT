@@ -822,6 +822,40 @@ namespace SMT.EVEData
                 ValidShipGroupIDs.Add("1534"); //  Command Destroyer
                 ValidShipGroupIDs.Add("1538"); //  Force Auxiliary
                 ValidShipGroupIDs.Add("1972"); //  Flag Cruiser
+                // fighters
+                ValidShipGroupIDs.Add("1537"); //  Support Fighter None    0   0   0   0   1
+                ValidShipGroupIDs.Add("1652"); //  Light Fighter   None    0   0   0   0   1
+                ValidShipGroupIDs.Add("1653"); //  Heavy Fighter   None    0   0   0   0   1
+
+                // deployables
+                ValidShipGroupIDs.Add("361");  //  Mobile Warp Disruptor
+                ValidShipGroupIDs.Add("1149"); //  Mobile Jump Disruptor
+                ValidShipGroupIDs.Add("1246"); //  Mobile Depot
+                ValidShipGroupIDs.Add("1247"); //  Mobile Siphon Unit
+                ValidShipGroupIDs.Add("1249"); //  Mobile Cyno Inhibitor
+                ValidShipGroupIDs.Add("1250"); //  Mobile Tractor Unit
+                ValidShipGroupIDs.Add("1273"); //  Encounter Surveillance System
+                ValidShipGroupIDs.Add("1274"); //  Mobile Decoy Unit
+                ValidShipGroupIDs.Add("1275"); //  Mobile Scan Inhibitor
+                ValidShipGroupIDs.Add("1276"); //  Mobile Micro Jump Unit
+                ValidShipGroupIDs.Add("1297"); //  Mobile Vault
+
+                // structures
+                ValidShipGroupIDs.Add("1312"); //  Observatory Structures
+                ValidShipGroupIDs.Add("1404"); //  Engineering Complex
+                ValidShipGroupIDs.Add("1405"); //  Laboratory
+                ValidShipGroupIDs.Add("1406"); //  Refinery
+                ValidShipGroupIDs.Add("1407"); //  Observatory Array
+                ValidShipGroupIDs.Add("1408"); //  Stargate
+                ValidShipGroupIDs.Add("1409"); //  Administration Hub
+                ValidShipGroupIDs.Add("1410"); //  Advertisement Center
+
+                // citadels
+                ValidShipGroupIDs.Add("1657"); //  Citadel
+                ValidShipGroupIDs.Add("1876"); //  Engineering Complex
+                ValidShipGroupIDs.Add("1924"); //  Forward Operating Base
+
+
 
                 StreamReader file = new StreamReader(eveStaticDataItemTypesFile);
 

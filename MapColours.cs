@@ -96,7 +96,7 @@ namespace SMT
 
 
 
-        static public Color GetSecStatusColour(double secStatus)
+        static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
         {
             /*
                Note : these are rounded to the nearest 0.1..
@@ -115,6 +115,11 @@ namespace SMT
             */
 
             Color secCol = (Color)ColorConverter.ConvertFromString("#FFF00000");
+
+            if(GradeTrueSec && secStatus < 0.0)
+            {
+                secCol.R = (byte)(60 + (1.0-(secStatus / -1.0)) * 195) ;
+            }
 
             if (secStatus > 0.05)
             {

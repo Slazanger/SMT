@@ -513,7 +513,7 @@ namespace SMT
                 // override with sec status colours
                 if (ShowSystemSecurity)
                 {
-                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec));
+                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
                 }
 
                 // add the hover over and click handlers
@@ -529,6 +529,7 @@ namespace SMT
 
                 Label sysText = new Label();
                 sysText.Content = system.Name;
+
                 if (MapConf.ActiveColourScheme.SystemTextSize > 0)
                 {
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
@@ -650,7 +651,6 @@ namespace SMT
                         systemShape.Fill = JumpOutRange;
                     }
                 }
-
 
 
                 if (system.OutOfRegion)
