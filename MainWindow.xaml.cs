@@ -455,7 +455,7 @@ namespace SMT
                 {
                     continue;
                 }
-                if (EVEManager.Systems.Any(x => (x.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)))
+                if (EVEManager.Systems.Any(x => (s.IndexOf(x.Name, StringComparison.OrdinalIgnoreCase) >= 0)))
                 {
                     EVEData.System sys = EVEManager.GetEveSystem(s);
                     if (sys == null)
@@ -821,7 +821,7 @@ namespace SMT
 
                     if (Standing == 10.0)
                     {
-                        rowCol = Colors.Blue;
+                        rowCol = Colors.CornflowerBlue;
                     }
                 }
 
