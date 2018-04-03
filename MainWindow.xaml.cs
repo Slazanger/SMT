@@ -449,28 +449,25 @@ namespace SMT
            
             EVEData.IntelData intel = RawIntelBox.SelectedItem as EVEData.IntelData;
 
-            foreach(string s in intel.IntelString.Split(' '))
+            foreach (string s in intel.IntelString.Split(' '))
             {
-                if(s=="")
+                if (s == "")
                 {
                     continue;
                 }
-                if (EVEManager.Systems.Any(x => (s.IndexOf(x.Name, StringComparison.OrdinalIgnoreCase) >= 0)))
+
+                foreach (EVEData.System sys in EVEManager.Systems)
                 {
-                    EVEData.System sys = EVEManager.GetEveSystem(s);
-                    if (sys == null)
+                    if (s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
                     {
+                        if (RegionRC.Region.Name != sys.Region)
+                        {
+                            RegionRC.SelectRegion(sys.Region);
+                        }
+
+                        RegionRC.SelectSystem(s);
                         return;
                     }
-
-                    if(RegionRC.Region.Name != sys.Region)
-                    {
-                        RegionRC.SelectRegion(sys.Region);
-                    }
-
-
-                    RegionRC.SelectSystem(s);
-                    return;
                 }
             }
 

@@ -1426,10 +1426,12 @@ namespace SMT.EVEData
 
                                     foreach (string s in id.IntelString.Split(' '))
                                     {
-                                        if (DoesSystemExist(s))
+                                        foreach(System sys in Systems)
                                         {
-                                            outputLog.Info("Adding Intel Line : {0} ", line);
-                                            id.Systems.Add(s);
+                                            if(s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                                            {
+                                                id.Systems.Add(sys.Name);
+                                            }
                                         }
                                     }
 
