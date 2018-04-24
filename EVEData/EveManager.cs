@@ -72,7 +72,7 @@ namespace SMT.EVEData
         /// </summary>
         public EveManager()
         {
-            LocalCharacters = new ObservableCollection<Character>();
+            LocalCharacters = new ObservableCollection<LocalCharacter>();
 
             // ensure we have the cache folder setup
             DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";
@@ -170,7 +170,7 @@ namespace SMT.EVEData
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<Character> LocalCharacters { get; set; }
+        public ObservableCollection<LocalCharacter> LocalCharacters { get; set; }
 
         /// <summary>
         /// Gets or sets the character cache
@@ -262,9 +262,9 @@ namespace SMT.EVEData
         public void SaveData()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
-            ObservableCollection<Character> saveList = new ObservableCollection<Character>();
+            ObservableCollection<LocalCharacter> saveList = new ObservableCollection<LocalCharacter>();
 
-            foreach (Character c in LocalCharacters)
+            foreach (LocalCharacter c in LocalCharacters)
             {
                 if (c.ESIRefreshToken != string.Empty)
                 {
@@ -272,7 +272,7 @@ namespace SMT.EVEData
                 }
             }
 
-            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
+            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
@@ -1236,15 +1236,15 @@ namespace SMT.EVEData
 
             try
             {
-                ObservableCollection<Character> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<Character>));
+                ObservableCollection<LocalCharacter> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
 
                 FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
-                loadList = (ObservableCollection<Character>)xms.Deserialize(xmlr);
+                loadList = (ObservableCollection<LocalCharacter>)xms.Deserialize(xmlr);
 
-                foreach (Character c in loadList)
+                foreach (LocalCharacter c in loadList)
                 {
                     c.ESIAccessToken = string.Empty;
                     c.ESIAccessTokenExpiry = DateTime.MinValue;
@@ -1329,7 +1329,7 @@ namespace SMT.EVEData
                                     characterName = l.Split(':')[1].Trim();
 
                                     bool addChar = true;
-                                    foreach (EVEData.Character c in LocalCharacters)
+                                    foreach (EVEData.LocalCharacter c in LocalCharacters)
                                     {
                                         if (characterName == c.Name)
                                         {
@@ -1343,7 +1343,7 @@ namespace SMT.EVEData
                                     {
                                         Application.Current.Dispatcher.Invoke((Action)(() =>
                                         {
-                                            LocalCharacters.Add(new EVEData.Character(characterName, changedFile, system));
+                                            LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
                                         }), DispatcherPriority.ApplicationIdle);
 
 
@@ -1393,7 +1393,7 @@ namespace SMT.EVEData
 
                                 Application.Current.Dispatcher.Invoke((Action)(() =>
                                 {
-                                    foreach (EVEData.Character c in LocalCharacters)
+                                    foreach (EVEData.LocalCharacter c in LocalCharacters)
                                     {
                                         if (c.LocalChatFile == changedFile)
                                         {
@@ -1544,8 +1544,8 @@ namespace SMT.EVEData
                                 string expiresOn = obj["ExpiresOn"].ToString();
 
                                 // now find the matching character and update..
-                                Character esiChar = null;
-                                foreach (Character c in LocalCharacters)
+                                LocalCharacter esiChar = null;
+                                foreach (LocalCharacter c in LocalCharacters)
                                 {
                                     if (c.Name == characterName)
                                     {
@@ -1555,7 +1555,7 @@ namespace SMT.EVEData
 
                                 if (esiChar == null)
                                 {
-                                    esiChar = new Character(characterName, string.Empty, string.Empty);
+                                    esiChar = new LocalCharacter(characterName, string.Empty, string.Empty);
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
@@ -1716,7 +1716,7 @@ namespace SMT.EVEData
                 {
                     for (int i = 0; i < LocalCharacters.Count; i++)
                     {
-                        Character c = LocalCharacters.ElementAt(i);
+                        LocalCharacter c = LocalCharacters.ElementAt(i);
                         c.Update();
                     }
 
@@ -1914,6 +1914,55 @@ namespace SMT.EVEData
             {
             }
         }
+
+        public void BulkUpdateCharacterCache(List<string> charList)
+        {
+            string esiCharString = "[";
+            foreach (string s in charList)
+            {
+                esiCharString += s;
+                esiCharString += ",";
+            }
+            esiCharString = "0]";
+
+            string url = @"https://esi.tech.ccp.is/v1/universe/ids/?";
+
+            var httpData = HttpUtility.ParseQueryString(string.Empty);
+
+            httpData["datasource"] = "tranquility";
+            httpData["names"] = esiCharString;
+
+            string httpDataStr = httpData.ToString();
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url + httpDataStr);
+            request.Method = WebRequestMethods.Http.Post;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+            if (esiResult.StatusCode != HttpStatusCode.OK)
+            {
+                return;
+            }
+
+            Stream responseStream = esiResult.GetResponseStream();
+            using (StreamReader sr = new StreamReader(responseStream))
+            {
+                // Need to return this response
+                string strContent = sr.ReadToEnd();
+
+                try
+                {
+                    CharacterIDs.CharacterIdData cd = CharacterIDs.CharacterIdData.FromJson(strContent);
+                    if (cd.Characters != null)
+                    {
+                    }
+                }
+                catch { }
+            }
+        }
+
 
         /// <summary>
         /// Initialise the ZKillBoard Feed

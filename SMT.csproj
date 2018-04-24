@@ -118,6 +118,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EVEData\ESI\CharacterIDData.cs" />
+    <Compile Include="EVEData\LocalCharacter.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>

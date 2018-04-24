@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.43" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico" Loaded="Window_Loaded">
+        Title="Slazanger's Map Tool 0.44" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico" Loaded="Window_Loaded">
 
     <Window.Resources>
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
@@ -89,11 +89,11 @@
                                         <StackPanel>
                                             <CheckBox Content="Current Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
 
-                                            <DataGrid  x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" >
+                                            <DataGrid  x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
                                                 <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" />
-                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*"/>
-                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*"/>
+                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" />
+                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True"/>
+                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True"/>
                                                 </DataGrid.Columns>
                                                 <DataGrid.RowStyle>
                                                     <Style TargetType="DataGridRow">
@@ -114,6 +114,24 @@
                                                     </ContextMenu>
                                                 </DataGrid.ContextMenu>
                                             </DataGrid>
+                                        </StackPanel>
+                                    </Grid>
+                                </xcad:LayoutAnchorable>
+
+                                <xcad:LayoutAnchorable x:Name="LocalAnalyser"  Title="Local Tool" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="LocalContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                    <Grid Background="#FFE5E5E5">
+                                        <StackPanel>
+                                            <CheckBox Content="Filter Friendly?" x:Name="LocalPilotsFilterFriendlyChk" IsChecked="True" />
+
+                                            <DataGrid  x:Name="LocalPilots" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" >
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Name" Binding="{Binding SystemName}" Width="30*" />
+                                                    <DataGridTextColumn Header="Corp" Binding="{Binding VictimAllianceName}" Width="40*"/>
+                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding ShipType}" Width="30*"/>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                            <Button x:Name="UpdateLocalFromClipboardBtn" Content="Update from Clipboard" Click="UpdateLocalFromClipboardBtn_Click"/>
+                                            
                                         </StackPanel>
                                     </Grid>
                                 </xcad:LayoutAnchorable>

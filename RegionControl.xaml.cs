@@ -32,8 +32,8 @@ namespace SMT
 
 
 
-        private Character m_ActiveCharacter;
-        public Character ActiveCharacter
+        private LocalCharacter m_ActiveCharacter;
+        public LocalCharacter ActiveCharacter
         {
             get
             {
@@ -345,6 +345,8 @@ namespace SMT
         {
             EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
+            BridgeInfo.Content = string.Empty;
+
 
             DynamicMapElements = new List<UIElement>();
 
@@ -399,6 +401,12 @@ namespace SMT
                     SystemDropDownAC.SelectedItem = es;
                     SelectedSystem = es.Name;
                     AddHighlightToSystem(name);
+                    if(!MapConf.LockJumpSystem)
+                    {
+                        MapConf.CurrentJumpSystem = es.Name;
+                        BridgeInfo.Content = "Range from " + es.Name;
+                    }
+
 
                     break;
                 }
@@ -605,11 +613,15 @@ namespace SMT
                     regionMarkerOffset += SYSTEM_TEXT_TEXT_SIZE;
                 }
 
+                if(!MapConf.ShowJumpDistance)
+                {
+                    BridgeInfo.Content = string.Empty;
+                }
 
-                if (MapConf.ShowJumpDistance && SelectedSystem != null && system.Name != SelectedSystem)
+                if (MapConf.ShowJumpDistance && MapConf.CurrentJumpSystem != null && system.Name != MapConf.CurrentJumpSystem)
                 {
 
-                    double Distance = EM.GetRangeBetweenSystems(SelectedSystem, system.Name);
+                    double Distance = EM.GetRangeBetweenSystems(MapConf.CurrentJumpSystem, system.Name);
                     Distance = Distance / 9460730472580800.0;
 
                     double Max = 0.1f;
@@ -626,10 +638,10 @@ namespace SMT
                         case MapConfig.JumpShip.JF: { Max = 10.0; } break;
                     }
 
+                    BridgeInfo.Content = MapConf.JumpShipType + " range from " + MapConf.CurrentJumpSystem;
+
                     if (Distance < Max && Distance > 0.0)
                     {
-                        systemShape.Fill = JumpInRange;
-
                         string JD = Distance.ToString("0.00") + " LY";
 
                         Label DistanceText = new Label();
@@ -645,10 +657,46 @@ namespace SMT
                         Canvas.SetZIndex(DistanceText, 20);
                         MainCanvas.Children.Add(DistanceText);
 
-                    }
-                    else
-                    {
-                        systemShape.Fill = JumpOutRange;
+                        /*                        // add circle for system
+                                                Shape InRangeMarker;
+
+                                                if (system.ActualSystem.HasNPCStation)
+                                                {
+                                                    InRangeMarker = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                                                }
+                                                else
+                                                {
+                                                    InRangeMarker = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                                                }
+
+                                                InRangeMarker.Stroke = JumpInRange;
+                                                InRangeMarker.StrokeThickness = 6;
+                                                InRangeMarker.StrokeLineJoin = PenLineJoin.Round;
+                                                InRangeMarker.Fill = JumpInRange;
+
+                                                Canvas.SetLeft(InRangeMarker, system.LayoutX - (SYSTEM_SHAPE_SIZE + 6)/2  );
+                                                Canvas.SetTop(InRangeMarker, system.LayoutY - (SYSTEM_SHAPE_SIZE + 6)/2);
+
+                                                MainCanvas.Children.Add(InRangeMarker);
+                        */
+
+                        Polygon poly = new Polygon();
+
+                        foreach (Point p in system.CellPoints)
+                        {
+                            poly.Points.Add(p);
+                        }
+
+
+
+                        poly.Fill = JumpInRange;
+                        poly.SnapsToDevicePixels = true;
+                        poly.Stroke = poly.Fill;
+                        poly.StrokeThickness = 3;
+                        poly.StrokeDashCap = PenLineCap.Round;
+                        poly.StrokeLineJoin = PenLineJoin.Round;
+                        MainCanvas.Children.Add(poly);
+
                     }
                 }
 
@@ -861,9 +909,9 @@ namespace SMT
         void AddCharactersToMap()
         {
             // Cache all characters in the same system so we can render them on seperate lines
-            Dictionary<string, List<EVEData.Character>> charLocationMap = new Dictionary<string, List<EVEData.Character>>();
+            Dictionary<string, List<EVEData.LocalCharacter>> charLocationMap = new Dictionary<string, List<EVEData.LocalCharacter>>();
 
-            foreach (EVEData.Character c in EM.LocalCharacters)
+            foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
             {
                 // ignore characters out of this Map..
                 if (!Region.IsSystemOnMap(c.Location))
@@ -874,12 +922,12 @@ namespace SMT
 
                 if (!charLocationMap.Keys.Contains(c.Location))
                 {
-                    charLocationMap[c.Location] = new List<EVEData.Character>();
+                    charLocationMap[c.Location] = new List<EVEData.LocalCharacter>();
                 }
                 charLocationMap[c.Location].Add(c);
             }
             
-            foreach (List<EVEData.Character> lc in charLocationMap.Values)
+            foreach (List<EVEData.LocalCharacter> lc in charLocationMap.Values)
             {
                 double textYOffset = -24;
                 double textXOffset = 6;
@@ -924,7 +972,7 @@ namespace SMT
                 RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
                 eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
                 
-                foreach (EVEData.Character c in lc)
+                foreach (EVEData.LocalCharacter c in lc)
                 {
                     Label charText = new Label();
                     charText.Content = c.Name;
@@ -1525,7 +1573,7 @@ namespace SMT
 
         private void HandleCharacterSelectionChange()
         {
-            EVEData.Character c = CharacterDropDown.SelectedItem as EVEData.Character;
+            EVEData.LocalCharacter c = CharacterDropDown.SelectedItem as EVEData.LocalCharacter;
             if(ActiveCharacter != c)
             {
                 ActiveCharacter = c;

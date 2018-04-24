@@ -71,7 +71,7 @@ namespace SMT
             }
 
             RegionLayoutDoc = null;
-            
+
             // now update the RegionLayoutDoc because the layout loading breaks the binding
             foreach (Xceed.Wpf.AvalonDock.Layout.LayoutPanel ldc in dockManager.Layout.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutPanel>())
             {
@@ -121,7 +121,7 @@ namespace SMT
             EVEData.EveManager.Instance = EVEManager;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = true;
+            bool initFromScratch = false;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -134,7 +134,7 @@ namespace SMT
             EVEManager.SetupIntelWatcher();
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
 
-            
+
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.UpdateESIUniverseData();
@@ -205,8 +205,9 @@ namespace SMT
             MapConf.ActiveColourScheme = selectedColours;
             ColoursPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
             MapConf.PropertyChanged += MapConf_PropertyChanged;
+            MapControlsPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
 
-            
+
             Closed += MainWindow_Closed;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
@@ -250,9 +251,9 @@ namespace SMT
 
         private void MapConf_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == "AlwaysOnTop")
+            if (e.PropertyName == "AlwaysOnTop")
             {
-                if(MapConf.AlwaysOnTop)
+                if (MapConf.AlwaysOnTop)
                 {
                     this.Topmost = true;
                 }
@@ -262,10 +263,12 @@ namespace SMT
                 }
             }
 
-            if(e.PropertyName == "ShowZKillData")
+            if (e.PropertyName == "ShowZKillData")
             {
-                EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData; 
+                EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
             }
+
+            RegionRC.ReDrawMap(true);
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -332,13 +335,13 @@ namespace SMT
 
         private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            RegionRC.ReDrawMap();
+            RegionRC.ReDrawMap(true);
         }
 
 
         private void OnIntelAdded()
         {
-            if(MapConf.PlayIntelSound)
+            if (MapConf.PlayIntelSound)
             {
                 Uri uri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
                 var player = new MediaPlayer();
@@ -351,7 +354,7 @@ namespace SMT
         {
             EVEManager.UpdateESIUniverseData();
         }
-         
+
         private void ResetColourData_Click(object sender, RoutedEventArgs e)
         {
             MapConf.MapColours = new List<MapColours>();
@@ -433,20 +436,20 @@ namespace SMT
                 hash = c + ((hash << 5) - hash);
             }
 
-            double R = (((byte) (hash & 0xff) / 255.0) * 80.0 ) + 127.0 ;
-            double G = (((byte) ((hash >> 8) & 0xff) / 255.0 ) * 80.0 ) + 127.0;
-            double B = (((byte) ((hash >> 16) & 0xff) / 255.0)* 80.0) + 127.0;
-           
-            return Color.FromArgb(100,(byte)R, (byte)G, (byte)B);
+            double R = (((byte)(hash & 0xff) / 255.0) * 80.0) + 127.0;
+            double G = (((byte)((hash >> 8) & 0xff) / 255.0) * 80.0) + 127.0;
+            double B = (((byte)((hash >> 16) & 0xff) / 255.0) * 80.0) + 127.0;
+
+            return Color.FromArgb(100, (byte)R, (byte)G, (byte)B);
         }
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if(RawIntelBox.SelectedItem == null)
+            if (RawIntelBox.SelectedItem == null)
             {
                 return;
             }
-           
+
             EVEData.IntelData intel = RawIntelBox.SelectedItem as EVEData.IntelData;
 
             foreach (string s in intel.IntelString.Split(' '))
@@ -475,8 +478,8 @@ namespace SMT
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.Character c = RegionRC.ActiveCharacter as EVEData.Character;
-            if(c!=null)
+            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null)
             {
                 c.ActiveRoute.Clear();
                 c.Waypoints.Clear();
@@ -493,7 +496,7 @@ namespace SMT
                     DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
                     EVEData.TheraConnection tc = dgr.Item as EVEData.TheraConnection;
 
-                    if(tc != null)
+                    if (tc != null)
                     {
                         RegionRC.SelectSystem(tc.System, true);
                     }
@@ -514,7 +517,7 @@ namespace SMT
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
- 
+
         }
 
         private void AddRegionsToUniverse()
@@ -589,7 +592,7 @@ namespace SMT
                 MainUniverseCanvas.Children.Add(RegionText);
 
 
-                if(mr.Faction != "")
+                if (mr.Faction != "")
                 {
 
                     Label FactionText = new Label();
@@ -635,16 +638,16 @@ namespace SMT
                 }
 
                 bool AddTheraConnection = false;
-                foreach(EVEData.TheraConnection tc in EVEManager.TheraConnections)
+                foreach (EVEData.TheraConnection tc in EVEManager.TheraConnections)
                 {
-                    if(string.Compare(tc.Region, mr.Name, true) == 0)
+                    if (string.Compare(tc.Region, mr.Name, true) == 0)
                     {
                         AddTheraConnection = true;
                         break;
                     }
                 }
 
-                if(AddTheraConnection)
+                if (AddTheraConnection)
                 {
                     Rectangle TheraShape = new Rectangle() { Width = 8, Height = 8 };
 
@@ -671,12 +674,12 @@ namespace SMT
         {
             Shape obj = sender as Shape;
             EVEData.MapRegion mr = obj.DataContext as EVEData.MapRegion;
-            if(mr == null)
+            if (mr == null)
             {
                 return;
             }
 
-            if(e.ClickCount == 2)
+            if (e.ClickCount == 2)
             {
                 RegionRC.SelectRegion(mr.Name);
                 RegionLayoutDoc.IsSelected = true;
@@ -725,7 +728,7 @@ namespace SMT
 
             EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
 
-            if(zkbs != null)
+            if (zkbs != null)
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
                 System.Diagnostics.Process.Start(KillURL);
@@ -737,18 +740,18 @@ namespace SMT
         private bool ZKBFeedFilter(object item)
         {
 
-            if(FilterByRegion == false)
+            if (FilterByRegion == false)
             {
                 return true;
             }
 
             EVEData.ZKillRedisQ.ZKBDataSimple zs = item as EVEData.ZKillRedisQ.ZKBDataSimple;
-            if(zs == null)
+            if (zs == null)
             {
                 return false;
             }
 
-            if(RegionRC.Region.IsSystemOnMap(zs.SystemName))
+            if (RegionRC.Region.IsSystemOnMap(zs.SystemName))
             {
                 return true;
             }
@@ -759,7 +762,7 @@ namespace SMT
 
         private void ZKBFeedFilterViewChk_Checked(object sender, RoutedEventArgs e)
         {
-            FilterByRegion = (bool) ZKBFeedFilterViewChk.IsChecked; 
+            FilterByRegion = (bool)ZKBFeedFilterViewChk.IsChecked;
 
             if (ZKBFeed != null)
             {
@@ -771,10 +774,44 @@ namespace SMT
                 {
 
                 }
-                
+
             }
         }
 
+        private void UpdateLocalFromClipboardBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string pasteData = Clipboard.GetText();
+
+            List<string> CharactersToResolve = new List<string>();
+            if (pasteData != null || pasteData != string.Empty)
+            {
+                string[] localItems = pasteData.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (String item in localItems)
+                    CharactersToResolve.Add(item);
+            }
+
+            if (CharactersToResolve.Count > 0)
+            {
+                EVEManager.BulkUpdateCharacterCache(CharactersToResolve);
+            }
+        }
+
+        private void ZKBFeed_MouseDoubleClick_1(object sender, MouseButtonEventArgs e)
+        {
+            if (ZKBFeed.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+
+            if (zkbs != null)
+            {
+                string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
+                System.Diagnostics.Process.Start(KillURL);
+            }
+        }
     }
 
 
@@ -788,7 +825,7 @@ namespace SMT
             {
                 float Standing = 0.0f;
 
-                EVEData.Character c = MainWindow.AppWindow.RegionRC.ActiveCharacter;
+                EVEData.LocalCharacter c = MainWindow.AppWindow.RegionRC.ActiveCharacter;
                 if (c != null && c.ESILinked)
                 {
                     if (c.AllianceID != null && c.AllianceID == zs.VictimAllianceID)

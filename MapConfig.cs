@@ -82,6 +82,29 @@ namespace SMT
         public bool ShowJumpDistance { get; set; }
 
         [Category("Navigation")]
+        [DisplayName("Lock Jump System")]
+        public bool LockJumpSystem { get; set; }
+
+
+        private string m_CurrentJumpSystem;
+        [Category("Navigation")]
+        [DisplayName("Current Jump System"), ReadOnly(true)]
+        public string CurrentJumpSystem
+        {
+            get
+            {
+                return m_CurrentJumpSystem;
+            }
+            set
+            {
+                m_CurrentJumpSystem = value;
+                OnPropertyChanged("CurrentJumpSystem");
+            }
+        }
+
+
+
+        [Category("Navigation")]
         [DisplayName("Ship Type")]
         public JumpShip JumpShipType { get; set; }
 
