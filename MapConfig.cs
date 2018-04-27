@@ -108,6 +108,24 @@ namespace SMT
         [DisplayName("Ship Type")]
         public JumpShip JumpShipType { get; set; }
 
+        private bool m_JumpRangeInAsOutline;
+        [Category("Navigation")]
+        [DisplayName("Jump Range as Outline")]
+        public bool JumpRangeInAsOutline
+        {
+            get
+            {
+                return m_JumpRangeInAsOutline;
+            }
+            set
+            {
+                m_JumpRangeInAsOutline = value;
+                OnPropertyChanged("JumpRangeInAsOutline");
+            }
+        }
+
+
+
         [Category("Intel")]
         [DisplayName("Warning Sound")]
         public bool PlayIntelSound { get; set; }
@@ -187,6 +205,8 @@ namespace SMT
 
 
 
+
+
         public void SetDefaults()
         {
             DefaultRegion = "Molden Heath";
@@ -196,6 +216,7 @@ namespace SMT
             ShowToolBox = true;
             ShowZKillData = true;
             ShowTrueSec = true;
+            JumpRangeInAsOutline = true;
             MapColours = new List<MapColours>();
             
         }
@@ -218,13 +239,12 @@ namespace SMT
             defaultColours.NormalGateColour = Color.FromRgb(255, 248, 220);
             defaultColours.ConstellationGateColour = Color.FromRgb(128, 128, 128);
             defaultColours.SelectedSystemColour = Color.FromRgb(255, 255, 255);
-            defaultColours.CharacterHighlightColour = Color.FromRgb(70, 130, 180);
-            defaultColours.CharacterTextColour = Color.FromRgb(0, 0, 0);
-            defaultColours.CharacterTextSize = 8;
+            defaultColours.CharacterHighlightColour = Color.FromRgb(170, 130, 180);
+            defaultColours.CharacterTextColour = Color.FromRgb(240, 190, 10);
+            defaultColours.CharacterTextSize = 11;
             defaultColours.SystemTextSize = 12;
 
-            defaultColours.JumpRangeInColour = Color.FromRgb(0, 255, 0);
-            defaultColours.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
+            defaultColours.JumpRangeInColour = Color.FromRgb(135, 206, 235);
 
 
 
@@ -251,7 +271,6 @@ namespace SMT
             blueColours.CharacterTextSize = 8;
             blueColours.SystemTextSize = 12;
             blueColours.JumpRangeInColour = Color.FromRgb(0, 255, 0);
-            blueColours.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
 
             MapColours.Add(blueColours);
 
@@ -276,7 +295,6 @@ namespace SMT
             greyAndRed.CharacterTextSize = 8;
             greyAndRed.SystemTextSize = 12;
             greyAndRed.JumpRangeInColour = Color.FromRgb(0, 255, 0);
-            greyAndRed.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
 
             MapColours.Add(greyAndRed);
 
@@ -301,7 +319,6 @@ namespace SMT
             dark.CharacterTextSize = 8;
             dark.SystemTextSize = 12;
             dark.JumpRangeInColour = Color.FromRgb(0, 255, 0);
-            dark.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
 
             MapColours.Add(dark);
 
@@ -326,7 +343,6 @@ namespace SMT
             lateNight.CharacterTextSize = 8;
             lateNight.SystemTextSize = 13;
             lateNight.JumpRangeInColour = Color.FromRgb(0, 255, 0);
-            lateNight.JumpRangeOutColour = Color.FromRgb(255, 255, 255);
 
             MapColours.Add(lateNight);
 

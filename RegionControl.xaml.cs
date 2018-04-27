@@ -479,7 +479,6 @@ namespace SMT
             Brush HostileJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
 
             Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
-            Brush JumpOutRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOutColour);
 
             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
@@ -657,46 +656,46 @@ namespace SMT
                         Canvas.SetZIndex(DistanceText, 20);
                         MainCanvas.Children.Add(DistanceText);
 
-                        /*                        // add circle for system
-                                                Shape InRangeMarker;
-
-                                                if (system.ActualSystem.HasNPCStation)
-                                                {
-                                                    InRangeMarker = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
-                                                }
-                                                else
-                                                {
-                                                    InRangeMarker = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
-                                                }
-
-                                                InRangeMarker.Stroke = JumpInRange;
-                                                InRangeMarker.StrokeThickness = 6;
-                                                InRangeMarker.StrokeLineJoin = PenLineJoin.Round;
-                                                InRangeMarker.Fill = JumpInRange;
-
-                                                Canvas.SetLeft(InRangeMarker, system.LayoutX - (SYSTEM_SHAPE_SIZE + 6)/2  );
-                                                Canvas.SetTop(InRangeMarker, system.LayoutY - (SYSTEM_SHAPE_SIZE + 6)/2);
-
-                                                MainCanvas.Children.Add(InRangeMarker);
-                        */
-
-                        Polygon poly = new Polygon();
-
-                        foreach (Point p in system.CellPoints)
+                        if (MapConf.JumpRangeInAsOutline)
                         {
-                            poly.Points.Add(p);
+                            Shape InRangeMarker;
+
+                            if (system.ActualSystem.HasNPCStation)
+                            {
+                                InRangeMarker = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                            }
+                            else
+                            {
+                                InRangeMarker = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                            }
+
+                            InRangeMarker.Stroke = JumpInRange;
+                            InRangeMarker.StrokeThickness = 6;
+                            InRangeMarker.StrokeLineJoin = PenLineJoin.Round;
+                            InRangeMarker.Fill = JumpInRange;
+
+                            Canvas.SetLeft(InRangeMarker, system.LayoutX - (SYSTEM_SHAPE_SIZE + 6) / 2);
+                            Canvas.SetTop(InRangeMarker, system.LayoutY - (SYSTEM_SHAPE_SIZE + 6) / 2);
+
+                            MainCanvas.Children.Add(InRangeMarker);
                         }
+                        else
+                        {
+                            Polygon poly = new Polygon();
 
+                            foreach (Point p in system.CellPoints)
+                            {
+                                poly.Points.Add(p);
+                            }
 
-
-                        poly.Fill = JumpInRange;
-                        poly.SnapsToDevicePixels = true;
-                        poly.Stroke = poly.Fill;
-                        poly.StrokeThickness = 3;
-                        poly.StrokeDashCap = PenLineCap.Round;
-                        poly.StrokeLineJoin = PenLineJoin.Round;
-                        MainCanvas.Children.Add(poly);
-
+                            poly.Fill = JumpInRange;
+                            poly.SnapsToDevicePixels = true;
+                            poly.Stroke = poly.Fill;
+                            poly.StrokeThickness = 3;
+                            poly.StrokeDashCap = PenLineCap.Round;
+                            poly.StrokeLineJoin = PenLineJoin.Round;
+                            MainCanvas.Children.Add(poly);
+                        }
                     }
                 }
 
