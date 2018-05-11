@@ -442,6 +442,7 @@ namespace SMT.EVEData
             StartUpdateKillsFromESI();
             StartUpdateJumpsFromESI();
             StartUpdateSOVFromESI();
+            StartUpdateIncursionsFromESI();
         }
 
         /// <summary>
@@ -1702,6 +1703,61 @@ namespace SMT.EVEData
             }
         }
 
+
+        /// <summary>
+        /// Start the ESI download for the Jump info
+        /// </summary>
+        private void StartUpdateIncursionsFromESI()
+        {
+            string url = @"https://esi.tech.ccp.is/latest/incursions/?datasource=tranquility";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(ESIIncursionsReadCallback), request);
+        }
+
+        /// <summary>
+        /// ESI Result Response
+        /// </summary>
+        private void ESIIncursionsReadCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+                        IncursionData.IncursionInfo[] incursions  = IncursionData.IncursionInfo.FromJson(strContent);
+
+                        foreach(IncursionData.IncursionInfo id in incursions)
+                        {
+                            foreach(long systemID in id.InfestedSolarSystems)
+                            {
+                                EVEData.System s = GetEveSystemFromID(systemID.ToString());
+                                if(s!=null)
+                                {
+                                    s.ActiveIncursion = true; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        
+
+
         /// <summary>
         /// Start the Character Update Thread
         /// </summary>
@@ -1915,35 +1971,46 @@ namespace SMT.EVEData
             }
         }
 
-        public void BulkUpdateCharacterCache(List<string> charList)
+        public CharacterIDs.Character[] BulkUpdateCharacterCache(List<string> charList)
         {
+            CharacterIDs.CharacterIdData cd = new CharacterIDs.CharacterIdData();
+
             string esiCharString = "[";
             foreach (string s in charList)
             {
+                esiCharString += "\"";
                 esiCharString += s;
-                esiCharString += ",";
+                esiCharString += "\",";
             }
-            esiCharString = "0]";
+            esiCharString += "\"0\"]";
 
             string url = @"https://esi.tech.ccp.is/v1/universe/ids/?";
 
             var httpData = HttpUtility.ParseQueryString(string.Empty);
 
             httpData["datasource"] = "tranquility";
-            httpData["names"] = esiCharString;
+
 
             string httpDataStr = httpData.ToString();
+            byte[] data = UTF8Encoding.UTF8.GetBytes(esiCharString);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url + httpDataStr);
             request.Method = WebRequestMethods.Http.Post;
             request.Timeout = 20000;
             request.Proxy = null;
+            request.ContentType = "application/json";
+            request.ContentLength = data.Length;
+
+            var stream = request.GetRequestStream();
+            stream.Write(data, 0, data.Length);
 
             HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+ 
+
 
             if (esiResult.StatusCode != HttpStatusCode.OK)
             {
-                return;
+                return null;
             }
 
             Stream responseStream = esiResult.GetResponseStream();
@@ -1954,13 +2021,15 @@ namespace SMT.EVEData
 
                 try
                 {
-                    CharacterIDs.CharacterIdData cd = CharacterIDs.CharacterIdData.FromJson(strContent);
+                    cd = CharacterIDs.CharacterIdData.FromJson(strContent);
                     if (cd.Characters != null)
                     {
                     }
                 }
                 catch { }
             }
+
+            return cd.Characters;
         }
 
 

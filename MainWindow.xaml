@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.44" Height="800" Width="1024" Background="#FFEEEEEE" Icon="Images/smt_icon.ico" Loaded="Window_Loaded">
+        Title="Slazanger's Map Tool 0.44" Height="800" Width="1024" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded">
 
     <Window.Resources>
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
@@ -30,60 +30,14 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Menu DockPanel.Dock="Top" Grid.Row="0" IsEnabled="False">
-                <MenuItem Header="_File">
-                    <MenuItem>
-
-                    </MenuItem>
-                </MenuItem>
-                <MenuItem Header="View">
-                    <MenuItem Header="Intel" IsCheckable="True" IsChecked="{Binding IntelLayoutAnchorable.IsVisible}" Click="MenuItem_ViewIntelClick"/>
-                </MenuItem>
-            </Menu>
-
+ 
 
             <xcad:DockingManager x:Name="dockManager" Grid.Row="1" Grid.RowSpan="1" >
 
                 <xcad:LayoutRoot>
                     <xcad:LayoutRoot.RootPanel>
                         <xcad:LayoutPanel>
-                            <xcad:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False" >
-                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
-                                    <local:RegionControl x:Name="RegionRC" />
-                                </xcad:LayoutDocument>
-                            
-                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Universe">
-                                    <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1" >
-                                        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Canvas x:Name="MainUniverseCanvas"   Margin="5" Width="1050" Height="800" HorizontalAlignment="Stretch" />
-                                        </Viewbox>
-
-                                    </Grid>
-                               </xcad:LayoutDocument>
-                            </xcad:LayoutDocumentPane>
-                        </xcad:LayoutPanel>
-
-                        
-                        
-                    </xcad:LayoutRoot.RootPanel>
-
-                    <xcad:LayoutRoot.RightSide>
-                        <xcad:LayoutAnchorSide>
-                            <xcad:LayoutAnchorGroup>
-                                <xcad:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <Grid Background="#FFE5E5E5">
-                                        <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid>
-                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
-                                        </ListBox>
-                                    </Grid>
-                                </xcad:LayoutAnchorable>
-
+                            <xcad:LayoutAnchorablePane DockWidth="250" DockMinWidth="250">
                                 <xcad:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid Background="#FFE5E5E5">
                                         <StackPanel>
@@ -106,7 +60,7 @@
                                                         </Style.Setters>
                                                     </Style>
                                                 </DataGrid.RowStyle>
-                                                
+
                                                 <DataGrid.ContextMenu>
                                                     <ContextMenu>
                                                         <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
@@ -118,7 +72,50 @@
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable x:Name="LocalAnalyser"  Title="Local Tool" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="LocalContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+
+                                <xcad:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                    <Grid Background="#FFE5E5E5">
+                                        <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+                                </xcad:LayoutAnchorable>
+
+                            </xcad:LayoutAnchorablePane>
+                            <xcad:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False" >
+                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
+                                    <local:RegionControl x:Name="RegionRC" />
+                                </xcad:LayoutDocument>
+                            
+                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Universe">
+                                    <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1" >
+                                        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Canvas x:Name="MainUniverseCanvas"   Margin="5" Width="1050" Height="800" HorizontalAlignment="Stretch" />
+                                        </Viewbox>
+
+                                    </Grid>
+                               </xcad:LayoutDocument>
+                            </xcad:LayoutDocumentPane>
+                        </xcad:LayoutPanel>
+
+                        
+                        
+                    </xcad:LayoutRoot.RootPanel>
+
+
+
+                    <xcad:LayoutRoot.RightSide>
+                        <xcad:LayoutAnchorSide>
+                            <xcad:LayoutAnchorGroup>
+
+                                <!---
+                                <xcad:LayoutAnchorable x:Name="LocalAnalyser"  Title="Local Tool" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="LocalContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" IsEnabled="False" IsVisible="False" CanFloat="False">
                                     <Grid Background="#FFE5E5E5">
                                         <StackPanel>
                                             <CheckBox Content="Filter Friendly?" x:Name="LocalPilotsFilterFriendlyChk" IsChecked="True" />
@@ -135,7 +132,7 @@
                                         </StackPanel>
                                     </Grid>
                                 </xcad:LayoutAnchorable>
-
+                                -->
 
                                 <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

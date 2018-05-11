@@ -77,6 +77,11 @@ namespace SMT
         public bool ShowSystemPopup { get; set; }
 
 
+        [Category("Incursions")]
+        [DisplayName("Show Active Incursions")]
+        public bool ShowActiveIncursions { get; set; }
+
+
         [Category("Navigation")]
         [DisplayName("Show Jump Distance")]
         public bool ShowJumpDistance { get; set; }
@@ -218,7 +223,9 @@ namespace SMT
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
             MapColours = new List<MapColours>();
-            
+            ShowActiveIncursions = true;
+
+
         }
 
         public void SetDefaultColours()
@@ -245,7 +252,9 @@ namespace SMT
             defaultColours.SystemTextSize = 12;
 
             defaultColours.JumpRangeInColour = Color.FromRgb(135, 206, 235);
+            defaultColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
+            
 
 
             MapColours.Add(defaultColours);
@@ -271,6 +280,7 @@ namespace SMT
             blueColours.CharacterTextSize = 8;
             blueColours.SystemTextSize = 12;
             blueColours.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            blueColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             MapColours.Add(blueColours);
 
@@ -295,6 +305,7 @@ namespace SMT
             greyAndRed.CharacterTextSize = 8;
             greyAndRed.SystemTextSize = 12;
             greyAndRed.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            greyAndRed.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             MapColours.Add(greyAndRed);
 
@@ -319,6 +330,7 @@ namespace SMT
             dark.CharacterTextSize = 8;
             dark.SystemTextSize = 12;
             dark.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            dark.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             MapColours.Add(dark);
 
@@ -343,6 +355,8 @@ namespace SMT
             lateNight.CharacterTextSize = 8;
             lateNight.SystemTextSize = 13;
             lateNight.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            lateNight.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
+            
 
             MapColours.Add(lateNight);
 

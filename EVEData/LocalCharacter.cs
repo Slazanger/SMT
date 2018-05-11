@@ -671,8 +671,11 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string allianceID = obj["alliance_id"].ToString();
-                                AllianceID = allianceID;
+                                if(obj["alliance_id"] != null)
+                                {
+                                    string allianceID = obj["alliance_id"].ToString();
+                                    AllianceID = allianceID;
+                                }
                             }
                         }
                     }

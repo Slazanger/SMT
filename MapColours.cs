@@ -90,6 +90,13 @@ namespace SMT
         public Color JumpRangeInColour { get; set; }
 
 
+        [Category("Incursion")]
+        [DisplayName("Active Incursion")]
+        public Color ActiveIncursionColour { get; set; }
+
+        
+
+
         static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
         {
             /*

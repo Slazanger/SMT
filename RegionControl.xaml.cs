@@ -381,6 +381,11 @@ namespace SMT
 
         public void SelectSystem(string name, bool changeRegion = false)
         {
+            if(SelectedSystem == name)
+            {
+                return;
+            }
+
             EVEData.System sys = EM.GetEveSystem(name);
 
             if(sys == null)
@@ -479,6 +484,12 @@ namespace SMT
             Brush HostileJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
 
             Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+
+            Brush Incursion = new SolidColorBrush(MapConf.ActiveColourScheme.ActiveIncursionColour);
+
+
+            //HatchBrush  Incursion = new HatchBrush(HatchStyle.DiagonalCross, System.Drawing.Color.FromArgb(MapConf.ActiveColourScheme.ActiveIncursionColour.GetHashCode()));
+                //MapConf.ActiveColourScheme.ActiveIncursionColour);
 
             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
@@ -590,6 +601,27 @@ namespace SMT
 
                 double regionMarkerOffset = SYSTEM_REGION_TEXT_Y_OFFSET ;
 
+                if (MapConf.ShowActiveIncursions && system.ActualSystem.ActiveIncursion)
+                {
+                    {
+                        Polygon poly = new Polygon();
+
+                        foreach (Point p in system.CellPoints)
+                        {
+                            poly.Points.Add(p);
+                        }
+
+                        //poly.Fill
+                        poly.Fill = Incursion;
+                        poly.SnapsToDevicePixels = true;
+                        poly.Stroke = poly.Fill;
+                        poly.StrokeThickness = 3;
+                        poly.StrokeDashCap = PenLineCap.Round;
+                        poly.StrokeLineJoin = PenLineJoin.Round;
+                        MainCanvas.Children.Add(poly);
+                    }
+                }
+
                 if ((ShowSov) && system.ActualSystem.SOVAlliance != null && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
                 {
                     Label sysRegionText = new Label();
@@ -676,6 +708,8 @@ namespace SMT
 
                             Canvas.SetLeft(InRangeMarker, system.LayoutX - (SYSTEM_SHAPE_SIZE + 6) / 2);
                             Canvas.SetTop(InRangeMarker, system.LayoutY - (SYSTEM_SHAPE_SIZE + 6) / 2);
+                            Canvas.SetZIndex(InRangeMarker, 19);
+
 
                             MainCanvas.Children.Add(InRangeMarker);
                         }
@@ -896,8 +930,15 @@ namespace SMT
                 da.To = 360;
                 da.Duration = new Duration(TimeSpan.FromSeconds(12));
 
-                RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
-                eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+                try
+                {
+                    RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
+                    eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+                }
+                catch
+                {
+
+                }
             }
         }
 

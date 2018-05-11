@@ -164,10 +164,7 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// <summary>
         ///     Gets polygon shape of this Tracker
         /// </summary>
-        public Polygon Polygon
-        {
-            get { return m_Polygon; }
-        }
+        public Polygon Polygon => m_Polygon;
 
         /// <summary>
         ///     Gets or sets Brush that specifies how the shape's interior is painted
@@ -322,10 +319,7 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// <summary>
         ///     Returns a number of Tracker points
         /// </summary>
-        public int PointCount
-        {
-            get { return m_Polygon.Points.Count; }
-        }
+        public int PointCount => m_Polygon.Points.Count;
 
         /// <summary>
         ///     Gets or sets a Tracker point

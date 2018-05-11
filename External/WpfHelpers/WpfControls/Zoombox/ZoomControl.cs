@@ -175,10 +175,7 @@ namespace WpfHelpers.WpfControls.Zoombox
             set { SetValue(ZoomBoxVisibilityProperty, value); }
         }
 
-        public Point OrigoPosition
-        {
-            get { return new Point(ActualWidth/2, ActualHeight/2); }
-        }
+        public Point OrigoPosition => new Point(ActualWidth / 2, ActualHeight / 2);
 
         public double TranslateX
         {

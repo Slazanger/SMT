@@ -53,7 +53,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>smt_icon.ico</ApplicationIcon>
+    <ApplicationIcon>smt_bomb_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -119,6 +119,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EVEData\ESI\CharacterIDData.cs" />
+    <Compile Include="EVEData\ESI\IncursionData.cs" />
     <Compile Include="EVEData\LocalCharacter.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="About.xaml">
@@ -208,6 +209,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="smt_bomb_icon.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -261,12 +263,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\zkb.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\smt_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="smt_icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\help.png" />

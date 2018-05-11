@@ -788,7 +788,13 @@ namespace SMT
                 string[] localItems = pasteData.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (String item in localItems)
-                    CharactersToResolve.Add(item);
+                {
+                    if (item.All(x => char.IsLetterOrDigit(x) || char.IsWhiteSpace(x) || x == '-' || x == '\''))
+                    {
+                        CharactersToResolve.Add(item);
+                    }
+                }
+                    
             }
 
             if (CharactersToResolve.Count > 0)

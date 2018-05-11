@@ -39,6 +39,8 @@ namespace SMT.EVEData
             PodKillsLastHour = -1;
             ShipKillsLastHour = -1;
             JumpsLastHour = -1;
+            ActiveIncursion = false;
+
 
             Jumps = new List<string>();
         }
@@ -129,6 +131,13 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public string NPCSOVFaction { get; set; }
+
+        /// <summary>
+        /// Gets or sets the an incursion is active in this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public bool ActiveIncursion { get; set; }
+
 
         /// <summary>
         /// Gets or sets the list of Jumps from this system
