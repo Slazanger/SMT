@@ -45,9 +45,9 @@
 
                                             <DataGrid  x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
                                                 <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" />
-                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True"/>
-                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True"/>
+                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
+                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
                                                 </DataGrid.Columns>
                                                 <DataGrid.RowStyle>
                                                     <Style TargetType="DataGridRow">

@@ -208,6 +208,9 @@ namespace SMT.EVEData
         /// </summary>
         private List<string> IntelFilters { get; set; }
 
+
+        public EveTrace.EveTraceFleetInfo FleetIntel;
+
         /// <summary>
         /// Get the System name from the System ID
         /// </summary>
@@ -443,6 +446,8 @@ namespace SMT.EVEData
             StartUpdateJumpsFromESI();
             StartUpdateSOVFromESI();
             StartUpdateIncursionsFromESI();
+            //StartEveTraceFleetUpdate();
+            StartUpdateStructureHunterUpdate();
         }
 
         /// <summary>
@@ -573,16 +578,6 @@ namespace SMT.EVEData
                     string name;
                     bool hasStation = false;
 
-                    // scan for <polygon> nodes as these are the npc station nodes
-                    foreach (XmlNode sxn in sysdefNode.ChildNodes)
-                    {
-                        if (sxn.Name == "polygon")
-                        {
-                            hasStation = true;
-                            break;
-                        }
-                    }
-
                     // SS Nodes for system nodes
                     XmlNodeList ssNodes = aNode.SelectNodes(@".//*[@class='ss']");
                     if (ssNodes[0] != null)
@@ -697,8 +692,36 @@ namespace SMT.EVEData
                 }
             }
 
-            // now create the voronoi regions
-            foreach (MapRegion mr in Regions)
+            // now open up the eve static data export and extract some info from it
+            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\staStations.csv";
+            if (File.Exists(eveStaticDataStationsFile))
+            {
+                StreamReader file = new StreamReader(eveStaticDataStationsFile);
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] bits = line.Split(',');
+
+                    string stationSystem = bits[8];
+
+                    System SS = GetEveSystemFromID(stationSystem);
+                    if(SS != null)
+                    {
+                        SS.HasNPCStation = true;
+                    }
+                }
+            }
+            else
+            {
+                // error
+            }
+
+
+                // now create the voronoi regions
+                foreach (MapRegion mr in Regions)
             {
                 // collect the system points to generate them from 
                 List<Vector2f> points = new List<Vector2f>();
@@ -1019,8 +1042,7 @@ namespace SMT.EVEData
             esiQuery["response_type"] = "code";
             esiQuery["client_id"] = EveAppConfig.ClientID;
             esiQuery["redirect_uri"] = EveAppConfig.CallbackURL;
-            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1 esi-alliances.read_contacts.v1 esi-fleets.read_fleet.v1 fleetRead";
-
+            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-search.search_structures.v1 esi-clones.read_clones.v1 esi-universe.read_structures.v1 esi-fleets.read_fleet.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1 esi-characters.read_fatigue.v1 esi-alliances.read_contacts.v1";
             esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
 
             esiLogonBuilder.Query = esiQuery.ToString();
@@ -1103,7 +1125,7 @@ namespace SMT.EVEData
             if (allianceList != string.Empty)
             {
                 allianceList += "0";
-                string url = @"https://esi.tech.ccp.is/v2/alliances/names/?datasource=tranquility";
+                string url = @"https://esi.evetech.net/v2/alliances/names/?datasource=tranquility";
 
                 url += "&alliance_ids=" + Uri.EscapeUriString(allianceList);
 
@@ -1136,7 +1158,7 @@ namespace SMT.EVEData
             if (allianceList != string.Empty)
             {
                 allianceList += "0";
-                string url = @"https://esi.tech.ccp.is/v2/alliances/names/?datasource=tranquility";
+                string url = @"https://esi.evetech.net/v2/alliances/names/?datasource=tranquility";
 
                 url += "&alliance_ids=" + Uri.EscapeUriString(allianceList);
 
@@ -1579,12 +1601,102 @@ namespace SMT.EVEData
             }
         }
 
+
+        private void StartEveTraceFleetUpdate()
+        {
+            string url = @"https://api.evetrace.com/api/v1/fleet/";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(EveTraceFleetUpdateCallback), request);
+        }
+
+        private void EveTraceFleetUpdateCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        EveTrace.EveTraceFleetInfo fleetInfo = EveTrace.EveTraceFleetInfo.FromJson(strContent);
+
+                        if(fleetInfo != null)
+                        {
+                            FleetIntel = fleetInfo;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void StartUpdateStructureHunterUpdate()
+        {
+            string url = @"https://stop.hammerti.me.uk/api/structure/all";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(StructureHunterUpdateCallback), request);
+        }
+
+        private void StructureHunterUpdateCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        var structures = StructureHunter.Structures.FromJson(strContent);
+
+                        if (structures != null)
+                        {
+                            foreach(StructureHunter.Structures s in structures.Values.ToList())
+                            {
+                                EVEData.System es = GetEveSystemFromID(s.SystemId.ToString());
+                                
+                                if( es != null )
+                                {
+                                    es.SHStructures.Add(s);
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        
+
         /// <summary>
         /// Start the ESI download for the kill info
         /// </summary>
         private void StartUpdateKillsFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/v2/universe/system_kills/?datasource=tranquility";
+            string url = @"https://esi.evetech.net/v2/universe/system_kills/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1648,7 +1760,7 @@ namespace SMT.EVEData
         /// </summary>
         private void StartUpdateJumpsFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/v1/universe/system_jumps/?datasource=tranquility";
+            string url = @"https://esi.evetech.net/v1/universe/system_jumps/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1709,7 +1821,7 @@ namespace SMT.EVEData
         /// </summary>
         private void StartUpdateIncursionsFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/latest/incursions/?datasource=tranquility";
+            string url = @"https://esi.evetech.net/latest/incursions/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1786,7 +1898,7 @@ namespace SMT.EVEData
         /// </summary>
         private void StartUpdateSOVFromESI()
         {
-            string url = @"https://esi.tech.ccp.is/v1/sovereignty/map/?datasource=tranquility";
+            string url = @"https://esi.evetech.net/v1/sovereignty/map/?datasource=tranquility";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Http.Get;
@@ -1874,7 +1986,7 @@ namespace SMT.EVEData
                                 string allianceId = obj["alliance_id"].ToString();
                                 AllianceIDToName[allianceId] = allianceName;
 
-                                string allianceUrl = @"https://esi.tech.ccp.is/v3/alliances/" + allianceId + "/?datasource=tranquility";
+                                string allianceUrl = @"https://esi.evetech.net/v3/alliances/" + allianceId + "/?datasource=tranquility";
 
                                 HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
                                 allianceRequest.Method = WebRequestMethods.Http.Get;
@@ -1984,7 +2096,7 @@ namespace SMT.EVEData
             }
             esiCharString += "\"0\"]";
 
-            string url = @"https://esi.tech.ccp.is/v1/universe/ids/?";
+            string url = @"https://esi.evetech.net/v1/universe/ids/?";
 
             var httpData = HttpUtility.ParseQueryString(string.Empty);
 

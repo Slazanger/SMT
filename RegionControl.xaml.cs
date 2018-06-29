@@ -65,6 +65,51 @@ namespace SMT
         private bool m_ShowSov = false;
         private bool m_ShowSystemSecurity = false;
 
+        private List<Point> SystemIcon_Keepstar = new List<Point>
+        {
+            new Point(1,17),
+            new Point(1,0),
+            new Point(7,0),
+            new Point(7,7),
+            new Point(12,7),
+            new Point(12,0),
+            new Point(18,0),
+            new Point(18,17),
+        };
+
+        private List<Point> SystemIcon_Fortizar = new List<Point>
+        {
+            new Point(4,12),
+            new Point(4,7),
+            new Point(6,7),
+            new Point(6,5),
+            new Point(12,5),
+            new Point(12,7),
+            new Point(14,7),
+            new Point(14,12),
+        };
+
+        private List<Point> SystemIcon_Astrahaus = new List<Point>
+        {
+            new Point(6,12),
+            new Point(6,7),
+            new Point(9,7),
+            new Point(9,4),
+            //new Point(10,4),
+            new Point(9,7),
+            new Point(12,7),
+            new Point(12,12),
+        };
+
+        private List<Point> SystemIcon_NPCStation = new List<Point>
+        {
+            new Point(2,16),
+            new Point(2,2),
+            new Point(16,2),
+            new Point(16,16),
+            
+
+        };
 
 
         public bool ShowStandings
@@ -283,7 +328,7 @@ namespace SMT
         public void ReDrawMap(bool FullRedraw = false)
         {
             if (ActiveCharacter != null && FollowCharacter == true)
-            {
+            { 
                 HandleCharacterSelectionChange();
             }
 
@@ -317,6 +362,7 @@ namespace SMT
             AddHighlightToSystem(SelectedSystem);
             AddRouteToMap();
             AddTheraSystemsToMap();
+            AddEveTraceFleetsToMap();
         }
 
 
@@ -335,7 +381,7 @@ namespace SMT
         private const double SYSTEM_REGION_TEXT_X_OFFSET = 5;
         private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 2;
 
-        private const int SYSTEM_Z_INDEX = 20;
+        private const int SYSTEM_Z_INDEX = 22;
         private const int SYSTEM_LINK_INDEX = 19;
 
         /// <summary>
@@ -460,12 +506,20 @@ namespace SMT
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
 
+// SJS Disabled until ticket resolved with CCP
+//            if (ActiveCharacter != null)
+//            {
+//                ActiveCharacter.UpdateStructureInfoForRegion(regionName);
+//            }
+
+
             ReDrawMap(true);
 
             // select the item in the dropdown
             RegionSelectCB.SelectedItem = Region;
 
             OnRegionChanged(regionName);
+
         }
 
         /// <summary>
@@ -477,6 +531,12 @@ namespace SMT
             Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
             Brush SysInRegionBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
             Brush SysOutRegionBrush = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
+
+            Brush SysInRegionDarkBrush = new SolidColorBrush(DarkenColour(MapConf.ActiveColourScheme.InRegionSystemColour));
+            Brush SysOutRegionDarkBrush = new SolidColorBrush(DarkenColour(MapConf.ActiveColourScheme.OutRegionSystemColour));
+
+
+
             Brush SysInRegionTextBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
             Brush SysOutRegionTextBrush = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
 
@@ -501,49 +561,202 @@ namespace SMT
             // cache all system links 
             List<GateHelper> systemLinks = new List<GateHelper>();
 
+            Random rnd = new Random(4);
+
+
+
             foreach (EVEData.MapSystem system in Region.MapSystems.Values.ToList())
             {
                 // add circle for system
-                Shape systemShape;
-
-                if (system.ActualSystem.HasNPCStation)
-                {
-                    systemShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE, Width = SYSTEM_SHAPE_SIZE };
-                }
-                else
-                {
-                    systemShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE, Width = SYSTEM_SHAPE_SIZE };
-                }
-
-                systemShape.Stroke = SysOutlineBrush;
+                Polygon systemShape = new Polygon();
                 systemShape.StrokeThickness = 1.5;
-                systemShape.StrokeLineJoin = PenLineJoin.Round;
+                
+                bool needsOutline = true;
+                bool drawKeep = false;
+                bool drawFort = false;
+                bool drawAstra = false;
+                bool drawNPCStation = system.ActualSystem.HasNPCStation;
 
-                if (system.OutOfRegion)
+                foreach(StructureHunter.Structures sh in system.ActualSystem.SHStructures)
                 {
-                    systemShape.Fill = SysOutRegionBrush;
+                    switch (sh.TypeId)
+                    {
+                        case 35834: // Keepstar
+                            drawKeep = true;
+                            break;
+
+                        case 35833: // fortizar 
+                        case 47512: // faction fortizar 
+                        case 47513: // faction fortizar 
+                        case 47514: // faction fortizar 
+                        case 47515: // faction fortizar 
+                        case 47516: // faction fortizar
+                        case 35827: // Sotiyo
+                            drawFort = true;
+                            break;
+
+                        default:
+                            drawAstra = true;
+                            break;
+
+                    }
+
                 }
-                else
+
+                /*if(ActiveCharacter != null && ActiveCharacter.ESILinked && ActiveCharacter.DockableStructures.Keys.Contains(system.Name))
                 {
-                    systemShape.Fill = SysInRegionBrush;
-                }
+                    foreach(StructureIDs.StructureIdData sid in ActiveCharacter.DockableStructures[system.Name])
+                    {
+                        switch(sid.TypeId)
+                        {
+                            case 35834: // Keepstar
+                                drawKeep = true;
+                                break;
 
-                // override with sec status colours
-                if (ShowSystemSecurity)
+                            case 35833: // fortizar 
+                            case 47512: // faction fortizar 
+                            case 47513: // faction fortizar 
+                            case 47514: // faction fortizar 
+                            case 47515: // faction fortizar 
+                            case 47516: // faction fortizar
+                            case 35827: // Sotiyo
+                                drawFort = true;
+                                break;
+
+                            default:
+                                drawAstra = true;
+                                break;
+
+                        }
+                    }
+                }
+                */
+
+                if (drawKeep)
                 {
-                    systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
+                    drawFort = false;
+                    drawAstra = false;
+                    drawNPCStation = false;
+
+                    needsOutline = false;
                 }
 
-                // add the hover over and click handlers
-                systemShape.DataContext = system;
-                systemShape.MouseDown += ShapeMouseDownHandler;
-                systemShape.MouseEnter += ShapeMouseOverHandler;
-                systemShape.MouseLeave += ShapeMouseOverHandler;
+                if(drawFort)
+                {
+                    drawAstra = false;
+                    drawNPCStation = false;
+                }
 
-                Canvas.SetLeft(systemShape, system.LayoutX - SYSTEM_SHAPE_OFFSET);
-                Canvas.SetTop(systemShape, system.LayoutY - SYSTEM_SHAPE_OFFSET);
-                Canvas.SetZIndex(systemShape, SYSTEM_Z_INDEX);
-                MainCanvas.Children.Add(systemShape);
+                if(drawNPCStation)
+                {
+                    drawAstra = false;
+                }
+
+                List<Point> shapePoints = null;
+                
+                if(drawKeep)
+                {
+                    shapePoints = SystemIcon_Keepstar;
+                    systemShape.StrokeThickness = 1.5;
+                }
+                    
+                if(drawFort)
+                {
+                    shapePoints = SystemIcon_Fortizar;
+                    systemShape.StrokeThickness = 1;
+
+                }
+                if (drawAstra)
+                {
+                    shapePoints = SystemIcon_Astrahaus;
+                    systemShape.StrokeThickness = 1;
+                }
+
+                if (drawNPCStation)
+                {
+                    shapePoints = SystemIcon_NPCStation;
+                    systemShape.StrokeThickness = 1.5;
+                    needsOutline = false;
+                }
+
+                if(shapePoints != null)
+                {
+                    foreach (Point p in shapePoints)
+                    {
+                        systemShape.Points.Add(p);
+                    }
+
+
+
+                    systemShape.Stroke = SysOutlineBrush;
+                    systemShape.StrokeLineJoin = PenLineJoin.Round;
+
+                    if (system.OutOfRegion)
+                    {
+                        systemShape.Fill = SysOutRegionDarkBrush;
+                    }
+                    else
+                    {
+                        systemShape.Fill = SysInRegionDarkBrush;
+                    }
+
+                    // override with sec status colours
+                    if (ShowSystemSecurity)
+                    {
+                        systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
+                    }
+
+                    if (!needsOutline)
+                    {
+                        // add the hover over and click handlers
+                        systemShape.DataContext = system;
+                        systemShape.MouseDown += ShapeMouseDownHandler;
+                        systemShape.MouseEnter += ShapeMouseOverHandler;
+                        systemShape.MouseLeave += ShapeMouseOverHandler;
+                    }
+
+                    Canvas.SetLeft(systemShape, system.LayoutX - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetTop(systemShape, system.LayoutY - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetZIndex(systemShape, SYSTEM_Z_INDEX);
+                    MainCanvas.Children.Add(systemShape);
+
+                }
+
+
+
+
+                if (needsOutline)
+                {
+                    Shape SystemOutline = new Ellipse { Width = SYSTEM_SHAPE_SIZE, Height = SYSTEM_SHAPE_SIZE };
+                    SystemOutline.Stroke = SysOutlineBrush;
+                    SystemOutline.StrokeThickness = 1.5;
+                    SystemOutline.StrokeLineJoin = PenLineJoin.Round;
+
+                    if (system.OutOfRegion)
+                    {
+                        SystemOutline.Fill = SysOutRegionBrush;
+                    }
+                    else
+                    {
+                        SystemOutline.Fill = SysInRegionBrush;
+                    }
+
+                    // override with sec status colours
+                    if (ShowSystemSecurity)
+                    {
+                        SystemOutline.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
+                    }
+
+                    SystemOutline.DataContext = system;
+                    SystemOutline.MouseDown += ShapeMouseDownHandler;
+                    SystemOutline.MouseEnter += ShapeMouseOverHandler;
+                    SystemOutline.MouseLeave += ShapeMouseOverHandler;
+
+                    Canvas.SetLeft(SystemOutline, system.LayoutX - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetTop(SystemOutline, system.LayoutY - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetZIndex(SystemOutline, SYSTEM_Z_INDEX - 1);
+                    MainCanvas.Children.Add(SystemOutline);
+                }
 
                 Label sysText = new Label();
                 sysText.Content = system.Name;
@@ -887,6 +1100,14 @@ namespace SMT
             }
         }
 
+        private Color DarkenColour(Color inCol)
+        {
+            Color Dark = inCol;
+            Dark.R = (Byte)(0.8 * Dark.R);
+            Dark.G = (Byte)(0.8 * Dark.G);
+            Dark.B = (Byte)(0.8 * Dark.B);
+            return Dark;
+        }
 
         private void AddHighlightToSystem(string name)
         {
@@ -1143,6 +1364,45 @@ namespace SMT
             }
         }
 
+
+        public void AddEveTraceFleetsToMap()
+        {
+            Brush TheraBrush = new SolidColorBrush(Colors.OrangeRed);
+
+            if(EM.FleetIntel == null)
+            {
+                return;
+            }
+
+            foreach( EveTrace.FleetInstance fi in EM.FleetIntel.FleetInstances)
+            {
+                EVEData.System s = EM.GetEveSystemFromID(fi.System.ToString());
+                if(s==null)
+                {
+                    continue;
+                }
+
+                if(Region.IsSystemOnMap(s.Name))
+                {
+                    int size = (int)(fi.KillCount * ESIOverlayScale);
+
+                    Shape ETShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + size, Width = SYSTEM_SHAPE_SIZE + size }; ;
+                    ETShape.Stroke = TheraBrush;
+                    ETShape.StrokeThickness = 1.5;
+                    ETShape.StrokeLineJoin = PenLineJoin.Round;
+                    ETShape.Fill = TheraBrush;
+
+                    MapSystem ms = Region.MapSystems[s.Name];
+
+                    Canvas.SetLeft(ETShape, ms.LayoutX - (ETShape.Width/2));
+                    Canvas.SetTop(ETShape, ms.LayoutY - (ETShape.Height/2));
+                    Canvas.SetZIndex(ETShape, SYSTEM_Z_INDEX - 3);
+                    MainCanvas.Children.Add(ETShape);
+
+                }
+            }
+        }
+
         public void AddTheraSystemsToMap()
         {
             Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
@@ -1175,8 +1435,6 @@ namespace SMT
                     Canvas.SetTop(TheraShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET +3));
                     Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX -3);
                     MainCanvas.Children.Add(TheraShape);
-
-      
                 }
             }
         }

@@ -18,6 +18,7 @@ namespace SMT.EVEData
         public System()
         {
             Jumps = new List<string>();
+            SHStructures = new List<StructureHunter.Structures>();
         }
 
         /// <summary>
@@ -43,6 +44,7 @@ namespace SMT.EVEData
 
 
             Jumps = new List<string>();
+            SHStructures = new List<StructureHunter.Structures>();
         }
 
         /// <summary>
@@ -137,6 +139,12 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public bool ActiveIncursion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the an incursion is active in this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public List<StructureHunter.Structures> SHStructures{ get; set; }
 
 
         /// <summary>

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
@@ -80,6 +81,8 @@ namespace SMT.EVEData
         /// </summary>
         public string ESIRefreshToken { get; set; }
 
+
+
         /// <summary>
         /// Gets or sets the character standings dictionary
         /// </summary>
@@ -105,9 +108,16 @@ namespace SMT.EVEData
         public ObservableCollection<string> ActiveRoute { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Character" /> class
+        /// Gets or sets the character structure dictionary
         /// </summary>
-        public LocalCharacter()
+        [XmlIgnoreAttribute]
+        public Dictionary<string, List<StructureIDs.StructureIdData>> DockableStructures { get; set; }
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Character" /> class
+    /// </summary>
+    public LocalCharacter()
         {
             Standings = new Dictionary<string, float>();
             CorporationID = string.Empty;
@@ -115,6 +125,7 @@ namespace SMT.EVEData
             FleetInfo = new Fleet();
             Waypoints = new ObservableCollection<string>();
             ActiveRoute = new ObservableCollection<string>();
+            DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
         }
 
         /// <summary>
@@ -200,7 +211,7 @@ namespace SMT.EVEData
 
             routeNeedsUpdate = true;
 
-            string url = @"https://esi.tech.ccp.is/v2/ui/autopilot/waypoint/?";
+            string url = @"https://esi.evetech.net/v2/ui/autopilot/waypoint/?";
 
             var httpData = HttpUtility.ParseQueryString(string.Empty);
 
@@ -254,7 +265,7 @@ namespace SMT.EVEData
                 EVEData.System startSys = EveManager.Instance.GetEveSystem(start);
                 EVEData.System endSys = EveManager.Instance.GetEveSystem(end);
 
-                UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/route/" + startSys.ID + "/" + endSys.ID + "/");
+                UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/route/" + startSys.ID + "/" + endSys.ID + "/");
 
                 var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
                 esiQuery["datasource"] = "tranquility";
@@ -376,7 +387,7 @@ namespace SMT.EVEData
         /// </summary>
         private void UpdatePositionFromESI()
         {
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/characters/" + ID + "/location");
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/characters/" + ID + "/location");
 
             var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
             esiQuery["character_id"] = ID;
@@ -428,7 +439,7 @@ namespace SMT.EVEData
         /// </summary>
         private void UpdateFleetIDFromESI()
         {
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/characters/" + ID + "/fleet");
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/characters/" + ID + "/fleet");
 
             var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
             esiQuery["character_id"] = ID;
@@ -492,7 +503,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/fleets/" + FleetInfo.FleetID + "/");
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/fleets/" + FleetInfo.FleetID + "/");
 
             var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
 
@@ -549,7 +560,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/fleets/" + FleetInfo.FleetID + "/members/");
+            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/fleets/" + FleetInfo.FleetID + "/members/");
 
             var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
 
@@ -610,7 +621,7 @@ namespace SMT.EVEData
             {
                 if (string.IsNullOrEmpty(CorporationID))
                 {
-                    string url = @"https://esi.tech.ccp.is/v4/characters/" + ID + "/?datasource=tranquility";
+                    string url = @"https://esi.evetech.net/v4/characters/" + ID + "/?datasource=tranquility";
 
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                     request.Method = WebRequestMethods.Http.Get;
@@ -645,7 +656,7 @@ namespace SMT.EVEData
 
                 if (string.IsNullOrEmpty(AllianceID) && !string.IsNullOrEmpty(CorporationID))
                 {
-                    string url = @"https://esi.tech.ccp.is/v4/corporations/" + CorporationID + "/?datasource=tranquility";
+                    string url = @"https://esi.evetech.net/v4/corporations/" + CorporationID + "/?datasource=tranquility";
 
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                     request.Method = WebRequestMethods.Http.Get;
@@ -689,7 +700,7 @@ namespace SMT.EVEData
                     {
                         page++;
 
-                        UriBuilder urlBuilder = new UriBuilder(@"https://esi.tech.ccp.is/v1/alliances/" + AllianceID + "/contacts/");
+                        UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/alliances/" + AllianceID + "/contacts/");
                         var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
                         esiQuery["page"] = page.ToString();
                         esiQuery["datasource"] = "tranquility";
@@ -770,6 +781,127 @@ namespace SMT.EVEData
             {
             }
         }
+
+        public void UpdateStructureInfoForRegion(string Region)
+        {
+            if (!ESILinked)
+                return;
+
+            MapRegion mr = EveManager.Instance.GetRegion(Region);
+
+            // somethings gone wrong
+            if(mr == null)
+            {
+                return;
+            }
+
+            // iterate over each structure and search for structres containing the text for each system
+            foreach(MapSystem ms in mr.MapSystems.Values.ToList())
+            {
+                // skip systems we've already checked
+                if( DockableStructures.Keys.Contains(ms.Name))
+                {
+                    continue;
+                }
+
+                List<StructureIDs.StructureIdData> SystemStructureList = new List<StructureIDs.StructureIdData>();
+
+                UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/latest/characters/" + ID + "/search/");
+
+                var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
+                esiQuery["datasource"] = "tranquility";
+                esiQuery["token"] = ESIAccessToken;
+                esiQuery["categories"] = "structure";
+                esiQuery["search"] = ms.Name;
+                esiQuery["strict"] = "false";
+
+                urlBuilder.Query = esiQuery.ToString();
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
+                request.Method = WebRequestMethods.Http.Get;
+                request.ContentType = "application/json";
+                request.Timeout = 20000;
+                request.Proxy = null;
+
+                try
+                {
+                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
+
+                    if (esiResult.StatusCode != HttpStatusCode.OK)
+                    {
+                        continue;
+                    }
+
+                    Stream responseStream = esiResult.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        StructureSearches.StructureSearch ss = StructureSearches.StructureSearch.FromJson(strContent);
+
+                        if (ss == null || ss.Structure == null)
+                            continue;
+
+
+                        foreach (long l in ss.Structure)
+                        {
+                            // now search on each structure
+                            UriBuilder urlStructureIDBuilder = new UriBuilder(@"https://esi.evetech.net/v1/universe/structures/" + l.ToString() + "/");
+
+                            var esiStructureIDQuery = HttpUtility.ParseQueryString(urlStructureIDBuilder.Query);
+                            esiStructureIDQuery["datasource"] = "tranquility";
+                            esiStructureIDQuery["token"] = ESIAccessToken;
+
+                            urlStructureIDBuilder.Query = esiStructureIDQuery.ToString();
+
+                            HttpWebRequest sid_request = (HttpWebRequest)WebRequest.Create(urlStructureIDBuilder.ToString());
+                            sid_request.Method = WebRequestMethods.Http.Get;
+                            sid_request.ContentType = "application/json";
+                            sid_request.Timeout = 20000;
+                            sid_request.Proxy = null;
+
+                            try
+                            {
+                                HttpWebResponse esi_sid_Result = (HttpWebResponse)sid_request.GetResponse();
+
+                                Stream sid_responseStream = esi_sid_Result.GetResponseStream();
+                                using (StreamReader sr2 = new StreamReader(sid_responseStream))
+                                {
+
+                                    // Need to return this response
+                                    string strSIDContent = sr2.ReadToEnd();
+                                    StructureIDs.StructureIdData sidd = StructureIDs.StructureIdData.FromJson(strSIDContent);
+                                    if(sidd.Name != "")
+                                    {
+                                        SystemStructureList.Add(sidd);
+                                    }
+
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+
+
+
+
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
+                DockableStructures.Add(ms.Name, SystemStructureList);
+                Thread.Sleep(10);
+            }
+
+
+
+        }
+        
 
     }
 }
