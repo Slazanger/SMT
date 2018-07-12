@@ -46,6 +46,38 @@ namespace SMT
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
 
+        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument FindDocWithContentID(Xceed.Wpf.AvalonDock.Layout.ILayoutElement root, string contentID)
+        {
+            Xceed.Wpf.AvalonDock.Layout.LayoutDocument content = null;
+
+            if (root is Xceed.Wpf.AvalonDock.Layout.ILayoutContainer)
+            {
+                Xceed.Wpf.AvalonDock.Layout.ILayoutContainer ic = root as Xceed.Wpf.AvalonDock.Layout.ILayoutContainer;
+                foreach(Xceed.Wpf.AvalonDock.Layout.ILayoutElement ie in ic.Children )
+                {
+                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument f = FindDocWithContentID(ie, contentID);
+                    if(f != null)
+                    {
+                        content = f;
+                        break;
+                    }
+                }
+                
+            }
+            else
+            {
+                if(root is Xceed.Wpf.AvalonDock.Layout.LayoutDocument)
+                {
+                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument i = root as Xceed.Wpf.AvalonDock.Layout.LayoutDocument;
+                    if(i.ContentId == contentID)
+                    {
+                        content = i;
+                    }
+                }
+            }
+            return content;
+        }
+
         public MainWindow()
         {
             OutputLog.Info("Starting App..");
@@ -70,22 +102,30 @@ namespace SMT
                 }
             }
 
-            RegionLayoutDoc = null;
+            RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
 
-            // now update the RegionLayoutDoc because the layout loading breaks the binding
-            foreach (Xceed.Wpf.AvalonDock.Layout.LayoutPanel ldc in dockManager.Layout.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutPanel>())
+/*            // now update the RegionLayoutDoc because the layout loading breaks the binding
+            foreach (Xceed.Wpf.AvalonDock.Layout.ILayoutElement ile in dockManager.Layout.Children)
             {
-                foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane ldp in ldc.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane>())
+                if(ile is Xceed.Wpf.AvalonDock.Layout.ILayoutContainer )
                 {
-                    foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocument ld in ldp.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocument>())
+                    Xceed.Wpf.AvalonDock.Layout.ILayoutContainer ilc = ile as Xceed.Wpf.AvalonDock.Layout.ILayoutContainer;
+
+                    foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane ldp in ilc.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane>())
                     {
-                        if (ld.ContentId == "MapRegionContentID")
+                        foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocument ld in ldp.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocument>())
                         {
-                            RegionLayoutDoc = ld;
+                            if (ld.ContentId == "MapRegionContentID")
+                            {
+                                RegionLayoutDoc = ld;
+                            }
                         }
                     }
+
                 }
+
             }
+*/
 
             // load any custom map settings off disk
             string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
@@ -244,7 +284,11 @@ namespace SMT
 
         private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
         {
-            RegionLayoutDoc.Title = "Region : " + RegionRC.Region.Name;
+            if(RegionLayoutDoc != null)
+            {
+                RegionLayoutDoc.Title = "Region : " + RegionRC.Region.Name;
+            }
+
 
             CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
         }
@@ -532,6 +576,7 @@ namespace SMT
             Brush CaldariBg = new SolidColorBrush(Color.FromArgb(255, 149, 159, 171));
 
             Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
+            Brush CharacterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
 
             MainUniverseCanvas.Background = BackgroundColourBrush;
             MainUniverseGrid.Background = BackgroundColourBrush;
@@ -564,6 +609,58 @@ namespace SMT
                 if (mr.Faction == "Caldari")
                 {
                     RegionShape.Fill = CaldariBg;
+                }
+
+
+                if (RegionRC.ActiveCharacter != null && RegionRC.ActiveCharacter.ESILinked)
+                {
+                    float averageStanding = 0.0f;
+                    float numSystems = 0;
+
+                    foreach(EVEData.MapSystem s in mr.MapSystems.Values)
+                    {
+                        if (s.OutOfRegion)
+                            continue;
+
+                        numSystems++;
+
+
+                        if (RegionRC.ActiveCharacter.AllianceID != null && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAlliance)
+                        {
+                            averageStanding += 10.0f;
+                        }
+
+                        if (s.ActualSystem.SOVCorp != null && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
+                        {
+                            averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVCorp];
+                        }
+
+                        if (s.ActualSystem.SOVAlliance != null && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAlliance))
+                        {
+                            averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVAlliance];
+                        }
+                    }
+
+                    averageStanding = averageStanding / numSystems;
+
+                    if(averageStanding > 0.5)
+                    {
+                        Color BlueIsh = Colors.Gray;
+                        BlueIsh.B += (byte)( (255 - BlueIsh.B) * (averageStanding / 10.0f));
+                        RegionShape.Fill = new SolidColorBrush(BlueIsh);
+                    } else  if (averageStanding < -0.5)
+                    {
+                        averageStanding *= -1;
+                        Color RedIsh = Colors.Gray;
+                        RedIsh.R += (byte)((255 - RedIsh.R) * (averageStanding / 10.0f));
+                        RegionShape.Fill = new SolidColorBrush(RedIsh);
+                    }
+                    else
+                    {
+                        RegionShape.Fill = new SolidColorBrush(Colors.Gray);
+                    }
+
+
                 }
 
 
@@ -663,11 +760,82 @@ namespace SMT
                     Canvas.SetTop(TheraShape, mr.RegionY + 3);
                     Canvas.SetZIndex(TheraShape, 22);
                     MainUniverseCanvas.Children.Add(TheraShape);
-
-
                 }
 
+
+                bool AddCharacter = false;
+
+                foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                {
+                    EVEData.System s = EVEManager.GetEveSystem(lc.Location);
+                    if(s != null && s.Region == mr.Name )
+                    {
+                        AddCharacter = true;
+                    }
+                }
+
+                if (AddCharacter)
+                {
+                    Rectangle CharacterShape = new Rectangle() { Width = 8, Height = 8 };
+
+                    CharacterShape.Stroke = SysOutlineBrush;
+                    CharacterShape.StrokeThickness = 1;
+                    CharacterShape.StrokeLineJoin = PenLineJoin.Round;
+                    CharacterShape.RadiusX = 2;
+                    CharacterShape.RadiusY = 2;
+                    CharacterShape.Fill = CharacterBrush;
+
+                    CharacterShape.DataContext = mr;
+                    CharacterShape.MouseEnter += RegionCharacter_ShapeMouseOverHandler;
+                    CharacterShape.MouseLeave += RegionCharacter_ShapeMouseOverHandler;
+
+
+                    Canvas.SetLeft(CharacterShape, mr.RegionX + 28);
+                    Canvas.SetTop(CharacterShape, mr.RegionY -11);
+                    Canvas.SetZIndex(CharacterShape, 23);
+                    MainUniverseCanvas.Children.Add(CharacterShape);
+                }
+
+
+
             }
+        }
+
+        private void RegionCharacter_ShapeMouseOverHandler(object sender, MouseEventArgs e)
+        {
+            Shape obj = sender as Shape;
+
+            EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
+
+            if (obj.IsMouseOver)
+            {
+                RegionCharacterInfo.PlacementTarget = obj;
+                RegionCharacterInfo.VerticalOffset = 5;
+                RegionCharacterInfo.HorizontalOffset = 15;
+
+                RegionCharacterInfoSP.Children.Clear();
+
+
+                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                {
+                    EVEData.System s = EVEManager.GetEveSystem(lc.Location);
+                    if (s != null && s.Region == selectedRegion.Name)
+                    {
+                        Label l = new Label();
+                        l.Content = lc.Name + " (" + lc.Location + ")";
+                        RegionCharacterInfoSP.Children.Add(l);
+                    }
+                }
+
+                RegionCharacterInfo.IsOpen = true;
+
+            }
+            else
+            {
+                RegionCharacterInfo.IsOpen = false;
+            }
+
+
         }
 
         private void RegionShape_MouseDown(object sender, MouseButtonEventArgs e)
@@ -682,7 +850,10 @@ namespace SMT
             if (e.ClickCount == 2)
             {
                 RegionRC.SelectRegion(mr.Name);
-                RegionLayoutDoc.IsSelected = true;
+                if (RegionLayoutDoc != null)
+                {
+                    RegionLayoutDoc.IsSelected = true;
+                }
             }
 
         }
@@ -715,7 +886,12 @@ namespace SMT
             if (zkbs != null)
             {
                 RegionRC.SelectSystem(zkbs.SystemName, true);
-                RegionLayoutDoc.IsSelected = true;
+
+                if (RegionLayoutDoc != null)
+                {
+                    RegionLayoutDoc.IsSelected = true;
+                }
+                    
             }
         }
 

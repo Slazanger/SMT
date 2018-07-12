@@ -137,7 +137,7 @@ namespace SMT.EVEData
 
                             zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);                            
 
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
                                 KillStream.Insert(0,zs);
                             }), DispatcherPriority.Normal);
@@ -163,7 +163,7 @@ namespace SMT.EVEData
                                 {
                                     if(KillStream[i].VictimAllianceName == string.Empty)
                                     {
-                                        if (!EveManager.Instance.AllianceIDToTicker.Keys.Contains(KillStream[i].VictimAllianceID))
+                                        if (!EveManager.Instance.AllianceIDToTicker.Keys.Contains(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != "0")
                                         {
                                             AllianceIDs.Add(KillStream[i].VictimAllianceID);
                                         }

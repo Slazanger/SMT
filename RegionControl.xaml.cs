@@ -422,6 +422,23 @@ namespace SMT
         /// <param name="e"></param>
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
+            if (MapConf.CurrentJumpCharacterSet && ActiveCharacter != null)
+            {
+                MapConf.CurrentJumpCharacter = ActiveCharacter.Name;
+                MapConf.CurrentJumpCharacterSet = false;
+            }
+
+            if (MapConf.CurrentJumpCharacter != "")
+            {
+                foreach (LocalCharacter c in EM.LocalCharacters)
+                {
+                    if (c.Name == MapConf.CurrentJumpCharacter)
+                    {
+                        MapConf.CurrentJumpSystem = c.Location;
+                    }
+                }
+            }
+
             ReDrawMap(false);
         }
 
@@ -455,6 +472,8 @@ namespace SMT
                     if(!MapConf.LockJumpSystem)
                     {
                         MapConf.CurrentJumpSystem = es.Name;
+                        MapConf.CurrentJumpCharacterSet = false;
+                        MapConf.CurrentJumpCharacter = "";
                         BridgeInfo.Content = "Range from " + es.Name;
                     }
 
@@ -714,6 +733,10 @@ namespace SMT
                         systemShape.MouseEnter += ShapeMouseOverHandler;
                         systemShape.MouseLeave += ShapeMouseOverHandler;
                     }
+                    else
+                    {
+                        systemShape.IsHitTestVisible = false;
+                    }
 
                     Canvas.SetLeft(systemShape, system.LayoutX - SYSTEM_SHAPE_OFFSET);
                     Canvas.SetTop(systemShape, system.LayoutY - SYSTEM_SHAPE_OFFSET);
@@ -862,6 +885,10 @@ namespace SMT
                     BridgeInfo.Content = string.Empty;
                 }
 
+
+
+ 
+
                 if (MapConf.ShowJumpDistance && MapConf.CurrentJumpSystem != null && system.Name != MapConf.CurrentJumpSystem)
                 {
 
@@ -881,8 +908,15 @@ namespace SMT
                         case MapConfig.JumpShip.Blops: { Max = 8.0; } break;
                         case MapConfig.JumpShip.JF: { Max = 10.0; } break;
                     }
-
-                    BridgeInfo.Content = MapConf.JumpShipType + " range from " + MapConf.CurrentJumpSystem;
+                    if(MapConf.CurrentJumpCharacter != "")
+                    {
+                        BridgeInfo.Content = MapConf.JumpShipType + " range from " + MapConf.CurrentJumpCharacter + " (" + MapConf.CurrentJumpSystem + ")";
+                    }
+                    else
+                    {
+                        BridgeInfo.Content = MapConf.JumpShipType + " range from " + MapConf.CurrentJumpSystem;
+                    }
+                    
 
                     if (Distance < Max && Distance > 0.0)
                     {
@@ -1843,6 +1877,7 @@ namespace SMT
                 SystemInfoPopup.VerticalOffset = 5;
                 SystemInfoPopup.HorizontalOffset = 15;
                 SystemInfoPopup.DataContext = selectedSys.ActualSystem;
+
 
                 // check JB Info
                 SystemInfoPopup_JBInfo.Content = "";

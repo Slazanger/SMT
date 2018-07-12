@@ -446,7 +446,7 @@ namespace SMT.EVEData
             StartUpdateJumpsFromESI();
             StartUpdateSOVFromESI();
             StartUpdateIncursionsFromESI();
-            //StartEveTraceFleetUpdate();
+            StartEveTraceFleetUpdate();
             StartUpdateStructureHunterUpdate();
         }
 
@@ -1113,26 +1113,36 @@ namespace SMT.EVEData
                 return;
             }
 
-            string allianceList = string.Empty;
+            string allianceList = "[";
             foreach (MapSystem s in r.MapSystems.Values.ToList())
             {
                 if (s.ActualSystem.SOVAlliance != null && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !allianceList.Contains(s.ActualSystem.SOVAlliance))
                 {
-                    allianceList += s.ActualSystem.SOVAlliance + ",";
+                    allianceList += "\"";
+                    allianceList += s.ActualSystem.SOVAlliance;
+                    allianceList += "\",";
                 }
             }
+            allianceList += "\"0\"]";
 
-            if (allianceList != string.Empty)
+            if (allianceList.Length > 8)
             {
-                allianceList += "0";
-                string url = @"https://esi.evetech.net/v2/alliances/names/?datasource=tranquility";
+                string url = @"https://esi.evetech.net/v2/universe/names/?datasource=tranquility";
 
-                url += "&alliance_ids=" + Uri.EscapeUriString(allianceList);
+               byte[] data = UTF8Encoding.UTF8.GetBytes(allianceList);
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = WebRequestMethods.Http.Get;
+                request.Method = WebRequestMethods.Http.Post;
                 request.Timeout = 20000;
                 request.Proxy = null;
+
+
+                request.ContentType = "application/json";
+                request.ContentLength = data.Length;
+
+                var stream = request.GetRequestStream();
+                stream.Write(data, 0, data.Length);
+
                 request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
             }
             else
@@ -1146,27 +1156,38 @@ namespace SMT.EVEData
         /// </summary>
         public void ResolveAllianceIDs(List<string> IDs)
         {
-            string allianceList = string.Empty;
+            string allianceList = "["; ;
             foreach (string s in IDs)
             {
                 if (!AllianceIDToName.Keys.Contains(s) && !allianceList.Contains(s))
                 {
-                    allianceList += s + ",";
+                    allianceList += "\"";
+                    allianceList += s ;
+                    allianceList += "\",";
                 }
             }
 
-            if (allianceList != string.Empty)
-            {
-                allianceList += "0";
-                string url = @"https://esi.evetech.net/v2/alliances/names/?datasource=tranquility";
+            allianceList += "\"0\"]";
 
-                url += "&alliance_ids=" + Uri.EscapeUriString(allianceList);
+            if (allianceList.Length > 8)
+            {
+                string url = @"https://esi.evetech.net/v2/universe/names/?datasource=tranquility";
+
+                byte[] data = UTF8Encoding.UTF8.GetBytes(allianceList);
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = WebRequestMethods.Http.Get;
+                request.Method = WebRequestMethods.Http.Post;
                 request.Timeout = 20000;
                 request.Proxy = null;
+                request.ContentType = "application/json";
+                request.ContentLength = data.Length;
+
+                var stream = request.GetRequestStream();
+                stream.Write(data, 0, data.Length);
+
                 request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
+
+
             }
             else
             {
@@ -1449,9 +1470,13 @@ namespace SMT.EVEData
 
                                     foreach (string s in id.IntelString.Split(' '))
                                     {
+                                        if(s == "" || s.Length < 3)
+                                        {
+                                            continue;
+                                        }
                                         foreach(System sys in Systems)
                                         {
-                                            if(s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                                            if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
                                             {
                                                 id.Systems.Add(sys.Name);
                                             }
@@ -1982,8 +2007,14 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string allianceName = obj["alliance_name"].ToString();
-                                string allianceId = obj["alliance_id"].ToString();
+
+                                if(obj["category"].ToString() != "alliance")
+                                {
+                                    continue;
+                                }
+
+                                string allianceName = obj["name"].ToString();
+                                string allianceId = obj["id"].ToString();
                                 AllianceIDToName[allianceId] = allianceName;
 
                                 string allianceUrl = @"https://esi.evetech.net/v3/alliances/" + allianceId + "/?datasource=tranquility";
@@ -1992,7 +2023,7 @@ namespace SMT.EVEData
                                 allianceRequest.Method = WebRequestMethods.Http.Get;
                                 allianceRequest.Timeout = 20000;
                                 allianceRequest.Proxy = null;
-
+                                
                                 WebResponse allianceRequestWebResponse = allianceRequest.GetResponse();
 
                                 Stream allianceRequestResponeStream = allianceRequestWebResponse.GetResponseStream();
@@ -2018,7 +2049,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
         }

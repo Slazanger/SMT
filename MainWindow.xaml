@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.45" Height="800" Width="1024" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded">
+        Title="Slazanger's Map Tool 0.46" Height="800" Width="1024" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded">
 
     <Window.Resources>
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
@@ -95,6 +95,10 @@
                             
                                 <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Universe">
                                     <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1" >
+                                        <Popup x:Name="RegionCharacterInfo" IsOpen="False" AllowsTransparency="True"  >
+                                            <StackPanel x:Name="RegionCharacterInfoSP" Background="Gray" />
+                                        </Popup>
+                                        
                                         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <Canvas x:Name="MainUniverseCanvas"   Margin="5" Width="1050" Height="800" HorizontalAlignment="Stretch" />
                                         </Viewbox>

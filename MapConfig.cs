@@ -107,6 +107,38 @@ namespace SMT
             }
         }
 
+        private bool m_CurrentJumpCharacterSet;
+        [Category("Navigation")]
+        [DisplayName("Set Current Jump Character")]
+        public bool CurrentJumpCharacterSet
+        {
+            get
+            {
+                return m_CurrentJumpCharacterSet;
+            }
+            set
+            {
+                m_CurrentJumpCharacterSet = value;
+                OnPropertyChanged("CurrentJumpCharacterSet");
+            }
+        }
+
+
+        private string m_CurrentJumpCharacter;
+        [Category("Navigation")]
+        [DisplayName("Current Jump Character"), ReadOnly(true)]
+        public string CurrentJumpCharacter
+        {
+            get
+            {
+                return m_CurrentJumpCharacter;
+            }
+            set
+            {
+                m_CurrentJumpCharacter = value;
+                OnPropertyChanged("CurrentJumpCharacter");
+            }
+        }
 
 
         [Category("Navigation")]
@@ -224,7 +256,7 @@ namespace SMT
             JumpRangeInAsOutline = true;
             MapColours = new List<MapColours>();
             ShowActiveIncursions = true;
-
+            CurrentJumpCharacter = "";
 
         }
 
