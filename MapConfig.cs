@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SMT
 {
@@ -107,26 +108,13 @@ namespace SMT
             }
         }
 
-        private bool m_CurrentJumpCharacterSet;
-        [Category("Navigation")]
-        [DisplayName("Set Current Jump Character")]
-        public bool CurrentJumpCharacterSet
-        {
-            get
-            {
-                return m_CurrentJumpCharacterSet;
-            }
-            set
-            {
-                m_CurrentJumpCharacterSet = value;
-                OnPropertyChanged("CurrentJumpCharacterSet");
-            }
-        }
 
 
         private string m_CurrentJumpCharacter;
         [Category("Navigation")]
-        [DisplayName("Current Jump Character"), ReadOnly(true)]
+        [DisplayName("Current Jump Character")]
+        [ItemsSource(typeof(JumpCharacterItemsSource))]
+
         public string CurrentJumpCharacter
         {
             get
@@ -398,6 +386,24 @@ namespace SMT
         public MapConfig()
         {
             SetDefaults();
+        }
+
+
+  
+    }
+
+    public class JumpCharacterItemsSource : IItemsSource
+    {
+        public ItemCollection GetValues()
+        {
+            ItemCollection sizes = new ItemCollection();
+            sizes.Add("");
+
+            foreach (EVEData.LocalCharacter c in EVEData.EveManager.Instance.LocalCharacters)
+            {
+                sizes.Add(c.Name);
+            }
+            return sizes;
         }
     }
 }

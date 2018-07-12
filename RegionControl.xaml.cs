@@ -391,7 +391,8 @@ namespace SMT
         {
             EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
-            BridgeInfo.Content = string.Empty;
+            BridgeInfoL1.Content = string.Empty;
+            BridgeInfoL2.Content = string.Empty;
 
 
             DynamicMapElements = new List<UIElement>();
@@ -422,11 +423,6 @@ namespace SMT
         /// <param name="e"></param>
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (MapConf.CurrentJumpCharacterSet && ActiveCharacter != null)
-            {
-                MapConf.CurrentJumpCharacter = ActiveCharacter.Name;
-                MapConf.CurrentJumpCharacterSet = false;
-            }
 
             if (MapConf.CurrentJumpCharacter != "")
             {
@@ -472,9 +468,11 @@ namespace SMT
                     if(!MapConf.LockJumpSystem)
                     {
                         MapConf.CurrentJumpSystem = es.Name;
-                        MapConf.CurrentJumpCharacterSet = false;
                         MapConf.CurrentJumpCharacter = "";
-                        BridgeInfo.Content = "Range from " + es.Name;
+                        BridgeInfoL1.Content = MapConf.JumpShipType + " range from";
+                        BridgeInfoL2.Content = es.Name;
+
+                        MapConf.CurrentJumpCharacter = "";
                     }
 
 
@@ -882,7 +880,8 @@ namespace SMT
 
                 if(!MapConf.ShowJumpDistance)
                 {
-                    BridgeInfo.Content = string.Empty;
+                    BridgeInfoL1.Content = string.Empty;
+                    BridgeInfoL2.Content = string.Empty;
                 }
 
 
@@ -908,15 +907,20 @@ namespace SMT
                         case MapConfig.JumpShip.Blops: { Max = 8.0; } break;
                         case MapConfig.JumpShip.JF: { Max = 10.0; } break;
                     }
-                    if(MapConf.CurrentJumpCharacter != "")
+
+                    EVEData.System js = EM.GetEveSystem(MapConf.CurrentJumpSystem);
+
+                    if (MapConf.CurrentJumpCharacter != "")
                     {
-                        BridgeInfo.Content = MapConf.JumpShipType + " range from " + MapConf.CurrentJumpCharacter + " (" + MapConf.CurrentJumpSystem + ")";
+                        BridgeInfoL1.Content = MapConf.JumpShipType + " range from";
+                        BridgeInfoL2.Content = MapConf.CurrentJumpCharacter + " : " + MapConf.CurrentJumpSystem + " (" + js.Region + ")";
                     }
                     else
                     {
-                        BridgeInfo.Content = MapConf.JumpShipType + " range from " + MapConf.CurrentJumpSystem;
+                        BridgeInfoL1.Content = MapConf.JumpShipType + " range from";
+                        BridgeInfoL2.Content = MapConf.CurrentJumpSystem + " (" + js.Region + ")";
                     }
-                    
+
 
                     if (Distance < Max && Distance > 0.0)
                     {
