@@ -55,6 +55,9 @@ namespace SMT.EVEData
             }
         }
 
+        public string Region { get; set; }
+        
+
         /// <summary>
         /// Gets or sets if this character is linked with ESI
         /// </summary>
@@ -425,6 +428,17 @@ namespace SMT.EVEData
                             string sysID = obj["solar_system_id"].ToString();
 
                             Location = EveManager.Instance.SystemIDToName[sysID];
+
+                            System s = EVEData.EveManager.Instance.GetEveSystem(Location);
+                            if (s != null)
+                            {
+                                Region = s.Region;
+                            }
+                            else
+                            {
+                                Region = "";
+                            }
+
                         }
                     }
                 }

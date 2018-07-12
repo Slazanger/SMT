@@ -182,7 +182,7 @@ namespace SMT
             MapControlsPropertyGrid.SelectedObject = MapConf;
 
             ColourListDropdown.ItemsSource = MapConf.MapColours;
-            CharacterList.ItemsSource = EVEManager.LocalCharacters;
+            CharactersList.ItemsSource = EVEManager.LocalCharacters;
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
 
@@ -992,6 +992,24 @@ namespace SMT
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
                 System.Diagnostics.Process.Start(KillURL);
+            }
+        }
+
+        private void CharactersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    EVEData.LocalCharacter lc = dgr.Item as EVEData.LocalCharacter;
+
+                    if (lc != null)
+                    {
+                        RegionRC.SelectSystem(lc.Location, true);
+                    }
+                }
             }
         }
     }

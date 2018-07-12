@@ -905,6 +905,7 @@ namespace SMT
                         case MapConfig.JumpShip.Carrier: { Max = 7.0; } break;
                         case MapConfig.JumpShip.FAX: { Max = 7.0; } break;
                         case MapConfig.JumpShip.Blops: { Max = 8.0; } break;
+                        case MapConfig.JumpShip.Rorqual: { Max = 10.0; } break;
                         case MapConfig.JumpShip.JF: { Max = 10.0; } break;
                     }
 

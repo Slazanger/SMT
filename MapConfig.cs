@@ -18,6 +18,7 @@ namespace SMT
             Titan,
             Blops,
             JF,
+            Rorqual
         } 
 
 

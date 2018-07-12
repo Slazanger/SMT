@@ -1265,6 +1265,9 @@ namespace SMT.EVEData
             InitTheraConnections();
 
             InitZKillFeed();
+
+
+            StartUpdateESIUniverseDataThread();
         }
 
         /// <summary>
@@ -1294,6 +1297,7 @@ namespace SMT.EVEData
                     c.ESIAccessTokenExpiry = DateTime.MinValue;
                     c.LocalChatFile = string.Empty;
                     c.Location = string.Empty;
+                    c.Region = string.Empty;
                     c.Update();
 
                     LocalCharacters.Add(c);
@@ -1379,6 +1383,18 @@ namespace SMT.EVEData
                                         {
                                             c.Location = system;
                                             c.LocalChatFile = changedFile;
+
+                                            System s = GetEveSystem(system);
+                                            if(s!=null)
+                                            {
+                                                c.Region = s.Region;
+                                            }
+                                            else
+                                            {
+                                                c.Region = "";
+                                            }
+
+
                                             addChar = false;
                                         }
                                     }
@@ -1914,6 +1930,27 @@ namespace SMT.EVEData
                     }
 
                     Thread.Sleep(2000);
+                }
+            }).Start();
+        }
+
+
+        /// <summary>
+        /// Start the Character Update Thread
+        /// </summary>
+        private void StartUpdateESIUniverseDataThread()
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                // loop forever
+                while (true)
+                {
+                    UpdateESIUniverseData();
+
+                    // every 30 mins
+                    Thread.Sleep(1800000);
                 }
             }).Start();
         }

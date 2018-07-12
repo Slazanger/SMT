@@ -213,7 +213,14 @@
                                 <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
-                                            <ListBox x:Name="CharacterList"/>
+                                            <DataGrid  x:Name="CharactersList" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick">
+
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                                                    <DataGridTextColumn Header="Location" Binding="{Binding Location}" />
+                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" />
+                                                </DataGrid.Columns>
+                                            </DataGrid>
                                             <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
                                         </StackPanel>
                                     </ScrollViewer>
