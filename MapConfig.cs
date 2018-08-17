@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
@@ -9,17 +10,6 @@ namespace SMT
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public enum JumpShip
-        {
-            Dread,
-            Carrier,
-            FAX,
-            Super,
-            Titan,
-            Blops,
-            JF,
-            Rorqual
-        } 
 
 
 
@@ -132,7 +122,7 @@ namespace SMT
 
         [Category("Navigation")]
         [DisplayName("Ship Type")]
-        public JumpShip JumpShipType { get; set; }
+        public EVEData.EveManager.JumpShip JumpShipType { get; set; }
 
         private bool m_JumpRangeInAsOutline;
         [Category("Navigation")]
@@ -229,6 +219,8 @@ namespace SMT
         }
 
 
+        [Category("Navigation")]
+        public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
 
 
 
@@ -246,6 +238,7 @@ namespace SMT
             MapColours = new List<MapColours>();
             ShowActiveIncursions = true;
             CurrentJumpCharacter = "";
+            StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
 
         }
 

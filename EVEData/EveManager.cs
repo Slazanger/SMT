@@ -211,6 +211,22 @@ namespace SMT.EVEData
 
         public EveTrace.EveTraceFleetInfo FleetIntel;
 
+
+
+        public enum JumpShip
+        {
+            Dread,
+            Carrier,
+            FAX,
+            Super,
+            Titan,
+            Blops,
+            JF,
+            Rorqual
+        }
+
+
+
         /// <summary>
         /// Get the System name from the System ID
         /// </summary>

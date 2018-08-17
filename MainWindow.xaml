@@ -33,6 +33,9 @@
  
 
             <xcad:DockingManager x:Name="dockManager" Grid.Row="1" Grid.RowSpan="1" >
+                <xcad:DockingManager.Theme>
+                    <xcad:MetroTheme/>
+                </xcad:DockingManager.Theme>
 
                 <xcad:LayoutRoot>
                     <xcad:LayoutRoot.RootPanel>

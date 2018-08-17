@@ -413,6 +413,14 @@ namespace SMT
 
             //ToolBoxCanvas.DataContext = this;
 
+            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
+            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
+            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+
+            List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
+            SystemDropDownAC.ItemsSource = newList;
+
+
             PropertyChanged += MapObjectChanged;
         }
 
@@ -898,15 +906,14 @@ namespace SMT
 
                     switch (MapConf.JumpShipType)
                     {
-                        case MapConfig.JumpShip.Super: { Max = 6.0; } break;
-                        case MapConfig.JumpShip.Titan: { Max = 6.0; } break;
-
-                        case MapConfig.JumpShip.Dread: { Max = 7.0; } break;
-                        case MapConfig.JumpShip.Carrier: { Max = 7.0; } break;
-                        case MapConfig.JumpShip.FAX: { Max = 7.0; } break;
-                        case MapConfig.JumpShip.Blops: { Max = 8.0; } break;
-                        case MapConfig.JumpShip.Rorqual: { Max = 10.0; } break;
-                        case MapConfig.JumpShip.JF: { Max = 10.0; } break;
+                        case EVEData.EveManager.JumpShip.Super: { Max = 6.0; } break;
+                        case EVEData.EveManager.JumpShip.Titan: { Max = 6.0; } break;
+                        case EVEData.EveManager.JumpShip.Dread: { Max = 7.0; } break;
+                        case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0; } break;
+                        case EVEData.EveManager.JumpShip.FAX: { Max = 7.0; } break;
+                        case EVEData.EveManager.JumpShip.Blops: { Max = 8.0; } break;
+                        case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0; } break;
+                        case EVEData.EveManager.JumpShip.JF: { Max = 10.0; } break;
                     }
 
                     EVEData.System js = EM.GetEveSystem(MapConf.CurrentJumpSystem);
@@ -1965,6 +1972,19 @@ namespace SMT
                 ReDrawMap(false);
             }
         }
+
+        private void GlobalSystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
+
+            if (sd != null)
+            {
+                bool ChangeRegion = sd.Region != Region.Name;
+                SelectSystem(sd.Name, ChangeRegion);
+                ReDrawMap(ChangeRegion);
+            }
+        }
+
 
         private void MapObjectChanged(object sender, PropertyChangedEventArgs e)
         {
