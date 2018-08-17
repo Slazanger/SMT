@@ -1975,6 +1975,8 @@ namespace SMT
 
         private void GlobalSystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            FollowCharacter = false;
+
             EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
 
             if (sd != null)

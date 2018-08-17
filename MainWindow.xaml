@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.46" Height="800" Width="1024" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded">
+        Title="Slazanger's Map Tool 0.47" Height="800" Width="1024" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded">
 
     <Window.Resources>
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
@@ -40,57 +40,86 @@
                 <xcad:LayoutRoot>
                     <xcad:LayoutRoot.RootPanel>
                         <xcad:LayoutPanel>
-                            <xcad:LayoutAnchorablePane DockWidth="250" DockMinWidth="250">
-                                <xcad:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <Grid Background="#FFE5E5E5">
-                                        <StackPanel>
-                                            <CheckBox Content="Current Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
+                            <xcad:LayoutAnchorablePaneGroup DockWidth="250" DockMinWidth="250" Orientation="Vertical">
+                                <xcad:LayoutAnchorablePane>
+                                    <xcad:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                        <Grid Background="#FFE5E5E5">
+                                            <StackPanel>
+                                                <CheckBox Content="Current Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
 
-                                            <DataGrid  x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
-                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
-                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
-                                                </DataGrid.Columns>
-                                                <DataGrid.RowStyle>
-                                                    <Style TargetType="DataGridRow">
-                                                        <Style.Setters>
-                                                            <Setter Property="Background">
-                                                                <Setter.Value>
-                                                                    <Binding Converter="{StaticResource zkbBGConverter}" />
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style.Setters>
-                                                    </Style>
-                                                </DataGrid.RowStyle>
+                                                <DataGrid  x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                        <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
+                                                        <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
+                                                    </DataGrid.Columns>
+                                                    <DataGrid.RowStyle>
+                                                        <Style TargetType="DataGridRow">
+                                                            <Style.Setters>
+                                                                <Setter Property="Background">
+                                                                    <Setter.Value>
+                                                                        <Binding Converter="{StaticResource zkbBGConverter}" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style.Setters>
+                                                        </Style>
+                                                    </DataGrid.RowStyle>
 
-                                                <DataGrid.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
-                                                        <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
-                                                    </ContextMenu>
-                                                </DataGrid.ContextMenu>
-                                            </DataGrid>
-                                        </StackPanel>
-                                    </Grid>
-                                </xcad:LayoutAnchorable>
+                                                    <DataGrid.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
+                                                            <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
+                                                        </ContextMenu>
+                                                    </DataGrid.ContextMenu>
+                                                </DataGrid>
+                                            </StackPanel>
+                                        </Grid>
+                                    </xcad:LayoutAnchorable>
+                                    <xcad:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                        <Grid Background="#FFE5E5E5">
+                                            <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid>
+                                                            <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </Grid>
+                                    </xcad:LayoutAnchorable>
+
+                                </xcad:LayoutAnchorablePane>
+                                
+                                <xcad:LayoutAnchorablePane>
+                                    <xcad:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapConfigContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                        <ScrollViewer Background="#FFE5E5E5">
+                                            <StackPanel>
+                                                <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
+                                                    <xctk:PropertyGrid.EditorDefinitions>
+                                                        <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
+                                                            <xctk:EditorTemplateDefinition.EditingTemplate>
+                                                                <DataTemplate>
+                                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
+                                                                </DataTemplate>
+                                                            </xctk:EditorTemplateDefinition.EditingTemplate>
+                                                        </xctk:EditorTemplateDefinition>
+                                                    </xctk:PropertyGrid.EditorDefinitions>
+                                                </xctk:PropertyGrid>
+
+                                                <StackPanel>
+                                                    <Separator />
+                                                    <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
+                                                </StackPanel>
+
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </xcad:LayoutAnchorable>
+                                </xcad:LayoutAnchorablePane>
+
+                            </xcad:LayoutAnchorablePaneGroup>
 
 
-                                <xcad:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <Grid Background="#FFE5E5E5">
-                                        <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick">
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid>
-                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" FontSize="10" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
-                                        </ListBox>
-                                    </Grid>
-                                </xcad:LayoutAnchorable>
-
-                            </xcad:LayoutAnchorablePane>
                             <xcad:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False" >
                                 <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
                                     <local:RegionControl x:Name="RegionRC" />
@@ -170,10 +199,10 @@
                                             </DataGrid.RowStyle>
 
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" />
+                                                <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" Width="*" />
 
-                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
-                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*"/>
+                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Grid.Row="2">
@@ -182,7 +211,7 @@
                                     </Grid>
                                 </xcad:LayoutAnchorable>
 
-                                <xcad:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <xcad:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
                                             <ComboBox x:Name="ColourListDropdown" SelectionChanged="ColourListDropdown_SelectionChanged" />
@@ -190,38 +219,22 @@
                                             <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
                                             <Separator />
                                             <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
-                                            <Separator />
-
-                                            <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
-                                                <xctk:PropertyGrid.EditorDefinitions>
-                                                    <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
-                                                        <xctk:EditorTemplateDefinition.EditingTemplate>
-                                                            <DataTemplate>
-                                                                <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
-                                                            </DataTemplate>
-                                                        </xctk:EditorTemplateDefinition.EditingTemplate>
-                                                    </xctk:EditorTemplateDefinition>
-                                                </xctk:PropertyGrid.EditorDefinitions>
-                                            </xctk:PropertyGrid>
-
-                                            <StackPanel>
-                                                <Separator />
-                                                <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
-                                            </StackPanel>
-
                                         </StackPanel>
                                     </ScrollViewer>
                                 </xcad:LayoutAnchorable>
 
+
+ 
+
                                 <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
-                                            <DataGrid  x:Name="CharactersList" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick">
+                                            <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick">
 
                                                 <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                                                    <DataGridTextColumn Header="Location" Binding="{Binding Location}" />
-                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" />
+                                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*"/>
+                                                    <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*"/>
+                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*"/>
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
@@ -264,11 +277,11 @@
                                                 </DataGrid.RowStyle>
 
                                                 <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="System" Binding="{Binding System}" />
-                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" />
-                                                    <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" />
-                                                    <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" />
-                                                    <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" />
+                                                    <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
+                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
+                                                    <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*"  />
+                                                    <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
+                                                    <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*"  />
                                                 </DataGrid.Columns>
                                             </DataGrid>
 
