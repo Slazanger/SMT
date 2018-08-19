@@ -94,7 +94,13 @@ namespace SMT
         [DisplayName("Active Incursion")]
         public Color ActiveIncursionColour { get; set; }
 
-        
+        [Category("SOV")]
+        [DisplayName("Structure Vunerable")]
+        public Color SOVStructureVunerableColour { get; set; }
+
+        [Category("SOV")]
+        [DisplayName("Structure Vunerable Soon")]
+        public Color SOVStructureVunerableSoonColour { get; set; }
 
 
         static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)

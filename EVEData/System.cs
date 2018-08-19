@@ -2,6 +2,7 @@
 // System
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -145,6 +146,27 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public List<StructureHunter.Structures> SHStructures{ get; set; }
+
+        [XmlIgnoreAttribute]
+        public DateTimeOffset IHubVunerabliltyStart { get; set; }
+
+        [XmlIgnoreAttribute]
+        public DateTimeOffset IHubVunerabliltyEnd { get; set; }
+
+        [XmlIgnoreAttribute]
+        public float IHubOccupancyLevel { get; set; }
+
+
+        [XmlIgnoreAttribute]
+        public DateTimeOffset TCUVunerabliltyStart { get; set; }
+
+        [XmlIgnoreAttribute]
+        public DateTimeOffset TCUVunerabliltyEnd { get; set; }
+
+        [XmlIgnoreAttribute]
+        public float TCUOccupancyLevel { get; set; }
+
+
 
 
         /// <summary>

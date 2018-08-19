@@ -1516,6 +1516,8 @@ namespace SMT
             SolidColorBrush zkbColour = new SolidColorBrush(Colors.Purple);
 
             SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
+            SolidColorBrush infoVulnerable = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVunerableColour);
+            SolidColorBrush infoVulnerableSoon = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVunerableSoonColour);
 
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
@@ -1551,6 +1553,43 @@ namespace SMT
                     infoValue = sys.ActualSystem.JumpsLastHour;
                     infoSize = infoValue * ESIOverlayScale;
                 }
+
+                if(MapConf.ShowIhubVunerabilities)
+                {
+                    DateTime now = DateTime.Now;
+
+                    if(now > sys.ActualSystem.IHubVunerabliltyStart && now < sys.ActualSystem.IHubVunerabliltyEnd)
+                    {
+                        infoValue = (int)sys.ActualSystem.IHubOccupancyLevel;
+                        infoSize = 30;
+                        infoColour = infoVulnerable;
+                    }
+                    else if( now.AddMinutes(30) > sys.ActualSystem.IHubVunerabliltyStart )
+                    {
+                        infoValue = (int)sys.ActualSystem.IHubOccupancyLevel;
+                        infoSize = 27;
+                        infoColour = infoVulnerableSoon;
+                    }
+                }
+
+                if (MapConf.ShowTCUVunerabilities)
+                {
+                    DateTime now = DateTime.Now;
+
+                    if (now > sys.ActualSystem.TCUVunerabliltyStart && now < sys.ActualSystem.TCUVunerabliltyEnd)
+                    {
+                        infoValue = (int)sys.ActualSystem.TCUOccupancyLevel;
+                        infoSize = 30;
+                        infoColour = infoVulnerable;
+                    }
+                    else if (now.AddMinutes(MapConf.UpcomingSovMinutes) > sys.ActualSystem.TCUVunerabliltyStart)
+                    {
+                        infoValue = (int)sys.ActualSystem.TCUOccupancyLevel;
+                        infoSize = 27;
+                        infoColour = infoVulnerableSoon;
+                    }
+                }
+
 
 
                 if (infoValue > 0)
@@ -1648,7 +1687,7 @@ namespace SMT
                         poly.Fill = br;
                         poly.SnapsToDevicePixels = true;
                         poly.Stroke = poly.Fill;
-                        poly.StrokeThickness = 1;
+                        poly.StrokeThickness = 0.4;
                         poly.StrokeDashCap = PenLineCap.Round;
                         poly.StrokeLineJoin = PenLineJoin.Round;
 

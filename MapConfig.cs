@@ -237,6 +237,75 @@ namespace SMT
         }
 
 
+        private bool m_ShowTCUVunerabilities;
+        [Category("SOV")]
+        [DisplayName("Show TCU Timers")]
+        public bool ShowTCUVunerabilities
+        {
+            get
+            {
+                return m_ShowTCUVunerabilities;
+            }
+
+            set
+            {
+                m_ShowTCUVunerabilities = value;
+
+                if (m_ShowTCUVunerabilities)
+                {
+                    ShowIhubVunerabilities = false;
+                }
+
+                OnPropertyChanged("ShowTCUVunerabilities");
+            }
+        }
+
+        private bool m_ShowIhubVunerabilities;
+        [Category("SOV")]
+        [DisplayName("Show IHUB Timers")]
+        public bool ShowIhubVunerabilities
+        {
+            get
+            {
+                return m_ShowIhubVunerabilities;
+            }
+
+            set
+            {
+                m_ShowIhubVunerabilities = value;
+                if (m_ShowIhubVunerabilities)
+                {
+                    ShowTCUVunerabilities = false;
+                }
+
+                OnPropertyChanged("ShowIhubVunerabilities");
+            }
+        }
+
+        private int m_UpcomingSovMinutes;
+
+        [Category("SOV")]
+        [DisplayName("Upcoming Period (Mins)")]
+        public int UpcomingSovMinutes
+        {
+            get
+            {
+                return m_UpcomingSovMinutes;
+            }
+
+            set
+            {
+                m_UpcomingSovMinutes = value;
+                if (m_UpcomingSovMinutes < 5)
+                {
+                    m_UpcomingSovMinutes = 5;
+                }
+
+                OnPropertyChanged("UpcomingSovMinutes");
+            }
+        }
+
+
 
         [Category("Navigation")]
         public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
@@ -251,6 +320,7 @@ namespace SMT
             DefaultRegion = "Molden Heath";
             ShowSystemPopup = true;
             MaxIntelSeconds = 120;
+            UpcomingSovMinutes = 30;
             AlwaysOnTop = false;
             ShowToolBox = true;
             ShowZKillData = true;
@@ -289,7 +359,11 @@ namespace SMT
             defaultColours.JumpRangeInColour = Color.FromRgb(135, 206, 235);
             defaultColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
-            
+            defaultColours.SOVStructureVunerableColour = Colors.Red;
+            defaultColours.SOVStructureVunerableSoonColour = Colors.Yellow;
+
+
+
 
 
             MapColours.Add(defaultColours);
@@ -317,6 +391,11 @@ namespace SMT
             blueColours.JumpRangeInColour = Color.FromRgb(0, 255, 0);
             blueColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
+            blueColours.SOVStructureVunerableColour = Colors.Red;
+            blueColours.SOVStructureVunerableSoonColour = Colors.Yellow;
+
+
+
             MapColours.Add(blueColours);
 
             MapColours greyAndRed = new MapColours();
@@ -341,6 +420,11 @@ namespace SMT
             greyAndRed.SystemTextSize = 12;
             greyAndRed.JumpRangeInColour = Color.FromRgb(0, 255, 0);
             greyAndRed.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
+
+            greyAndRed.SOVStructureVunerableColour = Colors.Red;
+            greyAndRed.SOVStructureVunerableSoonColour = Colors.Yellow;
+
+
 
             MapColours.Add(greyAndRed);
 
@@ -367,6 +451,9 @@ namespace SMT
             dark.JumpRangeInColour = Color.FromRgb(0, 255, 0);
             dark.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
+            dark.SOVStructureVunerableColour = Colors.Red;
+            dark.SOVStructureVunerableSoonColour = Colors.Yellow;
+
             MapColours.Add(dark);
 
             MapColours lateNight = new MapColours();
@@ -391,7 +478,11 @@ namespace SMT
             lateNight.SystemTextSize = 13;
             lateNight.JumpRangeInColour = Color.FromRgb(0, 255, 0);
             lateNight.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
-            
+
+
+            lateNight.SOVStructureVunerableColour = Colors.Red;
+            lateNight.SOVStructureVunerableSoonColour = Colors.Yellow;
+
 
             MapColours.Add(lateNight);
 

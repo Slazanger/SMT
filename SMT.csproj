@@ -121,6 +121,7 @@
     <Compile Include="EVEData\ESI\CharacterIDData.cs" />
     <Compile Include="EVEData\ESI\EveTrace.cs" />
     <Compile Include="EVEData\ESI\IncursionData.cs" />
+    <Compile Include="EVEData\ESI\SovStructures.cs" />
     <Compile Include="EVEData\ESI\StructureHunter.cs" />
     <Compile Include="EVEData\ESI\StructureIDData.cs" />
     <Compile Include="EVEData\ESI\StructureSearch.cs" />
