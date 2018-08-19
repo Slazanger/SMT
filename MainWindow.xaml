@@ -44,35 +44,36 @@
                                 <xcad:LayoutAnchorablePane>
                                     <xcad:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                         <Grid Background="#FFE5E5E5">
-                                            <StackPanel>
-                                                <CheckBox Content="Current Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
+                                            <ScrollViewer>
+                                                <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
+                                                    <CheckBox Content="Current Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
+                                                    <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
+                                                        </DataGrid.Columns>
+                                                        <DataGrid.RowStyle>
+                                                            <Style TargetType="DataGridRow">
+                                                                <Style.Setters>
+                                                                    <Setter Property="Background">
+                                                                        <Setter.Value>
+                                                                            <Binding Converter="{StaticResource zkbBGConverter}" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Style.Setters>
+                                                            </Style>
+                                                        </DataGrid.RowStyle>
 
-                                                <DataGrid  x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
-                                                    <DataGrid.Columns>
-                                                        <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
-                                                        <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
-                                                        <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
-                                                    </DataGrid.Columns>
-                                                    <DataGrid.RowStyle>
-                                                        <Style TargetType="DataGridRow">
-                                                            <Style.Setters>
-                                                                <Setter Property="Background">
-                                                                    <Setter.Value>
-                                                                        <Binding Converter="{StaticResource zkbBGConverter}" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </Style.Setters>
-                                                        </Style>
-                                                    </DataGrid.RowStyle>
-
-                                                    <DataGrid.ContextMenu>
-                                                        <ContextMenu>
-                                                            <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
-                                                            <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
-                                                        </ContextMenu>
-                                                    </DataGrid.ContextMenu>
-                                                </DataGrid>
-                                            </StackPanel>
+                                                        <DataGrid.ContextMenu>
+                                                            <ContextMenu>
+                                                                <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
+                                                                <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
+                                                            </ContextMenu>
+                                                        </DataGrid.ContextMenu>
+                                                    </DataGrid>
+                                                </StackPanel>
+                                            </ScrollViewer>
                                         </Grid>
                                     </xcad:LayoutAnchorable>
                                     <xcad:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">

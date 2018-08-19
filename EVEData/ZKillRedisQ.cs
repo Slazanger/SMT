@@ -82,19 +82,24 @@ namespace SMT.EVEData
                     continue;
                 }
 
+                //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(redistURL);
                 request.Method = WebRequestMethods.Http.Get;
-                request.Timeout = 10000;
+                request.Timeout = 60000;
+                request.UserAgent = "SMT/0.47";
+                request.KeepAlive = true;
                 request.Proxy = null;
-
                 HttpWebResponse response;
 
                 try
                 {
                     response = request.GetResponse() as HttpWebResponse;
                 }
-                catch
+                catch (Exception ex)
                 {
+
                     Thread.Sleep(1000);
                     continue;
                 }
