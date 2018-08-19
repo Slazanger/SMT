@@ -218,9 +218,30 @@ namespace SMT
             }
         }
 
+        private bool m_ShowRegionStandings;
+
+        [Category("Universe")]
+        [DisplayName("Show RegionStandings")]
+        public bool ShowRegionStandings
+        {
+            get
+            {
+                return m_ShowRegionStandings;
+            }
+
+            set
+            {
+                m_ShowRegionStandings = value;
+                OnPropertyChanged("ShowRegionStandings");
+            }
+        }
+
+
 
         [Category("Navigation")]
         public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
+
+
 
 
 
@@ -254,7 +275,7 @@ namespace SMT
             defaultColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
             defaultColours.OutRegionSystemColour = Color.FromRgb(218, 165, 32);
             defaultColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
-            defaultColours.MapBackgroundColour = Color.FromRgb(105, 105, 105);
+            defaultColours.MapBackgroundColour = Color.FromRgb(104, 104, 117);
             defaultColours.ESIOverlayColour = Color.FromRgb(188, 143, 143);
             defaultColours.IntelOverlayColour = Color.FromRgb(178, 34, 34);
             defaultColours.NormalGateColour = Color.FromRgb(255, 248, 220);

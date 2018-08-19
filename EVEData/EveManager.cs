@@ -585,6 +585,10 @@ namespace SMT.EVEData
                     float x = float.Parse(system.Attributes["x"].Value) + (float.Parse(system.Attributes["width"].Value) / 2.0f);
                     float y = float.Parse(system.Attributes["y"].Value) + (float.Parse(system.Attributes["height"].Value) / 2.0f);
 
+                    float RoundVal = 5.0f;
+                    x = (float)Math.Round(x/ RoundVal, 0) * RoundVal;
+                    y = (float)Math.Round(y/ RoundVal, 0) * RoundVal;
+
                     string systemnodepath = @"//*[@id='def" + systemID + "']";
                     XmlNodeList snl = xmldoc.SelectNodes(systemnodepath);
                     XmlNode sysdefNode = snl[0];
@@ -758,7 +762,9 @@ namespace SMT.EVEData
 
                     foreach (Vector2f vc in cellList)
                     {
-                        ms.CellPoints.Add(new Point(Math.Round(vc.x * 4.0) / 4.0, Math.Round(vc.y * 4.0) / 4.0));
+                        float RoundVal = 2.5f;
+                        ms.CellPoints.Add(new Point(Math.Round(vc.x / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal, Math.Round(vc.y / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal));
+                        //ms.CellPoints.Add(new Point(vc.x, vc.y));
                     }
                 }
             }

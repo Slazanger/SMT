@@ -161,7 +161,7 @@ namespace SMT
             EVEData.EveManager.Instance = EVEManager;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -279,7 +279,7 @@ namespace SMT
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            RedrawUniverse();
+            RedrawUniverse(false);
         }
 
         private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
@@ -313,6 +313,12 @@ namespace SMT
             }
 
             RegionRC.ReDrawMap(true);
+
+            if(e.PropertyName == "ShowRegionStandings")
+            {
+                RedrawUniverse(true);
+            }
+
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -370,10 +376,24 @@ namespace SMT
             EVEManager.ShutDown();
         }
 
-        private void RedrawUniverse()
+        private void RedrawUniverse(bool Redraw)
         {
-            MainUniverseCanvas.Children.Clear();
-            AddRegionsToUniverse();
+            if(Redraw)
+            {
+                MainUniverseCanvas.Children.Clear();
+                AddRegionsToUniverse();
+            }
+            else
+            {
+                foreach(UIElement uie in DynamicUniverseElements)
+                {
+                    MainUniverseCanvas.Children.Remove(uie);
+                }
+                DynamicUniverseElements.Clear();
+            }
+
+
+            AddDataToUniverse();
         }
 
 
@@ -564,6 +584,8 @@ namespace SMT
 
         }
 
+        List<UIElement> DynamicUniverseElements = new List<UIElement>();
+
         private void AddRegionsToUniverse()
         {
             Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
@@ -575,8 +597,6 @@ namespace SMT
             Brush GallenteBg = new SolidColorBrush(Color.FromArgb(255, 127, 139, 137));
             Brush CaldariBg = new SolidColorBrush(Color.FromArgb(255, 149, 159, 171));
 
-            Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
-            Brush CharacterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
 
             MainUniverseCanvas.Background = BackgroundColourBrush;
             MainUniverseGrid.Background = BackgroundColourBrush;
@@ -612,7 +632,7 @@ namespace SMT
                 }
 
 
-                if (RegionRC.ActiveCharacter != null && RegionRC.ActiveCharacter.ESILinked)
+                if (RegionRC.ActiveCharacter != null && RegionRC.ActiveCharacter.ESILinked && MapConf.ShowRegionStandings)
                 {
                     float averageStanding = 0.0f;
                     float numSystems = 0;
@@ -734,6 +754,17 @@ namespace SMT
                     MainUniverseCanvas.Children.Add(regionLink);
                 }
 
+            }
+        }
+
+        private void AddDataToUniverse()
+        {
+            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
+            Brush CharacterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+
+            foreach (EVEData.MapRegion mr in EVEManager.Regions)
+            {
                 bool AddTheraConnection = false;
                 foreach (EVEData.TheraConnection tc in EVEManager.TheraConnections)
                 {
@@ -760,15 +791,16 @@ namespace SMT
                     Canvas.SetTop(TheraShape, mr.RegionY + 3);
                     Canvas.SetZIndex(TheraShape, 22);
                     MainUniverseCanvas.Children.Add(TheraShape);
+                    DynamicUniverseElements.Add(TheraShape);
                 }
 
 
                 bool AddCharacter = false;
 
-                foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                 {
                     EVEData.System s = EVEManager.GetEveSystem(lc.Location);
-                    if(s != null && s.Region == mr.Name )
+                    if (s != null && s.Region == mr.Name)
                     {
                         AddCharacter = true;
                     }
@@ -791,15 +823,15 @@ namespace SMT
 
 
                     Canvas.SetLeft(CharacterShape, mr.RegionX + 28);
-                    Canvas.SetTop(CharacterShape, mr.RegionY -11);
+                    Canvas.SetTop(CharacterShape, mr.RegionY - 11);
                     Canvas.SetZIndex(CharacterShape, 23);
                     MainUniverseCanvas.Children.Add(CharacterShape);
+                    DynamicUniverseElements.Add(CharacterShape);
                 }
-
-
-
             }
         }
+
+
 
         private void RegionCharacter_ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {

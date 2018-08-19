@@ -1517,6 +1517,7 @@ namespace SMT
 
             SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
 
+
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
                 int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
@@ -1584,16 +1585,9 @@ namespace SMT
 
                 if ( sys.ActualSystem.SOVAlliance != null && ShowStandings)
                 {
-                    Polygon poly = new Polygon();
-
-                    foreach (Point p in sys.CellPoints)
-                    {
-                        poly.Points.Add(p);
-                    }
-
                     bool addToMap = true;
                     Brush br = null;
-                    
+
                     if (ActiveCharacter != null && ActiveCharacter.ESILinked)
                     {
                         float Standing = 0.0f;
@@ -1647,15 +1641,23 @@ namespace SMT
                     }
 
 
-                    poly.Fill = br;
-                    poly.SnapsToDevicePixels = true;
-                    poly.Stroke = poly.Fill;
-                    poly.StrokeThickness = 0.5;
-                    poly.StrokeDashCap = PenLineCap.Round;
-                    poly.StrokeLineJoin = PenLineJoin.Round;
-
+ 
                     if (addToMap)
                     {
+                        Polygon poly = new Polygon();
+                        poly.Fill = br;
+                        poly.SnapsToDevicePixels = true;
+                        poly.Stroke = poly.Fill;
+                        poly.StrokeThickness = 1;
+                        poly.StrokeDashCap = PenLineCap.Round;
+                        poly.StrokeLineJoin = PenLineJoin.Round;
+
+                        foreach (Point p in sys.CellPoints)
+                        {
+                            poly.Points.Add(p);
+                        }
+
+
                         MainCanvas.Children.Add(poly);
 
                         // save the dynamic map elements
@@ -1663,6 +1665,128 @@ namespace SMT
                     }
                 }
             }
+
+            /* New Merge of Poly's, doesnt 100% fold down
+            if(!OldRender && ShowStandings && ActiveCharacter != null && ActiveCharacter.ESILinked )
+            {
+                Dictionary<float, List<MapSystem>> StandingsDict = new Dictionary<float, List<MapSystem>>();
+                StandingsDict[-10.0f] = new List<MapSystem>();
+                StandingsDict[-5.0f] = new List<MapSystem>();
+                StandingsDict[0.0f] = new List<MapSystem>();
+                StandingsDict[5.0f] = new List<MapSystem>();
+                StandingsDict[10.0f] = new List<MapSystem>();
+
+
+                
+                foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
+                {
+                    if (sys.ActualSystem.SOVAlliance != null)
+                    {
+                        float Standing = 0.0f;
+                        if (ActiveCharacter.AllianceID != null && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAlliance)
+                        {
+                            Standing = 10.0f ;
+                        }
+
+                        if (sys.ActualSystem.SOVCorp != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
+                        {
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
+                        }
+
+                        if (sys.ActualSystem.SOVAlliance != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                        {
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAlliance];
+                        }
+
+                        StandingsDict[Standing].Add(sys);
+                    }
+                }
+
+                foreach(KeyValuePair<float, List<MapSystem>> kvp in StandingsDict)
+                {
+                    float Standing = kvp.Key;
+                    List<MapSystem> StandingsList = kvp.Value;
+                    Brush br = null;
+                    if(Standing == 0.0f)
+                    {
+                        continue;
+                    }
+
+                    if(StandingsList.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    if (Standing == -10.0)
+                    {
+                        br = StandingVBadBrush;
+                    }
+
+                    if (Standing == -5.0)
+                    {
+                        br = StandingBadBrush;
+                    }
+
+                    if (Standing == 5.0)
+                    {
+                        br = StandingGoodBrush;
+                    }
+
+                    if (Standing == 10.0)
+                    {
+                        br = StandingVGoodBrush;
+                    }
+
+                    // build up the poly list 
+                    GeometryGroup gg = new GeometryGroup();
+                    //PathGeometry gg = new PathGeometry();
+
+                    foreach ( MapSystem ms in StandingsList)
+                    {
+                        PathGeometry g = new PathGeometry();
+                        PathFigure pf = new PathFigure();
+                        g.FillRule = FillRule.Nonzero;
+
+                        pf.StartPoint = ms.CellPoints[0];
+                        pf.IsClosed = true;
+                        pf.IsFilled = true;
+
+                        for(int i = 1; i < ms.CellPoints.Count; i++)
+                        {
+                            LineSegment pls = new LineSegment();
+                            pls.Point = ms.CellPoints[i];
+                            pf.Segments.Add(pls);
+                        }
+                        g.Figures.Add(pf);                       
+                        gg.Children.Add(g);
+                    }
+                    gg.FillRule = FillRule.Nonzero;
+
+                    PathGeometry gTest = gg.Children[0] as PathGeometry;
+                    for(int i = 1; i < gg.Children.Count;i++)
+                    {
+                        gTest = PathGeometry.Combine(gg.Children[i], gTest, GeometryCombineMode.Union, Transform.Identity, 0.25, ToleranceType.Relative);
+
+                    }
+
+
+
+                    Path standingsPath = new Path();
+                    standingsPath.Fill = br;
+                    standingsPath.Data = gg;
+                    standingsPath.Stroke = new SolidColorBrush(Colors.Black);
+
+
+
+                    DynamicMapElements.Add(standingsPath);
+                    MainCanvas.Children.Add(standingsPath);
+
+
+
+                }
+
+            }
+            */
 
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
             {
