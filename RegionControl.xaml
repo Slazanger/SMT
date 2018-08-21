@@ -101,7 +101,7 @@
                                 </ToggleButton>
 
 
-                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSov}" ToolTip="Show Sov Owners" Width="36" Height="36">
+                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSovOwner}" ToolTip="Show Sov Owners" Width="36" Height="36">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
