@@ -337,9 +337,31 @@ namespace SMT
             if (FullRedraw)
             {
                 // reset the background
-                MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
-                MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
-                MainZoomControl.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+                //MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+
+                Color c1 = MapConf.ActiveColourScheme.MapBackgroundColour;
+                Color c2 = MapConf.ActiveColourScheme.MapBackgroundColour;
+                c1.R = (byte)(0.9 * c1.R);
+                c1.G = (byte)(0.9 * c1.G);
+                c1.B = (byte)(0.9 * c1.B);
+
+
+                LinearGradientBrush lgb = new LinearGradientBrush();
+                lgb.StartPoint = new Point(0, 0);
+                lgb.EndPoint = new Point(0, 1);
+
+                lgb.GradientStops.Add(new GradientStop(c1, 0.0));
+                lgb.GradientStops.Add(new GradientStop(c2, 0.4));
+                lgb.GradientStops.Add(new GradientStop(c2, 0.6));
+                lgb.GradientStops.Add(new GradientStop(c1, 1.0));
+
+                MainCanvasGrid.Background = lgb;
+
+
+                //                MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+                MainCanvasGrid.Background = lgb;
+                //MainZoomControl.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+                MainZoomControl.Background = lgb;
 
                 MainCanvas.Children.Clear();
 
@@ -2120,8 +2142,7 @@ namespace SMT
 
                 SystemInfoPopupSP.Children.Add(header);
 
-                Separator s = new Separator();
-                SystemInfoPopupSP.Children.Add(s);
+                SystemInfoPopupSP.Children.Add(new Separator());
 
                 if (selectedSys.ActualSystem.ShipKillsLastHour != 0)
                 {
@@ -2185,8 +2206,14 @@ namespace SMT
                     }
                 }
 
+                if (selectedSys.ActualSystem.IHubOccupancyLevel != 0.0f || selectedSys.ActualSystem.TCUOccupancyLevel != 0.0f)
+                {
+                    SystemInfoPopupSP.Children.Add(new Separator());
+                }
+
+
                 // update IHubInfo
-                if(selectedSys.ActualSystem.IHubOccupancyLevel != 0.0f)
+                if (selectedSys.ActualSystem.IHubOccupancyLevel != 0.0f)
                 {
                     Label sov = new Label();
                     sov.Padding = one;
@@ -2203,6 +2230,23 @@ namespace SMT
                     sov.Margin = one;
                     sov.Content = $"TCU\t:  {selectedSys.ActualSystem.TCUVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.TCUVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.TCUOccupancyLevel}";
                     SystemInfoPopupSP.Children.Add(sov);
+                }
+
+
+                // update Thera Info
+                foreach(EVEData.TheraConnection tc in EM.TheraConnections)
+                {
+                    if(selectedSys.Name == tc.System)
+                    {
+                        SystemInfoPopupSP.Children.Add(new Separator());
+
+                        Label tl = new Label();
+                        tl.Padding = one;
+                        tl.Margin = one;
+                        tl.Content = $"Thera \t:  {tc.InSignatureID}";
+                        SystemInfoPopupSP.Children.Add(tl);
+
+                    }
                 }
 
                 SystemInfoPopup.IsOpen = true;
