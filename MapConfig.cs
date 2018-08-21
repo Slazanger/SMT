@@ -306,6 +306,25 @@ namespace SMT
         }
 
 
+        private bool m_ShowADM;
+        [Category("SOV")]
+        [DisplayName("Show ADM")]
+        public bool ShowADM
+        {
+            get
+            {
+                return m_ShowADM;
+            }
+
+            set
+            {
+                m_ShowADM = value;
+                OnPropertyChanged("ShowADM");
+            }
+        }
+
+
+
 
         [Category("Navigation")]
         public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
@@ -359,8 +378,8 @@ namespace SMT
             defaultColours.JumpRangeInColour = Color.FromRgb(135, 206, 235);
             defaultColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
-            defaultColours.SOVStructureVunerableColour = Colors.Red;
-            defaultColours.SOVStructureVunerableSoonColour = Colors.Yellow;
+            defaultColours.SOVStructureVunerableColour = Color.FromRgb(64,64,64);
+            defaultColours.SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178);
 
 
 

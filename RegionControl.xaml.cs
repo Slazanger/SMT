@@ -62,7 +62,7 @@ namespace SMT
         private bool m_ShowShipJumps = false;
         private bool m_ShowJumpBridges = true;
         private bool m_ShowStandings = false;
-        private bool m_ShowSov = false;
+        private bool m_ShowSovOwner = false;
         private bool m_ShowSystemSecurity = false;
 
         private List<Point> SystemIcon_Keepstar = new List<Point>
@@ -125,16 +125,16 @@ namespace SMT
             }
         }
 
-        public bool ShowSov
+        public bool ShowSovOwner
         {
             get
             {
-                return m_ShowSov;
+                return m_ShowSovOwner;
             }
             set
             {
-                m_ShowSov = value;
-                OnPropertyChanged("ShowSov");
+                m_ShowSovOwner = value;
+                OnPropertyChanged("ShowSovOwner");
             }
         }
 
@@ -373,9 +373,9 @@ namespace SMT
         }
 
 
-        private const double SYSTEM_SHAPE_SIZE = 18;
+        private const double SYSTEM_SHAPE_SIZE = 20;
         private const double SYSTEM_SHAPE_OFFSET = SYSTEM_SHAPE_SIZE / 2;
-        private const double SYSTEM_TEXT_TEXT_SIZE= 6;
+        private const double SYSTEM_TEXT_TEXT_SIZE= 7;
         private const double SYSTEM_TEXT_X_OFFSET = 10;
         private const double SYSTEM_TEXT_Y_OFFSET = 2;
         private const double SYSTEM_REGION_TEXT_X_OFFSET = 5;
@@ -704,6 +704,13 @@ namespace SMT
                     needsOutline = false;
                 }
 
+                // override
+                if(MapConf.ShowADM)
+                {
+                    shapePoints = null;
+                    needsOutline = true;
+                }
+
                 if(shapePoints != null)
                 {
                     foreach (Point p in shapePoints)
@@ -731,6 +738,8 @@ namespace SMT
                         systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
                     }
 
+
+
                     if (!needsOutline)
                     {
                         // add the hover over and click handlers
@@ -744,8 +753,8 @@ namespace SMT
                         systemShape.IsHitTestVisible = false;
                     }
 
-                    Canvas.SetLeft(systemShape, system.LayoutX - SYSTEM_SHAPE_OFFSET);
-                    Canvas.SetTop(systemShape, system.LayoutY - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetLeft(systemShape, system.LayoutX - SYSTEM_SHAPE_OFFSET +1);
+                    Canvas.SetTop(systemShape, system.LayoutY - SYSTEM_SHAPE_OFFSET +1);
                     Canvas.SetZIndex(systemShape, SYSTEM_Z_INDEX);
                     MainCanvas.Children.Add(systemShape);
 
@@ -776,6 +785,28 @@ namespace SMT
                         SystemOutline.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
                     }
 
+                    if (MapConf.ShowADM && system.ActualSystem.IHubOccupancyLevel != 0.0f)
+                    {
+
+                        float SovVal = system.ActualSystem.IHubOccupancyLevel;
+
+                        float Blend = 1.0f - ((SovVal - 1.0f) / 5.0f);
+                        byte r, g;
+
+                        if (Blend < 0.5)
+                        {
+                            r = 255;
+                            g = (byte)(255 * Blend / 0.5);
+                        }
+                        else
+                        {
+                            g = 255;
+                            r = (byte)(255 - (255 * (Blend - 0.5) / 0.5));
+                        }
+
+                        SystemOutline.Fill = new SolidColorBrush(Color.FromRgb(r, g, 0));
+                    }
+
                     SystemOutline.DataContext = system;
                     SystemOutline.MouseDown += ShapeMouseDownHandler;
                     SystemOutline.MouseEnter += ShapeMouseOverHandler;
@@ -785,6 +816,20 @@ namespace SMT
                     Canvas.SetTop(SystemOutline, system.LayoutY - SYSTEM_SHAPE_OFFSET);
                     Canvas.SetZIndex(SystemOutline, SYSTEM_Z_INDEX - 1);
                     MainCanvas.Children.Add(SystemOutline);
+                }
+
+                if(MapConf.ShowADM && system.ActualSystem.IHubOccupancyLevel != 0.0)
+                {
+                    Label sovADM = new Label();
+                    sovADM.Content = "1.0";
+                    sovADM.FontSize = 8;
+                    sovADM.IsHitTestVisible = false;
+                    sovADM.Content = $"{system.ActualSystem.IHubOccupancyLevel:f1}";
+                    Canvas.SetLeft(sovADM, system.LayoutX - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetTop(sovADM, system.LayoutY - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetZIndex(sovADM, SYSTEM_Z_INDEX - 1);
+                    MainCanvas.Children.Add(sovADM);
+
                 }
 
                 Label sysText = new Label();
@@ -864,7 +909,7 @@ namespace SMT
                     }
                 }
 
-                if ((ShowSov) && system.ActualSystem.SOVAlliance != null && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
+                if ((ShowSovOwner) && system.ActualSystem.SOVAlliance != null && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
                 {
                     Label sysRegionText = new Label();
 
@@ -1570,6 +1615,10 @@ namespace SMT
                         infoSize = 27;
                         infoColour = infoVulnerableSoon;
                     }
+                    else
+                    {
+                        infoValue = -1;
+                    }
                 }
 
                 if (MapConf.ShowTCUVunerabilities)
@@ -1587,6 +1636,10 @@ namespace SMT
                         infoValue = (int)sys.ActualSystem.TCUOccupancyLevel;
                         infoSize = 27;
                         infoColour = infoVulnerableSoon;
+                    }
+                    else
+                    {
+                        infoValue = -1;
                     }
                 }
 
@@ -2046,6 +2099,9 @@ namespace SMT
 
             EVEData.MapSystem selectedSys = obj.DataContext as EVEData.MapSystem;
 
+            Thickness one = new Thickness(1);
+
+
             if (obj.IsMouseOver && MapConf.ShowSystemPopup)
             {
                 SystemInfoPopup.PlacementTarget = obj;
@@ -2053,24 +2109,102 @@ namespace SMT
                 SystemInfoPopup.HorizontalOffset = 15;
                 SystemInfoPopup.DataContext = selectedSys.ActualSystem;
 
+                SystemInfoPopupSP.Children.Clear();
 
-                // check JB Info
-                SystemInfoPopup_JBInfo.Content = "";
-                if(ShowJumpBridges)
+                Label header = new Label();
+                header.Content = selectedSys.Name;
+                header.FontWeight = FontWeights.Bold;
+                header.FontSize = 13;
+                header.Padding = one;
+                header.Margin = one;
+
+                SystemInfoPopupSP.Children.Add(header);
+
+                Separator s = new Separator();
+                SystemInfoPopupSP.Children.Add(s);
+
+                if (selectedSys.ActualSystem.ShipKillsLastHour != 0)
+                {
+                    Label data = new Label();
+                    data.Padding = one;
+                    data.Margin = one;
+                    data.Content = $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
+                    SystemInfoPopupSP.Children.Add(data);
+                }
+
+                if (selectedSys.ActualSystem.PodKillsLastHour != 0)
+                {
+                    Label data = new Label();
+                    data.Padding = one;
+                    data.Margin = one;
+                    data.Content = $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
+                    SystemInfoPopupSP.Children.Add(data);
+                }
+
+                if (selectedSys.ActualSystem.NPCKillsLastHour != 0)
+                {
+                    Label data = new Label();
+                    data.Padding = one;
+                    data.Margin = one;
+                    data.Content = $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}";
+                    SystemInfoPopupSP.Children.Add(data);
+                }
+
+                if (selectedSys.ActualSystem.JumpsLastHour != 0)
+                {
+                    Label data = new Label();
+                    data.Padding = one;
+                    data.Margin = one;
+
+                    data.Content = $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
+                    SystemInfoPopupSP.Children.Add(data);
+                }
+
+
+                if (ShowJumpBridges)
                 {
                     foreach (EVEData.JumpBridge jb in EM.JumpBridges)
                     {
                         if (selectedSys.Name == jb.From)
                         {
-                            SystemInfoPopup_JBInfo.Content = "JB (" + jb.FromInfo + ") to " + jb.To;
+                            Label jbl = new Label();
+                            jbl.Padding = one;
+                            jbl.Margin = one;
+                            jbl.Content = $"JB\t:  {jb.FromInfo} to {jb.To}";
+                            SystemInfoPopupSP.Children.Add(jbl);
                         }
 
                         if (selectedSys.Name == jb.To)
                         {
-                            SystemInfoPopup_JBInfo.Content = "JB (" + jb.ToInfo + ") to " + jb.From;
+                            Label jbl = new Label();
+                            jbl.Padding = one;
+                            jbl.Margin = one;
+                            jbl.Content = $"JB\t:  {jb.To} to {jb.From}";
+                            SystemInfoPopupSP.Children.Add(jbl);
                         }
                     }
                 }
+
+                // update IHubInfo
+                if(selectedSys.ActualSystem.IHubOccupancyLevel != 0.0f)
+                {
+                    Label sov = new Label();
+                    sov.Padding = one;
+                    sov.Margin = one;
+                    sov.Content = $"IHUB\t:  {selectedSys.ActualSystem.IHubVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.IHubVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.IHubVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.IHubVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.IHubOccupancyLevel}";
+                    SystemInfoPopupSP.Children.Add(sov);
+                }
+
+                // update TCUInfo
+                if (selectedSys.ActualSystem.TCUOccupancyLevel != 0.0f)
+                {
+                    Label sov = new Label();
+                    sov.Padding = one;
+                    sov.Margin = one;
+                    sov.Content = $"TCU\t:  {selectedSys.ActualSystem.TCUVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.TCUVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.TCUOccupancyLevel}";
+                    SystemInfoPopupSP.Children.Add(sov);
+                }
+
                 SystemInfoPopup.IsOpen = true;
             }
             else

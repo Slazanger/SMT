@@ -9,9 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -757,6 +755,11 @@ namespace SMT
             }
         }
 
+
+ 
+
+
+
         private void AddDataToUniverse()
         {
             Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
@@ -785,7 +788,10 @@ namespace SMT
                     TheraShape.RadiusX = 2;
                     TheraShape.RadiusY = 2;
                     TheraShape.Fill = TheraBrush;
-                    TheraShape.IsHitTestVisible = false;
+
+                    TheraShape.DataContext = mr;
+                    TheraShape.MouseEnter += RegionThera_ShapeMouseOverHandler;
+                    TheraShape.MouseLeave += RegionThera_ShapeMouseOverHandler;
 
                     Canvas.SetLeft(TheraShape, mr.RegionX + 28);
                     Canvas.SetTop(TheraShape, mr.RegionY + 3);
@@ -831,6 +837,51 @@ namespace SMT
             }
         }
 
+
+        private void RegionThera_ShapeMouseOverHandler(object sender, MouseEventArgs e)
+        {
+            Shape obj = sender as Shape;
+
+            EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
+
+            if (obj.IsMouseOver)
+            {
+                RegionTheraInfo.PlacementTarget = obj;
+                RegionTheraInfo.VerticalOffset = 5;
+                RegionTheraInfo.HorizontalOffset = 15;
+
+                RegionTheraInfoSP.Children.Clear();
+
+                Label header = new Label();
+                header.Content = "Thera Connections";
+                header.FontWeight = FontWeights.Bold;
+                header.Margin = new Thickness(1) ;
+                header.Padding = new Thickness(1);
+                RegionTheraInfoSP.Children.Add(header);
+
+
+                foreach (EVEData.TheraConnection tc in EVEManager.TheraConnections)
+                {
+                    if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                    {
+                        Label l = new Label();
+                        l.Content = $"    {tc.System}";
+                        l.Margin = new Thickness(1);
+                        l.Padding = new Thickness(1);
+
+                        RegionTheraInfoSP.Children.Add(l);
+                    }
+                }
+
+                RegionTheraInfo.IsOpen = true;
+            }
+            else
+            {
+                RegionTheraInfo.IsOpen = false;
+            }
+
+
+        }
 
 
         private void RegionCharacter_ShapeMouseOverHandler(object sender, MouseEventArgs e)
