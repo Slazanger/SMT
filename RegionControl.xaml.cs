@@ -351,8 +351,8 @@ namespace SMT
                 lgb.EndPoint = new Point(0, 1);
 
                 lgb.GradientStops.Add(new GradientStop(c1, 0.0));
-                lgb.GradientStops.Add(new GradientStop(c2, 0.4));
-                lgb.GradientStops.Add(new GradientStop(c2, 0.6));
+                lgb.GradientStops.Add(new GradientStop(c2, 0.05));
+                lgb.GradientStops.Add(new GradientStop(c2, 0.95));
                 lgb.GradientStops.Add(new GradientStop(c1, 1.0));
 
                 MainCanvasGrid.Background = lgb;
@@ -1497,7 +1497,7 @@ namespace SMT
 
                 if(Region.IsSystemOnMap(s.Name))
                 {
-                    int size = (int)(fi.KillCount * ESIOverlayScale);
+                    int size = 2;
 
                     Shape ETShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + size, Width = SYSTEM_SHAPE_SIZE + size }; ;
                     ETShape.Stroke = TheraBrush;
@@ -2200,7 +2200,7 @@ namespace SMT
                             Label jbl = new Label();
                             jbl.Padding = one;
                             jbl.Margin = one;
-                            jbl.Content = $"JB\t:  {jb.To} to {jb.From}";
+                            jbl.Content = $"JB\t:  {jb.ToInfo} to {jb.From}";
                             SystemInfoPopupSP.Children.Add(jbl);
                         }
                     }
