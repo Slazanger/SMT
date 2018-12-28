@@ -381,6 +381,9 @@ namespace SMT
             defaultColours.SOVStructureVunerableColour = Color.FromRgb(64,64,64);
             defaultColours.SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178);
 
+            defaultColours.TheraEntranceRegion = Colors.YellowGreen;
+            defaultColours.TheraEntranceSystem = Colors.YellowGreen;
+
 
 
 
@@ -413,6 +416,9 @@ namespace SMT
             blueColours.SOVStructureVunerableColour = Colors.Red;
             blueColours.SOVStructureVunerableSoonColour = Colors.Yellow;
 
+            blueColours.TheraEntranceRegion = Colors.YellowGreen;
+            blueColours.TheraEntranceSystem = Colors.YellowGreen;
+
 
 
             MapColours.Add(blueColours);
@@ -443,6 +449,8 @@ namespace SMT
             greyAndRed.SOVStructureVunerableColour = Colors.Red;
             greyAndRed.SOVStructureVunerableSoonColour = Colors.Yellow;
 
+            greyAndRed.TheraEntranceRegion = Colors.YellowGreen;
+            greyAndRed.TheraEntranceSystem = Colors.YellowGreen;
 
 
             MapColours.Add(greyAndRed);
@@ -473,6 +481,10 @@ namespace SMT
             dark.SOVStructureVunerableColour = Colors.Red;
             dark.SOVStructureVunerableSoonColour = Colors.Yellow;
 
+            dark.TheraEntranceRegion = Colors.YellowGreen;
+            dark.TheraEntranceSystem = Colors.YellowGreen;
+
+
             MapColours.Add(dark);
 
             MapColours lateNight = new MapColours();
@@ -498,10 +510,11 @@ namespace SMT
             lateNight.JumpRangeInColour = Color.FromRgb(0, 255, 0);
             lateNight.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
-
             lateNight.SOVStructureVunerableColour = Colors.Red;
             lateNight.SOVStructureVunerableSoonColour = Colors.Yellow;
 
+            lateNight.TheraEntranceRegion = Colors.YellowGreen;
+            lateNight.TheraEntranceSystem = Colors.YellowGreen;
 
             MapColours.Add(lateNight);
 

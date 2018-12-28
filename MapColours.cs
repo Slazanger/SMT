@@ -102,6 +102,14 @@ namespace SMT
         [DisplayName("Structure Vunerable Soon")]
         public Color SOVStructureVunerableSoonColour { get; set; }
 
+        [Category("Thera")]
+        [DisplayName("Thera Entrance (Region)")]
+        public Color TheraEntranceRegion { get; set; }
+
+        [Category("Thera")]
+        [DisplayName("Thera Entrance (System)")]
+        public Color TheraEntranceSystem { get; set; }
+
 
         static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
         {

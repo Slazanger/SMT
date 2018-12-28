@@ -126,6 +126,7 @@
     <Compile Include="EVEData\ESI\StructureIDData.cs" />
     <Compile Include="EVEData\ESI\StructureSearch.cs" />
     <Compile Include="EVEData\LocalCharacter.cs" />
+    <Compile Include="EVEData\Structure.cs" />
     <Compile Include="StaticJumpOverlay.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="About.xaml">

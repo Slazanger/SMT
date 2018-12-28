@@ -516,10 +516,7 @@ namespace SMT
 
             EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
             ANOMManager.ActiveSystem = system;
-
             ///AnomSigList.ItemsSource = system.Anoms.Values;
-
-
         }
 
 
@@ -535,6 +532,11 @@ namespace SMT
             {
                 return;
             }
+
+            // close the context menu if its open
+            ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
+            cm.IsOpen = false;
+
 
             EM.UpdateIDsForMapRegion(regionName);
 
@@ -601,6 +603,17 @@ namespace SMT
             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
             Brush SysTextBackgroundBrush = new SolidColorBrush(bgtc);
+
+
+            Color bgd = MapConf.ActiveColourScheme.MapBackgroundColour;
+
+            bgd.R =(byte)(0.7 * bgd.R);
+            bgd.G = (byte)(0.7 * bgd.G);
+            bgd.B = (byte)(0.7 * bgd.B);
+
+            Brush MapBackgroundBrushDarkend = new SolidColorBrush(bgd);
+
+
 
             Brush NormalGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
             Brush ConstellationGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
@@ -963,7 +976,7 @@ namespace SMT
 
  
 
-                if (MapConf.ShowJumpDistance && MapConf.CurrentJumpSystem != null && system.Name != MapConf.CurrentJumpSystem)
+                if (MapConf.ShowJumpDistance && MapConf.CurrentJumpSystem != null && system.Name != MapConf.CurrentJumpSystem && MapConf.CurrentJumpSystem != "")
                 {
 
                     double Distance = EM.GetRangeBetweenSystems(MapConf.CurrentJumpSystem, system.Name);
@@ -1071,7 +1084,27 @@ namespace SMT
                     Canvas.SetTop(sysRegionText, system.LayoutY + regionMarkerOffset);
                     Canvas.SetZIndex(sysRegionText, SYSTEM_Z_INDEX);
 
+
+
+                    /*
+                    Polygon poly = new Polygon();
+
+                    foreach (Point p in system.CellPoints)
+                    {
+                        poly.Points.Add(p);
+                    }
+
+                    //poly.Fill
+                    poly.Fill = MapBackgroundBrushDarkend;
+                    poly.SnapsToDevicePixels = true;
+                    poly.Stroke = MapBackgroundBrushDarkend;
+                    poly.StrokeThickness = 3;
+                    poly.StrokeDashCap = PenLineCap.Round;
+                    poly.StrokeLineJoin = PenLineJoin.Round;
+                    MainCanvas.Children.Add(poly);
+
                     MainCanvas.Children.Add(sysRegionText);
+                    */
                 }
             }
 
@@ -1518,7 +1551,7 @@ namespace SMT
 
         public void AddTheraSystemsToMap()
         {
-            Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
+            Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
 
             foreach(TheraConnection tc in EM.TheraConnections)
             {

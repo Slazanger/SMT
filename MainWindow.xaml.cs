@@ -763,7 +763,7 @@ namespace SMT
         private void AddDataToUniverse()
         {
             Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
-            Brush TheraBrush = new SolidColorBrush(Colors.YellowGreen);
+            Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
             Brush CharacterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
 
             foreach (EVEData.MapRegion mr in EVEManager.Regions)
