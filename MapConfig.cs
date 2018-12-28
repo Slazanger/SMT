@@ -364,7 +364,9 @@ namespace SMT
             defaultColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
             defaultColours.OutRegionSystemColour = Color.FromRgb(218, 165, 32);
             defaultColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
-            defaultColours.MapBackgroundColour = Color.FromRgb(104, 104, 117);
+
+            
+            defaultColours.MapBackgroundColour = (Color)ColorConverter.ConvertFromString("#5E615E");
             defaultColours.ESIOverlayColour = Color.FromRgb(188, 143, 143);
             defaultColours.IntelOverlayColour = Color.FromRgb(178, 34, 34);
             defaultColours.NormalGateColour = Color.FromRgb(255, 248, 220);
@@ -383,6 +385,8 @@ namespace SMT
 
             defaultColours.TheraEntranceRegion = Colors.YellowGreen;
             defaultColours.TheraEntranceSystem = Colors.YellowGreen;
+
+            defaultColours.ZKillDataOverlay = Colors.Purple;
 
 
 
@@ -419,6 +423,7 @@ namespace SMT
             blueColours.TheraEntranceRegion = Colors.YellowGreen;
             blueColours.TheraEntranceSystem = Colors.YellowGreen;
 
+            blueColours.ZKillDataOverlay = Colors.Purple;
 
 
             MapColours.Add(blueColours);
@@ -452,6 +457,8 @@ namespace SMT
             greyAndRed.TheraEntranceRegion = Colors.YellowGreen;
             greyAndRed.TheraEntranceSystem = Colors.YellowGreen;
 
+            greyAndRed.ZKillDataOverlay = Colors.Purple;
+
 
             MapColours.Add(greyAndRed);
 
@@ -484,6 +491,7 @@ namespace SMT
             dark.TheraEntranceRegion = Colors.YellowGreen;
             dark.TheraEntranceSystem = Colors.YellowGreen;
 
+            dark.ZKillDataOverlay = Colors.Purple;
 
             MapColours.Add(dark);
 
@@ -515,6 +523,8 @@ namespace SMT
 
             lateNight.TheraEntranceRegion = Colors.YellowGreen;
             lateNight.TheraEntranceSystem = Colors.YellowGreen;
+
+            lateNight.ZKillDataOverlay = Colors.Purple;
 
             MapColours.Add(lateNight);
 

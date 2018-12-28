@@ -110,6 +110,11 @@ namespace SMT
         [DisplayName("Thera Entrance (System)")]
         public Color TheraEntranceSystem { get; set; }
 
+        [Category("Zkill")]
+        [DisplayName("Data Overlay")]
+        public Color ZKillDataOverlay{ get; set; }
+
+
 
         static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
         {

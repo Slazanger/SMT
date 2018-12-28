@@ -607,9 +607,11 @@ namespace SMT
 
             Color bgd = MapConf.ActiveColourScheme.MapBackgroundColour;
 
-            bgd.R =(byte)(0.7 * bgd.R);
-            bgd.G = (byte)(0.7 * bgd.G);
-            bgd.B = (byte)(0.7 * bgd.B);
+            float darkenFactor = 0.9f;
+
+            bgd.R =(byte)(darkenFactor * bgd.R);
+            bgd.G = (byte)(darkenFactor * bgd.G);
+            bgd.B = (byte)(darkenFactor * bgd.B);
 
             Brush MapBackgroundBrushDarkend = new SolidColorBrush(bgd);
 
@@ -1084,9 +1086,10 @@ namespace SMT
                     Canvas.SetTop(sysRegionText, system.LayoutY + regionMarkerOffset);
                     Canvas.SetZIndex(sysRegionText, SYSTEM_Z_INDEX);
 
+                    MainCanvas.Children.Add(sysRegionText);
 
 
-                    /*
+                    
                     Polygon poly = new Polygon();
 
                     foreach (Point p in system.CellPoints)
@@ -1103,8 +1106,7 @@ namespace SMT
                     poly.StrokeLineJoin = PenLineJoin.Round;
                     MainCanvas.Children.Add(poly);
 
-                    MainCanvas.Children.Add(sysRegionText);
-                    */
+                    
                 }
             }
 
@@ -1613,7 +1615,7 @@ namespace SMT
 
 
             SolidColorBrush infoColour = new SolidColorBrush(DataColor);
-            SolidColorBrush zkbColour = new SolidColorBrush(Colors.Purple);
+            SolidColorBrush zkbColour = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 
             SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
             SolidColorBrush infoVulnerable = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVunerableColour);
@@ -2039,7 +2041,18 @@ namespace SMT
             {
                 if (eveSys != null)
                 {
-                    Clipboard.SetText(eveSys.Name);
+                    bool CopyWithMeta = true;
+                    if(CopyWithMeta)
+                    {
+                        Clipboard.SetText($"<url=showinfo:5//{eveSys.ActualSystem.ID}>{eveSys.Name}</url>");
+                    }
+                    else
+                    {
+                        Clipboard.SetText(eveSys.Name);
+                    }
+
+
+
                 }
             }
             catch { }
