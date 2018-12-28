@@ -462,7 +462,8 @@ namespace SMT.EVEData
             StartUpdateJumpsFromESI();
             StartUpdateSOVFromESI();
             StartUpdateIncursionsFromESI();
-            StartEveTraceFleetUpdate();
+            // temp disabled
+            //StartEveTraceFleetUpdate();
             StartUpdateStructureHunterUpdate();
             StartUpdateSovStructureUpdate();
         }
