@@ -22,6 +22,7 @@ namespace SMT
         public EveManager EM { get; set; }
         public AnomManager ANOMManager { get; set; }
         public string SelectedSystem { get; set; }
+        private string SelectedAlliance = string.Empty;
 
         // Constant Colours
         private Brush StandingVBadBrush  = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
@@ -29,6 +30,8 @@ namespace SMT
         private Brush StandingNeutBrush  = new SolidColorBrush(Color.FromArgb(110, 140, 140, 140));
         private Brush StandingGoodBrush  = new SolidColorBrush(Color.FromArgb(110, 43, 101, 196));
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
+
+        private Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180,200,200,200));
 
 
 
@@ -537,6 +540,8 @@ namespace SMT
             ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
             cm.IsOpen = false;
 
+            SelectedAlliance = string.Empty;
+
 
             EM.UpdateIDsForMapRegion(regionName);
 
@@ -614,6 +619,8 @@ namespace SMT
             bgd.B = (byte)(darkenFactor * bgd.B);
 
             Brush MapBackgroundBrushDarkend = new SolidColorBrush(bgd);
+
+            List<string> AlliancesKeyList = new List<string>();
 
 
 
@@ -946,6 +953,28 @@ namespace SMT
                     }
                 }
 
+
+
+                if(ShowSovOwner && SelectedAlliance != string.Empty && system.ActualSystem.SOVAlliance == SelectedAlliance)
+                {
+                    Polygon poly = new Polygon();
+
+                    foreach (Point p in system.CellPoints)
+                    {
+                        poly.Points.Add(p);
+                    }
+                                       
+                    poly.Fill = SelectedAllianceBrush;
+                    poly.SnapsToDevicePixels = true;
+                    poly.Stroke = poly.Fill;
+                    poly.StrokeThickness = 1;
+                    poly.StrokeDashCap = PenLineCap.Round;
+                    poly.StrokeLineJoin = PenLineJoin.Round;
+                    Canvas.SetZIndex(poly, SYSTEM_Z_INDEX - 2);
+                    MainCanvas.Children.Add(poly);
+                }
+
+
                 if ((ShowSovOwner) && system.ActualSystem.SOVAlliance != null && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
                 {
                     Label sysRegionText = new Label();
@@ -966,6 +995,11 @@ namespace SMT
                     MainCanvas.Children.Add(sysRegionText);
 
                     regionMarkerOffset += SYSTEM_TEXT_TEXT_SIZE;
+
+                    if(!AlliancesKeyList.Contains(system.ActualSystem.SOVAlliance))
+                    {
+                        AlliancesKeyList.Add(system.ActualSystem.SOVAlliance);
+                    }
                 }
 
                 if(!MapConf.ShowJumpDistance)
@@ -1245,6 +1279,65 @@ namespace SMT
                         MainCanvas.Children.Add(path);
                     }
                 }
+            }
+            if(AlliancesKeyList.Count > 0)
+            {
+                AllianceNameList.Visibility = Visibility.Visible;
+                AllianceNameListStackPanel.Children.Clear();
+
+                Brush fontColour = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF767576"));
+                Brush SelectedFont = new SolidColorBrush(Colors.White);
+
+                foreach (string allianceID in AlliancesKeyList)
+                {
+                    string allianceName = EM.GetAllianceName(allianceID);
+                    string allianceTicker = EM.GetAllianceTicker(allianceID);
+
+                    Label akl = new Label();
+                    akl.MouseDown += AllianceKeyList_MouseDown;
+                    akl.DataContext = allianceID;                   
+                    akl.Content = $"{allianceTicker}\t{allianceName}";
+                    akl.Foreground = fontColour;
+
+                    if(allianceID == SelectedAlliance)
+                    {
+                        akl.Foreground = SelectedFont;
+                    }
+
+                    AllianceNameListStackPanel.Children.Insert(0,akl);
+
+
+                }
+            }
+            else
+            {
+                AllianceNameList.Visibility = Visibility.Hidden;
+            }
+
+        }
+
+        private void AllianceKeyList_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Label obj = sender as Label;
+            string AllianceID = obj.DataContext as string;
+
+            if (e.ClickCount == 2)
+            {
+                string AURL = $"https://zkillboard.com/region/{Region.ID}/alliance/{AllianceID}";
+                System.Diagnostics.Process.Start(AURL);
+
+            }
+            else
+            {
+                if (SelectedAlliance == AllianceID)
+                {
+                    SelectedAlliance = string.Empty;
+                }
+                else
+                {
+                    SelectedAlliance = AllianceID;
+                }
+                ReDrawMap(true);
             }
         }
 
@@ -2237,7 +2330,7 @@ namespace SMT
                             Label jbl = new Label();
                             jbl.Padding = one;
                             jbl.Margin = one;
-                            jbl.Content = $"JB\t:  {jb.FromInfo} to {jb.To}";
+                            jbl.Content = $"JB\t: {jb.To}";
                             SystemInfoPopupSP.Children.Add(jbl);
                         }
 
@@ -2246,7 +2339,7 @@ namespace SMT
                             Label jbl = new Label();
                             jbl.Padding = one;
                             jbl.Margin = one;
-                            jbl.Content = $"JB\t:  {jb.ToInfo} to {jb.From}";
+                            jbl.Content = $"JB\t: {jb.From}";
                             SystemInfoPopupSP.Children.Add(jbl);
                         }
                     }
@@ -2379,5 +2472,6 @@ namespace SMT
         {
             ReDrawMap(true);
         }
+
     }
 }

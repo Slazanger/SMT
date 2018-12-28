@@ -71,6 +71,10 @@
             <Label x:Name="BridgeInfoL1" HorizontalContentAlignment="Left" HorizontalAlignment="Right" Margin="0,0,25,188" VerticalAlignment="Bottom" FontSize="14" Panel.ZIndex="50" FontWeight="Bold" RenderTransformOrigin="-4.3,7.3" />
             <Label x:Name="BridgeInfoL2" HorizontalContentAlignment="Left" HorizontalAlignment="Right" Margin="0,0,25,168" VerticalAlignment="Bottom" FontSize="14" Panel.ZIndex="50" FontWeight="Bold" RenderTransformOrigin="-4.3,7.3" />
             <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3"/>
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,170" x:Name="AllianceNameList" Visibility="Visible" Width="190" Panel.ZIndex="111" >
+                <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom"/>
+            </Border>
+
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="190" Height="140" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis},  diag:PresentationTraceSources.TraceLevel=High}" >
                 <Canvas x:Name="ToolBoxCanvas">
                     <Grid Canvas.Left="0" Canvas.Top="2" Width="210" >

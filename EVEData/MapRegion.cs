@@ -28,10 +28,11 @@ namespace SMT.EVEData
         /// <param name="faction">Faction (if any) of the region</param>
         /// <param name="regionX">X Location to render this on the universe map</param>
         /// <param name="regionY">Y Location to render this on the universe map</param>
-        public MapRegion(string name, string faction, double regionX, double regionY)
+        public MapRegion(string name, string id, string faction, double regionX, double regionY)
         {
             Name = name;
             DotLanRef = name.Replace(" ", "_");
+            ID = id;
 
             Faction = faction;
             RegionX = regionX;
@@ -45,6 +46,11 @@ namespace SMT.EVEData
         ///  Gets or sets the English name of this region
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the region ID
+        /// </summary>
+        public string ID { get; set; }
 
         /// <summary>
         /// Gets or sets the Regions Faction name
