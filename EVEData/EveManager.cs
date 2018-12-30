@@ -599,6 +599,13 @@ namespace SMT.EVEData
 
                     string name;
                     bool hasStation = false;
+                    bool hasIceBelt = false;
+                    XmlNodeList iceNodes = aNode.SelectNodes(@".//*[@class='i']");
+                    if(iceNodes[0] != null)
+                    {
+                        hasIceBelt = true;
+                    }
+
 
                     // SS Nodes for system nodes
                     XmlNodeList ssNodes = aNode.SelectNodes(@".//*[@class='ss']");
@@ -607,7 +614,7 @@ namespace SMT.EVEData
                         name = ssNodes[0].InnerText;
 
                         // create and add the system
-                        System s = new System(name, systemID, rd.Name, hasStation);
+                        System s = new System(name, systemID, rd.Name, hasStation, hasIceBelt);
                         Systems.Add(s);
 
                         NameToSystem[name] = s;
@@ -648,7 +655,13 @@ namespace SMT.EVEData
                         }
                     }
                 }
+                // extract Ice Systems
+
+
             }
+
+
+
 
             // now open up the eve static data export and extract some info from it
             string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystems.csv";
@@ -1516,7 +1529,7 @@ namespace SMT.EVEData
                                         }
                                         foreach(System sys in Systems)
                                         {
-                                            if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                            if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
                                             {
                                                 id.Systems.Add(sys.Name);
                                             }

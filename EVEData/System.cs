@@ -29,12 +29,13 @@ namespace SMT.EVEData
         /// <param name="id">ID of the system</param>
         /// <param name="region">Region this system is in</param>
         /// <param name="station">Does this system contain an NPC station</param>
-        public System(string name, string id, string region, bool station)
+        public System(string name, string id, string region, bool station, bool iceBelt)
         {
             Name = name;
             ID = id;
             Region = region;
             HasNPCStation = station;
+            HasIceBelt = iceBelt;
 
             // default the ESI stats
             NPCKillsLastHour = -1;
@@ -92,6 +93,9 @@ namespace SMT.EVEData
         /// Gets or sets if this system has an NPC Station
         /// </summary>
         public bool HasNPCStation { get; set; }
+
+
+        public bool HasIceBelt { get; set; }
 
         /// <summary>
         /// Gets or sets the number of NPC Kills in the last hour
