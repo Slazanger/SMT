@@ -102,6 +102,9 @@ namespace SMT.EVEData
             AllianceIDToName = new SerializableDictionary<string, string>();
             AllianceIDToTicker = new SerializableDictionary<string, string>();
             NameToSystem = new Dictionary<string, System>();
+
+
+            ServerInfo = new EVEData.Server();
         }
 
         /// <summary>
@@ -210,6 +213,8 @@ namespace SMT.EVEData
 
 
         public EveTrace.EveTraceFleetInfo FleetIntel;
+
+        public EVEData.Server ServerInfo { get; set; }
 
 
 
@@ -1304,7 +1309,8 @@ namespace SMT.EVEData
             InitZKillFeed();
 
 
-            StartUpdateESIUniverseDataThread();
+            StartLowFreqUpdateThread();
+            StartHighFreqUpdateThread();
         }
 
         /// <summary>
@@ -1829,6 +1835,57 @@ namespace SMT.EVEData
         }
 
 
+        /// <summary>
+        /// Start the download for the Server Info
+        /// </summary>
+        private void StartUpdateServerInfo()
+        {
+            string url = @"https://esi.evetech.net/latest/status/?datasource=tranquility";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(ESIServerStatusCallback), request);
+        }
+
+
+        /// <summary>
+        /// ESI Result Response
+        /// </summary>
+        private void ESIServerStatusCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+
+                        ServerData.ServerStatus ss = ServerData.ServerStatus.FromJson(strContent);
+
+                        ServerInfo.Name = "Tranquility";
+                        ServerInfo.NumPlayers = (int)ss.Players;
+                        ServerInfo.Version = ss.ServerVersion.ToString();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                ServerInfo.Name = "Tranquility";
+                ServerInfo.NumPlayers = 0;
+                ServerInfo.Version = "????";
+
+            }
+        }
+
 
         /// <summary>
         /// Start the ESI download for the kill info
@@ -1844,6 +1901,7 @@ namespace SMT.EVEData
 
             request.BeginGetResponse(new AsyncCallback(ESIKillsReadCallback), request);
         }
+
 
         /// <summary>
         /// ESI Result Response
@@ -2034,9 +2092,9 @@ namespace SMT.EVEData
 
 
         /// <summary>
-        /// Start the Character Update Thread
+        /// Start the Low Frequency Update Thread
         /// </summary>
-        private void StartUpdateESIUniverseDataThread()
+        private void StartLowFreqUpdateThread()
         {
             new Thread(() =>
             {
@@ -2049,6 +2107,26 @@ namespace SMT.EVEData
 
                     // every 30 mins
                     Thread.Sleep(1800000);
+                }
+            }).Start();
+        }
+
+
+        /// <summary>
+        /// Start the Character Update Thread
+        /// </summary>
+        private void StartHighFreqUpdateThread()
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                // loop forever
+                while (true)
+                {
+
+                    StartUpdateServerInfo();
+                    Thread.Sleep(120000);
                 }
             }).Start();
         }

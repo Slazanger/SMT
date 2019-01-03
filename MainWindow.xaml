@@ -11,7 +11,7 @@
         xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Slazanger's Map Tool 0.51" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded">
+        Title="Slazanger's Map Tool 0.51" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
@@ -28,6 +28,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="1"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="22"/>
             </Grid.RowDefinitions>
 
  
@@ -332,6 +333,40 @@
                     </StackPanel>
                 </StackPanel>
             </Popup>
+            <StatusBar Grid.Row="2" x:Name="AppStatusBar">
+                <StatusBarItem>
+                    <TextBlock>EVE Time :</TextBlock>
+                </StatusBarItem>
+
+                <StatusBarItem>
+                    <TextBlock Text="{Binding ServerTime, StringFormat=HH:mm}" />
+                </StatusBarItem>
+
+                <Separator/>
+
+                <StatusBarItem>
+                    <TextBlock>Tranquility Version: </TextBlock>
+                </StatusBarItem>
+
+                <StatusBarItem>
+                    <TextBlock Text="{Binding Version}"/>
+                </StatusBarItem>
+
+                
+                <Separator/>
+
+                <StatusBarItem>
+                    <TextBlock Text="{Binding NumPlayers}"/>
+                </StatusBarItem>
+                
+                <StatusBarItem>
+                    <TextBlock Text="Players"/>
+                </StatusBarItem>
+
+
+            </StatusBar>
         </Grid>
+
     </Grid>
+
 </Window>

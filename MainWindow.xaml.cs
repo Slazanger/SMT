@@ -237,6 +237,8 @@ namespace SMT
             MainRouteGrid.DataContext = RegionRC;
 
 
+            AppStatusBar.DataContext = EVEManager.ServerInfo;
+
 
             // ColourListDropdown.SelectedItem = selectedColours;
             ColoursPropertyGrid.SelectedObject = selectedColours;
