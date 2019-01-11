@@ -125,13 +125,13 @@ namespace SMT.EVEData
         /// Gets or sets the name of the alliance holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public string SOVAlliance { get; set; }
+        public long SOVAlliance { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the corporation holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public string SOVCorp { get; set; }
+        public long SOVCorp { get; set; }
 
         /// <summary>
         /// Gets or sets the Faction of the system if owned by an NPC Corp

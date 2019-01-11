@@ -22,7 +22,7 @@ namespace SMT
         public EveManager EM { get; set; }
         public AnomManager ANOMManager { get; set; }
         public string SelectedSystem { get; set; }
-        private string SelectedAlliance = string.Empty;
+        private long SelectedAlliance = 0;
 
         // Constant Colours
         private Brush StandingVBadBrush  = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
@@ -540,7 +540,7 @@ namespace SMT
             ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
             cm.IsOpen = false;
 
-            SelectedAlliance = string.Empty;
+            SelectedAlliance = 0;
 
 
             EM.UpdateIDsForMapRegion(regionName);
@@ -589,6 +589,7 @@ namespace SMT
             Brush SysInRegionDarkBrush = new SolidColorBrush(DarkenColour(MapConf.ActiveColourScheme.InRegionSystemColour));
             Brush SysOutRegionDarkBrush = new SolidColorBrush(DarkenColour(MapConf.ActiveColourScheme.OutRegionSystemColour));
 
+            Brush HasIceBrush = new SolidColorBrush(Colors.LightBlue);
 
 
             Brush SysInRegionTextBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
@@ -620,7 +621,7 @@ namespace SMT
 
             Brush MapBackgroundBrushDarkend = new SolidColorBrush(bgd);
 
-            List<string> AlliancesKeyList = new List<string>();
+            List<long> AlliancesKeyList = new List<long>();
 
 
 
@@ -776,6 +777,14 @@ namespace SMT
                         systemShape.Fill = SysInRegionDarkBrush;
                     }
 
+
+
+                    if (system.ActualSystem.HasIceBelt)
+                    {
+                        systemShape.Fill = HasIceBrush;
+                    }
+
+
                     // override with sec status colours
                     if (ShowSystemSecurity)
                     {
@@ -821,6 +830,11 @@ namespace SMT
                     else
                     {
                         SystemOutline.Fill = SysInRegionBrush;
+                    }
+
+                    if (system.ActualSystem.HasIceBelt)
+                    {
+                        SystemOutline.Fill = HasIceBrush;
                     }
 
                     // override with sec status colours
@@ -955,7 +969,7 @@ namespace SMT
 
 
 
-                if(ShowSovOwner && SelectedAlliance != string.Empty && system.ActualSystem.SOVAlliance == SelectedAlliance)
+                if(ShowSovOwner && SelectedAlliance != 0 && system.ActualSystem.SOVAlliance == SelectedAlliance)
                 {
                     Polygon poly = new Polygon();
 
@@ -975,7 +989,7 @@ namespace SMT
                 }
 
 
-                if ((ShowSovOwner) && system.ActualSystem.SOVAlliance != null && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
+                if ((ShowSovOwner) && system.ActualSystem.SOVAlliance != 0 && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
                 {
                     Label sysRegionText = new Label();
 
@@ -1288,14 +1302,14 @@ namespace SMT
                 Brush fontColour = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF767576"));
                 Brush SelectedFont = new SolidColorBrush(Colors.White);
 
-                foreach (string allianceID in AlliancesKeyList)
+                foreach (long allianceID in AlliancesKeyList)
                 {
                     string allianceName = EM.GetAllianceName(allianceID);
                     string allianceTicker = EM.GetAllianceTicker(allianceID);
 
                     Label akl = new Label();
                     akl.MouseDown += AllianceKeyList_MouseDown;
-                    akl.DataContext = allianceID;                   
+                    akl.DataContext = allianceID.ToString();                   
                     akl.Content = $"{allianceTicker}\t{allianceName}";
                     akl.Foreground = fontColour;
 
@@ -1319,7 +1333,8 @@ namespace SMT
         private void AllianceKeyList_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Label obj = sender as Label;
-            string AllianceID = obj.DataContext as string;
+            string AllianceIDStr = obj.DataContext as string;
+            long AllianceID = long.Parse(AllianceIDStr);
 
             if (e.ClickCount == 2)
             {
@@ -1331,7 +1346,7 @@ namespace SMT
             {
                 if (SelectedAlliance == AllianceID)
                 {
-                    SelectedAlliance = string.Empty;
+                    SelectedAlliance = 0;
                 }
                 else
                 {
@@ -1825,7 +1840,7 @@ namespace SMT
 
                 }
 
-                if ( sys.ActualSystem.SOVAlliance != null && ShowStandings)
+                if ( sys.ActualSystem.SOVAlliance != 0 && ShowStandings)
                 {
                     bool addToMap = true;
                     Brush br = null;
@@ -1834,17 +1849,17 @@ namespace SMT
                     {
                         float Standing = 0.0f;
 
-                        if (ActiveCharacter.AllianceID != null && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAlliance)
+                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAlliance)
                         {
                             Standing = 10.0f;
                         }
 
-                        if (sys.ActualSystem.SOVCorp != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
+                        if (sys.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
                         {
                             Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
                         }
 
-                        if (sys.ActualSystem.SOVAlliance != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
+                        if (sys.ActualSystem.SOVAlliance != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
                         {
                             Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAlliance];
                         }

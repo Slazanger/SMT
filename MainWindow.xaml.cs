@@ -645,17 +645,17 @@ namespace SMT
                         numSystems++;
 
 
-                        if (RegionRC.ActiveCharacter.AllianceID != null && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAlliance)
+                        if (RegionRC.ActiveCharacter.AllianceID != 0 && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAlliance)
                         {
                             averageStanding += 10.0f;
                         }
 
-                        if (s.ActualSystem.SOVCorp != null && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
+                        if (s.ActualSystem.SOVCorp != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
                         {
                             averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVCorp];
                         }
 
-                        if (s.ActualSystem.SOVAlliance != null && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAlliance))
+                        if (s.ActualSystem.SOVAlliance != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAlliance))
                         {
                             averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVAlliance];
                         }
@@ -1113,7 +1113,7 @@ namespace SMT
                 EVEData.LocalCharacter c = MainWindow.AppWindow.RegionRC.ActiveCharacter;
                 if (c != null && c.ESILinked)
                 {
-                    if (c.AllianceID != null && c.AllianceID == zs.VictimAllianceID)
+                    if (c.AllianceID != 0 && c.AllianceID == zs.VictimAllianceID)
                     {
                         Standing = 10.0f;
                     }

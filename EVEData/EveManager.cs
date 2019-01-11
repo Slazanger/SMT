@@ -99,8 +99,8 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(logosFoilder);
             }
 
-            AllianceIDToName = new SerializableDictionary<string, string>();
-            AllianceIDToTicker = new SerializableDictionary<string, string>();
+            AllianceIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToTicker = new SerializableDictionary<long, string>();
             NameToSystem = new Dictionary<string, System>();
 
 
@@ -157,12 +157,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
-        public SerializableDictionary<string, string> AllianceIDToName { get; set; }
+        public SerializableDictionary<long, string> AllianceIDToName { get; set; }
 
         /// <summary>
         /// Gets or sets the Alliance ID to Alliance Ticker dictionary
         /// </summary>
-        public SerializableDictionary<string, string> AllianceIDToTicker { get; set; }
+        public SerializableDictionary<long, string> AllianceIDToTicker { get; set; }
 
         /// <summary>
         /// Gets or sets the Intel List
@@ -253,7 +253,7 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="id">Alliance ID</param>
         /// <returns>Alliance Name</returns>
-        public string GetAllianceName(string id)
+        public string GetAllianceName(long id)
         {
             string name = string.Empty;
             if (AllianceIDToName.Keys.Contains(id))
@@ -269,7 +269,7 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="id">Alliance ID</param>
         /// <returns>Alliance Ticker</returns>
-        public string GetAllianceTicker(string id)
+        public string GetAllianceTicker(long id)
         {
             string ticker = string.Empty;
             if (AllianceIDToTicker.Keys.Contains(id))
@@ -305,8 +305,8 @@ namespace SMT.EVEData
             }
 
             // now serialise the caches to disk
-            Utils.SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
-            Utils.SerializToDisk<SerializableDictionary<string, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
         }
 
         public void ShutDown()
@@ -980,20 +980,20 @@ namespace SMT.EVEData
 
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat"))
             {
-                AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+                AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
             }
             else
             {
-                AllianceIDToName = new SerializableDictionary<string, string>();
+                AllianceIDToName = new SerializableDictionary<long, string>();
             }
 
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat"))
             {
-                AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+                AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
             }
             else
             {
-                AllianceIDToTicker = new SerializableDictionary<string, string>();
+                AllianceIDToTicker = new SerializableDictionary<long, string>();
             }
 
             Init();
@@ -1158,10 +1158,10 @@ namespace SMT.EVEData
             string allianceList = "[";
             foreach (MapSystem s in r.MapSystems.Values.ToList())
             {
-                if (s.ActualSystem.SOVAlliance != null && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !allianceList.Contains(s.ActualSystem.SOVAlliance))
+                if (s.ActualSystem.SOVAlliance != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !allianceList.Contains(s.ActualSystem.SOVAlliance.ToString()))
                 {
                     allianceList += "\"";
-                    allianceList += s.ActualSystem.SOVAlliance;
+                    allianceList += s.ActualSystem.SOVAlliance.ToString();
                     allianceList += "\",";
                 }
             }
@@ -1196,15 +1196,15 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Alliance and Ticker data for specified list
         /// </summary>
-        public void ResolveAllianceIDs(List<string> IDs)
+        public void ResolveAllianceIDs(List<long> IDs)
         {
             string allianceList = "["; ;
-            foreach (string s in IDs)
+            foreach (long s in IDs)
             {
-                if (!AllianceIDToName.Keys.Contains(s) && !allianceList.Contains(s))
+                if (!AllianceIDToName.Keys.Contains(s) && !allianceList.Contains(s.ToString()))
                 {
                     allianceList += "\"";
-                    allianceList += s ;
+                    allianceList += s.ToString() ;
                     allianceList += "\",";
                 }
             }
@@ -2151,8 +2151,6 @@ namespace SMT.EVEData
         /// </summary>
         private void ESIUpdateSovCallback(IAsyncResult asyncResult)
         {
-            string alliancesToResolve = string.Empty;
-
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
             try
             {
@@ -2180,9 +2178,7 @@ namespace SMT.EVEData
                                     {
                                         if (obj["alliance_id"] != null)
                                         {
-                                            es.SOVAlliance = obj["alliance_id"].ToString();
-
-                                            alliancesToResolve += es.SOVAlliance + ",";
+                                            es.SOVAlliance = long.Parse(obj["alliance_id"].ToString());
                                         }
                                     }
                                 }
@@ -2227,7 +2223,7 @@ namespace SMT.EVEData
                                 }
 
                                 string allianceName = obj["name"].ToString();
-                                string allianceId = obj["id"].ToString();
+                                long allianceId = long.Parse(obj["id"].ToString());
                                 AllianceIDToName[allianceId] = allianceName;
 
                                 string allianceUrl = @"https://esi.evetech.net/v3/alliances/" + allianceId + "/?datasource=tranquility";

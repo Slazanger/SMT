@@ -117,10 +117,10 @@ namespace SMT.EVEData
                         if (z.Package != null)
                         {
                             ZKBDataSimple zs = new ZKBDataSimple();
-                            zs.KillID = z.Package.KillId.ToString();
-                            zs.VictimAllianceID = z.Package.Killmail.Victim.AllianceId.ToString();
-                            zs.VictimCharacterID = z.Package.Killmail.Victim.CharacterId.ToString();
-                            zs.VictimCorpID = z.Package.Killmail.Victim.CharacterId.ToString();
+                            zs.KillID = long.Parse(z.Package.KillId.ToString());
+                            zs.VictimAllianceID = long.Parse(z.Package.Killmail.Victim.AllianceId.ToString());
+                            zs.VictimCharacterID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
+                            zs.VictimCorpID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
                             zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId.ToString());
                             if(zs.SystemName == string.Empty)
                             {
@@ -160,7 +160,7 @@ namespace SMT.EVEData
                         if (cleanupCounter > 5)
                         {
 
-                            List<string> AllianceIDs = new List<string>();
+                            List<long> AllianceIDs = new List<long>();
 
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
@@ -168,7 +168,7 @@ namespace SMT.EVEData
                                 {
                                     if(KillStream[i].VictimAllianceName == string.Empty)
                                     {
-                                        if (!EveManager.Instance.AllianceIDToTicker.Keys.Contains(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != "0")
+                                        if (!EveManager.Instance.AllianceIDToTicker.Keys.Contains(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
                                         {
                                             AllianceIDs.Add(KillStream[i].VictimAllianceID);
                                         }
@@ -214,22 +214,22 @@ namespace SMT.EVEData
             /// <summary>
             /// Gets or sets the ZKillboard Kill ID
             /// </summary>
-            public string KillID { get; set; }
+            public long KillID { get; set; }
 
             /// <summary>
             /// Gets or sets the character ID of the victim
             /// </summary>
-            public string VictimCharacterID { get; set; }
+            public long VictimCharacterID { get; set; }
 
             /// <summary>
             /// Gets or sets the Victim's corp ID
             /// </summary>
-            public string VictimCorpID { get; set; }
+            public long VictimCorpID { get; set; }
 
             /// <summary>
             /// Gets or sets the Victims Alliance ID
             /// </summary>
-            public string VictimAllianceID { get; set; }
+            public long VictimAllianceID { get; set; }
 
 
             private string m_victimAllianceName;
@@ -287,7 +287,7 @@ namespace SMT.EVEData
                 }
                 if(allianceTicker == string.Empty)
                 {
-                    allianceTicker = VictimAllianceID; 
+                    allianceTicker = VictimAllianceID.ToString(); 
                 }
 
                 return string.Format("System: {0}, Alliance: {1}, Ship {2}", systemName, allianceTicker,  ShipType);

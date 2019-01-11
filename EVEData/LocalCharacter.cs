@@ -23,6 +23,8 @@ namespace SMT.EVEData
         /// </summary>
         private string location;
 
+        
+
         /// <summary>
         /// Does the route need updating
         /// </summary>
@@ -90,7 +92,14 @@ namespace SMT.EVEData
         /// Gets or sets the character standings dictionary
         /// </summary>
         [XmlIgnoreAttribute]
-        public Dictionary<string, float> Standings { get; set; }
+        public Dictionary<long, float> Standings { get; set; }
+
+        [XmlIgnoreAttribute]
+        public Dictionary<long, long> LabelMap { get; set; }
+
+        [XmlIgnoreAttribute]
+        public Dictionary<long, string> LabelNames { get; set; }
+
 
         /// <summary>
         /// Gets or sets the current fleet info for this character
@@ -122,9 +131,13 @@ namespace SMT.EVEData
     /// </summary>
     public LocalCharacter()
         {
-            Standings = new Dictionary<string, float>();
-            CorporationID = string.Empty;
-            AllianceID = string.Empty;
+            Standings = new Dictionary<long, float>();
+
+            LabelMap = new Dictionary<long, long>();
+            LabelNames = new Dictionary<long, string>();
+
+            CorporationID = 0;
+            AllianceID = 0;
             FleetInfo = new Fleet();
             Waypoints = new ObservableCollection<string>();
             ActiveRoute = new ObservableCollection<string>();
@@ -148,7 +161,11 @@ namespace SMT.EVEData
             ESIAccessToken = string.Empty;
             ESIRefreshToken = string.Empty;
 
-            Standings = new Dictionary<string, float>();
+            Standings = new Dictionary<long, float>();
+
+            LabelMap = new Dictionary<long, long>();
+            LabelNames = new Dictionary<long, string>();
+
             FleetInfo = new Fleet();
 
             Waypoints = new ObservableCollection<string>();
@@ -633,7 +650,7 @@ namespace SMT.EVEData
 
             try
             {
-                if (string.IsNullOrEmpty(CorporationID))
+                if (CorporationID == 0)
                 {
                     string url = @"https://esi.evetech.net/v4/characters/" + ID + "/?datasource=tranquility";
 
@@ -661,14 +678,14 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string corpID = obj["corporation_id"].ToString();
+                                long corpID = long.Parse(obj["corporation_id"].ToString());
                                 CorporationID = corpID;
                             }
                         }
                     }
                 }
 
-                if (string.IsNullOrEmpty(AllianceID) && !string.IsNullOrEmpty(CorporationID))
+                if (AllianceID == 0 && CorporationID != 0)
                 {
                     string url = @"https://esi.evetech.net/v4/corporations/" + CorporationID + "/?datasource=tranquility";
 
@@ -698,15 +715,14 @@ namespace SMT.EVEData
                                 JObject obj = JObject.Load(jsr);
                                 if(obj["alliance_id"] != null)
                                 {
-                                    string allianceID = obj["alliance_id"].ToString();
-                                    AllianceID = allianceID;
+                                    AllianceID = long.Parse(obj["alliance_id"].ToString());
                                 }
                             }
                         }
                     }
                 }
 
-                if (!string.IsNullOrEmpty(AllianceID))
+                if(AllianceID != 0)
                 {
                     int page = 0;
                     int maxPageCount = 1;
@@ -750,11 +766,22 @@ namespace SMT.EVEData
                                     if (jsr.TokenType == JsonToken.StartObject)
                                     {
                                         JObject obj = JObject.Load(jsr);
-                                        string contactID = obj["contact_id"].ToString();
+                                        long contactID = long.Parse(obj["contact_id"].ToString());
                                         string contactType = obj["contact_type"].ToString();
+                                        long LabelID = 0;
+
+                                        if (obj["label_id"] != null)
+                                        {
+                                            LabelID = long.Parse(obj["label_id"].ToString());
+
+                                            LabelMap[contactID] = LabelID;
+                                        }
+
                                         float standing = float.Parse(obj["standing"].ToString());
 
                                         Standings[contactID] = standing;
+
+
                                     }
                                 }
                             }
