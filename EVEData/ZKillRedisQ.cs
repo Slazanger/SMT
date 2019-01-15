@@ -121,7 +121,7 @@ namespace SMT.EVEData
                             zs.VictimAllianceID = long.Parse(z.Package.Killmail.Victim.AllianceId.ToString());
                             zs.VictimCharacterID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
                             zs.VictimCorpID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
-                            zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId.ToString());
+                            zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId);
                             if(zs.SystemName == string.Empty)
                             {
                                 zs.SystemName = z.Package.Killmail.SolarSystemId.ToString();
@@ -279,18 +279,13 @@ namespace SMT.EVEData
 
             public override string ToString()
             {
-                string systemName = EVEData.EveManager.Instance.GetSystemNameFromSystemID(SystemName);
                 string allianceTicker = EVEData.EveManager.Instance.GetAllianceTicker(VictimAllianceID);
-                if (systemName == string.Empty)
-                {
-                    systemName = SystemName;
-                }
                 if(allianceTicker == string.Empty)
                 {
                     allianceTicker = VictimAllianceID.ToString(); 
                 }
 
-                return string.Format("System: {0}, Alliance: {1}, Ship {2}", systemName, allianceTicker,  ShipType);
+                return string.Format("System: {0}, Alliance: {1}, Ship {2}", SystemName, allianceTicker,  ShipType);
             }
         }
     }

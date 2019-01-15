@@ -19,6 +19,10 @@ using System.Xml;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Options;
+using ESI.NET;
+using ESI.NET.Enumerations;
+using ESI.NET.Models.SSO;
 
 namespace SMT.EVEData
 {
@@ -152,7 +156,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the System ID to Name dictionary
         /// </summary>
-        public SerializableDictionary<string, string> SystemIDToName { get; set; }
+        public SerializableDictionary<long, string> SystemIDToName { get; set; }
 
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
@@ -211,12 +215,13 @@ namespace SMT.EVEData
         /// </summary>
         private List<string> IntelFilters { get; set; }
 
-
         public EveTrace.EveTraceFleetInfo FleetIntel;
 
         public EVEData.Server ServerInfo { get; set; }
 
+        public List<string> ESIScopes { get; set; }
 
+        public ESI.NET.EsiClient ESIClient { get; set; }
 
         public enum JumpShip
         {
@@ -230,14 +235,12 @@ namespace SMT.EVEData
             Rorqual
         }
 
-
-
         /// <summary>
         /// Get the System name from the System ID
         /// </summary>
         /// <param name="id">System ID</param>
         /// <returns>System Name</returns>
-        public string GetSystemNameFromSystemID(string id)
+        public string GetSystemNameFromSystemID(long id)
         {
             string name = string.Empty;
             if (SystemIDToName.Keys.Contains(id))
@@ -546,7 +549,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Verge Vendor", "10000068", "Gallente", 245, 330));
             Regions.Add(new MapRegion("Wicked Creek", "10000006", string.Empty, 790, 615));
 
-            SystemIDToName = new SerializableDictionary<string, string>();
+            SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
 
@@ -588,7 +591,7 @@ namespace SMT.EVEData
                 foreach (XmlNode system in sysUseNode.ChildNodes)
                 {
                     // extact the base from info from the g
-                    string systemID = system.Attributes["id"].Value.Substring(3);
+                    long systemID = long.Parse(system.Attributes["id"].Value.Substring(3));
                     float x = float.Parse(system.Attributes["x"].Value) + (float.Parse(system.Attributes["width"].Value) / 2.0f);
                     float y = float.Parse(system.Attributes["y"].Value) + (float.Parse(system.Attributes["height"].Value) / 2.0f);
 
@@ -718,8 +721,8 @@ namespace SMT.EVEData
                 {
                     string[] bits = line.Split(',');
 
-                    string fromID = bits[2];
-                    string toID = bits[3];
+                    long fromID = long.Parse(bits[2]);
+                    long toID = long.Parse(bits[3]);
 
                     System from = GetEveSystemFromID(fromID);
                     System to = GetEveSystemFromID(toID);
@@ -745,7 +748,7 @@ namespace SMT.EVEData
                 {
                     string[] bits = line.Split(',');
 
-                    string stationSystem = bits[8];
+                    long stationSystem = long.Parse(bits[8]);
 
                     System SS = GetEveSystemFromID(stationSystem);
                     if(SS != null)
@@ -967,7 +970,7 @@ namespace SMT.EVEData
         /// </summary>
         public void LoadFromDisk()
         {
-            SystemIDToName = new SerializableDictionary<string, string>();
+            SystemIDToName = new SerializableDictionary<long, string>();
 
             Regions = Utils.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
             Systems = Utils.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
@@ -1024,7 +1027,7 @@ namespace SMT.EVEData
         /// Get a System object from the ID
         /// </summary>
         /// <param name="id">ID of the system</param>
-        public System GetEveSystemFromID(string id)
+        public System GetEveSystemFromID(long id)
         {
             foreach (System s in Systems)
             {
@@ -1041,7 +1044,7 @@ namespace SMT.EVEData
         /// Get a System name from the ID
         /// </summary>
         /// <param name="id">ID of the system</param>
-        public string GetEveSystemNameFromID(string id)
+        public string GetEveSystemNameFromID(long id)
         {
             foreach (System s in Systems)
             {
@@ -1078,71 +1081,60 @@ namespace SMT.EVEData
         /// </summary>
         public string GetESILogonURL()
         {
-            UriBuilder esiLogonBuilder = new UriBuilder("https://login.eveonline.com/oauth/authorize/");
-
-            var esiQuery = HttpUtility.ParseQueryString(esiLogonBuilder.Query);
-            esiQuery["response_type"] = "code";
-            esiQuery["client_id"] = EveAppConfig.ClientID;
-            esiQuery["redirect_uri"] = EveAppConfig.CallbackURL;
-            esiQuery["scope"] = "publicData esi-location.read_location.v1 esi-search.search_structures.v1 esi-clones.read_clones.v1 esi-universe.read_structures.v1 esi-fleets.read_fleet.v1 esi-ui.write_waypoint.v1 esi-characters.read_standings.v1 esi-location.read_online.v1 esi-characters.read_fatigue.v1 esi-alliances.read_contacts.v1";
-            esiQuery["state"] = Process.GetCurrentProcess().Id.ToString();
-
-            esiLogonBuilder.Query = esiQuery.ToString();
-
-            // old way... Process.Start();
-            return esiLogonBuilder.ToString();
+            return ESIClient.SSO.CreateAuthenticationUrl(ESIScopes);
         }
 
         /// <summary>
         /// Hand the custom smtauth- url we get back from the logon screen
         /// </summary>
-        public bool HandleEveAuthSMTUri(Uri uri)
+        public async void HandleEveAuthSMTUri(Uri uri)
         {
             // parse the uri
             var query = HttpUtility.ParseQueryString(uri.Query);
-
-            if (query["state"] == null || int.Parse(query["state"]) != Process.GetCurrentProcess().Id)
-            {
-                // this query isnt for us..
-                return false;
-            }
-
             if (query["code"] == null)
             {
                 // we're missing a query code
-                return false;
+                return;
             }
 
-            // now we have the initial uri call back we can verify the auth code
-            string url = @"https://login.eveonline.com/oauth/token";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Post;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
             string code = query["code"];
-            string authHeader = EveAppConfig.ClientID + ":" + EveAppConfig.SecretKey;
-            string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
-            request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
+            SsoToken sst = await ESIClient.SSO.GetToken(GrantType.AuthorizationCode, code);
+            AuthorizedCharacterData acd = await ESIClient.SSO.Verify(sst);
 
-            var httpData = HttpUtility.ParseQueryString(string.Empty);
-            httpData["grant_type"] = "authorization_code";
-            httpData["code"] = code;
+            // now find the matching character and update..
+            LocalCharacter esiChar = null;
+            foreach (LocalCharacter c in LocalCharacters)
+            {
+                if (c.Name == acd.CharacterName)
+                {
+                    esiChar = c;
+                }
+            }
 
-            string httpDataStr = httpData.ToString();
-            byte[] data = UTF8Encoding.UTF8.GetBytes(httpDataStr);
-            request.ContentLength = data.Length;
-            request.ContentType = "application/x-www-form-urlencoded";
+            if (esiChar == null)
+            {
+                esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
 
-            var stream = request.GetRequestStream();
-            stream.Write(data, 0, data.Length);
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    LocalCharacters.Add(esiChar);
+                }), DispatcherPriority.ApplicationIdle);
+            }
 
-            request.BeginGetResponse(new AsyncCallback(ESIValidateAuthCodeCallback), request);
+            esiChar.ESIRefreshToken = acd.RefreshToken;
+            esiChar.ESILinked = true;
+            esiChar.ESIAccessToken = acd.Token;
+            esiChar.ESIAccessTokenExpiry = acd.ExpiresOn;
+            esiChar.ID = acd.CharacterID.ToString();
+            esiChar.ESIAuthData = acd;
 
-            return true;
+
+            // now to find if a matching character
+
         }
+
+
 
         /// <summary>
         /// Update the Alliance and Ticker data for all SOV owners in the specified region
@@ -1284,6 +1276,35 @@ namespace SMT.EVEData
         /// </summary>
         private void Init()
         {
+
+            IOptions<EsiConfig> config = Options.Create(new EsiConfig()
+            {
+                EsiUrl = "https://esi.evetech.net/",
+                DataSource = DataSource.Tranquility,
+                ClientId = EveAppConfig.ClientID,
+                SecretKey = EveAppConfig.SecretKey,
+                CallbackUrl = EveAppConfig.CallbackURL,
+                UserAgent = "SMT-map-app"
+            });
+
+            ESIClient = new ESI.NET.EsiClient(config);
+            ESIScopes = new List<string>
+            {
+                "publicData",
+                "esi-location.read_location.v1",
+                "esi-search.search_structures.v1",
+                "esi-clones.read_clones.v1",
+                "esi-universe.read_structures.v1",
+                "esi-fleets.read_fleet.v1",
+                "esi-ui.write_waypoint.v1",
+                "esi-characters.read_standings.v1",
+                "esi-location.read_online.v1",
+                "esi-characters.read_fatigue.v1",
+                "esi-alliances.read_contacts.v1"
+            };
+
+
+
             // patch up any links
             foreach (System s in Systems)
             {
@@ -1575,117 +1596,6 @@ namespace SMT.EVEData
             }
         }
 
-        /// <summary>
-        /// ESI Validate Auth Code Callback
-        /// </summary>
-        private void ESIValidateAuthCodeCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                        while (jsr.Read())
-                        {
-                            if (jsr.TokenType == JsonToken.StartObject)
-                            {
-                                JObject obj = JObject.Load(jsr);
-                                pendingAccessToken = obj["access_token"].ToString();
-                                pendingTokenType = obj["token_type"].ToString();
-                                pendingExpiresIn = obj["expires_in"].ToString();
-                                pendingRefreshToken = obj["refresh_token"].ToString();
-
-                                // now requests the character information
-                                string url = @"https://login.eveonline.com/oauth/verify";
-                                HttpWebRequest verifyRequest = (HttpWebRequest)WebRequest.Create(url);
-                                verifyRequest.Method = WebRequestMethods.Http.Get;
-                                verifyRequest.Timeout = 20000;
-                                verifyRequest.Proxy = null;
-                                string authHeader = "Bearer " + pendingAccessToken;
-
-                                verifyRequest.Headers[HttpRequestHeader.Authorization] = authHeader;
-
-                                verifyRequest.BeginGetResponse(new AsyncCallback(ESIVerifyAccessCodeCallback), verifyRequest);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        /// <summary>
-        /// ESI Verify Access Code Callback
-        /// </summary>
-        private void ESIVerifyAccessCodeCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream verifyStream = response.GetResponseStream();
-                    using (StreamReader srr = new StreamReader(verifyStream))
-                    {
-                        string verifyResult = srr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(verifyResult));
-                        while (jsr.Read())
-                        {
-                            if (jsr.TokenType == JsonToken.StartObject)
-                            {
-                                JObject obj = JObject.Load(jsr);
-                                string characterID = obj["CharacterID"].ToString();
-                                string characterName = obj["CharacterName"].ToString();
-                                string tokenType = obj["TokenType"].ToString();
-                                string characterOwnerHash = obj["CharacterOwnerHash"].ToString();
-                                string expiresOn = obj["ExpiresOn"].ToString();
-
-                                // now find the matching character and update..
-                                LocalCharacter esiChar = null;
-                                foreach (LocalCharacter c in LocalCharacters)
-                                {
-                                    if (c.Name == characterName)
-                                    {
-                                        esiChar = c;
-                                    }
-                                }
-
-                                if (esiChar == null)
-                                {
-                                    esiChar = new LocalCharacter(characterName, string.Empty, string.Empty);
-
-                                    Application.Current.Dispatcher.Invoke((Action)(() =>
-                                    {
-                                        LocalCharacters.Add(esiChar);
-                                    }), DispatcherPriority.ApplicationIdle);
-                                }
-
-                                esiChar.ESIRefreshToken = pendingRefreshToken;
-                                esiChar.ESILinked = true;
-                                esiChar.ESIAccessToken = pendingAccessToken;
-                                esiChar.ESIAccessTokenExpiry = DateTime.Parse(expiresOn);
-                                esiChar.ID = characterID;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-
         private void StartEveTraceFleetUpdate()
         {
             string url = @"https://api.evetrace.com/api/v1/fleet/";
@@ -1756,7 +1666,7 @@ namespace SMT.EVEData
                         {
                             foreach(StructureHunter.Structures s in structures.Values.ToList())
                             {
-                                EVEData.System es = GetEveSystemFromID(s.SystemId.ToString());
+                                EVEData.System es = GetEveSystemFromID(s.SystemId);
                                 
                                 if( es != null )
                                 {
@@ -1804,7 +1714,7 @@ namespace SMT.EVEData
                         {
                             foreach (SovStructures.SovStructure s in structures)
                             {
-                                EVEData.System es = GetEveSystemFromID(s.SolarSystemId.ToString());
+                                EVEData.System es = GetEveSystemFromID(s.SolarSystemId);
 
                                 if (es != null && s.VulnerabilityOccupancyLevel != null && s.VulnerableEndTime != null && s.VulnerableStartTime != null)
                                 {
@@ -1927,7 +1837,7 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string systemID = obj["system_id"].ToString();
+                                long systemID = long.Parse(obj["system_id"].ToString());
                                 string shipKills = obj["ship_kills"].ToString();
                                 string npcKills = obj["npc_kills"].ToString();
                                 string podKills = obj["pod_kills"].ToString();
@@ -1991,7 +1901,7 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string systemID = obj["system_id"].ToString();
+                                long systemID = long.Parse(obj["system_id"].ToString());
                                 string ship_jumps = obj["ship_jumps"].ToString();
 
                                 if (SystemIDToName[systemID] != null)
@@ -2049,7 +1959,7 @@ namespace SMT.EVEData
                         {
                             foreach(long systemID in id.InfestedSolarSystems)
                             {
-                                EVEData.System s = GetEveSystemFromID(systemID.ToString());
+                                EVEData.System s = GetEveSystemFromID(systemID);
                                 if(s!=null)
                                 {
                                     s.ActiveIncursion = true; 
@@ -2169,7 +2079,7 @@ namespace SMT.EVEData
                             if (jsr.TokenType == JsonToken.StartObject)
                             {
                                 JObject obj = JObject.Load(jsr);
-                                string systemID = obj["system_id"].ToString();
+                                long systemID = long.Parse(obj["system_id"].ToString());
 
                                 if (SystemIDToName.Keys.Contains(systemID))
                                 {
@@ -2298,7 +2208,7 @@ namespace SMT.EVEData
                                 JObject obj = JObject.Load(jsr);
                                 string inSignatureId = obj["wormholeDestinationSignatureId"].ToString();
                                 string outSignatureId = obj["signatureId"].ToString();
-                                string solarSystemId = obj["wormholeDestinationSolarSystemId"].ToString();
+                                long solarSystemId = long.Parse(obj["wormholeDestinationSolarSystemId"].ToString());
                                 string wormHoleEOL = obj["wormholeEol"].ToString();
                                 string type = obj["type"].ToString();
 

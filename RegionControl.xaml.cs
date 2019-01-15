@@ -1632,7 +1632,7 @@ namespace SMT
 
             foreach( EveTrace.FleetInstance fi in EM.FleetIntel.FleetInstances)
             {
-                EVEData.System s = EM.GetEveSystemFromID(fi.System.ToString());
+                EVEData.System s = EM.GetEveSystemFromID(fi.System);
                 if(s==null)
                 {
                     continue;

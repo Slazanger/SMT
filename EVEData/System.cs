@@ -29,7 +29,7 @@ namespace SMT.EVEData
         /// <param name="id">ID of the system</param>
         /// <param name="region">Region this system is in</param>
         /// <param name="station">Does this system contain an NPC station</param>
-        public System(string name, string id, string region, bool station, bool iceBelt)
+        public System(string name, long id, string region, bool station, bool iceBelt)
         {
             Name = name;
             ID = id;
@@ -62,7 +62,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets Eve's internal ID for this System
         /// </summary>
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         /// <summary>
         /// Gets or sets EVE's internal Constellation ID

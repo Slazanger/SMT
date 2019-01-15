@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using ESI.NET.Enumerations;
+using ESI.NET.Models.SSO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -6,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -16,6 +17,10 @@ using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
+
+    //jumpclones
+
+
     public class LocalCharacter : Character
     {
         /// <summary>
@@ -86,7 +91,8 @@ namespace SMT.EVEData
         /// </summary>
         public string ESIRefreshToken { get; set; }
 
-
+        [XmlIgnoreAttribute]
+        public ESI.NET.Models.SSO.AuthorizedCharacterData ESIAuthData { get; set; }
 
         /// <summary>
         /// Gets or sets the character standings dictionary
@@ -191,12 +197,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Character info
         /// </summary>
-        public void Update()
+        public async void Update()
         {
             TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
             if (ts.Minutes < 0)
             {
-                RefreshAccessToken();
+                await RefreshAccessToken();
                 UpdateInfoFromESI();
             }
 
@@ -219,7 +225,7 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="systemID">System to set destination to</param>
         /// <param name="clear">Clear all waypoints before setting?</param>
-        public void AddDestination(string systemID, bool clear)
+        public async void AddDestination(long systemID, bool clear)
         {
             if (clear)
             {
@@ -229,28 +235,12 @@ namespace SMT.EVEData
 
             Waypoints.Add(EveManager.Instance.SystemIDToName[systemID]);
 
+            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+            esiClient.SetCharacterData(ESIAuthData);
+            //esiClient.UserInterface.Waypoint()
+
+            ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(systemID, false, clear);
             routeNeedsUpdate = true;
-
-            string url = @"https://esi.evetech.net/v2/ui/autopilot/waypoint/?";
-
-            var httpData = HttpUtility.ParseQueryString(string.Empty);
-
-            httpData["add_to_beginning"] = "false";
-            httpData["clear_other_waypoints"] = clear ? "true" : "false";
-            httpData["datasource"] = "tranquility";
-            httpData["destination_id"] = systemID;
-            string httpDataStr = httpData.ToString();
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url + httpDataStr);
-            request.Method = WebRequestMethods.Http.Post;
-            request.Timeout = 20000;
-            request.Proxy = null;
-            request.ContentType = "application/json";
-            request.ContentLength = 0;
-
-            request.Headers[HttpRequestHeader.Authorization] = "Bearer " + ESIAccessToken;
-
-            request.BeginGetResponse(new AsyncCallback(AddDestinationCallback), request);
         }
 
         /// <summary>
@@ -322,7 +312,7 @@ namespace SMT.EVEData
 
                                 for (int j = 1; j < systems.Length; j++)
                                 {
-                                    string sysName = EveManager.Instance.SystemIDToName[systems[j]];
+                                    string sysName = EveManager.Instance.SystemIDToName[long.Parse(systems[j])];
 
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
@@ -342,71 +332,52 @@ namespace SMT.EVEData
         /// <summary>
         /// Refresh the ESI access token
         /// </summary>
-        private bool RefreshAccessToken()
+        private async Task RefreshAccessToken()
         {
-            if (ESIRefreshToken == string.Empty || ESIRefreshToken == null)
+            SsoToken sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
+            AuthorizedCharacterData acd = await EveManager.Instance.ESIClient.SSO.Verify(sst);
+            
+            if(String.IsNullOrEmpty(acd.Token))
             {
-                return false;
+                return;
             }
 
-            string url = @"https://login.eveonline.com/oauth/token";
+            ESIAccessToken = acd.Token;
+            ESIAccessTokenExpiry = acd.ExpiresOn;
+            ESIRefreshToken = acd.RefreshToken;
+            ESILinked = true;
+            ESIAuthData = acd;
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Post;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            string authHeader = EveAppConfig.ClientID + ":" + EveAppConfig.SecretKey;
-            string authHeader_64 = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
-
-            request.Headers[HttpRequestHeader.Authorization] = authHeader_64;
-
-            var httpData = HttpUtility.ParseQueryString(string.Empty);
-            httpData["grant_type"] = "refresh_token";
-            httpData["refresh_token"] = ESIRefreshToken;
-
-            string httpDataStr = httpData.ToString();
-            byte[] data = UTF8Encoding.UTF8.GetBytes(httpDataStr);
-            request.ContentLength = data.Length;
-            request.ContentType = "application/x-www-form-urlencoded";
-
-            var stream = request.GetRequestStream();
-            stream.Write(data, 0, data.Length);
-
-            WebResponse refreshResult = request.GetResponse();
-
-            Stream responseStream = refreshResult.GetResponseStream();
-            using (StreamReader sr = new StreamReader(responseStream))
-            {
-                // Need to return this response
-                string strContent = sr.ReadToEnd();
-
-                JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                while (jsr.Read())
-                {
-                    if (jsr.TokenType == JsonToken.StartObject)
-                    {
-                        JObject obj = JObject.Load(jsr);
-                        string accessToken = obj["access_token"].ToString();
-                        string tokenType = obj["token_type"].ToString();
-                        string expiresIn = obj["expires_in"].ToString();
-                        string refreshToken = obj["refresh_token"].ToString();
-                        double expiryMinutes = double.Parse(expiresIn);
-                        expiryMinutes -= 5.0; // chop down 5 minutes to give us a buffer
-                        ESIAccessToken = accessToken;
-                        ESIAccessTokenExpiry = DateTime.Now.AddSeconds(expiryMinutes);
-                    }
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
         /// Update the characters position from ESI (will override the position read from any log files
         /// </summary>
-        private void UpdatePositionFromESI()
+        private async void UpdatePositionFromESI()
         {
+            if(string.IsNullOrEmpty(ESIAccessToken) )
+            {
+                return;
+            }
+
+            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+            esiClient.SetCharacterData(ESIAuthData);
+            ESI.NET.EsiResponse<ESI.NET.Models.Location.Location> location = await esiClient.Location.Location();
+
+            
+            Location = EveManager.Instance.SystemIDToName[location.Data.SolarSystemId];
+            System s = EVEData.EveManager.Instance.GetEveSystem(Location);
+            if (s != null)
+            {
+                Region = s.Region;
+            }
+            else
+            {
+                Region = "";
+            }
+            /*
+             *
+
             UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/characters/" + ID + "/location");
 
             var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
@@ -442,7 +413,7 @@ namespace SMT.EVEData
                         if (jsr.TokenType == JsonToken.StartObject)
                         {
                             JObject obj = JObject.Load(jsr);
-                            string sysID = obj["solar_system_id"].ToString();
+                            long sysID = long.Parse(obj["solar_system_id"].ToString());
 
                             Location = EveManager.Instance.SystemIDToName[sysID];
 
@@ -463,6 +434,7 @@ namespace SMT.EVEData
             catch
             {
             }
+            */
         }
 
         /// <summary>
