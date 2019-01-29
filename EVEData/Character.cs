@@ -30,8 +30,9 @@ namespace SMT.EVEData
         /// </summary>
         public Character()
         {
-            CorporationID = 0;
-            AllianceID = 0;
+            CorporationID = -1;
+            AllianceID = -1;
+            ID = -1;
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the ID used by ESI for this character
         /// </summary>
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         /// <summary>
         /// Gets or sets the ID of the Corp this character is in

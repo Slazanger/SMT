@@ -143,8 +143,8 @@ namespace SMT.EVEData
             LabelMap = new Dictionary<long, long>();
             LabelNames = new Dictionary<long, string>();
 
-            CorporationID = 0;
-            AllianceID = 0;
+            CorporationID = -1;
+            AllianceID = -1;
             FleetInfo = new Fleet();
             Waypoints = new ObservableCollection<string>();
             ActiveRoute = new ObservableCollection<string>();
@@ -198,21 +198,16 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Character info
         /// </summary>
-        public async void Update()
+        public async Task Update()
         {
             TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
             if (ts.Minutes < 0)
             {
                 await RefreshAccessToken();
-                UpdateInfoFromESI();
+                await UpdateInfoFromESI();
             }
 
             UpdatePositionFromESI();
-
-            //// TODO : 
-            ////UpdateFleetIDFromESI();
-            ////UpdateFleetInfoFromESI();
-            ////UpdateFleetMembersFromESI();
 
             if (routeNeedsUpdate)
             {
@@ -249,7 +244,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the active route for the character
         /// </summary>
-        private async void UpdateActiveRoute()
+        private async Task UpdateActiveRoute()
         {
 
             if (Waypoints.Count == 0)
@@ -257,10 +252,8 @@ namespace SMT.EVEData
                 return;
             }
 
-
             ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
             esiClient.SetCharacterData(ESIAuthData);
-
 
             string start = string.Empty;
             string end = Location;
@@ -364,262 +357,34 @@ namespace SMT.EVEData
             } 
         }
 
-        /// <summary>
-        /// Update the characters Fleet ID (if Any)
-        /// </summary>
-        private void UpdateFleetIDFromESI()
-        {
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/characters/" + ID + "/fleet");
-
-            var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
-            esiQuery["character_id"] = ID;
-            esiQuery["datasource"] = "tranquility";
-            esiQuery["token"] = ESIAccessToken;
-
-            urlBuilder.Query = esiQuery.ToString();
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            try
-            {
-                HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                if (esiResult.StatusCode != HttpStatusCode.OK)
-                {
-                    return;
-                }
-
-                Stream responseStream = esiResult.GetResponseStream();
-                using (StreamReader sr = new StreamReader(responseStream))
-                {
-                    // Need to return this response
-                    string strContent = sr.ReadToEnd();
-
-                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                    while (jsr.Read())
-                    {
-                        if (jsr.TokenType == JsonToken.StartObject)
-                        {
-                            JObject obj = JObject.Load(jsr);
-                            string fleetID = obj["fleet_id"].ToString();
-
-                            if (fleetID == "-1")
-                            {
-                                FleetInfo.FleetID = Fleet.NoFleet;
-                            }
-                            else
-                            {
-                                FleetInfo.FleetID = fleetID;
-                            }
-                        }
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
-        /// <summary>
-        /// Update the current Fleet information
-        /// </summary>
-        private void UpdateFleetInfoFromESI()
-        {
-            if (FleetInfo.FleetID == Fleet.NoFleet)
-            {
-                return;
-            }
-
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/fleets/" + FleetInfo.FleetID + "/");
-
-            var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
-
-            esiQuery["datasource"] = "tranquility";
-            esiQuery["token"] = ESIAccessToken;
-
-            urlBuilder.Query = esiQuery.ToString();
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            try
-            {
-                HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                if (esiResult.StatusCode != HttpStatusCode.OK)
-                {
-                    return;
-                }
-
-                Stream responseStream = esiResult.GetResponseStream();
-                using (StreamReader sr = new StreamReader(responseStream))
-                {
-                    // Need to return this response
-                    string strContent = sr.ReadToEnd();
-
-                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                    while (jsr.Read())
-                    {
-                        if (jsr.TokenType == JsonToken.StartObject)
-                        {
-                            JObject obj = JObject.Load(jsr);
-                            string motd = obj["motd"].ToString();
-
-                            FleetInfo.FleetMOTD = motd;
-                        }
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
-        /// <summary>
-        /// Update the fleet members from ESI
-        /// </summary>
-        private void UpdateFleetMembersFromESI()
-        {
-            if (FleetInfo.FleetID == Fleet.NoFleet)
-            {
-                return;
-            }
-
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/fleets/" + FleetInfo.FleetID + "/members/");
-
-            var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
-
-            esiQuery["datasource"] = "tranquility";
-            esiQuery["token"] = ESIAccessToken;
-
-            urlBuilder.Query = esiQuery.ToString();
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            try
-            {
-                HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                if (esiResult.StatusCode != HttpStatusCode.OK)
-                {
-                    return;
-                }
-
-                Stream responseStream = esiResult.GetResponseStream();
-                using (StreamReader sr = new StreamReader(responseStream))
-                {
-                    // Need to return this response
-                    string strContent = sr.ReadToEnd();
-
-                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                    while (jsr.Read())
-                    {
-                        if (jsr.TokenType == JsonToken.StartObject)
-                        {
-                            JObject obj = JObject.Load(jsr);
-                            string charID = obj["character_id"].ToString();
-                            string shipType = obj["ship_type_id"].ToString();
-                            string locationID = obj["solar_system_id"].ToString();
-                        }
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
 
         /// <summary>
         /// Update the character info from the ESI data if linked
         /// </summary>
-        private void UpdateInfoFromESI()
+        private async Task UpdateInfoFromESI()
         {
-            if (string.IsNullOrEmpty(ID) || !ESILinked)
+            if (ID == 0 || !ESILinked)
             {
                 return;
             }
 
             try
             {
-                if (CorporationID == 0)
+                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                esiClient.SetCharacterData(ESIAuthData);
+
+
+                if (CorporationID == -1 || AllianceID == -1)
                 {
-                    string url = @"https://esi.evetech.net/v4/characters/" + ID + "/?datasource=tranquility";
+                    ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esr = await esiClient.Character.Information((int)ID);
 
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                    request.Method = WebRequestMethods.Http.Get;
-                    request.Timeout = 20000;
-                    request.Proxy = null;
-
-                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                    if (esiResult.StatusCode != HttpStatusCode.OK)
+                    if(EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Character.Information>(esr))
                     {
-                        return;
-                    }
-
-                    Stream responseStream = esiResult.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                        while (jsr.Read())
-                        {
-                            if (jsr.TokenType == JsonToken.StartObject)
-                            {
-                                JObject obj = JObject.Load(jsr);
-                                long corpID = long.Parse(obj["corporation_id"].ToString());
-                                CorporationID = corpID;
-                            }
-                        }
+                        CorporationID = esr.Data.CorporationId;
+                        AllianceID = esr.Data.AllianceId;
                     }
                 }
 
-                if (AllianceID == 0 && CorporationID != 0)
-                {
-                    string url = @"https://esi.evetech.net/v4/corporations/" + CorporationID + "/?datasource=tranquility";
-
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                    request.Method = WebRequestMethods.Http.Get;
-                    request.Timeout = 20000;
-                    request.Proxy = null;
-
-                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                    if (esiResult.StatusCode != HttpStatusCode.OK)
-                    {
-                        return;
-                    }
-
-                    Stream responseStream = esiResult.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                        while (jsr.Read())
-                        {
-                            if (jsr.TokenType == JsonToken.StartObject)
-                            {
-                                JObject obj = JObject.Load(jsr);
-                                if(obj["alliance_id"] != null)
-                                {
-                                    AllianceID = long.Parse(obj["alliance_id"].ToString());
-                                }
-                            }
-                        }
-                    }
-                }
 
                 if(AllianceID != 0)
                 {
@@ -629,64 +394,21 @@ namespace SMT.EVEData
                     {
                         page++;
 
-                        UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/alliances/" + AllianceID + "/contacts/");
-                        var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
-                        esiQuery["page"] = page.ToString();
-                        esiQuery["datasource"] = "tranquility";
-                        esiQuery["token"] = ESIAccessToken;
+                        esiClient.SetCharacterData(ESIAuthData);
+                        ESI.NET.EsiResponse<List<ESI.NET.Models.Contacts.Contact>> esr = await esiClient.Contacts.ListForAlliance(page);
 
-                        urlBuilder.Query = esiQuery.ToString();
-
-                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
-                        request.Method = WebRequestMethods.Http.Get;
-                        request.ContentType = "application/json";
-                        request.Timeout = 20000;
-                        request.Proxy = null;
-
-                        try
+                        if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
                         {
-                            HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-                            maxPageCount = int.Parse(esiResult.Headers["X-Pages"].ToString());
-
-                            if (esiResult.StatusCode != HttpStatusCode.OK)
+                            if(esr.Pages.HasValue)
                             {
-                                return;
+                                maxPageCount = (int)esr.Pages;
                             }
 
-                            Stream responseStream = esiResult.GetResponseStream();
-                            using (StreamReader sr = new StreamReader(responseStream))
+                            foreach(ESI.NET.Models.Contacts.Contact con in esr.Data)
                             {
-                                // Need to return this response
-                                string strContent = sr.ReadToEnd();
-
-                                JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                                while (jsr.Read())
-                                {
-                                    if (jsr.TokenType == JsonToken.StartObject)
-                                    {
-                                        JObject obj = JObject.Load(jsr);
-                                        long contactID = long.Parse(obj["contact_id"].ToString());
-                                        string contactType = obj["contact_type"].ToString();
-                                        long LabelID = 0;
-
-                                        if (obj["label_id"] != null)
-                                        {
-                                            LabelID = long.Parse(obj["label_id"].ToString());
-
-                                            LabelMap[contactID] = LabelID;
-                                        }
-
-                                        float standing = float.Parse(obj["standing"].ToString());
-
-                                        Standings[contactID] = standing;
-
-
-                                    }
-                                }
+                                Standings[con.ContactId] = (float)con.Standing;
+                                LabelMap[con.ContactId] = con.LabelId;
                             }
-                        }
-                        catch (Exception)
-                        {
                         }
                     }
                     while (page < maxPageCount);

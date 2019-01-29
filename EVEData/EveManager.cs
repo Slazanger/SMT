@@ -1106,7 +1106,7 @@ namespace SMT.EVEData
             esiChar.ESILinked = true;
             esiChar.ESIAccessToken = acd.Token;
             esiChar.ESIAccessTokenExpiry = acd.ExpiresOn;
-            esiChar.ID = acd.CharacterID.ToString();
+            esiChar.ID = acd.CharacterID;
             esiChar.ESIAuthData = acd;
 
 
@@ -1317,7 +1317,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Load the character data from disk
         /// </summary>
-        private void LoadCharacters()
+        private async void LoadCharacters()
         {
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
             if (!File.Exists(dataFilename))
@@ -1342,7 +1342,7 @@ namespace SMT.EVEData
                     c.LocalChatFile = string.Empty;
                     c.Location = string.Empty;
                     c.Region = string.Empty;
-                    c.Update();
+                    await c.Update();
 
                     LocalCharacters.Add(c);
                 }
@@ -1962,7 +1962,7 @@ namespace SMT.EVEData
         /// </summary>
         private void StartUpdateCharacterThread()
         {
-            new Thread(() =>
+            new Thread(async () =>
             {
                 Thread.CurrentThread.IsBackground = true;
 
@@ -1972,7 +1972,7 @@ namespace SMT.EVEData
                     for (int i = 0; i < LocalCharacters.Count; i++)
                     {
                         LocalCharacter c = LocalCharacters.ElementAt(i);
-                        c.Update();
+                        await c.Update();
                     }
 
                     Thread.Sleep(2000);
