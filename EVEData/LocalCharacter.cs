@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 
+
 namespace SMT.EVEData
 {
 
@@ -237,21 +238,29 @@ namespace SMT.EVEData
 
             ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
             esiClient.SetCharacterData(ESIAuthData);
-            //esiClient.UserInterface.Waypoint()
 
             ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(systemID, false, clear);
-            routeNeedsUpdate = true;
+            if(EVEData.ESIHelpers.ValidateESICall<string>(esr))
+            {
+                routeNeedsUpdate = true;
+            }
         }
 
         /// <summary>
         /// Update the active route for the character
         /// </summary>
-        private void UpdateActiveRoute()
+        private async void UpdateActiveRoute()
         {
+
             if (Waypoints.Count == 0)
             {
                 return;
             }
+
+
+            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+            esiClient.SetCharacterData(ESIAuthData);
+
 
             string start = string.Empty;
             string end = Location;
@@ -275,58 +284,24 @@ namespace SMT.EVEData
                 EVEData.System startSys = EveManager.Instance.GetEveSystem(start);
                 EVEData.System endSys = EveManager.Instance.GetEveSystem(end);
 
-                UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/route/" + startSys.ID + "/" + endSys.ID + "/");
 
-                var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
-                esiQuery["datasource"] = "tranquility";
+                ESI.NET.EsiResponse<int[]> esr = await esiClient.Routes.Map((int)startSys.ID, (int)endSys.ID);
 
-                urlBuilder.Query = esiQuery.ToString();
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
-                request.Method = WebRequestMethods.Http.Get;
-                request.Timeout = 20000;
-                request.Proxy = null;
-
-                try
+                if(EVEData.ESIHelpers.ValidateESICall<int[]>(esr))
                 {
-                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                    if (esiResult.StatusCode != HttpStatusCode.OK)
+                    foreach(int j in esr.Data)
                     {
-                        return;
-                    }
+                        string sysName = EveManager.Instance.SystemIDToName[j];
 
-                    Stream responseStream = esiResult.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                        while (jsr.Read())
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
-                            if (jsr.TokenType == JsonToken.StartArray)
-                            {
-                                JArray obj = JArray.Load(jsr);
-                                string[] systems = obj.ToObject<string[]>();
-
-                                for (int j = 1; j < systems.Length; j++)
-                                {
-                                    string sysName = EveManager.Instance.SystemIDToName[long.Parse(systems[j])];
-
-                                    Application.Current.Dispatcher.Invoke((Action)(() =>
-                                    {
-                                        ActiveRoute.Add(sysName);
-                                    }), DispatcherPriority.ApplicationIdle);
-                                }
-                            }
-                        }
+                            ActiveRoute.Add(sysName);
+                        }), DispatcherPriority.ApplicationIdle);
                     }
                 }
-                catch
-                {
-                }
+
             }
+
         }
 
         /// <summary>
@@ -386,67 +361,7 @@ namespace SMT.EVEData
             else
             {
                 Region = "";
-            }
-            /*
-             *
-
-            UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/v1/characters/" + ID + "/location");
-
-            var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
-            esiQuery["character_id"] = ID;
-            esiQuery["datasource"] = "tranquility";
-            esiQuery["token"] = ESIAccessToken;
-
-            urlBuilder.Query = esiQuery.ToString();
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            try
-            {
-                HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                if (esiResult.StatusCode != HttpStatusCode.OK)
-                {
-                    return;
-                }
-
-                Stream responseStream = esiResult.GetResponseStream();
-                using (StreamReader sr = new StreamReader(responseStream))
-                {
-                    // Need to return this response
-                    string strContent = sr.ReadToEnd();
-
-                    JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-                    while (jsr.Read())
-                    {
-                        if (jsr.TokenType == JsonToken.StartObject)
-                        {
-                            JObject obj = JObject.Load(jsr);
-                            long sysID = long.Parse(obj["solar_system_id"].ToString());
-
-                            Location = EveManager.Instance.SystemIDToName[sysID];
-
-                            System s = EVEData.EveManager.Instance.GetEveSystem(Location);
-                            if (s != null)
-                            {
-                                Region = s.Region;
-                            }
-                            else
-                            {
-                                Region = "";
-                            }
-
-                        }
-                    }
-                }
-            }
-            catch
-            {
-            }
-            */
+            } 
         }
 
         /// <summary>

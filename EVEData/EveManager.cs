@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -51,25 +50,6 @@ namespace SMT.EVEData
         /// </summary>
         private Dictionary<string, int> intelFileReadPos;
 
-        /// <summary>
-        /// Pending Access token 
-        /// </summary>
-        private string pendingAccessToken;
-
-        /// <summary>
-        /// Pending Token Type
-        /// </summary>
-        private string pendingTokenType;
-
-        /// <summary>
-        /// Pending Token Expiry
-        /// </summary>
-        private string pendingExpiresIn;
-
-        /// <summary>
-        /// Pending Refresh Token
-        /// </summary>
-        private string pendingRefreshToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
