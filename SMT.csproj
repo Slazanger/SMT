@@ -175,6 +175,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EVEData\ESI\CharacterIDData.cs" />
+    <Compile Include="EVEData\ESI\ESIHelper.cs" />
     <Compile Include="EVEData\ESI\EveTrace.cs" />
     <Compile Include="EVEData\ESI\IncursionData.cs" />
     <Compile Include="EVEData\ESI\ServerStatus.cs" />

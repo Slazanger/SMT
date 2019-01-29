@@ -334,10 +334,22 @@ namespace SMT.EVEData
         /// </summary>
         private async Task RefreshAccessToken()
         {
-            SsoToken sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
-            AuthorizedCharacterData acd = await EveManager.Instance.ESIClient.SSO.Verify(sst);
-            
-            if(String.IsNullOrEmpty(acd.Token))
+            if(String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
+            {
+                return;
+            }
+
+            SsoToken sst;
+            AuthorizedCharacterData acd;
+            sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
+            if(sst.RefreshToken == null)
+            {
+                return;
+            }
+
+            acd = await EveManager.Instance.ESIClient.SSO.Verify(sst);
+   
+            if (String.IsNullOrEmpty(acd.Token))
             {
                 return;
             }
