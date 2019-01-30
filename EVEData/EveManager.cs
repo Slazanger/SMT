@@ -644,8 +644,6 @@ namespace SMT.EVEData
                     }
                 }
                 // extract Ice Systems
-
-
             }
 
 
@@ -1127,85 +1125,35 @@ namespace SMT.EVEData
                 return;
             }
 
-            string allianceList = "[";
+            List<long> IDToResolve = new List<long>();
+
             foreach (MapSystem s in r.MapSystems.Values.ToList())
             {
-                if (s.ActualSystem.SOVAlliance != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !allianceList.Contains(s.ActualSystem.SOVAlliance.ToString()))
+                
+                if (s.ActualSystem.SOVAlliance != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !IDToResolve.Contains(s.ActualSystem.SOVAlliance))
                 {
-                    allianceList += "\"";
-                    allianceList += s.ActualSystem.SOVAlliance.ToString();
-                    allianceList += "\",";
+                    IDToResolve.Add(s.ActualSystem.SOVAlliance);
                 }
             }
-            allianceList += "\"0\"]";
-
-            if (allianceList.Length > 8)
-            {
-                string url = @"https://esi.evetech.net/v2/universe/names/?datasource=tranquility";
-
-               byte[] data = UTF8Encoding.UTF8.GetBytes(allianceList);
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = WebRequestMethods.Http.Post;
-                request.Timeout = 20000;
-                request.Proxy = null;
 
 
-                request.ContentType = "application/json";
-                request.ContentLength = data.Length;
-
-                var stream = request.GetRequestStream();
-                stream.Write(data, 0, data.Length);
-
-                request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
-            }
-            else
-            {
-                // we've cached every known system on the map already
-            }
+            ResolveAllianceIDs(IDToResolve);
         }
 
         /// <summary>
         /// Update the Alliance and Ticker data for specified list
         /// </summary>
-        public void ResolveAllianceIDs(List<long> IDs)
+        public async void ResolveAllianceIDs(List<long> IDs)
         {
-            string allianceList = "["; ;
-            foreach (long s in IDs)
+
+            foreach(long id in IDs)
             {
-                if (!AllianceIDToName.Keys.Contains(s) && !allianceList.Contains(s.ToString()))
+                ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esra = await ESIClient.Alliance.Information((int)id);
+                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esra))
                 {
-                    allianceList += "\"";
-                    allianceList += s.ToString() ;
-                    allianceList += "\",";
+                    AllianceIDToTicker[id] = esra.Data.Ticker;
+                    AllianceIDToName[id] = esra.Data.Name;
                 }
-            }
-
-            allianceList += "\"0\"]";
-
-            if (allianceList.Length > 8)
-            {
-                string url = @"https://esi.evetech.net/v2/universe/names/?datasource=tranquility";
-
-                byte[] data = UTF8Encoding.UTF8.GetBytes(allianceList);
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = WebRequestMethods.Http.Post;
-                request.Timeout = 20000;
-                request.Proxy = null;
-                request.ContentType = "application/json";
-                request.ContentLength = data.Length;
-
-                var stream = request.GetRequestStream();
-                stream.Write(data, 0, data.Length);
-
-                request.BeginGetResponse(new AsyncCallback(ESIUpdateAllianceIDCallback), request);
-
-
-            }
-            else
-            {
-                // we've cached every known system on the map already
             }
         }
 
@@ -1728,51 +1676,21 @@ namespace SMT.EVEData
         /// <summary>
         /// Start the download for the Server Info
         /// </summary>
-        private void StartUpdateServerInfo()
+        private async void UpdateServerInfo()
         {
-            string url = @"https://esi.evetech.net/latest/status/?datasource=tranquility";
+            ESI.NET.EsiResponse<ESI.NET.Models.Status.Status> esr = await ESIClient.Status.Retrieve();
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(ESIServerStatusCallback), request);
-        }
-
-
-        /// <summary>
-        /// ESI Result Response
-        /// </summary>
-        private void ESIServerStatusCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
+            if(ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
             {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-
-                        ServerData.ServerStatus ss = ServerData.ServerStatus.FromJson(strContent);
-
-                        ServerInfo.Name = "Tranquility";
-                        ServerInfo.NumPlayers = (int)ss.Players;
-                        ServerInfo.Version = ss.ServerVersion.ToString();
-                    }
-                }
+                ServerInfo.Name = "Tranquility";
+                ServerInfo.NumPlayers = esr.Data.Players;
+                ServerInfo.Version = esr.Data.ServerVersion.ToString();
             }
-            catch (Exception)
+            else
             {
                 ServerInfo.Name = "Tranquility";
                 ServerInfo.NumPlayers = 0;
-                ServerInfo.Version = "????";
-
+                ServerInfo.Version = "??????";
             }
         }
 
@@ -2015,7 +1933,7 @@ namespace SMT.EVEData
                 while (true)
                 {
 
-                    StartUpdateServerInfo();
+                    UpdateServerInfo();
                     Thread.Sleep(120000);
                 }
             }).Start();

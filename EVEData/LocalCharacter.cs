@@ -212,7 +212,7 @@ namespace SMT.EVEData
             if (routeNeedsUpdate)
             {
                 routeNeedsUpdate = false;
-                UpdateActiveRoute();
+                await UpdateActiveRoute();
             }
         }
 
@@ -342,19 +342,21 @@ namespace SMT.EVEData
 
             ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
             esiClient.SetCharacterData(ESIAuthData);
-            ESI.NET.EsiResponse<ESI.NET.Models.Location.Location> location = await esiClient.Location.Location();
+            ESI.NET.EsiResponse<ESI.NET.Models.Location.Location> esr = await esiClient.Location.Location();
 
-            
-            Location = EveManager.Instance.SystemIDToName[location.Data.SolarSystemId];
-            System s = EVEData.EveManager.Instance.GetEveSystem(Location);
-            if (s != null)
+            if(ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
             {
-                Region = s.Region;
+                Location = EveManager.Instance.SystemIDToName[esr.Data.SolarSystemId];
+                System s = EVEData.EveManager.Instance.GetEveSystem(Location);
+                if (s != null)
+                {
+                    Region = s.Region;
+                }
+                else
+                {
+                    Region = "";
+                }
             }
-            else
-            {
-                Region = "";
-            } 
         }
 
 
@@ -421,28 +423,6 @@ namespace SMT.EVEData
             EveManager.Instance.ResolveAllianceIDs(Standings.Keys.ToList());
         }
 
-        /// <summary>
-        /// Add Destination async callback
-        /// </summary>
-        private void AddDestinationCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    if (response.StatusCode != HttpStatusCode.OK)
-                    {
-                        int test = 0;
-                        test++;
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
 
         public void UpdateStructureInfoForRegion(string Region)
         {
@@ -545,9 +525,6 @@ namespace SMT.EVEData
                             {
 
                             }
-
-
-
 
                         }
                     }
