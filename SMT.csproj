@@ -178,8 +178,6 @@
     <Compile Include="EVEData\ESI\ESIHelper.cs" />
     <Compile Include="EVEData\ESI\EveTrace.cs" />
     <Compile Include="EVEData\ESI\IncursionData.cs" />
-    <Compile Include="EVEData\ESI\ServerStatus.cs" />
-    <Compile Include="EVEData\ESI\SovStructures.cs" />
     <Compile Include="EVEData\ESI\StructureHunter.cs" />
     <Compile Include="EVEData\ESI\StructureIDData.cs" />
     <Compile Include="EVEData\ESI\StructureSearch.cs" />

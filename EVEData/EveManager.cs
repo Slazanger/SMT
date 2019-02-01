@@ -1667,125 +1667,42 @@ namespace SMT.EVEData
         /// <summary>
         /// Start the ESI download for the kill info
         /// </summary>
-        private void StartUpdateKillsFromESI()
+        private async void StartUpdateKillsFromESI()
         {
-            string url = @"https://esi.evetech.net/v2/universe/system_kills/?datasource=tranquility";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(ESIKillsReadCallback), request);
-        }
-
-
-        /// <summary>
-        /// ESI Result Response
-        /// </summary>
-        private void ESIKillsReadCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.Kills>> esr = await ESIClient.Universe.Kills();
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.Kills>>(esr))
             {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                foreach(ESI.NET.Models.Universe.Kills k in esr.Data)
                 {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
+                    EVEData.System es = GetEveSystemFromID(k.SystemId);
+                    if (es != null)
                     {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-
-                        // JSON feed is now in the format : [{ "system_id": 30035042, "ship_kills": 103, "npc_kills": 103, "pod_kills": 0},
-                        while (jsr.Read())
-                        {
-                            if (jsr.TokenType == JsonToken.StartObject)
-                            {
-                                JObject obj = JObject.Load(jsr);
-                                long systemID = long.Parse(obj["system_id"].ToString());
-                                string shipKills = obj["ship_kills"].ToString();
-                                string npcKills = obj["npc_kills"].ToString();
-                                string podKills = obj["pod_kills"].ToString();
-
-                                if (SystemIDToName[systemID] != null)
-                                {
-                                    System es = GetEveSystem(SystemIDToName[systemID]);
-                                    if (es != null)
-                                    {
-                                        es.ShipKillsLastHour = int.Parse(shipKills);
-                                        es.PodKillsLastHour = int.Parse(podKills);
-                                        es.NPCKillsLastHour = int.Parse(npcKills);
-                                    }
-                                }
-                            }
-                        }
+                        es.NPCKillsLastHour = k.NpcKills;
+                        es.PodKillsLastHour = k.PodKills;
+                        es.ShipKillsLastHour = k.ShipKills;
                     }
                 }
             }
-            catch (Exception)
-            {
-            }
-        }
+         }
+
+
 
         /// <summary>
         /// Start the ESI download for the Jump info
         /// </summary>
-        private void StartUpdateJumpsFromESI()
+        private async void StartUpdateJumpsFromESI()
         {
-            string url = @"https://esi.evetech.net/v1/universe/system_jumps/?datasource=tranquility";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(ESIJumpsReadCallback), request);
-        }
-
-        /// <summary>
-        /// ESI Result Response
-        /// </summary>
-        private void ESIJumpsReadCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.Jumps>> esr = await ESIClient.Universe.Jumps();
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.Jumps>>(esr))
             {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                foreach (ESI.NET.Models.Universe.Jumps j in esr.Data)
                 {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
+                    EVEData.System es = GetEveSystemFromID(j.SystemId);
+                    if (es != null)
                     {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-
-                        // JSON feed is now in the format : [{ "system_id": 30035042, "ship_jumps": 103},
-                        while (jsr.Read())
-                        {
-                            if (jsr.TokenType == JsonToken.StartObject)
-                            {
-                                JObject obj = JObject.Load(jsr);
-                                long systemID = long.Parse(obj["system_id"].ToString());
-                                string ship_jumps = obj["ship_jumps"].ToString();
-
-                                if (SystemIDToName[systemID] != null)
-                                {
-                                    System es = GetEveSystem(SystemIDToName[systemID]);
-                                    if (es != null)
-                                    {
-                                        es.JumpsLastHour = int.Parse(ship_jumps);
-                                    }
-                                }
-                            }
-                        }
+                        es.JumpsLastHour = j.ShipJumps;
                     }
                 }
-            }
-            catch (Exception)
-            {
             }
         }
 
@@ -1793,55 +1710,24 @@ namespace SMT.EVEData
         /// <summary>
         /// Start the ESI download for the Jump info
         /// </summary>
-        private void StartUpdateIncursionsFromESI()
+        private async void StartUpdateIncursionsFromESI()
         {
-            string url = @"https://esi.evetech.net/latest/incursions/?datasource=tranquility";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(ESIIncursionsReadCallback), request);
-        }
-
-        /// <summary>
-        /// ESI Result Response
-        /// </summary>
-        private void ESIIncursionsReadCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Incursions.Incursion>> esr = await ESIClient.Incursions.All();
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Incursions.Incursion>>(esr))
             {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                foreach(ESI.NET.Models.Incursions.Incursion i in esr.Data)
                 {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
+                    foreach(long s in i.InfestedSystems )
                     {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-                        IncursionData.IncursionInfo[] incursions  = IncursionData.IncursionInfo.FromJson(strContent);
-
-                        foreach(IncursionData.IncursionInfo id in incursions)
+                        EVEData.System sys = GetEveSystemFromID(s);
+                        if (sys != null)
                         {
-                            foreach(long systemID in id.InfestedSolarSystems)
-                            {
-                                EVEData.System s = GetEveSystemFromID(systemID);
-                                if(s!=null)
-                                {
-                                    s.ActiveIncursion = true; 
-                                }
-                            }
+                            sys.ActiveIncursion = true;
                         }
                     }
                 }
             }
-            catch (Exception)
-            {
-            }
         }
-
-        
 
 
         /// <summary>
@@ -1921,12 +1807,30 @@ namespace SMT.EVEData
             request.Proxy = null;
 
             request.BeginGetResponse(new AsyncCallback(ESIUpdateSovCallback), request);
+
+            /*
+            This need expanding; awaiting fix
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.SystemSovereignty>> esr = await ESIClient.Sovereignty.Systems();
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.SystemSovereignty>>(esr))
+            {
+                foreach (ESI.NET.Models.Sovereignty.SystemSovereignty ss in esr.Data)
+                {
+                    EVEData.System sys = GetEveSystemFromID(ss.SystemId);
+                    if(sys != null)
+                    {
+                        sys.SOVAlliance = ss.
+                    }
+                }
+
+
+            }
+            */
         }
 
-        /// <summary>
-        /// ESI Result Response
-        /// </summary>
-        private void ESIUpdateSovCallback(IAsyncResult asyncResult)
+            /// <summary>
+            /// ESI Result Response
+            /// </summary>
+            private void ESIUpdateSovCallback(IAsyncResult asyncResult)
         {
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
             try
@@ -1969,76 +1873,7 @@ namespace SMT.EVEData
             }
         }
 
-        /// <summary>
-        /// ESI Result Response
-        /// </summary>
-        private void ESIUpdateAllianceIDCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
-
-                        // JSON feed is now in the format : [{ "system_id": 30035042,  and then optionally alliance_id, corporation_id and corporation_id, faction_id },
-                        while (jsr.Read())
-                        {
-                            if (jsr.TokenType == JsonToken.StartObject)
-                            {
-                                JObject obj = JObject.Load(jsr);
-
-                                if(obj["category"].ToString() != "alliance")
-                                {
-                                    continue;
-                                }
-
-                                string allianceName = obj["name"].ToString();
-                                long allianceId = long.Parse(obj["id"].ToString());
-                                AllianceIDToName[allianceId] = allianceName;
-
-                                string allianceUrl = @"https://esi.evetech.net/v3/alliances/" + allianceId + "/?datasource=tranquility";
-
-                                HttpWebRequest allianceRequest = (HttpWebRequest)WebRequest.Create(allianceUrl);
-                                allianceRequest.Method = WebRequestMethods.Http.Get;
-                                allianceRequest.Timeout = 20000;
-                                allianceRequest.Proxy = null;
-                                
-                                WebResponse allianceRequestWebResponse = allianceRequest.GetResponse();
-
-                                Stream allianceRequestResponeStream = allianceRequestWebResponse.GetResponseStream();
-                                using (StreamReader allianceRequestResponseStreamReader = new StreamReader(allianceRequestResponeStream))
-                                {
-                                    // Need to return this response
-                                    string allianceRequestString = allianceRequestResponseStreamReader.ReadToEnd();
-
-                                    JsonTextReader jobj = new JsonTextReader(new StringReader(allianceRequestString));
-                                    while (jobj.Read())
-                                    {
-                                        if (jobj.TokenType == JsonToken.StartObject)
-                                        {
-                                            JObject aobj = JObject.Load(jobj);
-                                            allianceName = aobj["name"].ToString();
-                                            string allianceTicker = aobj["ticker"].ToString();
-                                            AllianceIDToTicker[allianceId] = allianceTicker;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-        }
+ 
 
         /// <summary>
         /// Initialise the Thera Connection Data from EVE-Scout
@@ -2079,7 +1914,7 @@ namespace SMT.EVEData
                                 string wormHoleEOL = obj["wormholeEol"].ToString();
                                 string type = obj["type"].ToString();
 
-                                if (type != null && type == "wormhole" && solarSystemId != null && wormHoleEOL != null && SystemIDToName.Keys.Contains(solarSystemId))
+                                if (type != null && type == "wormhole" && solarSystemId != 0 && wormHoleEOL != null && SystemIDToName.Keys.Contains(solarSystemId))
                                 {
                                     System theraConnectionSystem = GetEveSystemFromID(solarSystemId);
 
@@ -2102,7 +1937,14 @@ namespace SMT.EVEData
 
         public CharacterIDs.Character[] BulkUpdateCharacterCache(List<string> charList)
         {
+
+
+
+
             CharacterIDs.CharacterIdData cd = new CharacterIDs.CharacterIdData();
+
+
+
 
             string esiCharString = "[";
             foreach (string s in charList)
