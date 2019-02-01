@@ -1611,66 +1611,35 @@ namespace SMT.EVEData
             }
         }
 
-        private void StartUpdateSovStructureUpdate()
+        private async void StartUpdateSovStructureUpdate()
         {
-            string url = @"https://esi.evetech.net/latest/sovereignty/structures/?datasource=tranquility";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(StartUpdateSovStructureUpdateCallback), request);
-        }
-
-        private void StartUpdateSovStructureUpdateCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Structure>> esr = await ESIClient.Sovereignty.Structures();
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Structure>>(esr))
             {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                foreach (ESI.NET.Models.Sovereignty.Structure ss in esr.Data)
                 {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
+                    EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
+                    if (es != null)
                     {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        var structures = SovStructures.SovStructure.FromJson(strContent);
-
-                        if (structures != null)
+                        if (ss.TypeId == 32226)
                         {
-                            foreach (SovStructures.SovStructure s in structures)
-                            {
-                                EVEData.System es = GetEveSystemFromID(s.SolarSystemId);
+                            es.TCUVunerabliltyStart = ss.VulnerableStartTime;
+                            es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
+                            es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                        }
 
-                                if (es != null && s.VulnerabilityOccupancyLevel != null && s.VulnerableEndTime != null && s.VulnerableStartTime != null)
-                                {
-                                    // TCU
-                                    if(s.StructureTypeId == 32226)
-                                    {
-                                        es.TCUVunerabliltyStart = s.VulnerableStartTime.Value;
-                                        es.TCUVunerabliltyEnd = s.VulnerableEndTime.Value;
-                                        es.TCUOccupancyLevel = (float)s.VulnerabilityOccupancyLevel.Value;
-                                    }
-
-                                    if (s.StructureTypeId == 32458)
-                                    {
-                                        es.IHubVunerabliltyStart = s.VulnerableStartTime.Value;
-                                        es.IHubVunerabliltyEnd = s.VulnerableEndTime.Value;
-                                        es.IHubOccupancyLevel = (float)s.VulnerabilityOccupancyLevel.Value;
-                                    }
-                                }
-                            }
-
+                        if (ss.TypeId == 32458)
+                        {
+                            es.IHubVunerabliltyStart = ss.VulnerableStartTime;
+                            es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
+                            es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
                         }
                     }
                 }
             }
-            catch (Exception)
-            {
-            }
         }
+
+
 
 
         /// <summary>
