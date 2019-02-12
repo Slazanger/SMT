@@ -298,6 +298,12 @@ namespace SMT.EVEData
         }
 
 
+        public void InitNavigation()
+        {
+            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges);
+        }
+
+
         /// <summary>
         /// Load the jump bridge data from disk
         /// </summary>
@@ -452,7 +458,7 @@ namespace SMT.EVEData
             StartUpdateIncursionsFromESI();
             // temp disabled
             //StartEveTraceFleetUpdate();
-            StartUpdateStructureHunterUpdate();
+//            StartUpdateStructureHunterUpdate();
             StartUpdateSovStructureUpdate();
         }
 
@@ -1260,6 +1266,8 @@ namespace SMT.EVEData
 
             StartLowFreqUpdateThread();
             StartHighFreqUpdateThread();
+
+
         }
 
         /// <summary>

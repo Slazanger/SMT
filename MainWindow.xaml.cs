@@ -176,6 +176,7 @@ namespace SMT
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.UpdateESIUniverseData();
+            EVEManager.InitNavigation();
 
             MapControlsPropertyGrid.SelectedObject = MapConf;
 

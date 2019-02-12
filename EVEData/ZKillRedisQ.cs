@@ -97,7 +97,7 @@ namespace SMT.EVEData
                 {
                     response = request.GetResponse() as HttpWebResponse;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     Thread.Sleep(1000);
