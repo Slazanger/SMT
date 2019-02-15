@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using ESI.NET;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
+using System.Threading.Tasks;
 
 namespace SMT.EVEData
 {
@@ -1273,7 +1274,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Load the character data from disk
         /// </summary>
-        private async void LoadCharacters()
+        private void LoadCharacters()
         {
             string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
             if (!File.Exists(dataFilename))
@@ -1298,7 +1299,6 @@ namespace SMT.EVEData
                     c.LocalChatFile = string.Empty;
                     c.Location = string.Empty;
                     c.Region = string.Empty;
-                    await c.Update();
 
                     LocalCharacters.Add(c);
                 }
@@ -1621,30 +1621,36 @@ namespace SMT.EVEData
 
         private async void StartUpdateSovStructureUpdate()
         {
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Structure>> esr = await ESIClient.Sovereignty.Structures();
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Structure>>(esr))
+            try
             {
-                foreach (ESI.NET.Models.Sovereignty.Structure ss in esr.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Structure>> esr = await ESIClient.Sovereignty.Structures();
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Structure>>(esr))
                 {
-                    EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
-                    if (es != null)
+                    foreach (ESI.NET.Models.Sovereignty.Structure ss in esr.Data)
                     {
-                        if (ss.TypeId == 32226)
+                        EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
+                        if (es != null)
                         {
-                            es.TCUVunerabliltyStart = ss.VulnerableStartTime;
-                            es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
-                            es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
-                        }
+                            if (ss.TypeId == 32226)
+                            {
+                                es.TCUVunerabliltyStart = ss.VulnerableStartTime;
+                                es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
+                                es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                            }
 
-                        if (ss.TypeId == 32458)
-                        {
-                            es.IHubVunerabliltyStart = ss.VulnerableStartTime;
-                            es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
-                            es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                            if (ss.TypeId == 32458)
+                            {
+                                es.IHubVunerabliltyStart = ss.VulnerableStartTime;
+                                es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
+                                es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                            }
                         }
                     }
                 }
+
             }
+            catch { }
+
         }
 
 

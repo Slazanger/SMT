@@ -122,9 +122,6 @@ namespace SMT.EVEData
             // clear the scores, values and parents from the list
             foreach (MapNode mapNode in MapNodes.Values)
             {
-                mapNode.F = 0;
-                mapNode.G = 0;
-                mapNode.H = 0;
                 mapNode.NearestToStart = null;
                 mapNode.MinCostToStart = 0;
                 mapNode.Visited = false;

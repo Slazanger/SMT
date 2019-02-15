@@ -178,7 +178,6 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
             EVEManager.InitNavigation();
 
-            MapControlsPropertyGrid.SelectedObject = MapConf;
 
             ColourListDropdown.ItemsSource = MapConf.MapColours;
             CharactersList.ItemsSource = EVEManager.LocalCharacters;
@@ -269,6 +268,10 @@ namespace SMT
 
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
             zKBFeedview.Filter = ZKBFeedFilter;
+
+
+
+            MapControlsPropertyGrid.SelectedObject = MapConf;
 
 
         }
