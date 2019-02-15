@@ -4,6 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+namespace SMT
+{
+    public enum RoutingMode
+    {
+        Shortest,
+        Safest,
+        PreferLow,
+    }
+
+}
+
 namespace SMT.EVEData
 {
 
@@ -15,6 +26,8 @@ namespace SMT.EVEData
             public bool HighSec { get; set; }
             public string Name { get; set; }
             public int Cost;
+            public int MinCostToStart;
+            public bool Visited;
 
             public double X;
             public double Y;
@@ -24,13 +37,35 @@ namespace SMT.EVEData
             public int G;
             public int H;
 
-            public MapNode Parent;
+            public MapNode NearestToStart;
 
             public List<string> Connections { get; set; }
 
             public string JBConnection;
         }
 
+        public enum GateType
+        {
+            StarGate,
+            Ansibex
+        }
+    
+        public class RoutePoint
+        {
+            public string SystemName { get; set; }
+            public GateType GateToTake { get; set; }
+
+            public override string ToString()
+            {
+                string s = SystemName;
+                if(GateToTake == GateType.Ansibex)
+                {
+                    s += " (Ansiblex)";
+                }
+
+                return s;
+            }
+        }
 
         public static void InitNavigation(List<System> eveSystems, List<JumpBridge> jumpBridges)
         {
@@ -43,12 +78,13 @@ namespace SMT.EVEData
                 MapNode mn = new MapNode
                 {
                     Name = sys.Name,
-                    HighSec = sys.TrueSec >= 0.5,
+                    HighSec = sys.TrueSec > 0.45,
                     Connections = new List<string>(),
                     Cost = 1,
+                    MinCostToStart = 0,
                     X = sys.ActualX,
                     Y = sys.ActualY,
-                    Z = sys.ActualZ,
+                    Z = sys.ActualZ,                    
                     F = 0
                 };
 
@@ -72,34 +108,48 @@ namespace SMT.EVEData
         }
 
 
-        static int CalculateHScore(MapNode from, MapNode to)
+        public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, RoutingMode routingMode)
         {
-            double x = from.X - to.X;
-            double z = from.Z - to.Z;
-            double y = from.Y - to.Y;
+            
 
-            double length = Math.Sqrt((x * x) + (y * y) + (z * z));
-
-            length = length / 9460730472580800.0;
-
-            return (int)length;
-        }
-
-
-        public static List<string> Navigate(string From, string To, bool UseJumpGates)
-        {
             if( !(MapNodes.Keys.Contains(From)||MapNodes.Keys.Contains(To)) )
             {
                 return null;
             }
 
+
+
             // clear the scores, values and parents from the list
-            foreach(MapNode mapNode in MapNodes.Values)
+            foreach (MapNode mapNode in MapNodes.Values)
             {
                 mapNode.F = 0;
                 mapNode.G = 0;
                 mapNode.H = 0;
-                mapNode.Parent = null;
+                mapNode.NearestToStart = null;
+                mapNode.MinCostToStart = 0;
+                mapNode.Visited = false;
+
+                switch (routingMode)
+                {
+                    case RoutingMode.PreferLow:
+                        {
+                            if (mapNode.HighSec)
+                                mapNode.Cost = 1000;
+                        }
+                        break;
+
+                    case RoutingMode.Safest:
+                        {
+                            if (!mapNode.HighSec)
+                                mapNode.Cost = 1000;
+                        }
+                        break;
+
+                    case RoutingMode.Shortest:
+                        mapNode.Cost = 1 ;
+                        break;
+                }
+
             }
 
 
@@ -109,7 +159,6 @@ namespace SMT.EVEData
             List<MapNode> OpenList = new List<MapNode>();
             List<MapNode> ClosedList = new List<MapNode>();
 
-            int g = 0;
             MapNode CurrentNode = null;
 
             // add the start to the open list
@@ -119,8 +168,8 @@ namespace SMT.EVEData
             while (OpenList.Count > 0)
             {
                 // get the MapNode with the lowest F score
-                int lowest = OpenList.Min(mn => mn.F);
-                CurrentNode = OpenList.First(mn => mn.F == lowest);
+                int lowest = OpenList.Min(mn => mn.MinCostToStart);
+                CurrentNode = OpenList.First(mn => mn.MinCostToStart == lowest);
 
                 // add the list to the closed list
                 ClosedList.Add(CurrentNode);
@@ -128,100 +177,87 @@ namespace SMT.EVEData
                 // remove it from the open list
                 OpenList.Remove(CurrentNode);
 
-
-                // if we added the destination to the closed list, we've found a path
-                if (ClosedList.FirstOrDefault(l => l.Name == To) != null)
-                    break;
-
-                g++;
-
                 // walk the connections
-                foreach(string connectionName in CurrentNode.Connections)
+                foreach (string connectionName in CurrentNode.Connections)
                 {
-
-                    // if this connection is in the closed list ignore it
-                    if( ClosedList.FirstOrDefault(mn => mn.Name == connectionName) != null)
-                    {
-                        continue;
-                    }
-
                     MapNode CMN = MapNodes[connectionName];
 
-                    // if its not in the Open List
-                    if (OpenList.FirstOrDefault(mn => mn.Name == connectionName) == null)
-                    {
-                        // compute its score, set the parent
-                        CMN.G = g;
-                        CMN.H = CalculateHScore(CMN, End);
-                        CMN.F = CMN.G + CMN.H;
-                        CMN.Parent = CurrentNode;
 
-                        // add it to the open list
-                        OpenList.Insert(0, CMN);
+                    if (CMN.Visited)
+                        continue;
 
-                    }
-                    else
+                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
                     {
-                        // test if using the current G score makes the route better, if so update it
-                        if(g + CMN.H < CMN.F)
+                        CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
+                        CMN.NearestToStart = CurrentNode;
+                        if (!OpenList.Contains(CMN))
                         {
-                            CMN.G = g;
-                            CMN.F = CMN.G + CMN.H;
-                            CMN.Parent = CurrentNode;
+                            OpenList.Add(CMN);
                         }
                     }
                 }
 
-                if(UseJumpGates && CurrentNode.JBConnection != null)
+
+                if (UseJumpGates && CurrentNode.JBConnection != null)
                 {
                     MapNode JMN = MapNodes[CurrentNode.JBConnection];
-
-                    // if this connection is in the closed list ignore it
-                    if (ClosedList.FirstOrDefault(mn => mn.Name == CurrentNode.JBConnection) != null)
+                    if (!JMN.Visited && JMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + JMN.Cost < JMN.MinCostToStart)
                     {
-                        continue;
-                    }
-
-
-
-                    // if its not in the Open List
-                    if (OpenList.FirstOrDefault(mn => mn.Name == CurrentNode.JBConnection) == null)
-                    {
-                        // compute its score, set the parent
-                        JMN.G = g;
-                        JMN.H = CalculateHScore(JMN, End);
-                        JMN.F = JMN.G + JMN.H;
-                        JMN.Parent = CurrentNode;
-
-                        // add it to the open list
-                        OpenList.Insert(0, JMN);
-
-                    }
-                    else
-                    {
-                        // test if using the current G score makes the route better, if so update it
-                        if (g + JMN.H < JMN.F)
+                        JMN.MinCostToStart = CurrentNode.MinCostToStart + JMN.Cost;
+                        JMN.NearestToStart = CurrentNode;
+                        if (!OpenList.Contains(JMN))
                         {
-                            JMN.G = g;
-                            JMN.F = JMN.G + JMN.H;
-                            JMN.Parent = CurrentNode;
+                            OpenList.Add(JMN);
                         }
                     }
+
                 }
+
+                CurrentNode.Visited = true;
+
             }
+
+
 
             // build the path
 
             List<string> Route = new List<string>();
 
-            while(CurrentNode != null)
+            CurrentNode = End;
+            if(End.NearestToStart != null)
             {
-                Route.Add(CurrentNode.Name);
-                CurrentNode = CurrentNode.Parent;
+                while (CurrentNode != null)
+                {
+                    Route.Add(CurrentNode.Name);
+                    CurrentNode = CurrentNode.NearestToStart;
+                }
+                Route.Reverse();
             }
-            Route.Reverse();
-            return Route;
+
+            List <RoutePoint> ActualRoute = new List<RoutePoint>();
+
+            for(int i = 0; i < Route.Count; i++)
+            {
+                RoutePoint RP = new RoutePoint();
+                RP.SystemName = Route[i];
+                RP.GateToTake = GateType.StarGate;
+
+                if(i < Route.Count -1 )
+                {
+                    MapNode mn = MapNodes[RP.SystemName];
+                    if(mn.JBConnection != null && mn.JBConnection == Route[i+1])
+                    {
+                        RP.GateToTake = GateType.Ansibex;
+                    }
+                }
+                ActualRoute.Add(RP);
+            }
+
+
+            return ActualRoute;
         }
+
+
 
 
         static Dictionary<string, MapNode> MapNodes { get; set; }

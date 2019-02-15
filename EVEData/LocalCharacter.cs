@@ -114,6 +114,50 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public Fleet FleetInfo { get; set; }
 
+
+
+        private bool m_UseAnsiblexGates;
+        public bool UseAnsiblexGates
+        {
+            get
+            {
+                return m_UseAnsiblexGates;
+            }
+            set
+            {
+                if (m_UseAnsiblexGates == value)
+                {
+                    return;
+                }
+
+                m_UseAnsiblexGates = value;
+                routeNeedsUpdate = true;
+            }
+
+        }
+
+
+        private RoutingMode m_NavigationMode;
+
+        public RoutingMode NavigationMode
+        {
+            get
+            {
+                return m_NavigationMode;
+            }
+            set
+            {
+                if (m_NavigationMode == value)
+                {
+                    return;
+                }
+
+
+                m_NavigationMode = value;
+                routeNeedsUpdate = true;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the current list of Waypoints
         /// </summary>
@@ -124,7 +168,7 @@ namespace SMT.EVEData
         /// Gets or sets the current active route
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<string> ActiveRoute { get; set; }
+        public ObservableCollection<Navigation.RoutePoint> ActiveRoute { get; set; }
 
         /// <summary>
         /// Gets or sets the character structure dictionary
@@ -147,7 +191,7 @@ namespace SMT.EVEData
             AllianceID = -1;
             FleetInfo = new Fleet();
             Waypoints = new ObservableCollection<string>();
-            ActiveRoute = new ObservableCollection<string>();
+            ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
             DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
         }
 
@@ -176,7 +220,7 @@ namespace SMT.EVEData
             FleetInfo = new Fleet();
 
             Waypoints = new ObservableCollection<string>();
-            ActiveRoute = new ObservableCollection<string>();
+            ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
         }
 
 
@@ -212,7 +256,7 @@ namespace SMT.EVEData
             if (routeNeedsUpdate)
             {
                 routeNeedsUpdate = false;
-                await UpdateActiveRoute();
+                UpdateActiveRoute();
             }
         }
 
@@ -231,20 +275,43 @@ namespace SMT.EVEData
 
             Waypoints.Add(EveManager.Instance.SystemIDToName[systemID]);
 
+
+            UpdateActiveRoute();
+
+
             ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
             esiClient.SetCharacterData(ESIAuthData);
 
-            ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(systemID, false, clear);
+            bool firstRoute = true;
+
+            foreach(Navigation.RoutePoint rp in ActiveRoute)
+            {
+                // explicitly add interim waypoints for ansiblex gates or actual waypoints
+                if(rp.GateToTake == Navigation.GateType.Ansibex || Waypoints.Contains(rp.SystemName))
+                {
+                    long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
+                    ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(wayPointSysID, false, firstRoute);
+                    if (EVEData.ESIHelpers.ValidateESICall<string>(esr))
+                    {
+                        routeNeedsUpdate = true;
+                    }
+
+                    firstRoute = false;
+                }
+            }
+/*
+            ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(systemID, false, true);
             if(EVEData.ESIHelpers.ValidateESICall<string>(esr))
             {
                 routeNeedsUpdate = true;
             }
+*/
         }
 
         /// <summary>
         /// Update the active route for the character
         /// </summary>
-        private async Task UpdateActiveRoute()
+        private void UpdateActiveRoute()
         {
 
             if (Waypoints.Count == 0)
@@ -252,8 +319,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-            esiClient.SetCharacterData(ESIAuthData);
+            // new routing
 
             string start = string.Empty;
             string end = Location;
@@ -274,32 +340,26 @@ namespace SMT.EVEData
                 start = end;
                 end = Waypoints[i];
 
-                EVEData.System startSys = EveManager.Instance.GetEveSystem(start);
-                EVEData.System endSys = EveManager.Instance.GetEveSystem(end);
+                List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, NavigationMode);
 
-
-                ESI.NET.EsiResponse<int[]> esr = await esiClient.Routes.Map((int)startSys.ID, (int)endSys.ID);
-
-                if(EVEData.ESIHelpers.ValidateESICall<int[]>(esr))
+                if(sysList != null)
                 {
-                    foreach(int j in esr.Data)
-                    {
-                        string sysName = EveManager.Instance.SystemIDToName[j];
 
+                    foreach(Navigation.RoutePoint s in sysList)
+                    {
                         Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
-                            ActiveRoute.Add(sysName);
+                            ActiveRoute.Add(s);
                         }), DispatcherPriority.ApplicationIdle);
                     }
                 }
-
             }
 
         }
 
-        /// <summary>
-        /// Refresh the ESI access token
-        /// </summary>
+            /// <summary>
+            /// Refresh the ESI access token
+            /// </summary>
         private async Task RefreshAccessToken()
         {
             if(String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)

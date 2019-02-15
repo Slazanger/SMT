@@ -1556,6 +1556,9 @@ namespace SMT
                 return;
 
             Brush RouteBrush = new SolidColorBrush(Colors.Yellow);
+            Brush RouteAnsiblexBrush = new SolidColorBrush(Colors.DarkMagenta);
+
+
             Brush WaypointBrush = new SolidColorBrush(Colors.DarkGray);
 
             // no active route
@@ -1567,10 +1570,10 @@ namespace SMT
             string Start = "";
             string End = ActiveCharacter.Location;
 
-            for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
+            for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
             {
                 Start = End;
-                End = ActiveCharacter.ActiveRoute[i];
+                End = ActiveCharacter.ActiveRoute[i].SystemName;
 
                 if (!(Region.IsSystemOnMap(Start) && Region.IsSystemOnMap(End)))
                 {
@@ -1592,7 +1595,15 @@ namespace SMT
 
                 routeLine.StrokeThickness = 5;
                 routeLine.Visibility = Visibility.Visible;
-                routeLine.Stroke = RouteBrush;
+                if(ActiveCharacter.ActiveRoute[i-1].GateToTake == Navigation.GateType.Ansibex)
+                {
+                    routeLine.Stroke = RouteAnsiblexBrush;
+                }
+                else
+                {
+                    routeLine.Stroke = RouteBrush;
+                }
+
 
                 DoubleCollection dashes = new DoubleCollection();
                 dashes.Add(1.0);
