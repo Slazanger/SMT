@@ -242,13 +242,13 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Character info
         /// </summary>
-        public async Task Update()
+        public void Update()
         {
             TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
             if (ts.Minutes < 0)
             {
-                await RefreshAccessToken();
-                await UpdateInfoFromESI();
+                RefreshAccessToken().Wait();
+                UpdateInfoFromESI().Wait();
             }
 
             UpdatePositionFromESI();
@@ -370,7 +370,7 @@ namespace SMT.EVEData
             SsoToken sst;
             AuthorizedCharacterData acd;
             sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
-            if(sst.RefreshToken == null)
+            if(sst == null || sst.RefreshToken == null)
             {
                 return;
             }
@@ -436,7 +436,7 @@ namespace SMT.EVEData
                 esiClient.SetCharacterData(ESIAuthData);
 
 
-                if (CorporationID == -1 || AllianceID == -1)
+ //               if (CorporationID == -1 || AllianceID == -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esr = await esiClient.Character.Information((int)ID);
 

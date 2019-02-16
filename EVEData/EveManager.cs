@@ -1749,7 +1749,7 @@ namespace SMT.EVEData
         /// </summary>
         private void StartUpdateCharacterThread()
         {
-            new Thread(async () =>
+            new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
 
@@ -1759,7 +1759,7 @@ namespace SMT.EVEData
                     for (int i = 0; i < LocalCharacters.Count; i++)
                     {
                         LocalCharacter c = LocalCharacters.ElementAt(i);
-                        await c.Update();
+                        c.Update();
                     }
 
                     Thread.Sleep(2000);
