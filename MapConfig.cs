@@ -306,6 +306,24 @@ namespace SMT
         }
 
 
+        private bool m_ShowCoalition;
+        [Category("SOV")]
+        [DisplayName("Show Coalition")]
+        public bool ShowCoalition
+        {
+            get
+            {
+                return m_ShowCoalition;
+            }
+
+            set
+            {
+                m_ShowCoalition = value;
+                OnPropertyChanged("ShowCoalition");
+            }
+        }
+
+
         private bool m_ShowADM;
         [Category("SOV")]
         [DisplayName("Show ADM")]
@@ -322,7 +340,6 @@ namespace SMT
                 OnPropertyChanged("ShowADM");
             }
         }
-
 
 
 

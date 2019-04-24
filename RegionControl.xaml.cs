@@ -637,6 +637,26 @@ namespace SMT
 
             foreach (EVEData.MapSystem system in Region.MapSystems.Values.ToList())
             {
+
+                Coalition SystemCoalition = null;
+                if (system.ActualSystem.SOVAlliance != 0)
+                {
+                    foreach (Coalition c in EM.Coalitions)
+                    {
+                        foreach (long l in c.MemberAlliances)
+                        {
+                            if (l == system.ActualSystem.SOVAlliance)
+                            {
+                                SystemCoalition = c;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                string SystemSubText = string.Empty;
+
+
                 // add circle for system
                 Polygon systemShape = new Polygon();
                 systemShape.StrokeThickness = 1.5;
@@ -989,21 +1009,43 @@ namespace SMT
                 }
 
 
-                if ((ShowSovOwner) && system.ActualSystem.SOVAlliance != 0 && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
+                if ((ShowSovOwner || MapConf.ShowCoalition) && system.ActualSystem.SOVAlliance != 0 && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
                 {
                     Label sysRegionText = new Label();
 
-                    string content = "";
                     string allianceName = EM.GetAllianceName(system.ActualSystem.SOVAlliance);
                     string allianceTicker = EM.GetAllianceTicker(system.ActualSystem.SOVAlliance);
-                    content = allianceTicker;
+                    string coalitionName = string.Empty;
+
+                    string content = allianceTicker;
+
+
+                    if (MapConf.ShowCoalition && SystemCoalition != null)
+                    {
+                        content = SystemCoalition.Name + " (" + allianceTicker +  ")";
+                    }
+
+                    if(SystemSubText != string.Empty)
+                    {
+                        SystemSubText += "\n";
+                    }
+                    SystemSubText += content;
+
+
+                    if (!AlliancesKeyList.Contains(system.ActualSystem.SOVAlliance))
+                    {
+                        AlliancesKeyList.Add(system.ActualSystem.SOVAlliance);
+                    }
+
+
+                    /*
 
                     sysRegionText.Content = content;
                     sysRegionText.FontSize = SYSTEM_TEXT_TEXT_SIZE;
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
 
                     Canvas.SetLeft(sysRegionText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
-                    Canvas.SetTop (sysRegionText, system.LayoutY + SYSTEM_REGION_TEXT_Y_OFFSET);
+                    Canvas.SetTop (sysRegionText, system.LayoutY + SYSTEM_REGION_TEXT_Y_OFFSET + 9);
                     Canvas.SetZIndex(sysRegionText, SYSTEM_Z_INDEX);
 
                     MainCanvas.Children.Add(sysRegionText);
@@ -1014,9 +1056,10 @@ namespace SMT
                     {
                         AlliancesKeyList.Add(system.ActualSystem.SOVAlliance);
                     }
+                    */
                 }
 
-                if(!MapConf.ShowJumpDistance)
+                if (!MapConf.ShowJumpDistance)
                 {
                     BridgeInfoL1.Content = string.Empty;
                     BridgeInfoL2.Content = string.Empty;
@@ -1125,18 +1168,26 @@ namespace SMT
 
                 if (system.OutOfRegion)
                 {
+                    /*
                     Label sysRegionText = new Label();
                     sysRegionText.Content = "(" + system.Region + ")";
                     sysRegionText.FontSize = SYSTEM_TEXT_TEXT_SIZE;
                     sysRegionText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
 
+                    
                     Canvas.SetLeft(sysRegionText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
                     Canvas.SetTop(sysRegionText, system.LayoutY + regionMarkerOffset);
                     Canvas.SetZIndex(sysRegionText, SYSTEM_Z_INDEX);
 
                     MainCanvas.Children.Add(sysRegionText);
 
+                    */
 
+                    if(SystemSubText != string.Empty)
+                    {
+                        SystemSubText += "\n";
+                    }
+                    SystemSubText += "(" + system.Region + ")";
                     
                     Polygon poly = new Polygon();
 
@@ -1155,6 +1206,21 @@ namespace SMT
                     MainCanvas.Children.Add(poly);
 
                     
+                }
+
+                if(SystemSubText != string.Empty)
+                {
+                    Label sysSubText = new Label();
+                    sysSubText.Content = SystemSubText;
+                    sysSubText.FontSize = SYSTEM_TEXT_TEXT_SIZE;
+                    sysSubText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+
+
+                    Canvas.SetLeft(sysSubText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
+                    Canvas.SetTop(sysSubText, system.LayoutY + regionMarkerOffset);
+                    Canvas.SetZIndex(sysSubText, SYSTEM_Z_INDEX);
+
+                    MainCanvas.Children.Add(sysSubText);
                 }
             }
 
@@ -1298,9 +1364,17 @@ namespace SMT
                         Canvas.SetZIndex(path, 19);
 
                         MainCanvas.Children.Add(path);
+
+
+
                     }
+
                 }
+
+
+
             }
+
             if(AlliancesKeyList.Count > 0)
             {
                 AllianceNameList.Visibility = Visibility.Visible;
@@ -1763,6 +1837,28 @@ namespace SMT
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
+
+                //                     
+                Coalition SystemCoalition = null;
+                if ( sys.ActualSystem.SOVAlliance != 0)
+                {
+                    foreach (Coalition c in EM.Coalitions)
+                    {
+                        foreach (long l in c.MemberAlliances)
+                        {
+                            if (l == sys.ActualSystem.SOVAlliance)
+                            {
+                                SystemCoalition = c;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+
+
+
                 int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
                 int podKillsLastHour = sys.ActualSystem.PodKillsLastHour;
                 int shipKillsLastHour = sys.ActualSystem.ShipKillsLastHour;
@@ -1952,129 +2048,33 @@ namespace SMT
                         DynamicMapElements.Add(poly);
                     }
                 }
-            }
-
-            /* New Merge of Poly's, doesnt 100% fold down
-            if(!OldRender && ShowStandings && ActiveCharacter != null && ActiveCharacter.ESILinked )
-            {
-                Dictionary<float, List<MapSystem>> StandingsDict = new Dictionary<float, List<MapSystem>>();
-                StandingsDict[-10.0f] = new List<MapSystem>();
-                StandingsDict[-5.0f] = new List<MapSystem>();
-                StandingsDict[0.0f] = new List<MapSystem>();
-                StandingsDict[5.0f] = new List<MapSystem>();
-                StandingsDict[10.0f] = new List<MapSystem>();
 
 
-                
-                foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
+                if (sys.ActualSystem.SOVAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null)
                 {
-                    if (sys.ActualSystem.SOVAlliance != null)
+
+                    Polygon poly = new Polygon();
+                    poly.Fill = new SolidColorBrush(SystemCoalition.CoalitionColor); 
+                    poly.SnapsToDevicePixels = true;
+                    poly.Stroke = poly.Fill;
+                    poly.StrokeThickness = 0.4;
+                    poly.StrokeDashCap = PenLineCap.Round;
+                    poly.StrokeLineJoin = PenLineJoin.Round;
+
+                    foreach (Point p in sys.CellPoints)
                     {
-                        float Standing = 0.0f;
-                        if (ActiveCharacter.AllianceID != null && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAlliance)
-                        {
-                            Standing = 10.0f ;
-                        }
-
-                        if (sys.ActualSystem.SOVCorp != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
-                        {
-                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
-                        }
-
-                        if (sys.ActualSystem.SOVAlliance != null && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
-                        {
-                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAlliance];
-                        }
-
-                        StandingsDict[Standing].Add(sys);
+                        poly.Points.Add(p);
                     }
+
+
+                    MainCanvas.Children.Add(poly);
+
+                    // save the dynamic map elements
+                    DynamicMapElements.Add(poly);
                 }
 
-                foreach(KeyValuePair<float, List<MapSystem>> kvp in StandingsDict)
-                {
-                    float Standing = kvp.Key;
-                    List<MapSystem> StandingsList = kvp.Value;
-                    Brush br = null;
-                    if(Standing == 0.0f)
-                    {
-                        continue;
-                    }
-
-                    if(StandingsList.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    if (Standing == -10.0)
-                    {
-                        br = StandingVBadBrush;
-                    }
-
-                    if (Standing == -5.0)
-                    {
-                        br = StandingBadBrush;
-                    }
-
-                    if (Standing == 5.0)
-                    {
-                        br = StandingGoodBrush;
-                    }
-
-                    if (Standing == 10.0)
-                    {
-                        br = StandingVGoodBrush;
-                    }
-
-                    // build up the poly list 
-                    GeometryGroup gg = new GeometryGroup();
-                    //PathGeometry gg = new PathGeometry();
-
-                    foreach ( MapSystem ms in StandingsList)
-                    {
-                        PathGeometry g = new PathGeometry();
-                        PathFigure pf = new PathFigure();
-                        g.FillRule = FillRule.Nonzero;
-
-                        pf.StartPoint = ms.CellPoints[0];
-                        pf.IsClosed = true;
-                        pf.IsFilled = true;
-
-                        for(int i = 1; i < ms.CellPoints.Count; i++)
-                        {
-                            LineSegment pls = new LineSegment();
-                            pls.Point = ms.CellPoints[i];
-                            pf.Segments.Add(pls);
-                        }
-                        g.Figures.Add(pf);                       
-                        gg.Children.Add(g);
-                    }
-                    gg.FillRule = FillRule.Nonzero;
-
-                    PathGeometry gTest = gg.Children[0] as PathGeometry;
-                    for(int i = 1; i < gg.Children.Count;i++)
-                    {
-                        gTest = PathGeometry.Combine(gg.Children[i], gTest, GeometryCombineMode.Union, Transform.Identity, 0.25, ToleranceType.Relative);
-
-                    }
-
-
-
-                    Path standingsPath = new Path();
-                    standingsPath.Fill = br;
-                    standingsPath.Data = gg;
-                    standingsPath.Stroke = new SolidColorBrush(Colors.Black);
-
-
-
-                    DynamicMapElements.Add(standingsPath);
-                    MainCanvas.Children.Add(standingsPath);
-
-
-
-                }
 
             }
-            */
 
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
             {

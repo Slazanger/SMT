@@ -201,7 +201,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EVEData\Coalition.cs" />
     <Compile Include="EVEData\ESI\CharacterIDData.cs" />
+    <Compile Include="EVEData\ESI\CoalitionInfo.cs" />
     <Compile Include="EVEData\ESI\ESIHelper.cs" />
     <Compile Include="EVEData\ESI\EveTrace.cs" />
     <Compile Include="EVEData\ESI\IncursionData.cs" />

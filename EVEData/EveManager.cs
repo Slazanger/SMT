@@ -23,6 +23,7 @@ using ESI.NET;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace SMT.EVEData
 {
@@ -187,6 +188,9 @@ namespace SMT.EVEData
         /// Gets or sets the current list of Jump Bridges
         /// </summary>
         public List<JumpBridge> JumpBridges { get; set; }
+
+        
+        public List<Coalition> Coalitions { get; set; }
 
         /// <summary>
         /// Gets or sets the Name to System dictionary
@@ -415,10 +419,12 @@ namespace SMT.EVEData
             {
                 outputLog.Info("adding file watcher to : {0}", eveLogFolder);
 
-                intelFileWatcher = new FileSystemWatcher(eveLogFolder);
-                intelFileWatcher.Filter = "*.txt";
-                intelFileWatcher.EnableRaisingEvents = true;
-                intelFileWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
+                intelFileWatcher = new FileSystemWatcher(eveLogFolder)
+                {
+                    Filter = "*.txt",
+                    EnableRaisingEvents = true,
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
+                };
                 intelFileWatcher.Changed += IntelFileWatcher_Changed;
             }
 
@@ -592,8 +598,10 @@ namespace SMT.EVEData
                 }
 
                 // parse the svg as xml
-                XmlDocument xmldoc = new XmlDocument();
-                xmldoc.XmlResolver = null;
+                XmlDocument xmldoc = new XmlDocument
+                {
+                    XmlResolver = null
+                };
                 FileStream fs = new FileStream(localSVG, FileMode.Open, FileAccess.Read);
                 xmldoc.Load(fs);
 
@@ -1333,6 +1341,8 @@ namespace SMT.EVEData
 
             InitZKillFeed();
 
+            StartUpdateCoalitionInfo();
+
 
             StartLowFreqUpdateThread();
             StartHighFreqUpdateThread();
@@ -1648,6 +1658,67 @@ namespace SMT.EVEData
             {
             }
         }
+
+
+        private void StartUpdateCoalitionInfo()
+        {
+
+            Coalitions = new List<Coalition>();
+
+
+            string url = @"http://rischwa.net/api/coalitions/current";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(UpdateCoalitionInfoCallback), request);
+        }
+
+        private void UpdateCoalitionInfoCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        var coalitions = CoalitionData.CoalitionInfo.FromJson(strContent);
+
+                        if (coalitions != null)
+                        {
+                            foreach (CoalitionData.Coalition cd in coalitions.Coalitions)
+                            {
+                                Coalition c = new Coalition();
+                                c.Name = cd.Name;
+                                c.ID = cd.Id;
+                                c.MemberAlliances = new List<long>();
+                                c.CoalitionColor = (Color)ColorConverter.ConvertFromString(cd.Color);
+                                //c.CoalitionBrush = new SolidColorBrush(c.CoalitionColor);
+
+                                foreach (CoalitionData.Alliance a in cd.Alliances)
+                                {
+                                    c.MemberAlliances.Add(a.Id);
+                                }
+
+                                Coalitions.Add(c);
+                            }
+
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
 
         private void StartUpdateStructureHunterUpdate()
         {

@@ -34,8 +34,6 @@ namespace SMT.EVEData
             public double Z;
 
             public int F;
-            public int G;
-            public int H;
 
             public MapNode NearestToStart;
 
