@@ -367,27 +367,32 @@ namespace SMT.EVEData
                 return;
             }
 
-            SsoToken sst;
-            AuthorizedCharacterData acd;
-            sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
-            if(sst == null || sst.RefreshToken == null)
+            try
             {
-                return;
+                SsoToken sst;
+                AuthorizedCharacterData acd;
+                sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
+                if (sst == null || sst.RefreshToken == null)
+                {
+                    return;
+                }
+
+                acd = await EveManager.Instance.ESIClient.SSO.Verify(sst);
+
+                if (String.IsNullOrEmpty(acd.Token))
+                {
+                    return;
+                }
+
+                ESIAccessToken = acd.Token;
+                ESIAccessTokenExpiry = acd.ExpiresOn;
+                ESIRefreshToken = acd.RefreshToken;
+                ESILinked = true;
+                ESIAuthData = acd;
+
             }
 
-            acd = await EveManager.Instance.ESIClient.SSO.Verify(sst);
-   
-            if (String.IsNullOrEmpty(acd.Token))
-            {
-                return;
-            }
-
-            ESIAccessToken = acd.Token;
-            ESIAccessTokenExpiry = acd.ExpiresOn;
-            ESIRefreshToken = acd.RefreshToken;
-            ESILinked = true;
-            ESIAuthData = acd;
-
+            catch { }
         }
 
         /// <summary>
@@ -455,6 +460,9 @@ namespace SMT.EVEData
                     do
                     {
                         page++;
+
+
+                        // SJS here.. list modifeied exception
 
                         esiClient.SetCharacterData(ESIAuthData);
                         ESI.NET.EsiResponse<List<ESI.NET.Models.Contacts.Contact>> esr = await esiClient.Contacts.ListForAlliance(page);

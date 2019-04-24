@@ -19,12 +19,19 @@ namespace SMT
 
         static public T DeserializeFromDisk<T>(string filename)
         {
-            XmlSerializer xms = new XmlSerializer(typeof(T));
+            try
+            {
+                XmlSerializer xms = new XmlSerializer(typeof(T));
 
-            FileStream fs = new FileStream(filename, FileMode.Open);
-            XmlReader xmlr = XmlReader.Create(fs);
+                FileStream fs = new FileStream(filename, FileMode.Open);
+                XmlReader xmlr = XmlReader.Create(fs);
 
-            return (T)xms.Deserialize(xmlr);
+                return (T)xms.Deserialize(xmlr);
+            }
+            catch
+            {
+                return default(T);
+            }
         }
 
         public static Encoding GetEncoding(string filename)

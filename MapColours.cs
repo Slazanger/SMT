@@ -82,8 +82,13 @@ namespace SMT
         public Color ESIOverlayColour { get; set; }
 
         [Category("Intel")]
-        [DisplayName("Overlay")]
+        [DisplayName("Warning")]
         public Color IntelOverlayColour { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Clear")]
+        public Color IntelClearOverlayColour { get; set; }
+
 
         [Category("Navigation")]
         [DisplayName("In Range")]

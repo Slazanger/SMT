@@ -1282,11 +1282,18 @@ namespace SMT
                         da.From = 0;
                         da.To = 200;
                         da.By = 2;
-                        da.Duration = new Duration(TimeSpan.FromSeconds(90));
+                        da.Duration = new Duration(TimeSpan.FromSeconds(100));
                         da.RepeatBehavior = RepeatBehavior.Forever;
+                        Timeline.SetDesiredFrameRate(da, 20);
+                        // Storyboard.SetTargetProperty(path, new PropertyPath(Shape.StrokeDashOffsetProperty));
+                        // Storyboard.SetTargetName()
+                        // Storyboard sb = new Storyboard();
+                        // sb.Children.Add(da);
+                        
 
                         path.StrokeDashArray = dashes;
                         path.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                       // path.BeginStoryboard(sb);
 
                         Canvas.SetZIndex(path, 19);
 
@@ -1406,6 +1413,7 @@ namespace SMT
                 da.From = 0;
                 da.To = 360;
                 da.Duration = new Duration(TimeSpan.FromSeconds(12));
+                Timeline.SetDesiredFrameRate(da, 20);
 
                 try
                 {
@@ -1486,6 +1494,8 @@ namespace SMT
                 da.Duration = new Duration(TimeSpan.FromSeconds(12));
                 da.RepeatBehavior = RepeatBehavior.Forever;
 
+                Timeline.SetDesiredFrameRate(da, 20);
+
                 RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
                 eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
                 
@@ -1515,6 +1525,8 @@ namespace SMT
         private void AddSystemIntelOverlay()
         {
             Brush intelBlobBrush = new SolidColorBrush(MapConf.ActiveColourScheme.IntelOverlayColour);
+            Brush intelClearBlobBrush = new SolidColorBrush(MapConf.ActiveColourScheme.IntelClearOverlayColour);
+
             foreach (EVEData.IntelData id in EM.IntelDataList)
             {
                 foreach (string sysStr in id.Systems)
@@ -1535,8 +1547,15 @@ namespace SMT
                         double circleOffset = radius / 2;
 
                         Shape intelShape = new Ellipse() { Height = radius, Width = radius };
-
-                        intelShape.Fill = intelBlobBrush;
+                        if(id.ClearNotification)
+                        {
+                            intelShape.Fill = intelClearBlobBrush;
+                        }
+                        else
+                        {
+                            intelShape.Fill = intelBlobBrush;
+                        }
+                        
                         Canvas.SetLeft(intelShape, sys.LayoutX - circleOffset);
                         Canvas.SetTop(intelShape, sys.LayoutY - circleOffset);
                         Canvas.SetZIndex(intelShape, 15);
@@ -1618,6 +1637,7 @@ namespace SMT
                 da.By = 2;
                 da.Duration = new Duration(TimeSpan.FromSeconds(40));
                 da.RepeatBehavior = RepeatBehavior.Forever;
+                Timeline.SetDesiredFrameRate(da, 20);
 
                 routeLine.StrokeDashArray = dashes;
                 routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);

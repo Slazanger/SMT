@@ -369,6 +369,8 @@ namespace SMT
             defaultColours.MapBackgroundColour = (Color)ColorConverter.ConvertFromString("#5E615E");
             defaultColours.ESIOverlayColour = Color.FromRgb(188, 143, 143);
             defaultColours.IntelOverlayColour = Color.FromRgb(178, 34, 34);
+            defaultColours.IntelClearOverlayColour = Colors.Orange;
+
             defaultColours.NormalGateColour = Color.FromRgb(255, 248, 220);
             defaultColours.ConstellationGateColour = Color.FromRgb(128, 128, 128);
             defaultColours.SelectedSystemColour = Color.FromRgb(255, 255, 255);
@@ -407,6 +409,7 @@ namespace SMT
             blueColours.MapBackgroundColour = Color.FromRgb(245, 245, 245);
             blueColours.ESIOverlayColour = Color.FromRgb(192, 192, 192);
             blueColours.IntelOverlayColour = Color.FromRgb(216, 191, 216);
+            blueColours.IntelClearOverlayColour = Colors.Orange;
             blueColours.NormalGateColour = Color.FromRgb(90, 90, 90);
             blueColours.ConstellationGateColour = Color.FromRgb(120, 120, 120);
             blueColours.SelectedSystemColour = Color.FromRgb(0, 0, 0);
@@ -441,6 +444,7 @@ namespace SMT
             greyAndRed.MapBackgroundColour = Color.FromRgb(245, 245, 245);
             greyAndRed.ESIOverlayColour = Color.FromRgb(192, 192, 192);
             greyAndRed.IntelOverlayColour = Color.FromRgb(80, 34, 34);
+            greyAndRed.IntelClearOverlayColour = Colors.Orange;
             greyAndRed.NormalGateColour = Color.FromRgb(80, 80, 80);
             greyAndRed.ConstellationGateColour = Color.FromRgb(120, 120, 120);
             greyAndRed.SelectedSystemColour = Color.FromRgb(0, 0, 0);
@@ -475,6 +479,7 @@ namespace SMT
             dark.MapBackgroundColour = Color.FromRgb(20, 20, 20);
             dark.ESIOverlayColour = Color.FromRgb(209, 201, 202);
             dark.IntelOverlayColour = Color.FromRgb(205, 92, 92);
+            dark.IntelClearOverlayColour = Colors.Orange;
             dark.NormalGateColour = Color.FromRgb(192, 192, 192);
             dark.ConstellationGateColour = Color.FromRgb(150, 150, 150);
             dark.SelectedSystemColour = Color.FromRgb(255, 255, 255);
@@ -508,6 +513,7 @@ namespace SMT
             lateNight.MapBackgroundColour = Color.FromRgb(32, 32, 32);
             lateNight.ESIOverlayColour = Color.FromRgb(81, 81, 81);
             lateNight.IntelOverlayColour = Color.FromRgb(178, 34, 34);
+            lateNight.IntelClearOverlayColour = Colors.Orange;
             lateNight.NormalGateColour = Color.FromRgb(255, 248, 220);
             lateNight.ConstellationGateColour = Color.FromRgb(128, 128, 128);
             lateNight.SelectedSystemColour = Color.FromRgb(173, 255, 47);

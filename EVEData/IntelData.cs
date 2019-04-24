@@ -25,6 +25,8 @@ namespace SMT.EVEData
             IntelString.Trim();
             IntelTime = DateTime.Now;
             Systems = new List<string>();
+            ClearNotification = false;
+
         }
 
         /// <summary>
@@ -48,5 +50,7 @@ namespace SMT.EVEData
         public List<string> Systems { get; set; }
 
         public override string ToString() => "[" + IntelTime.ToString("HH:mm") + "] " + IntelString;
+
+        public bool ClearNotification { get; set; }
     }
 }

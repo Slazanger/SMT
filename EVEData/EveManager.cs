@@ -154,6 +154,8 @@ namespace SMT.EVEData
         /// </summary>
         public BindingList<EVEData.IntelData> IntelDataList { get; set; }
 
+
+
         /// <summary>
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
@@ -195,6 +197,12 @@ namespace SMT.EVEData
         /// Gets or sets the current list of intel filters used to monitor the local log files
         /// </summary>
         private List<string> IntelFilters { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current list of clear markers for the intel (eg "Clear" "Clr" etc)
+        /// </summary>
+        private List<string> IntelClearFilters { get; set; }
+
 
         public EveTrace.EveTraceFleetInfo FleetIntel;
 
@@ -335,22 +343,19 @@ namespace SMT.EVEData
                     string[] jbbits = line.Split(' ');
 
                     // malformed line
-                    if (jbbits.Length < 5)
+                    if (jbbits.Length < 3)
                     {
                         continue;
                     }
 
                     // in the form :
-                    // FromSystem FromPlanetMoon <-> ToSystem ToPlanetMoon
+                    // FromSystem --> ToSystem
                     string from = jbbits[0];
-                    string fromData = jbbits[1];
-
-                    string to = jbbits[3];
-                    string toData = jbbits[4];
+                    string to = jbbits[2];
 
                     if (DoesSystemExist(from) && DoesSystemExist(to))
                     {
-                        JumpBridges.Add(new JumpBridge(from, fromData, to, toData, friendly));
+                        JumpBridges.Add(new JumpBridge(from, to, friendly));
                     }
                 }
             }
@@ -380,6 +385,28 @@ namespace SMT.EVEData
                     }
                 }
             }
+
+
+            IntelClearFilters = new List<string>();
+            string intelClearFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelClearFilters.txt";
+
+            outputLog.Info("intelClearFileFilter Intel Filter File from  {0}", intelClearFileFilter);
+            if (File.Exists(intelClearFileFilter))
+            {
+                StreamReader file = new StreamReader(intelClearFileFilter);
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    line.Trim();
+                    if (line != string.Empty)
+                    {
+                        outputLog.Info("adding clear intel filer : {0}", line);
+                        IntelClearFilters.Add(line);
+                    }
+                }
+            }
+
+
 
             intelFileReadPos = new Dictionary<string, int>();
 
@@ -970,7 +997,8 @@ namespace SMT.EVEData
             {
                 AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
             }
-            else
+
+            if(AllianceIDToName == null)
             {
                 AllianceIDToName = new SerializableDictionary<long, string>();
             }
@@ -979,7 +1007,8 @@ namespace SMT.EVEData
             {
                 AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
             }
-            else
+
+            if(AllianceIDToTicker == null)
             {
                 AllianceIDToTicker = new SerializableDictionary<long, string>();
             }
@@ -1152,16 +1181,56 @@ namespace SMT.EVEData
         /// </summary>
         public async void ResolveAllianceIDs(List<long> IDs)
         {
+            if(IDs.Count == 0 )
+            {
+                return;
+            }
 
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(IDs);
+            if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+            {
+                foreach(ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                {
+                    if(ri.Category == "alliance")
+                    {
+                        ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
+
+
+                        if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
+                        {
+                            AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
+                            AllianceIDToName[ri.Id] = esraA.Data.Name;
+                        }
+                        else
+                        {
+                            AllianceIDToTicker[ri.Id] = "???????????????";
+                            AllianceIDToName[ri.Id] = "?????";
+
+                        }
+                    }
+                }
+            }
+
+
+            /*
             foreach(long id in IDs)
             {
                 ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esra = await ESIClient.Alliance.Information((int)id);
+
+                
                 if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esra))
                 {
                     AllianceIDToTicker[id] = esra.Data.Ticker;
                     AllianceIDToName[id] = esra.Data.Name;
                 }
+                else
+                {
+                    AllianceIDToTicker[id] = "???????????????";
+                    AllianceIDToName[id] = "?????";
+
+                }
             }
+            */
         }
 
 
@@ -1490,6 +1559,15 @@ namespace SMT.EVEData
                                         {
                                             continue;
                                         }
+
+                                        foreach(String clearMarker in IntelClearFilters)
+                                        {
+                                            if(clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                            {
+                                                id.ClearNotification = true;
+                                            }
+                                        }
+
                                         foreach(System sys in Systems)
                                         {
                                             if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
