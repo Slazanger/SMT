@@ -549,8 +549,11 @@ namespace SMT
             EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null)
             {
-                c.ActiveRoute.Clear();
-                c.Waypoints.Clear();
+                lock(c.ActiveRouteLock)
+                {
+                    c.ActiveRoute.Clear();
+                    c.Waypoints.Clear();
+                }
             }
         }
 

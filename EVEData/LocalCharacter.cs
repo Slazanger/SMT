@@ -29,12 +29,18 @@ namespace SMT.EVEData
         /// </summary>
         private string location;
 
+        [XmlIgnoreAttribute]
+        public object ActiveRouteLock;
+
         
 
         /// <summary>
         /// Does the route need updating
         /// </summary>
         private bool routeNeedsUpdate = false;
+
+
+        private bool esiRouteNeedsUpdate = false;
 
         /// <summary>
         /// Gets or sets the The location of the local file bound to this session's "Local" chat channel
@@ -133,11 +139,10 @@ namespace SMT.EVEData
                 m_UseAnsiblexGates = value;
                 routeNeedsUpdate = true;
             }
-
         }
 
 
-        private RoutingMode m_NavigationMode;
+    private RoutingMode m_NavigationMode;
 
         public RoutingMode NavigationMode
         {
@@ -193,6 +198,8 @@ namespace SMT.EVEData
             Waypoints = new ObservableCollection<string>();
             ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
             DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
+
+            ActiveRouteLock = new object();
         }
 
         /// <summary>
@@ -221,6 +228,8 @@ namespace SMT.EVEData
 
             Waypoints = new ObservableCollection<string>();
             ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
+
+            ActiveRouteLock = new object();
         }
 
 
@@ -265,96 +274,120 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="systemID">System to set destination to</param>
         /// <param name="clear">Clear all waypoints before setting?</param>
-        public async void AddDestination(long systemID, bool clear)
+        public void AddDestination(long systemID, bool clear)
         {
-            if (clear)
+            lock (ActiveRouteLock)
             {
-                Waypoints.Clear();
-                ActiveRoute.Clear();
+                if (clear)
+                {
+                    Waypoints.Clear();
+                    ActiveRoute.Clear();
+                }
+
+
             }
 
             Waypoints.Add(EveManager.Instance.SystemIDToName[systemID]);
 
-
-            UpdateActiveRoute();
-
-
-            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-            esiClient.SetCharacterData(ESIAuthData);
-
-            bool firstRoute = true;
-
-            foreach(Navigation.RoutePoint rp in ActiveRoute)
-            {
-                // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                if(rp.GateToTake == Navigation.GateType.Ansibex || Waypoints.Contains(rp.SystemName))
-                {
-                    long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
-                    ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(wayPointSysID, false, firstRoute);
-                    if (EVEData.ESIHelpers.ValidateESICall<string>(esr))
-                    {
-                        routeNeedsUpdate = true;
-                    }
-
-                    firstRoute = false;
-                }
-            }
-/*
-            ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(systemID, false, true);
-            if(EVEData.ESIHelpers.ValidateESICall<string>(esr))
-            {
-                routeNeedsUpdate = true;
-            }
-*/
+            routeNeedsUpdate = true;
+            esiRouteNeedsUpdate = true;
         }
 
         /// <summary>
         /// Update the active route for the character
         /// </summary>
-        private void UpdateActiveRoute()
+        private async void UpdateActiveRoute()
         {
-
             if (Waypoints.Count == 0)
             {
                 return;
             }
 
-            // new routing
 
-            string start = string.Empty;
-            string end = Location;
-
-            Application.Current.Dispatcher.Invoke((Action)(() =>
+            lock (ActiveRouteLock)
             {
-                if (Location == Waypoints[0])
+                // new routing
+
+                string start = string.Empty;
+                string end = Location;
+
+                Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
-                    Waypoints.RemoveAt(0);
-                }
-
-                ActiveRoute.Clear();
-            }), DispatcherPriority.ApplicationIdle);
-
-            // loop through all the waypoints and query ESI for the route
-            for (int i = 0; i < Waypoints.Count; i++)
-            {
-                start = end;
-                end = Waypoints[i];
-
-                List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, NavigationMode);
-
-                if(sysList != null)
-                {
-
-                    foreach(Navigation.RoutePoint s in sysList)
+                    if (Location == Waypoints[0])
                     {
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        Waypoints.RemoveAt(0);
+                    }
+
+                    ActiveRoute.Clear();
+                }), DispatcherPriority.ApplicationIdle);
+
+                // loop through all the waypoints and query ESI for the route
+                for (int i = 0; i < Waypoints.Count; i++)
+                {
+                    start = end;
+                    end = Waypoints[i];
+
+                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, NavigationMode);
+
+                    if (sysList != null)
+                    {
+
+                        foreach (Navigation.RoutePoint s in sysList)
                         {
-                            ActiveRoute.Add(s);
-                        }), DispatcherPriority.ApplicationIdle);
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                ActiveRoute.Add(s);
+                            }), DispatcherPriority.ContextIdle, null);
+                        }
                     }
                 }
+
             }
 
+            if(esiRouteNeedsUpdate)
+            {
+
+                esiRouteNeedsUpdate = false;
+
+
+
+
+
+                List<long> WayPointsToAdd = new List<long>();
+
+
+                lock (ActiveRouteLock)
+                {
+                    foreach (Navigation.RoutePoint rp in ActiveRoute)
+                    {
+                        // explicitly add interim waypoints for ansiblex gates or actual waypoints
+                        if (rp.GateToTake == Navigation.GateType.Ansibex || Waypoints.Contains(rp.SystemName))
+                        {
+                            long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
+                            WayPointsToAdd.Add(wayPointSysID);
+
+                        }
+                    }
+                }
+
+                bool firstRoute = true;
+
+
+                foreach (long SysID in WayPointsToAdd)
+                {
+                    ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                    esiClient.SetCharacterData(ESIAuthData);
+
+                    ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(SysID, false, firstRoute);
+                    if (EVEData.ESIHelpers.ValidateESICall<string>(esr))
+                    {
+//                        routeNeedsUpdate = true;
+                    }
+                    firstRoute = false;
+
+                    //Thread.Sleep(50);
+                }
+            }
         }
 
             /// <summary>
@@ -405,23 +438,27 @@ namespace SMT.EVEData
                 return;
             }
 
-            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-            esiClient.SetCharacterData(ESIAuthData);
-            ESI.NET.EsiResponse<ESI.NET.Models.Location.Location> esr = await esiClient.Location.Location();
-
-            if(ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
+            try
             {
-                Location = EveManager.Instance.SystemIDToName[esr.Data.SolarSystemId];
-                System s = EVEData.EveManager.Instance.GetEveSystem(Location);
-                if (s != null)
+                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                esiClient.SetCharacterData(ESIAuthData);
+                ESI.NET.EsiResponse<ESI.NET.Models.Location.Location> esr = await esiClient.Location.Location();
+
+                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
                 {
-                    Region = s.Region;
-                }
-                else
-                {
-                    Region = "";
+                    Location = EveManager.Instance.SystemIDToName[esr.Data.SolarSystemId];
+                    System s = EVEData.EveManager.Instance.GetEveSystem(Location);
+                    if (s != null)
+                    {
+                        Region = s.Region;
+                    }
+                    else
+                    {
+                        Region = "";
+                    }
                 }
             }
+            catch { }
         }
 
 

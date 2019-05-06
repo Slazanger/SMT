@@ -74,7 +74,7 @@ namespace SMT.EVEData
                         Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
                             KillStream.Clear();
-                        }), DispatcherPriority.Normal);
+                        }), DispatcherPriority.ContextIdle, null);
 
                     }
 
@@ -145,7 +145,7 @@ namespace SMT.EVEData
                              Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
                                 KillStream.Insert(0,zs);
-                            }), DispatcherPriority.Normal);
+                            }), DispatcherPriority.ContextIdle, null);
                         }
                         else
                         {
@@ -188,7 +188,7 @@ namespace SMT.EVEData
                                     EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
                                 }
 
-                            }), DispatcherPriority.Normal);
+                            }), DispatcherPriority.ContextIdle, null);
 
                             cleanupCounter = 0;
                         }

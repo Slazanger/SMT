@@ -1141,7 +1141,7 @@ namespace SMT.EVEData
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     LocalCharacters.Add(esiChar);
-                }), DispatcherPriority.ApplicationIdle);
+                }), DispatcherPriority.ContextIdle, null);
             }
 
             esiChar.ESIRefreshToken = acd.RefreshToken;
@@ -1219,26 +1219,6 @@ namespace SMT.EVEData
                 }
             }
 
-
-            /*
-            foreach(long id in IDs)
-            {
-                ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esra = await ESIClient.Alliance.Information((int)id);
-
-                
-                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esra))
-                {
-                    AllianceIDToTicker[id] = esra.Data.Ticker;
-                    AllianceIDToName[id] = esra.Data.Name;
-                }
-                else
-                {
-                    AllianceIDToTicker[id] = "???????????????";
-                    AllianceIDToName[id] = "?????";
-
-                }
-            }
-            */
         }
 
 
@@ -1256,9 +1236,14 @@ namespace SMT.EVEData
             request.Timeout = 20000;
             request.Proxy = null;
 
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                TheraConnections.Clear();
+            }), DispatcherPriority.ContextIdle, null);
+
             request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
 
-            TheraConnections.Clear();
+
         }
 
         /// <summary>
@@ -1334,20 +1319,11 @@ namespace SMT.EVEData
 
             LoadCharacters();
 
-            // start the character update thread
-            StartUpdateCharacterThread();
-
             InitTheraConnections();
-
             InitZKillFeed();
-
             StartUpdateCoalitionInfo();
 
-
-            StartLowFreqUpdateThread();
-            StartHighFreqUpdateThread();
-
-
+            StartBackgroundThread();
         }
 
         /// <summary>
@@ -1483,7 +1459,7 @@ namespace SMT.EVEData
                                         Application.Current.Dispatcher.Invoke((Action)(() =>
                                         {
                                             LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        }), DispatcherPriority.ApplicationIdle);
+                                        }), DispatcherPriority.ContextIdle, null);
 
 
                                     }
@@ -1541,7 +1517,7 @@ namespace SMT.EVEData
                                             c.Location = system;
                                         }
                                     }
-                                }), DispatcherPriority.ApplicationIdle);
+                                }), DispatcherPriority.ContextIdle, null);
                             }
                         }
                         else
@@ -1598,7 +1574,7 @@ namespace SMT.EVEData
                                 {
                                     outputLog.Info("Already have Line : {0} ", line);
                                 }
-                            }), DispatcherPriority.ApplicationIdle);
+                            }), DispatcherPriority.ContextIdle, null);
                         }
 
                         line = file.ReadLine();
@@ -1893,69 +1869,57 @@ namespace SMT.EVEData
         }
 
 
-        /// <summary>
-        /// Start the Character Update Thread
-        /// </summary>
-        private void StartUpdateCharacterThread()
-        {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-
-                // loop forever
-                while (true)
-                {
-                    for (int i = 0; i < LocalCharacters.Count; i++)
-                    {
-                        LocalCharacter c = LocalCharacters.ElementAt(i);
-                        c.Update();
-                    }
-
-                    Thread.Sleep(2000);
-                }
-            }).Start();
-        }
-
 
         /// <summary>
         /// Start the Low Frequency Update Thread
         /// </summary>
-        private void StartLowFreqUpdateThread()
+        private void StartBackgroundThread()
         {
+
+
+
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
 
-                // loop forever
-                while (true)
-                {
-                    UpdateESIUniverseData();
+                TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
+                TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(10);
 
-                    // every 30 mins
-                    Thread.Sleep(1800000);
-                }
-            }).Start();
-        }
+                DateTime NextCharacterUpdate = DateTime.Now;
+                DateTime NextLowFreqUpdate = DateTime.Now;
 
-
-        /// <summary>
-        /// Start the Character Update Thread
-        /// </summary>
-        private void StartHighFreqUpdateThread()
-        {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
 
                 // loop forever
                 while (true)
                 {
+                    // character Update 
+                    if((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)
+                    {
+                        NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
 
-                    UpdateServerInfo();
-                    Thread.Sleep(120000);
+                        for (int i = 0; i < LocalCharacters.Count; i++)
+                        {
+                            LocalCharacter c = LocalCharacters.ElementAt(i);
+                            c.Update();
+                        }
+                    }
+
+
+                    // low frequency update
+                    if((NextLowFreqUpdate - DateTime.Now).Minutes < 0 )
+                    {
+                        NextLowFreqUpdate = DateTime.Now + LowFreqUpdateRate;
+
+                        UpdateESIUniverseData();
+                        UpdateServerInfo();
+                        UpdateTheraConnections();
+                    }
+
+                    Thread.Sleep(100);
                 }
             }).Start();
         }
+
 
         /// <summary>
         /// Start the ESI download for the kill info
@@ -2086,7 +2050,7 @@ namespace SMT.EVEData
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
                                         TheraConnections.Add(tc);
-                                    }), DispatcherPriority.ApplicationIdle);
+                                    }), DispatcherPriority.ContextIdle, null);
                                 }
                             }
                         }
@@ -2101,13 +2065,7 @@ namespace SMT.EVEData
         public CharacterIDs.Character[] BulkUpdateCharacterCache(List<string> charList)
         {
 
-
-
-
             CharacterIDs.CharacterIdData cd = new CharacterIDs.CharacterIdData();
-
-
-
 
             string esiCharString = "[";
             foreach (string s in charList)

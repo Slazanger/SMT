@@ -1663,65 +1663,72 @@ namespace SMT
             string Start = "";
             string End = ActiveCharacter.Location;
 
-            for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
+            try
             {
-                Start = End;
-                End = ActiveCharacter.ActiveRoute[i].SystemName;
-
-                if (!(Region.IsSystemOnMap(Start) && Region.IsSystemOnMap(End)))
+                for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
                 {
-                    continue;
+                    Start = End;
+                    End = ActiveCharacter.ActiveRoute[i].SystemName;
+
+                    if (!(Region.IsSystemOnMap(Start) && Region.IsSystemOnMap(End)))
+                    {
+                        continue;
+                    }
+
+                    EVEData.MapSystem from = Region.MapSystems[Start];
+                    EVEData.MapSystem to = Region.MapSystems[End];
+
+
+                    Line routeLine = new Line();
+
+
+                    routeLine.X1 = from.LayoutX;
+                    routeLine.Y1 = from.LayoutY;
+
+                    routeLine.X2 = to.LayoutX;
+                    routeLine.Y2 = to.LayoutY;
+
+                    routeLine.StrokeThickness = 5;
+                    routeLine.Visibility = Visibility.Visible;
+                    if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == Navigation.GateType.Ansibex)
+                    {
+                        routeLine.Stroke = RouteAnsiblexBrush;
+                    }
+                    else
+                    {
+                        routeLine.Stroke = RouteBrush;
+                    }
+
+
+                    DoubleCollection dashes = new DoubleCollection();
+                    dashes.Add(1.0);
+                    dashes.Add(1.0);
+
+                    routeLine.StrokeDashArray = dashes;
+
+                    // animate the jump bridges
+                    DoubleAnimation da = new DoubleAnimation();
+                    da.From = 200;
+                    da.To = 0;
+                    da.By = 2;
+                    da.Duration = new Duration(TimeSpan.FromSeconds(40));
+                    da.RepeatBehavior = RepeatBehavior.Forever;
+                    Timeline.SetDesiredFrameRate(da, 20);
+
+                    routeLine.StrokeDashArray = dashes;
+                    routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+
+
+                    Canvas.SetZIndex(routeLine, 18);
+                    MainCanvas.Children.Add(routeLine);
+
+                    DynamicMapElements.Add(routeLine);
                 }
+            }
+            catch
+            {
 
-                EVEData.MapSystem from = Region.MapSystems[Start];
-                EVEData.MapSystem to = Region.MapSystems[End];
-
-
-                Line routeLine = new Line();
-
-
-                routeLine.X1 = from.LayoutX;
-                routeLine.Y1 = from.LayoutY;
-
-                routeLine.X2 = to.LayoutX;
-                routeLine.Y2 = to.LayoutY;
-
-                routeLine.StrokeThickness = 5;
-                routeLine.Visibility = Visibility.Visible;
-                if(ActiveCharacter.ActiveRoute[i-1].GateToTake == Navigation.GateType.Ansibex)
-                {
-                    routeLine.Stroke = RouteAnsiblexBrush;
-                }
-                else
-                {
-                    routeLine.Stroke = RouteBrush;
-                }
-
-
-                DoubleCollection dashes = new DoubleCollection();
-                dashes.Add(1.0);
-                dashes.Add(1.0);
-
-                routeLine.StrokeDashArray = dashes;
-
-                // animate the jump bridges
-                DoubleAnimation da = new DoubleAnimation();
-                da.From = 200;
-                da.To = 0;
-                da.By = 2;
-                da.Duration = new Duration(TimeSpan.FromSeconds(40));
-                da.RepeatBehavior = RepeatBehavior.Forever;
-                Timeline.SetDesiredFrameRate(da, 20);
-
-                routeLine.StrokeDashArray = dashes;
-                routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
-
-
-
-                Canvas.SetZIndex(routeLine, 18);
-                MainCanvas.Children.Add(routeLine);
-
-                DynamicMapElements.Add(routeLine);
             }
         }
 
