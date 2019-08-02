@@ -8,7 +8,7 @@ namespace SMT.EVEData
 {
     class Structure
     {
-        public enum UpwellType
+        public enum StructureType
         {
             // citadel
             Astrahus,
@@ -25,6 +25,12 @@ namespace SMT.EVEData
             Athanor,
             Tatara,
             NPC_Station,
+
+            // Ansiblex
+            JumpGate,
+            CynoBecon,
+            CynoJammer
+
         }
 
         public enum PowerState
@@ -40,6 +46,6 @@ namespace SMT.EVEData
         public string System { get; set; }
         public DateTime LastUpdate { get; set; }
         public PowerState State { get; set; }
-        public UpwellType Type { get; set; }
+        public StructureType Type { get; set; }
     }
 }
