@@ -208,6 +208,10 @@ namespace SMT.EVEData
         private List<string> IntelClearFilters { get; set; }
 
 
+        private bool WatcherThreadShouldTerminate = false;
+        private bool BackgroundThreadShouldTerminate = false;
+
+
         public EveTrace.EveTraceFleetInfo FleetIntel;
 
         public EVEData.Server ServerInfo { get; set; }
@@ -307,6 +311,9 @@ namespace SMT.EVEData
 
         public void ShutDown()
         {
+            ShuddownIntelWatcher();
+            BackgroundThreadShouldTerminate = true;
+
             ZKillFeed.ShutDown();
         }
 
@@ -435,12 +442,15 @@ namespace SMT.EVEData
             // by opening and closing them it updates the sytem meta files which
             // causes the file watcher to operate correctly otherwise this data
             // doesnt get updated until something other than the eve client reads these files
+
+
+
             new Thread(() =>
             {
-                Thread.CurrentThread.IsBackground = true;
+                Thread.CurrentThread.IsBackground = false;
 
                 // loop forever
-                while (true)
+                while (WatcherThreadShouldTerminate == false)
                 {
                     DirectoryInfo di = new DirectoryInfo(eveLogFolder);
                     FileInfo[] files = di.GetFiles("*.txt");
@@ -479,6 +489,16 @@ namespace SMT.EVEData
 
             // END SUPERHACK
             // -----------------------------------------------------------------
+        }
+
+        public void ShuddownIntelWatcher()
+        {
+            string eveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
+            if (intelFileWatcher != null)
+            {
+                intelFileWatcher.Changed -= IntelFileWatcher_Changed;
+            }
+            WatcherThreadShouldTerminate = true;
         }
 
         /// <summary>
@@ -1880,7 +1900,7 @@ namespace SMT.EVEData
 
             new Thread(() =>
             {
-                Thread.CurrentThread.IsBackground = true;
+                Thread.CurrentThread.IsBackground = false;
 
                 TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
                 TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(10);
@@ -1889,8 +1909,8 @@ namespace SMT.EVEData
                 DateTime NextLowFreqUpdate = DateTime.Now;
 
 
-                // loop forever
-                while (true)
+            // loop forever
+                while (BackgroundThreadShouldTerminate == false)
                 {
                     // character Update 
                     if((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)

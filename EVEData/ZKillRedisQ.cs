@@ -25,7 +25,6 @@ namespace SMT.EVEData
         ~ZKillRedisQ()
         {
             updateThreadRunning = false;
-            updateThread.Join();
         }
 
         /// <summary>
@@ -54,6 +53,10 @@ namespace SMT.EVEData
         public void ShutDown()
         {
             updateThreadRunning = false;
+            if(!updateThread.Join(5000))
+            {
+                updateThread.Abort();
+            }
         }
 
         /// <summary>
@@ -201,6 +204,10 @@ namespace SMT.EVEData
                 // wait for the next request
                 Thread.Sleep(100);
             }
+
+            // finished thread
+            int test = 0;
+            test++;
         }
 
         /// <summary>
