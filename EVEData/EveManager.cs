@@ -1219,7 +1219,7 @@ namespace SMT.EVEData
             {
                 foreach(ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
                 {
-                    if(ri.Category == "alliance")
+                    if(ri.Category == ResolvedInfoCategory.Alliance)
                     {
                         ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
 

@@ -467,7 +467,7 @@ namespace SMT.EVEData
         /// </summary>
         private async Task UpdateInfoFromESI()
         {
-            if (ID == 0 || !ESILinked)
+            if (ID == 0 || !ESILinked || ESIAuthData == null)
             {
                 return;
             }

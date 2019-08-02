@@ -78,8 +78,8 @@
       <HintPath>packages\DotNetKit.Wpf.AutoCompleteComboBox.1.2.0\lib\net45\DotNetKit.Wpf.AutoCompleteComboBox.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ESI.NET, Version=2.9.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\ESI.NET.2.9.8\lib\net471\ESI.NET.dll</HintPath>
+    <Reference Include="ESI.NET, Version=2.13.13.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\ESI.NET.2.13.13\lib\net471\ESI.NET.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Configuration.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
@@ -377,10 +377,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="RUN ME FIRST SMT Built in Browser Fix.reg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="RUN ME FIRST SMT Built in Browser Fix.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SMT_TemporaryKey.pfx" />
     <None Include="Sounds\woop.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
