@@ -261,6 +261,7 @@ namespace SMT.EVEData
             }
 
             UpdatePositionFromESI();
+            UpdateFleetInfo();
 
             if (routeNeedsUpdate)
             {
@@ -433,7 +434,7 @@ namespace SMT.EVEData
         /// </summary>
         private async void UpdatePositionFromESI()
         {
-            if(string.IsNullOrEmpty(ESIAccessToken) )
+            if(ID == 0 || !ESILinked || ESIAuthData == null)
             {
                 return;
             }
@@ -456,6 +457,50 @@ namespace SMT.EVEData
                     {
                         Region = "";
                     }
+                }
+            }
+            catch { }
+        }
+
+
+        /// <summary>
+        /// Update the characters FleetInfo
+        /// </summary>
+        private async void UpdateFleetInfo()
+        {
+            if (ID == 0 || !ESILinked || ESIAuthData == null)
+            {
+                return;
+            }
+
+            try
+            {
+                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                esiClient.SetCharacterData(ESIAuthData);
+
+                ESI.NET.EsiResponse<ESI.NET.Models.Fleets.FleetInfo> esr = await esiClient.Fleets.FleetInfo();
+
+                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Fleets.FleetInfo>(esr))
+                {
+                    FleetInfo.FleetID = esr.Data.FleetId;
+
+                    // in fleet, extract info
+                    ESI.NET.EsiResponse<List<ESI.NET.Models.Fleets.Member>> esrf = await esiClient.Fleets.Members(esr.Data.FleetId);
+                    if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Fleets.Member>>(esrf))
+                    {
+                        foreach (ESI.NET.Models.Fleets.Member fm in esrf.Data)
+                        {
+                            //fm.CharacterId
+                        }
+
+
+
+                    }
+                }
+                else
+                {
+                    FleetInfo.FleetID = 0;
+                    FleetInfo.Members.Clear();
                 }
             }
             catch { }
@@ -525,7 +570,7 @@ namespace SMT.EVEData
             {
             }
 
-            EveManager.Instance.ResolveAllianceIDs(Standings.Keys.ToList());
+            await EveManager.Instance.ResolveAllianceIDs(Standings.Keys.ToList());
         }
 
 

@@ -18,8 +18,7 @@ namespace SMT.EVEData
         /// </summary>
         public Fleet()
         {
-            FleetID = NoFleet;
-            CharacterID = string.Empty;
+            FleetID = 0;
             FleetMOTD = string.Empty;
             Members = new ObservableCollection<FleetMember>();
         }
@@ -27,12 +26,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the fleet id used in all ESI Fleet operations
         /// </summary>
-        public string FleetID { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ID of the character the character this fleet info belongs to
-        /// </summary>
-        public string CharacterID { get; set; }
+        public long FleetID { get; set; }
 
         /// <summary>
         /// Gets or sets the fleet MOTD

@@ -1207,7 +1207,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Alliance and Ticker data for specified list
         /// </summary>
-        public async void ResolveAllianceIDs(List<long> IDs)
+        public async Task ResolveAllianceIDs(List<long> IDs)
         {
             if(IDs.Count == 0 )
             {
