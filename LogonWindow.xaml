@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
-        Title="Auth.." Height="600" Width="650" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Auth.." Height="800" Width="650" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25" />
-            <RowDefinition Height="540" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBox x:Name="URLName" Grid.Row="0" IsReadOnly="True" BorderThickness="2" />
         <WebBrowser x:Name="logonBrowser" Grid.Row="1" Navigating="LogonBrowser_Navigating" />
