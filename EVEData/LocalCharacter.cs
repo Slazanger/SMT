@@ -419,7 +419,7 @@ namespace SMT.EVEData
                 }
 
                 ESIAccessToken = acd.Token;
-                ESIAccessTokenExpiry = acd.ExpiresOn;
+                ESIAccessTokenExpiry = acd.ExpiresOn.ToLocalTime();
                 ESIRefreshToken = acd.RefreshToken;
                 ESILinked = true;
                 ESIAuthData = acd;
