@@ -71,15 +71,12 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetKit.Wpf.AutoCompleteComboBox, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DotNetKit.Wpf.AutoCompleteComboBox.1.2.0\lib\net45\DotNetKit.Wpf.AutoCompleteComboBox.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="ESI.NET, Version=2.13.13.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\ESI.NET.2.13.13\lib\net471\ESI.NET.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Configuration.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
@@ -385,6 +382,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ESI.Net\ESI.NET\ESI.NET.csproj">
+      <Project>{ce2f56cf-617d-46f7-9389-68e2d2699e69}</Project>
+      <Name>ESI.NET</Name>
+    </ProjectReference>
     <ProjectReference Include="External\WpfHelpers\WpfHelpers.csproj">
       <Project>{2d1e6ac7-6fb8-42e6-a1d8-754951a99428}</Project>
       <Name>WpfHelpers</Name>

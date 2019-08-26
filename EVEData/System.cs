@@ -97,6 +97,9 @@ namespace SMT.EVEData
 
         public bool HasIceBelt { get; set; }
 
+        public bool HasJoveObservatory { get; set; }
+
+
         /// <summary>
         /// Gets or sets the number of NPC Kills in the last hour
         /// </summary>

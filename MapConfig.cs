@@ -74,6 +74,12 @@ namespace SMT
         public bool ShowActiveIncursions { get; set; }
 
 
+        [Category("Jove")]
+        [DisplayName("Show Observatories")]
+        public bool ShowJoveObservatories { get; set; }
+
+
+
         [Category("Navigation")]
         [DisplayName("Show Jump Distance")]
         public bool ShowJumpDistance { get; set; }

@@ -563,7 +563,7 @@ namespace SMT
 // SJS Disabled until ticket resolved with CCP
 //            if (ActiveCharacter != null)
 //            {
-//                ActiveCharacter.UpdateStructureInfoForRegion(regionName);
+//                ActiveCharacter.UpdateStructureInfoForRegion2(regionName);
 //            }
 
 
@@ -602,9 +602,12 @@ namespace SMT
 
             Brush Incursion = new SolidColorBrush(MapConf.ActiveColourScheme.ActiveIncursionColour);
 
+            Brush ConstellationHighlight = new SolidColorBrush(Colors.DarkGreen) ;
+
+
 
             //HatchBrush  Incursion = new HatchBrush(HatchStyle.DiagonalCross, System.Drawing.Color.FromArgb(MapConf.ActiveColourScheme.ActiveIncursionColour.GetHashCode()));
-                //MapConf.ActiveColourScheme.ActiveIncursionColour);
+            //MapConf.ActiveColourScheme.ActiveIncursionColour);
 
             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
@@ -988,8 +991,50 @@ namespace SMT
                 }
 
 
+                if(MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory)
+                {
+                    Shape JoveOutline = new Ellipse { Width = SYSTEM_SHAPE_SIZE+6, Height = SYSTEM_SHAPE_SIZE+6 };
+                    JoveOutline.Stroke = SysOutlineBrush;
+                    JoveOutline.StrokeThickness = 1.5;
+                    JoveOutline.StrokeLineJoin = PenLineJoin.Round;
+                    JoveOutline.Fill = SysInRegionBrush;
 
-                if(ShowSovOwner && SelectedAlliance != 0 && system.ActualSystem.SOVAlliance == SelectedAlliance)
+                    Canvas.SetLeft(JoveOutline, system.LayoutX - (SYSTEM_SHAPE_OFFSET+3));
+                    Canvas.SetTop(JoveOutline, system.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetZIndex(JoveOutline, SYSTEM_Z_INDEX - 10);
+                    MainCanvas.Children.Add(JoveOutline);
+
+                }
+
+
+                EVEData.System es = EM.GetEveSystem(SelectedSystem);
+
+
+                if (es != null && ( MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities ) && system.ActualSystem.ConstellationID == es.ConstellationID)
+                {
+                    {
+                        Polygon poly = new Polygon();
+
+                        foreach (Point p in system.CellPoints)
+                        {
+                            poly.Points.Add(p);
+                        }
+
+                        //poly.Fill
+                        poly.Fill = ConstellationHighlight;
+                        poly.SnapsToDevicePixels = true;
+                        poly.Stroke = poly.Fill;
+                        poly.StrokeThickness = 3;
+                        poly.StrokeDashCap = PenLineCap.Round;
+                        poly.StrokeLineJoin = PenLineJoin.Round;
+                        MainCanvas.Children.Add(poly);
+                    }
+                }
+
+
+
+
+                if (ShowSovOwner && SelectedAlliance != 0 && system.ActualSystem.SOVAlliance == SelectedAlliance)
                 {
                     Polygon poly = new Polygon();
 
@@ -2249,13 +2294,12 @@ namespace SMT
                 if (e.ClickCount == 1)
                 {
                     bool redraw = false;
-                    if (MapConf.ShowJumpDistance)
+                    if (MapConf.ShowJumpDistance || MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)
                     {
                         redraw = true;
                     }
                     FollowCharacter = false;
                     SelectSystem(selectedSys.Name);
-
                     ReDrawMap(redraw);
 
                 }

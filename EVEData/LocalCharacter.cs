@@ -32,7 +32,7 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public object ActiveRouteLock;
 
-        
+
 
         /// <summary>
         /// Does the route need updating
@@ -70,7 +70,7 @@ namespace SMT.EVEData
         }
 
         public string Region { get; set; }
-        
+
 
         /// <summary>
         /// Gets or sets if this character is linked with ESI
@@ -114,6 +114,9 @@ namespace SMT.EVEData
         public Dictionary<long, string> LabelNames { get; set; }
 
 
+        public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
+
+
         /// <summary>
         /// Gets or sets the current fleet info for this character
         /// </summary>
@@ -142,7 +145,7 @@ namespace SMT.EVEData
         }
 
 
-    private RoutingMode m_NavigationMode;
+        private RoutingMode m_NavigationMode;
 
         public RoutingMode NavigationMode
         {
@@ -182,10 +185,10 @@ namespace SMT.EVEData
         public Dictionary<string, List<StructureIDs.StructureIdData>> DockableStructures { get; set; }
 
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Character" /> class
-    /// </summary>
-    public LocalCharacter()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Character" /> class
+        /// </summary>
+        public LocalCharacter()
         {
             Standings = new Dictionary<long, float>();
 
@@ -200,6 +203,8 @@ namespace SMT.EVEData
             DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
 
             ActiveRouteLock = new object();
+
+            KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
         }
 
         /// <summary>
@@ -260,8 +265,8 @@ namespace SMT.EVEData
                 UpdateInfoFromESI().Wait();
             }
 
-            UpdatePositionFromESI();
-            UpdateFleetInfo();
+            UpdatePositionFromESI().Wait();
+            //UpdateFleetInfo();
 
             if (routeNeedsUpdate)
             {
@@ -345,7 +350,7 @@ namespace SMT.EVEData
 
             }
 
-            if(esiRouteNeedsUpdate)
+            if (esiRouteNeedsUpdate)
             {
 
                 esiRouteNeedsUpdate = false;
@@ -382,7 +387,7 @@ namespace SMT.EVEData
                     ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(SysID, false, firstRoute);
                     if (EVEData.ESIHelpers.ValidateESICall<string>(esr))
                     {
-//                        routeNeedsUpdate = true;
+                        //                        routeNeedsUpdate = true;
                     }
                     firstRoute = false;
 
@@ -391,12 +396,12 @@ namespace SMT.EVEData
             }
         }
 
-            /// <summary>
-            /// Refresh the ESI access token
-            /// </summary>
+        /// <summary>
+        /// Refresh the ESI access token
+        /// </summary>
         private async Task RefreshAccessToken()
         {
-            if(String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
+            if (String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
             {
                 return;
             }
@@ -432,9 +437,9 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the characters position from ESI (will override the position read from any log files
         /// </summary>
-        private async void UpdatePositionFromESI()
+        private async Task UpdatePositionFromESI()
         {
-            if(ID == 0 || !ESILinked || ESIAuthData == null)
+            if (ID == 0 || !ESILinked || ESIAuthData == null)
             {
                 return;
             }
@@ -523,11 +528,11 @@ namespace SMT.EVEData
                 esiClient.SetCharacterData(ESIAuthData);
 
 
- //               if (CorporationID == -1 || AllianceID == -1)
+                //               if (CorporationID == -1 || AllianceID == -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esr = await esiClient.Character.Information((int)ID);
 
-                    if(EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Character.Information>(esr))
+                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Character.Information>(esr))
                     {
                         CorporationID = esr.Data.CorporationId;
                         AllianceID = esr.Data.AllianceId;
@@ -535,7 +540,7 @@ namespace SMT.EVEData
                 }
 
 
-                if(AllianceID != 0)
+                if (AllianceID != 0)
                 {
                     int page = 0;
                     int maxPageCount = 1;
@@ -551,12 +556,12 @@ namespace SMT.EVEData
 
                         if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
                         {
-                            if(esr.Pages.HasValue)
+                            if (esr.Pages.HasValue)
                             {
                                 maxPageCount = (int)esr.Pages;
                             }
 
-                            foreach(ESI.NET.Models.Contacts.Contact con in esr.Data)
+                            foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
                             {
                                 Standings[con.ContactId] = (float)con.Standing;
                                 LabelMap[con.ContactId] = con.LabelId;
@@ -574,123 +579,138 @@ namespace SMT.EVEData
         }
 
 
-        public void UpdateStructureInfoForRegion(string Region)
+        public async void UpdateStructureInfoForRegion2(string Region)
         {
             if (!ESILinked)
                 return;
 
-            MapRegion mr = EveManager.Instance.GetRegion(Region);
 
+            MapRegion mr = EveManager.Instance.GetRegion(Region);
             // somethings gone wrong
-            if(mr == null)
+            if (mr == null)
             {
                 return;
             }
 
+
+            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+            esiClient.SetCharacterData(ESIAuthData);
+
+
+            Dictionary<long, ESI.NET.Models.Universe.Structure> SystemStructureList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
+
+
             // iterate over each structure and search for structres containing the text for each system
-            foreach(MapSystem ms in mr.MapSystems.Values.ToList())
+            foreach (MapSystem ms in mr.MapSystems.Values.ToList())
             {
-                // skip systems we've already checked
-                if( DockableStructures.Keys.Contains(ms.Name))
+
+                if (ms.OutOfRegion)
                 {
                     continue;
                 }
 
-                List<StructureIDs.StructureIdData> SystemStructureList = new List<StructureIDs.StructureIdData>();
 
                 UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/latest/characters/" + ID + "/search/");
 
-                var esiQuery = HttpUtility.ParseQueryString(urlBuilder.Query);
-                esiQuery["datasource"] = "tranquility";
-                esiQuery["token"] = ESIAccessToken;
-                esiQuery["categories"] = "structure";
-                esiQuery["search"] = ms.Name;
-                esiQuery["strict"] = "false";
 
-                urlBuilder.Query = esiQuery.ToString();
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
-                request.Method = WebRequestMethods.Http.Get;
-                request.ContentType = "application/json";
-                request.Timeout = 20000;
-                request.Proxy = null;
-
-                try
+                esiClient.SetCharacterData(ESIAuthData);
+                ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, ms.Name, SearchCategory.Structure);
+                if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
                 {
-                    HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-                    if (esiResult.StatusCode != HttpStatusCode.OK)
+                    if (esr.Data.Structures == null)
                     {
-                        continue;
+                        return;
                     }
 
-                    Stream responseStream = esiResult.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
+
+                    foreach (long stationID in esr.Data.Structures)
                     {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
+                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
 
-                        StructureSearches.StructureSearch ss = StructureSearches.StructureSearch.FromJson(strContent);
-
-                        if (ss == null || ss.Structure == null)
-                            continue;
-
-
-                        foreach (long l in ss.Structure)
+                        if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
                         {
-                            // now search on each structure
-                            UriBuilder urlStructureIDBuilder = new UriBuilder(@"https://esi.evetech.net/v1/universe/structures/" + l.ToString() + "/");
-
-                            var esiStructureIDQuery = HttpUtility.ParseQueryString(urlStructureIDBuilder.Query);
-                            esiStructureIDQuery["datasource"] = "tranquility";
-                            esiStructureIDQuery["token"] = ESIAccessToken;
-
-                            urlStructureIDBuilder.Query = esiStructureIDQuery.ToString();
-
-                            HttpWebRequest sid_request = (HttpWebRequest)WebRequest.Create(urlStructureIDBuilder.ToString());
-                            sid_request.Method = WebRequestMethods.Http.Get;
-                            sid_request.ContentType = "application/json";
-                            sid_request.Timeout = 20000;
-                            sid_request.Proxy = null;
-
-                            try
-                            {
-                                HttpWebResponse esi_sid_Result = (HttpWebResponse)sid_request.GetResponse();
-
-                                Stream sid_responseStream = esi_sid_Result.GetResponseStream();
-                                using (StreamReader sr2 = new StreamReader(sid_responseStream))
-                                {
-
-                                    // Need to return this response
-                                    string strSIDContent = sr2.ReadToEnd();
-                                    StructureIDs.StructureIdData sidd = StructureIDs.StructureIdData.FromJson(strSIDContent);
-                                    if(sidd.Name != "")
-                                    {
-                                        SystemStructureList.Add(sidd);
-                                    }
-
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-
+                            SystemStructureList[stationID] = esrs.Data;
                         }
+
+                        Thread.Sleep(20);
                     }
                 }
-                catch (Exception)
-                {
-                }
 
-                DockableStructures.Add(ms.Name, SystemStructureList);
-                Thread.Sleep(10);
+                Thread.Sleep(100);
+
+                //ssssss
+
             }
 
 
 
+            string CSVPath = AppDomain.CurrentDomain.BaseDirectory + "\\Strucutres_" + mr.Name + "_" + ID + ".csv";
+
+            using (var w = new StreamWriter(CSVPath, false))
+            {
+                string Header = "SolarSystem ID,StructureID,Type ID,Name,Owner";
+                w.WriteLine(Header);
+
+
+                foreach (long ID in SystemStructureList.Keys)
+                {
+                    ESI.NET.Models.Universe.Structure s = SystemStructureList[ID];
+                    string Line = $"{s.SolarSystemId},{ID},{s.TypeId},{s.Name}";
+                    w.WriteLine(Line);
+                    w.Flush();
+                }
+            }
         }
-        
+
+
+        public async void GetStructureInfoForSystem(string system)
+        {
+            if (!ESILinked)
+                return;
+
+
+            MapRegion mr = EveManager.Instance.GetRegion(Region);
+            // somethings gone wrong
+            if (mr == null)
+            {
+                return;
+            }
+
+            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+            esiClient.SetCharacterData(ESIAuthData);
+
+
+            Dictionary<long, ESI.NET.Models.Universe.Structure> SystemStructureList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
+
+
+            esiClient.SetCharacterData(ESIAuthData);
+            ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, system, SearchCategory.Structure);
+            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
+            {
+                if (esr.Data.Structures == null)
+                {
+                    return;
+                }
+
+
+                foreach (long stationID in esr.Data.Structures)
+                {
+                    ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
+
+                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                    {
+                        SystemStructureList[stationID] = esrs.Data;
+                    }
+
+                    Thread.Sleep(20);
+                }
+            }
+
+            Thread.Sleep(100);
+
+
+
+        }
 
     }
 }

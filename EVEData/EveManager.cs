@@ -997,6 +997,43 @@ namespace SMT.EVEData
                 }
             }
 
+
+            // now add the jove systems
+            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\JoveSystems.csv";
+            if (File.Exists(eveStaticDataJoveObservatories))
+            {
+
+
+                StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (line == string.Empty)
+                    {
+                        continue;
+                    }
+                    string[] bits = line.Split(';');
+
+                    if (bits.Length != 3)
+                    {
+                        continue;
+                    }
+
+
+                    string system = bits[0];
+
+                    System s = GetEveSystem(system);
+                    if(s != null)
+                    {
+                        s.HasJoveObservatory = true;
+                    }
+                }
+            }
+
+
             // now serialise the classes to disk
             Utils.SerializToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
             Utils.SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
@@ -1319,7 +1356,6 @@ namespace SMT.EVEData
                 "esi-characters.read_fatigue.v1",
                 "esi-alliances.read_contacts.v1"
             };
-
 
 
             // patch up any links
