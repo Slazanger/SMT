@@ -8,7 +8,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WpfHelpers.ResourceUsage;
 
 namespace SMT
 {
@@ -604,8 +606,7 @@ namespace SMT
 
             Brush ConstellationHighlight = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationHighlightColour );
 
-
-            Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
+             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
             Brush SysTextBackgroundBrush = new SolidColorBrush(bgtc);
 
@@ -989,16 +990,40 @@ namespace SMT
 
                 if(MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory)
                 {
-                    Shape JoveOutline = new Ellipse { Width = SYSTEM_SHAPE_SIZE+6, Height = SYSTEM_SHAPE_SIZE+6 };
-                    JoveOutline.Stroke = SysOutlineBrush;
-                    JoveOutline.StrokeThickness = 1.5;
-                    JoveOutline.StrokeLineJoin = PenLineJoin.Round;
-                    JoveOutline.Fill = SysInRegionBrush;
+                    //                    Shape JoveOutline = new Ellipse { Width = SYSTEM_SHAPE_SIZE+6, Height = SYSTEM_SHAPE_SIZE+6 };
+                    //                    JoveOutline.Stroke = SysOutlineBrush;
+                    //                    JoveOutline.StrokeThickness = 1.5;
+                    //                    JoveOutline.StrokeLineJoin = PenLineJoin.Round;
+                    //                    JoveOutline.Fill = SysInRegionBrush;
 
-                    Canvas.SetLeft(JoveOutline, system.LayoutX - (SYSTEM_SHAPE_OFFSET+3));
-                    Canvas.SetTop(JoveOutline, system.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
-                    Canvas.SetZIndex(JoveOutline, SYSTEM_Z_INDEX - 10);
-                    MainCanvas.Children.Add(JoveOutline);
+
+
+                    //                    Canvas.SetLeft(JoveOutline, system.LayoutX - (SYSTEM_SHAPE_OFFSET + 3));
+                    //                    Canvas.SetTop(JoveOutline, system.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
+                    //                    Canvas.SetZIndex(JoveOutline, SYSTEM_Z_INDEX - 10);
+                    //                    MainCanvas.Children.Add(JoveOutline);
+
+
+
+                    Image JoveLogo = new Image
+                    {
+                        Width = 10,
+                        Height = 9,
+                        Name = "JoveLogo",
+                        Source = ResourceLoader.LoadBitmapFromResource("Images/Jove_logo.png"),
+                        Stretch = Stretch.Uniform,
+                        IsHitTestVisible = false,
+                    };
+
+                    RenderOptions.SetBitmapScalingMode(JoveLogo, BitmapScalingMode.NearestNeighbor);
+
+                    Canvas.SetLeft(JoveLogo, system.LayoutX - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetTop(JoveLogo, system.LayoutY - SYSTEM_SHAPE_OFFSET + 6);
+                    Canvas.SetZIndex(JoveLogo, SYSTEM_Z_INDEX + 5);
+                    MainCanvas.Children.Add(JoveLogo);
+
+
+
 
                 }
 
