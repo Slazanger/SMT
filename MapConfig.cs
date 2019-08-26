@@ -408,6 +408,8 @@ namespace SMT
             defaultColours.SOVStructureVunerableColour = Color.FromRgb(64,64,64);
             defaultColours.SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178);
 
+            defaultColours.ConstellationHighlightColour = Color.FromRgb(148, 200, 180);
+
             defaultColours.TheraEntranceRegion = Colors.YellowGreen;
             defaultColours.TheraEntranceSystem = Colors.YellowGreen;
 
@@ -445,6 +447,7 @@ namespace SMT
 
             blueColours.SOVStructureVunerableColour = Colors.Red;
             blueColours.SOVStructureVunerableSoonColour = Colors.Yellow;
+            blueColours.ConstellationHighlightColour = Color.FromRgb(148, 200, 180);
 
             blueColours.TheraEntranceRegion = Colors.YellowGreen;
             blueColours.TheraEntranceSystem = Colors.YellowGreen;
@@ -480,6 +483,7 @@ namespace SMT
 
             greyAndRed.SOVStructureVunerableColour = Colors.Red;
             greyAndRed.SOVStructureVunerableSoonColour = Colors.Yellow;
+            greyAndRed.ConstellationHighlightColour = Color.FromRgb(148, 200, 180);
 
             greyAndRed.TheraEntranceRegion = Colors.YellowGreen;
             greyAndRed.TheraEntranceSystem = Colors.YellowGreen;
@@ -515,6 +519,7 @@ namespace SMT
 
             dark.SOVStructureVunerableColour = Colors.Red;
             dark.SOVStructureVunerableSoonColour = Colors.Yellow;
+            dark.ConstellationHighlightColour = Color.FromRgb(148, 200, 180);
 
             dark.TheraEntranceRegion = Colors.YellowGreen;
             dark.TheraEntranceSystem = Colors.YellowGreen;
@@ -549,6 +554,7 @@ namespace SMT
 
             lateNight.SOVStructureVunerableColour = Colors.Red;
             lateNight.SOVStructureVunerableSoonColour = Colors.Yellow;
+            lateNight.ConstellationHighlightColour = Color.FromRgb(148, 200, 180);
 
             lateNight.TheraEntranceRegion = Colors.YellowGreen;
             lateNight.TheraEntranceSystem = Colors.YellowGreen;

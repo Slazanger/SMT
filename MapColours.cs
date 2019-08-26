@@ -107,6 +107,12 @@ namespace SMT
         [DisplayName("Structure Vunerable Soon")]
         public Color SOVStructureVunerableSoonColour { get; set; }
 
+        [Category("SOV")]
+        [DisplayName("Constellation Highlight")]
+        public Color ConstellationHighlightColour { get; set; }
+
+
+
         [Category("Thera")]
         [DisplayName("Thera Entrance (Region)")]
         public Color TheraEntranceRegion { get; set; }

@@ -602,12 +602,8 @@ namespace SMT
 
             Brush Incursion = new SolidColorBrush(MapConf.ActiveColourScheme.ActiveIncursionColour);
 
-            Brush ConstellationHighlight = new SolidColorBrush(Colors.DarkGreen) ;
+            Brush ConstellationHighlight = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationHighlightColour );
 
-
-
-            //HatchBrush  Incursion = new HatchBrush(HatchStyle.DiagonalCross, System.Drawing.Color.FromArgb(MapConf.ActiveColourScheme.ActiveIncursionColour.GetHashCode()));
-            //MapConf.ActiveColourScheme.ActiveIncursionColour);
 
             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
