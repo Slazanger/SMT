@@ -500,16 +500,6 @@ namespace SMT
                     SystemDropDownAC.SelectedItem = es;
                     SelectedSystem = es.Name;
                     AddHighlightToSystem(name);
-                    if(!MapConf.LockJumpSystem)
-                    {
-                        MapConf.CurrentJumpSystem = es.Name;
-                        MapConf.CurrentJumpCharacter = "";
-                        BridgeInfoL1.Content = MapConf.JumpShipType + " range from";
-                        BridgeInfoL2.Content = es.Name;
-
-                        MapConf.CurrentJumpCharacter = "";
-                    }
-
 
                     break;
                 }
@@ -2591,5 +2581,41 @@ namespace SMT
             ReDrawMap(true);
         }
 
+        private void SetJumpRange_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+
+            MenuItem mi = sender as MenuItem;
+            if(mi != null)
+            {
+                EveManager.JumpShip js = EveManager.JumpShip.Super;
+
+                if (mi.DataContext as string == "6")
+                {
+                    js = EveManager.JumpShip.Super;
+                }
+                if (mi.DataContext as string == "7")
+                {
+                    js = EveManager.JumpShip.Carrier;
+                }
+
+                if (mi.DataContext as string == "8")
+                {
+                    js = EveManager.JumpShip.Blops;
+                }
+
+                if (mi.DataContext as string == "10")
+                {
+                    js = EveManager.JumpShip.JF;
+                }
+
+                MapConf.ShowJumpDistance = true;
+                MapConf.CurrentJumpCharacter = "" ;
+                MapConf.CurrentJumpSystem = eveSys.Name;
+                MapConf.JumpShipType = js;
+
+            }
+        }
     }
 }

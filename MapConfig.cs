@@ -84,10 +84,6 @@ namespace SMT
         [DisplayName("Show Jump Distance")]
         public bool ShowJumpDistance { get; set; }
 
-        [Category("Navigation")]
-        [DisplayName("Lock Jump System")]
-        public bool LockJumpSystem { get; set; }
-
 
         private string m_CurrentJumpSystem;
         [Category("Navigation")]
