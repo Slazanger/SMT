@@ -234,7 +234,115 @@ namespace SMT
             set
             {
                 m_ShowRegionStandings = value;
+
+                if (m_ShowRegionStandings)
+                {
+                    ShowUniverseRats = false;
+                    ShowUniversePods = false;
+                    ShowUniverseKills = false;
+                }
+
                 OnPropertyChanged("ShowRegionStandings");
+            }
+        }
+
+        private bool m_ShowUniverseRats;
+        [Category("Universe")]
+        [DisplayName("Show Ratting Stats")]
+        public bool ShowUniverseRats
+        {
+            get
+            {
+                return m_ShowUniverseRats;
+            }
+
+            set
+            {
+                m_ShowUniverseRats = value;
+                if (m_ShowUniverseRats)
+                {
+                    ShowRegionStandings = false;
+                    ShowUniversePods = false;
+                    ShowUniverseKills = false;
+                }
+
+
+                OnPropertyChanged("ShowUniverseRats");
+            }
+        }
+
+        private bool m_ShowUniversePods;
+        [Category("Universe")]
+        [DisplayName("Show Pod kill Stats")]
+        public bool ShowUniversePods
+        {
+            get
+            {
+                return m_ShowUniversePods;
+            }
+
+            set
+            {
+                m_ShowUniversePods = value;
+                if (ShowUniversePods)
+                {
+                    ShowRegionStandings = false;
+                    ShowUniverseRats = false;
+                    ShowUniverseKills = false;
+                }
+
+
+                OnPropertyChanged("ShowUniversePods");
+            }
+        }
+
+        private bool m_ShowUniverseKills;
+        [Category("Universe")]
+        [DisplayName("Show Ship kill Stats")]
+        public bool ShowUniverseKills
+        {
+            get
+            {
+                return m_ShowUniverseKills;
+            }
+
+            set
+            {
+                m_ShowUniverseKills = value;
+
+                if (m_ShowUniverseKills)
+                {
+                    ShowRegionStandings = false;
+                    ShowUniverseRats = false;
+                    ShowUniversePods = false;
+                }
+
+
+                OnPropertyChanged("ShowUniverseKills");
+            }
+        }
+
+        private double m_UniverseDataScale = 1.0f;
+        [Category("Universe")]
+        [DisplayName("Universe Data Scale")]
+        public double UniverseDataScale
+        {
+            get
+            {
+                return m_UniverseDataScale;
+            }
+
+            set
+            {
+                m_UniverseDataScale = value;
+
+                if(m_UniverseDataScale < 0.01)
+                {
+                    m_UniverseDataScale = 0.01;
+                }
+ 
+
+                OnPropertyChanged("UniverseDataScale");
             }
         }
 

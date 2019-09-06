@@ -323,6 +323,33 @@ namespace SMT
                 RedrawUniverse(true);
             }
 
+            if (e.PropertyName == "ShowUniverseRats")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "ShowUniversePods")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "ShowUniverseKills")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "UniverseDataScale")
+            {
+                RedrawUniverse(true);
+            }
+
+            
+
+
+
+
+
+
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -689,6 +716,90 @@ namespace SMT
 
 
                 }
+
+
+                if (MapConf.ShowUniverseRats)
+                {
+                    double numRatkills = 0.0f;
+                   
+
+
+                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
+                    {
+                        if (s.OutOfRegion)
+                            continue;
+
+                        numRatkills += s.ActualSystem.NPCKillsLastHour;
+                    }
+                    byte b = 255;
+
+                    double ratScale = numRatkills / (15000 * MapConf.UniverseDataScale);
+                    ratScale = Math.Min(Math.Max(0.0, ratScale), 1.0);
+                    b = (byte)( 255.0 * (ratScale));
+                    
+
+                    Color c = new Color() ;
+                    c.A = b;
+                    c.B = b;
+                    c.G = b;
+                    c.A = 255;
+
+
+                    RegionShape.Fill = new SolidColorBrush(c);
+
+                }
+
+                if (MapConf.ShowUniversePods)
+                {
+                    float numPodKills = 0.0f;
+
+                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
+                    {
+                        if (s.OutOfRegion)
+                            continue;
+
+                        numPodKills += s.ActualSystem.PodKillsLastHour;
+                    }
+                    byte b = 255;
+
+                    double podScale = numPodKills / (50 * MapConf.UniverseDataScale);
+                    podScale = Math.Min(Math.Max(0.0, podScale), 1.0);
+                    b = (byte)(255.0 * (podScale));
+
+                    Color c = new Color();
+                    c.A = b;
+                    c.R = b;
+                    c.G = b;
+                    c.A = 255;
+
+                    RegionShape.Fill = new SolidColorBrush(c);
+                }
+
+
+                if (MapConf.ShowUniverseKills)
+                {
+                    float numShipKills = 0.0f;
+
+                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
+                    {
+                        if (s.OutOfRegion)
+                            continue;
+
+                        numShipKills += s.ActualSystem.ShipKillsLastHour;
+                    }
+                    byte b = 255;
+                    double shipScale = numShipKills / (100 * MapConf.UniverseDataScale);
+                    shipScale = Math.Min(Math.Max(0.0, shipScale), 1.0);
+                    b = (byte)(255.0 * (shipScale));
+
+                    Color c = new Color();
+                    c.A = b;
+                    c.R = b;
+                    c.B = b;
+                    c.A = 255;
+                    RegionShape.Fill = new SolidColorBrush(c);
+                }
+
 
 
                 Canvas.SetLeft(RegionShape, mr.RegionX - 40);

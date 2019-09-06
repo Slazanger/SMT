@@ -103,10 +103,10 @@
                                             <StackPanel>
                                                 <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
                                                     <xctk:PropertyGrid.EditorDefinitions>
-                                                        <xctk:EditorTemplateDefinition TargetProperties="ESIOverlayScale">
+                                                        <xctk:EditorTemplateDefinition TargetProperties="UniverseDataScale">
                                                             <xctk:EditorTemplateDefinition.EditingTemplate>
                                                                 <DataTemplate>
-                                                                    <Slider Minimum="0.1" Maximum="2" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
+                                                                    <Slider Minimum="0.1" Maximum="5" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
                                                                 </DataTemplate>
                                                             </xctk:EditorTemplateDefinition.EditingTemplate>
                                                         </xctk:EditorTemplateDefinition>
