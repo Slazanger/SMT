@@ -50,6 +50,12 @@ namespace SMT.EVEData
         public StructureType Type { get; set; }
 
 
+        public Structure()
+        {
+        }
+
+
+
         public Structure(long TypeID, long StructureID, string SystemName, string StructureName)
         {
             ID = TypeID;
