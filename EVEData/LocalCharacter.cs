@@ -259,7 +259,7 @@ namespace SMT.EVEData
         public void Update()
         {
             TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
-            if (ts.Minutes < 0)
+            if (ts.Minutes < 1)
             {
                 RefreshAccessToken().Wait();
                 UpdateInfoFromESI().Wait();
