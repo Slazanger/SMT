@@ -53,8 +53,9 @@ namespace SMT.EVEData
         public void ShutDown()
         {
             updateThreadRunning = false;
-            if(!updateThread.Join(5000))
+            if(!updateThread.Join(10000))
             {
+
                 updateThread.Abort();
             }
         }
@@ -111,11 +112,12 @@ namespace SMT.EVEData
 
                 using (StreamReader sr = new StreamReader(responseStream))
                 {
-                    // Need to return this response
-                    string strContent = sr.ReadToEnd();
-
                     try
                     {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+
                         ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
                         if (z.Package != null)
                         {
