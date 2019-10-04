@@ -1017,7 +1017,7 @@ namespace SMT.EVEData
                     }
                     string[] bits = line.Split(';');
 
-                    if (bits.Length != 3)
+                    if (bits.Length != 4)
                     {
                         continue;
                     }
