@@ -110,7 +110,7 @@ namespace SMT.EVEData
         {
             
 
-            if( !(MapNodes.Keys.Contains(From)||MapNodes.Keys.Contains(To)) || From == "" || To == "" )
+            if( !(MapNodes.Keys.Contains(From))||!(MapNodes.Keys.Contains(To)) || From == "" || To == "" )
 
             {
                 return null;

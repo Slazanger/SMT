@@ -452,6 +452,10 @@ namespace SMT.EVEData
 
                 if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
                 {
+                    if(!EveManager.Instance.SystemIDToName.Keys.Contains(esr.Data.SolarSystemId))
+                    {
+                        return;
+                    }
                     Location = EveManager.Instance.SystemIDToName[esr.Data.SolarSystemId];
                     System s = EVEData.EveManager.Instance.GetEveSystem(Location);
                     if (s != null)
