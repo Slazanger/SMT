@@ -307,6 +307,8 @@ namespace SMT.EVEData
             // now serialise the caches to disk
             Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
             Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+
+            Utils.SerializToDisk<ObservableCollection<JumpBridge>>(JumpBridges, AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.dat");
         }
 
         public void ShutDown()
@@ -331,48 +333,31 @@ namespace SMT.EVEData
         {
             JumpBridges = new ObservableCollection<JumpBridge>();
 
-            /* Now automatic
-            string jumpBridgeData = AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.txt";
 
-            bool friendly = true;
-
-            if (File.Exists(jumpBridgeData))
+            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.dat";
+            if (!File.Exists(dataFilename))
             {
-                StreamReader file = new StreamReader(jumpBridgeData);
-                string line;
-                while ((line = file.ReadLine()) != null)
+                return;
+            }
+
+            try
+            {
+                ObservableCollection<JumpBridge> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<JumpBridge>));
+
+                FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
+                XmlReader xmlr = XmlReader.Create(fs);
+
+                loadList = (ObservableCollection<JumpBridge>)xms.Deserialize(xmlr);
+
+                foreach (JumpBridge j in loadList)
                 {
-                    if (line.StartsWith("---HOSTILE---"))
-                    {
-                        friendly = false;
-                    }
-
-                    // Skip comments
-                    if (line.StartsWith("#"))
-                    {
-                        continue;
-                    }
-
-                    string[] jbbits = line.Split(' ');
-
-                    // malformed line
-                    if (jbbits.Length < 3)
-                    {
-                        continue;
-                    }
-
-                    // in the form :
-                    // FromSystem --> ToSystem
-                    string from = jbbits[0];
-                    string to = jbbits[2];
-
-                    if (DoesSystemExist(from) && DoesSystemExist(to))
-                    {
-                        JumpBridges.Add(new JumpBridge(from, to, friendly));
-                    }
+                    JumpBridges.Add(j);
                 }
             }
-            */
+            catch
+            {
+            }
         }
 
         /// <summary>

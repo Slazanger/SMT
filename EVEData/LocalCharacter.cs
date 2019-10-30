@@ -202,6 +202,8 @@ namespace SMT.EVEData
             ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
             DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
 
+            UseAnsiblexGates = true;
+
             ActiveRouteLock = new object();
 
             KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
@@ -218,6 +220,8 @@ namespace SMT.EVEData
             Name = name;
             LocalChatFile = lcf;
             Location = location;
+
+            UseAnsiblexGates = true;
 
             ESILinked = false;
             ESIAuthCode = string.Empty;
@@ -289,7 +293,6 @@ namespace SMT.EVEData
                     Waypoints.Clear();
                     ActiveRoute.Clear();
                 }
-
 
             }
 

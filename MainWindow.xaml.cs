@@ -1219,7 +1219,10 @@ namespace SMT
 
         private async void ImportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
         {
-            foreach(EVEData.LocalCharacter c in EVEManager.LocalCharacters)
+            ImportJumpGatesBtn.IsEnabled = false;
+            ClearJumpGatesBtn.IsEnabled = false;
+
+            foreach (EVEData.LocalCharacter c in EVEManager.LocalCharacters)
             {
                 if (c.ESILinked)
                 {
@@ -1248,6 +1251,10 @@ namespace SMT
             }
 
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+
+            ImportJumpGatesBtn.IsEnabled = true;
+            ClearJumpGatesBtn.IsEnabled = true;
+
         }
 
         private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
