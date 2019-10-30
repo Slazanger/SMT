@@ -485,7 +485,6 @@ namespace SMT
             defaultColours.Name = "Default";
             defaultColours.UserEditable = false;
             defaultColours.FriendlyJumpBridgeColour = Color.FromRgb(102, 205, 170);
-            defaultColours.HostileJumpBridgeColour = Color.FromRgb(250, 128, 114);
             defaultColours.SystemOutlineColour = Color.FromRgb(0, 0, 0);
             defaultColours.InRegionSystemColour = Color.FromRgb(255, 239, 213);
             defaultColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
@@ -529,7 +528,6 @@ namespace SMT
             blueColours.Name = "Blue";
             blueColours.UserEditable = false;
             blueColours.FriendlyJumpBridgeColour = Color.FromRgb(154, 205, 50);
-            blueColours.HostileJumpBridgeColour = Color.FromRgb(216, 191, 216);
             blueColours.SystemOutlineColour = Color.FromRgb(0, 0, 0);
             blueColours.InRegionSystemColour = Color.FromRgb(134, 206, 235);
             blueColours.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
@@ -565,7 +563,6 @@ namespace SMT
             greyAndRed.Name = "Grey & Red";
             greyAndRed.UserEditable = false;
             greyAndRed.FriendlyJumpBridgeColour = Color.FromRgb(128, 128, 128);
-            greyAndRed.HostileJumpBridgeColour = Color.FromRgb(178, 34, 34);
             greyAndRed.SystemOutlineColour = Color.FromRgb(0, 0, 0);
             greyAndRed.InRegionSystemColour = Color.FromRgb(240, 248, 255);
             greyAndRed.InRegionSystemTextColour = Color.FromRgb(0, 0, 0);
@@ -601,7 +598,6 @@ namespace SMT
             dark.Name = "Dark";
             dark.UserEditable = false;
             dark.FriendlyJumpBridgeColour = Color.FromRgb(46, 139, 87);
-            dark.HostileJumpBridgeColour = Color.FromRgb(178, 34, 34);
             dark.SystemOutlineColour = Color.FromRgb(0, 0, 0);
             dark.InRegionSystemColour = Color.FromRgb(112, 128, 144);
             dark.InRegionSystemTextColour = Color.FromRgb(128, 128, 128);
@@ -636,7 +632,6 @@ namespace SMT
             lateNight.Name = "Modern Dark";
             lateNight.UserEditable = false;
             lateNight.FriendlyJumpBridgeColour = Color.FromRgb(102, 205, 170);
-            lateNight.HostileJumpBridgeColour = Color.FromRgb(250, 128, 114);
             lateNight.SystemOutlineColour = Color.FromRgb(0, 0, 0);
             lateNight.InRegionSystemColour = Color.FromRgb(255, 239, 213);
             lateNight.InRegionSystemTextColour = Color.FromRgb(245, 245, 245);

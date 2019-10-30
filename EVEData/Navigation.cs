@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -97,14 +98,36 @@ namespace SMT.EVEData
 
             foreach(JumpBridge jb in jumpBridges)
             {
-                if(jb.Friendly)
+                MapNodes[jb.From].JBConnection = jb.To;
+                MapNodes[jb.To].JBConnection = jb.From;
+            }
+        }
+
+
+        public static void UpdateJumpBridges(List<JumpBridge> jumpBridges)
+        {
+            foreach (JumpBridge jb in jumpBridges)
+            {
+                if(jb.FromID != 0)
                 {
                     MapNodes[jb.From].JBConnection = jb.To;
+                }
+
+                if(jb.ToID != 0)
+                {
                     MapNodes[jb.To].JBConnection = jb.From;
                 }
             }
         }
 
+        public static void ClearJumpBridges()
+        {
+            foreach(MapNode mn in MapNodes.Values)
+            {
+                mn.JBConnection = null;
+            }
+
+        }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, RoutingMode routingMode)
         {

@@ -588,7 +588,6 @@ namespace SMT
             Brush SysOutRegionTextBrush = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
 
             Brush FriendlyJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
-            Brush HostileJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
 
             Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
 
@@ -1339,16 +1338,8 @@ namespace SMT
                             MainCanvas.Children.Add(jbOutofSystemBlob);
 
 
-                            if (jb.Friendly)
-                            {
-                                jbOutofSystemBlob.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
-                                jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
-                            }
-                            else
-                            {
-                                jbOutofSystemBlob.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
-                                jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
-                            }
+                            jbOutofSystemBlob.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+                            jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
 
 
                         }
@@ -1382,14 +1373,7 @@ namespace SMT
                         System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
                         path.Data = pathGeometry;
 
-                        if (jb.Friendly)
-                        {
-                            path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
-                        }
-                        else
-                        {
-                            path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.HostileJumpBridgeColour);
-                        }
+                        path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
 
                         path.StrokeThickness = 2;
 

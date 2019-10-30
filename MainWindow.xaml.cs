@@ -183,6 +183,7 @@ namespace SMT
             CharactersList.ItemsSource = EVEManager.LocalCharacters;
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
+            JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
 
             MapColours selectedColours = MapConf.MapColours[0];
 
@@ -1214,6 +1215,46 @@ namespace SMT
                     }
                 }
             }
+        }
+
+        private async void ImportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            foreach(EVEData.LocalCharacter c in EVEManager.LocalCharacters)
+            {
+                if (c.ESILinked)
+                {
+                    List<EVEData.JumpBridge> jbl = await c.FindJumpGates(GateSearchFilter.Text);
+
+                    foreach (EVEData.JumpBridge jb in jbl)
+                    {
+                        bool found = false;
+
+                        foreach (EVEData.JumpBridge jbr in EVEManager.JumpBridges)
+                        {
+                            if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From) )
+                            {
+                                found = true;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            EVEManager.JumpBridges.Add(jb);
+                        }
+                    }
+
+                }
+
+            }
+
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+        }
+
+        private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+            EVEManager.JumpBridges.Clear();
+            EVEData.Navigation.ClearJumpBridges();
         }
     }
 

@@ -21,12 +21,10 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="f">From</param>
         /// <param name="t">To</param>
-        /// <param name="friend">Is Friendly?</param>
-        public JumpBridge(string f, string t, bool friend)
+        public JumpBridge(string f, string t)
         {
             From = f;
             To = t;
-            Friendly = friend;
         }
 
         /// <summary>
@@ -35,13 +33,23 @@ namespace SMT.EVEData
         public string From { get; set; }
 
         /// <summary>
+        /// InGame Structure ID
+        /// </summary>
+        public long FromID { get; set; }
+
+        /// <summary>
         /// Gets or sets the ending System
         /// </summary>
         public string To { get; set; }
 
         /// <summary>
-        /// Gets or sets if this is a friendly or hostile Jump bridge
+        /// InGame Structure ID
         /// </summary>
-        public bool Friendly { get; set; }
+        public long ToID { get; set; }
+
+        public override string ToString()
+        {
+            return $"{From} <==> {To}";
+        }
     }
 }

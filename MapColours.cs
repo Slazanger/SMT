@@ -17,10 +17,6 @@ namespace SMT
         [DisplayName("Friendly")]
         public Color FriendlyJumpBridgeColour { get; set; }
 
-        [Category("Jump Bridges")]
-        [DisplayName("Hostile ")]
-        public Color HostileJumpBridgeColour { get; set; }
-
         [Category("Systems")]
         [DisplayName("Name Size")]
         public int SystemTextSize { get; set; }

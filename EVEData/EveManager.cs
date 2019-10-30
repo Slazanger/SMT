@@ -187,7 +187,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current list of Jump Bridges
         /// </summary>
-        public List<JumpBridge> JumpBridges { get; set; }
+        public ObservableCollection<JumpBridge> JumpBridges { get; set; }
 
         
         public List<Coalition> Coalitions { get; set; }
@@ -320,7 +320,7 @@ namespace SMT.EVEData
 
         public void InitNavigation()
         {
-            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges);
+            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges.ToList());
         }
 
 
@@ -329,7 +329,9 @@ namespace SMT.EVEData
         /// </summary>
         public void LoadJumpBridgeData()
         {
-            JumpBridges = new List<JumpBridge>();
+            JumpBridges = new ObservableCollection<JumpBridge>();
+
+            /* Now automatic
             string jumpBridgeData = AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.txt";
 
             bool friendly = true;
@@ -370,6 +372,7 @@ namespace SMT.EVEData
                     }
                 }
             }
+            */
         }
 
         /// <summary>
@@ -1238,7 +1241,7 @@ namespace SMT.EVEData
             }
 
 
-            ResolveAllianceIDs(IDToResolve);
+            ResolveAllianceIDs(IDToResolve).Wait();
         }
 
         /// <summary>

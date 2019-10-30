@@ -355,10 +355,6 @@ namespace SMT.EVEData
 
                 esiRouteNeedsUpdate = false;
 
-
-
-
-
                 List<long> WayPointsToAdd = new List<long>();
 
 
@@ -370,8 +366,32 @@ namespace SMT.EVEData
                         if (rp.GateToTake == Navigation.GateType.Ansibex || Waypoints.Contains(rp.SystemName))
                         {
                             long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
-                            WayPointsToAdd.Add(wayPointSysID);
 
+                            if(rp.GateToTake == Navigation.GateType.Ansibex)
+                            {
+                                foreach(JumpBridge jb in EveManager.Instance.JumpBridges)
+                                {
+                                    if(jb.From == rp.SystemName)
+                                    {
+                                        if(jb.FromID != 0)
+                                        {
+                                            wayPointSysID = jb.FromID;
+                                        }
+                                        break;
+                                    }
+
+                                    if (jb.To == rp.SystemName)
+                                    {
+                                        if (jb.ToID != 0)
+                                        {
+                                            wayPointSysID = jb.ToID;
+                                        }
+                                        break;
+                                    }
+
+                                }
+                            }
+                            WayPointsToAdd.Add(wayPointSysID);
                         }
                     }
                 }
@@ -532,7 +552,7 @@ namespace SMT.EVEData
                 esiClient.SetCharacterData(ESIAuthData);
 
 
-                //               if (CorporationID == -1 || AllianceID == -1)
+                //if (CorporationID == -1 || AllianceID == -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esr = await esiClient.Character.Information((int)ID);
 
@@ -580,6 +600,79 @@ namespace SMT.EVEData
             }
 
             await EveManager.Instance.ResolveAllianceIDs(Standings.Keys.ToList());
+        }
+
+
+        public async Task<List<JumpBridge>> FindJumpGates(string JumpBridgeFilterString = " » " )
+        {
+
+
+            List<JumpBridge> jbl = new List<JumpBridge>();
+
+            if (!ESILinked)
+                return jbl;
+
+            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+            esiClient.SetCharacterData(ESIAuthData);
+
+
+            Dictionary<long, ESI.NET.Models.Universe.Structure> SystemJumpGateList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
+
+            esiClient.SetCharacterData(ESIAuthData);
+            ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, JumpBridgeFilterString, SearchCategory.Structure);
+            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
+            {
+                if (esr.Data.Structures == null)
+                {
+                    return jbl; 
+                }
+
+
+                foreach (long stationID in esr.Data.Structures)
+                {
+                    ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
+
+                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                    {
+                        SystemJumpGateList[stationID] = esrs.Data;
+
+                        // found a jump gate
+                        if(esrs.Data.TypeId == 35841)
+                        {
+                            string[] parts = esrs.Data.Name.Split(' ');
+                            string from = parts[0];
+                            string to = parts[2];
+
+                            bool found = false;
+                            foreach(JumpBridge jb in jbl)
+                            {
+                                if (jb.From == from)
+                                {
+                                    found = true;
+                                    jb.FromID = stationID;
+                                }
+                                if (jb.To == from)
+                                {
+                                    found = true;
+                                    jb.ToID = stationID;
+                                }
+                            }
+
+                            if (!found)
+                            {
+                                JumpBridge njb = new JumpBridge(from, to);
+                                njb.FromID = stationID;
+                                jbl.Add(njb);
+                            }
+
+                        }
+                    }
+                    
+                    Thread.Sleep(20);
+                }
+            }
+
+            return jbl;
         }
 
 
