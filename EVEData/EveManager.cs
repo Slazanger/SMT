@@ -1226,7 +1226,7 @@ namespace SMT.EVEData
             }
 
 
-            ResolveAllianceIDs(IDToResolve).Wait();
+            ResolveAllianceIDs(IDToResolve);
         }
 
         /// <summary>
