@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -22,8 +23,11 @@ namespace SMT.EVEData
     //jumpclones
 
 
-    public class LocalCharacter : Character
+    public class LocalCharacter : Character, INotifyPropertyChanged
     {
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// The name of the system this character is currently in 
         /// </summary>
@@ -141,6 +145,8 @@ namespace SMT.EVEData
 
                 m_UseAnsiblexGates = value;
                 routeNeedsUpdate = true;
+                esiRouteNeedsUpdate = true;
+                OnPropertyChanged("UseAnsiblexGates");
             }
         }
 
@@ -671,7 +677,7 @@ namespace SMT.EVEData
                         }
                     }
                     
-                    Thread.Sleep(20);
+                    Thread.Sleep(10);
                 }
             }
 
@@ -810,6 +816,16 @@ namespace SMT.EVEData
 
 
 
+        }
+
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
         }
 
     }
