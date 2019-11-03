@@ -20,6 +20,9 @@ namespace SMT.EVEData
         {
             Jumps = new List<string>();
             SHStructures = new List<StructureHunter.Structures>();
+
+            SOVAllianceTCU = 0;
+            SOVAllianceIHUB = 0;
         }
 
         /// <summary>
@@ -44,6 +47,8 @@ namespace SMT.EVEData
             JumpsLastHour = -1;
             ActiveIncursion = false;
 
+            SOVAllianceTCU = 0;
+            SOVAllianceIHUB = 0;
 
             Jumps = new List<string>();
             SHStructures = new List<StructureHunter.Structures>();

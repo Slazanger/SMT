@@ -2058,7 +2058,7 @@ namespace SMT
 
                 }
 
-                if (SystemAlliance != 0 && ShowStandings)
+                if (( sys.ActualSystem.SOVAllianceTCU != 0 || sys.ActualSystem.SOVAllianceIHUB != 0) && ShowStandings)
                 {
                     bool addToMap = true;
                     Brush br = null;
@@ -2087,11 +2087,11 @@ namespace SMT
 
 
 
-                        if (SystemAlliance != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceTCU))
+                        if (sys.ActualSystem.SOVAllianceTCU != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceTCU))
                         {
                             StandingTCU = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceTCU];
                         }
-                        if (SystemAlliance != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceIHUB))
+                        if (sys.ActualSystem.SOVAllianceIHUB != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceIHUB))
                         {
                             StandingIHUB = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceIHUB];
                         }
@@ -2138,7 +2138,7 @@ namespace SMT
                         }
 
                         
-                        if(sys.ActualSystem.SOVAllianceTCU != sys.ActualSystem.SOVAllianceIHUB)
+                        if(MapConf.SOVShowConflicts && sys.ActualSystem.SOVAllianceTCU != sys.ActualSystem.SOVAllianceIHUB)
                         {
                             addToMap = true;
 

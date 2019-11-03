@@ -104,7 +104,7 @@ namespace SMT.EVEData
                 catch (Exception)
                 {
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(60000);
                     continue;
                 }
 

@@ -346,6 +346,23 @@ namespace SMT
             }
         }
 
+        private bool m_SOVShowConflicts;
+        [Category("SOV")]
+        [DisplayName("Show Sov Conflicts")]
+        public bool SOVShowConflicts
+        {
+            get
+            {
+                return m_SOVShowConflicts;
+            }
+            set
+            {
+                m_SOVShowConflicts = value;
+                OnPropertyChanged("SOVShowConflicts");
+            }
+        }
+
+
         private bool m_SOVBasedonTCU;
         [Category("SOV")]
         [DisplayName("Show Sov Based on TCU")]
@@ -493,6 +510,8 @@ namespace SMT
             ShowActiveIncursions = true;
             CurrentJumpCharacter = "";
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
+            SOVShowConflicts = true;
+            SOVBasedITCU = false;
 
         }
 
