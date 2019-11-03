@@ -92,7 +92,7 @@ namespace SMT.EVEData
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(redistURL);
                 request.Method = WebRequestMethods.Http.Get;
                 request.Timeout = 60000;
-                request.UserAgent = "SMT/0.47";
+                request.UserAgent = "SMT/0.60";
                 request.KeepAlive = true;
                 request.Proxy = null;
                 HttpWebResponse response;
@@ -200,6 +200,12 @@ namespace SMT.EVEData
                     }
                     catch
                     {
+                        // wait 10 minutes
+                        for (int i = 0; i < 6000; i++)
+                        {
+                            Thread.Sleep(1000);
+                        }
+
                     }
                 }
 
