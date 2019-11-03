@@ -628,16 +628,37 @@ namespace SMT
             {
 
                 Coalition SystemCoalition = null;
-                if (system.ActualSystem.SOVAlliance != 0)
+
+                if (MapConf.SOVBasedITCU)
                 {
-                    foreach (Coalition c in EM.Coalitions)
+                    if (system.ActualSystem.SOVAllianceTCU != 0)
                     {
-                        foreach (long l in c.MemberAlliances)
+                        foreach (Coalition c in EM.Coalitions)
                         {
-                            if (l == system.ActualSystem.SOVAlliance)
+                            foreach (long l in c.MemberAlliances)
                             {
-                                SystemCoalition = c;
-                                break;
+                                if (l == system.ActualSystem.SOVAllianceTCU)
+                                {
+                                    SystemCoalition = c;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (system.ActualSystem.SOVAllianceIHUB != 0)
+                    {
+                        foreach (Coalition c in EM.Coalitions)
+                        {
+                            foreach (long l in c.MemberAlliances)
+                            {
+                                if (l == system.ActualSystem.SOVAllianceIHUB)
+                                {
+                                    SystemCoalition = c;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -1042,9 +1063,19 @@ namespace SMT
                 }
 
 
+                long SystemAlliance = 0;
 
 
-                if (ShowSovOwner && SelectedAlliance != 0 && system.ActualSystem.SOVAlliance == SelectedAlliance)
+                if(MapConf.SOVBasedITCU)
+                {
+                    SystemAlliance = system.ActualSystem.SOVAllianceTCU;
+                }
+                else
+                {
+                    SystemAlliance = system.ActualSystem.SOVAllianceIHUB;
+                }
+
+                if (ShowSovOwner && SelectedAlliance != 0 && SystemAlliance == SelectedAlliance)
                 {
                     Polygon poly = new Polygon();
 
@@ -1064,12 +1095,12 @@ namespace SMT
                 }
 
 
-                if ((ShowSovOwner || MapConf.ShowCoalition) && system.ActualSystem.SOVAlliance != 0 && EM.AllianceIDToName.Keys.Contains(system.ActualSystem.SOVAlliance))
+                if ((ShowSovOwner || MapConf.ShowCoalition) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
                 {
                     Label sysRegionText = new Label();
 
-                    string allianceName = EM.GetAllianceName(system.ActualSystem.SOVAlliance);
-                    string allianceTicker = EM.GetAllianceTicker(system.ActualSystem.SOVAlliance);
+                    string allianceName = EM.GetAllianceName(SystemAlliance);
+                    string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
                     string coalitionName = string.Empty;
 
                     string content = allianceTicker;
@@ -1087,9 +1118,9 @@ namespace SMT
                     SystemSubText += content;
 
 
-                    if (!AlliancesKeyList.Contains(system.ActualSystem.SOVAlliance))
+                    if (!AlliancesKeyList.Contains(SystemAlliance))
                     {
-                        AlliancesKeyList.Add(system.ActualSystem.SOVAlliance);
+                        AlliancesKeyList.Add(SystemAlliance);
                     }
 
 
@@ -1885,15 +1916,28 @@ namespace SMT
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
 
+                long SystemAlliance = 0;
+
+
+                if (MapConf.SOVBasedITCU)
+                {
+                    SystemAlliance = sys.ActualSystem.SOVAllianceTCU;
+                }
+                else
+                {
+                    SystemAlliance = sys.ActualSystem.SOVAllianceIHUB;
+                }
+
+
                 //                     
                 Coalition SystemCoalition = null;
-                if ( sys.ActualSystem.SOVAlliance != 0)
+                if (SystemAlliance != 0)
                 {
                     foreach (Coalition c in EM.Coalitions)
                     {
                         foreach (long l in c.MemberAlliances)
                         {
-                            if (l == sys.ActualSystem.SOVAlliance)
+                            if (l == SystemAlliance)
                             {
                                 SystemCoalition = c;
                                 break;
@@ -2014,7 +2058,7 @@ namespace SMT
 
                 }
 
-                if ( sys.ActualSystem.SOVAlliance != 0 && ShowStandings)
+                if (SystemAlliance != 0 && ShowStandings)
                 {
                     bool addToMap = true;
                     Brush br = null;
@@ -2022,21 +2066,49 @@ namespace SMT
                     if (ActiveCharacter != null && ActiveCharacter.ESILinked)
                     {
                         float Standing = 0.0f;
+                        float StandingTCU = 0.0f;
+                        float StandingIHUB = 0.0f; 
 
-                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAlliance)
+                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceTCU)
                         {
-                            Standing = 10.0f;
+                            StandingTCU = 10.0f;
                         }
+                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceIHUB)
+                        {
+                            StandingIHUB = 10.0f;
+                        }
+
 
                         if (sys.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
                         {
-                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
+                            StandingTCU = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
+                            StandingIHUB = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
                         }
 
-                        if (sys.ActualSystem.SOVAlliance != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAlliance))
+
+
+                        if (SystemAlliance != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceTCU))
                         {
-                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAlliance];
+                            StandingTCU = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceTCU];
                         }
+                        if (SystemAlliance != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceIHUB))
+                        {
+                            StandingIHUB = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceIHUB];
+                        }
+
+
+                        if (MapConf.SOVBasedITCU)
+                        {
+                            Standing = StandingTCU;
+                        }
+                        else
+                        {
+                            Standing = StandingIHUB;
+                        }
+
+
+
+
 
                         if (Standing == 0.0f)
                         {
@@ -2064,6 +2136,130 @@ namespace SMT
                         {
                             br = StandingVGoodBrush;
                         }
+
+                        
+                        if(sys.ActualSystem.SOVAllianceTCU != sys.ActualSystem.SOVAllianceIHUB)
+                        {
+                            addToMap = true;
+
+
+                            Brush b1 = Brushes.Transparent;
+                            Brush b2 = Brushes.Transparent;
+
+
+                            switch (StandingTCU)
+                            {
+                                case -10.0f:
+                                    b1 = StandingVBadBrush;
+                                    break;
+
+                                case -5.0f:
+                                    b1 = StandingBadBrush;
+                                    break;
+
+                                case 5.0f:
+                                    b1 = StandingGoodBrush;
+                                    break;
+
+                                case 10.0f:
+                                    b1 = StandingVGoodBrush;
+                                    break;
+                            }
+
+                            switch (StandingIHUB)
+                            {
+                                case -10.0f:
+                                    b2 = StandingVBadBrush;
+                                    break;
+
+                                case -5.0f:
+                                    b2 = StandingBadBrush;
+                                    break;
+
+                                case 5.0f:
+                                    b2 = StandingGoodBrush;
+                                    break;
+
+                                case 10.0f:
+                                    b2 = StandingVGoodBrush;
+                                    break;
+                            }
+
+
+
+                            // Create a DrawingBrush  
+                            DrawingBrush myBrush = new DrawingBrush();
+                            // Create a Geometry with white background  
+                            GeometryDrawing backgroundSquare = new GeometryDrawing(b1, null, new RectangleGeometry(new Rect(0, 0, 8, 8)));
+                            // Create a GeometryGroup that will be added to Geometry  
+                            GeometryGroup gGroup = new GeometryGroup();
+                            gGroup.Children.Add(new RectangleGeometry(new Rect(0, 0, 4, 4)));
+                            gGroup.Children.Add(new RectangleGeometry(new Rect(4, 4, 4, 4)));
+                            // Create a GeomertyDrawing  
+                            GeometryDrawing checkers = new GeometryDrawing(b2, null, gGroup);
+                            DrawingGroup checkersDrawingGroup = new DrawingGroup();
+                            checkersDrawingGroup.Children.Add(backgroundSquare);
+                            checkersDrawingGroup.Children.Add(checkers);
+                            myBrush.Drawing = checkersDrawingGroup;
+                            // Set Viewport and TimeMode  
+                            myBrush.Viewport = new Rect(0, 0, 8, 8);
+                            myBrush.Viewbox = new Rect(0, 0, 8, 8);
+                            myBrush.TileMode = TileMode.Tile;
+                            myBrush.ViewboxUnits = BrushMappingMode.Absolute;
+                            myBrush.ViewportUnits = BrushMappingMode.Absolute;
+
+
+
+                            /*
+                            DrawingBrush myBrush = new DrawingBrush();
+                            GeometryGroup gg1 = new GeometryGroup();
+                            GeometryGroup gg2 = new GeometryGroup();
+
+                            RectangleGeometry rg1 = new RectangleGeometry(new Rect(0, 0, 2, 2));
+                            RectangleGeometry rg2 = new RectangleGeometry(new Rect(0, 0, 1, 1));
+                            RectangleGeometry rg3 = new RectangleGeometry(new Rect(1, 1, 1, 1));
+
+                            gg1
+
+                            */
+
+
+                            /*
+                            DrawingBrush myBrush = new DrawingBrush();
+
+                            GeometryDrawing backgroundSquare =
+                                new GeometryDrawing(
+                                    Brushes.White,
+                                    null,
+                                    new RectangleGeometry(new Rect(0, 0, 100, 100)));
+
+                            GeometryGroup aGeometryGroup = new GeometryGroup();
+                            aGeometryGroup.Children.Add(new RectangleGeometry(new Rect(0, 0, 50, 50)));
+                            aGeometryGroup.Children.Add(new RectangleGeometry(new Rect(50, 50, 50, 50)));
+
+                            LinearGradientBrush checkerBrush = new LinearGradientBrush();
+                            checkerBrush.GradientStops.Add(new GradientStop(Colors.Black, 0.0));
+                            checkerBrush.GradientStops.Add(new GradientStop(Colors.Gray, 1.0));
+
+                            GeometryDrawing checkers = new GeometryDrawing(checkerBrush, null, aGeometryGroup);
+
+                            DrawingGroup checkersDrawingGroup = new DrawingGroup();
+                            checkersDrawingGroup.Children.Add(backgroundSquare);
+                            checkersDrawingGroup.Children.Add(checkers);
+
+                            myBrush.Drawing = checkersDrawingGroup;
+                            myBrush.Viewport = new Rect(0, 0, 0.5, 0.5);
+                            myBrush.ViewboxUnits = BrushMappingMode.Absolute;
+                            myBrush.TileMode = TileMode.Tile;
+
+                            */
+
+                            br = myBrush;
+
+                        }
+                        
+
+
                     }
                     else
                     {
@@ -2077,11 +2273,17 @@ namespace SMT
                     {
                         Polygon poly = new Polygon();
                         poly.Fill = br;
-                        poly.SnapsToDevicePixels = true;
+                        //poly.SnapsToDevicePixels = true;
                         poly.Stroke = poly.Fill;
                         poly.StrokeThickness = 0.4;
                         poly.StrokeDashCap = PenLineCap.Round;
                         poly.StrokeLineJoin = PenLineJoin.Round;
+                        poly.Stretch = Stretch.None;
+                        
+
+
+
+
 
                         foreach (Point p in sys.CellPoints)
                         {
@@ -2097,7 +2299,7 @@ namespace SMT
                 }
 
 
-                if (sys.ActualSystem.SOVAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null)
+                if (SystemAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null)
                 {
 
                     Polygon poly = new Polygon();

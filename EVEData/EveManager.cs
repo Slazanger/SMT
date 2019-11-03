@@ -1219,10 +1219,16 @@ namespace SMT.EVEData
             foreach (MapSystem s in r.MapSystems.Values.ToList())
             {
                 
-                if (s.ActualSystem.SOVAlliance != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAlliance) && !IDToResolve.Contains(s.ActualSystem.SOVAlliance))
+                if (s.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(s.ActualSystem.SOVAllianceTCU))
                 {
-                    IDToResolve.Add(s.ActualSystem.SOVAlliance);
+                    IDToResolve.Add(s.ActualSystem.SOVAllianceTCU);
                 }
+
+                if (s.ActualSystem.SOVAllianceIHUB != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAllianceIHUB) && !IDToResolve.Contains(s.ActualSystem.SOVAllianceIHUB))
+                {
+                    IDToResolve.Add(s.ActualSystem.SOVAllianceIHUB);
+                }
+
             }
 
 
@@ -1805,6 +1811,7 @@ namespace SMT.EVEData
                                 es.TCUVunerabliltyStart = ss.VulnerableStartTime;
                                 es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
                                 es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                                es.SOVAllianceTCU = ss.AllianceId;
                             }
 
                             if (ss.TypeId == 32458)
@@ -1812,6 +1819,8 @@ namespace SMT.EVEData
                                 es.IHubVunerabliltyStart = ss.VulnerableStartTime;
                                 es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
                                 es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                                es.SOVAllianceIHUB = ss.AllianceId;
+                                
                             }
                         }
                     }
@@ -2030,7 +2039,7 @@ namespace SMT.EVEData
                                     {
                                         if (obj["alliance_id"] != null)
                                         {
-                                            es.SOVAlliance = long.Parse(obj["alliance_id"].ToString());
+                                            es.SOVAllianceTCU = long.Parse(obj["alliance_id"].ToString());
                                         }
                                     }
                                 }

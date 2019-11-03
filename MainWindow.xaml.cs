@@ -679,21 +679,39 @@ namespace SMT
 
                         numSystems++;
 
-
-                        if (RegionRC.ActiveCharacter.AllianceID != 0 && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAlliance)
+                        if(MapConf.SOVBasedITCU)
                         {
-                            averageStanding += 10.0f;
+                            if (RegionRC.ActiveCharacter.AllianceID != 0 && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceTCU)
+                            {
+                                averageStanding += 10.0f;
+                            }
+
+                            if (s.ActualSystem.SOVAllianceTCU != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceTCU))
+                            {
+                                averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVAllianceTCU];
+                            }
+
                         }
+                        else
+                        {
+                            if (RegionRC.ActiveCharacter.AllianceID != 0 && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceIHUB)
+                            {
+                                averageStanding += 10.0f;
+                            }
+
+                            if (s.ActualSystem.SOVAllianceTCU != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceIHUB))
+                            {
+                                averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVAllianceIHUB];
+                            }
+
+                        }
+
 
                         if (s.ActualSystem.SOVCorp != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
                         {
                             averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVCorp];
                         }
 
-                        if (s.ActualSystem.SOVAlliance != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAlliance))
-                        {
-                            averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVAlliance];
-                        }
                     }
 
                     averageStanding = averageStanding / numSystems;

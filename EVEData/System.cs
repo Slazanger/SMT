@@ -128,7 +128,14 @@ namespace SMT.EVEData
         /// Gets or sets the name of the alliance holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public long SOVAlliance { get; set; }
+        public long SOVAllianceTCU { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the alliance holding sov in this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public long SOVAllianceIHUB { get; set; }
+
 
         /// <summary>
         /// Gets or sets the name of the corporation holding sov in this system

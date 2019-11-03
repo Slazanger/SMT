@@ -346,6 +346,23 @@ namespace SMT
             }
         }
 
+        private bool m_SOVBasedonTCU;
+        [Category("SOV")]
+        [DisplayName("Show Sov Based on TCU")]
+        public bool SOVBasedITCU
+        {
+            get
+            {
+                return m_SOVBasedonTCU;
+            }
+            set
+            {
+                m_SOVBasedonTCU = value;
+                OnPropertyChanged("SOVBasedITCU");
+            }
+        }
+
+
 
         private bool m_ShowTCUVunerabilities;
         [Category("SOV")]
