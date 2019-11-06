@@ -511,7 +511,7 @@ namespace SMT
             CurrentJumpCharacter = "";
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
-            SOVBasedITCU = false;
+            SOVBasedITCU = true;
 
         }
 
