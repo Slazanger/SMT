@@ -1118,19 +1118,9 @@ namespace SMT.EVEData
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line == string.Empty)
-                    {
-                        continue;
-                    }
-                    string[] bits = line.Split(';');
-
-                    if (bits.Length < 2)
-                    {
-                        continue;
-                    }
 
 
-                    string system = bits[0];
+                    string system = line.Trim();
 
                     System s = GetEveSystem(system);
                     if (s != null)
