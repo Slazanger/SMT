@@ -79,6 +79,12 @@ namespace SMT
         public bool ShowJoveObservatories { get; set; }
 
 
+        [Category("Navigation")]
+        [DisplayName("Show Cyno Beacons")]
+        public bool ShowCynoBeacons { get; set; }
+
+        
+
 
         [Category("Navigation")]
         [DisplayName("Show Jump Distance")]
@@ -346,6 +352,8 @@ namespace SMT
             }
         }
 
+
+
         private bool m_SOVShowConflicts;
         [Category("SOV")]
         [DisplayName("Show Sov Conflicts")]
@@ -527,7 +535,10 @@ namespace SMT
             defaultColours.OutRegionSystemColour = Color.FromRgb(218, 165, 32);
             defaultColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
 
-            
+            defaultColours.PopupText = Color.FromRgb(0, 0, 0);
+            defaultColours.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
+
+
             defaultColours.MapBackgroundColour = (Color)ColorConverter.ConvertFromString("#5E615E");
             defaultColours.ESIOverlayColour = Color.FromRgb(188, 143, 143);
             defaultColours.IntelOverlayColour = Color.FromRgb(178, 34, 34);
@@ -592,6 +603,10 @@ namespace SMT
 
             blueColours.ZKillDataOverlay = Colors.Purple;
 
+            blueColours.PopupText = Color.FromRgb(0, 0, 0);
+            blueColours.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
+
+
 
             MapColours.Add(blueColours);
 
@@ -624,6 +639,10 @@ namespace SMT
 
             greyAndRed.TheraEntranceRegion = Colors.YellowGreen;
             greyAndRed.TheraEntranceSystem = Colors.YellowGreen;
+
+            greyAndRed.PopupText = Color.FromRgb(0, 0, 0);
+            greyAndRed.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
+
 
             greyAndRed.ZKillDataOverlay = Colors.Purple;
 
@@ -660,6 +679,10 @@ namespace SMT
             dark.TheraEntranceRegion = Colors.YellowGreen;
             dark.TheraEntranceSystem = Colors.YellowGreen;
 
+            defaultColours.PopupText = Color.FromRgb(0, 0, 0);
+            defaultColours.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
+
+
             dark.ZKillDataOverlay = Colors.Purple;
 
             MapColours.Add(dark);
@@ -693,6 +716,10 @@ namespace SMT
 
             lateNight.TheraEntranceRegion = Colors.YellowGreen;
             lateNight.TheraEntranceSystem = Colors.YellowGreen;
+
+            lateNight.PopupText = Color.FromRgb(200, 200, 200);
+            lateNight.PopupBackground = Colors.DarkGray;
+
 
             lateNight.ZKillDataOverlay = Colors.Purple;
 

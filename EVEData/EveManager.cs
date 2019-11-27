@@ -500,7 +500,8 @@ namespace SMT.EVEData
             StartUpdateIncursionsFromESI();
             // temp disabled
             //StartEveTraceFleetUpdate();
-//            StartUpdateStructureHunterUpdate();
+            //StartUpdateStructureHunterUpdate();
+
             StartUpdateSovStructureUpdate();
         }
 
@@ -537,7 +538,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("The Forge", "10000002", "Caldari", 600, 300));
             Regions.Add(new MapRegion("Fountain", "10000058", string.Empty, 60, 250));
             Regions.Add(new MapRegion("Geminate", "10000029", "The Society", 665, 245));
-            Regions.Add(new MapRegion("Genesis", "10000067", string.Empty, 240, 430));
+            Regions.Add(new MapRegion("Genesis", "10000067", "Amarr", 240, 430));
             Regions.Add(new MapRegion("Great Wildlands", "10000011", "Thukker Tribe", 815, 460));
             Regions.Add(new MapRegion("Heimatar", "10000030", "Minmatar", 610, 430));
             Regions.Add(new MapRegion("Immensea", "10000025", string.Empty, 675, 615));
@@ -1021,6 +1022,9 @@ namespace SMT.EVEData
                 }
             }
 
+   
+
+
 
             // now serialise the classes to disk
             Utils.SerializToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
@@ -1028,6 +1032,38 @@ namespace SMT.EVEData
             Utils.SerializToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
             Init();
+        }
+
+        internal void AddUpdateJumpBridge(string from, string to, long stationID)
+        {
+            // validate
+            if (GetEveSystem(from) == null || GetEveSystem(to) == null)
+            {
+                return;
+            }
+
+            bool found = false;
+
+            foreach (JumpBridge jb in JumpBridges)
+            {
+                if (jb.From == from)
+                {
+                    found = true;
+                    jb.FromID = stationID;
+                }
+                if (jb.To == from)
+                {
+                    found = true;
+                    jb.ToID = stationID;
+                }
+            }
+
+            if (!found)
+            {
+                JumpBridge njb = new JumpBridge(from, to);
+                njb.FromID = stationID;
+                JumpBridges.Add(njb);
+            }
         }
 
         /// <summary>
@@ -1065,6 +1101,45 @@ namespace SMT.EVEData
             {
                 AllianceIDToTicker = new SerializableDictionary<long, string>();
             }
+
+            // patch up any links
+            foreach (System s in Systems)
+            {
+                NameToSystem[s.Name] = s;
+            }
+
+
+            // now add the beacons
+            string cynoBeaconsFile = AppDomain.CurrentDomain.BaseDirectory + @"\CynoBeacons.txt";
+            if (File.Exists(cynoBeaconsFile))
+            {
+                StreamReader file = new StreamReader(cynoBeaconsFile);
+
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (line == string.Empty)
+                    {
+                        continue;
+                    }
+                    string[] bits = line.Split(';');
+
+                    if (bits.Length < 2)
+                    {
+                        continue;
+                    }
+
+
+                    string system = bits[0];
+
+                    System s = GetEveSystem(system);
+                    if (s != null)
+                    {
+                        s.HasJumpBeacon = true;
+                    }
+                }
+            }
+
 
             Init();
         }
@@ -1352,11 +1427,7 @@ namespace SMT.EVEData
             };
 
 
-            // patch up any links
-            foreach (System s in Systems)
-            {
-                NameToSystem[s.Name] = s;
-            }
+
 
             foreach (MapRegion rr in Regions)
             {

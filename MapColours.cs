@@ -121,7 +121,13 @@ namespace SMT
         [DisplayName("Data Overlay")]
         public Color ZKillDataOverlay{ get; set; }
 
+        [Category("Popup")]
+        [DisplayName("Background")]
+        public Color PopupBackground { get; set; }
 
+        [Category("Popup")]
+        [DisplayName("Text")]
+        public Color PopupText { get; set; }
 
         static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
         {

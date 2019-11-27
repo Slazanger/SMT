@@ -330,6 +330,7 @@
     <Resource Include="Images\Security Inactive.png" />
     <Resource Include="Images\Security.png" />
     <Resource Include="Images\Jove_logo.png" />
+    <Resource Include="Images\CynoBeacon.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>

@@ -703,7 +703,7 @@ namespace SMT
 
                 }
 
-                /*if(ActiveCharacter != null && ActiveCharacter.ESILinked && ActiveCharacter.DockableStructures.Keys.Contains(system.Name))
+                if(ActiveCharacter != null && ActiveCharacter.ESILinked && ActiveCharacter.DockableStructures.Keys.Contains(system.Name))
                 {
                     foreach(StructureIDs.StructureIdData sid in ActiveCharacter.DockableStructures[system.Name])
                     {
@@ -730,7 +730,7 @@ namespace SMT
                         }
                     }
                 }
-                */
+                
 
                 if (drawKeep)
                 {
@@ -997,24 +997,23 @@ namespace SMT
                     }
                 }
 
+                if(MapConf.ShowCynoBeacons && system.ActualSystem.HasJumpBeacon)
+                {
+                    Shape CynoBeaconLogo = new Ellipse { Width = 8, Height = 8 };
+                    CynoBeaconLogo.Stroke = SysOutlineBrush;
+                    CynoBeaconLogo.StrokeThickness = 1.0;
+                    CynoBeaconLogo.StrokeLineJoin = PenLineJoin.Round;
+                    CynoBeaconLogo.Fill = new SolidColorBrush(Colors.OrangeRed);
+
+                    Canvas.SetLeft(CynoBeaconLogo, system.LayoutX + 7);
+                    Canvas.SetTop(CynoBeaconLogo, system.LayoutY - 12);
+                    Canvas.SetZIndex(CynoBeaconLogo, SYSTEM_Z_INDEX + 5);
+                    MainCanvas.Children.Add(CynoBeaconLogo);
+                }
+
 
                 if(MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory)
                 {
-                    //                    Shape JoveOutline = new Ellipse { Width = SYSTEM_SHAPE_SIZE+6, Height = SYSTEM_SHAPE_SIZE+6 };
-                    //                    JoveOutline.Stroke = SysOutlineBrush;
-                    //                    JoveOutline.StrokeThickness = 1.5;
-                    //                    JoveOutline.StrokeLineJoin = PenLineJoin.Round;
-                    //                    JoveOutline.Fill = SysInRegionBrush;
-
-
-
-                    //                    Canvas.SetLeft(JoveOutline, system.LayoutX - (SYSTEM_SHAPE_OFFSET + 3));
-                    //                    Canvas.SetTop(JoveOutline, system.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
-                    //                    Canvas.SetZIndex(JoveOutline, SYSTEM_Z_INDEX - 10);
-                    //                    MainCanvas.Children.Add(JoveOutline);
-
-
-
                     Image JoveLogo = new Image
                     {
                         Width = 10,
@@ -1031,10 +1030,6 @@ namespace SMT
                     Canvas.SetTop(JoveLogo, system.LayoutY - SYSTEM_SHAPE_OFFSET + 6);
                     Canvas.SetZIndex(JoveLogo, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(JoveLogo);
-
-
-
-
                 }
 
 
@@ -2185,76 +2180,50 @@ namespace SMT
                                     break;
                             }
 
+                            if(StandingIHUB < 0 && StandingTCU > 0 || StandingIHUB > 0 && StandingTCU < 0)
+                            {
+                                LinearGradientBrush lgb = new LinearGradientBrush();
+                                lgb.StartPoint = new Point(0, 0);
+                                lgb.EndPoint = new Point(1, 1);
+                                lgb.GradientStops.Add(new GradientStop(Colors.Yellow, 0.0));
+                                lgb.GradientStops.Add(new GradientStop(Colors.Red, 1));
+
+                                br = lgb;
+
+                            }
+                            else
+                            {
+                                // Create a DrawingBrush  
+                                DrawingBrush myBrush = new DrawingBrush();
+                                // Create a Geometry with white background  
+                                GeometryDrawing backgroundSquare = new GeometryDrawing(b1, null, new RectangleGeometry(new Rect(0, 0, 8, 8)));
+                                // Create a GeometryGroup that will be added to Geometry  
+                                GeometryGroup gGroup = new GeometryGroup();
+                                gGroup.Children.Add(new RectangleGeometry(new Rect(0, 0, 4, 4)));
+                                gGroup.Children.Add(new RectangleGeometry(new Rect(4, 4, 4, 4)));
+                                // Create a GeomertyDrawing  
+                                GeometryDrawing checkers = new GeometryDrawing(b2, null, gGroup);
+                                DrawingGroup checkersDrawingGroup = new DrawingGroup();
+                                checkersDrawingGroup.Children.Add(backgroundSquare);
+                                checkersDrawingGroup.Children.Add(checkers);
+                                myBrush.Drawing = checkersDrawingGroup;
+                                // Set Viewport and TimeMode  
+                                myBrush.Viewport = new Rect(0, 0, 8, 8);
+                                myBrush.Viewbox = new Rect(0, 0, 8, 8);
+                                myBrush.TileMode = TileMode.Tile;
+                                myBrush.ViewboxUnits = BrushMappingMode.Absolute;
+                                myBrush.ViewportUnits = BrushMappingMode.Absolute;
 
 
-                            // Create a DrawingBrush  
-                            DrawingBrush myBrush = new DrawingBrush();
-                            // Create a Geometry with white background  
-                            GeometryDrawing backgroundSquare = new GeometryDrawing(b1, null, new RectangleGeometry(new Rect(0, 0, 8, 8)));
-                            // Create a GeometryGroup that will be added to Geometry  
-                            GeometryGroup gGroup = new GeometryGroup();
-                            gGroup.Children.Add(new RectangleGeometry(new Rect(0, 0, 4, 4)));
-                            gGroup.Children.Add(new RectangleGeometry(new Rect(4, 4, 4, 4)));
-                            // Create a GeomertyDrawing  
-                            GeometryDrawing checkers = new GeometryDrawing(b2, null, gGroup);
-                            DrawingGroup checkersDrawingGroup = new DrawingGroup();
-                            checkersDrawingGroup.Children.Add(backgroundSquare);
-                            checkersDrawingGroup.Children.Add(checkers);
-                            myBrush.Drawing = checkersDrawingGroup;
-                            // Set Viewport and TimeMode  
-                            myBrush.Viewport = new Rect(0, 0, 8, 8);
-                            myBrush.Viewbox = new Rect(0, 0, 8, 8);
-                            myBrush.TileMode = TileMode.Tile;
-                            myBrush.ViewboxUnits = BrushMappingMode.Absolute;
-                            myBrush.ViewportUnits = BrushMappingMode.Absolute;
 
 
 
-                            /*
-                            DrawingBrush myBrush = new DrawingBrush();
-                            GeometryGroup gg1 = new GeometryGroup();
-                            GeometryGroup gg2 = new GeometryGroup();
+                                br = myBrush;
 
-                            RectangleGeometry rg1 = new RectangleGeometry(new Rect(0, 0, 2, 2));
-                            RectangleGeometry rg2 = new RectangleGeometry(new Rect(0, 0, 1, 1));
-                            RectangleGeometry rg3 = new RectangleGeometry(new Rect(1, 1, 1, 1));
-
-                            gg1
-
-                            */
+                            }
 
 
-                            /*
-                            DrawingBrush myBrush = new DrawingBrush();
 
-                            GeometryDrawing backgroundSquare =
-                                new GeometryDrawing(
-                                    Brushes.White,
-                                    null,
-                                    new RectangleGeometry(new Rect(0, 0, 100, 100)));
-
-                            GeometryGroup aGeometryGroup = new GeometryGroup();
-                            aGeometryGroup.Children.Add(new RectangleGeometry(new Rect(0, 0, 50, 50)));
-                            aGeometryGroup.Children.Add(new RectangleGeometry(new Rect(50, 50, 50, 50)));
-
-                            LinearGradientBrush checkerBrush = new LinearGradientBrush();
-                            checkerBrush.GradientStops.Add(new GradientStop(Colors.Black, 0.0));
-                            checkerBrush.GradientStops.Add(new GradientStop(Colors.Gray, 1.0));
-
-                            GeometryDrawing checkers = new GeometryDrawing(checkerBrush, null, aGeometryGroup);
-
-                            DrawingGroup checkersDrawingGroup = new DrawingGroup();
-                            checkersDrawingGroup.Children.Add(backgroundSquare);
-                            checkersDrawingGroup.Children.Add(checkers);
-
-                            myBrush.Drawing = checkersDrawingGroup;
-                            myBrush.Viewport = new Rect(0, 0, 0.5, 0.5);
-                            myBrush.ViewboxUnits = BrushMappingMode.Absolute;
-                            myBrush.TileMode = TileMode.Tile;
-
-                            */
-
-                            br = myBrush;
 
                         }
                         
@@ -2564,6 +2533,9 @@ namespace SMT
                 SystemInfoPopup.HorizontalOffset = 15;
                 SystemInfoPopup.DataContext = selectedSys.ActualSystem;
 
+                SystemInfoPopupSP.Background = new SolidColorBrush(MapConf.ActiveColourScheme.PopupBackground);
+
+
                 SystemInfoPopupSP.Children.Clear();
 
                 Label header = new Label();
@@ -2572,6 +2544,8 @@ namespace SMT
                 header.FontSize = 13;
                 header.Padding = one;
                 header.Margin = one;
+                header.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                
 
                 SystemInfoPopupSP.Children.Add(header);
 
@@ -2583,6 +2557,7 @@ namespace SMT
                     data.Padding = one;
                     data.Margin = one;
                     data.Content = $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
+                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
@@ -2592,6 +2567,7 @@ namespace SMT
                     data.Padding = one;
                     data.Margin = one;
                     data.Content = $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
+                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
@@ -2601,6 +2577,7 @@ namespace SMT
                     data.Padding = one;
                     data.Margin = one;
                     data.Content = $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}";
+                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
@@ -2611,6 +2588,7 @@ namespace SMT
                     data.Margin = one;
 
                     data.Content = $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
+                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
@@ -2625,7 +2603,9 @@ namespace SMT
                             jbl.Padding = one;
                             jbl.Margin = one;
                             jbl.Content = $"JB\t: {jb.To}";
+                            jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                             SystemInfoPopupSP.Children.Add(jbl);
+
                         }
 
                         if (selectedSys.Name == jb.To)
@@ -2634,6 +2614,7 @@ namespace SMT
                             jbl.Padding = one;
                             jbl.Margin = one;
                             jbl.Content = $"JB\t: {jb.From}";
+                            jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                             SystemInfoPopupSP.Children.Add(jbl);
                         }
                     }
@@ -2652,6 +2633,7 @@ namespace SMT
                     sov.Padding = one;
                     sov.Margin = one;
                     sov.Content = $"IHUB\t:  {selectedSys.ActualSystem.IHubVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.IHubVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.IHubVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.IHubVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.IHubOccupancyLevel}";
+                    sov.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(sov);
                 }
 
@@ -2662,6 +2644,7 @@ namespace SMT
                     sov.Padding = one;
                     sov.Margin = one;
                     sov.Content = $"TCU\t:  {selectedSys.ActualSystem.TCUVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.TCUVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.TCUOccupancyLevel}";
+                    sov.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(sov);
                 }
 
@@ -2677,6 +2660,7 @@ namespace SMT
                         tl.Padding = one;
                         tl.Margin = one;
                         tl.Content = $"Thera \t:  {tc.InSignatureID}";
+                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
 
                     }

@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
-        Title="SMT 0.61" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
+        Title="SMT 0.62" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
@@ -260,6 +260,7 @@
                                             <RowDefinition Height="30"/>
                                             <RowDefinition Height="25"/>
                                             <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
                                             <RowDefinition Height="30"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
@@ -269,9 +270,10 @@
                                         </StackPanel>
                                         <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="ImportJumpGatesBtn_Click" Margin="2" Grid.Row="1"/>
                                         <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2"/>
+                                        <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3"/>
 
-                                        <Label Content="Ansiblex Gates" Margin="2" Grid.Row="3"/>
-                                        <ListBox x:Name="JumpBridgeList" Margin="2" Grid.Row="4"/>
+                                        <Label Content="Ansiblex Gates" Margin="2" Grid.Row="4"/>
+                                        <ListBox x:Name="JumpBridgeList" Margin="2" Grid.Row="5"/>
 
                                     </Grid>
                                 </xcad:LayoutAnchorable>
@@ -338,31 +340,7 @@
                 </xcad:LayoutRoot>
             </xcad:DockingManager>
 
-            <Popup x:Name="SystemInfoPopup" IsOpen="False" AllowsTransparency="True" Width="100" Margin="458,0" Grid.RowSpan="2">
-                <StackPanel Background="#FF959595">
-                    <Label Content="{Binding Name}" FontWeight="Bold" />
-
-                    <StackPanel Orientation="Horizontal"  Margin="10,0,0,0">
-                        <Label Content="Jumps" Width="50" Padding="1" />
-                        <Label Content="{Binding JumpsLastHour}" Padding="1" FontWeight="Bold" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal"  Margin="10,0,0,0">
-                        <Label Content="Pods" Width="50" Padding="1" />
-                        <Label Content="{Binding PodKillsLastHour}" Padding="1" FontWeight="Bold" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                        <Label Content="Ships" Width="50" Padding="1" />
-                        <Label Content="{Binding ShipKillsLastHour}" Padding="1" FontWeight="Bold" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                        <Label Content="NPCs" Width="50" Padding="1" />
-                        <Label Content="{Binding NPCKillsLastHour}" Padding="1" FontWeight="Bold" />
-                    </StackPanel>
-                </StackPanel>
-            </Popup>
+ 
             <StatusBar Grid.Row="2" x:Name="AppStatusBar">
                 <StatusBarItem>
                     <TextBlock>EVE Time :</TextBlock>

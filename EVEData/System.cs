@@ -23,6 +23,7 @@ namespace SMT.EVEData
 
             SOVAllianceTCU = 0;
             SOVAllianceIHUB = 0;
+            HasJumpBeacon = false;
         }
 
         /// <summary>
@@ -103,6 +104,10 @@ namespace SMT.EVEData
         public bool HasIceBelt { get; set; }
 
         public bool HasJoveObservatory { get; set; }
+
+
+        [XmlIgnoreAttribute]
+        public bool HasJumpBeacon { get; set; }
 
 
         /// <summary>

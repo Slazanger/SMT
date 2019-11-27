@@ -652,28 +652,7 @@ namespace SMT.EVEData
                             string from = parts[0];
                             string to = parts[2];
 
-                            bool found = false;
-                            foreach(JumpBridge jb in jbl)
-                            {
-                                if (jb.From == from)
-                                {
-                                    found = true;
-                                    jb.FromID = stationID;
-                                }
-                                if (jb.To == from)
-                                {
-                                    found = true;
-                                    jb.ToID = stationID;
-                                }
-                            }
-
-                            if (!found)
-                            {
-                                JumpBridge njb = new JumpBridge(from, to);
-                                njb.FromID = stationID;
-                                jbl.Add(njb);
-                            }
-
+                            EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
                         }
                     }
                     

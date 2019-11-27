@@ -1235,6 +1235,55 @@ namespace SMT
             }
         }
 
+        private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (!Clipboard.ContainsText(TextDataFormat.Text))
+            {
+                return;
+            }
+            String JBText = Clipboard.GetText(TextDataFormat.Text);
+
+            using (StringReader reader = new StringReader(JBText))
+            {
+                string line = string.Empty;
+                do
+                {
+                    line = reader.ReadLine();
+                    if (line != null)
+                    {
+
+                        // ignore comments
+                        if(line.StartsWith("#"))
+                        {
+                            continue;
+                        }
+
+                        string[] bits = line.Split(' ');
+                        if(bits.Length >3)
+                        {
+                            int test = 1;
+                            test++;
+
+                            long IDFrom = 0;
+                            long.TryParse(bits[0], out IDFrom);
+
+                            string from = bits[1];
+                            string to = bits[3];
+
+                            EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
+                        }
+
+
+
+                    }
+
+                } while (line != null);
+            }
+
+        }
+
+
         private async void ImportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
         {
             ImportJumpGatesBtn.IsEnabled = false;
