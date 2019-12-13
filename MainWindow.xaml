@@ -127,7 +127,7 @@
 
 
                             <xcad:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False" >
-                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Universe">
+                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Regions">
                                     <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1" >
                                         <Popup x:Name="RegionCharacterInfo" IsOpen="False" AllowsTransparency="True"  >
                                             <StackPanel x:Name="RegionCharacterInfoSP" Background="Gray" />
@@ -148,7 +148,14 @@
                                 <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
                                     <local:RegionControl x:Name="RegionRC" />
                                 </xcad:LayoutDocument>
-                            
+
+                                <xcad:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverseViewID" Title="Universe View">
+                                    <local:UniverseControl x:Name="UniverseUC" />
+                                </xcad:LayoutDocument>
+
+                               
+
+
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutPanel>
 

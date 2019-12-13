@@ -14,6 +14,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 
+
 namespace SMT
 {
     /// <summary>
@@ -21,6 +22,9 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
+
+
+
         /// <summary>
         /// Main Region Manager
         /// </summary>
@@ -206,6 +210,9 @@ namespace SMT
 
             RegionRC.RegionChanged += RegionRC_RegionChanged;
             RegionRC.CharacterSelectionChanged += RegionRC_CharacterSelectionChanged;
+
+
+            UniverseUC.Init();
 
 
             // load the anom data

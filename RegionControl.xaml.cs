@@ -703,7 +703,7 @@ namespace SMT
 
                 }
 
-                if (ActiveCharacter != null && ActiveCharacter.ESILinked && ActiveCharacter.DockableStructure != null && ActiveCharacter.DockableStructures.Keys.Contains(system.Name))
+                if (ActiveCharacter != null && ActiveCharacter.ESILinked && ActiveCharacter.DockableStructures != null && ActiveCharacter.DockableStructures.Keys.Contains(system.Name))
                 {
                     foreach(StructureIDs.StructureIdData sid in ActiveCharacter.DockableStructures[system.Name])
                     {

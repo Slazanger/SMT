@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace SMT
@@ -42,7 +43,8 @@ namespace SMT
             DrawingBrush dBrush = new DrawingBrush();
             dBrush.Drawing = drawingGroup;
 
-            UniverseMainCanvas.Background = dBrush;
+            
+            //UniverseMainCanvas.Background = dBrush;
         }
 
 
@@ -64,7 +66,6 @@ namespace SMT
 
         private EVEData.EveManager EM;
 
-        DispatcherTimer dispatchTimer;
 
         public void Init()
         {
@@ -144,8 +145,8 @@ namespace SMT
         public void ReDrawMap(bool FullRedraw = false)
         {
             double Padding = -3;
-            double textXOffset = 1;
-            double textYOffset = 1;
+            double textXOffset = 0.5;
+            double textYOffset = 0.5;
 
             double XScale = (8000) / universeWidth;
             double ZScale = (8000) / universeDepth;
@@ -154,7 +155,14 @@ namespace SMT
             Brush SysCol = new SolidColorBrush(Colors.Black);
             Brush ConstGateCol = new SolidColorBrush(Colors.Gray);
             Brush TextCol = new SolidColorBrush(Colors.DarkGray);
+            Brush GateCol = new SolidColorBrush(Colors.LightGray);
             Brush JBCol = new SolidColorBrush(Colors.Blue);
+
+            SysCol.Freeze();
+            ConstGateCol.Freeze();
+            TextCol.Freeze();
+            GateCol.Freeze();
+            JBCol.Freeze();
 
 
             System.Windows.FontStyle fontStyle = FontStyles.Normal;
@@ -175,6 +183,16 @@ namespace SMT
                     // need to invert Z
                     double Z = (universeDepth - (sys.ActualZ - universeZMin)) * scale;
 
+
+                    Shape systemShape = new Rectangle() { Height = 6, Width = 6 };
+                    systemShape.Fill = SysCol;
+                    Canvas.SetLeft(systemShape, Padding + X);
+                    Canvas.SetTop(systemShape, Padding + Z);
+                    Canvas.SetZIndex(systemShape, 20);
+
+                    UniverseMainCanvas.Children.Add(systemShape);
+
+                    /*
                     RectangleGeometry rg = new RectangleGeometry(new Rect(X - 3, Z - 3, 6, 6));
                     rg.Freeze();
 
@@ -193,10 +211,10 @@ namespace SMT
                     Geometry textGeometry = formattedText.BuildGeometry(new Point(X + textXOffset, Z + textYOffset));
                     textGeometry.Freeze();
                     textGeometryGroup.Children.Add(textGeometry);
+                    */
 
 
-
-                    /*
+                    
 
                     // add text
                     Label sysText = new Label();
@@ -210,7 +228,7 @@ namespace SMT
 
                     UniverseMainCanvas.Children.Add(sysText);
 
-                    */
+                    
                 }
 
                 systemsGeometryGroup.Freeze();
@@ -224,10 +242,32 @@ namespace SMT
                     double X2 = (gh.to.ActualX - universeXMin) * scale;
                     double Y2 = (universeDepth - (gh.to.ActualZ - universeZMin)) * scale;
 
+                    /*
                     LineGeometry lg = new LineGeometry(new Point(X1, Y1), new Point(X2, Y2));
                     lg.Freeze();
 
                     linksGeometryGroup.Children.Add(lg);
+                    */
+
+                    Line sysLink = new Line();
+
+                    sysLink.X1 = (gh.from.ActualX - universeXMin) * scale;
+                    sysLink.Y1 = (universeDepth - (gh.from.ActualZ - universeZMin)) * scale;
+                    sysLink.X2 = (gh.to.ActualX - universeXMin) * scale;
+                    sysLink.Y2 = (universeDepth - (gh.to.ActualZ - universeZMin)) * scale;
+
+                    if (gh.from.Region != gh.to.Region || gh.from.ConstellationID != gh.to.ConstellationID)
+                    {
+                        sysLink.Stroke = ConstGateCol;
+                    }
+                    else
+                    {
+                        sysLink.Stroke = GateCol;
+                    }
+                    sysLink.StrokeThickness = 1;
+                    Canvas.SetZIndex(sysLink, 19);
+                    UniverseMainCanvas.Children.Add(sysLink);
+
                 }
 
                 linksGeometryGroup.Freeze();
@@ -237,7 +277,7 @@ namespace SMT
 
 
 
-            /*
+            
             foreach( EVEData.JumpBridge jb in EM.JumpBridges)
             {
                 Line jbLink = new Line();
@@ -267,7 +307,7 @@ namespace SMT
                 Canvas.SetZIndex(jbLink, 19);
                 UniverseMainCanvas.Children.Add(jbLink);
             }
-           */
+           
         }
 
 
