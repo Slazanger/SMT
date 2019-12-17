@@ -8,7 +8,7 @@
              xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" >
+        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged">
             <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="8000" Height="8000" UseLayoutRounding="True">
             </Canvas>
         </zoombox1:ZoomControl>

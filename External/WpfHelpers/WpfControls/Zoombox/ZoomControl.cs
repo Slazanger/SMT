@@ -85,6 +85,14 @@ namespace WpfHelpers.WpfControls.Zoombox
             DependencyProperty.Register("Zoom", typeof(double), typeof(ZoomControl),
                 new UIPropertyMetadata(1.0, Zoom_PropertyChanged));
 
+        public static readonly RoutedEvent ZoomChangedEvent = EventManager.RegisterRoutedEvent("ZoomChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(ZoomControl));
+
+        public event RoutedEventHandler ZoomChanged 
+        {
+            add { AddHandler(ZoomChangedEvent, value); }
+            remove { RemoveHandler(ZoomChangedEvent, value); }
+        }
+
 
         public static readonly DependencyProperty AllowAltZoomBoxProperty =
             DependencyProperty.Register("AllowAltZoomBox", typeof(bool), typeof(ZoomControl),
@@ -532,6 +540,9 @@ namespace WpfHelpers.WpfControls.Zoombox
                 zc.TranslateY *= delta;
                 zc.Mode = ZoomControlModes.Custom;
             }
+
+            RoutedEventArgs newEventArgs = new RoutedEventArgs(ZoomChangedEvent);
+            zc.RaiseEvent(newEventArgs);
         }
 
         private void ZoomControl_MouseWheel(object sender, MouseWheelEventArgs e)

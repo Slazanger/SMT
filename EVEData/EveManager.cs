@@ -738,6 +738,42 @@ namespace SMT.EVEData
                 // Error
             }
 
+            // now open up the eve static data export for the regions and extract some info from it
+            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapRegions.csv";
+            if (File.Exists(eveStaticDataRegionFile))
+            {
+                StreamReader file = new StreamReader(eveStaticDataRegionFile);
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] bits = line.Split(',');
+
+                    string regionName = bits[1]; // SystemIDToName[SystemID];
+
+                    double x = Convert.ToDouble(bits[2]);
+                    double y = Convert.ToDouble(bits[3]);
+                    double z = Convert.ToDouble(bits[4]);
+
+                    MapRegion r = GetRegion(regionName);
+                    if (r != null)
+                    {
+                        r.RegionX = x;
+                        r.RegionY = y;
+                        r.RegionZ = z;
+                    }
+                }
+            }
+            else
+            {
+                // Error
+            }
+
+
+
+
             string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystemJumps.csv";
             if (File.Exists(eveStaticDataJumpsFile))
             {

@@ -67,6 +67,13 @@ namespace SMT.EVEData
         /// </summary>
         public double RegionY { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the Regions Z coord on the universe map
+        /// </summary>
+        public double RegionZ { get; set; }
+
+
         /// <summary>
         /// Gets or sets the "Name" on Dotlan, used in URL's etc
         /// </summary>
@@ -100,6 +107,9 @@ namespace SMT.EVEData
 
             return false;
         }
+
+
+
 
         public override string ToString() => Name;
     }

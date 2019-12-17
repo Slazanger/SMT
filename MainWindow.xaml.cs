@@ -163,7 +163,7 @@ namespace SMT
             EVEData.EveManager.Instance = EVEManager;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
