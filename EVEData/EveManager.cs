@@ -879,7 +879,7 @@ namespace SMT.EVEData
             {
                 mr.RegionLinks = new List<string>();
 
-                regionpoints.Add(new Vector2f(mr.RegionX, mr.RegionY));
+                regionpoints.Add(new Vector2f(mr.UniverseViewX, mr.UniverseViewY));
 
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                 {

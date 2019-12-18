@@ -1012,7 +1012,7 @@ namespace SMT
                 }
 
 
-                if(MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory)
+                if(MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory && !MapConf.ShowADM)
                 {
                     Image JoveLogo = new Image
                     {

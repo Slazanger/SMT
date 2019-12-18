@@ -298,7 +298,7 @@ namespace SMT
         {
             if(RegionLayoutDoc != null)
             {
-                RegionLayoutDoc.Title = "Region : " + RegionRC.Region.Name;
+                RegionLayoutDoc.Title = RegionRC.Region.Name;
             }
 
 
@@ -828,8 +828,8 @@ namespace SMT
 
 
 
-                Canvas.SetLeft(RegionShape, mr.RegionX - 40);
-                Canvas.SetTop(RegionShape, mr.RegionY - 15);
+                Canvas.SetLeft(RegionShape, mr.UniverseViewX - 40);
+                Canvas.SetTop(RegionShape, mr.UniverseViewY - 15);
                 Canvas.SetZIndex(RegionShape, 22);
                 MainUniverseCanvas.Children.Add(RegionShape);
 
@@ -847,8 +847,8 @@ namespace SMT
                 RegionText.VerticalContentAlignment = VerticalAlignment.Center;
 
 
-                Canvas.SetLeft(RegionText, mr.RegionX - 40);
-                Canvas.SetTop(RegionText, mr.RegionY - 15);
+                Canvas.SetLeft(RegionText, mr.UniverseViewX - 40);
+                Canvas.SetTop(RegionText, mr.UniverseViewY - 15);
                 Canvas.SetZIndex(RegionText, 23);
                 MainUniverseCanvas.Children.Add(RegionText);
 
@@ -869,8 +869,8 @@ namespace SMT
                     FactionText.HorizontalContentAlignment = HorizontalAlignment.Center;
                     FactionText.VerticalContentAlignment = VerticalAlignment.Bottom;
 
-                    Canvas.SetLeft(FactionText, mr.RegionX - 40);
-                    Canvas.SetTop(FactionText, mr.RegionY - 15);
+                    Canvas.SetLeft(FactionText, mr.UniverseViewX - 40);
+                    Canvas.SetTop(FactionText, mr.UniverseViewY - 15);
                     Canvas.SetZIndex(FactionText, 23);
                     MainUniverseCanvas.Children.Add(FactionText);
 
@@ -884,11 +884,11 @@ namespace SMT
                     EVEData.MapRegion or = EVEManager.GetRegion(s);
                     Line regionLink = new Line();
 
-                    regionLink.X1 = mr.RegionX;
-                    regionLink.Y1 = mr.RegionY;
+                    regionLink.X1 = mr.UniverseViewX;
+                    regionLink.Y1 = mr.UniverseViewY;
 
-                    regionLink.X2 = or.RegionX;
-                    regionLink.Y2 = or.RegionY;
+                    regionLink.X2 = or.UniverseViewX;
+                    regionLink.Y2 = or.UniverseViewY;
 
                     regionLink.Stroke = SysOutlineBrush;
                     regionLink.StrokeThickness = 1.2;
@@ -939,8 +939,8 @@ namespace SMT
                     TheraShape.MouseEnter += RegionThera_ShapeMouseOverHandler;
                     TheraShape.MouseLeave += RegionThera_ShapeMouseOverHandler;
 
-                    Canvas.SetLeft(TheraShape, mr.RegionX + 28);
-                    Canvas.SetTop(TheraShape, mr.RegionY + 3);
+                    Canvas.SetLeft(TheraShape, mr.UniverseViewX + 28);
+                    Canvas.SetTop(TheraShape, mr.UniverseViewY + 3);
                     Canvas.SetZIndex(TheraShape, 22);
                     MainUniverseCanvas.Children.Add(TheraShape);
                     DynamicUniverseElements.Add(TheraShape);
@@ -974,8 +974,8 @@ namespace SMT
                     CharacterShape.MouseLeave += RegionCharacter_ShapeMouseOverHandler;
 
 
-                    Canvas.SetLeft(CharacterShape, mr.RegionX + 28);
-                    Canvas.SetTop(CharacterShape, mr.RegionY - 11);
+                    Canvas.SetLeft(CharacterShape, mr.UniverseViewX + 28);
+                    Canvas.SetTop(CharacterShape, mr.UniverseViewY - 11);
                     Canvas.SetZIndex(CharacterShape, 23);
                     MainUniverseCanvas.Children.Add(CharacterShape);
                     DynamicUniverseElements.Add(CharacterShape);

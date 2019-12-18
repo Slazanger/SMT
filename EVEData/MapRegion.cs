@@ -26,17 +26,17 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="name">Name of the Region</param>
         /// <param name="faction">Faction (if any) of the region</param>
-        /// <param name="regionX">X Location to render this on the universe map</param>
-        /// <param name="regionY">Y Location to render this on the universe map</param>
-        public MapRegion(string name, string id, string faction, double regionX, double regionY)
+        /// <param name="universeViewX">X Location to render this on the universe map</param>
+        /// <param name="universeViewY">Y Location to render this on the universe map</param>
+        public MapRegion(string name, string id, string faction, double universeViewX, double universeViewY)
         {
             Name = name;
             DotLanRef = name.Replace(" ", "_");
             ID = id;
 
             Faction = faction;
-            RegionX = regionX;
-            RegionY = regionY;
+            UniverseViewX = universeViewX;
+            UniverseViewY = universeViewY;
 
             MapSystems = new SerializableDictionary<string, MapSystem>();
             RegionLinks = new List<string>();
@@ -60,13 +60,23 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Regions X coord on the universe map
         /// </summary>
+        public double UniverseViewX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Regions Y coord on the universe map
+        /// </summary>
+        public double UniverseViewY { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the Regions X coord on the universe map
+        /// </summary>
         public double RegionX { get; set; }
 
         /// <summary>
         /// Gets or sets the Regions Y coord on the universe map
         /// </summary>
         public double RegionY { get; set; }
-
 
         /// <summary>
         /// Gets or sets the Regions Z coord on the universe map
