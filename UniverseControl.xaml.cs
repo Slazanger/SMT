@@ -307,8 +307,8 @@ namespace SMT
             universeZMax = 472860102256057000.0;
 
             VHSystems = new VisualHost();
-            VHSystems.HitTestEnabled = true;
-            VHSystems.MouseClicked += VHSystems_MouseClicked;
+//            VHSystems.HitTestEnabled = true;
+//            VHSystems.MouseClicked += VHSystems_MouseClicked;
 
             VHLinks = new VisualHost();
             VHNames = new VisualHost();
