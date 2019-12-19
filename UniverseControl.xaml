@@ -7,6 +7,39 @@
              mc:Ignorable="d" 
              xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ContextMenu x:Key="SysRightClickContextMenu">
+            <ContextMenu.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="-20,0,-40,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Ident}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Description}" />
+                    </Grid>
+                </DataTemplate>
+            </ContextMenu.ItemTemplate>
+
+            <MenuItem Header="{Binding Name}" FontWeight="Bold" />
+
+
+            <MenuItem Header="Show Jump Range">
+                <MenuItem Header="None" DataContext="0" Click="SetJumpRange_Click"/>
+                <MenuItem Header="Ansiblex  (5.0LY)" DataContext="5" Click="SetJumpRange_Click"/>
+                <MenuItem Header="Super/Titan  (6.0LY)" DataContext="6" Click="SetJumpRange_Click"/>
+                <MenuItem Header="Carriers/Fax (7.0LY)" DataContext="7" Click="SetJumpRange_Click"/>
+                <MenuItem Header="Black Ops    (8.0LY)" DataContext="8" Click="SetJumpRange_Click"/>
+                <MenuItem Header="JF/Rorq     (10.0LY)" DataContext="10" Click="SetJumpRange_Click"/>
+            </MenuItem>
+
+        </ContextMenu>
+    </UserControl.Resources>
+
+
+
     <Grid>
         <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged">
             <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True">

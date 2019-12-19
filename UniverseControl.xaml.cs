@@ -307,8 +307,8 @@ namespace SMT
             universeZMax = 472860102256057000.0;
 
             VHSystems = new VisualHost();
-//            VHSystems.HitTestEnabled = true;
-//            VHSystems.MouseClicked += VHSystems_MouseClicked;
+            VHSystems.HitTestEnabled = true;
+            VHSystems.MouseClicked += VHSystems_MouseClicked;
 
             VHLinks = new VisualHost();
             VHNames = new VisualHost();
@@ -387,18 +387,23 @@ namespace SMT
             ReDrawMap(true);
         }
 
-        private void UiRefreshTimer_Tick(object sender, EventArgs e)
-        {
-            ReDrawMap(false);
-        }
 
-        private void VHSystems_MouseClicked(object sender, RoutedEventArgs e)
+        private void SetJumpRange_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.System sys = (EVEData.System)e.OriginalSource;
+            EVEData.System sys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
 
             VHRangeSpheres.ClearAllChildren();
 
-            double Radius = 9460730472580800.0 * 7.0 * universeScale;
+            MenuItem mi = sender as MenuItem;
+            double AU = double.Parse( mi.DataContext as string );
+
+            if(AU == 0.0)
+            {
+                return;
+            }
+
+
+            double Radius = 9460730472580800.0 * AU * universeScale;
             Brush rangeCol = new SolidColorBrush(Colors.WhiteSmoke);
             Brush sysCentreCol = new SolidColorBrush(Colors.Purple);
             Brush sysRangeCol = new SolidColorBrush(Colors.CornflowerBlue);
@@ -423,7 +428,6 @@ namespace SMT
             drawingContext.Close();
 
 
-
             VHRangeSpheres.AddChild(rangeCircleDV, "Sphere");
 
             foreach (EVEData.System es in EM.Systems)
@@ -432,7 +436,7 @@ namespace SMT
                 double Distance = EM.GetRangeBetweenSystems(sys.Name, es.Name);
                 Distance = Distance / 9460730472580800.0;
 
-                double Max = 7.0;
+                double Max = AU;
 
                 if (Distance < Max && Distance > 0.0)
                 {
@@ -451,6 +455,23 @@ namespace SMT
                 }
             }
 
+
+        }
+
+        private void UiRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            ReDrawMap(false);
+        }
+
+        private void VHSystems_MouseClicked(object sender, RoutedEventArgs e)
+        {
+            EVEData.System sys = (EVEData.System)e.OriginalSource;
+
+
+            ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
+
+            cm.DataContext = sys;
+            cm.IsOpen = true;
         }
 
         private void UniverseControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
