@@ -200,22 +200,17 @@ namespace SMT.EVEData
                     }
                     catch
                     {
-                        // wait 10 minutes
-                        for (int i = 0; i < 6000; i++)
+                        // wait 10 seconds
+                        for (int i = 0; i < 10; i++)
                         {
                             Thread.Sleep(1000);
                         }
-
                     }
                 }
 
                 // wait for the next request
                 Thread.Sleep(100);
             }
-
-            // finished thread
-            int test = 0;
-            test++;
         }
 
         /// <summary>

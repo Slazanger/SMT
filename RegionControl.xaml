@@ -28,7 +28,10 @@
             </ContextMenu.ItemTemplate>
 
             <MenuItem Header="{Binding Name}" FontWeight="Bold" />
+
             <Separator />
+            <MenuItem Header="Set Destination" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
+            <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
 
             <MenuItem Header="Show Jump Range">
                 <MenuItem Header="Super/Titan  (6.0LY)" DataContext="6" Click="SetJumpRange_Click"/>

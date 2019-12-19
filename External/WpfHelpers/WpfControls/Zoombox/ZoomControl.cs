@@ -424,6 +424,13 @@ namespace WpfHelpers.WpfControls.Zoombox
             ZoomBox = new Rect();
         }
 
+        public void Show(double X, double Y, double ZoomValue)
+        {
+            Zoom = ZoomValue;
+            TranslateX = ((ActualWidth / 2) * Zoom ) - (X * Zoom); 
+            TranslateY = ((ActualHeight / 2)* Zoom ) - (Y * Zoom); 
+        }
+
         private void ZoomControl_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             switch (ModifierMode)

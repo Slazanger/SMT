@@ -284,6 +284,7 @@ namespace SMT
         private VisualHost VHNames;
         private VisualHost VHRegionNames;
         private VisualHost VHRangeSpheres;
+        private VisualHost VHRangeHighlights;
         private VisualHost VHDataSpheres;
 
 
@@ -315,9 +316,11 @@ namespace SMT
             VHRegionNames = new VisualHost();
             VHRangeSpheres = new VisualHost();
             VHDataSpheres = new VisualHost();
+            VHRangeHighlights = new VisualHost();
 
-            UniverseMainCanvas.Children.Add(VHDataSpheres);
             UniverseMainCanvas.Children.Add(VHRangeSpheres);
+            UniverseMainCanvas.Children.Add(VHDataSpheres);
+            UniverseMainCanvas.Children.Add(VHRangeHighlights);
 
             UniverseMainCanvas.Children.Add(VHLinks);
             UniverseMainCanvas.Children.Add(VHSystems);
@@ -384,6 +387,13 @@ namespace SMT
             universeWidth = universeXMax - universeXMin;
             universeDepth = universeZMax - universeZMin;
 
+
+            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
+            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
+            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+
+
+
             ReDrawMap(true);
         }
 
@@ -393,6 +403,7 @@ namespace SMT
             EVEData.System sys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
 
             VHRangeSpheres.ClearAllChildren();
+            VHRangeHighlights.ClearAllChildren();
 
             MenuItem mi = sender as MenuItem;
             double AU = double.Parse( mi.DataContext as string );
@@ -451,7 +462,7 @@ namespace SMT
                     dcR.DrawRectangle(sysRangeCol, new Pen(sysRangeCol, 1), new Rect(irX - 5, irZ - 5, 10, 10));
                     dcR.Close();
 
-                    VHRangeSpheres.AddChild(rangeSquareDV, "SysH");
+                    VHRangeHighlights.AddChild(rangeSquareDV, "SysH");
                 }
             }
 
@@ -777,6 +788,24 @@ namespace SMT
             }
         }
 
+        private void GlobalSystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
+
+            double HalfZoomSize = 600;
+
+            if (sd != null)
+            {
+
+                // actual 
+                double X1 = (sd.ActualX - universeXMin) * universeScale;
+                double Y1 = (universeDepth - (sd.ActualZ - universeZMin)) * universeScale;
+
+                MainZoomControl.Show(X1, Y1, 3.0);
+
+
+            }
+        }
     }
 }
 
