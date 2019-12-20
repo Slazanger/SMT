@@ -91,14 +91,12 @@ namespace SMT
             }
 
 
-            // If a child visual object is hit, toggle its opacity to visually indicate a hit.
             public HitTestResultBehavior HitTestCheck(HitTestResult result)
             {
                 System.Windows.Media.DrawingVisual dv = null;
                 if (result.VisualHit.GetType() == typeof(System.Windows.Media.DrawingVisual))
                 {
                     dv = (System.Windows.Media.DrawingVisual)result.VisualHit;
-                    dv.Opacity = dv.Opacity == 1.0 ? 0.4 : 1.0;
                 }
 
                 if (dv != null && DataContextData.ContainsKey(dv))
@@ -135,7 +133,7 @@ namespace SMT
 
 
 
-
+        public MapConfig MapConf { get; set; }
 
 
         public UniverseControl()
@@ -262,6 +260,15 @@ namespace SMT
 
                 OnPropertyChanged("ShowShipJumps");
             }
+        }
+
+
+        public static readonly RoutedEvent RequestRegionSystemSelectEvent = EventManager.RegisterRoutedEvent("RequestRegionSystem", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
+
+        public event RoutedEventHandler RequestRegionSystem
+        {
+            add { AddHandler(RequestRegionSystemSelectEvent, value); }
+            remove { RemoveHandler(RequestRegionSystemSelectEvent, value); }
         }
 
 
@@ -425,9 +432,9 @@ namespace SMT
 
 
             double Radius = 9460730472580800.0 * AU * universeScale;
-            Brush rangeCol = new SolidColorBrush(Colors.WhiteSmoke);
-            Brush sysCentreCol = new SolidColorBrush(Colors.Purple);
-            Brush sysRangeCol = new SolidColorBrush(Colors.CornflowerBlue);
+            Brush rangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColourHighlight);
+            Brush sysCentreCol = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
+            Brush sysRangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
 
             double X = (sys.ActualX - universeXMin) * universeScale; ;
             double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
@@ -534,15 +541,20 @@ namespace SMT
 
 
 
-            Brush SysCol = new SolidColorBrush(Colors.Black);
-            Brush ConstGateCol = new SolidColorBrush(Colors.LightGray);
-            Brush TextCol = new SolidColorBrush(Colors.DarkGray);
-            Brush RegionTextCol = new SolidColorBrush(Colors.Black);
-            Brush GateCol = new SolidColorBrush(Colors.Gray);
-            Brush JBCol = new SolidColorBrush(Colors.Blue);
-            Brush DataCol = new SolidColorBrush(Colors.LightPink);
+            Brush SysCol = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
+            Brush ConstGateCol = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+            Brush TextCol = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+            Brush RegionTextCol = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+            Brush GateCol = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+            Brush JBCol = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+            Brush DataCol = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
 
-            SysCol.Freeze();
+            Brush BG = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+
+            MainZoomControl.Background = BG;
+            UniverseMainCanvas.Background = BG;
+
+
             ConstGateCol.Freeze();
             TextCol.Freeze();
             GateCol.Freeze();
@@ -605,7 +617,7 @@ namespace SMT
                     DrawingContext drawingContext = sysLinkVisual.RenderOpen();
 
                     // Create a rectangle and draw it in the DrawingContext.
-                    drawingContext.DrawLine(new Pen(Col, 1), new Point(X1, Y1), new Point(X2, Y2));
+                    drawingContext.DrawLine(new Pen(Col, 0.6), new Point(X1, Y1), new Point(X2, Y2));
 
                     drawingContext.Close();
 
@@ -634,7 +646,7 @@ namespace SMT
                         // Retrieve the DrawingContext in order to create new drawing content.
                         DrawingContext drawingContext = sysLinkVisual.RenderOpen();
 
-                        Pen p = new Pen(JBCol, 1);
+                        Pen p = new Pen(JBCol, 0.6);
                         p.DashStyle = DashStyles.Dot;
 
                         // Create a rectangle and draw it in the DrawingContext.
@@ -758,9 +770,9 @@ namespace SMT
 
                 float characterNametextXOffset = 3;
                 float characterNametextYOffset = -16;
-                Brush CharacterNameBrush = new SolidColorBrush(Colors.DarkBlue);
-                Brush CharacterNameSysHighlightBrush = new SolidColorBrush(Colors.Blue);
-                Brush ZKBBrush = new SolidColorBrush(Colors.Purple);
+                Brush CharacterNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+                Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+                Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 
 
                 Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
@@ -899,7 +911,20 @@ namespace SMT
             }
         }
 
+        public void ShowSystem(string SystemName)
+        {
+            EVEData.System sd = EM.GetEveSystem(SystemName);
 
+            if (sd != null)
+            {
+                // actual 
+                double X1 = (sd.ActualX - universeXMin) * universeScale;
+                double Y1 = (universeDepth - (sd.ActualZ - universeZMin)) * universeScale;
+
+                MainZoomControl.Show(X1, Y1, 3.0);
+            }
+
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -916,15 +941,52 @@ namespace SMT
         {
             EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
 
-            if (sd != null)
-            {
-                // actual 
-                double X1 = (sd.ActualX - universeXMin) * universeScale;
-                double Y1 = (universeDepth - (sd.ActualZ - universeZMin)) * universeScale;
+            ShowSystem(sd.Name);
 
-                MainZoomControl.Show(X1, Y1, 3.0);
-            }
         }
+
+        /// <summary>
+        /// Dotlan Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SysContexMenuItemDotlan_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            EVEData.MapRegion rd = EM.GetRegion(eveSys.Region);
+
+            string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
+            System.Diagnostics.Process.Start(uRL);
+        }
+
+        /// <summary>
+        /// ZKillboard Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SysContexMenuItemZKB_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            EVEData.MapRegion rd = EM.GetRegion(eveSys.Region);
+
+            string uRL = string.Format("https://zkillboard.com/system/{0}", eveSys.ID);
+            System.Diagnostics.Process.Start(uRL);
+        }
+
+
+        private void SysContexMenuShowInRegion_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.System s = ((System.Windows.Controls.MenuItem)e.OriginalSource).DataContext as EVEData.System;
+
+            RoutedEventArgs newEventArgs = new RoutedEventArgs(RequestRegionSystemSelectEvent, s.Name);
+            RaiseEvent(newEventArgs);
+        }
+
+        
+
+
+
+
     }
 }
 

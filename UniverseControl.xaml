@@ -36,6 +36,11 @@
                 <MenuItem Header="JF/Rorq     (10.0LY)" DataContext="10" Click="SetJumpRange_Click"/>
             </MenuItem>
 
+            <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
+            <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
+            <MenuItem Header="Show In Regions" Click="SysContexMenuShowInRegion_Click" />
+
+
         </ContextMenu>
     </UserControl.Resources>
 

@@ -286,7 +286,13 @@ namespace SMT
         }
 
 
+        public static readonly RoutedEvent UniverseSystemSelectEvent = EventManager.RegisterRoutedEvent("UniverseSystemSelect", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
 
+        public event RoutedEventHandler UniverseSystemSelect
+        {
+            add { AddHandler(UniverseSystemSelectEvent, value); }
+            remove { RemoveHandler(UniverseSystemSelectEvent, value); }
+        }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -2416,6 +2422,18 @@ namespace SMT
             }
             catch { }
         }
+
+        private void SysContexMenuItemShowInUniverse_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+            RoutedEventArgs newEventArgs = new RoutedEventArgs(UniverseSystemSelectEvent, eveSys.Name);
+            RaiseEvent(newEventArgs);
+        }
+
+
+
+
 
         /// <summary>
         /// Dotlan Clicked

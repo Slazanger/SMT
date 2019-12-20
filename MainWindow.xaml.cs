@@ -43,6 +43,8 @@ namespace SMT
 
         private Xceed.Wpf.AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
 
+        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
+
 
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
@@ -105,29 +107,7 @@ namespace SMT
             }
 
             RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
-
-/*            // now update the RegionLayoutDoc because the layout loading breaks the binding
-            foreach (Xceed.Wpf.AvalonDock.Layout.ILayoutElement ile in dockManager.Layout.Children)
-            {
-                if(ile is Xceed.Wpf.AvalonDock.Layout.ILayoutContainer )
-                {
-                    Xceed.Wpf.AvalonDock.Layout.ILayoutContainer ilc = ile as Xceed.Wpf.AvalonDock.Layout.ILayoutContainer;
-
-                    foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane ldp in ilc.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocumentPane>())
-                    {
-                        foreach (Xceed.Wpf.AvalonDock.Layout.LayoutDocument ld in ldp.Children.OfType<Xceed.Wpf.AvalonDock.Layout.LayoutDocument>())
-                        {
-                            if (ld.ContentId == "MapRegionContentID")
-                            {
-                                RegionLayoutDoc = ld;
-                            }
-                        }
-                    }
-
-                }
-
-            }
-*/
+            UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
             string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
@@ -210,9 +190,13 @@ namespace SMT
 
             RegionRC.RegionChanged += RegionRC_RegionChanged;
             RegionRC.CharacterSelectionChanged += RegionRC_CharacterSelectionChanged;
+            RegionRC.UniverseSystemSelect += RegionRC_UniverseSystemSelect;
 
 
+
+            UniverseUC.MapConf = MapConf;
             UniverseUC.Init();
+            UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
 
 
             // load the anom data
@@ -284,6 +268,31 @@ namespace SMT
 
         }
 
+        private void UniverseUC_RequestRegionSystem(object sender, RoutedEventArgs e)
+        {
+            string sysName = e.OriginalSource as string;
+            RegionRC.FollowCharacter = false;
+            RegionRC.SelectSystem(sysName, true);
+
+            if (RegionLayoutDoc != null)
+            {
+                RegionLayoutDoc.IsSelected = true;
+            }
+
+        }
+
+        private void RegionRC_UniverseSystemSelect(object sender, RoutedEventArgs e)
+        {
+            string sysName = e.OriginalSource as string;
+            UniverseUC.ShowSystem(sysName);
+
+            if(UniverseLayoutDoc != null)
+            {
+                UniverseLayoutDoc.IsSelected = true;
+            }
+
+        }
+
         private void RegionRC_CharacterSelectionChanged(object sender, PropertyChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
@@ -325,8 +334,10 @@ namespace SMT
             }
 
             RegionRC.ReDrawMap(true);
+            UniverseUC.ReDrawMap(true,true,true);
 
-            if(e.PropertyName == "ShowRegionStandings")
+
+            if (e.PropertyName == "ShowRegionStandings")
             {
                 RedrawUniverse(true);
             }

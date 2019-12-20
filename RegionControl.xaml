@@ -44,6 +44,7 @@
             <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
             <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
             <MenuItem Header="Copy Name" Click="SysContexMenuItemCopy_Click" />
+            <MenuItem Header="Show In Universe" Click="SysContexMenuItemShowInUniverse_Click" />
 
 
         </ContextMenu>
@@ -86,7 +87,7 @@
                 <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom"/>
             </Border>
 
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="190" Height="140" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis},  diag:PresentationTraceSources.TraceLevel=High}" >
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="190" Height="140" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}" >
                 <Canvas x:Name="ToolBoxCanvas">
                     <Grid Canvas.Left="0" Canvas.Top="2" Width="210" >
 

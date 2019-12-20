@@ -90,6 +90,10 @@ namespace SMT
         [DisplayName("In Range")]
         public Color JumpRangeInColour { get; set; }
 
+        [Category("Navigation")]
+        [DisplayName("In Range Highlight")]
+        public Color JumpRangeInColourHighlight { get; set; }
+
 
         [Category("Incursion")]
         [DisplayName("Active Incursion")]

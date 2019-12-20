@@ -553,6 +553,9 @@ namespace SMT
             defaultColours.SystemTextSize = 12;
 
             defaultColours.JumpRangeInColour = Color.FromRgb(135, 206, 235);
+            defaultColours.JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155);
+
+
             defaultColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             defaultColours.SOVStructureVunerableColour = Color.FromRgb(64,64,64);
@@ -592,6 +595,7 @@ namespace SMT
             blueColours.CharacterTextSize = 8;
             blueColours.SystemTextSize = 12;
             blueColours.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            blueColours.JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155);
             blueColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             blueColours.SOVStructureVunerableColour = Colors.Red;
@@ -631,6 +635,7 @@ namespace SMT
             greyAndRed.CharacterTextSize = 8;
             greyAndRed.SystemTextSize = 12;
             greyAndRed.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            greyAndRed.JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155);
             greyAndRed.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             greyAndRed.SOVStructureVunerableColour = Colors.Red;
@@ -670,6 +675,7 @@ namespace SMT
             dark.CharacterTextSize = 8;
             dark.SystemTextSize = 12;
             dark.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            dark.JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155);
             dark.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             dark.SOVStructureVunerableColour = Colors.Red;
@@ -708,6 +714,7 @@ namespace SMT
             lateNight.CharacterTextSize = 8;
             lateNight.SystemTextSize = 13;
             lateNight.JumpRangeInColour = Color.FromRgb(0, 255, 0);
+            lateNight.JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155);
             lateNight.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             lateNight.SOVStructureVunerableColour = Colors.Red;
