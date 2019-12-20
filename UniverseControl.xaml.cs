@@ -132,7 +132,7 @@ namespace SMT
         private bool m_ShowShipKills = false;
         private bool m_ShowShipJumps = false;
         private bool m_ShowJumpBridges = true;
-        
+
 
 
 
@@ -287,9 +287,13 @@ namespace SMT
         private VisualHost VHRangeHighlights;
         private VisualHost VHDataSpheres;
 
+        private VisualHost VHCharacters;
+        private VisualHost VHZKB;
+
 
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
+        private int uiRefreshTimer_interval = 0;
 
 
         public void Init()
@@ -317,17 +321,23 @@ namespace SMT
             VHRangeSpheres = new VisualHost();
             VHDataSpheres = new VisualHost();
             VHRangeHighlights = new VisualHost();
+            VHCharacters = new VisualHost();
+            VHZKB = new VisualHost();
+
 
             UniverseMainCanvas.Children.Add(VHRangeSpheres);
             UniverseMainCanvas.Children.Add(VHDataSpheres);
+            UniverseMainCanvas.Children.Add(VHZKB);
             UniverseMainCanvas.Children.Add(VHRangeHighlights);
 
             UniverseMainCanvas.Children.Add(VHLinks);
+            UniverseMainCanvas.Children.Add(VHCharacters);
             UniverseMainCanvas.Children.Add(VHSystems);
+
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
-            uiRefreshTimer.Interval = new TimeSpan(0, 0, 10);
+            uiRefreshTimer.Interval = new TimeSpan(0, 0, 5);
             uiRefreshTimer.Start();
 
             PropertyChanged += UniverseControl_PropertyChanged;
@@ -406,9 +416,9 @@ namespace SMT
             VHRangeHighlights.ClearAllChildren();
 
             MenuItem mi = sender as MenuItem;
-            double AU = double.Parse( mi.DataContext as string );
+            double AU = double.Parse(mi.DataContext as string);
 
-            if(AU == 0.0)
+            if (AU == 0.0)
             {
                 return;
             }
@@ -471,7 +481,19 @@ namespace SMT
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            ReDrawMap(false);
+            uiRefreshTimer_interval++;
+
+            bool FullRedraw = false;
+            bool FastUpdate = true;
+            bool DataRedraw = false;
+
+            if (uiRefreshTimer_interval == 2)
+            {
+                uiRefreshTimer_interval = 0;
+                DataRedraw = false;
+            }
+
+            ReDrawMap(FullRedraw, DataRedraw, FastUpdate);
         }
 
         private void VHSystems_MouseClicked(object sender, RoutedEventArgs e)
@@ -487,7 +509,7 @@ namespace SMT
 
         private void UniverseControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            ReDrawMap(false);
+            ReDrawMap(false, true, true);
         }
 
 
@@ -500,11 +522,11 @@ namespace SMT
         /// Redraw the map
         /// </summary>
         /// <param name="FullRedraw">Clear all the static items or not</param>
-        public void ReDrawMap(bool FullRedraw = false)
+        public void ReDrawMap(bool FullRedraw = false, bool DataRedraw = false, bool FastUpdate = false)
         {
 
-            double textXOffset = 5;
-            double textYOffset = 5;
+            double textXOffset = 3;
+            double textYOffset = 2;
 
             double XScale = (5000) / universeWidth;
             double ZScale = (5000) / universeDepth;
@@ -537,9 +559,6 @@ namespace SMT
                 VHNames.ClearAllChildren();
                 VHRegionNames.ClearAllChildren();
 
-
-
-
                 foreach (EVEData.MapRegion mr in EM.Regions)
                 {
                     double X = (mr.RegionX - universeXMin) * universeScale; ;
@@ -551,16 +570,13 @@ namespace SMT
                     // Retrieve the DrawingContext from the DrawingVisual.
                     DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
-#pragma warning disable CS0618 // 'FormattedText.FormattedText(string, CultureInfo, FlowDirection, Typeface, double, Brush)' is obsolete: 'Use the PixelsPerDip override'
+#pragma warning disable CS0618 
                     // Draw a formatted text string into the DrawingContext.
-
-
-
                     FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 60, RegionTextCol);
                     ft.TextAlignment = TextAlignment.Center;
 
                     drawingContext.DrawText(ft, new Point(X + textXOffset, Z + textYOffset));
-#pragma warning restore CS0618 // 'FormattedText.FormattedText(string, CultureInfo, FlowDirection, Typeface, double, Brush)' is obsolete: 'Use the PixelsPerDip override'
+#pragma warning restore CS0618 
 
                     // Close the DrawingContext to persist changes to the DrawingVisual.
                     drawingContext.Close();
@@ -568,9 +584,6 @@ namespace SMT
                     VHRegionNames.AddChild(SystemTextVisual, mr.Name);
 
                 }
-
-
-
 
                 foreach (GateHelper gh in universeSysLinksCache)
                 {
@@ -586,7 +599,6 @@ namespace SMT
                         Col = ConstGateCol;
                     }
 
-
                     System.Windows.Media.DrawingVisual sysLinkVisual = new System.Windows.Media.DrawingVisual();
 
                     // Retrieve the DrawingContext in order to create new drawing content.
@@ -600,7 +612,7 @@ namespace SMT
                     VHLinks.AddChild(sysLinkVisual, "link");
                 }
 
-                if(ShowJumpBridges)
+                if (ShowJumpBridges)
                 {
                     foreach (EVEData.JumpBridge jb in EM.JumpBridges)
                     {
@@ -637,7 +649,7 @@ namespace SMT
 
                 foreach (EVEData.System sys in EM.Systems)
                 {
-  
+
                     double X = (sys.ActualX - universeXMin) * universeScale;
 
                     // need to invert Z
@@ -666,7 +678,7 @@ namespace SMT
                     // Retrieve the DrawingContext from the DrawingVisual.
                     drawingContext = SystemTextVisual.RenderOpen();
 
-#pragma warning disable CS0618 // 'FormattedText.FormattedText(string, CultureInfo, FlowDirection, Typeface, double, Brush)' is obsolete: 'Use the PixelsPerDip override'
+#pragma warning disable CS0618 
                     // Draw a formatted text string into the DrawingContext.
                     drawingContext.DrawText(
                         new FormattedText(sys.Name,
@@ -675,7 +687,7 @@ namespace SMT
                             new Typeface("Verdana"),
                             6, TextCol),
                         new Point(X + textXOffset, Z + textYOffset));
-#pragma warning restore CS0618 // 'FormattedText.FormattedText(string, CultureInfo, FlowDirection, Typeface, double, Brush)' is obsolete: 'Use the PixelsPerDip override'
+#pragma warning restore CS0618 
 
                     // Close the DrawingContext to persist changes to the DrawingVisual.
                     drawingContext.Close();
@@ -686,61 +698,177 @@ namespace SMT
             }
 
 
-
-
-            // update the data
-            VHDataSpheres.ClearAllChildren();
-            foreach (EVEData.System sys in EM.Systems)
+            if (DataRedraw)
             {
-
-                double X = (sys.ActualX - universeXMin) * universeScale;
-
-                // need to invert Z
-                double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
-
-                double DataScale = 0;
-
-
-                if (ShowNPCKills)
+                // update the data
+                VHDataSpheres.ClearAllChildren();
+                foreach (EVEData.System sys in EM.Systems)
                 {
-                    DataScale = sys.NPCKillsLastHour * ESIOverlayScale * 0.05f;
+
+                    double X = (sys.ActualX - universeXMin) * universeScale;
+
+                    // need to invert Z
+                    double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+
+                    double DataScale = 0;
+
+
+                    if (ShowNPCKills)
+                    {
+                        DataScale = sys.NPCKillsLastHour * ESIOverlayScale * 0.05f;
+                    }
+
+                    if (ShowPodKills)
+                    {
+                        DataScale = sys.PodKillsLastHour * ESIOverlayScale * 2f;
+                    }
+
+                    if (ShowShipKills)
+                    {
+                        DataScale = sys.ShipKillsLastHour * ESIOverlayScale * 8f;
+                    }
+
+                    if (ShowShipJumps)
+                    {
+                        DataScale = sys.JumpsLastHour * ESIOverlayScale * 0.1f;
+                    }
+
+                    if (DataScale > 3)
+                    {
+                        System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
+
+                        // Retrieve the DrawingContext in order to create new drawing content.
+                        DrawingContext drawingContext = dataDV.RenderOpen();
+
+                        // Create a rectangle and draw it in the DrawingContext.
+                        drawingContext.DrawEllipse(DataCol, new Pen(DataCol, 1), new Point(X, Z), DataScale, DataScale);
+
+                        drawingContext.Close();
+
+                        VHDataSpheres.AddChild(dataDV, "DATA");
+                    }
                 }
 
-                if (ShowPodKills)
-                {
-                    DataScale = sys.PodKillsLastHour * ESIOverlayScale * 2f;
-                }
-
-                if (ShowShipKills)
-                {
-                    DataScale = sys.ShipKillsLastHour * ESIOverlayScale * 8f;
-                }
-
-                if (ShowShipJumps)
-                {
-                    DataScale = sys.JumpsLastHour * ESIOverlayScale * 0.1f;
-                }
-
-
-                if (DataScale > 3)
-                {
-                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
-
-                    // Retrieve the DrawingContext in order to create new drawing content.
-                    DrawingContext drawingContext = dataDV.RenderOpen();
-
-
-                    // Create a rectangle and draw it in the DrawingContext.
-                    drawingContext.DrawEllipse(DataCol, new Pen(DataCol, 1), new Point(X, Z), DataScale, DataScale);
-
-                    drawingContext.Close();
-
-                    VHDataSpheres.AddChild(dataDV, "DATA");
-
-                }
             }
 
+            if (FastUpdate)
+            {
+                VHCharacters.ClearAllChildren();
+                VHZKB.ClearAllChildren();
 
+                float characterNametextXOffset = 3;
+                float characterNametextYOffset = -16;
+                Brush CharacterNameBrush = new SolidColorBrush(Colors.DarkBlue);
+                Brush CharacterNameSysHighlightBrush = new SolidColorBrush(Colors.Blue);
+                Brush ZKBBrush = new SolidColorBrush(Colors.Purple);
+
+
+                Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
+
+                // add the characters
+                foreach (EVEData.LocalCharacter lc in EM.LocalCharacters)
+                {
+                    if (!string.IsNullOrEmpty(lc.Location))
+                    {
+                        if (!MapCharacters.ContainsKey(lc.Location))
+                        {
+                            MapCharacters.Add(lc.Location, new List<string>());
+
+                        }
+                        MapCharacters[lc.Location].Add(lc.Name);
+                    }
+                }
+
+                foreach (KeyValuePair<string, List<string>> kvp in MapCharacters)
+                {
+                    EVEData.System sys = EM.GetEveSystem(kvp.Key);
+                    double X = (sys.ActualX - universeXMin) * universeScale;
+                    // need to invert Z
+                    double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+
+
+                    int charTextOffset = 0;
+
+                    // Create an instance of a DrawingVisual.
+                    System.Windows.Media.DrawingVisual nameTextVisual = new System.Windows.Media.DrawingVisual();
+
+                    // Retrieve the DrawingContext from the DrawingVisual.
+                    DrawingContext dc = nameTextVisual.RenderOpen();
+
+                    // draw a circle around the system
+                    dc.DrawEllipse(CharacterNameSysHighlightBrush, new Pen(CharacterNameSysHighlightBrush, 1.0), new Point(X, Z), 6, 6);
+
+
+                    foreach (string name in kvp.Value)
+                    {
+#pragma warning disable CS0618 
+                        // Draw a formatted text string into the DrawingContext.
+                        dc.DrawText(
+                            new FormattedText(name,
+                                CultureInfo.GetCultureInfo("en-us"),
+                                FlowDirection.LeftToRight,
+                                new Typeface("Verdana"),
+                                8, CharacterNameBrush),
+                            new Point(X + characterNametextXOffset, Z + characterNametextYOffset + charTextOffset));
+#pragma warning restore CS0618 
+
+                        charTextOffset -= 10;
+                    }
+
+                    dc.Close();
+                    VHCharacters.AddChild(nameTextVisual, "CharNames");
+                }
+
+
+                // now add the zkill data
+                Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
+                {
+                    foreach (EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream)
+                    {
+                        if (ZKBBaseFeed.ContainsKey(zs.SystemName))
+                        {
+                            ZKBBaseFeed[zs.SystemName]++;
+                        }
+                        else
+                        {
+                            ZKBBaseFeed[zs.SystemName] = 1;
+                        }
+                    }
+
+
+                    foreach (KeyValuePair<string, int> kvp in ZKBBaseFeed)
+                    {
+                        double zkbVal = 5 + ((double)kvp.Value * ESIOverlayScale * 2);
+
+                        EVEData.System sys = EM.GetEveSystem(kvp.Key);
+                        if(sys == null)
+                        {
+                            // probably a WH
+                            continue;
+                        }
+                        double X = (sys.ActualX - universeXMin) * universeScale;
+                        // need to invert Z
+                        double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+
+
+                        // Create an instance of a DrawingVisual.
+                        System.Windows.Media.DrawingVisual zkbVisual = new System.Windows.Media.DrawingVisual();
+
+                        // Retrieve the DrawingContext from the DrawingVisual.
+                        DrawingContext dc = zkbVisual.RenderOpen();
+
+                        // draw a circle around the system
+                        dc.DrawEllipse(ZKBBrush, new Pen(ZKBBrush, 1.0), new Point(X, Z), zkbVal, zkbVal);
+
+
+                        dc.Close();
+
+                        VHZKB.AddChild(zkbVisual, "ZKBData");
+
+
+                    }
+                }
+            }
         }
 
         private void MainZoomControl_ZoomChanged(object sender, RoutedEventArgs e)
@@ -756,9 +884,6 @@ namespace SMT
                 {
                     UniverseMainCanvas.Children.Add(VHRegionNames);
                 }
-
-
-
             }
             else
             {
@@ -771,7 +896,6 @@ namespace SMT
                 {
                     UniverseMainCanvas.Children.Remove(VHRegionNames);
                 }
-
             }
         }
 
@@ -792,18 +916,13 @@ namespace SMT
         {
             EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
 
-            double HalfZoomSize = 600;
-
             if (sd != null)
             {
-
                 // actual 
                 double X1 = (sd.ActualX - universeXMin) * universeScale;
                 double Y1 = (universeDepth - (sd.ActualZ - universeZMin)) * universeScale;
 
                 MainZoomControl.Show(X1, Y1, 3.0);
-
-
             }
         }
     }

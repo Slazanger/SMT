@@ -940,6 +940,7 @@ namespace SMT
 
                 sysText.Padding = border;
                 sysText.Margin = border;
+                sysText.IsHitTestVisible = false;
 
                 Canvas.SetLeft(sysText, system.LayoutX + SYSTEM_TEXT_X_OFFSET);
                 Canvas.SetTop(sysText, system.LayoutY + SYSTEM_TEXT_Y_OFFSET);
@@ -1295,6 +1296,7 @@ namespace SMT
                     sysSubText.Content = SystemSubText;
                     sysSubText.FontSize = SYSTEM_TEXT_TEXT_SIZE;
                     sysSubText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+                    sysSubText.IsHitTestVisible = false;
 
 
                     Canvas.SetLeft(sysSubText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
