@@ -250,7 +250,7 @@ namespace SMT
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
-            uiRefreshTimer.Interval = new TimeSpan(0, 0, 4);
+            uiRefreshTimer.Interval = new TimeSpan(0, 0, 5);
             uiRefreshTimer.Start();
 
 
@@ -449,7 +449,23 @@ namespace SMT
 
         private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if( e.PropertyName == "isVisible" || 
+                e.PropertyName == "IsMouseOver" ||
+                e.PropertyName == "IsMouseCaptureWithin" ||
+                e.PropertyName == "ActualHeight" ||
+                e.PropertyName == "ActualWidth" ||
+
+                e.PropertyName == "IsKeyboardFocusWithin"  ||
+                e.PropertyName == "SelectedProperty" ||
+                e.PropertyName == "SelectedPropertyItem"
+
+                )
+            {
+                return;
+            }
+
             RegionRC.ReDrawMap(true);
+            UniverseUC.ReDrawMap(true, true, true);
         }
 
 

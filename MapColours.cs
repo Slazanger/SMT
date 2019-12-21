@@ -53,6 +53,12 @@ namespace SMT
         [DisplayName("Map Background")]
         public Color MapBackgroundColour { get; set; }
 
+
+        [Category("General")]
+        [DisplayName("Region Marker")]
+        public Color RegionMarkerTextColour { get; set; }
+
+
         [Category("General")]
         [DisplayName("Selected System")]
         public Color SelectedSystemColour { get; set; }

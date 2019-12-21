@@ -65,7 +65,7 @@
         </StackPanel>
 
         <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1"  >
-            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" >
+            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="6000" Height="6000" UseLayoutRounding="True" >
             </Canvas>
         </zoombox1:ZoomControl>
 
@@ -164,7 +164,7 @@
                         </StackPanel>
 
 
-                        <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale"/>
+                        <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.2" Maximum="2" TickFrequency="0.2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" TickPlacement="Both" SmallChange="0.2" IsSnapToTickEnabled="True"/>
                     </StackPanel>
 
 

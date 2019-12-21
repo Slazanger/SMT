@@ -1317,21 +1317,21 @@ namespace SMT.EVEData
 
             List<long> IDToResolve = new List<long>();
 
-            foreach (MapSystem s in r.MapSystems.Values.ToList())
+            foreach (KeyValuePair<string, MapSystem> kvp in r.MapSystems)
             {
                 
-                if (s.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(s.ActualSystem.SOVAllianceTCU))
+                if (kvp.Value.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.Keys.Contains(kvp.Value.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceTCU))
                 {
-                    IDToResolve.Add(s.ActualSystem.SOVAllianceTCU);
+                    IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceTCU);
                 }
 
-                if (s.ActualSystem.SOVAllianceIHUB != 0 && !AllianceIDToName.Keys.Contains(s.ActualSystem.SOVAllianceIHUB) && !IDToResolve.Contains(s.ActualSystem.SOVAllianceIHUB))
+                if (kvp.Value.ActualSystem.SOVAllianceIHUB != 0 && !AllianceIDToName.Keys.Contains(kvp.Value.ActualSystem.SOVAllianceIHUB) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceIHUB))
                 {
-                    IDToResolve.Add(s.ActualSystem.SOVAllianceIHUB);
+                    IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceIHUB);
                 }
 
             }
-
+  
 
             ResolveAllianceIDs(IDToResolve);
         }
@@ -1458,9 +1458,9 @@ namespace SMT.EVEData
             foreach (MapRegion rr in Regions)
             {
                 // link to the real systems
-                foreach (MapSystem ms in rr.MapSystems.Values.ToList())
+                foreach (KeyValuePair<string, MapSystem> kvp in rr.MapSystems)
                 {
-                    ms.ActualSystem = GetEveSystem(ms.Name);
+                    kvp.Value.ActualSystem = GetEveSystem(kvp.Value.Name);
                 }
             }
 
@@ -2033,7 +2033,7 @@ namespace SMT.EVEData
                 Thread.CurrentThread.IsBackground = false;
 
                 TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
-                TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(10);
+                TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
 
                 DateTime NextCharacterUpdate = DateTime.Now;
                 DateTime NextLowFreqUpdate = DateTime.Now;

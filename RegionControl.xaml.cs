@@ -499,12 +499,13 @@ namespace SMT
             }
 
 
-            foreach (EVEData.MapSystem es in Region.MapSystems.Values.ToList())
+            foreach (KeyValuePair<string, MapSystem> kvp in Region.MapSystems)
             {
-                if (es.Name == name)
+
+                if (kvp.Value.Name == name)
                 {
-                    SystemDropDownAC.SelectedItem = es;
-                    SelectedSystem = es.Name;
+                    SystemDropDownAC.SelectedItem = kvp.Value;
+                    SelectedSystem = kvp.Value.Name;
                     AddHighlightToSystem(name);
 
                     break;
@@ -629,9 +630,9 @@ namespace SMT
             Random rnd = new Random(4);
 
 
-
-            foreach (EVEData.MapSystem system in Region.MapSystems.Values.ToList())
+            foreach (KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
             {
+                EVEData.MapSystem system = kvp.Value;
 
                 Coalition SystemCoalition = null;
 
@@ -1576,13 +1577,16 @@ namespace SMT
         }
 
 
+        private Dictionary<string, List<EVEData.LocalCharacter>> CharacterTrackingLocationMap = new Dictionary<string, List<EVEData.LocalCharacter>>();
+
+
         /// <summary>
         /// Add Characters to the region
         /// </summary>
         void AddCharactersToMap()
         {
             // Cache all characters in the same system so we can render them on seperate lines
-            Dictionary<string, List<EVEData.LocalCharacter>> charLocationMap = new Dictionary<string, List<EVEData.LocalCharacter>>();
+            CharacterTrackingLocationMap.Clear();
 
             foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
             {
@@ -1593,14 +1597,14 @@ namespace SMT
                 }
 
 
-                if (!charLocationMap.Keys.Contains(c.Location))
+                if (!CharacterTrackingLocationMap.ContainsKey(c.Location))
                 {
-                    charLocationMap[c.Location] = new List<EVEData.LocalCharacter>();
+                    CharacterTrackingLocationMap[c.Location] = new List<EVEData.LocalCharacter>();
                 }
-                charLocationMap[c.Location].Add(c);
+                CharacterTrackingLocationMap[c.Location].Add(c);
             }
             
-            foreach (List<EVEData.LocalCharacter> lc in charLocationMap.Values)
+            foreach (List<EVEData.LocalCharacter> lc in CharacterTrackingLocationMap.Values)
             {
                 double textYOffset = -24;
                 double textXOffset = 6;
@@ -2316,9 +2320,10 @@ namespace SMT
                     }
                 }
 
-
-                foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
+                foreach (KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
                 {
+                    EVEData.MapSystem sys = kvp.Value;
+
                     if (ZKBBaseFeed.Keys.Contains(sys.ActualSystem.Name))
                     {
                         double ZKBValue = 24 + ((double)ZKBBaseFeed[sys.ActualSystem.Name] * ESIOverlayScale * 2);

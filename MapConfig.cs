@@ -228,7 +228,7 @@ namespace SMT
 
         private bool m_ShowRegionStandings;
 
-        [Category("Universe")]
+        [Category("Regions")]
         [DisplayName("Show RegionStandings")]
         public bool ShowRegionStandings
         {
@@ -253,7 +253,7 @@ namespace SMT
         }
 
         private bool m_ShowUniverseRats;
-        [Category("Universe")]
+        [Category("Regions")]
         [DisplayName("Show Ratting Stats")]
         public bool ShowUniverseRats
         {
@@ -278,7 +278,7 @@ namespace SMT
         }
 
         private bool m_ShowUniversePods;
-        [Category("Universe")]
+        [Category("Regions")]
         [DisplayName("Show Pod kill Stats")]
         public bool ShowUniversePods
         {
@@ -303,7 +303,7 @@ namespace SMT
         }
 
         private bool m_ShowUniverseKills;
-        [Category("Universe")]
+        [Category("Regions")]
         [DisplayName("Show Ship kill Stats")]
         public bool ShowUniverseKills
         {
@@ -329,7 +329,7 @@ namespace SMT
         }
 
         private double m_UniverseDataScale = 1.0f;
-        [Category("Universe")]
+        [Category("Regions")]
         [DisplayName("Universe Data Scale")]
         public double UniverseDataScale
         {
@@ -540,6 +540,7 @@ namespace SMT
 
 
             defaultColours.MapBackgroundColour = (Color)ColorConverter.ConvertFromString("#5E615E");
+            defaultColours.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
             defaultColours.ESIOverlayColour = Color.FromRgb(188, 143, 143);
             defaultColours.IntelOverlayColour = Color.FromRgb(178, 34, 34);
             defaultColours.IntelClearOverlayColour = Colors.Orange;
@@ -584,6 +585,7 @@ namespace SMT
             blueColours.OutRegionSystemColour = Color.FromRgb(112, 108, 124);
             blueColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
             blueColours.MapBackgroundColour = Color.FromRgb(245, 245, 245);
+            blueColours.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
             blueColours.ESIOverlayColour = Color.FromRgb(192, 192, 192);
             blueColours.IntelOverlayColour = Color.FromRgb(216, 191, 216);
             blueColours.IntelClearOverlayColour = Colors.Orange;
@@ -624,6 +626,7 @@ namespace SMT
             greyAndRed.OutRegionSystemColour = Color.FromRgb(128, 34, 34);
             greyAndRed.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
             greyAndRed.MapBackgroundColour = Color.FromRgb(245, 245, 245);
+            greyAndRed.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
             greyAndRed.ESIOverlayColour = Color.FromRgb(192, 192, 192);
             greyAndRed.IntelOverlayColour = Color.FromRgb(80, 34, 34);
             greyAndRed.IntelClearOverlayColour = Colors.Orange;
@@ -664,6 +667,7 @@ namespace SMT
             dark.OutRegionSystemColour = Color.FromRgb(224, 255, 255);
             dark.OutRegionSystemTextColour = Color.FromRgb(128, 128, 128);
             dark.MapBackgroundColour = Color.FromRgb(20, 20, 20);
+            dark.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
             dark.ESIOverlayColour = Color.FromRgb(209, 201, 202);
             dark.IntelOverlayColour = Color.FromRgb(205, 92, 92);
             dark.IntelClearOverlayColour = Colors.Orange;
@@ -703,6 +707,7 @@ namespace SMT
             lateNight.OutRegionSystemColour = Color.FromRgb(218, 165, 32);
             lateNight.OutRegionSystemTextColour = Color.FromRgb(218, 165, 32);
             lateNight.MapBackgroundColour = Color.FromRgb(32, 32, 32);
+            lateNight.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
             lateNight.ESIOverlayColour = Color.FromRgb(81, 81, 81);
             lateNight.IntelOverlayColour = Color.FromRgb(178, 34, 34);
             lateNight.IntelClearOverlayColour = Colors.Orange;

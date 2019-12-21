@@ -25,7 +25,7 @@ namespace SMT
 
             private Dictionary<Visual, Object> DataContextData;
 
-            public void AddChild(Visual vis, object dataContext)
+            public void AddChild(Visual vis, object dataContext = null)
             {
                 Children.Add(vis);
                 DataContextData.Add(vis, dataContext);
@@ -33,7 +33,7 @@ namespace SMT
 
 
 
-            public void RemoveChild(Visual vis, object dataContext)
+            public void RemoveChild(Visual vis, object dataContext = null)
             {
                 Children.Remove(vis);
                 DataContextData.Remove(vis);
@@ -332,14 +332,17 @@ namespace SMT
             VHZKB = new VisualHost();
 
 
+            UniverseMainCanvas.Children.Add(VHRegionNames);
             UniverseMainCanvas.Children.Add(VHRangeSpheres);
             UniverseMainCanvas.Children.Add(VHDataSpheres);
             UniverseMainCanvas.Children.Add(VHZKB);
             UniverseMainCanvas.Children.Add(VHRangeHighlights);
 
             UniverseMainCanvas.Children.Add(VHLinks);
+            UniverseMainCanvas.Children.Add(VHNames);
             UniverseMainCanvas.Children.Add(VHCharacters);
             UniverseMainCanvas.Children.Add(VHSystems);
+
 
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
@@ -436,6 +439,10 @@ namespace SMT
             Brush sysCentreCol = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
             Brush sysRangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
 
+            rangeCol.Freeze();
+            sysCentreCol.Freeze();
+            sysRangeCol.Freeze();
+
             double X = (sys.ActualX - universeXMin) * universeScale; ;
             double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
 
@@ -443,20 +450,14 @@ namespace SMT
 
             // Create an instance of a DrawingVisual.
             System.Windows.Media.DrawingVisual rangeCircleDV = new System.Windows.Media.DrawingVisual();
-
-            // Retrieve the DrawingContext from the DrawingVisual.
             DrawingContext drawingContext = rangeCircleDV.RenderOpen();
 
             drawingContext.DrawEllipse(rangeCol, new Pen(rangeCol, 1), new Point(X, Z), Radius, Radius);
             drawingContext.DrawRectangle(sysCentreCol, new Pen(sysCentreCol, 1), new Rect(X - 5, Z - 5, 10, 10));
 
-
-
-            // Close the DrawingContext to persist changes to the DrawingVisual.
             drawingContext.Close();
-
-
-            VHRangeSpheres.AddChild(rangeCircleDV, "Sphere");
+            
+            VHRangeSpheres.AddChild(rangeCircleDV);
 
             foreach (EVEData.System es in EM.Systems)
             {
@@ -479,11 +480,9 @@ namespace SMT
                     dcR.DrawRectangle(sysRangeCol, new Pen(sysRangeCol, 1), new Rect(irX - 5, irZ - 5, 10, 10));
                     dcR.Close();
 
-                    VHRangeHighlights.AddChild(rangeSquareDV, "SysH");
+                    VHRangeHighlights.AddChild(rangeSquareDV);
                 }
             }
-
-
         }
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
@@ -494,7 +493,7 @@ namespace SMT
             bool FastUpdate = true;
             bool DataRedraw = false;
 
-            if (uiRefreshTimer_interval == 2)
+            if (uiRefreshTimer_interval == 4)
             {
                 uiRefreshTimer_interval = 0;
                 DataRedraw = false;
@@ -521,7 +520,14 @@ namespace SMT
 
 
 
-
+        private Brush SystemColourBrush;
+        private Brush ConstellationColourBrush;
+        private Brush SystemTextColourBrush;
+        private Brush RegionTextColourBrush;
+        private Brush GateColourBrush;
+        private Brush JumpBridgeColourBrush;
+        private Brush DataColourBrush;
+        private Brush BackgroundColourBrush;
 
 
 
@@ -535,34 +541,53 @@ namespace SMT
             double textXOffset = 3;
             double textYOffset = 2;
 
-            double XScale = (5000) / universeWidth;
-            double ZScale = (5000) / universeDepth;
+            double SystemTextSize = 5;
+            double RegionTextSize = 60;
+            double CharacterTextSize = 6;
+
+            double XScale = (UniverseMainCanvas.Width) / universeWidth;
+            double ZScale = (UniverseMainCanvas.Height) / universeDepth;
             universeScale = Math.Min(XScale, ZScale);
 
 
-
-            Brush SysCol = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
-            Brush ConstGateCol = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
-            Brush TextCol = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
-            Brush RegionTextCol = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
-            Brush GateCol = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
-            Brush JBCol = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
-            Brush DataCol = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
-
-            Brush BG = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
-
-            MainZoomControl.Background = BG;
-            UniverseMainCanvas.Background = BG;
+            // recreate the brushes on a full draw
+            if(FullRedraw)
+            {
+                SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
+                ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+                SystemTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+                RegionTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
+                GateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+                JumpBridgeColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+                DataColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
+                BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
 
 
-            ConstGateCol.Freeze();
-            TextCol.Freeze();
-            GateCol.Freeze();
-            JBCol.Freeze();
+                SystemColourBrush.Freeze();
+                ConstellationColourBrush.Freeze();
+                SystemTextColourBrush.Freeze();
+                RegionTextColourBrush.Freeze();
+                GateColourBrush.Freeze();
+                JumpBridgeColourBrush.Freeze();
+                DataColourBrush.Freeze();
+                BackgroundColourBrush.Freeze();
+
+
+            }
+
+
+
+
+            // update the background colours
+            MainZoomControl.Background = BackgroundColourBrush;
+            UniverseMainCanvas.Background = BackgroundColourBrush;
+
+
 
 
             System.Windows.FontStyle fontStyle = FontStyles.Normal;
             FontWeight fontWeight = FontWeights.Medium;
+            Typeface tf = new Typeface("Verdana");
 
             if (FullRedraw)
             {
@@ -576,25 +601,19 @@ namespace SMT
                     double X = (mr.RegionX - universeXMin) * universeScale; ;
                     double Z = (universeDepth - (mr.RegionZ - universeZMin)) * universeScale;
 
-                    // Create an instance of a DrawingVisual.
                     System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
 
-                    // Retrieve the DrawingContext from the DrawingVisual.
                     DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
 #pragma warning disable CS0618 
-                    // Draw a formatted text string into the DrawingContext.
-                    FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 60, RegionTextCol);
+                    FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, tf, RegionTextSize, RegionTextColourBrush);
                     ft.TextAlignment = TextAlignment.Center;
-
                     drawingContext.DrawText(ft, new Point(X + textXOffset, Z + textYOffset));
 #pragma warning restore CS0618 
 
-                    // Close the DrawingContext to persist changes to the DrawingVisual.
                     drawingContext.Close();
 
                     VHRegionNames.AddChild(SystemTextVisual, mr.Name);
-
                 }
 
                 foreach (GateHelper gh in universeSysLinksCache)
@@ -604,21 +623,16 @@ namespace SMT
 
                     double X2 = (gh.to.ActualX - universeXMin) * universeScale;
                     double Y2 = (universeDepth - (gh.to.ActualZ - universeZMin)) * universeScale;
-                    Brush Col = GateCol;
+                    Brush Col = GateColourBrush;
 
                     if (gh.from.Region != gh.to.Region || gh.from.ConstellationID != gh.to.ConstellationID)
                     {
-                        Col = ConstGateCol;
+                        Col = ConstellationColourBrush;
                     }
 
                     System.Windows.Media.DrawingVisual sysLinkVisual = new System.Windows.Media.DrawingVisual();
-
-                    // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = sysLinkVisual.RenderOpen();
-
-                    // Create a rectangle and draw it in the DrawingContext.
                     drawingContext.DrawLine(new Pen(Col, 0.6), new Point(X1, Y1), new Point(X2, Y2));
-
                     drawingContext.Close();
 
                     VHLinks.AddChild(sysLinkVisual, "link");
@@ -646,7 +660,7 @@ namespace SMT
                         // Retrieve the DrawingContext in order to create new drawing content.
                         DrawingContext drawingContext = sysLinkVisual.RenderOpen();
 
-                        Pen p = new Pen(JBCol, 0.6);
+                        Pen p = new Pen(JumpBridgeColourBrush, 0.6);
                         p.DashStyle = DashStyles.Dot;
 
                         // Create a rectangle and draw it in the DrawingContext.
@@ -657,6 +671,8 @@ namespace SMT
                         VHLinks.AddChild(sysLinkVisual, "JB");
                     }
                 }
+
+
 
 
                 foreach (EVEData.System sys in EM.Systems)
@@ -674,8 +690,8 @@ namespace SMT
                     DrawingContext drawingContext = systemShapeVisual.RenderOpen();
 
                     // Create a rectangle and draw it in the DrawingContext.
-                    Rect rect = new Rect(new Point(X - 3, Z - 3), new Size(6, 6));
-                    drawingContext.DrawRectangle(SysCol, null, rect);
+                    Rect rect = new Rect(X - 3, Z - 3, 6, 6);
+                    drawingContext.DrawRectangle(SystemColourBrush, null, rect);
 
                     // Persist the drawing content.
                     drawingContext.Close();
@@ -696,8 +712,8 @@ namespace SMT
                         new FormattedText(sys.Name,
                             CultureInfo.GetCultureInfo("en-us"),
                             FlowDirection.LeftToRight,
-                            new Typeface("Verdana"),
-                            6, TextCol),
+                            tf,
+                            SystemTextSize, SystemTextColourBrush),
                         new Point(X + textXOffset, Z + textYOffset));
 #pragma warning restore CS0618 
 
@@ -753,11 +769,11 @@ namespace SMT
                         DrawingContext drawingContext = dataDV.RenderOpen();
 
                         // Create a rectangle and draw it in the DrawingContext.
-                        drawingContext.DrawEllipse(DataCol, new Pen(DataCol, 1), new Point(X, Z), DataScale, DataScale);
+                        drawingContext.DrawEllipse(DataColourBrush, new Pen(DataColourBrush, 1), new Point(X, Z), DataScale, DataScale);
 
                         drawingContext.Close();
 
-                        VHDataSpheres.AddChild(dataDV, "DATA");
+                        VHDataSpheres.AddChild(dataDV);
                     }
                 }
 
@@ -799,7 +815,7 @@ namespace SMT
                     double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
 
 
-                    int charTextOffset = 0;
+                    double charTextOffset = 0;
 
                     // Create an instance of a DrawingVisual.
                     System.Windows.Media.DrawingVisual nameTextVisual = new System.Windows.Media.DrawingVisual();
@@ -819,16 +835,16 @@ namespace SMT
                             new FormattedText(name,
                                 CultureInfo.GetCultureInfo("en-us"),
                                 FlowDirection.LeftToRight,
-                                new Typeface("Verdana"),
-                                8, CharacterNameBrush),
+                                tf,
+                                CharacterTextSize, CharacterNameBrush),
                             new Point(X + characterNametextXOffset, Z + characterNametextYOffset + charTextOffset));
 #pragma warning restore CS0618 
 
-                        charTextOffset -= 10;
+                        charTextOffset -= (CharacterTextSize + 2);
                     }
 
                     dc.Close();
-                    VHCharacters.AddChild(nameTextVisual, "CharNames");
+                    VHCharacters.AddChild(nameTextVisual);
                 }
 
 
@@ -887,27 +903,11 @@ namespace SMT
         {
             if (MainZoomControl.Zoom < 0.8)
             {
-                if (UniverseMainCanvas.Children.Contains(VHNames))
-                {
-                    UniverseMainCanvas.Children.Remove(VHNames);
-                }
-
-                if (!UniverseMainCanvas.Children.Contains(VHRegionNames))
-                {
-                    UniverseMainCanvas.Children.Add(VHRegionNames);
-                }
+                VHNames.Visibility = Visibility.Hidden;
             }
             else
             {
-                if (!UniverseMainCanvas.Children.Contains(VHNames))
-                {
-                    UniverseMainCanvas.Children.Add(VHNames);
-                }
-
-                if (UniverseMainCanvas.Children.Contains(VHRegionNames))
-                {
-                    UniverseMainCanvas.Children.Remove(VHRegionNames);
-                }
+                VHNames.Visibility = Visibility.Visible;
             }
         }
 
@@ -981,12 +981,6 @@ namespace SMT
             RoutedEventArgs newEventArgs = new RoutedEventArgs(RequestRegionSystemSelectEvent, s.Name);
             RaiseEvent(newEventArgs);
         }
-
-        
-
-
-
-
     }
 }
 
