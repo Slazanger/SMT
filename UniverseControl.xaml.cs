@@ -901,7 +901,7 @@ namespace SMT
 
         private void MainZoomControl_ZoomChanged(object sender, RoutedEventArgs e)
         {
-            if (MainZoomControl.Zoom < 0.8)
+            if (MainZoomControl.Zoom < 1.1)
             {
                 VHNames.Visibility = Visibility.Hidden;
             }

@@ -65,7 +65,7 @@
         </StackPanel>
 
         <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1"  >
-            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="6000" Height="6000" UseLayoutRounding="True" >
+            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" >
             </Canvas>
         </zoombox1:ZoomControl>
 
