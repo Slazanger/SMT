@@ -64,7 +64,7 @@
             </dotNetKitControls:AutoCompleteComboBox>
         </StackPanel>
 
-        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1"  >
+        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Mode="Original"  >
             <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" >
             </Canvas>
         </zoombox1:ZoomControl>

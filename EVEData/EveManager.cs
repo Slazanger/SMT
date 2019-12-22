@@ -1346,7 +1346,23 @@ namespace SMT.EVEData
                 return;
             }
 
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(IDs);
+            // strip out any ID's we already know..
+            List<long> UnknownIDs = new List<long>();
+            foreach(long l in IDs)
+            {
+                if(!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l))
+                {
+                    UnknownIDs.Add(l);
+                }
+            }
+
+            if(UnknownIDs.Count == 0)
+            {
+                return;
+            }
+
+
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
             if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
             {
                 foreach(ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
@@ -1365,7 +1381,6 @@ namespace SMT.EVEData
                         {
                             AllianceIDToTicker[ri.Id] = "???????????????";
                             AllianceIDToName[ri.Id] = "?????";
-
                         }
                     }
                 }

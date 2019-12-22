@@ -555,6 +555,8 @@ namespace SMT.EVEData
                 return;
             }
 
+            List<long> AllianceToResolve = new List<long>();
+
             try
             {
                 ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
@@ -573,7 +575,8 @@ namespace SMT.EVEData
                 }
 
 
-                if (AllianceID != 0)
+                // if we have an alliance, and no current standings set
+                if (AllianceID != 0 && Standings.Count == 0)
                 {
                     int page = 0;
                     int maxPageCount = 1;
@@ -598,6 +601,11 @@ namespace SMT.EVEData
                             {
                                 Standings[con.ContactId] = (float)con.Standing;
                                 LabelMap[con.ContactId] = con.LabelId;
+
+                                if (con.ContactType == "alliance")
+                                {
+                                    AllianceToResolve.Add(con.ContactId);
+                                }
                             }
                         }
                     }
@@ -608,7 +616,7 @@ namespace SMT.EVEData
             {
             }
 
-            await EveManager.Instance.ResolveAllianceIDs(Standings.Keys.ToList());
+            await EveManager.Instance.ResolveAllianceIDs(AllianceToResolve);
         }
 
 

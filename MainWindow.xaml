@@ -101,7 +101,7 @@
                                     <xcad:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapConfigContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                         <ScrollViewer Background="#FFE5E5E5">
                                             <StackPanel>
-                                                <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False">
+                                                <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" IsScrollingToTopAfterRefresh="False" IsVirtualizing="True">
                                                     <xctk:PropertyGrid.EditorDefinitions>
                                                         <xctk:EditorTemplateDefinition TargetProperties="UniverseDataScale">
                                                             <xctk:EditorTemplateDefinition.EditingTemplate>
