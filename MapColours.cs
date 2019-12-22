@@ -55,8 +55,12 @@ namespace SMT
 
 
         [Category("General")]
-        [DisplayName("Region Marker")]
+        [DisplayName("Region Marker Zoomed")]
         public Color RegionMarkerTextColour { get; set; }
+
+        [Category("General")]
+        [DisplayName("Region Marker")]
+        public Color RegionMarkerTextColourFull { get; set; }
 
 
         [Category("General")]

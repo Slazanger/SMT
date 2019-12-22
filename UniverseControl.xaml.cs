@@ -331,7 +331,6 @@ namespace SMT
             VHZKB = new VisualHost();
 
 
-            UniverseMainCanvas.Children.Add(VHRegionNames);
             UniverseMainCanvas.Children.Add(VHRangeSpheres);
             UniverseMainCanvas.Children.Add(VHDataSpheres);
             UniverseMainCanvas.Children.Add(VHZKB);
@@ -523,6 +522,7 @@ namespace SMT
         private Brush ConstellationColourBrush;
         private Brush SystemTextColourBrush;
         private Brush RegionTextColourBrush;
+        private Brush RegionTextZoomedOutColourBrush;
         private Brush GateColourBrush;
         private Brush JumpBridgeColourBrush;
         private Brush DataColourBrush;
@@ -541,7 +541,6 @@ namespace SMT
             double textYOffset = 2;
 
             double SystemTextSize = 5;
-            double RegionTextSize = 60;
             double CharacterTextSize = 6;
 
             double XScale = (UniverseMainCanvas.Width) / universeWidth;
@@ -556,6 +555,7 @@ namespace SMT
                 ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
                 SystemTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
                 RegionTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
+                RegionTextZoomedOutColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColourFull);
                 GateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
                 JumpBridgeColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
                 DataColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
@@ -570,6 +570,7 @@ namespace SMT
                 JumpBridgeColourBrush.Freeze();
                 DataColourBrush.Freeze();
                 BackgroundColourBrush.Freeze();
+                RegionTextZoomedOutColourBrush.Freeze();
 
 
             }
@@ -593,27 +594,10 @@ namespace SMT
 
                 VHLinks.ClearAllChildren();
                 VHNames.ClearAllChildren();
-                VHRegionNames.ClearAllChildren();
 
-                foreach (EVEData.MapRegion mr in EM.Regions)
-                {
-                    double X = (mr.RegionX - universeXMin) * universeScale; ;
-                    double Z = (universeDepth - (mr.RegionZ - universeZMin)) * universeScale;
 
-                    System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
+                ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
 
-                    DrawingContext drawingContext = SystemTextVisual.RenderOpen();
-
-#pragma warning disable CS0618 
-                    FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, tf, RegionTextSize, RegionTextColourBrush);
-                    ft.TextAlignment = TextAlignment.Center;
-                    drawingContext.DrawText(ft, new Point(X + textXOffset, Z + textYOffset));
-#pragma warning restore CS0618 
-
-                    drawingContext.Close();
-
-                    VHRegionNames.AddChild(SystemTextVisual, mr.Name);
-                }
 
                 foreach (GateHelper gh in universeSysLinksCache)
                 {
@@ -900,7 +884,7 @@ namespace SMT
 
         private void MainZoomControl_ZoomChanged(object sender, RoutedEventArgs e)
         {
-            if (MainZoomControl.Zoom < 1.1)
+            if (MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystemsText)
             {
                 VHNames.Visibility = Visibility.Hidden;
             }
@@ -909,16 +893,69 @@ namespace SMT
                 VHNames.Visibility = Visibility.Visible;
             }
 
-            if (MainZoomControl.Zoom < 0.8)
+            if (MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems)
             {
                 VHSystems.Visibility = Visibility.Hidden;
+                ReCreateRegionMarkers(true);
+
             }
             else
             {
                 VHSystems.Visibility = Visibility.Visible;
+                ReCreateRegionMarkers(false);
             }
 
 
+        }
+
+        private bool RegionZoomed = false;
+        private void ReCreateRegionMarkers(bool ZoomedOut)
+        {
+
+            if(RegionZoomed == ZoomedOut)
+            {
+                return;
+            }
+            RegionZoomed = ZoomedOut;
+
+            UniverseMainCanvas.Children.Remove(VHRegionNames);
+            VHRegionNames.ClearAllChildren();
+
+
+
+            double RegionTextSize = 50;
+            Typeface tf = new Typeface("Verdana");
+
+            Brush rtb = RegionTextColourBrush;
+            if(ZoomedOut)
+            {
+                UniverseMainCanvas.Children.Add(VHRegionNames);
+                rtb = RegionTextZoomedOutColourBrush;
+            }
+            else
+            {
+                UniverseMainCanvas.Children.Insert(0,VHRegionNames);
+            }
+
+            foreach (EVEData.MapRegion mr in EM.Regions)
+            {
+                double X = (mr.RegionX - universeXMin) * universeScale; ;
+                double Z = (universeDepth - (mr.RegionZ - universeZMin)) * universeScale;
+
+                System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
+
+                DrawingContext drawingContext = SystemTextVisual.RenderOpen();
+
+#pragma warning disable CS0618
+                FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, tf, RegionTextSize, rtb);
+                ft.TextAlignment = TextAlignment.Center;
+                drawingContext.DrawText(ft, new Point(X, Z));
+#pragma warning restore CS0618
+
+                drawingContext.Close();
+
+                VHRegionNames.AddChild(SystemTextVisual);
+            }
         }
 
         public void ShowSystem(string SystemName)

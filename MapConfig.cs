@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Media;
@@ -494,6 +495,42 @@ namespace SMT
         }
 
 
+        private float m_UniverseMaxZoomDisplaySystems;
+        [Category("Universe View")]
+        [DisplayName("Systems Max Zoom")]
+        public float UniverseMaxZoomDisplaySystems
+        {
+            get
+            {
+                return m_UniverseMaxZoomDisplaySystems;
+            }
+
+            set
+            {
+                m_UniverseMaxZoomDisplaySystems = Math.Min(Math.Max(value, 0.5f), 10.0f);
+                OnPropertyChanged("UniverseMaxZoomDisplaySystems");
+            }
+        }
+
+
+        private float m_UniverseMaxZoomDisplaySystemsText;
+        [Category("Universe View")]
+        [DisplayName("Systems Text Max Zoom")]
+        public float UniverseMaxZoomDisplaySystemsText
+        {
+            get
+            {
+                return m_UniverseMaxZoomDisplaySystemsText;
+            }
+
+            set
+            {
+                m_UniverseMaxZoomDisplaySystemsText = Math.Min(Math.Max(value, 0.5f), 10.0f);
+                OnPropertyChanged("UniverseMaxZoomDisplaySystemsText");
+            }
+        }
+
+
 
         [Category("Navigation")]
         public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
@@ -521,6 +558,10 @@ namespace SMT
             SOVShowConflicts = true;
             SOVBasedITCU = true;
 
+            UniverseMaxZoomDisplaySystems = 1.3f;
+            UniverseMaxZoomDisplaySystemsText = 2.0f;
+
+
         }
 
         public void SetDefaultColours()
@@ -541,6 +582,7 @@ namespace SMT
 
             defaultColours.MapBackgroundColour = (Color)ColorConverter.ConvertFromString("#5E615E");
             defaultColours.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
+            defaultColours.RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0);
             defaultColours.ESIOverlayColour = Color.FromRgb(188, 143, 143);
             defaultColours.IntelOverlayColour = Color.FromRgb(178, 34, 34);
             defaultColours.IntelClearOverlayColour = Colors.Orange;
@@ -586,6 +628,7 @@ namespace SMT
             blueColours.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
             blueColours.MapBackgroundColour = Color.FromRgb(245, 245, 245);
             blueColours.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
+            blueColours.RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0);
             blueColours.ESIOverlayColour = Color.FromRgb(192, 192, 192);
             blueColours.IntelOverlayColour = Color.FromRgb(216, 191, 216);
             blueColours.IntelClearOverlayColour = Colors.Orange;
@@ -627,6 +670,7 @@ namespace SMT
             greyAndRed.OutRegionSystemTextColour = Color.FromRgb(0, 0, 0);
             greyAndRed.MapBackgroundColour = Color.FromRgb(245, 245, 245);
             greyAndRed.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
+            greyAndRed.RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0);
             greyAndRed.ESIOverlayColour = Color.FromRgb(192, 192, 192);
             greyAndRed.IntelOverlayColour = Color.FromRgb(80, 34, 34);
             greyAndRed.IntelClearOverlayColour = Colors.Orange;
@@ -668,6 +712,7 @@ namespace SMT
             dark.OutRegionSystemTextColour = Color.FromRgb(128, 128, 128);
             dark.MapBackgroundColour = Color.FromRgb(20, 20, 20);
             dark.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
+            dark.RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0);
             dark.ESIOverlayColour = Color.FromRgb(209, 201, 202);
             dark.IntelOverlayColour = Color.FromRgb(205, 92, 92);
             dark.IntelClearOverlayColour = Colors.Orange;
@@ -708,6 +753,7 @@ namespace SMT
             lateNight.OutRegionSystemTextColour = Color.FromRgb(218, 165, 32);
             lateNight.MapBackgroundColour = Color.FromRgb(32, 32, 32);
             lateNight.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
+            lateNight.RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0);
             lateNight.ESIOverlayColour = Color.FromRgb(81, 81, 81);
             lateNight.IntelOverlayColour = Color.FromRgb(178, 34, 34);
             lateNight.IntelClearOverlayColour = Colors.Orange;
