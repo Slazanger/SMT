@@ -11,7 +11,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
     {
         private readonly CancelAsyncCommand _cancelCommand;
         private readonly Func<T, CancellationToken, Task> _command;
-        private readonly Func<bool> _canExecute = ()=>true;
+        private readonly Func<bool> _canExecute = () => true;
 
         private NotifyTaskCompletionBase _execution;
 

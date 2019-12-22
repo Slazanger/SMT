@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:SMT"
              mc:Ignorable="d" 
              xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -64,9 +65,14 @@
             </dotNetKitControls:AutoCompleteComboBox>
         </StackPanel>
 
-        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Mode="Original"  >
-            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" >
+        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2"  >
+
+            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" >
+                <!--<Canvas.CacheMode>
+                    <BitmapCache RenderAtScale="5" EnableClearType="True" SnapsToDevicePixels="True" />
+                </Canvas.CacheMode> -->
             </Canvas>
+
         </zoombox1:ZoomControl>
 
 

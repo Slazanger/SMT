@@ -1,6 +1,6 @@
 ﻿using ESI.NET;
-using System.Net;
 using System;
+using System.Net;
 
 namespace SMT.EVEData
 {
@@ -14,7 +14,7 @@ namespace SMT.EVEData
             }
 
 
-            Console.WriteLine("ESI Error : " + esiR.Message );
+            Console.WriteLine("ESI Error : " + esiR.Message);
             return false;
         }
     }

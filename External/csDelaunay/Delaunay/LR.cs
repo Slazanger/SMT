@@ -1,22 +1,27 @@
-﻿namespace csDelaunay {
-	
-	public class LR {
+﻿namespace csDelaunay
+{
 
-		public static readonly LR LEFT = new LR("left");
-		public static readonly LR RIGHT = new LR("right");
+    public class LR
+    {
 
-		private string name;
+        public static readonly LR LEFT = new LR("left");
+        public static readonly LR RIGHT = new LR("right");
 
-		public LR(string name) {
-			this.name = name;
-		}
+        private string name;
 
-		public static LR Other(LR leftRight) {
-			return leftRight == LEFT ? RIGHT : LEFT;
-		}
+        public LR(string name)
+        {
+            this.name = name;
+        }
 
-		public override string ToString() {
-			return name;
-		}
-	}
+        public static LR Other(LR leftRight)
+        {
+            return leftRight == LEFT ? RIGHT : LEFT;
+        }
+
+        public override string ToString()
+        {
+            return name;
+        }
+    }
 }

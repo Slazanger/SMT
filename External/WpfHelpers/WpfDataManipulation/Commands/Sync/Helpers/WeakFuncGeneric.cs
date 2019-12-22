@@ -14,7 +14,6 @@
 // ****************************************************************************
 
 using System;
-using System.Reflection;
 
 namespace GalaSoft.MvvmLight.Helpers
 {
@@ -188,14 +187,14 @@ namespace GalaSoft.MvvmLight.Helpers
             }
 
             var funcTarget = FuncTarget;
-            
+
             if (IsAlive)
             {
                 if (Method != null
                     && FuncReference != null
                     && funcTarget != null)
                 {
-                    return (TResult) Method.Invoke(
+                    return (TResult)Method.Invoke(
                         funcTarget,
                         new object[]
                         {

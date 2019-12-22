@@ -26,7 +26,7 @@ namespace WpfHelpers.WpfDataManipulation.XamlConverters
         {
             if (value is bool)
             {
-                var result = (bool) value;
+                var result = (bool)value;
 
                 if (parameter != null && parameter.Equals("r"))
                     result = !result;

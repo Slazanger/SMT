@@ -133,10 +133,10 @@ namespace WpfHelpers.WpfControls.Paging
                 if (itemCount == 0)
                     return 0;
 
-                var ceil = (int) Math.Ceiling((double) itemCount / pageSize);
+                var ceil = (int)Math.Ceiling((double)itemCount / pageSize);
 
                 Contract.Assume(ceil > 0);
-                    // Math.Ceiling makes the static checker unable to prove the postcondition without help
+                // Math.Ceiling makes the static checker unable to prove the postcondition without help
                 return ceil;
             }
         }
@@ -214,9 +214,9 @@ namespace WpfHelpers.WpfControls.Paging
             Contract.Ensures(Contract.Result<int>() >= 1);
             Contract.Ensures(Contract.Result<int>() <= PageCount);
 
-            var result = (int) Math.Floor((double) itemIndex / PageSize) + 1;
+            var result = (int)Math.Floor((double)itemIndex / PageSize) + 1;
             Contract.Assume(result >= 1);
-                // Math.Floor makes the static checker unable to prove the postcondition without help
+            // Math.Floor makes the static checker unable to prove the postcondition without help
             Contract.Assume(result <= PageCount); // Ditto
             return result;
         }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Security.AccessControl;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Rectangle = System.Windows.Shapes.Rectangle;
 using Size = System.Windows.Size;
 
 namespace WpfHelpers.WpfDataManipulation

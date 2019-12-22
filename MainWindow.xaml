@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
-        Title="SMT 0.65 (Experimental)" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
+        Title="SMT 0.67 (Experimental JTACS edition)" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
@@ -35,7 +35,7 @@
                 <RowDefinition Height="22"/>
             </Grid.RowDefinitions>
 
- 
+
 
             <xcad:DockingManager x:Name="dockManager" Grid.Row="1" Grid.RowSpan="1" >
                 <xcad:DockingManager.Theme>
@@ -96,7 +96,7 @@
                                     </xcad:LayoutAnchorable>
 
                                 </xcad:LayoutAnchorablePane>
-                                
+
                                 <xcad:LayoutAnchorablePane>
                                     <xcad:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapConfigContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                         <ScrollViewer Background="#FFE5E5E5">
@@ -106,7 +106,7 @@
                                                         <xctk:EditorTemplateDefinition TargetProperties="UniverseDataScale">
                                                             <xctk:EditorTemplateDefinition.EditingTemplate>
                                                                 <DataTemplate>
-                                                                    <Slider Minimum="0.1" Maximum="5" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" />
+                                                                    <Slider Minimum="0.1" Maximum="5" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" IsSnapToTickEnabled="True" />
                                                                 </DataTemplate>
                                                             </xctk:EditorTemplateDefinition.EditingTemplate>
                                                         </xctk:EditorTemplateDefinition>
@@ -153,14 +153,14 @@
                                     <local:UniverseControl x:Name="UniverseUC" />
                                 </xcad:LayoutDocument>
 
-                               
+
 
 
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutPanel>
 
-                        
-                        
+
+
                     </xcad:LayoutRoot.RootPanel>
 
 
@@ -169,25 +169,6 @@
                         <xcad:LayoutAnchorSide>
                             <xcad:LayoutAnchorGroup>
 
-                                <!---
-                                <xcad:LayoutAnchorable x:Name="LocalAnalyser"  Title="Local Tool" CanClose="False" CanAutoHide="False" CanHide="False" ContentId="LocalContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" IsEnabled="False" IsVisible="False" CanFloat="False">
-                                    <Grid Background="#FFE5E5E5">
-                                        <StackPanel>
-                                            <CheckBox Content="Filter Friendly?" x:Name="LocalPilotsFilterFriendlyChk" IsChecked="True" />
-
-                                            <DataGrid  x:Name="LocalPilots" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" >
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="Name" Binding="{Binding SystemName}" Width="30*" />
-                                                    <DataGridTextColumn Header="Corp" Binding="{Binding VictimAllianceName}" Width="40*"/>
-                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding ShipType}" Width="30*"/>
-                                                </DataGrid.Columns>
-                                            </DataGrid>
-                                            <Button x:Name="UpdateLocalFromClipboardBtn" Content="Update from Clipboard" Click="UpdateLocalFromClipboardBtn_Click"/>
-                                            
-                                        </StackPanel>
-                                    </Grid>
-                                </xcad:LayoutAnchorable>
-                                -->
 
                                 <xcad:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -243,7 +224,7 @@
                                 </xcad:LayoutAnchorable>
 
 
- 
+
 
                                 <xcad:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
@@ -347,7 +328,7 @@
                 </xcad:LayoutRoot>
             </xcad:DockingManager>
 
- 
+
             <StatusBar Grid.Row="2" x:Name="AppStatusBar">
                 <StatusBarItem>
                     <TextBlock>EVE Time :</TextBlock>
@@ -360,28 +341,25 @@
                 <Separator/>
 
                 <StatusBarItem>
-                    <TextBlock>Tranquility Version: </TextBlock>
+                    <TextBlock>Tranquility Version:</TextBlock>
                 </StatusBarItem>
 
                 <StatusBarItem>
                     <TextBlock Text="{Binding Version}"/>
                 </StatusBarItem>
 
-                
+
                 <Separator/>
 
                 <StatusBarItem>
                     <TextBlock Text="{Binding NumPlayers}"/>
                 </StatusBarItem>
-                
+
                 <StatusBarItem>
                     <TextBlock Text="Players"/>
                 </StatusBarItem>
 
-
             </StatusBar>
         </Grid>
-
     </Grid>
-
 </Window>

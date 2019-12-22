@@ -40,13 +40,13 @@ namespace WpfHelpers.Helpers
         /// </summary>
         public static readonly DependencyProperty RowCountProperty =
             DependencyProperty.RegisterAttached(
-                "RowCount", typeof (int), typeof (GridHelpers),
+                "RowCount", typeof(int), typeof(GridHelpers),
                 new PropertyMetadata(-1, RowCountChanged));
 
         // Get
         public static int GetRowCount(DependencyObject obj)
         {
-            return (int) obj.GetValue(RowCountProperty);
+            return (int)obj.GetValue(RowCountProperty);
         }
 
         // Set
@@ -59,15 +59,15 @@ namespace WpfHelpers.Helpers
         public static void RowCountChanged(
             DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (!(obj is Grid) || (int) e.NewValue < 0)
+            if (!(obj is Grid) || (int)e.NewValue < 0)
                 return;
 
-            var grid = (Grid) obj;
+            var grid = (Grid)obj;
             grid.RowDefinitions.Clear();
 
-            for (var i = 0; i < (int) e.NewValue; i++)
+            for (var i = 0; i < (int)e.NewValue; i++)
                 grid.RowDefinitions.Add(
-                    new RowDefinition {Height = new GridLength(1.0, GridUnitType.Star)});
+                    new RowDefinition { Height = new GridLength(1.0, GridUnitType.Star) });
 
             SetStarRows(grid);
         }
@@ -82,13 +82,13 @@ namespace WpfHelpers.Helpers
         /// </summary>
         public static readonly DependencyProperty ColumnCountProperty =
             DependencyProperty.RegisterAttached(
-                "ColumnCount", typeof (int), typeof (GridHelpers),
+                "ColumnCount", typeof(int), typeof(GridHelpers),
                 new PropertyMetadata(-1, ColumnCountChanged));
 
         // Get
         public static int GetColumnCount(DependencyObject obj)
         {
-            return (int) obj.GetValue(ColumnCountProperty);
+            return (int)obj.GetValue(ColumnCountProperty);
         }
 
         // Set
@@ -101,15 +101,15 @@ namespace WpfHelpers.Helpers
         public static void ColumnCountChanged(
             DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (!(obj is Grid) || (int) e.NewValue < 0)
+            if (!(obj is Grid) || (int)e.NewValue < 0)
                 return;
 
-            var grid = (Grid) obj;
+            var grid = (Grid)obj;
             grid.ColumnDefinitions.Clear();
 
-            for (var i = 0; i < (int) e.NewValue; i++)
+            for (var i = 0; i < (int)e.NewValue; i++)
                 grid.ColumnDefinitions.Add(
-                    new ColumnDefinition {Width = new GridLength(1.0, GridUnitType.Star)});
+                    new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
 
             SetStarColumns(grid);
         }
@@ -124,13 +124,13 @@ namespace WpfHelpers.Helpers
         /// </summary>
         public static readonly DependencyProperty StarRowsProperty =
             DependencyProperty.RegisterAttached(
-                "StarRows", typeof (string), typeof (GridHelpers),
+                "StarRows", typeof(string), typeof(GridHelpers),
                 new PropertyMetadata(string.Empty, StarRowsChanged));
 
         // Get
         public static string GetStarRows(DependencyObject obj)
         {
-            return (string) obj.GetValue(StarRowsProperty);
+            return (string)obj.GetValue(StarRowsProperty);
         }
 
         // Set
@@ -146,7 +146,7 @@ namespace WpfHelpers.Helpers
             if (!(obj is Grid) || string.IsNullOrEmpty(e.NewValue.ToString()))
                 return;
 
-            SetStarRows((Grid) obj);
+            SetStarRows((Grid)obj);
         }
 
         #endregion
@@ -159,13 +159,13 @@ namespace WpfHelpers.Helpers
         /// </summary>
         public static readonly DependencyProperty StarColumnsProperty =
             DependencyProperty.RegisterAttached(
-                "StarColumns", typeof (string), typeof (GridHelpers),
+                "StarColumns", typeof(string), typeof(GridHelpers),
                 new PropertyMetadata(string.Empty, StarColumnsChanged));
 
         // Get
         public static string GetStarColumns(DependencyObject obj)
         {
-            return (string) obj.GetValue(StarColumnsProperty);
+            return (string)obj.GetValue(StarColumnsProperty);
         }
 
         // Set
@@ -181,7 +181,7 @@ namespace WpfHelpers.Helpers
             if (!(obj is Grid) || string.IsNullOrEmpty(e.NewValue.ToString()))
                 return;
 
-            SetStarColumns((Grid) obj);
+            SetStarColumns((Grid)obj);
         }
 
         #endregion

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMT
 {
@@ -48,7 +45,7 @@ namespace SMT.EVEData
             StarGate,
             Ansibex
         }
-    
+
         public class RoutePoint
         {
             public string SystemName { get; set; }
@@ -57,7 +54,7 @@ namespace SMT.EVEData
             public override string ToString()
             {
                 string s = SystemName;
-                if(GateToTake == GateType.Ansibex)
+                if (GateToTake == GateType.Ansibex)
                 {
                     s += " (Ansiblex)";
                 }
@@ -72,7 +69,7 @@ namespace SMT.EVEData
 
 
             // build up the nav structures
-            foreach(System sys in eveSystems)
+            foreach (System sys in eveSystems)
             {
                 MapNode mn = new MapNode
                 {
@@ -83,11 +80,11 @@ namespace SMT.EVEData
                     MinCostToStart = 0,
                     X = sys.ActualX,
                     Y = sys.ActualY,
-                    Z = sys.ActualZ,                    
+                    Z = sys.ActualZ,
                     F = 0
                 };
 
-                foreach(string s in sys.Jumps)
+                foreach (string s in sys.Jumps)
                 {
                     mn.Connections.Add(s);
                 }
@@ -96,7 +93,7 @@ namespace SMT.EVEData
 
             }
 
-            foreach(JumpBridge jb in jumpBridges)
+            foreach (JumpBridge jb in jumpBridges)
             {
                 MapNodes[jb.From].JBConnection = jb.To;
                 MapNodes[jb.To].JBConnection = jb.From;
@@ -108,12 +105,12 @@ namespace SMT.EVEData
         {
             foreach (JumpBridge jb in jumpBridges)
             {
-                if(jb.FromID != 0)
+                if (jb.FromID != 0)
                 {
                     MapNodes[jb.From].JBConnection = jb.To;
                 }
 
-                if(jb.ToID != 0)
+                if (jb.ToID != 0)
                 {
                     MapNodes[jb.To].JBConnection = jb.From;
                 }
@@ -122,7 +119,7 @@ namespace SMT.EVEData
 
         public static void ClearJumpBridges()
         {
-            foreach(MapNode mn in MapNodes.Values)
+            foreach (MapNode mn in MapNodes.Values)
             {
                 mn.JBConnection = null;
             }
@@ -131,9 +128,9 @@ namespace SMT.EVEData
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, RoutingMode routingMode)
         {
-            
 
-            if( !(MapNodes.Keys.Contains(From))||!(MapNodes.Keys.Contains(To)) || From == "" || To == "" )
+
+            if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
 
             {
                 return null;
@@ -165,7 +162,7 @@ namespace SMT.EVEData
                         break;
 
                     case RoutingMode.Shortest:
-                        mapNode.Cost = 1 ;
+                        mapNode.Cost = 1;
                         break;
                 }
 
@@ -243,7 +240,7 @@ namespace SMT.EVEData
             List<string> Route = new List<string>();
 
             CurrentNode = End;
-            if(End.NearestToStart != null)
+            if (End.NearestToStart != null)
             {
                 while (CurrentNode != null)
                 {
@@ -253,18 +250,18 @@ namespace SMT.EVEData
                 Route.Reverse();
             }
 
-            List <RoutePoint> ActualRoute = new List<RoutePoint>();
+            List<RoutePoint> ActualRoute = new List<RoutePoint>();
 
-            for(int i = 0; i < Route.Count; i++)
+            for (int i = 0; i < Route.Count; i++)
             {
                 RoutePoint RP = new RoutePoint();
                 RP.SystemName = Route[i];
                 RP.GateToTake = GateType.StarGate;
 
-                if(i < Route.Count -1 )
+                if (i < Route.Count - 1)
                 {
                     MapNode mn = MapNodes[RP.SystemName];
-                    if(mn.JBConnection != null && mn.JBConnection == Route[i+1])
+                    if (mn.JBConnection != null && mn.JBConnection == Route[i + 1])
                     {
                         RP.GateToTake = GateType.Ansibex;
                     }

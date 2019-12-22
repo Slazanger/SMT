@@ -39,21 +39,21 @@ namespace WpfHelpers.Animation
         /// <summary>
         ///     Dependency property for the From property
         /// </summary>
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof (GridLength),
-            typeof (GridLengthAnimation));
+        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(GridLength),
+            typeof(GridLengthAnimation));
 
         /// <summary>
         ///     Dependency property for the To property
         /// </summary>
-        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof (GridLength),
-            typeof (GridLengthAnimation));
+        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(GridLength),
+            typeof(GridLengthAnimation));
 
         /// <summary>
         ///     Returns the type of object to animate
         /// </summary>
         public override Type TargetPropertyType
         {
-            get { return typeof (GridLength); }
+            get { return typeof(GridLength); }
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace WpfHelpers.Animation
         /// </summary>
         public GridLength From
         {
-            get { return (GridLength) GetValue(FromProperty); }
+            get { return (GridLength)GetValue(FromProperty); }
             set { SetValue(FromProperty, value); }
         }
 
@@ -70,7 +70,7 @@ namespace WpfHelpers.Animation
         /// </summary>
         public GridLength To
         {
-            get { return (GridLength) GetValue(ToProperty); }
+            get { return (GridLength)GetValue(ToProperty); }
             set { SetValue(ToProperty, value); }
         }
 
@@ -93,18 +93,18 @@ namespace WpfHelpers.Animation
         public override object GetCurrentValue(object defaultOriginValue,
             object defaultDestinationValue, AnimationClock animationClock)
         {
-            var fromVal = ((GridLength) GetValue(FromProperty)).Value;
+            var fromVal = ((GridLength)GetValue(FromProperty)).Value;
             //check that from was set from the caller
             if (fromVal == 1)
                 //set the from as the actual value
-                fromVal = ((GridLength) defaultDestinationValue).Value;
+                fromVal = ((GridLength)defaultDestinationValue).Value;
 
-            var toVal = ((GridLength) GetValue(ToProperty)).Value;
+            var toVal = ((GridLength)GetValue(ToProperty)).Value;
 
             if (fromVal > toVal)
-                return new GridLength((1 - animationClock.CurrentProgress.Value)*(fromVal - toVal) + toVal,
+                return new GridLength((1 - animationClock.CurrentProgress.Value) * (fromVal - toVal) + toVal,
                     GridUnitType.Star);
-            return new GridLength(animationClock.CurrentProgress.Value*(toVal - fromVal) + fromVal, GridUnitType.Star);
+            return new GridLength(animationClock.CurrentProgress.Value * (toVal - fromVal) + fromVal, GridUnitType.Star);
         }
     }
 }

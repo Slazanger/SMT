@@ -39,7 +39,7 @@ namespace WpfHelpers.WpfDataManipulation.Rules.Converters
                 return string.Empty;
 
             return string.Join("\n", (from e in errors
-                select e.ErrorContent as string).ToArray());
+                                      select e.ErrorContent as string).ToArray());
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,

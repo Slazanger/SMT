@@ -267,8 +267,8 @@ namespace WpfHelpers.WpfControls.TrackerControl
 
                 for (int i = 0; i < m_Corners.Count; i++)
                 {
-                    m_Corners[i].Width = value*2;
-                    m_Corners[i].Height = value*2;
+                    m_Corners[i].Width = value * 2;
+                    m_Corners[i].Height = value * 2;
 
                     Canvas.SetLeft(m_Corners[i], m_Polygon.Points[i].X - CornerRadius);
                     Canvas.SetTop(m_Corners[i], m_Polygon.Points[i].Y - CornerRadius);
@@ -367,79 +367,79 @@ namespace WpfHelpers.WpfControls.TrackerControl
             switch (ModeType)
             {
                 case SelectionType.Object:
-                {
-                    FillBrush = new SolidColorBrush(Color.FromArgb(60, 20, 160, 20));
+                    {
+                        FillBrush = new SolidColorBrush(Color.FromArgb(60, 20, 160, 20));
 
-                    StrokeThickness = 2;
-                    StrokeBrush = new SolidColorBrush(Color.FromArgb(100, 20, 160, 20));
-                    StrokeBrushPoint = StrokeBrush;
-                    StrokeLineJoin = PenLineJoin.Round;
-                    StrokeDashArray = new DoubleCollection(new double[] {4, 2});
+                        StrokeThickness = 2;
+                        StrokeBrush = new SolidColorBrush(Color.FromArgb(100, 20, 160, 20));
+                        StrokeBrushPoint = StrokeBrush;
+                        StrokeLineJoin = PenLineJoin.Round;
+                        StrokeDashArray = new DoubleCollection(new double[] { 4, 2 });
 
-                    FillBrushSelection = new SolidColorBrush(Color.FromArgb(60, 20, 20, 160));
-                    StrokeBrushSelection = new SolidColorBrush(Color.FromArgb(100, 20, 20, 160));
-                    m_Selected = false;
-                }
+                        FillBrushSelection = new SolidColorBrush(Color.FromArgb(60, 20, 20, 160));
+                        StrokeBrushSelection = new SolidColorBrush(Color.FromArgb(100, 20, 20, 160));
+                        m_Selected = false;
+                    }
                     break;
 
                 case SelectionType.Graphic:
-                {
-                    FillBrush = new SolidColorBrush(Colors.Transparent); //Color.FromArgb(60, 20, 20, 160));
+                    {
+                        FillBrush = new SolidColorBrush(Colors.Transparent); //Color.FromArgb(60, 20, 20, 160));
 
-                    StrokeThickness = 2;
-                    StrokeBrush = new SolidColorBrush(Color.FromArgb(100, 20, 20, 160));
-                    StrokeBrushPoint = StrokeBrush;
-                    StrokeLineJoin = PenLineJoin.Round;
+                        StrokeThickness = 2;
+                        StrokeBrush = new SolidColorBrush(Color.FromArgb(100, 20, 20, 160));
+                        StrokeBrushPoint = StrokeBrush;
+                        StrokeLineJoin = PenLineJoin.Round;
 
-                    m_Polygon.IsMouseDirectlyOverChanged += M_Polygon_IsMouseDirectlyOverChanged;
+                        m_Polygon.IsMouseDirectlyOverChanged += M_Polygon_IsMouseDirectlyOverChanged;
 
-                    FillBrushSelection = new SolidColorBrush(Colors.Transparent); //Color.FromArgb(60, 120, 20, 160));
-                    StrokeBrushSelection = new SolidColorBrush(Color.FromArgb(100, 120, 20, 160));
+                        FillBrushSelection = new SolidColorBrush(Colors.Transparent); //Color.FromArgb(60, 120, 20, 160));
+                        StrokeBrushSelection = new SolidColorBrush(Color.FromArgb(100, 120, 20, 160));
 
-                    m_Selected = false;
-                }
+                        m_Selected = false;
+                    }
                     break;
 
                 case SelectionType.Point:
-                {
-                    FillBrush = new SolidColorBrush(Colors.Transparent);
+                    {
+                        FillBrush = new SolidColorBrush(Colors.Transparent);
 
-                    StrokeThickness = 2;
-                    StrokeBrush = new SolidColorBrush(Colors.Transparent);
-                    StrokeBrushPoint = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
-                    StrokeLineJoin = PenLineJoin.Round;
-                    StrokeDashArray = new DoubleCollection(new double[] {4, 2});
+                        StrokeThickness = 2;
+                        StrokeBrush = new SolidColorBrush(Colors.Transparent);
+                        StrokeBrushPoint = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
+                        StrokeLineJoin = PenLineJoin.Round;
+                        StrokeDashArray = new DoubleCollection(new double[] { 4, 2 });
 
-                    FillBrushSelection = new SolidColorBrush(Colors.Transparent);
-                    StrokeBrushSelection = new SolidColorBrush(Colors.Transparent);
+                        FillBrushSelection = new SolidColorBrush(Colors.Transparent);
+                        StrokeBrushSelection = new SolidColorBrush(Colors.Transparent);
 
-                    m_Selected = false;
-                    break;
-                    //m_labelVisible = true;
-                }
+                        m_Selected = false;
+                        break;
+                        //m_labelVisible = true;
+                    }
                 case SelectionType.Line:
-                {
-                    FillBrush = new SolidColorBrush(Colors.Transparent);
-                    StrokeThickness = 1;
-                    StrokeBrush = new SolidColorBrush(Colors.Black);
-                    StrokeBrushPoint = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+                    {
+                        FillBrush = new SolidColorBrush(Colors.Transparent);
+                        StrokeThickness = 1;
+                        StrokeBrush = new SolidColorBrush(Colors.Black);
+                        StrokeBrushPoint = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
 
-                    StrokeLineJoin = PenLineJoin.Round;
-                    //StrokeDashArray = new DoubleCollection(new double[] {2, 2});
+                        StrokeLineJoin = PenLineJoin.Round;
+                        //StrokeDashArray = new DoubleCollection(new double[] {2, 2});
 
-                    FillBrushSelection = new SolidColorBrush(Colors.Transparent);
-                    StrokeBrushSelection = new SolidColorBrush(Colors.Transparent);
+                        FillBrushSelection = new SolidColorBrush(Colors.Transparent);
+                        StrokeBrushSelection = new SolidColorBrush(Colors.Transparent);
 
-                    m_Selected = false;
-                    break;
-                }
+                        m_Selected = false;
+                        break;
+                    }
             }
         }
 
         private void M_Polygon_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             foreach (var ellipse in m_Corners)
-                if ((bool) e.NewValue)
+                if ((bool)e.NewValue)
                     ellipse.Visibility = Visibility.Visible;
                 else
                     ellipse.Visibility = Visibility.Collapsed;

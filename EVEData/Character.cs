@@ -2,20 +2,6 @@
 // EVE AnomManager
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Web;
-using System.Windows;
-using System.Windows.Threading;
-using System.Xml.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Linq;
-
 namespace SMT.EVEData
 {
     /// <summary>

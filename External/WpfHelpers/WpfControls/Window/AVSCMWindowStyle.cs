@@ -32,7 +32,7 @@ namespace WpfHelpers.WpfControls.Window
 
         public static void ForWindowFromTemplate(this object templateFrameworkElement, Action<System.Windows.Window> action)
         {
-            var window = ((FrameworkElement) templateFrameworkElement).TemplatedParent as System.Windows.Window;
+            var window = ((FrameworkElement)templateFrameworkElement).TemplatedParent as System.Windows.Window;
             if (window != null) action(window);
         }
 
@@ -58,7 +58,7 @@ namespace WpfHelpers.WpfControls.Window
         /// <returns>default: <see cref="Cursors.Arrow" />, else depends on value name or param</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((ResizeMode) value == ResizeMode.NoResize)
+            if ((ResizeMode)value == ResizeMode.NoResize)
                 return Cursors.Arrow;
 
 
@@ -89,7 +89,7 @@ namespace WpfHelpers.WpfControls.Window
     /// <summary>
     ///     App window style template
     /// </summary>
-    [TemplatePart(Name = "PART_grid", Type = typeof (Grid))]
+    [TemplatePart(Name = "PART_grid", Type = typeof(Grid))]
     public partial class AVSCMWindowStyle
     {
         /// <summary>
@@ -220,7 +220,7 @@ namespace WpfHelpers.WpfControls.Window
             else
             {
                 sender.ForWindowFromTemplate(w =>
-                    SendMessage(w.GetWindowHandle(), WM_SYSCOMMAND, (IntPtr) SC_KEYMENU, (IntPtr) ' '));
+                    SendMessage(w.GetWindowHandle(), WM_SYSCOMMAND, (IntPtr)SC_KEYMENU, (IntPtr)' '));
             }
         }
 
@@ -265,11 +265,11 @@ namespace WpfHelpers.WpfControls.Window
                         w.BeginInit();
                         const double adjustment = 40.0;
                         var mouse1 = e.MouseDevice.GetPosition(w);
-                        var width1 = Math.Max(w.ActualWidth - 2*adjustment, adjustment);
+                        var width1 = Math.Max(w.ActualWidth - 2 * adjustment, adjustment);
                         w.WindowState = WindowState.Normal;
                         // ISSUE: fix multiple monitors 
-                        var width2 = Math.Max(w.ActualWidth - 2*adjustment, adjustment);
-                        w.Left = (mouse1.X - adjustment)*(1 - width2/width1);
+                        var width2 = Math.Max(w.ActualWidth - 2 * adjustment, adjustment);
+                        w.Left = (mouse1.X - adjustment) * (1 - width2 / width1);
                         w.Top = -7;
                         w.EndInit();
                         w.DragMove();
@@ -290,7 +290,7 @@ namespace WpfHelpers.WpfControls.Window
 
         private void DragSize(IntPtr handle, SizingAction sizingAction)
         {
-            SendMessage(handle, WM_SYSCOMMAND, (IntPtr) (SC_SIZE + sizingAction), IntPtr.Zero);
+            SendMessage(handle, WM_SYSCOMMAND, (IntPtr)(SC_SIZE + sizingAction), IntPtr.Zero);
             SendMessage(handle, 514, IntPtr.Zero, IntPtr.Zero);
         }
 

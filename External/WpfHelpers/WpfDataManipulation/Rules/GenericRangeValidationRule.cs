@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace WpfHelpers.WpfDataManipulation.Rules
 {
-    public class GenericRangeValidationRule<T> : ValidationRule 
+    public class GenericRangeValidationRule<T> : ValidationRule
         where T : IComparable
     {
         public T MinValue { get; set; }
@@ -22,9 +22,9 @@ namespace WpfHelpers.WpfDataManipulation.Rules
             {
                 return new ValidationResult(false, "Not valid");
             }
-            
+
             string text = $"Must be between {MinValue} and {MaxValue}";
-            
+
             if (tValue.CompareTo(MinValue) < 0)
                 return new ValidationResult(false, "To small. " + text);
             if (tValue.CompareTo(MaxValue) > 0)

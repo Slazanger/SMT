@@ -87,7 +87,7 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public static readonly RoutedEvent ZoomChangedEvent = EventManager.RegisterRoutedEvent("ZoomChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(ZoomControl));
 
-        public event RoutedEventHandler ZoomChanged 
+        public event RoutedEventHandler ZoomChanged
         {
             add { AddHandler(ZoomChangedEvent, value); }
             remove { RemoveHandler(ZoomChangedEvent, value); }
@@ -146,31 +146,31 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public Brush ZoomBoxBackground
         {
-            get { return (Brush) GetValue(ZoomBoxBackgroundProperty); }
+            get { return (Brush)GetValue(ZoomBoxBackgroundProperty); }
             set { SetValue(ZoomBoxBackgroundProperty, value); }
         }
 
         public Brush ZoomBoxBorderBrush
         {
-            get { return (Brush) GetValue(ZoomBoxBorderBrushProperty); }
+            get { return (Brush)GetValue(ZoomBoxBorderBrushProperty); }
             set { SetValue(ZoomBoxBorderBrushProperty, value); }
         }
 
         public Thickness ZoomBoxBorderThickness
         {
-            get { return (Thickness) GetValue(ZoomBoxBorderThicknessProperty); }
+            get { return (Thickness)GetValue(ZoomBoxBorderThicknessProperty); }
             set { SetValue(ZoomBoxBorderThicknessProperty, value); }
         }
 
         public double ZoomBoxOpacity
         {
-            get { return (double) GetValue(ZoomBoxOpacityProperty); }
+            get { return (double)GetValue(ZoomBoxOpacityProperty); }
             set { SetValue(ZoomBoxOpacityProperty, value); }
         }
 
         public Rect ZoomBox
         {
-            get { return (Rect) GetValue(ZoomBoxProperty); }
+            get { return (Rect)GetValue(ZoomBoxProperty); }
             set { SetValue(ZoomBoxProperty, value); }
         }
 
@@ -179,7 +179,7 @@ namespace WpfHelpers.WpfControls.Zoombox
         /// </summary>
         public Visibility ZoomBoxVisibility
         {
-            get { return (Visibility) GetValue(ZoomBoxVisibilityProperty); }
+            get { return (Visibility)GetValue(ZoomBoxVisibilityProperty); }
             set { SetValue(ZoomBoxVisibilityProperty, value); }
         }
 
@@ -187,7 +187,7 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public double TranslateX
         {
-            get { return (double) GetValue(TranslateXProperty); }
+            get { return (double)GetValue(TranslateXProperty); }
             set
             {
                 BeginAnimation(TranslateXProperty, null);
@@ -197,7 +197,7 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public double TranslateY
         {
-            get { return (double) GetValue(TranslateYProperty); }
+            get { return (double)GetValue(TranslateYProperty); }
             set
             {
                 BeginAnimation(TranslateYProperty, null);
@@ -207,40 +207,40 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public TimeSpan AnimationLength
         {
-            get { return (TimeSpan) GetValue(AnimationLengthProperty); }
+            get { return (TimeSpan)GetValue(AnimationLengthProperty); }
             set { SetValue(AnimationLengthProperty, value); }
         }
 
         public double MinZoom
         {
-            get { return (double) GetValue(MinZoomProperty); }
+            get { return (double)GetValue(MinZoomProperty); }
             set { SetValue(MinZoomProperty, value); }
         }
 
         public double MaxZoom
         {
-            get { return (double) GetValue(MaxZoomProperty); }
+            get { return (double)GetValue(MaxZoomProperty); }
             set { SetValue(MaxZoomProperty, value); }
         }
 
         public double MaxZoomDelta
         {
-            get { return (double) GetValue(MaxZoomDeltaProperty); }
+            get { return (double)GetValue(MaxZoomDeltaProperty); }
             set { SetValue(MaxZoomDeltaProperty, value); }
         }
 
         public double ZoomDeltaMultiplier
         {
-            get { return (double) GetValue(ZoomDeltaMultiplierProperty); }
+            get { return (double)GetValue(ZoomDeltaMultiplierProperty); }
             set { SetValue(ZoomDeltaMultiplierProperty, value); }
         }
 
         public double Zoom
         {
-            get { return (double) GetValue(ZoomProperty); }
+            get { return (double)GetValue(ZoomProperty); }
             set
             {
-                if (Math.Abs(value - (double) GetValue(ZoomProperty)) < double.Epsilon)
+                if (Math.Abs(value - (double)GetValue(ZoomProperty)) < double.Epsilon)
                     return;
                 BeginAnimation(ZoomProperty, null);
                 SetValue(ZoomProperty, value);
@@ -272,7 +272,7 @@ namespace WpfHelpers.WpfControls.Zoombox
         /// </summary>
         public ZoomViewModifierMode ModifierMode
         {
-            get { return (ZoomViewModifierMode) GetValue(ModifierModeProperty); }
+            get { return (ZoomViewModifierMode)GetValue(ModifierModeProperty); }
             set
             {
                 if (AllowPan)
@@ -285,14 +285,14 @@ namespace WpfHelpers.WpfControls.Zoombox
         /// </summary>
         public ZoomControlModes Mode
         {
-            get { return (ZoomControlModes) GetValue(ModeProperty); }
+            get { return (ZoomControlModes)GetValue(ModeProperty); }
             set { SetValue(ModeProperty, value); }
         }
 
         private static void Mode_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var zc = (ZoomControl) d;
-            var mode = (ZoomControlModes) e.NewValue;
+            var zc = (ZoomControl)d;
+            var mode = (ZoomControlModes)e.NewValue;
             switch (mode)
             {
                 case ZoomControlModes.Fill:
@@ -310,8 +310,8 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         private static object TranslateX_Coerce(DependencyObject d, object basevalue)
         {
-            var zc = (ZoomControl) d;
-            return zc.GetCoercedTranslateX((double) basevalue, zc.Zoom);
+            var zc = (ZoomControl)d;
+            return zc.GetCoercedTranslateX((double)basevalue, zc.Zoom);
         }
 
         private double GetCoercedTranslateX(double baseValue, double zoom)
@@ -327,8 +327,8 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         private static object TranslateY_Coerce(DependencyObject d, object basevalue)
         {
-            var zc = (ZoomControl) d;
-            return zc.GetCoercedTranslateY((double) basevalue, zc.Zoom);
+            var zc = (ZoomControl)d;
+            return zc.GetCoercedTranslateY((double)basevalue, zc.Zoom);
         }
 
         private double GetCoercedTranslateY(double baseValue, double zoom)
@@ -415,10 +415,10 @@ namespace WpfHelpers.WpfControls.Zoombox
         public void ZoomTo(Rect rect)
         {
             var deltaZoom = Math.Min(
-                ActualWidth/rect.Width,
-                ActualHeight/rect.Height);
+                ActualWidth / rect.Width,
+                ActualHeight / rect.Height);
 
-            var startHandlePosition = new Point(rect.X + rect.Width/2, rect.Y + rect.Height/2);
+            var startHandlePosition = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
 
             DoZoom(deltaZoom, OrigoPosition, startHandlePosition, OrigoPosition);
             ZoomBox = new Rect();
@@ -427,8 +427,8 @@ namespace WpfHelpers.WpfControls.Zoombox
         public void Show(double X, double Y, double ZoomValue)
         {
             Zoom = ZoomValue;
-            TranslateX = ((ActualWidth / 2) * Zoom ) - (X * Zoom); 
-            TranslateY = ((ActualHeight / 2)* Zoom ) - (Y * Zoom); 
+            TranslateX = ((ActualWidth / 2) * Zoom) - (X * Zoom);
+            TranslateY = ((ActualHeight / 2) * Zoom) - (Y * Zoom);
         }
 
         private void ZoomControl_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -472,7 +472,7 @@ namespace WpfHelpers.WpfControls.Zoombox
         private void OnMouseDown(MouseButtonEventArgs e, bool isPreview)
         {
             // ignore right mouse
-            if(e.RightButton == MouseButtonState.Pressed)
+            if (e.RightButton == MouseButtonState.Pressed)
             {
                 return;
             }
@@ -512,37 +512,37 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         private static void TranslateX_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var zc = (ZoomControl) d;
+            var zc = (ZoomControl)d;
             if (zc._translateTransform == null)
                 return;
-            zc._translateTransform.X = (double) e.NewValue;
+            zc._translateTransform.X = (double)e.NewValue;
             if (!zc._isZooming)
                 zc.Mode = ZoomControlModes.Custom;
         }
 
         private static void TranslateY_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var zc = (ZoomControl) d;
+            var zc = (ZoomControl)d;
             if (zc._translateTransform == null)
                 return;
-            zc._translateTransform.Y = (double) e.NewValue;
+            zc._translateTransform.Y = (double)e.NewValue;
             if (!zc._isZooming)
                 zc.Mode = ZoomControlModes.Custom;
         }
 
         private static void Zoom_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var zc = (ZoomControl) d;
+            var zc = (ZoomControl)d;
 
             if (zc._scaleTransform == null)
                 return;
 
-            var zoom = (double) e.NewValue;
+            var zoom = (double)e.NewValue;
             zc._scaleTransform.ScaleX = zoom;
             zc._scaleTransform.ScaleY = zoom;
             if (!zc._isZooming)
             {
-                var delta = (double) e.NewValue/(double) e.OldValue;
+                var delta = (double)e.NewValue / (double)e.OldValue;
                 zc.TranslateX *= delta;
                 zc.TranslateY *= delta;
                 zc.Mode = ZoomControlModes.Custom;
@@ -562,11 +562,11 @@ namespace WpfHelpers.WpfControls.Zoombox
                 return;
 
             e.Handled = true;
-            var origoPosition = new Point(ActualWidth/2, ActualHeight/2);
+            var origoPosition = new Point(ActualWidth / 2, ActualHeight / 2);
             var mousePosition = e.GetPosition(this);
 
             DoZoom(
-                Math.Max(1/MaxZoomDelta, Math.Min(MaxZoomDelta, e.Delta/10000.0*ZoomDeltaMultiplier + 1)),
+                Math.Max(1 / MaxZoomDelta, Math.Min(MaxZoomDelta, e.Delta / 10000.0 * ZoomDeltaMultiplier + 1)),
                 origoPosition,
                 mousePosition,
                 mousePosition);
@@ -575,7 +575,7 @@ namespace WpfHelpers.WpfControls.Zoombox
         private void DoZoom(double deltaZoom, Point origoPosition, Point startHandlePosition, Point targetHandlePosition)
         {
             var startZoom = Zoom;
-            var currentZoom = startZoom*deltaZoom;
+            var currentZoom = startZoom * deltaZoom;
             currentZoom = Math.Max(MinZoom, Math.Min(MaxZoom, currentZoom));
 
             var startTranslate = new Vector(TranslateX, TranslateY);
@@ -583,8 +583,8 @@ namespace WpfHelpers.WpfControls.Zoombox
             var v = startHandlePosition - origoPosition;
             var vTarget = targetHandlePosition - origoPosition;
 
-            var targetPoint = (v - startTranslate)/startZoom;
-            var zoomedTargetPointPos = targetPoint*currentZoom + startTranslate;
+            var targetPoint = (v - startTranslate) / startZoom;
+            var zoomedTargetPointPos = targetPoint * currentZoom + startTranslate;
             var endTranslate = vTarget - zoomedTargetPointPos;
 
             var transformX = GetCoercedTranslateX(TranslateX + endTranslate.X, currentZoom);
@@ -652,8 +652,8 @@ namespace WpfHelpers.WpfControls.Zoombox
                 return new Vector(0.0, 0.0);
             var w = _presenter.ContentSize.Width - _presenter.DesiredSize.Width;
             var h = _presenter.ContentSize.Height - _presenter.DesiredSize.Height;
-            var tX = -w/2.0;
-            var tY = -h/2.0;
+            var tX = -w / 2.0;
+            var tY = -h / 2.0;
 
             return new Vector(tX, tY);
             //return new Vector(0, 0);
@@ -670,11 +670,11 @@ namespace WpfHelpers.WpfControls.Zoombox
                 return;
 
             var deltaZoom = Math.Min(
-                ActualWidth/_presenter.ContentSize.Width,
-                ActualHeight/_presenter.ContentSize.Height);
+                ActualWidth / _presenter.ContentSize.Width,
+                ActualHeight / _presenter.ContentSize.Height);
 
             var initialTranslate = GetInitialTranslate();
-            DoZoomAnimation(deltaZoom, initialTranslate.X*deltaZoom, initialTranslate.Y*deltaZoom);
+            DoZoomAnimation(deltaZoom, initialTranslate.X * deltaZoom, initialTranslate.Y * deltaZoom);
         }
 
         public override void OnApplyTemplate()
@@ -703,19 +703,19 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public bool AllowAltZoomBox
         {
-            get { return (bool) GetValue(AllowAltZoomBoxProperty); }
+            get { return (bool)GetValue(AllowAltZoomBoxProperty); }
             set { SetValue(AllowAltZoomBoxProperty, value); }
         }
 
         public bool AllowScrolling
         {
-            get { return (bool) GetValue(AllowScrollingProperty); }
+            get { return (bool)GetValue(AllowScrollingProperty); }
             set { SetValue(AllowScrollingProperty, value); }
         }
 
         public bool AllowPan
         {
-            get { return (bool) GetValue(AllowPanProperty); }
+            get { return (bool)GetValue(AllowPanProperty); }
             set { SetValue(AllowPanProperty, value); }
         }
 

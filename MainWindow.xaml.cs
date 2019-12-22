@@ -57,23 +57,23 @@ namespace SMT
             if (root is Xceed.Wpf.AvalonDock.Layout.ILayoutContainer)
             {
                 Xceed.Wpf.AvalonDock.Layout.ILayoutContainer ic = root as Xceed.Wpf.AvalonDock.Layout.ILayoutContainer;
-                foreach(Xceed.Wpf.AvalonDock.Layout.ILayoutElement ie in ic.Children )
+                foreach (Xceed.Wpf.AvalonDock.Layout.ILayoutElement ie in ic.Children)
                 {
                     Xceed.Wpf.AvalonDock.Layout.LayoutDocument f = FindDocWithContentID(ie, contentID);
-                    if(f != null)
+                    if (f != null)
                     {
                         content = f;
                         break;
                     }
                 }
-                
+
             }
             else
             {
-                if(root is Xceed.Wpf.AvalonDock.Layout.LayoutDocument)
+                if (root is Xceed.Wpf.AvalonDock.Layout.LayoutDocument)
                 {
                     Xceed.Wpf.AvalonDock.Layout.LayoutDocument i = root as Xceed.Wpf.AvalonDock.Layout.LayoutDocument;
-                    if(i.ContentId == contentID)
+                    if (i.ContentId == contentID)
                     {
                         content = i;
                     }
@@ -286,7 +286,7 @@ namespace SMT
             string sysName = e.OriginalSource as string;
             UniverseUC.ShowSystem(sysName);
 
-            if(UniverseLayoutDoc != null)
+            if (UniverseLayoutDoc != null)
             {
                 UniverseLayoutDoc.IsSelected = true;
             }
@@ -305,7 +305,7 @@ namespace SMT
 
         private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(RegionLayoutDoc != null)
+            if (RegionLayoutDoc != null)
             {
                 RegionLayoutDoc.Title = RegionRC.Region.Name;
             }
@@ -334,7 +334,7 @@ namespace SMT
             }
 
             RegionRC.ReDrawMap(true);
-            UniverseUC.ReDrawMap(true,true,true);
+
 
 
             if (e.PropertyName == "ShowRegionStandings")
@@ -362,7 +362,7 @@ namespace SMT
                 RedrawUniverse(true);
             }
 
-            
+
 
 
 
@@ -428,14 +428,14 @@ namespace SMT
 
         private void RedrawUniverse(bool Redraw)
         {
-            if(Redraw)
+            if (Redraw)
             {
                 MainUniverseCanvas.Children.Clear();
                 AddRegionsToUniverse();
             }
             else
             {
-                foreach(UIElement uie in DynamicUniverseElements)
+                foreach (UIElement uie in DynamicUniverseElements)
                 {
                     MainUniverseCanvas.Children.Remove(uie);
                 }
@@ -449,13 +449,13 @@ namespace SMT
 
         private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if( e.PropertyName == "isVisible" || 
+            if (e.PropertyName == "isVisible" ||
                 e.PropertyName == "IsMouseOver" ||
                 e.PropertyName == "IsMouseCaptureWithin" ||
                 e.PropertyName == "ActualHeight" ||
                 e.PropertyName == "ActualWidth" ||
 
-                e.PropertyName == "IsKeyboardFocusWithin"  ||
+                e.PropertyName == "IsKeyboardFocusWithin" ||
                 e.PropertyName == "SelectedProperty" ||
                 e.PropertyName == "SelectedPropertyItem"
 
@@ -611,7 +611,7 @@ namespace SMT
             EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null)
             {
-                lock(c.ActiveRouteLock)
+                lock (c.ActiveRouteLock)
                 {
                     c.ActiveRoute.Clear();
                     c.Waypoints.Clear();
@@ -706,14 +706,14 @@ namespace SMT
                     float averageStanding = 0.0f;
                     float numSystems = 0;
 
-                    foreach(EVEData.MapSystem s in mr.MapSystems.Values)
+                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
                     {
                         if (s.OutOfRegion)
                             continue;
 
                         numSystems++;
 
-                        if(MapConf.SOVBasedITCU)
+                        if (MapConf.SOVBasedITCU)
                         {
                             if (RegionRC.ActiveCharacter.AllianceID != 0 && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceTCU)
                             {
@@ -750,12 +750,13 @@ namespace SMT
 
                     averageStanding = averageStanding / numSystems;
 
-                    if(averageStanding > 0.5)
+                    if (averageStanding > 0.5)
                     {
                         Color BlueIsh = Colors.Gray;
-                        BlueIsh.B += (byte)( (255 - BlueIsh.B) * (averageStanding / 10.0f));
+                        BlueIsh.B += (byte)((255 - BlueIsh.B) * (averageStanding / 10.0f));
                         RegionShape.Fill = new SolidColorBrush(BlueIsh);
-                    } else  if (averageStanding < -0.5)
+                    }
+                    else if (averageStanding < -0.5)
                     {
                         averageStanding *= -1;
                         Color RedIsh = Colors.Gray;
@@ -774,7 +775,7 @@ namespace SMT
                 if (MapConf.ShowUniverseRats)
                 {
                     double numRatkills = 0.0f;
-                   
+
 
 
                     foreach (EVEData.MapSystem s in mr.MapSystems.Values)
@@ -788,10 +789,10 @@ namespace SMT
 
                     double ratScale = numRatkills / (15000 * MapConf.UniverseDataScale);
                     ratScale = Math.Min(Math.Max(0.0, ratScale), 1.0);
-                    b = (byte)( 255.0 * (ratScale));
-                    
+                    b = (byte)(255.0 * (ratScale));
 
-                    Color c = new Color() ;
+
+                    Color c = new Color();
                     c.A = b;
                     c.B = b;
                     c.G = b;
@@ -929,7 +930,7 @@ namespace SMT
         }
 
 
- 
+
 
 
 
@@ -1028,7 +1029,7 @@ namespace SMT
                 Label header = new Label();
                 header.Content = "Thera Connections";
                 header.FontWeight = FontWeights.Bold;
-                header.Margin = new Thickness(1) ;
+                header.Margin = new Thickness(1);
                 header.Padding = new Thickness(1);
                 RegionTheraInfoSP.Children.Add(header);
 
@@ -1147,7 +1148,7 @@ namespace SMT
                 {
                     RegionLayoutDoc.IsSelected = true;
                 }
-                    
+
             }
         }
 
@@ -1226,7 +1227,7 @@ namespace SMT
                         CharactersToResolve.Add(item);
                     }
                 }
-                    
+
             }
 
             if (CharactersToResolve.Count > 0)
@@ -1288,13 +1289,13 @@ namespace SMT
                     {
 
                         // ignore comments
-                        if(line.StartsWith("#"))
+                        if (line.StartsWith("#"))
                         {
                             continue;
                         }
 
                         string[] bits = line.Split(' ');
-                        if(bits.Length >3)
+                        if (bits.Length > 3)
                         {
                             int test = 1;
                             test++;
@@ -1335,7 +1336,7 @@ namespace SMT
 
                         foreach (EVEData.JumpBridge jbr in EVEManager.JumpBridges)
                         {
-                            if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From) )
+                            if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
                             {
                                 found = true;
                             }

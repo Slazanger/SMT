@@ -83,7 +83,7 @@ namespace SMT
         [DisplayName("Show Cyno Beacons")]
         public bool ShowCynoBeacons { get; set; }
 
-        
+
 
 
         [Category("Navigation")]
@@ -165,7 +165,7 @@ namespace SMT
             set
             {
                 // clamp to 30s miniumum
-                if(value > 30)
+                if (value > 30)
                 {
                     m_MaxIntelSeconds = value;
                 }
@@ -342,11 +342,11 @@ namespace SMT
             {
                 m_UniverseDataScale = value;
 
-                if(m_UniverseDataScale < 0.01)
+                if (m_UniverseDataScale < 0.01)
                 {
                     m_UniverseDataScale = 0.01;
                 }
- 
+
 
                 OnPropertyChanged("UniverseDataScale");
             }
@@ -559,7 +559,7 @@ namespace SMT
 
             defaultColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
-            defaultColours.SOVStructureVunerableColour = Color.FromRgb(64,64,64);
+            defaultColours.SOVStructureVunerableColour = Color.FromRgb(64, 64, 64);
             defaultColours.SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178);
 
             defaultColours.ConstellationHighlightColour = Color.FromRgb(148, 200, 180);
@@ -746,7 +746,7 @@ namespace SMT
         }
 
 
-  
+
     }
 
     public class JumpCharacterItemsSource : IItemsSource

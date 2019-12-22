@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace SMT
 {
@@ -456,7 +455,7 @@ namespace SMT
             drawingContext.DrawRectangle(sysCentreCol, new Pen(sysCentreCol, 1), new Rect(X - 5, Z - 5, 10, 10));
 
             drawingContext.Close();
-            
+
             VHRangeSpheres.AddChild(rangeCircleDV);
 
             foreach (EVEData.System es in EM.Systems)
@@ -551,7 +550,7 @@ namespace SMT
 
 
             // recreate the brushes on a full draw
-            if(FullRedraw)
+            if (FullRedraw)
             {
                 SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
                 ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
@@ -869,7 +868,7 @@ namespace SMT
                         double zkbVal = 5 + ((double)kvp.Value * ESIOverlayScale * 2);
 
                         EVEData.System sys = EM.GetEveSystem(kvp.Key);
-                        if(sys == null)
+                        if (sys == null)
                         {
                             // probably a WH
                             continue;
@@ -909,6 +908,17 @@ namespace SMT
             {
                 VHNames.Visibility = Visibility.Visible;
             }
+
+            if (MainZoomControl.Zoom < 0.8)
+            {
+                VHSystems.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                VHSystems.Visibility = Visibility.Visible;
+            }
+
+
         }
 
         public void ShowSystem(string SystemName)

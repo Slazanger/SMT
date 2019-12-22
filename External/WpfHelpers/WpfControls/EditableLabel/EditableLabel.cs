@@ -4,20 +4,20 @@ using System.Windows.Input;
 
 namespace WpfHelpers.WpfControls.EditableLabel
 {
-    [TemplatePart(Name = @"PART_mainLabel", Type = typeof (TextBox))]
-    [TemplatePart(Name = @"PART_mainGrid", Type = typeof (Grid))]
+    [TemplatePart(Name = @"PART_mainLabel", Type = typeof(TextBox))]
+    [TemplatePart(Name = @"PART_mainGrid", Type = typeof(Grid))]
     public class EditableLabel : Control
     {
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof (string), typeof (EditableLabel),
+            DependencyProperty.Register("Text", typeof(string), typeof(EditableLabel),
                 new PropertyMetadata(default(string)));
 
         public static readonly DependencyProperty EnableEditingProperty =
-            DependencyProperty.Register("EnableEditing", typeof (bool), typeof (EditableLabel),
+            DependencyProperty.Register("EnableEditing", typeof(bool), typeof(EditableLabel),
                 new PropertyMetadata(default(bool), EnableEdititngChanged));
 
         public static readonly DependencyProperty EditButtonContentProperty =
-            DependencyProperty.Register("EditButtonContent", typeof (object), typeof (EditableLabel),
+            DependencyProperty.Register("EditButtonContent", typeof(object), typeof(EditableLabel),
                 new PropertyMetadata("X"));
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace WpfHelpers.WpfControls.EditableLabel
         /// </summary>
         public string Text
         {
-            get { return (string) GetValue(TextProperty); }
+            get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
 
@@ -34,7 +34,7 @@ namespace WpfHelpers.WpfControls.EditableLabel
         /// </summary>
         public bool EnableEditing
         {
-            get { return (bool) GetValue(EnableEditingProperty); }
+            get { return (bool)GetValue(EnableEditingProperty); }
             set { SetValue(EnableEditingProperty, value); }
         }
 
@@ -87,7 +87,7 @@ namespace WpfHelpers.WpfControls.EditableLabel
         private static void EnableEdititngChanged(DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs args)
         {
-            if ((bool) args.NewValue)
+            if ((bool)args.NewValue)
             {
                 var edit = dependencyObject as EditableLabel;
 

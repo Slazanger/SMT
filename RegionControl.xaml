@@ -273,7 +273,7 @@
                             </StackPanel>
 
 
-                            <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale"/>
+                            <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" IsSnapToTickEnabled="True"/>
                         </StackPanel>
                         
 

@@ -14,7 +14,6 @@
 // ****************************************************************************
 
 using System;
-using System.Reflection;
 
 namespace GalaSoft.MvvmLight.Helpers
 {
@@ -221,7 +220,7 @@ namespace GalaSoft.MvvmLight.Helpers
         /// being casted to T.</param>
         public void ExecuteWithObject(object parameter)
         {
-            var parameterCasted = (T) parameter;
+            var parameterCasted = (T)parameter;
             Execute(parameterCasted);
         }
 

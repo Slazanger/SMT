@@ -90,7 +90,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
         public NotifyTaskCompletion(Task<TResult> task) : base(task)
         {
         }
-        
+
         public TResult Result
         {
             get

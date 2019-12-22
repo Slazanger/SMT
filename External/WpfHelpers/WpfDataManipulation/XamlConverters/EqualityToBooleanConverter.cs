@@ -17,7 +17,7 @@ namespace WpfHelpers.WpfDataManipulation.XamlConverters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((bool) value)
+            if ((bool)value)
                 return parameter;
 
             return null;

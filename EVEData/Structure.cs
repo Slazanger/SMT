@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMT.EVEData
 {
@@ -64,7 +60,7 @@ namespace SMT.EVEData
             LastUpdate = DateTime.Now;
             State = PowerState.Unknown;
 
-            switch(StructureID)
+            switch (StructureID)
             {
 
                 case 35832: // Astra

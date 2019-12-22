@@ -129,7 +129,7 @@ namespace SMT
 
         [Category("Zkill")]
         [DisplayName("Data Overlay")]
-        public Color ZKillDataOverlay{ get; set; }
+        public Color ZKillDataOverlay { get; set; }
 
         [Category("Popup")]
         [DisplayName("Background")]
@@ -159,9 +159,9 @@ namespace SMT
 
             Color secCol = (Color)ColorConverter.ConvertFromString("#FFF00000");
 
-            if(GradeTrueSec && secStatus < 0.0)
+            if (GradeTrueSec && secStatus < 0.0)
             {
-                secCol.R = (byte)(60 + (1.0-(secStatus / -1.0)) * 195) ;
+                secCol.R = (byte)(60 + (1.0 - (secStatus / -1.0)) * 195);
             }
 
             if (secStatus > 0.05)

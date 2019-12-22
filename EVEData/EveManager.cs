@@ -2,6 +2,12 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
+using ESI.NET;
+using ESI.NET.Enumerations;
+using ESI.NET.Models.SSO;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,19 +17,13 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.Options;
-using ESI.NET;
-using ESI.NET.Enumerations;
-using ESI.NET.Models.SSO;
-using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace SMT.EVEData
 {
@@ -189,7 +189,7 @@ namespace SMT.EVEData
         /// </summary>
         public ObservableCollection<JumpBridge> JumpBridges { get; set; }
 
-        
+
         public List<Coalition> Coalitions { get; set; }
 
         /// <summary>
@@ -627,8 +627,8 @@ namespace SMT.EVEData
                     float y = float.Parse(system.Attributes["y"].Value) + (float.Parse(system.Attributes["height"].Value) / 2.0f);
 
                     float RoundVal = 5.0f;
-                    x = (float)Math.Round(x/ RoundVal, 0) * RoundVal;
-                    y = (float)Math.Round(y/ RoundVal, 0) * RoundVal;
+                    x = (float)Math.Round(x / RoundVal, 0) * RoundVal;
+                    y = (float)Math.Round(y / RoundVal, 0) * RoundVal;
 
                     string systemnodepath = @"//*[@id='def" + systemID + "']";
                     XmlNodeList snl = xmldoc.SelectNodes(systemnodepath);
@@ -640,7 +640,7 @@ namespace SMT.EVEData
                     bool hasStation = false;
                     bool hasIceBelt = false;
                     XmlNodeList iceNodes = aNode.SelectNodes(@".//*[@class='i']");
-                    if(iceNodes[0] != null)
+                    if (iceNodes[0] != null)
                     {
                         hasIceBelt = true;
                     }
@@ -816,7 +816,7 @@ namespace SMT.EVEData
                     long stationSystem = long.Parse(bits[8]);
 
                     System SS = GetEveSystemFromID(stationSystem);
-                    if(SS != null)
+                    if (SS != null)
                     {
                         SS.HasNPCStation = true;
                     }
@@ -828,8 +828,8 @@ namespace SMT.EVEData
             }
 
 
-                // now create the voronoi regions
-                foreach (MapRegion mr in Regions)
+            // now create the voronoi regions
+            foreach (MapRegion mr in Regions)
             {
                 // collect the system points to generate them from 
                 List<Vector2f> points = new List<Vector2f>();
@@ -998,16 +998,16 @@ namespace SMT.EVEData
                 line = file.ReadLine();
                 while ((line = file.ReadLine()) != null)
                 {
-                    if(line == string.Empty)
+                    if (line == string.Empty)
                     {
                         continue;
                     }
                     string[] bits = line.Split(',');
 
-                    if(bits.Length < 3)
+                    if (bits.Length < 3)
                     {
                         continue;
-                    } 
+                    }
 
 
                     string typeID = bits[0];
@@ -1051,14 +1051,14 @@ namespace SMT.EVEData
                     string system = bits[0];
 
                     System s = GetEveSystem(system);
-                    if(s != null)
+                    if (s != null)
                     {
                         s.HasJoveObservatory = true;
                     }
                 }
             }
 
-   
+
 
 
 
@@ -1123,7 +1123,7 @@ namespace SMT.EVEData
                 AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
             }
 
-            if(AllianceIDToName == null)
+            if (AllianceIDToName == null)
             {
                 AllianceIDToName = new SerializableDictionary<long, string>();
             }
@@ -1133,7 +1133,7 @@ namespace SMT.EVEData
                 AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
             }
 
-            if(AllianceIDToTicker == null)
+            if (AllianceIDToTicker == null)
             {
                 AllianceIDToTicker = new SerializableDictionary<long, string>();
             }
@@ -1319,7 +1319,7 @@ namespace SMT.EVEData
 
             foreach (KeyValuePair<string, MapSystem> kvp in r.MapSystems)
             {
-                
+
                 if (kvp.Value.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.Keys.Contains(kvp.Value.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceTCU))
                 {
                     IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceTCU);
@@ -1331,7 +1331,7 @@ namespace SMT.EVEData
                 }
 
             }
-  
+
 
             ResolveAllianceIDs(IDToResolve);
         }
@@ -1341,33 +1341,33 @@ namespace SMT.EVEData
         /// </summary>
         public async Task ResolveAllianceIDs(List<long> IDs)
         {
-            if(IDs.Count == 0 )
+            if (IDs.Count == 0)
             {
                 return;
             }
 
             // strip out any ID's we already know..
             List<long> UnknownIDs = new List<long>();
-            foreach(long l in IDs)
+            foreach (long l in IDs)
             {
-                if(!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l))
+                if (!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l))
                 {
                     UnknownIDs.Add(l);
                 }
             }
 
-            if(UnknownIDs.Count == 0)
+            if (UnknownIDs.Count == 0)
             {
                 return;
             }
 
 
             ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-            if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
             {
-                foreach(ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
                 {
-                    if(ri.Category == ResolvedInfoCategory.Alliance)
+                    if (ri.Category == ResolvedInfoCategory.Alliance)
                     {
                         ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
 
@@ -1585,7 +1585,7 @@ namespace SMT.EVEData
                                 fileReadFrom++;
 
                                 // explicitly skip just "local"
-                                if(l.Contains("Channel Name:    Local"))
+                                if (l.Contains("Channel Name:    Local"))
                                 {
                                     // now can read the next line
                                     l = file.ReadLine(); // should be the "Listener : <CharName>"
@@ -1602,7 +1602,7 @@ namespace SMT.EVEData
                                             c.LocalChatFile = changedFile;
 
                                             System s = GetEveSystem(system);
-                                            if(s!=null)
+                                            if (s != null)
                                             {
                                                 c.Region = s.Region;
                                             }
@@ -1654,7 +1654,7 @@ namespace SMT.EVEData
                             line = line.Substring(line.IndexOf("["));
                         }
 
-                        if(line == "")
+                        if (line == "")
                         {
                             line = file.ReadLine();
                             continue;
@@ -1703,22 +1703,22 @@ namespace SMT.EVEData
 
                                     foreach (string s in id.IntelString.Split(' '))
                                     {
-                                        if(s == "" || s.Length < 3)
+                                        if (s == "" || s.Length < 3)
                                         {
                                             continue;
                                         }
 
-                                        foreach(String clearMarker in IntelClearFilters)
+                                        foreach (String clearMarker in IntelClearFilters)
                                         {
-                                            if(clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                            if (clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
                                             {
                                                 id.ClearNotification = true;
                                             }
                                         }
 
-                                        foreach(System sys in Systems)
+                                        foreach (System sys in Systems)
                                         {
-                                            if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                                            if (sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
                                             {
                                                 id.Systems.Add(sys.Name);
                                             }
@@ -1785,7 +1785,7 @@ namespace SMT.EVEData
 
                         EveTrace.EveTraceFleetInfo fleetInfo = EveTrace.EveTraceFleetInfo.FromJson(strContent);
 
-                        if(fleetInfo != null)
+                        if (fleetInfo != null)
                         {
                             FleetIntel = fleetInfo;
                         }
@@ -1887,11 +1887,11 @@ namespace SMT.EVEData
 
                         if (structures != null)
                         {
-                            foreach(StructureHunter.Structures s in structures.Values.ToList())
+                            foreach (StructureHunter.Structures s in structures.Values.ToList())
                             {
                                 EVEData.System es = GetEveSystemFromID(s.SystemId);
-                                
-                                if( es != null )
+
+                                if (es != null)
                                 {
                                     es.SHStructures.Add(s);
                                 }
@@ -1932,7 +1932,7 @@ namespace SMT.EVEData
                                 es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
                                 es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
                                 es.SOVAllianceIHUB = ss.AllianceId;
-                                
+
                             }
                         }
                     }
@@ -1953,7 +1953,7 @@ namespace SMT.EVEData
         {
             ESI.NET.EsiResponse<ESI.NET.Models.Status.Status> esr = await ESIClient.Status.Retrieve();
 
-            if(ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
+            if (ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
             {
                 ServerInfo.Name = "Tranquility";
                 ServerInfo.NumPlayers = esr.Data.Players;
@@ -1976,7 +1976,7 @@ namespace SMT.EVEData
             ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.Kills>> esr = await ESIClient.Universe.Kills();
             if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.Kills>>(esr))
             {
-                foreach(ESI.NET.Models.Universe.Kills k in esr.Data)
+                foreach (ESI.NET.Models.Universe.Kills k in esr.Data)
                 {
                     EVEData.System es = GetEveSystemFromID(k.SystemId);
                     if (es != null)
@@ -1987,7 +1987,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-         }
+        }
 
 
 
@@ -2019,9 +2019,9 @@ namespace SMT.EVEData
             ESI.NET.EsiResponse<List<ESI.NET.Models.Incursions.Incursion>> esr = await ESIClient.Incursions.All();
             if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Incursions.Incursion>>(esr))
             {
-                foreach(ESI.NET.Models.Incursions.Incursion i in esr.Data)
+                foreach (ESI.NET.Models.Incursions.Incursion i in esr.Data)
                 {
-                    foreach(long s in i.InfestedSystems )
+                    foreach (long s in i.InfestedSystems)
                     {
                         EVEData.System sys = GetEveSystemFromID(s);
                         if (sys != null)
@@ -2054,11 +2054,11 @@ namespace SMT.EVEData
                 DateTime NextLowFreqUpdate = DateTime.Now;
 
 
-            // loop forever
+                // loop forever
                 while (BackgroundThreadShouldTerminate == false)
                 {
                     // character Update 
-                    if((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)
+                    if ((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)
                     {
                         NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
 
@@ -2071,7 +2071,7 @@ namespace SMT.EVEData
 
 
                     // low frequency update
-                    if((NextLowFreqUpdate - DateTime.Now).Minutes < 0 )
+                    if ((NextLowFreqUpdate - DateTime.Now).Minutes < 0)
                     {
                         NextLowFreqUpdate = DateTime.Now + LowFreqUpdateRate;
 
@@ -2119,10 +2119,10 @@ namespace SMT.EVEData
             */
         }
 
-            /// <summary>
-            /// ESI Result Response
-            /// </summary>
-            private void ESIUpdateSovCallback(IAsyncResult asyncResult)
+        /// <summary>
+        /// ESI Result Response
+        /// </summary>
+        private void ESIUpdateSovCallback(IAsyncResult asyncResult)
         {
             HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
             try
@@ -2165,7 +2165,7 @@ namespace SMT.EVEData
             }
         }
 
- 
+
 
         /// <summary>
         /// Initialise the Thera Connection Data from EVE-Scout
@@ -2262,7 +2262,7 @@ namespace SMT.EVEData
             stream.Write(data, 0, data.Length);
 
             HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
- 
+
 
 
             if (esiResult.StatusCode != HttpStatusCode.OK)
@@ -2297,6 +2297,6 @@ namespace SMT.EVEData
         {
             ZKillFeed = new ZKillRedisQ();
             ZKillFeed.Initialise();
-        }      
+        }
     }
 }

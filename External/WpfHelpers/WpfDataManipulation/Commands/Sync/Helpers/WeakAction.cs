@@ -142,8 +142,8 @@ namespace GalaSoft.MvvmLight.Helpers
         /// <param name="target">The action's owner.</param>
         /// <param name="action">The action that will be associated to this instance.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Microsoft.Design", 
-            "CA1062:Validate arguments of public methods", 
+            "Microsoft.Design",
+            "CA1062:Validate arguments of public methods",
             MessageId = "1")]
         public WeakAction(object target, Action action)
         {

@@ -1,17 +1,13 @@
 ﻿using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Serialization;
@@ -376,13 +372,13 @@ namespace SMT.EVEData
                         {
                             long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
 
-                            if(rp.GateToTake == Navigation.GateType.Ansibex)
+                            if (rp.GateToTake == Navigation.GateType.Ansibex)
                             {
-                                foreach(JumpBridge jb in EveManager.Instance.JumpBridges)
+                                foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
                                 {
-                                    if(jb.From == rp.SystemName)
+                                    if (jb.From == rp.SystemName)
                                     {
-                                        if(jb.FromID != 0)
+                                        if (jb.FromID != 0)
                                         {
                                             wayPointSysID = jb.FromID;
                                         }
@@ -481,7 +477,7 @@ namespace SMT.EVEData
 
                 if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
                 {
-                    if(!EveManager.Instance.SystemIDToName.Keys.Contains(esr.Data.SolarSystemId))
+                    if (!EveManager.Instance.SystemIDToName.Keys.Contains(esr.Data.SolarSystemId))
                     {
                         return;
                     }
@@ -620,7 +616,7 @@ namespace SMT.EVEData
         }
 
 
-        public async Task<List<JumpBridge>> FindJumpGates(string JumpBridgeFilterString = " » " )
+        public async Task<List<JumpBridge>> FindJumpGates(string JumpBridgeFilterString = " » ")
         {
 
 
@@ -641,7 +637,7 @@ namespace SMT.EVEData
             {
                 if (esr.Data.Structures == null)
                 {
-                    return jbl; 
+                    return jbl;
                 }
 
 
@@ -654,7 +650,7 @@ namespace SMT.EVEData
                         SystemJumpGateList[stationID] = esrs.Data;
 
                         // found a jump gate
-                        if(esrs.Data.TypeId == 35841)
+                        if (esrs.Data.TypeId == 35841)
                         {
                             string[] parts = esrs.Data.Name.Split(' ');
                             string from = parts[0];
@@ -663,7 +659,7 @@ namespace SMT.EVEData
                             EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
                         }
                     }
-                    
+
                     Thread.Sleep(10);
                 }
             }

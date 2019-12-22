@@ -16,10 +16,10 @@
 // slightly modified with his permission.</credits>
 // ****************************************************************************
 
+using GalaSoft.MvvmLight.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
-using GalaSoft.MvvmLight.Helpers;
 
 #if NETFX_CORE
 using System.Reflection;
@@ -71,7 +71,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
 
             if (canExecute != null)
             {
-                _canExecute = new WeakFunc<T,bool>(canExecute);
+                _canExecute = new WeakFunc<T, bool>(canExecute);
             }
         }
 
@@ -179,7 +179,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
                     return _canExecute.Execute(default(T));
                 }
 
-                return _canExecute.Execute((T) parameter);
+                return _canExecute.Execute((T)parameter);
             }
 
             return false;
@@ -200,7 +200,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
             {
                 if (parameter is IConvertible)
                 {
-                    val = Convert.ChangeType(parameter, typeof (T), null);
+                    val = Convert.ChangeType(parameter, typeof(T), null);
                 }
             }
 #endif

@@ -29,14 +29,14 @@ namespace Bvs.Common.Utility
 
         public int VerticalOffsetLine
         {
-            get { return (int) GetValue(VerticalOffsetLineProperty); }
+            get { return (int)GetValue(VerticalOffsetLineProperty); }
             set { SetValue(VerticalOffsetLineProperty, value); }
         }
 
         // Accessor for the child size dependency property
         public double ChildSize
         {
-            get { return (double) GetValue(ChildSizeProperty); }
+            get { return (double)GetValue(ChildSizeProperty); }
             set { SetValue(ChildSizeProperty, value); }
         }
 
@@ -181,7 +181,7 @@ namespace Bvs.Common.Utility
 
             // See how big we are
             return new Size(childrenPerRow * ChildSize,
-                ChildSize * Math.Ceiling((double) itemCount / childrenPerRow));
+                ChildSize * Math.Ceiling((double)itemCount / childrenPerRow));
         }
 
         /// <summary>
@@ -193,8 +193,8 @@ namespace Bvs.Common.Utility
         {
             var childrenPerRow = CalculateChildrenPerRow(_extent);
 
-            firstVisibleItemIndex = (int) Math.Floor(_offset.Y / ChildSize) * childrenPerRow;
-            lastVisibleItemIndex = (int) Math.Ceiling((_offset.Y + _viewport.Height) / ChildSize) * childrenPerRow - 1;
+            firstVisibleItemIndex = (int)Math.Floor(_offset.Y / ChildSize) * childrenPerRow;
+            lastVisibleItemIndex = (int)Math.Ceiling((_offset.Y + _viewport.Height) / ChildSize) * childrenPerRow - 1;
 
             var itemsControl = ItemsControl.GetItemsOwner(this);
             var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
@@ -239,7 +239,7 @@ namespace Bvs.Common.Utility
             if (availableSize.Width == double.PositiveInfinity)
                 childrenPerRow = Children.Count;
             else
-                childrenPerRow = Math.Max(1, (int) Math.Floor(availableSize.Width / ChildSize));
+                childrenPerRow = Math.Max(1, (int)Math.Floor(availableSize.Width / ChildSize));
             return childrenPerRow;
         }
 

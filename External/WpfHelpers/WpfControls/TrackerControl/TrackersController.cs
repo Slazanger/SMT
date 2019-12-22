@@ -269,7 +269,7 @@ namespace WpfHelpers.WpfControls.TrackerControl
             // MOVE
             else
             {
-                if (!CanMoveTrackers )
+                if (!CanMoveTrackers)
                     return;
 
                 if (m_CurrentTracker?.AttachedObject != null)

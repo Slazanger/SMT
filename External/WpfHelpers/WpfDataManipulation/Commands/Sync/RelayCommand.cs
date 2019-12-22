@@ -16,10 +16,10 @@
 // slightly modified with his permission.</credits>
 // ****************************************************************************
 
+using GalaSoft.MvvmLight.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
-using GalaSoft.MvvmLight.Helpers;
 #if !NET_FXCORE
 
 #endif
@@ -164,8 +164,8 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         /// <returns>true if this command can be executed; otherwise, false.</returns>
         public bool CanExecute(object parameter)
         {
-            return _canExecute == null 
-                || (_canExecute.IsStatic || _canExecute.IsAlive) 
+            return _canExecute == null
+                || (_canExecute.IsStatic || _canExecute.IsAlive)
                     && _canExecute.Execute();
         }
 

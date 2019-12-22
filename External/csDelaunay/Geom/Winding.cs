@@ -1,6 +1,8 @@
-﻿namespace csDelaunay {
+﻿namespace csDelaunay
+{
 
-	public enum Winding {
-		CLOCKWISE, COUNTERCLOCKWISE, NONE
-	}
+    public enum Winding
+    {
+        CLOCKWISE, COUNTERCLOCKWISE, NONE
+    }
 }

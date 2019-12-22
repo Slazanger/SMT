@@ -169,7 +169,7 @@ namespace SMT.EVEData
         /// Gets or sets the an incursion is active in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public List<StructureHunter.Structures> SHStructures{ get; set; }
+        public List<StructureHunter.Structures> SHStructures { get; set; }
 
         [XmlIgnoreAttribute]
         public DateTimeOffset IHubVunerabliltyStart { get; set; }
@@ -202,6 +202,6 @@ namespace SMT.EVEData
         {
             return $"{Name} ({Region})";
         }
-        
+
     }
 }

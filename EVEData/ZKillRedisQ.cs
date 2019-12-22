@@ -53,7 +53,7 @@ namespace SMT.EVEData
         public void ShutDown()
         {
             updateThreadRunning = false;
-            if(!updateThread.Join(10000))
+            if (!updateThread.Join(10000))
             {
 
                 updateThread.Abort();
@@ -71,9 +71,9 @@ namespace SMT.EVEData
 
             while (updateThreadRunning)
             {
-                if(PauseUpdate)
+                if (PauseUpdate)
                 {
-                    if(KillStream.Count > 0)
+                    if (KillStream.Count > 0)
                     {
                         Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
@@ -127,7 +127,7 @@ namespace SMT.EVEData
                             zs.VictimCharacterID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
                             zs.VictimCorpID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
                             zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId);
-                            if(zs.SystemName == string.Empty)
+                            if (zs.SystemName == string.Empty)
                             {
                                 zs.SystemName = z.Package.Killmail.SolarSystemId.ToString();
                             }
@@ -145,12 +145,12 @@ namespace SMT.EVEData
 
 
 
-                            zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);                            
+                            zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);
 
-                             Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                KillStream.Insert(0,zs);
-                            }), DispatcherPriority.ContextIdle, null);
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                           {
+                               KillStream.Insert(0, zs);
+                           }), DispatcherPriority.ContextIdle, null);
                         }
                         else
                         {
@@ -171,7 +171,7 @@ namespace SMT.EVEData
                             {
                                 for (int i = KillStream.Count - 1; i >= 0; i--)
                                 {
-                                    if(KillStream[i].VictimAllianceName == string.Empty)
+                                    if (KillStream[i].VictimAllianceName == string.Empty)
                                     {
                                         if (!EveManager.Instance.AllianceIDToTicker.Keys.Contains(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
                                         {
@@ -188,7 +188,7 @@ namespace SMT.EVEData
                                         KillStream.RemoveAt(i);
                                     }
                                 }
-                                if(AllianceIDs.Count > 0)
+                                if (AllianceIDs.Count > 0)
                                 {
                                     EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
                                 }
@@ -290,12 +290,12 @@ namespace SMT.EVEData
             public override string ToString()
             {
                 string allianceTicker = EVEData.EveManager.Instance.GetAllianceTicker(VictimAllianceID);
-                if(allianceTicker == string.Empty)
+                if (allianceTicker == string.Empty)
                 {
-                    allianceTicker = VictimAllianceID.ToString(); 
+                    allianceTicker = VictimAllianceID.ToString();
                 }
 
-                return string.Format("System: {0}, Alliance: {1}, Ship {2}", SystemName, allianceTicker,  ShipType);
+                return string.Format("System: {0}, Alliance: {1}, Ship {2}", SystemName, allianceTicker, ShipType);
             }
         }
     }
