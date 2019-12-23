@@ -503,6 +503,8 @@ namespace SMT.EVEData
             //StartUpdateStructureHunterUpdate();
 
             StartUpdateSovStructureUpdate();
+
+            StartUpdateDotlanKillDeltaInfo();
         }
 
         /// <summary>
@@ -1797,6 +1799,72 @@ namespace SMT.EVEData
             }
         }
 
+
+        private void StartUpdateDotlanKillDeltaInfo()
+        {
+
+            foreach (MapRegion mr in Regions)
+            {
+                // clear the data set
+                foreach(MapSystem ms in mr.MapSystems.Values)
+                {
+                    if(!ms.OutOfRegion)
+                    {
+                        ms.ActualSystem.NPCKillsDeltaLastHour = 0;
+                    }
+                }
+
+
+                string url = @"http://evemaps.dotlan.net/js/" + mr.DotLanRef + ".js";
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.Method = WebRequestMethods.Http.Get;
+                request.Timeout = 20000;
+                request.Proxy = null;
+
+                request.BeginGetResponse(new AsyncCallback(UpdateDotlanKillDeltaInfoCallback), request);
+
+                Thread.Sleep(10);
+
+            }
+        }
+
+
+        private void UpdateDotlanKillDeltaInfoCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        string result = sr.ReadToEnd();
+
+                        // this string is a javascript variable; so if we strip off the comment and variable we can parse it as raw json
+                        int substrpos = result.IndexOf("{");
+                        string json = result.Substring(substrpos - 1);
+
+                        
+                        var systemData = Dotlan.SystemData.FromJson(json);
+
+                        foreach(KeyValuePair<string, Dotlan.SystemData> kvp in systemData)
+                        {
+                            System s = GetEveSystemFromID(long.Parse(kvp.Key));
+                            if(s != null && kvp.Value.Nd.HasValue)
+                            {
+                                s.NPCKillsDeltaLastHour = (int)kvp.Value.Nd.Value;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+        }
 
         private void StartUpdateCoalitionInfo()
         {

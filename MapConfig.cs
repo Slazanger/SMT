@@ -354,6 +354,39 @@ namespace SMT
         }
 
 
+        private bool m_ShowRattingDataAsDelta;
+        [Category("Misc")]
+        [DisplayName("Show Ratting Data as Delta")]
+        public bool ShowRattingDataAsDelta
+        {
+            get
+            {
+                return m_ShowRattingDataAsDelta;
+            }
+            set
+            {
+                m_ShowRattingDataAsDelta = value;
+                OnPropertyChanged("ShowRattingDataAsDelta");
+            }
+        }
+
+        private bool m_ShowNegativeRattingDelta;
+        [Category("Misc")]
+        [DisplayName("Show Negative Ratting Delta")]
+        public bool ShowNegativeRattingDelta
+        {
+            get
+            {
+                return m_ShowNegativeRattingDelta;
+            }
+            set
+            {
+                m_ShowNegativeRattingDelta = value;
+                OnPropertyChanged("ShowNegativeRattingDelta");
+            }
+        }
+
+
 
         private bool m_SOVShowConflicts;
         [Category("SOV")]

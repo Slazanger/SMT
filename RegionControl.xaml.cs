@@ -1910,8 +1910,23 @@ namespace SMT
             DataLargeColor.G = (byte)(DataLargeColor.G * 0.75);
             DataLargeColor.B = (byte)(DataLargeColor.B * 0.75);
 
+            Color DataLargeColorDelta = MapConf.ActiveColourScheme.ESIOverlayColour;
+            DataLargeColorDelta.R = (byte)(DataLargeColorDelta.R * 0.4);
+            DataLargeColorDelta.G = (byte)(DataLargeColorDelta.G * 0.4);
+            DataLargeColorDelta.B = (byte)(DataLargeColorDelta.B * 0.4);
 
-            SolidColorBrush infoColour = new SolidColorBrush(DataColor);
+
+
+
+            SolidColorBrush dataColor = new SolidColorBrush(DataColor);
+            SolidColorBrush infoColour = dataColor;
+
+            SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
+            SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
+
+            SolidColorBrush infoColourDelta = new SolidColorBrush(DataLargeColorDelta);
+
+
             SolidColorBrush zkbColour = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 
             SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
@@ -1922,6 +1937,7 @@ namespace SMT
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
 
+                infoColour = dataColor;
                 long SystemAlliance = 0;
 
 
@@ -1968,6 +1984,33 @@ namespace SMT
                 {
                     infoValue = nPCKillsLastHour;
                     infoSize = 0.15f * infoValue * ESIOverlayScale;
+
+                    if (MapConf.ShowRattingDataAsDelta)                        
+                    {
+                        if(!MapConf.ShowNegativeRattingDelta)
+                        {
+                            infoValue = Math.Max(0, sys.ActualSystem.NPCKillsDeltaLastHour);
+                            infoSize = 0.15f * infoValue * ESIOverlayScale;
+                        }
+                        else
+                        {
+                            infoValue = Math.Abs(sys.ActualSystem.NPCKillsDeltaLastHour);
+                            infoSize = 0.15f * infoValue * ESIOverlayScale;
+
+                            if (sys.ActualSystem.NPCKillsDeltaLastHour > 0)
+                            {
+                                infoColour = PositiveDeltaColor;
+                            }
+                            else
+                            {
+                                infoColour = NegativeDeltaColor;
+                            }
+                        }
+
+                    }
+
+
+ 
                 }
 
                 if (ShowPodKills)
@@ -2050,6 +2093,27 @@ namespace SMT
                     MainCanvas.Children.Add(infoCircle);
                     DynamicMapElements.Add(infoCircle);
                 }
+
+
+                /*
+                if (MapConf.ShowRattingDataAsDelta)
+                {
+                    infoValue = Math.Max(0, sys.ActualSystem.NPCKillsDeltaLastHour);
+                    infoSize = 0.15f * infoValue * ESIOverlayScale;
+
+                    Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
+                    infoCircle.Fill = infoColourDelta;
+
+                    Canvas.SetZIndex(infoCircle, 11);
+                    Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
+                    MainCanvas.Children.Add(infoCircle);
+                    DynamicMapElements.Add(infoCircle);
+                }
+                */
+
+
+
 
                 if (infoSize > 60)
                 {
@@ -2600,7 +2664,7 @@ namespace SMT
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}";
+                    data.Content = $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, Delta ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }

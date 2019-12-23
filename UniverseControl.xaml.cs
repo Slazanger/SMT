@@ -575,6 +575,8 @@ namespace SMT
 
             }
 
+            SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
+            SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
 
 
 
@@ -594,6 +596,7 @@ namespace SMT
 
                 VHLinks.ClearAllChildren();
                 VHNames.ClearAllChildren();
+
 
 
                 ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
@@ -711,6 +714,8 @@ namespace SMT
 
             if (DataRedraw)
             {
+                Brush dataBrush = DataColourBrush;
+
                 // update the data
                 VHDataSpheres.ClearAllChildren();
                 foreach (EVEData.System sys in EM.Systems)
@@ -727,6 +732,30 @@ namespace SMT
                     if (ShowNPCKills)
                     {
                         DataScale = sys.NPCKillsLastHour * ESIOverlayScale * 0.05f;
+
+                        if (MapConf.ShowRattingDataAsDelta)
+                        {
+                            if (!MapConf.ShowNegativeRattingDelta)
+                            {
+                                DataScale = Math.Max(0, sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f; ;
+                            }
+                            else
+                            {
+                                DataScale = Math.Abs(sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f ;
+
+                                if (sys.NPCKillsDeltaLastHour > 0)
+                                {
+                                    dataBrush = PositiveDeltaColor;
+                                }
+                                else
+                                {
+                                    dataBrush = NegativeDeltaColor;
+                                }
+                            }
+
+                        }
+
+
                     }
 
                     if (ShowPodKills)
@@ -752,7 +781,7 @@ namespace SMT
                         DrawingContext drawingContext = dataDV.RenderOpen();
 
                         // Create a rectangle and draw it in the DrawingContext.
-                        drawingContext.DrawEllipse(DataColourBrush, new Pen(DataColourBrush, 1), new Point(X, Z), DataScale, DataScale);
+                        drawingContext.DrawEllipse(dataBrush, new Pen(dataBrush, 1), new Point(X, Z), DataScale, DataScale);
 
                         drawingContext.Close();
 

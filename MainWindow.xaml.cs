@@ -25,7 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
-        public string SMTVersion = "SMT_067";
+        public string SMTVersion = "SMT_068";
 
 
         /// <summary>

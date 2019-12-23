@@ -41,11 +41,8 @@
             <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
             <MenuItem Header="Show In Regions" Click="SysContexMenuShowInRegion_Click" />
 
-
         </ContextMenu>
     </UserControl.Resources>
-
-
 
     <Grid>
 
@@ -83,7 +80,7 @@
 
                     <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0" Width="190">
 
- 
+
                         <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
                             <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="36" Height="36" >

@@ -43,6 +43,7 @@ namespace SMT.EVEData
 
             // default the ESI stats
             NPCKillsLastHour = -1;
+            NPCKillsDeltaLastHour = 0;
             PodKillsLastHour = -1;
             ShipKillsLastHour = -1;
             JumpsLastHour = -1;
@@ -115,6 +116,14 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public int NPCKillsLastHour { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the delta of NPC Kills in the last hour
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public int NPCKillsDeltaLastHour { get; set; }
+
 
         /// <summary>
         /// Gets or sets the number of pod kills in the last hour
