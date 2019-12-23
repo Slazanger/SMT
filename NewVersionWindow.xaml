@@ -1,0 +1,30 @@
+﻿<Window x:Class="SMT.NewVersionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SMT"
+        mc:Ignorable="d"
+        Title="Update Available" Height="300" Width="400" ResizeMode="NoResize" Loaded="Window_Loaded">
+    <Grid Background="#FFF1F1F1">
+        <ScrollViewer>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="New Version: " FontWeight="Bold"/>
+                    <Label Content="{Binding NewVersion}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Current Version: " FontWeight="Bold"/>
+                    <Label Content="{Binding CurrentVersion}"/>
+                </StackPanel>
+                <Separator/>
+                    <Label Content="Release Notes: " FontWeight="Bold"/>
+                <Label Content="{Binding ReleaseInfo}"/>
+                <Separator/>
+                    <Label><Hyperlink NavigateUri="{Binding ReleaseURL}" RequestNavigate="Hyperlink_RequestNavigate" >Download</Hyperlink></Label>
+            </StackPanel>
+
+        </ScrollViewer>
+    </Grid>
+</Window>

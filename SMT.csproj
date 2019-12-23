@@ -215,6 +215,10 @@
     <Compile Include="EVEData\Navigation.cs" />
     <Compile Include="EVEData\Server.cs" />
     <Compile Include="EVEData\Structure.cs" />
+    <Compile Include="GitHubRelease.cs" />
+    <Compile Include="NewVersionWindow.xaml.cs">
+      <DependentUpon>NewVersionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StaticJumpOverlay.cs" />
     <Compile Include="UniverseControl.xaml.cs">
       <DependentUpon>UniverseControl.xaml</DependentUpon>
@@ -293,6 +297,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="NewVersionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RegionControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

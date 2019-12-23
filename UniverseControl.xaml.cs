@@ -887,10 +887,13 @@ namespace SMT
             if (MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystemsText)
             {
                 VHNames.Visibility = Visibility.Hidden;
+                VHRangeHighlights.Visibility = Visibility.Hidden;
+
             }
             else
             {
                 VHNames.Visibility = Visibility.Visible;
+                VHRangeHighlights.Visibility = Visibility.Visible;
             }
 
             if (MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems)

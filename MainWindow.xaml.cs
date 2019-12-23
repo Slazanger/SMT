@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -23,6 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
+        public string SMTVersion = "SMT_067";
 
 
         /// <summary>
@@ -82,12 +85,18 @@ namespace SMT
             return content;
         }
 
+
+
         public MainWindow()
         {
             OutputLog.Info("Starting App..");
             AppWindow = this;
 
             InitializeComponent();
+
+            Title = "SMT (Experimental :" + SMTVersion + ")";
+
+            CheckGitHubVersion();
 
 
             string dockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
@@ -267,6 +276,63 @@ namespace SMT
 
 
         }
+
+
+        private void CheckGitHubVersion()
+        {
+            string url = @"https://api.github.com/repos/slazanger/smt/releases/latest";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+            request.UserAgent = "SMT/0.xx";
+
+            request.BeginGetResponse(new AsyncCallback(CheckGitHubVersionCallback), request);
+        }
+
+        private void CheckGitHubVersionCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        GitHubRelease.Release releaseInfo = GitHubRelease.Release.FromJson(strContent);
+
+                        if (releaseInfo != null)
+                        {
+                            if(releaseInfo.TagName != SMTVersion)
+                            {
+                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                {
+                                    NewVersionWindow nw = new NewVersionWindow();
+                                    nw.ReleaseInfo = releaseInfo.Body;
+                                    nw.CurrentVersion = SMTVersion;
+                                    nw.NewVersion = releaseInfo.TagName;
+                                    nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
+                                    nw.Show();
+
+                                }), DispatcherPriority.ApplicationIdle);
+
+
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+
 
         private void UniverseUC_RequestRegionSystem(object sender, RoutedEventArgs e)
         {
