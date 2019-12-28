@@ -280,7 +280,10 @@
                                                 <Label Content="Route"/>
                                                 <ListBox ItemsSource="{Binding Path=ActiveCharacter.ActiveRoute}"/>
                                                 <Separator/>
+                                                <Button x:Name="CopyWaypointsBtn" Click="CopyWaypointsBtn_Click" Content="Copy Waypoints"/>
+                                                <Separator/>
                                                 <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear"/>
+
                                             </StackPanel>
                                         </ScrollViewer>
 

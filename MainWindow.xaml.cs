@@ -25,7 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
-        public string SMTVersion = "SMT_068";
+        public string SMTVersion = "SMT_069";
 
 
         /// <summary>
@@ -1431,7 +1431,25 @@ namespace SMT
             EVEManager.JumpBridges.Clear();
             EVEData.Navigation.ClearJumpBridges();
         }
+
+        private void CopyWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null)
+            {
+                string WPT = c.GetWayPointText();
+
+                try
+                {
+                    Clipboard.SetText(WPT);
+                }
+                catch { }
+
+            }
+        }
+
     }
+
 
 
     public class ZKBBackgroundConverter : IValueConverter

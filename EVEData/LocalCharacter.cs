@@ -801,6 +801,76 @@ namespace SMT.EVEData
 
         }
 
+        public string GetWayPointText()
+        {
+            string ClipboardText = "Waypoints\n==============\n";
+
+
+            lock (ActiveRouteLock)
+            {
+                foreach (Navigation.RoutePoint rp in ActiveRoute)
+                {
+                    string WayPointText = string.Empty;
+                    long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
+                    // explicitly add interim waypoints for ansiblex gates or actual waypoints
+                    if (rp.GateToTake == Navigation.GateType.Ansibex)
+                    {
+
+                        bool isSystemLink = true;
+
+                        if (rp.GateToTake == Navigation.GateType.Ansibex)
+                        {
+                            foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
+                            {
+                                if (jb.From == rp.SystemName)
+                                {
+                                    if (jb.FromID != 0)
+                                    {
+                                        wayPointSysID = jb.FromID;
+                                        isSystemLink = false;
+                                    }
+                                    break;
+                                }
+
+                                if (jb.To == rp.SystemName)
+                                {
+                                    if (jb.ToID != 0)
+                                    {
+                                        wayPointSysID = jb.ToID;
+                                        isSystemLink = false;
+                                    }
+                                    break;
+                                }
+
+                            }
+
+                            if (isSystemLink)
+                            {
+                                WayPointText = "<url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + "</url> (Take Ansiblex) \n";
+                            }
+                            else
+                            {
+                                WayPointText = "<url=showinfo:35841//" + wayPointSysID + ">" + rp.SystemName + "</url> (Take Ansiblex) \n";
+                            }
+                        }
+                    }
+
+                    if (Waypoints.Contains(rp.SystemName))
+                    {
+                        // regular waypoint
+                        wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
+
+                        WayPointText = "<url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + "</url> (WayPoint) \n";
+                    }
+
+                    ClipboardText += WayPointText;
+                }
+            }
+
+
+            return ClipboardText;
+        }
+
 
         protected void OnPropertyChanged(string name)
         {

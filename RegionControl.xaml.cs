@@ -1987,12 +1987,13 @@ namespace SMT
 
                     if (MapConf.ShowRattingDataAsDelta)                        
                     {
-                        if(!MapConf.ShowNegativeRattingDelta)
-                        {
-                            infoValue = Math.Max(0, sys.ActualSystem.NPCKillsDeltaLastHour);
-                            infoSize = 0.15f * infoValue * ESIOverlayScale;
-                        }
-                        else
+                        /*                        if(!MapConf.ShowNegativeRattingDelta)
+                                                {
+                                                    infoValue = Math.Max(0, sys.ActualSystem.NPCKillsDeltaLastHour);
+                                                    infoSize = 0.15f * infoValue * ESIOverlayScale;
+                                                }
+                        */
+                        if (MapConf.ShowNegativeRattingDelta)
                         {
                             infoValue = Math.Abs(sys.ActualSystem.NPCKillsDeltaLastHour);
                             infoSize = 0.15f * infoValue * ESIOverlayScale;
@@ -2095,8 +2096,8 @@ namespace SMT
                 }
 
 
-                /*
-                if (MapConf.ShowRattingDataAsDelta)
+                
+                if (ShowNPCKills && MapConf.ShowRattingDataAsDelta && !MapConf.ShowNegativeRattingDelta)
                 {
                     infoValue = Math.Max(0, sys.ActualSystem.NPCKillsDeltaLastHour);
                     infoSize = 0.15f * infoValue * ESIOverlayScale;
@@ -2110,7 +2111,7 @@ namespace SMT
                     MainCanvas.Children.Add(infoCircle);
                     DynamicMapElements.Add(infoCircle);
                 }
-                */
+                
 
 
 
