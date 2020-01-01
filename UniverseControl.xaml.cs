@@ -822,6 +822,10 @@ namespace SMT
                 foreach (KeyValuePair<string, List<string>> kvp in MapCharacters)
                 {
                     EVEData.System sys = EM.GetEveSystem(kvp.Key);
+                    if(sys == null)
+                    {
+                        continue;
+                    }
                     double X = (sys.ActualX - universeXMin) * universeScale;
                     // need to invert Z
                     double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;

@@ -479,6 +479,8 @@ namespace SMT.EVEData
                 {
                     if (!EveManager.Instance.SystemIDToName.Keys.Contains(esr.Data.SolarSystemId))
                     {
+                        Location = "";
+                        Region = "";
                         return;
                     }
                     Location = EveManager.Instance.SystemIDToName[esr.Data.SolarSystemId];
