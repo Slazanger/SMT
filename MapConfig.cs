@@ -628,7 +628,7 @@ namespace SMT
             defaultColours.CharacterTextSize = 11;
             defaultColours.SystemTextSize = 12;
 
-            defaultColours.JumpRangeInColour = Color.FromRgb(135, 206, 235);
+            defaultColours.JumpRangeInColour = Color.FromRgb(255, 165, 0);
             defaultColours.JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155);
 
 

@@ -53,12 +53,16 @@ namespace SMT.EVEData
         private Dictionary<string, int> intelFileReadPos;
 
 
+        private string VersionStr;
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
-        public EveManager()
+        public EveManager(string version)
         {
             LocalCharacters = new ObservableCollection<LocalCharacter>();
+            VersionStr = version;
 
             // ensure we have the cache folder setup
             DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";
@@ -66,6 +70,19 @@ namespace SMT.EVEData
             {
                 Directory.CreateDirectory(DataCacheFolder);
             }
+
+            string SaveDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT";
+            if (!Directory.Exists(SaveDataRoot))
+            {
+                Directory.CreateDirectory(SaveDataRoot);
+            }
+
+            SaveDataFolder = SaveDataRoot + "\\" + VersionStr;
+            if (!Directory.Exists(SaveDataFolder))
+            {
+                Directory.CreateDirectory(SaveDataFolder);
+            }
+
 
             string webCacheFoilder = DataCacheFolder + "\\WebCache";
             if (!Directory.Exists(webCacheFoilder))
@@ -173,6 +190,12 @@ namespace SMT.EVEData
         /// Gets or sets the folder to cache dotland svg's etc to
         /// </summary>
         public string DataCacheFolder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the folder to cache dotland svg's etc to
+        /// </summary>
+        public string SaveDataFolder { get; set; }
+
 
         /// <summary>
         /// Gets or sets the current list of thera connections
@@ -297,7 +320,7 @@ namespace SMT.EVEData
             }
 
             XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
-            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
+            string dataFilename =  SaveDataFolder + @"\Characters.dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
             {
@@ -305,10 +328,10 @@ namespace SMT.EVEData
             }
 
             // now serialise the caches to disk
-            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToName, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
-            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataFolder + @"\AllianceNames.dat");
+            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataFolder + @"\AllianceTickers.dat");
 
-            Utils.SerializToDisk<ObservableCollection<JumpBridge>>(JumpBridges, AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.dat");
+            Utils.SerializToDisk<ObservableCollection<JumpBridge>>(JumpBridges, SaveDataFolder + @"\JumpBridges.dat");
         }
 
         public void ShutDown()
@@ -334,7 +357,7 @@ namespace SMT.EVEData
             JumpBridges = new ObservableCollection<JumpBridge>();
 
 
-            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\JumpBridges.dat";
+            string dataFilename = SaveDataFolder + @"\JumpBridges.dat";
             if (!File.Exists(dataFilename))
             {
                 return;
@@ -1120,9 +1143,9 @@ namespace SMT.EVEData
                 SystemIDToName[s.ID] = s.Name;
             }
 
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat"))
+            if (File.Exists(SaveDataFolder + @"\AllianceNames.dat"))
             {
-                AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceNames.dat");
+                AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataFolder + @"\AllianceNames.dat");
             }
 
             if (AllianceIDToName == null)
@@ -1130,9 +1153,9 @@ namespace SMT.EVEData
                 AllianceIDToName = new SerializableDictionary<long, string>();
             }
 
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat"))
+            if (File.Exists(SaveDataFolder + @"\AllianceTickers.dat"))
             {
-                AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\AllianceTickers.dat");
+                AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataFolder + @"\AllianceTickers.dat");
             }
 
             if (AllianceIDToTicker == null)
@@ -1495,7 +1518,7 @@ namespace SMT.EVEData
         /// </summary>
         private void LoadCharacters()
         {
-            string dataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Characters.dat";
+            string dataFilename = SaveDataFolder + @"\Characters.dat";
             if (!File.Exists(dataFilename))
             {
                 return;

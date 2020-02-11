@@ -99,7 +99,7 @@ namespace SMT
             CheckGitHubVersion();
 
 
-            string dockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
+            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\Layout.dat";
             if (File.Exists(dockManagerLayoutName))
             {
                 try
@@ -119,7 +119,7 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
+            string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\MapConfig.dat";
             OutputLog.Info("Loading Map config from {0}", mapConfigFileName);
 
 
@@ -148,7 +148,7 @@ namespace SMT
                 MapConf.SetDefaultColours();
             }
 
-            EVEManager = new EVEData.EveManager();
+            EVEManager = new EVEData.EveManager(SMTVersion);
             EVEData.EveManager.Instance = EVEManager;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
@@ -209,7 +209,7 @@ namespace SMT
 
 
             // load the anom data
-            string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
+            string anomDataFilename = EVEManager.SaveDataFolder + @"\Anoms.dat";
             if (File.Exists(anomDataFilename))
             {
                 try
@@ -442,7 +442,8 @@ namespace SMT
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             // save off the dockmanager layout
-            string dockManagerLayoutName = AppDomain.CurrentDomain.BaseDirectory + @"\Layout.dat";
+            
+            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\Layout.dat";
             try
             {
                 Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
@@ -459,7 +460,7 @@ namespace SMT
             try
             {
                 // Save the Map Colours
-                string mapConfigFileName = AppDomain.CurrentDomain.BaseDirectory + @"\MapConfig.dat";
+                string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\MapConfig.dat";
 
                 // now serialise the class to disk
                 XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
@@ -478,7 +479,7 @@ namespace SMT
                 // save the Anom Data
                 // now serialise the class to disk
                 XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
-                string anomDataFilename = AppDomain.CurrentDomain.BaseDirectory + @"\Anoms.dat";
+                string anomDataFilename = EVEManager.SaveDataFolder + @"\Anoms.dat";
 
                 using (TextWriter tw = new StreamWriter(anomDataFilename))
                 {
