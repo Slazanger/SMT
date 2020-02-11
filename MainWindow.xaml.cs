@@ -25,7 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
-        public string SMTVersion = "SMT_071";
+        public string SMTVersion = "SMT_072";
 
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Experimental JTAC Edition :" + SMTVersion + ")";
+            Title = "SMT (Experimental Peter Han Edition : " + SMTVersion + ")";
 
             CheckGitHubVersion();
 
@@ -615,15 +615,22 @@ namespace SMT
             }
         }
 
+        private LogonWindow logonBrowserWindow;
+
         private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
         {
             string eSILogonURL = EVEManager.GetESILogonURL();
 
-            LogonWindow logonBrowserWindow = new LogonWindow();
-            logonBrowserWindow.logonBrowser.Navigate(eSILogonURL);
+            if (logonBrowserWindow != null)
+            {
+                logonBrowserWindow.Close();
+            }
+            System.Diagnostics.Process.Start(eSILogonURL);
 
-            logonBrowserWindow.URLName.Text = eSILogonURL;
+            logonBrowserWindow = new LogonWindow();
+            logonBrowserWindow.Owner = this;
             logonBrowserWindow.ShowDialog();
+            
         }
 
         public Color stringToColour(string str)

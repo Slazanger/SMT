@@ -5,13 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
-        Title="Auth.." Height="800" Width="650" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Auth.." Height="120" Width="250" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closed="Window_Closed">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="25" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TextBox x:Name="URLName" Grid.Row="0" IsReadOnly="True" BorderThickness="2" />
-        <WebBrowser x:Name="logonBrowser" Grid.Row="1" Navigating="LogonBrowser_Navigating" />
+        <StackPanel>
+            <Label>logon using the browser that opened...</Label>
+        </StackPanel>
     </Grid>
 </Window>
