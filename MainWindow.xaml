@@ -298,7 +298,7 @@
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
 
-                                <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpPlannerContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+ <!--   Temp Disabled   <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpPlannerContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="JumpPlannerGrid">
                                         <ScrollViewer Background="#FFE5E5E5">
                                             <StackPanel >
@@ -314,7 +314,7 @@
 
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
-
+-->
 
 
                                 <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">

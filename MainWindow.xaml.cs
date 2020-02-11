@@ -271,7 +271,7 @@ namespace SMT
             zKBFeedview.Filter = ZKBFeedFilter;
 
 
-            JPShipType.ItemsSource = Enum.GetValues(typeof(EVEData.EveManager.JumpShip)).Cast<EVEData.EveManager.JumpShip>();
+            // SJS Removed Temp            JPShipType.ItemsSource = Enum.GetValues(typeof(EVEData.EveManager.JumpShip)).Cast<EVEData.EveManager.JumpShip>();
 
 
             MapControlsPropertyGrid.SelectedObject = MapConf;
@@ -310,7 +310,7 @@ namespace SMT
 
                         if (releaseInfo != null)
                         {
-                            if(releaseInfo.TagName != SMTVersion)
+                            if (releaseInfo.TagName != SMTVersion)
                             {
                                 Application.Current.Dispatcher.Invoke((Action)(() =>
                                 {
@@ -1450,9 +1450,11 @@ namespace SMT
             }
         }
 
+        /*
+
         private void JPSuggestRoute_Click(object sender, RoutedEventArgs e)
         {
-            if(JPShipType.SelectedItem == null)
+            if (JPShipType.SelectedItem == null)
             {
                 return;
             }
@@ -1481,7 +1483,10 @@ namespace SMT
 
 
         }
+
+        */
     }
+
 
 
 
