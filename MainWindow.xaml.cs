@@ -25,7 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
-        public string SMTVersion = "SMT_070";
+        public string SMTVersion = "SMT_071";
 
 
         /// <summary>
@@ -270,6 +270,8 @@ namespace SMT
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
             zKBFeedview.Filter = ZKBFeedFilter;
 
+
+            JPShipType.ItemsSource = Enum.GetValues(typeof(EVEData.EveManager.JumpShip)).Cast<EVEData.EveManager.JumpShip>();
 
 
             MapControlsPropertyGrid.SelectedObject = MapConf;
@@ -1448,6 +1450,37 @@ namespace SMT
             }
         }
 
+        private void JPSuggestRoute_Click(object sender, RoutedEventArgs e)
+        {
+            if(JPShipType.SelectedItem == null)
+            {
+                return;
+            }
+
+            EVEData.EveManager.JumpShip js = (EVEData.EveManager.JumpShip)JPShipType.SelectedItem;
+            double JumpDistance = 0.0;
+
+            switch (js)
+            {
+                case EVEData.EveManager.JumpShip.Super: { JumpDistance = 6.0; } break;
+                case EVEData.EveManager.JumpShip.Titan: { JumpDistance = 6.0; } break;
+                case EVEData.EveManager.JumpShip.Dread: { JumpDistance = 7.0; } break;
+                case EVEData.EveManager.JumpShip.Carrier: { JumpDistance = 7.0; } break;
+                case EVEData.EveManager.JumpShip.FAX: { JumpDistance = 7.0; } break;
+                case EVEData.EveManager.JumpShip.Blops: { JumpDistance = 8.0; } break;
+                case EVEData.EveManager.JumpShip.Rorqual: { JumpDistance = 10.0; } break;
+                case EVEData.EveManager.JumpShip.JF: { JumpDistance = 10.0; } break;
+            }
+            {
+                List<EVEData.Navigation.RoutePoint> rpl = EVEData.Navigation.NavigateCapitals("B-II34", "Obe", JumpDistance);
+                JPSuggestedRoute.ItemsSource = rpl;
+
+                UniverseUC.ActiveRoute = rpl;
+
+            }
+
+
+        }
     }
 
 

@@ -23,19 +23,20 @@ namespace SMT.EVEData
         {
             public bool HighSec { get; set; }
             public string Name { get; set; }
-            public int Cost;
-            public int MinCostToStart;
+            public double Cost;
+            public double MinCostToStart;
             public bool Visited;
 
             public double X;
             public double Y;
             public double Z;
 
-            public int F;
+            public double F;
 
             public MapNode NearestToStart;
 
             public List<string> Connections { get; set; }
+            public List<JumpLink> JumpableSystems { get; set; }
 
             public string JBConnection;
         }
@@ -43,13 +44,21 @@ namespace SMT.EVEData
         public enum GateType
         {
             StarGate,
-            Ansibex
+            Ansibex,
+            JumpTo,
+        }
+
+        struct JumpLink
+        {
+            public string System;
+            public double RangeLY;
         }
 
         public class RoutePoint
         {
             public string SystemName { get; set; }
             public GateType GateToTake { get; set; }
+            public double LY { get; set; }
 
             public override string ToString()
             {
@@ -57,6 +66,11 @@ namespace SMT.EVEData
                 if (GateToTake == GateType.Ansibex)
                 {
                     s += " (Ansiblex)";
+                }
+
+                if(GateToTake == GateType.JumpTo && LY > 0.0)
+                {
+                    s += " (Jump To, Range " + LY.ToString("0.##") + " )";
                 }
 
                 return s;
@@ -76,6 +90,7 @@ namespace SMT.EVEData
                     Name = sys.Name,
                     HighSec = sys.TrueSec > 0.45,
                     Connections = new List<string>(),
+                    JumpableSystems = new List<JumpLink>(),
                     Cost = 1,
                     MinCostToStart = 0,
                     X = sys.ActualX,
@@ -97,6 +112,32 @@ namespace SMT.EVEData
             {
                 MapNodes[jb.From].JBConnection = jb.To;
                 MapNodes[jb.To].JBConnection = jb.From;
+            }
+
+            double MaxRange = 10 * 9460730472580800.0;
+
+
+
+            // now create the jumpable system links
+            foreach (MapNode mn in MapNodes.Values)
+            {
+                foreach (System sys in eveSystems)
+                {
+                    // cant jump into highsec systems
+                    if(sys.TrueSec > 0.45)
+                    {
+                        continue;
+                    }
+                    
+                    double Distance = EveManager.Instance.GetRangeBetweenSystems(sys.Name, mn.Name);
+                    if(Distance < MaxRange && Distance > 0)
+                    {
+                        JumpLink jl = new JumpLink();
+                        jl.System = sys.Name;
+                        jl.RangeLY = Distance / 9460730472580800.0;
+                        mn.JumpableSystems.Add(jl);
+                    }
+                }
             }
         }
 
@@ -184,7 +225,7 @@ namespace SMT.EVEData
             while (OpenList.Count > 0)
             {
                 // get the MapNode with the lowest F score
-                int lowest = OpenList.Min(mn => mn.MinCostToStart);
+                double lowest = OpenList.Min(mn => mn.MinCostToStart);
                 CurrentNode = OpenList.First(mn => mn.MinCostToStart == lowest);
 
                 // add the list to the closed list
@@ -257,11 +298,12 @@ namespace SMT.EVEData
                 RoutePoint RP = new RoutePoint();
                 RP.SystemName = Route[i];
                 RP.GateToTake = GateType.StarGate;
+                RP.LY = 0.0;
 
-                if (i < Route.Count - 1)
+                if (i > 0 )
                 {
                     MapNode mn = MapNodes[RP.SystemName];
-                    if (mn.JBConnection != null && mn.JBConnection == Route[i + 1])
+                    if (mn.JBConnection != null && mn.JBConnection == Route[i - 1])
                     {
                         RP.GateToTake = GateType.Ansibex;
                     }
@@ -272,6 +314,122 @@ namespace SMT.EVEData
 
             return ActualRoute;
         }
+
+
+        public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY)
+        {
+            if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
+            {
+                return null;
+            }
+
+
+            double ExtraJumpFactor = 5.0;
+
+
+            // clear the scores, values and parents from the list
+            foreach (MapNode mapNode in MapNodes.Values)
+            {
+                mapNode.NearestToStart = null;
+                mapNode.MinCostToStart = 0;
+                mapNode.Visited = false;
+
+            }
+
+            // reverse as we want the short jump at the start
+            MapNode Start = MapNodes[To];
+            MapNode End = MapNodes[From];
+
+            List<MapNode> OpenList = new List<MapNode>();
+            List<MapNode> ClosedList = new List<MapNode>();
+
+            MapNode CurrentNode = null;
+
+            // add the start to the open list
+            OpenList.Add(Start);
+
+
+            while (OpenList.Count > 0)
+            {
+                // get the MapNode with the lowest F score
+                double lowest = OpenList.Min(mn => mn.MinCostToStart);
+                CurrentNode = OpenList.First(mn => mn.MinCostToStart == lowest);
+
+                // add the list to the closed list
+                ClosedList.Add(CurrentNode);
+
+                // remove it from the open list
+                OpenList.Remove(CurrentNode);
+
+                // walk the connections
+                foreach (JumpLink connection in CurrentNode.JumpableSystems)
+                {
+                    if(connection.RangeLY > MaxLY)
+                    {
+                        continue;
+                    }
+
+                    MapNode CMN = MapNodes[connection.System];
+
+
+                    if (CMN.Visited)
+                        continue;
+
+                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor < CMN.MinCostToStart)
+                    {
+                        CMN.MinCostToStart = CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor;
+                        CMN.NearestToStart = CurrentNode;
+                        if (!OpenList.Contains(CMN))
+                        {
+                            OpenList.Add(CMN);
+                        }
+                    }
+                }
+
+
+
+                CurrentNode.Visited = true;
+
+            }
+
+
+
+            // build the path
+
+            List<string> Route = new List<string>();
+
+            CurrentNode = End;
+            if (End.NearestToStart != null)
+            {
+                while (CurrentNode != null)
+                {
+                    Route.Add(CurrentNode.Name);
+                    CurrentNode = CurrentNode.NearestToStart;
+                }
+            }
+
+            List<RoutePoint> ActualRoute = new List<RoutePoint>();
+
+            for (int i = 0; i < Route.Count; i++)
+            {
+                RoutePoint RP = new RoutePoint();
+                RP.SystemName = Route[i];
+                RP.GateToTake = GateType.StarGate;
+                RP.LY = 0.0;
+
+                if (i>0)
+                {
+                    RP.GateToTake = GateType.JumpTo;
+                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]) / 9460730472580800.0 ;
+
+                }
+                ActualRoute.Add(RP);
+            }
+
+
+            return ActualRoute;
+        }
+
 
 
 

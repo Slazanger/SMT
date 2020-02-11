@@ -134,6 +134,8 @@ namespace SMT
 
         public MapConfig MapConf { get; set; }
 
+        public List<EVEData.Navigation.RoutePoint> ActiveRoute { get; set; }
+
 
         public UniverseControl()
         {
@@ -292,6 +294,8 @@ namespace SMT
         private VisualHost VHRangeSpheres;
         private VisualHost VHRangeHighlights;
         private VisualHost VHDataSpheres;
+        private VisualHost VHCapRoute;
+
 
         private VisualHost VHCharacters;
         private VisualHost VHZKB;
@@ -329,6 +333,7 @@ namespace SMT
             VHRangeHighlights = new VisualHost();
             VHCharacters = new VisualHost();
             VHZKB = new VisualHost();
+            VHCapRoute = new VisualHost();
 
 
             UniverseMainCanvas.Children.Add(VHRangeSpheres);
@@ -337,6 +342,7 @@ namespace SMT
             UniverseMainCanvas.Children.Add(VHRangeHighlights);
 
             UniverseMainCanvas.Children.Add(VHLinks);
+            UniverseMainCanvas.Children.Add(VHCapRoute); 
             UniverseMainCanvas.Children.Add(VHNames);
             UniverseMainCanvas.Children.Add(VHCharacters);
             UniverseMainCanvas.Children.Add(VHSystems);
@@ -424,15 +430,15 @@ namespace SMT
             VHRangeHighlights.ClearAllChildren();
 
             MenuItem mi = sender as MenuItem;
-            double AU = double.Parse(mi.DataContext as string);
+            double LY = double.Parse(mi.DataContext as string);
 
-            if (AU == 0.0)
+            if (LY == 0.0)
             {
                 return;
             }
 
 
-            double Radius = 9460730472580800.0 * AU * universeScale;
+            double Radius = 9460730472580800.0 * LY * universeScale;
             Brush rangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColourHighlight);
             Brush sysCentreCol = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
             Brush sysRangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
@@ -463,7 +469,7 @@ namespace SMT
                 double Distance = EM.GetRangeBetweenSystems(sys.Name, es.Name);
                 Distance = Distance / 9460730472580800.0;
 
-                double Max = AU;
+                double Max = LY;
 
                 if (Distance < Max && Distance > 0.0)
                 {
@@ -578,6 +584,7 @@ namespace SMT
             SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
             SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
 
+            SolidColorBrush CapRouteColor = new SolidColorBrush(Colors.Yellow);
 
 
             // update the background colours
@@ -718,6 +725,8 @@ namespace SMT
 
                 // update the data
                 VHDataSpheres.ClearAllChildren();
+
+
                 foreach (EVEData.System sys in EM.Systems)
                 {
 
@@ -741,7 +750,7 @@ namespace SMT
                             }
                             else
                             {
-                                DataScale = Math.Abs(sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f ;
+                                DataScale = Math.Abs(sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f;
 
                                 if (sys.NPCKillsDeltaLastHour > 0)
                                 {
@@ -795,6 +804,7 @@ namespace SMT
             {
                 VHCharacters.ClearAllChildren();
                 VHZKB.ClearAllChildren();
+                VHCapRoute.ClearAllChildren();
 
                 float characterNametextXOffset = 3;
                 float characterNametextYOffset = -16;
@@ -822,7 +832,7 @@ namespace SMT
                 foreach (KeyValuePair<string, List<string>> kvp in MapCharacters)
                 {
                     EVEData.System sys = EM.GetEveSystem(kvp.Key);
-                    if(sys == null)
+                    if (sys == null)
                     {
                         continue;
                     }
@@ -912,6 +922,72 @@ namespace SMT
 
                     }
                 }
+
+                if(ActiveRoute != null)
+                {
+                    if (ActiveRoute.Count > 1)
+                    {
+                        for (int i = 1; i < ActiveRoute.Count; i++)
+                        {
+                            EVEData.System sysA = EM.GetEveSystem(ActiveRoute[i - 1].SystemName);
+                            EVEData.System sysB = EM.GetEveSystem(ActiveRoute[i].SystemName);
+
+                            if (sysA != null && sysB != null)
+                            {
+                                double X1 = (sysA.ActualX - universeXMin) * universeScale; ;
+                                double Y1 = (universeDepth - (sysA.ActualZ - universeZMin)) * universeScale;
+
+                                double X2 = (sysB.ActualX - universeXMin) * universeScale;
+                                double Y2 = (universeDepth - (sysB.ActualZ - universeZMin)) * universeScale;
+
+
+                                System.Windows.Media.DrawingVisual capJumpRouteVisual = new System.Windows.Media.DrawingVisual();
+
+                                // Retrieve the DrawingContext in order to create new drawing content.
+                                DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
+
+                                Pen p = new Pen(CapRouteColor, 2);
+                                p.DashStyle = DashStyles.Dot;
+
+                                // Create a rectangle and draw it in the DrawingContext.
+                                drawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
+
+                                drawingContext.Close();
+
+                                VHCapRoute.AddChild(capJumpRouteVisual, "ActiveRoute");
+
+                            }
+                        }
+
+                        for (int i = 0; i < ActiveRoute.Count; i++)
+                        {
+                            EVEData.System sysA = EM.GetEveSystem(ActiveRoute[i].SystemName);
+
+                            if (sysA != null)
+                            {
+                                double X1 = (sysA.ActualX - universeXMin) * universeScale; ;
+                                double Y1 = (universeDepth - (sysA.ActualZ - universeZMin)) * universeScale;
+
+
+                                System.Windows.Media.DrawingVisual capJumpRouteVisual = new System.Windows.Media.DrawingVisual();
+
+                                // Retrieve the DrawingContext in order to create new drawing content.
+                                DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
+
+                                Pen p = new Pen(CapRouteColor, 1);
+
+                                // Create a rectangle and draw it in the DrawingContext.
+                                drawingContext.DrawEllipse(CapRouteColor, p, new Point(X1, Y1), 10, 10);
+
+                                drawingContext.Close();
+
+                                VHCapRoute.AddChild(capJumpRouteVisual, "ActiveRoute");
+
+                            }
+
+                        }
+                    }
+                }
             }
         }
 
@@ -948,7 +1024,7 @@ namespace SMT
         private void ReCreateRegionMarkers(bool ZoomedOut)
         {
 
-            if(RegionZoomed == ZoomedOut)
+            if (RegionZoomed == ZoomedOut)
             {
                 return;
             }
@@ -963,14 +1039,14 @@ namespace SMT
             Typeface tf = new Typeface("Verdana");
 
             Brush rtb = RegionTextColourBrush;
-            if(ZoomedOut)
+            if (ZoomedOut)
             {
                 UniverseMainCanvas.Children.Add(VHRegionNames);
                 rtb = RegionTextZoomedOutColourBrush;
             }
             else
             {
-                UniverseMainCanvas.Children.Insert(0,VHRegionNames);
+                UniverseMainCanvas.Children.Insert(0, VHRegionNames);
             }
 
             foreach (EVEData.MapRegion mr in EM.Regions)
@@ -1024,7 +1100,10 @@ namespace SMT
         {
             EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
 
-            ShowSystem(sd.Name);
+            if (sd != null)
+            {
+                ShowSystem(sd.Name);
+            }
 
         }
 
