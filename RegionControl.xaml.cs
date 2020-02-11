@@ -2869,11 +2869,21 @@ namespace SMT
                     js = EveManager.JumpShip.JF;
                 }
 
-                MapConf.ShowJumpDistance = true;
-                MapConf.CurrentJumpCharacter = "";
-                MapConf.CurrentJumpSystem = eveSys.Name;
-                MapConf.JumpShipType = js;
 
+                if (mi.DataContext as string == "0")
+                {
+                    MapConf.ShowJumpDistance = false;
+                    MapConf.CurrentJumpCharacter = "";
+                    MapConf.CurrentJumpSystem = "";
+
+                }
+                else
+                {
+                    MapConf.ShowJumpDistance = true;
+                    MapConf.CurrentJumpCharacter = "";
+                    MapConf.CurrentJumpSystem = eveSys.Name;
+                    MapConf.JumpShipType = js;
+                }
             }
         }
     }

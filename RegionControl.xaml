@@ -34,6 +34,7 @@
             <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
 
             <MenuItem Header="Show Jump Range">
+                <MenuItem Header="None" DataContext="0" Click="SetJumpRange_Click"/>
                 <MenuItem Header="Super/Titan  (6.0LY)" DataContext="6" Click="SetJumpRange_Click"/>
                 <MenuItem Header="Carriers/Fax (7.0LY)" DataContext="7" Click="SetJumpRange_Click"/>
                 <MenuItem Header="Black Ops    (8.0LY)" DataContext="8" Click="SetJumpRange_Click"/>
