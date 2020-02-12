@@ -2107,20 +2107,27 @@ namespace SMT.EVEData
         /// </summary>
         private async void StartUpdateIncursionsFromESI()
         {
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Incursions.Incursion>> esr = await ESIClient.Incursions.All();
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Incursions.Incursion>>(esr))
+            try
             {
-                foreach (ESI.NET.Models.Incursions.Incursion i in esr.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Incursions.Incursion>> esr = await ESIClient.Incursions.All();
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Incursions.Incursion>>(esr))
                 {
-                    foreach (long s in i.InfestedSystems)
+                    foreach (ESI.NET.Models.Incursions.Incursion i in esr.Data)
                     {
-                        EVEData.System sys = GetEveSystemFromID(s);
-                        if (sys != null)
+                        foreach (long s in i.InfestedSystems)
                         {
-                            sys.ActiveIncursion = true;
+                            EVEData.System sys = GetEveSystemFromID(s);
+                            if (sys != null)
+                            {
+                                sys.ActiveIncursion = true;
+                            }
                         }
                     }
                 }
+            }
+            catch
+            {
+
             }
         }
 
