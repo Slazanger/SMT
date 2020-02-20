@@ -300,10 +300,10 @@ namespace SMT.EVEData
                 RP.GateToTake = GateType.StarGate;
                 RP.LY = 0.0;
 
-                if (i > 0 )
+                if (i < Route.Count - 1)
                 {
                     MapNode mn = MapNodes[RP.SystemName];
-                    if (mn.JBConnection != null && mn.JBConnection == Route[i - 1])
+                    if (mn.JBConnection != null && mn.JBConnection == Route[i +1])
                     {
                         RP.GateToTake = GateType.Ansibex;
                     }
