@@ -822,6 +822,8 @@ namespace SMT.EVEData
 
                         if (rp.GateToTake == Navigation.GateType.Ansibex)
                         {
+                            string GateDesto = string.Empty;
+
                             foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
                             {
                                 if (jb.From == rp.SystemName)
@@ -831,8 +833,11 @@ namespace SMT.EVEData
                                         wayPointSysID = jb.FromID;
                                         isSystemLink = false;
                                     }
+
+                                    GateDesto = jb.To;
                                     break;
                                 }
+                                
 
                                 if (jb.To == rp.SystemName)
                                 {
@@ -841,6 +846,8 @@ namespace SMT.EVEData
                                         wayPointSysID = jb.ToID;
                                         isSystemLink = false;
                                     }
+
+                                    GateDesto = jb.From;
                                     break;
                                 }
 
@@ -848,11 +855,11 @@ namespace SMT.EVEData
 
                             if (isSystemLink)
                             {
-                                WayPointText = "<url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + "</url> (Take Ansiblex) \n";
+                                WayPointText = "Ansiblex: <url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + " » " + GateDesto + " </url>\n";
                             }
                             else
                             {
-                                WayPointText = "<url=showinfo:35841//" + wayPointSysID + ">" + rp.SystemName + "</url> (Take Ansiblex) \n";
+                                WayPointText = "Ansiblex: <url=showinfo:35841//" + wayPointSysID + ">" + rp.SystemName + " » " + GateDesto + "</url>\n";
                             }
                         }
                     }
@@ -862,7 +869,7 @@ namespace SMT.EVEData
                         // regular waypoint
                         wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
 
-                        WayPointText = "<url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + "</url> (WayPoint) \n";
+                        WayPointText = "<url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + "</url>\n";
                     }
 
                     ClipboardText += WayPointText;
