@@ -1191,7 +1191,7 @@ namespace SMT
                     }
 
 
-                    if (Distance < Max && Distance > 0.0)
+                    if (Distance < Max && Distance > 0.0 && system.ActualSystem.TrueSec <= 0.45)
                     {
                         string JD = Distance.ToString("0.00") + " LY";
 

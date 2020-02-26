@@ -471,7 +471,7 @@ namespace SMT
 
                 double Max = LY;
 
-                if (Distance < Max && Distance > 0.0)
+                if (Distance < Max && Distance > 0.0 && es.TrueSec <= 0.45)
                 {
                     double irX = (es.ActualX - universeXMin) * universeScale; ;
                     double irZ = (universeDepth - (es.ActualZ - universeZMin)) * universeScale;
