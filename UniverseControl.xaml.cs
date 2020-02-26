@@ -275,6 +275,9 @@ namespace SMT
 
 
         private List<GateHelper> universeSysLinksCache;
+
+        private List<KeyValuePair<string, double>> activeJumpSpheres; 
+
         private double universeWidth;
         private double universeDepth;
         private double universeXMin;
@@ -313,6 +316,7 @@ namespace SMT
 
 
             universeSysLinksCache = new List<GateHelper>();
+            activeJumpSpheres = new List<KeyValuePair<string, double>>();
 
 
             universeXMin = 0.0;
@@ -434,44 +438,92 @@ namespace SMT
 
             if (LY == 0.0)
             {
+                activeJumpSpheres.Clear();
                 return;
             }
 
 
-            double Radius = 9460730472580800.0 * LY * universeScale;
+            foreach (KeyValuePair<string, double> kvp in activeJumpSpheres)
+            {
+                if (kvp.Key == sys.Name)
+                {
+                    activeJumpSpheres.Remove(kvp);
+                    break;
+                }
+            }
+
+            activeJumpSpheres.Add(new KeyValuePair<string, double>(sys.Name, LY));
+
+
+
+
             Brush rangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColourHighlight);
+            Brush rangeOverlapCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOverlapHighlight);
             Brush sysCentreCol = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
             Brush sysRangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
 
             rangeCol.Freeze();
+            rangeOverlapCol.Freeze();
             sysCentreCol.Freeze();
             sysRangeCol.Freeze();
 
-            double X = (sys.ActualX - universeXMin) * universeScale; ;
-            double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
 
-
-
-            // Create an instance of a DrawingVisual.
             System.Windows.Media.DrawingVisual rangeCircleDV = new System.Windows.Media.DrawingVisual();
             DrawingContext drawingContext = rangeCircleDV.RenderOpen();
 
-            drawingContext.DrawEllipse(rangeCol, new Pen(rangeCol, 1), new Point(X, Z), Radius, Radius);
-            drawingContext.DrawRectangle(sysCentreCol, new Pen(sysCentreCol, 1), new Rect(X - 5, Z - 5, 10, 10));
 
+            foreach (KeyValuePair<string, double> kvp in activeJumpSpheres)
+            {
+
+                EVEData.System ssys = EM.GetEveSystem(kvp.Key);
+
+                double Radius = 9460730472580800.0 * kvp.Value * universeScale;
+
+
+                double X = (ssys.ActualX - universeXMin) * universeScale; ;
+                double Z = (universeDepth - (ssys.ActualZ - universeZMin)) * universeScale;
+
+
+                // Create an instance of a DrawingVisual.
+
+                drawingContext.DrawEllipse(rangeCol, new Pen(rangeCol, 1), new Point(X, Z), Radius, Radius);
+                drawingContext.DrawRectangle(sysCentreCol, new Pen(sysCentreCol, 1), new Rect(X - 5, Z - 5, 10, 10));
+
+
+                
+            }
+            VHRangeSpheres.AddChild(rangeCircleDV);
             drawingContext.Close();
 
-            VHRangeSpheres.AddChild(rangeCircleDV);
+
+
+
 
             foreach (EVEData.System es in EM.Systems)
             {
+                bool inRange = false;
+                bool overlap = false;
 
-                double Distance = EM.GetRangeBetweenSystems(sys.Name, es.Name);
-                Distance = Distance / 9460730472580800.0;
+                foreach (KeyValuePair<string, double> kvp in activeJumpSpheres)
+                {
+                    double Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
+                    Distance = Distance / 9460730472580800.0;
 
-                double Max = LY;
+                    if (Distance < kvp.Value && Distance > 0.0 && es.TrueSec <= 0.45)
+                    {
+                        if(inRange == true)
+                        {
+                            overlap = true;
+                        }
+                        inRange = true;
+                    }
 
-                if (Distance < Max && Distance > 0.0 && es.TrueSec <= 0.45)
+
+                }
+
+
+
+                if (inRange)
                 {
                     double irX = (es.ActualX - universeXMin) * universeScale; ;
                     double irZ = (universeDepth - (es.ActualZ - universeZMin)) * universeScale;
@@ -480,8 +532,15 @@ namespace SMT
 
                     // Retrieve the DrawingContext from the DrawingVisual.
                     DrawingContext dcR = rangeSquareDV.RenderOpen();
+                    if(overlap)
+                    {
+                        dcR.DrawRectangle(sysRangeCol, new Pen(rangeOverlapCol, 1), new Rect(irX - 5, irZ - 5, 10, 10));
+                    }
+                    else
+                    {
+                        dcR.DrawRectangle(sysRangeCol, new Pen(sysRangeCol, 1), new Rect(irX - 5, irZ - 5, 10, 10));
+                    }
 
-                    dcR.DrawRectangle(sysRangeCol, new Pen(sysRangeCol, 1), new Rect(irX - 5, irZ - 5, 10, 10));
                     dcR.Close();
 
                     VHRangeHighlights.AddChild(rangeSquareDV);

@@ -104,6 +104,11 @@ namespace SMT
         [DisplayName("In Range Highlight")]
         public Color JumpRangeInColourHighlight { get; set; }
 
+        [Category("Navigation")]
+        [DisplayName("Jump Overlap Highlight")]
+        public Color JumpRangeOverlapHighlight { get; set; }
+
+
 
         [Category("Incursion")]
         [DisplayName("Active Incursion")]
