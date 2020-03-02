@@ -1650,6 +1650,8 @@ namespace SMT
                 RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
                 eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
 
+                List<string> WarningZoneHighlights = new List<string>();
+
                 foreach (EVEData.LocalCharacter c in lc)
                 {
                     Label charText = new Label();
@@ -1669,6 +1671,40 @@ namespace SMT
                     DynamicMapElements.Add(charText);
 
                     textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
+
+                    if (MapConf.ShowDangerZone && c.WarningSystems != null)
+                    { 
+                        foreach(string s in c.WarningSystems)
+                        {
+                            if(!WarningZoneHighlights.Contains(s))
+                            {
+                                WarningZoneHighlights.Add(s);
+                            }
+                        }
+                    }
+
+                }
+
+                double warningCircleSize = 40;
+                double warningCircleSizeOffset = warningCircleSize / 2;
+
+
+                foreach (string s in WarningZoneHighlights)
+                {
+                    if(Region.IsSystemOnMap(s))
+                    {
+                        EVEData.MapSystem mss = Region.MapSystems[s];
+                        Shape WarninghighlightSystemCircle = new Ellipse() { Height = warningCircleSize, Width = warningCircleSize };
+                        WarninghighlightSystemCircle.Stroke = new SolidColorBrush(Colors.IndianRed);
+                        WarninghighlightSystemCircle.StrokeThickness = 3;
+
+                        Canvas.SetLeft(WarninghighlightSystemCircle, mss.LayoutX - warningCircleSizeOffset);
+                        Canvas.SetTop(WarninghighlightSystemCircle, mss.LayoutY - warningCircleSizeOffset);
+                        Canvas.SetZIndex(WarninghighlightSystemCircle, 24);
+                        MainCanvas.Children.Add(WarninghighlightSystemCircle);
+                        DynamicMapElements.Add(WarninghighlightSystemCircle);
+
+                    }
                 }
             }
         }

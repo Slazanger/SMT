@@ -151,6 +151,7 @@ namespace SMT
             EVEManager = new EVEData.EveManager(SMTVersion);
             EVEData.EveManager.Instance = EVEManager;
 
+
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
             bool initFromScratch = false;
             if (initFromScratch)
@@ -273,9 +274,39 @@ namespace SMT
 
             // SJS Removed Temp            JPShipType.ItemsSource = Enum.GetValues(typeof(EVEData.EveManager.JumpShip)).Cast<EVEData.EveManager.JumpShip>();
 
+            // update
+
+            foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+            {
+                lc.WarningSystemRange = MapConf.WarningRange;
+                lc.Location = "";
+            }
+
+
 
             MapControlsPropertyGrid.SelectedObject = MapConf;
 
+
+            RawIntelBox.FontSize = MapConf.IntelTextSize;
+
+            ResetIntelSize();
+
+
+
+        }
+
+        private void ResetIntelSize()
+        {
+
+            var RawIntelTextBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
+            RawIntelTextBlockFactory.SetValue(TextBlock.TextProperty, new Binding("."));
+            RawIntelTextBlockFactory.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+            RawIntelTextBlockFactory.SetValue(TextBlock.FontSizeProperty, MapConf.IntelTextSize);
+            RawIntelTextBlockFactory.SetValue(TextBlock.ForegroundProperty, Brushes.Black);
+            var RawIntelTextTemplate = new DataTemplate();
+            RawIntelTextTemplate.VisualTree = RawIntelTextBlockFactory;
+
+            RawIntelBox.ItemTemplate = RawIntelTextTemplate;
 
         }
 
@@ -329,7 +360,7 @@ namespace SMT
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
@@ -396,6 +427,18 @@ namespace SMT
                 }
             }
 
+
+            if (e.PropertyName == "WarningRange")
+            {
+                foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                {
+                    lc.WarningSystemRange = MapConf.WarningRange;
+                    lc.warningSystemsNeedsUpdate = true;
+                }
+            }
+
+
+
             if (e.PropertyName == "ShowZKillData")
             {
                 EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
@@ -431,7 +474,10 @@ namespace SMT
             }
 
 
-
+            if(e.PropertyName == "IntelTextSize")
+            {
+                ResetIntelSize();
+            }
 
 
 
@@ -538,15 +584,49 @@ namespace SMT
         }
 
 
-        private void OnIntelAdded()
+        private void OnIntelAdded(List<string> intelsystems )
         {
+            bool PlaySound = false;
+
             if (MapConf.PlayIntelSound)
+            {
+                if(MapConf.PlaySoundOnlyInDangerZone)
+                {
+                    if(MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
+                    {
+                        PlaySound = true;
+                    }
+
+                    foreach(string s in intelsystems)
+                    {
+                        foreach( EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                        {
+                            foreach( string ls in lc.WarningSystems)
+                            {
+                                if(ls == s)
+                                {
+                                    PlaySound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    PlaySound = true;
+                }
+            }
+            
+            if(PlaySound)
             {
                 Uri uri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
                 var player = new MediaPlayer();
                 player.Open(uri);
                 player.Play();
             }
+
+
         }
 
         private void refreshData_Click(object sender, RoutedEventArgs e)
@@ -776,6 +856,12 @@ namespace SMT
                     RegionShape.Fill = CaldariBg;
                 }
 
+                if(mr.HasHighSecSystems)
+                {
+                    RegionShape.StrokeThickness = 2.0;
+                }
+
+
 
                 if (RegionRC.ActiveCharacter != null && RegionRC.ActiveCharacter.ESILinked && MapConf.ShowRegionStandings)
                 {
@@ -842,6 +928,11 @@ namespace SMT
                     else
                     {
                         RegionShape.Fill = new SolidColorBrush(Colors.Gray);
+                    }
+
+                    if(mr.HasHighSecSystems)
+                    {
+                        RegionShape.Fill = new SolidColorBrush(Colors.LightGray);
                     }
 
 
@@ -995,7 +1086,7 @@ namespace SMT
                     regionLink.Y2 = or.UniverseViewY;
 
                     regionLink.Stroke = SysOutlineBrush;
-                    regionLink.StrokeThickness = 1.2;
+                    regionLink.StrokeThickness = 1;
                     regionLink.Visibility = Visibility.Visible;
 
                     Canvas.SetZIndex(regionLink, 21);
@@ -1456,6 +1547,15 @@ namespace SMT
                 catch { }
 
             }
+        }
+
+        private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                EVEManager.IntelDataList.Clear();
+
+            }), DispatcherPriority.ApplicationIdle);
         }
 
         /*

@@ -18,16 +18,20 @@ namespace SMT.EVEData
         {
             MapSystems = new SerializableDictionary<string, MapSystem>();
             RegionLinks = new List<string>();
-        }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MapRegion" /> class.
-        /// </summary>
-        /// <param name="name">Name of the Region</param>
-        /// <param name="faction">Faction (if any) of the region</param>
-        /// <param name="universeViewX">X Location to render this on the universe map</param>
-        /// <param name="universeViewY">Y Location to render this on the universe map</param>
-        public MapRegion(string name, string id, string faction, double universeViewX, double universeViewY)
+
+
+
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MapRegion" /> class.
+    /// </summary>
+    /// <param name="name">Name of the Region</param>
+    /// <param name="faction">Faction (if any) of the region</param>
+    /// <param name="universeViewX">X Location to render this on the universe map</param>
+    /// <param name="universeViewY">Y Location to render this on the universe map</param>
+    public MapRegion(string name, string id, string faction, double universeViewX, double universeViewY)
         {
             Name = name;
             DotLanRef = name.Replace(" ", "_");
@@ -39,6 +43,11 @@ namespace SMT.EVEData
 
             MapSystems = new SerializableDictionary<string, MapSystem>();
             RegionLinks = new List<string>();
+
+            HasHighSecSystems = false;
+            HasLowSecSystems = false;
+            HasNullSecSystems = false;
+
         }
 
         /// <summary>
@@ -97,6 +106,10 @@ namespace SMT.EVEData
         /// Gets or sets the list of links to other Regions
         /// </summary>
         public List<string> RegionLinks { get; set; }
+
+        public bool HasHighSecSystems { get; set; }
+        public bool HasLowSecSystems { get; set; }
+        public bool HasNullSecSystems { get; set; }
 
         /// <summary>
         /// Is the System on this region map : note as we're using the dotlan layout we have out of region systems on the map for navigability reasons

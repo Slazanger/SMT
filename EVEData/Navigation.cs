@@ -167,6 +167,40 @@ namespace SMT.EVEData
 
         }
 
+        public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
+        {
+            if (X != 0)
+            {
+                if(!sysList.Contains(start))
+                {
+                    sysList.Add(start);
+                }
+
+
+                MapNode mn = MapNodes[start];
+
+                foreach (string mm in mn.Connections)
+                {
+                    if (!sysList.Contains(mm))
+                    {
+                        sysList.Add(mm);
+                    }
+
+
+                    List<string> connected = GetSystemsXJumpsFrom(sysList, mm, X - 1);
+                    foreach(string s in connected)
+                    {
+                        if(!sysList.Contains(s))
+                        {
+                            sysList.Add(s);
+                        }
+                    }
+                    
+                }
+            }
+            return sysList;
+        }
+
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, RoutingMode routingMode)
         {
 

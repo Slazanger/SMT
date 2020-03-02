@@ -199,7 +199,6 @@ Amdonen;Gebem;High;Kor-Azor
 Ameinaka;Ortner;High;Heimatar
 Ami;Jatari;Low;Kor-Azor
 Amoen;Mallugier;Low;Placid
-Amphar;Mekashtad;High;Derelik
 Ana;Maseend;High;Domain
 Anckee;Braille;Low;Solitude
 Andole;Eustron;High;Essence
@@ -227,7 +226,6 @@ Arera;Mulata;High;Domain
 Arifsdald;Fribrodi;Low;Metropolis
 Arkoz;Nasorin;High;Tash-Murkon
 Armala;Yestadan;High;Domain
-Arnola;Joas;High;Derelik
 Arnon;Peccanouette;High;Essence
 Arnstur;Aldodan;Low;Metropolis
 Arraron;Aideron;High;Verge Vendor
@@ -267,7 +265,6 @@ Bahromab;Yekti;High;Domain
 Balle;Disier;High;Sinq Laison
 Bamiette;Lolbrerie;High;Sinq Laison
 Bantish;Makh;Low;Genesis
-Bar;Oraron;High;Derelik
 Baratar;Akar;Low;Khanid
 Barira;Maseend;High;Domain
 Basan;Fua;Low;Domain
@@ -308,7 +305,6 @@ C6C-K9;OC-TTA;Null;The Spire
 C8VC-S;03C-SU;Null;Tribute
 Cabeki;Budar;Low;Khanid
 Cailanar;Yestadan;High;Domain
-Camal;Ananah;Low;Derelik
 Central Point;EVE;Low;Genesis
 CHA2-Q;Satyr;Null;Fountain
 Chamja;Mih;Low;Genesis
@@ -448,7 +444,6 @@ Frarn;Odengsolf;High;Heimatar
 FRTC-5;IJE6-J;Null;Immensea
 FS-RFL;BUG6-X;Null;Vale of the Silent
 FSW-3C;4BZ-R3;Null;Providence
-Futzchag;Mamouna;Low;Derelik
 FV-SE8;Y-2D6Q;Null;Stain
 FV-YEA;QJ2-0M;Null;Cobalt Edge
 FV1-RQ;I-WRVM;Null;Cobalt Edge
@@ -503,7 +498,6 @@ H90-C9;U7-GIV;Null;Omist
 Habu;Charak;High;Genesis
 Hadji;Mih;High;Genesis
 Hadonoo;Avib;High;Domain
-Hahyil;Aguh;Low;Derelik
 Haimeh;Mayonhen;High;Aridia
 Haine;Arand;Low;Essence
 Hakeri;Panorad;High;Metropolis
@@ -517,7 +511,6 @@ Haras;Tandoiras;Low;The Bleak Lands
 Harva;Kekah;High;Domain
 Hasama;Ieyama;Low;The Citadel
 Hasateem;Bedaleya;Low;Derelik
-Hasiari;Hevaka;High;Derelik
 Hath;Peges;High;Tash-Murkon
 Hati;Daredan;High;Devoid
 HB-1NJ;L-TEVM;Null;Great Wildlands
@@ -579,7 +572,6 @@ Illamur;Besateoden;Low;Molden Heath
 Immuri;Ishaga;Low;Black Rise
 Innia;Inolari;Low;Black Rise
 IO-R2S;3RU-10;Null;Oasa
-Iosantin;Mekashtad;High;Derelik
 IP6V-X;O5K-Y6;Null;Delve
 Ipref;Nohshayess;High;Khanid
 IPX-H5;9D1V-O;Null;Esoteria
@@ -615,11 +607,8 @@ JA-O6J;A-JI5E;Null;Catch
 Jachanu;Nohshayess;High;Khanid
 Jakanerva;Okomon;High;The Forge
 Jambu;Nakid;High;Domain
-Jarizza;Oraron;High;Derelik
 Jarzalad;Somi;High;Tash-Murkon
 JAUD-V;8T-OLH;Null;Esoteria
-Jaymass;Ananah;Low;Derelik
-Jayneleb;Mamouna;Low;Derelik
 JC-YX8;U8-CWA;Null;Pure Blind
 Jennim;Moghiz;High;Kador
 JEQG-7;GU-JZ1;Null;Wicked Creek
@@ -710,7 +699,6 @@ Lamadent;Aeman;Low;Sinq Laison
 Lansez;Youledian;High;Khanid
 Lari;Tsemshatel;High;Tash-Murkon
 Larkugei;Erada;High;Heimatar
-Lashesih;San Matar;High;Derelik
 Lasleinur;Aldodan;Low;Metropolis
 LBC-AW;ENP-SH;Null;Scalding Pass
 LD-2VL;D9DM-O;Null;Paragon Soul
@@ -721,9 +709,7 @@ Lermireve;Nadire;Low;Sinq Laison
 Leva;Gebem;High;Kor-Azor
 LGK-VP;5VN-B7;Null;Stain
 LGL-SD;WF-OP4;Null;Stain
-Lilmad;Mamouna;Low;Derelik
 Lirerim;Rollera;High;Metropolis
-Lisudeh;Kisana;High;Devoid
 LMM7-L;BVA-YH;Null;Cache
 Lossa;Damadil;High;Tash-Murkon
 Lower Debyl;Abthi;High;Devoid
@@ -773,7 +759,6 @@ Moclinamaud;Pegeler;Low;Placid
 MOCW-2;0-YMZM;Null;Insmother
 Mod;Pezarba;Low;Kador
 Moh;Sazdih;High;Derelik
-Mohas;Hevaka;High;Derelik
 Mora;Gebem;High;Kor-Azor
 Mormoen;Osnins;High;Everyshore
 Moro;Sib;High;Khanid
@@ -825,10 +810,8 @@ NG-M8K;MRC-29;Null;Cache
 Niarja;Yekti;High;Domain
 Nibainkier;Nimedaz;High;Kor-Azor
 Nidebora;Enka;High;Devoid
-Nieril;Subi;Low;Derelik
 Nifshed;Sosarir;High;Domain
 Nimambal;Hevaka;High;Derelik
-Nirbhi;San Matar;High;Derelik
 Nishah;Gebem;High;Kor-Azor
 Nisuwa;Okakuola;Low;Black Rise
 NIZJ-0;7ZRW-G;Null;Esoteria
@@ -917,7 +900,6 @@ Pimebeka;Arvachah;High;Tash-Murkon
 Pimsu;Somi;High;Tash-Murkon
 PNS7-J;M-J57M;Null;Tenal
 PO-3QW;C45-9Y;Null;Feythabolis
-Podion;Mamouna;Low;Derelik
 Poitot;Z-6NQ6;Null;Syndicate
 POQP-K;2747-4;Null;Malpais
 PQRE-W;GJH-1C;Null;Detorid
@@ -954,7 +936,6 @@ R1O-GN;P-B2NE;Null;The Kalevala Expanse
 R3W-XU;Wyvern;Null;Fountain
 Raa;Semou;Low;Devoid
 Rahabeda;Arniri;High;Khanid
-Rahadalon;Kabo;Low;Devoid
 Raihbaka;Inolari;Low;Black Rise
 Rakapas;Okakuola;Low;Black Rise
 Raneilles;Obray;High;Verge Vendor
@@ -1006,7 +987,6 @@ Salashayama;Mekashtad;High;Derelik
 Saminer;Anidaza;Low;Tash-Murkon
 Sankkasen;Uusasai;High;The Citadel
 Santola;Uusasai;High;The Citadel
-Sari;Sazdih;Low;Derelik
 Sarum Prime;Maddam;High;Domain
 Sasiekko;Vaarma;High;The Bleak Lands
 Sassecho;Budar;Low;Khanid
@@ -1029,11 +1009,9 @@ Shaha;Finena;High;Kor-Azor
 Shala;Mossas;High;Derelik
 Shamahi;Anares;Low;Derelik
 Sharhelund;Zemont;High;Domain
-Sharir;Mekashtad;Low;Derelik
 Sharji;Yekti;High;Domain
 Sharuveil;Disier;Low;Sinq Laison
 Shastal;Abthi;High;Devoid
-Shedoo;Subi;High;Derelik
 Shemah;Qermi;High;Kador
 Shenda;Tid;High;Aridia
 Shenela;Anares;High;Derelik
@@ -1080,7 +1058,6 @@ Tahli;Reya;High;Genesis
 TAL1-3;BXT7-V;Null;Perrigen Falls
 Talidal;Sib;High;Khanid
 Tama;Isoma;Low;The Citadel
-Tanoo;San Matar;High;Derelik
 Tartoken;Umamon;Low;Lonetrek
 Taru;Nasorin;High;Tash-Murkon
 Tash-Murkon Prime;Arvachah;High;Tash-Murkon
@@ -1094,7 +1071,6 @@ TET3-B;V-LQBF;Null;Great Wildlands
 Tew;Subhatoub;High;Tash-Murkon
 TFPT-U;J33-JR;Null;Outer Passage
 Thakala;Abthi;Low;Devoid
-Thiarer;Mekashtad;High;Derelik
 Tierijev;Aideron;High;Verge Vendor
 Tirbam;Sukanan;Low;Tash-Murkon
 TJM-JJ;F-ZNNG;Null;Geminate
@@ -1226,6 +1202,7 @@ YQM-P1;J33-JR;Null;Outer Passage
 YRNJ-8;Taurus;Null;Fountain
 YRV-MZ;FY6-NK;Null;Esoteria
 Yuhelia;Maseend;High;Domain
+Yulai;Sanctum;High;Genesis
 YUY-LM;K-DLD2;Null;Great Wildlands
 Yuzier;San Matar;High;Derelik
 Yvelet;Goins;High;Solitude
@@ -1243,14 +1220,12 @@ Z3V-1W;XPJ1-6;Null;Delve
 Z9PP-H;Centaur;Null;Fountain
 ZA0L-U;F-V9QW;Null;Vale of the Silent
 Zahefeus;Homroon;Low;Khanid
-Zaid;San Matar;High;Derelik
 Zaimeth;Zemont;High;Domain
 Zanka;Mofa;Low;Domain
 Zatamaka;Comadu;Low;Kor-Azor
 Zatsyaki;Norgoh;High;Domain
 ZD1-Z2;CL-QB2;Null;Tenerifis
 Zemalu;Mossas;High;Derelik
-Zet;Mekashtad;High;Derelik
 ZID-LE;3-PC31;Null;Feythabolis
 Ziona;Mobit;High;Domain
 Ziriert;Jakemhih;Low;Domain
@@ -1266,3 +1241,5 @@ ZOYW-O;S-B1E4;Null;Deklein
 ZQ-Z3Y;T-HHHT;Null;Catch
 ZXB-VC;NJU-QV;Null;Delve
 ZZK-VF;2FYX-H;Null;Outer Passage
+4LJ6-Q;N-APJ8;Null;Etherium Reach
+MJYW-3;Prelle;Null;Cloud Ring

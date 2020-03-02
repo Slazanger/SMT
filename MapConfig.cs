@@ -23,6 +23,7 @@ namespace SMT
             }
         }
 
+        private int m_WarningRange;
         private int m_MaxIntelSeconds;
         private string m_DefaultRegion;
 
@@ -150,10 +151,53 @@ namespace SMT
         }
 
 
+        private double m_IntelTextSize = 10;
+        [Category("Intel")]
+        [DisplayName("Text Size")]
+        public double IntelTextSize 
+        { 
+            get
+            {
+                return m_IntelTextSize;
+            }
+            set
+            {
+                if(value > 20)
+                {
+                    m_IntelTextSize = 20;
+                }
+                else
+                {
+                    m_IntelTextSize = value;
+                }
+
+                if(value < 8)
+                {
+                    m_IntelTextSize = 8;
+                }
+                else
+                {
+                    m_IntelTextSize = value;
+                }
+
+                OnPropertyChanged("IntelTextSize");
+
+            }
+        }
+
 
         [Category("Intel")]
         [DisplayName("Warning Sound")]
         public bool PlayIntelSound { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Warning On Unknown")]
+        public bool PlayIntelSoundOnUnknown { get; set; }
+
+
+        [Category("Intel")]
+        [DisplayName("Limit Sound to Dangerzone")]
+        public bool PlaySoundOnlyInDangerZone{ get; set; }
 
         [Category("Intel")]
         [DisplayName("Max Intel Time (s)")]
@@ -176,6 +220,57 @@ namespace SMT
                 }
             }
         }
+
+        [Category("Intel")]
+        [DisplayName("Warning Range")]
+        public int WarningRange
+        {
+            get
+            {
+                return m_WarningRange;
+            }
+            set
+            {
+                // clamp to 1 miniumum
+                if (value > 0)
+                {
+                    m_WarningRange = value;
+                }
+                else
+                {
+                    m_WarningRange = 1;
+                }
+
+                if( value < 10 )
+                {
+                    m_WarningRange = value;
+                }
+                else
+                {
+                    m_WarningRange = 9;
+                }
+
+                OnPropertyChanged("WarningRange");
+            }
+        }
+
+        bool m_ShowDangerZone = false;
+        [Category("Intel")]
+        [DisplayName("Show DangerZone")]
+        public bool ShowDangerZone
+        {
+            get
+            {
+                return m_ShowDangerZone;
+            }
+            set
+            {
+                m_ShowDangerZone = value;
+                OnPropertyChanged("ShowDangerZone");
+            }
+        }
+
+
 
         private bool m_AlwaysOnTop;
         [Category("General")]
@@ -593,6 +688,8 @@ namespace SMT
 
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
+
+            WarningRange = 5;
 
 
         }

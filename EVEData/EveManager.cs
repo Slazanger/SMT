@@ -113,7 +113,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Intel Added Event Handler
         /// </summary>
-        public delegate void IntelAddedEventHandler();
+        public delegate void IntelAddedEventHandler(List<string> systems);
 
         /// <summary>
         /// Intel Added Event
@@ -893,6 +893,26 @@ namespace SMT.EVEData
                 foreach (MapSystem ms in rr.MapSystems.Values.ToList())
                 {
                     ms.ActualSystem = GetEveSystem(ms.Name);
+
+                    if(!ms.OutOfRegion)
+                    {
+                        if(ms.ActualSystem.TrueSec >= 0.45)
+                        {
+                            rr.HasHighSecSystems = true;
+                        }
+
+                        if (ms.ActualSystem.TrueSec > 0.0 && ms.ActualSystem.TrueSec < 0.45)
+                        {
+                            rr.HasLowSecSystems = true;
+                        }
+
+                        if (ms.ActualSystem.TrueSec <= 0.0 )
+                        {
+                            rr.HasNullSecSystems = true;
+                        }
+
+
+                    }
                 }
             }
 
@@ -1754,7 +1774,7 @@ namespace SMT.EVEData
 
                                     if (IntelAddedEvent != null)
                                     {
-                                        IntelAddedEvent();
+                                        IntelAddedEvent(id.Systems);
                                     }
                                 }
                                 else

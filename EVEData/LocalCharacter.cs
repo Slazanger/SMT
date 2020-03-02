@@ -39,6 +39,8 @@ namespace SMT.EVEData
         /// </summary>
         private bool routeNeedsUpdate = false;
 
+        public bool warningSystemsNeedsUpdate = false;
+
 
         private bool esiRouteNeedsUpdate = false;
 
@@ -66,6 +68,7 @@ namespace SMT.EVEData
 
                 location = value;
                 routeNeedsUpdate = true;
+                warningSystemsNeedsUpdate = true;
             }
         }
 
@@ -115,6 +118,11 @@ namespace SMT.EVEData
 
 
         public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
+
+
+        public int WarningSystemRange { get; set; }
+
+        public List<string> WarningSystems { get; set; } 
 
 
         /// <summary>
@@ -279,6 +287,12 @@ namespace SMT.EVEData
                 routeNeedsUpdate = false;
                 UpdateActiveRoute();
             }
+
+            if(warningSystemsNeedsUpdate)
+            {   
+                warningSystemsNeedsUpdate = false;
+                UpdateWarningSystems();
+            }
         }
 
         /// <summary>
@@ -421,9 +435,18 @@ namespace SMT.EVEData
             }
         }
 
-        /// <summary>
-        /// Refresh the ESI access token
-        /// </summary>
+        private void UpdateWarningSystems()
+        {
+            if(!string.IsNullOrEmpty(Location) && WarningSystemRange > 0)
+            {
+                WarningSystems = Navigation.GetSystemsXJumpsFrom(new List<string>(), Location, WarningSystemRange);
+            }
+        }
+
+
+            /// <summary>
+            /// Refresh the ESI access token
+            /// </summary>
         private async Task RefreshAccessToken()
         {
             if (String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
