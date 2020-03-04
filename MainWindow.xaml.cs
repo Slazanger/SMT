@@ -25,7 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
-        public string SMTVersion = "SMT_074";
+        public string SMTVersion = "SMT_075";
 
 
         /// <summary>
@@ -601,12 +601,15 @@ namespace SMT
                     {
                         foreach( EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                         {
-                            foreach( string ls in lc.WarningSystems)
+                            if(lc.WarningSystems != null)
                             {
-                                if(ls == s)
+                                foreach (string ls in lc.WarningSystems)
                                 {
-                                    PlaySound = true;
-                                    break;
+                                    if (ls == s)
+                                    {
+                                        PlaySound = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
