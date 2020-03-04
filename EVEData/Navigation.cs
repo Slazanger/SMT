@@ -169,6 +169,11 @@ namespace SMT.EVEData
 
         public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
         {
+            if(MapNodes == null)
+            {
+                return sysList;
+            }
+
             if (X != 0)
             {
                 if(!sysList.Contains(start))

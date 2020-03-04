@@ -23,7 +23,7 @@ namespace SMT
             }
         }
 
-        private int m_WarningRange;
+        private int m_WarningRange = 5;
         private int m_MaxIntelSeconds;
         private string m_DefaultRegion;
 
