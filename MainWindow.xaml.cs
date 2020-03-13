@@ -25,7 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
-        public string SMTVersion = "SMT_075";
+        public string SMTVersion = "SMT_076";
 
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Experimental Multi-Circle Val Edition : " + SMTVersion + ")";
+            Title = "SMT (Return of the JTACs : " + SMTVersion + ")";
 
             CheckGitHubVersion();
 

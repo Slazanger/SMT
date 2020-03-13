@@ -746,6 +746,7 @@ namespace SMT.EVEData
                     double y = Convert.ToDouble(bits[5]);
                     double z = Convert.ToDouble(bits[6]);
                     double security = Convert.ToDouble(bits[21]);
+                    double radius = Convert.ToDouble(bits[23]);
 
                     System s = GetEveSystem(systemName);
                     if (s != null)
@@ -755,6 +756,7 @@ namespace SMT.EVEData
                         s.ActualZ = z;
                         s.TrueSec = security;
                         s.ConstellationID = constID;
+                        s.RadiusAU = radius / 149597870700;
                     }
                 }
             }

@@ -436,7 +436,7 @@ namespace SMT
             MenuItem mi = sender as MenuItem;
             double LY = double.Parse(mi.DataContext as string);
 
-            if (LY == 0.0)
+            if (LY == -1.0)
             {
                 activeJumpSpheres.Clear();
                 return;
@@ -452,7 +452,11 @@ namespace SMT
                 }
             }
 
-            activeJumpSpheres.Add(new KeyValuePair<string, double>(sys.Name, LY));
+            if(LY>0)
+            {
+                activeJumpSpheres.Add(new KeyValuePair<string, double>(sys.Name, LY));
+            }
+
 
 
 
@@ -574,6 +578,117 @@ namespace SMT
 
             cm.DataContext = sys;
             cm.IsOpen = true;
+
+
+            // update SOV
+            MenuItem SovHeader = cm.Items[3] as MenuItem;
+            SovHeader.Items.Clear();
+            SovHeader.IsEnabled = false;
+
+
+            if (sys.SOVAllianceIHUB != 0 )
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "IHUB: " + EM.GetAllianceTicker(sys.SOVAllianceIHUB);
+                mi.DataContext = sys.SOVAllianceIHUB;
+                mi.Click += VHSystems_SOV_Clicked;
+                SovHeader.IsEnabled = true;
+                SovHeader.Items.Add(mi);
+            }
+
+            if (sys.SOVAllianceTCU != 0)
+            {
+                MenuItem mi = new MenuItem();
+                mi.DataContext = sys.SOVAllianceTCU;
+                mi.Header = "TCU : " + EM.GetAllianceTicker(sys.SOVAllianceTCU);
+                mi.Click += VHSystems_SOV_Clicked;
+                SovHeader.IsEnabled = true;
+                SovHeader.Items.Add(mi);
+            }
+
+            // update stats
+            MenuItem StatsHeader = cm.Items[4] as MenuItem;
+            StatsHeader.Items.Clear();
+            StatsHeader.IsEnabled = false;
+
+            if (sys.HasNPCStation)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "NPC Station(s)";
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+            if (sys.HasIceBelt)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Ice Belts";
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+            if (sys.HasJoveObservatory)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Jove Observatory";
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+            if(sys.JumpsLastHour > 0)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Jumps : " + sys.JumpsLastHour;
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+            if (sys.ShipKillsLastHour > 0)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Ship Kills : " + sys.ShipKillsLastHour;
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+            if (sys.PodKillsLastHour > 0)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Pod Kills : " + sys.PodKillsLastHour;
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+
+            if (sys.NPCKillsLastHour > 0)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "NPC Kills : " + sys.NPCKillsLastHour + " (Delta: " + sys.NPCKillsDeltaLastHour + ")";
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+            if(sys.RadiusAU > 0)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Radius : " + sys.RadiusAU.ToString("#.##") + " (AU)";
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+
+            }
+
+        }
+
+        private void VHSystems_SOV_Clicked(object sender, RoutedEventArgs e)
+        {
+            MenuItem mi = sender as MenuItem;
+            long ID = (long)mi.DataContext;
+
+            if(ID != 0)
+            {
+                string uRL = string.Format("https://evewho.com/alliance/{0}", ID);
+                System.Diagnostics.Process.Start(uRL);
+            }
         }
 
         private void UniverseControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -833,7 +948,7 @@ namespace SMT
 
                     if (ShowShipKills)
                     {
-                        DataScale = sys.ShipKillsLastHour * ESIOverlayScale * 8f;
+                        DataScale = sys.ShipKillsLastHour * ESIOverlayScale * 1f;
                     }
 
                     if (ShowShipJumps)

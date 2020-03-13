@@ -106,6 +106,8 @@ namespace SMT.EVEData
 
         public bool HasJoveObservatory { get; set; }
 
+        public double RadiusAU { get; set; }
+
 
         [XmlIgnoreAttribute]
         public bool HasJumpBeacon { get; set; }
