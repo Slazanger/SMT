@@ -58,6 +58,7 @@ namespace SMT
 
                 HitTestEnabled = false;
 
+                UseLayoutRounding = true;
 
                 MouseRightButtonUp += VisualHost_MouseButtonUp;
             }
@@ -492,7 +493,7 @@ namespace SMT
 
                 drawingContext.DrawEllipse(rangeCol, new Pen(rangeCol, 1), new Point(X, Z), Radius, Radius);
                 drawingContext.DrawRectangle(sysCentreCol, new Pen(sysCentreCol, 1), new Rect(X - 5, Z - 5, 10, 10));
-
+                
 
                 
             }
@@ -766,6 +767,8 @@ namespace SMT
             UniverseMainCanvas.Background = BackgroundColourBrush;
 
 
+            CacheMode cm = new BitmapCache(5.0);
+
 
 
             System.Windows.FontStyle fontStyle = FontStyles.Normal;
@@ -782,34 +785,53 @@ namespace SMT
 
                 ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
 
+                Pen GatePen = new Pen(GateColourBrush, 0.6);
+                Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
+
+                System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
+                gatesDrawingVisual.CacheMode = cm;
+                DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
+
 
                 foreach (GateHelper gh in universeSysLinksCache)
                 {
+
+
                     double X1 = (gh.from.ActualX - universeXMin) * universeScale;
                     double Y1 = (universeDepth - (gh.from.ActualZ - universeZMin)) * universeScale;
 
                     double X2 = (gh.to.ActualX - universeXMin) * universeScale;
                     double Y2 = (universeDepth - (gh.to.ActualZ - universeZMin)) * universeScale;
-                    Brush Col = GateColourBrush;
+                    Pen p = GatePen;
 
                     if (gh.from.Region != gh.to.Region || gh.from.ConstellationID != gh.to.ConstellationID)
                     {
-                        Col = ConstellationColourBrush;
+                        p = ConstGatePen;
                     }
+                    gatesDrawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
 
-                    System.Windows.Media.DrawingVisual sysLinkVisual = new System.Windows.Media.DrawingVisual();
-                    DrawingContext drawingContext = sysLinkVisual.RenderOpen();
-                    drawingContext.DrawLine(new Pen(Col, 0.6), new Point(X1, Y1), new Point(X2, Y2));
-                    drawingContext.Close();
 
-                    VHLinks.AddChild(sysLinkVisual, "link");
                 }
+
+                gatesDrawingContext.Close();
+                VHLinks.AddChild(gatesDrawingVisual, "link");
+
 
                 if (ShowJumpBridges)
                 {
+
+                    Pen p = new Pen(JumpBridgeColourBrush, 0.6);
+                    p.DashStyle = DashStyles.Dot;
+
+                    System.Windows.Media.DrawingVisual jbDrawingVisual = new System.Windows.Media.DrawingVisual();
+                    jbDrawingVisual.CacheMode = cm;
+                    DrawingContext drawingContext;
+                    drawingContext = jbDrawingVisual.RenderOpen();
+
+
                     foreach (EVEData.JumpBridge jb in EM.JumpBridges)
                     {
-                        Line jbLink = new Line();
+
 
                         EVEData.System from = EM.GetEveSystem(jb.From);
                         EVEData.System to = EM.GetEveSystem(jb.To);
@@ -822,28 +844,32 @@ namespace SMT
                         double Y2 = (universeDepth - (to.ActualZ - universeZMin)) * universeScale;
 
 
-                        System.Windows.Media.DrawingVisual sysLinkVisual = new System.Windows.Media.DrawingVisual();
 
-                        // Retrieve the DrawingContext in order to create new drawing content.
-                        DrawingContext drawingContext = sysLinkVisual.RenderOpen();
-
-                        Pen p = new Pen(JumpBridgeColourBrush, 0.6);
-                        p.DashStyle = DashStyles.Dot;
 
                         // Create a rectangle and draw it in the DrawingContext.
                         drawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
 
-                        drawingContext.Close();
 
-                        VHLinks.AddChild(sysLinkVisual, "JB");
                     }
+
+                    drawingContext.Close();
+                    VHLinks.AddChild(jbDrawingVisual, "JB");
+
+
+
                 }
 
 
+                // Create an instance of a DrawingVisual.
 
+                CultureInfo ci = CultureInfo.GetCultureInfo("en-us");
 
                 foreach (EVEData.System sys in EM.Systems)
                 {
+                    System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
+                    SystemTextVisual.CacheMode = cm;
+                    DrawingContext systemTextDrawingContext = SystemTextVisual.RenderOpen();
+
 
                     double X = (sys.ActualX - universeXMin) * universeScale;
 
@@ -852,6 +878,7 @@ namespace SMT
 
 
                     System.Windows.Media.DrawingVisual systemShapeVisual = new System.Windows.Media.DrawingVisual();
+                    systemShapeVisual.CacheMode = cm;
 
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = systemShapeVisual.RenderOpen();
@@ -864,31 +891,23 @@ namespace SMT
                     drawingContext.Close();
                     VHSystems.AddChild(systemShapeVisual, sys);
 
-                    // add text
 
-
-                    // Create an instance of a DrawingVisual.
-                    System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
-
-                    // Retrieve the DrawingContext from the DrawingVisual.
-                    drawingContext = SystemTextVisual.RenderOpen();
 
 #pragma warning disable CS0618 
                     // Draw a formatted text string into the DrawingContext.
-                    drawingContext.DrawText(
+                    systemTextDrawingContext.DrawText(
                         new FormattedText(sys.Name,
-                            CultureInfo.GetCultureInfo("en-us"),
+                            ci,
                             FlowDirection.LeftToRight,
                             tf,
                             SystemTextSize, SystemTextColourBrush),
                         new Point(X + textXOffset, Z + textYOffset));
-#pragma warning restore CS0618 
+#pragma warning restore CS0618
 
                     // Close the DrawingContext to persist changes to the DrawingVisual.
-                    drawingContext.Close();
 
-                    VHNames.AddChild(SystemTextVisual, sys.Name);
-
+                    systemTextDrawingContext.Close();
+                    VHNames.AddChild(SystemTextVisual, null);
                 }
             }
 
@@ -901,8 +920,16 @@ namespace SMT
                 VHDataSpheres.ClearAllChildren();
 
 
+                Pen dataPen = new Pen(dataBrush, 1);
+
                 foreach (EVEData.System sys in EM.Systems)
                 {
+                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
+
+                    // Retrieve the DrawingContext in order to create new drawing content.
+                    DrawingContext drawingContext = dataDV.RenderOpen();
+
+
 
                     double X = (sys.ActualX - universeXMin) * universeScale;
 
@@ -958,18 +985,14 @@ namespace SMT
 
                     if (DataScale > 3)
                     {
-                        System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
-
-                        // Retrieve the DrawingContext in order to create new drawing content.
-                        DrawingContext drawingContext = dataDV.RenderOpen();
-
+ 
                         // Create a rectangle and draw it in the DrawingContext.
-                        drawingContext.DrawEllipse(dataBrush, new Pen(dataBrush, 1), new Point(X, Z), DataScale, DataScale);
+                        drawingContext.DrawEllipse(dataBrush, dataPen, new Point(X, Z), DataScale, DataScale);
 
-                        drawingContext.Close();
-
-                        VHDataSpheres.AddChild(dataDV);
                     }
+
+                    drawingContext.Close();
+                    VHDataSpheres.AddChild(dataDV);
                 }
 
             }
@@ -985,6 +1008,8 @@ namespace SMT
                 Brush CharacterNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
                 Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
+
+                Pen p = new Pen(CharacterNameSysHighlightBrush, 1.0);
 
 
                 Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
@@ -1003,6 +1028,8 @@ namespace SMT
                     }
                 }
 
+ 
+
                 foreach (KeyValuePair<string, List<string>> kvp in MapCharacters)
                 {
                     EVEData.System sys = EM.GetEveSystem(kvp.Key);
@@ -1017,14 +1044,16 @@ namespace SMT
 
                     double charTextOffset = 0;
 
+
                     // Create an instance of a DrawingVisual.
                     System.Windows.Media.DrawingVisual nameTextVisual = new System.Windows.Media.DrawingVisual();
+
 
                     // Retrieve the DrawingContext from the DrawingVisual.
                     DrawingContext dc = nameTextVisual.RenderOpen();
 
                     // draw a circle around the system
-                    dc.DrawEllipse(CharacterNameSysHighlightBrush, new Pen(CharacterNameSysHighlightBrush, 1.0), new Point(X, Z), 6, 6);
+                    dc.DrawEllipse(CharacterNameSysHighlightBrush, p , new Point(X, Z), 6, 6);
 
 
                     foreach (string name in kvp.Value)
@@ -1063,9 +1092,19 @@ namespace SMT
                         }
                     }
 
+                    Pen zkbPen = new Pen(ZKBBrush, 1.0);
+
+
 
                     foreach (KeyValuePair<string, int> kvp in ZKBBaseFeed)
                     {
+                        // Create an instance of a DrawingVisual.
+                        System.Windows.Media.DrawingVisual zkbVisual = new System.Windows.Media.DrawingVisual();
+
+                        // Retrieve the DrawingContext from the DrawingVisual.
+                        DrawingContext dc = zkbVisual.RenderOpen();
+
+
                         double zkbVal = 5 + ((double)kvp.Value * ESIOverlayScale * 2);
 
                         EVEData.System sys = EM.GetEveSystem(kvp.Key);
@@ -1079,28 +1118,27 @@ namespace SMT
                         double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
 
 
-                        // Create an instance of a DrawingVisual.
-                        System.Windows.Media.DrawingVisual zkbVisual = new System.Windows.Media.DrawingVisual();
-
-                        // Retrieve the DrawingContext from the DrawingVisual.
-                        DrawingContext dc = zkbVisual.RenderOpen();
 
                         // draw a circle around the system
-                        dc.DrawEllipse(ZKBBrush, new Pen(ZKBBrush, 1.0), new Point(X, Z), zkbVal, zkbVal);
-
-
+                        dc.DrawEllipse(ZKBBrush, zkbPen, new Point(X, Z), zkbVal, zkbVal);
                         dc.Close();
-
                         VHZKB.AddChild(zkbVisual, "ZKBData");
 
 
                     }
+
+
                 }
 
-                if(ActiveRoute != null)
+                /*
+                if (ActiveRoute != null)
                 {
                     if (ActiveRoute.Count > 1)
                     {
+                        Pen RoutePen = new Pen(CapRouteColor, 2);
+                        RoutePen.DashStyle = DashStyles.Dot;
+
+
                         for (int i = 1; i < ActiveRoute.Count; i++)
                         {
                             EVEData.System sysA = EM.GetEveSystem(ActiveRoute[i - 1].SystemName);
@@ -1120,11 +1158,9 @@ namespace SMT
                                 // Retrieve the DrawingContext in order to create new drawing content.
                                 DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
 
-                                Pen p = new Pen(CapRouteColor, 2);
-                                p.DashStyle = DashStyles.Dot;
 
                                 // Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
+                                drawingContext.DrawLine(RoutePen, new Point(X1, Y1), new Point(X2, Y2));
 
                                 drawingContext.Close();
 
@@ -1148,10 +1184,10 @@ namespace SMT
                                 // Retrieve the DrawingContext in order to create new drawing content.
                                 DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
 
-                                Pen p = new Pen(CapRouteColor, 1);
+                                //Pen p = new Pen(CapRouteColor, 1);
 
                                 // Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawEllipse(CapRouteColor, p, new Point(X1, Y1), 10, 10);
+                                drawingContext.DrawEllipse(CapRouteColor, RoutePen, new Point(X1, Y1), 10, 10);
 
                                 drawingContext.Close();
 
@@ -1162,6 +1198,7 @@ namespace SMT
                         }
                     }
                 }
+                */
             }
         }
 
@@ -1223,13 +1260,15 @@ namespace SMT
                 UniverseMainCanvas.Children.Insert(0, VHRegionNames);
             }
 
+            CacheMode cm = new BitmapCache(5.0);
+
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
                 double X = (mr.RegionX - universeXMin) * universeScale; ;
                 double Z = (universeDepth - (mr.RegionZ - universeZMin)) * universeScale;
 
                 System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
-
+                SystemTextVisual.CacheMode = cm;
                 DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
 #pragma warning disable CS0618

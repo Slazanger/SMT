@@ -25,7 +25,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
 
-        public string SMTVersion = "SMT_076";
+        public string SMTVersion = "SMT_077";
 
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Return of the JTACs : " + SMTVersion + ")";
+            Title = "SMT (Mk.2 Peter Han Edition : " + SMTVersion + ")";
 
             CheckGitHubVersion();
 
@@ -564,7 +564,7 @@ namespace SMT
 
         private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "isVisible" ||
+            if (e.PropertyName == "IsVisible" ||
                 e.PropertyName == "IsMouseOver" ||
                 e.PropertyName == "IsMouseCaptureWithin" ||
                 e.PropertyName == "ActualHeight" ||
@@ -572,7 +572,11 @@ namespace SMT
 
                 e.PropertyName == "IsKeyboardFocusWithin" ||
                 e.PropertyName == "SelectedProperty" ||
-                e.PropertyName == "SelectedPropertyItem"
+                e.PropertyName == "SelectedPropertyItem" ||
+                e.PropertyName == "SelectedObjectType" || 
+                e.PropertyName == "SelectedObjectTypeName" ||
+                e.PropertyName == "Properties" ||
+                e.PropertyName == "SelectedObject"
 
                 )
             {
