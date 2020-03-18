@@ -1469,7 +1469,7 @@ namespace SMT
                         }
 
                         string[] bits = line.Split(' ');
-                        if (bits.Length > 3)
+                        if (bits.Length > 2)
                         {
                             int test = 1;
                             test++;
@@ -1477,8 +1477,8 @@ namespace SMT
                             long IDFrom = 0;
                             long.TryParse(bits[0], out IDFrom);
 
-                            string from = bits[1];
-                            string to = bits[3];
+                            string from = bits[0];
+                            string to = bits[2];
 
                             EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
                         }
