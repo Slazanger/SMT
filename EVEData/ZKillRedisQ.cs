@@ -19,8 +19,8 @@ namespace SMT.EVEData
     /// </summary>
     public class ZKillRedisQ
     {
-        private bool updateThreadRunning = true;
         private Thread updateThread;
+        private bool updateThreadRunning = true;
 
         ~ZKillRedisQ()
         {
@@ -28,14 +28,14 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        ///
-        /// </summary>
-        public bool PauseUpdate { get; set; }
-
-        /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
         /// </summary>
         public ObservableCollection<ZKBDataSimple> KillStream { get; set; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public bool PauseUpdate { get; set; }
 
         /// <summary>
         /// Initialise the ZKB feed system
@@ -208,6 +208,8 @@ namespace SMT.EVEData
         /// </summary>
         public class ZKBDataSimple : INotifyPropertyChanged
         {
+            private string m_victimAllianceName;
+
             public event PropertyChangedEventHandler PropertyChanged;
 
             /// <summary>
@@ -216,21 +218,24 @@ namespace SMT.EVEData
             public long KillID { get; set; }
 
             /// <summary>
-            /// Gets or sets the character ID of the victim
+            /// Gets or sets the time of the kill
             /// </summary>
-            public long VictimCharacterID { get; set; }
+            public DateTimeOffset KillTime { get; set; }
 
             /// <summary>
-            /// Gets or sets the Victim's corp ID
+            /// Gets or sets the Ship Lost in this kill
             /// </summary>
-            public long VictimCorpID { get; set; }
+            public string ShipType { get; set; }
+
+            /// <summary>
+            /// Gets or sets the System ID the kill was in
+            /// </summary>
+            public string SystemName { get; set; }
 
             /// <summary>
             /// Gets or sets the Victims Alliance ID
             /// </summary>
             public long VictimAllianceID { get; set; }
-
-            private string m_victimAllianceName;
 
             /// <summary>
             /// Gets or sets the Victims Alliance Name
@@ -249,28 +254,14 @@ namespace SMT.EVEData
             }
 
             /// <summary>
-            /// Gets or sets the System ID the kill was in
+            /// Gets or sets the character ID of the victim
             /// </summary>
-            public string SystemName { get; set; }
+            public long VictimCharacterID { get; set; }
 
             /// <summary>
-            /// Gets or sets the Ship Lost in this kill
+            /// Gets or sets the Victim's corp ID
             /// </summary>
-            public string ShipType { get; set; }
-
-            /// <summary>
-            /// Gets or sets the time of the kill
-            /// </summary>
-            public DateTimeOffset KillTime { get; set; }
-
-            protected void OnPropertyChanged(string name)
-            {
-                PropertyChangedEventHandler handler = PropertyChanged;
-                if (handler != null)
-                {
-                    handler(this, new PropertyChangedEventArgs(name));
-                }
-            }
+            public long VictimCorpID { get; set; }
 
             public override string ToString()
             {
@@ -281,6 +272,15 @@ namespace SMT.EVEData
                 }
 
                 return string.Format("System: {0}, Alliance: {1}, Ship {2}", SystemName, allianceTicker, ShipType);
+            }
+
+            protected void OnPropertyChanged(string name)
+            {
+                PropertyChangedEventHandler handler = PropertyChanged;
+                if (handler != null)
+                {
+                    handler(this, new PropertyChangedEventArgs(name));
+                }
             }
         }
     }

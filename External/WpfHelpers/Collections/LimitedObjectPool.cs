@@ -12,14 +12,14 @@ namespace WpfHelpers.Collections
         private SemaphoreSlim _semaphore;
         private CancellationTokenSource cts;
 
-        public uint Maximum { get; }
-
         public LimitedObjectPool(uint maximum, Func<T> objectGenerator) : base(objectGenerator)
         {
             Maximum = maximum;
             _semaphore = new SemaphoreSlim((int)maximum, (int)maximum);
             cts = new CancellationTokenSource();
         }
+
+        public uint Maximum { get; }
 
         public void Cancel()
         {

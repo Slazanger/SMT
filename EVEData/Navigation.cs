@@ -16,28 +16,6 @@ namespace SMT.EVEData
 {
     public class Navigation
     {
-        private class MapNode
-        {
-            public bool HighSec { get; set; }
-            public string Name { get; set; }
-            public double Cost;
-            public double MinCostToStart;
-            public bool Visited;
-
-            public double X;
-            public double Y;
-            public double Z;
-
-            public double F;
-
-            public MapNode NearestToStart;
-
-            public List<string> Connections { get; set; }
-            public List<JumpLink> JumpableSystems { get; set; }
-
-            public string JBConnection;
-        }
-
         public enum GateType
         {
             StarGate,
@@ -45,33 +23,50 @@ namespace SMT.EVEData
             JumpTo,
         }
 
-        private struct JumpLink
+        private static Dictionary<string, MapNode> MapNodes { get; set; }
+
+        public static void ClearJumpBridges()
         {
-            public string System;
-            public double RangeLY;
+            foreach (MapNode mn in MapNodes.Values)
+            {
+                mn.JBConnection = null;
+            }
         }
 
-        public class RoutePoint
+        public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
         {
-            public string SystemName { get; set; }
-            public GateType GateToTake { get; set; }
-            public double LY { get; set; }
-
-            public override string ToString()
+            if (MapNodes == null)
             {
-                string s = SystemName;
-                if (GateToTake == GateType.Ansibex)
-                {
-                    s += " (Ansiblex)";
-                }
-
-                if (GateToTake == GateType.JumpTo && LY > 0.0)
-                {
-                    s += " (Jump To, Range " + LY.ToString("0.##") + " )";
-                }
-
-                return s;
+                return sysList;
             }
+
+            if (X != 0)
+            {
+                if (!sysList.Contains(start))
+                {
+                    sysList.Add(start);
+                }
+
+                MapNode mn = MapNodes[start];
+
+                foreach (string mm in mn.Connections)
+                {
+                    if (!sysList.Contains(mm))
+                    {
+                        sysList.Add(mm);
+                    }
+
+                    List<string> connected = GetSystemsXJumpsFrom(sysList, mm, X - 1);
+                    foreach (string s in connected)
+                    {
+                        if (!sysList.Contains(s))
+                        {
+                            sysList.Add(s);
+                        }
+                    }
+                }
+            }
+            return sysList;
         }
 
         public static void InitNavigation(List<System> eveSystems, List<JumpBridge> jumpBridges)
@@ -132,66 +127,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-        }
-
-        public static void UpdateJumpBridges(List<JumpBridge> jumpBridges)
-        {
-            foreach (JumpBridge jb in jumpBridges)
-            {
-                if (jb.FromID != 0)
-                {
-                    MapNodes[jb.From].JBConnection = jb.To;
-                }
-
-                if (jb.ToID != 0)
-                {
-                    MapNodes[jb.To].JBConnection = jb.From;
-                }
-            }
-        }
-
-        public static void ClearJumpBridges()
-        {
-            foreach (MapNode mn in MapNodes.Values)
-            {
-                mn.JBConnection = null;
-            }
-        }
-
-        public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
-        {
-            if (MapNodes == null)
-            {
-                return sysList;
-            }
-
-            if (X != 0)
-            {
-                if (!sysList.Contains(start))
-                {
-                    sysList.Add(start);
-                }
-
-                MapNode mn = MapNodes[start];
-
-                foreach (string mm in mn.Connections)
-                {
-                    if (!sysList.Contains(mm))
-                    {
-                        sysList.Add(mm);
-                    }
-
-                    List<string> connected = GetSystemsXJumpsFrom(sysList, mm, X - 1);
-                    foreach (string s in connected)
-                    {
-                        if (!sysList.Contains(s))
-                        {
-                            sysList.Add(s);
-                        }
-                    }
-                }
-            }
-            return sysList;
         }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, RoutingMode routingMode)
@@ -430,6 +365,66 @@ namespace SMT.EVEData
             return ActualRoute;
         }
 
-        private static Dictionary<string, MapNode> MapNodes { get; set; }
+        public static void UpdateJumpBridges(List<JumpBridge> jumpBridges)
+        {
+            foreach (JumpBridge jb in jumpBridges)
+            {
+                if (jb.FromID != 0)
+                {
+                    MapNodes[jb.From].JBConnection = jb.To;
+                }
+
+                if (jb.ToID != 0)
+                {
+                    MapNodes[jb.To].JBConnection = jb.From;
+                }
+            }
+        }
+
+        private struct JumpLink
+        {
+            public double RangeLY;
+            public string System;
+        }
+
+        public class RoutePoint
+        {
+            public GateType GateToTake { get; set; }
+            public double LY { get; set; }
+            public string SystemName { get; set; }
+
+            public override string ToString()
+            {
+                string s = SystemName;
+                if (GateToTake == GateType.Ansibex)
+                {
+                    s += " (Ansiblex)";
+                }
+
+                if (GateToTake == GateType.JumpTo && LY > 0.0)
+                {
+                    s += " (Jump To, Range " + LY.ToString("0.##") + " )";
+                }
+
+                return s;
+            }
+        }
+
+        private class MapNode
+        {
+            public double Cost;
+            public double F;
+            public string JBConnection;
+            public double MinCostToStart;
+            public MapNode NearestToStart;
+            public bool Visited;
+            public double X;
+            public double Y;
+            public double Z;
+            public List<string> Connections { get; set; }
+            public bool HighSec { get; set; }
+            public List<JumpLink> JumpableSystems { get; set; }
+            public string Name { get; set; }
+        }
     }
 }

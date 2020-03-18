@@ -6,9 +6,8 @@ namespace WpfHelpers.WpfDataManipulation.XamlConverters
 {
     public class BoolToAnySwitchConverter<T> : IValueConverter
     {
-        public T IfTrue { get; set; }
-
         public T IfFalse { get; set; }
+        public T IfTrue { get; set; }
 
         #region Implementation of IValueConverter
 

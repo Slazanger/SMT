@@ -32,11 +32,6 @@ namespace SMT.EVEData
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// Gets or sets the System to AnomData
-        /// </summary>
-        public SerializableDictionary<string, AnomData> Systems { get; set; }
-
-        /// <summary>
         /// Gets or sets the current active system
         /// </summary>
         public AnomData ActiveSystem
@@ -52,6 +47,11 @@ namespace SMT.EVEData
                 OnPropertyChanged("ActiveSystem");
             }
         }
+
+        /// <summary>
+        /// Gets or sets the System to AnomData
+        /// </summary>
+        public SerializableDictionary<string, AnomData> Systems { get; set; }
 
         /// <summary>
         /// Gets the Anom data for the specified system, creates it if it doesn't exist

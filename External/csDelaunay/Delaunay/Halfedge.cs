@@ -29,12 +29,11 @@ namespace csDelaunay
 
         #region Object
 
+        public Edge edge;
         public Halfedge edgeListLeftNeighbor;
         public Halfedge edgeListRightNeighbor;
-        public Halfedge nextInPriorityQueue;
-
-        public Edge edge;
         public LR leftRight;
+        public Halfedge nextInPriorityQueue;
         public Vertex vertex;
 
         // The vertex's y-coordinate in the transformed Voronoi space V
@@ -43,21 +42,6 @@ namespace csDelaunay
         public Halfedge(Edge edge, LR lr)
         {
             Init(edge, lr);
-        }
-
-        private Halfedge Init(Edge edge, LR lr)
-        {
-            this.edge = edge;
-            leftRight = lr;
-            nextInPriorityQueue = null;
-            vertex = null;
-
-            return this;
-        }
-
-        public override string ToString()
-        {
-            return "Halfedge (LeftRight: " + leftRight + "; vertex: " + vertex + ")";
         }
 
         public void Dispose()
@@ -72,17 +56,6 @@ namespace csDelaunay
                 // still in PriorityQueue
                 return;
             }
-            edge = null;
-            leftRight = null;
-            vertex = null;
-            pool.Enqueue(this);
-        }
-
-        public void ReallyDispose()
-        {
-            edgeListLeftNeighbor = null;
-            edgeListRightNeighbor = null;
-            nextInPriorityQueue = null;
             edge = null;
             leftRight = null;
             vertex = null;
@@ -147,6 +120,32 @@ namespace csDelaunay
                 above = t1 * t1 > t2 * t2 + t3 * t3;
             }
             return this.leftRight == LR.LEFT ? above : !above;
+        }
+
+        public void ReallyDispose()
+        {
+            edgeListLeftNeighbor = null;
+            edgeListRightNeighbor = null;
+            nextInPriorityQueue = null;
+            edge = null;
+            leftRight = null;
+            vertex = null;
+            pool.Enqueue(this);
+        }
+
+        public override string ToString()
+        {
+            return "Halfedge (LeftRight: " + leftRight + "; vertex: " + vertex + ")";
+        }
+
+        private Halfedge Init(Edge edge, LR lr)
+        {
+            this.edge = edge;
+            leftRight = lr;
+            nextInPriorityQueue = null;
+            vertex = null;
+
+            return this;
         }
 
         #endregion Object

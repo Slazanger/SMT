@@ -5,11 +5,8 @@ namespace csDelaunay
 {
     public class EdgeReorderer
     {
-        private List<Edge> edges;
         private List<LR> edgeOrientations;
-
-        public List<Edge> Edges { get { return edges; } }
-        public List<LR> EdgeOrientations { get { return edgeOrientations; } }
+        private List<Edge> edges;
 
         public EdgeReorderer(List<Edge> origEdges, Type criterion)
         {
@@ -20,6 +17,9 @@ namespace csDelaunay
                 edges = ReorderEdges(origEdges, criterion);
             }
         }
+
+        public List<LR> EdgeOrientations { get { return edgeOrientations; } }
+        public List<Edge> Edges { get { return edges; } }
 
         public void Dispose()
         {

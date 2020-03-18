@@ -12,66 +12,66 @@ namespace StructureHunter
     using System.Collections.Generic;
     using System.Globalization;
 
-    public partial class Structures
+    public enum RegionName { AR00001, AR00002, AR00003, Aridia, BR00004, BR00005, BR00006, BR00007, BR00008, BlackRise, Branch, CR00009, CR00010, CR00011, CR00012, CR00013, CR00014, CR00015, Cache, Catch, CloudRing, CobaltEdge, Curse, DR00016, DR00017, DR00018, DR00019, DR00020, DR00021, DR00022, DR00023, Deklein, Delve, Derelik, Detorid, Devoid, Domain, ER00024, ER00025, ER00026, ER00027, ER00028, ER00029, Esoteria, Essence, EtheriumReach, Everyshore, FR00030, Fade, Feythabolis, Fountain, Geminate, Genesis, GreatWildlands, Heimatar, Immensea, Impass, Insmother, Kador, Khanid, KorAzor, Lonetrek, Malpais, Metropolis, MoldenHeath, Oasa, Omist, OuterPassage, OuterRing, ParagonSoul, PeriodBasis, PerrigenFalls, Placid, Providence, PureBlind, Querious, ScaldingPass, SinqLaison, Solitude, Stain, Syndicate, TashMurkon, Tenal, Tenerifis, TheBleakLands, TheCitadel, TheForge, TheKalevalaExpanse, TheSpire, Tribute, ValeOfTheSilent, Venal, VergeVendor, WickedCreek };
+
+    public enum TypeName { Astrahus, Athanor, Azbel, Fortizar, Keepstar, Raitaru, Sotiyo, Tatara };
+
+    public static class Serialize
     {
-        [JsonProperty("typeId")]
-        public long? TypeId { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("regionId")]
-        public long RegionId { get; set; }
-
-        [JsonProperty("location")]
-        public Location Location { get; set; }
-
-        [JsonProperty("typeName")]
-        public TypeName? TypeName { get; set; }
-
-        [JsonProperty("systemId")]
-        public long SystemId { get; set; }
-
-        [JsonProperty("lastSeen")]
-        public DateTimeOffset LastSeen { get; set; }
-
-        [JsonProperty("systemName")]
-        public string SystemName { get; set; }
-
-        [JsonProperty("public")]
-        public bool Public { get; set; }
-
-        [JsonProperty("firstSeen")]
-        public DateTimeOffset FirstSeen { get; set; }
-
-        [JsonProperty("regionName")]
-        public RegionName RegionName { get; set; }
+        public static string ToJson(this Dictionary<string, Structures> self) => JsonConvert.SerializeObject(self, StructureHunter.Converter.Settings);
     }
 
     public partial class Location
     {
-        [JsonProperty("y")]
-        public double Y { get; set; }
-
         [JsonProperty("x")]
         public double X { get; set; }
+
+        [JsonProperty("y")]
+        public double Y { get; set; }
 
         [JsonProperty("z")]
         public double Z { get; set; }
     }
 
-    public enum RegionName { AR00001, AR00002, AR00003, Aridia, BR00004, BR00005, BR00006, BR00007, BR00008, BlackRise, Branch, CR00009, CR00010, CR00011, CR00012, CR00013, CR00014, CR00015, Cache, Catch, CloudRing, CobaltEdge, Curse, DR00016, DR00017, DR00018, DR00019, DR00020, DR00021, DR00022, DR00023, Deklein, Delve, Derelik, Detorid, Devoid, Domain, ER00024, ER00025, ER00026, ER00027, ER00028, ER00029, Esoteria, Essence, EtheriumReach, Everyshore, FR00030, Fade, Feythabolis, Fountain, Geminate, Genesis, GreatWildlands, Heimatar, Immensea, Impass, Insmother, Kador, Khanid, KorAzor, Lonetrek, Malpais, Metropolis, MoldenHeath, Oasa, Omist, OuterPassage, OuterRing, ParagonSoul, PeriodBasis, PerrigenFalls, Placid, Providence, PureBlind, Querious, ScaldingPass, SinqLaison, Solitude, Stain, Syndicate, TashMurkon, Tenal, Tenerifis, TheBleakLands, TheCitadel, TheForge, TheKalevalaExpanse, TheSpire, Tribute, ValeOfTheSilent, Venal, VergeVendor, WickedCreek };
+    public partial class Structures
+    {
+        [JsonProperty("firstSeen")]
+        public DateTimeOffset FirstSeen { get; set; }
 
-    public enum TypeName { Astrahus, Athanor, Azbel, Fortizar, Keepstar, Raitaru, Sotiyo, Tatara };
+        [JsonProperty("lastSeen")]
+        public DateTimeOffset LastSeen { get; set; }
+
+        [JsonProperty("location")]
+        public Location Location { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("public")]
+        public bool Public { get; set; }
+
+        [JsonProperty("regionId")]
+        public long RegionId { get; set; }
+
+        [JsonProperty("regionName")]
+        public RegionName RegionName { get; set; }
+
+        [JsonProperty("systemId")]
+        public long SystemId { get; set; }
+
+        [JsonProperty("systemName")]
+        public string SystemName { get; set; }
+
+        [JsonProperty("typeId")]
+        public long? TypeId { get; set; }
+
+        [JsonProperty("typeName")]
+        public TypeName? TypeName { get; set; }
+    }
 
     public partial class Structures
     {
         public static Dictionary<string, Structures> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<string, Structures>>(json, StructureHunter.Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this Dictionary<string, Structures> self) => JsonConvert.SerializeObject(self, StructureHunter.Converter.Settings);
     }
 
     internal static class Converter
@@ -90,6 +90,8 @@ namespace StructureHunter
 
     internal class RegionNameConverter : JsonConverter
     {
+        public static readonly RegionNameConverter Singleton = new RegionNameConverter();
+
         public override bool CanConvert(Type t) => t == typeof(RegionName) || t == typeof(RegionName?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
@@ -771,12 +773,12 @@ namespace StructureHunter
             }
             throw new Exception("Cannot marshal type RegionName");
         }
-
-        public static readonly RegionNameConverter Singleton = new RegionNameConverter();
     }
 
     internal class TypeNameConverter : JsonConverter
     {
+        public static readonly TypeNameConverter Singleton = new TypeNameConverter();
+
         public override bool CanConvert(Type t) => t == typeof(TypeName) || t == typeof(TypeName?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
@@ -856,7 +858,5 @@ namespace StructureHunter
             }
             throw new Exception("Cannot marshal type TypeName");
         }
-
-        public static readonly TypeNameConverter Singleton = new TypeNameConverter();
     }
 }

@@ -63,24 +63,24 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Gets or sets the Signature ID, eg XYZ
-        /// </summary>
-        public string Signature { get; set; }
-
-        /// <summary>
-        /// Gets or sets the type of signature
-        /// </summary>
-        public SignatureType Type { get; set; }
-
-        /// <summary>
         /// Gets or sets the name of the signature, eg True Sansha Base XXX
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the Signature ID, eg XYZ
+        /// </summary>
+        public string Signature { get; set; }
+
+        /// <summary>
         /// Gets or sets the time the signature was first found
         /// </summary>
         public DateTime TimeFound { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of signature
+        /// </summary>
+        public SignatureType Type { get; set; }
 
         /// <summary>
         /// Converts the signature text to appropriate Enum

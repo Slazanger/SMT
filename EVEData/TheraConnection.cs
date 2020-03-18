@@ -27,14 +27,9 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Gets or sets the system with the connection to Thera
+        /// Gets or sets the Estimated End of Life status
         /// </summary>
-        public string System { get; set; }
-
-        /// <summary>
-        /// Gets or sets the region that this system is in
-        /// </summary>
-        public string Region { get; set; }
+        public string EstimatedEOL { get; set; }
 
         /// <summary>
         /// Gets or sets the signature ID from the specified system into Thera
@@ -47,8 +42,13 @@ namespace SMT.EVEData
         public string OutSignatureID { get; set; }
 
         /// <summary>
-        /// Gets or sets the Estimated End of Life status
+        /// Gets or sets the region that this system is in
         /// </summary>
-        public string EstimatedEOL { get; set; }
+        public string Region { get; set; }
+
+        /// <summary>
+        /// Gets or sets the system with the connection to Thera
+        /// </summary>
+        public string System { get; set; }
     }
 }

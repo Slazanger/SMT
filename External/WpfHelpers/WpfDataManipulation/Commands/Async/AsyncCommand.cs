@@ -13,9 +13,8 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
     public class AsyncCommand : AsyncCommandBase, INotifyPropertyChanged
     {
         private readonly CancelAsyncCommand _cancelCommand;
-        private readonly Func<CancellationToken, Task> _command;
         private readonly Func<bool> _canExecute = () => true;
-
+        private readonly Func<CancellationToken, Task> _command;
         private NotifyTaskCompletionBase _execution;
 
         public AsyncCommand(Func<CancellationToken, Task> command)
@@ -29,6 +28,8 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
         {
             _canExecute = canExecute;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public ICommand CancelCommand
         {
@@ -44,8 +45,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
                 OnPropertyChanged();
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public override bool CanExecute(object parameter)
         {
@@ -73,6 +72,12 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
             private bool _commandExecuting;
             private CancellationTokenSource _cts = new CancellationTokenSource();
 
+            public event EventHandler CanExecuteChanged
+            {
+                add { CommandManager.RequerySuggested += value; }
+                remove { CommandManager.RequerySuggested -= value; }
+            }
+
             public CancellationToken Token
             {
                 get { return _cts.Token; }
@@ -89,10 +94,10 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
                 RaiseCanExecuteChanged();
             }
 
-            public event EventHandler CanExecuteChanged
+            public void NotifyCommandFinished()
             {
-                add { CommandManager.RequerySuggested += value; }
-                remove { CommandManager.RequerySuggested -= value; }
+                _commandExecuting = false;
+                RaiseCanExecuteChanged();
             }
 
             public void NotifyCommandStarting()
@@ -101,12 +106,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
                 if (!_cts.IsCancellationRequested)
                     return;
                 _cts = new CancellationTokenSource();
-                RaiseCanExecuteChanged();
-            }
-
-            public void NotifyCommandFinished()
-            {
-                _commandExecuting = false;
                 RaiseCanExecuteChanged();
             }
 

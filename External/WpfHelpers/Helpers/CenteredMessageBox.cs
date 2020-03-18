@@ -15,6 +15,40 @@ namespace WpfHelpers.Helpers
             helper.Prep(form);
         }
 
+        private static class NativeMethods
+        {
+            internal delegate int CenterMessageCallBackDelegate(int message, int wParam, int lParam);
+
+            [DllImport("kernel32.dll")]
+            internal static extern int GetCurrentThreadId();
+
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
+
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern IntPtr SetWindowsHookEx(int hook, CenterMessageCallBackDelegate callback, IntPtr hMod, int dwThreadId);
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool UnhookWindowsHookEx(int hhk);
+
+            internal struct RECT
+            {
+                public int Bottom;
+                public int Left;
+                public int Right;
+                public int Top;
+            }
+        }
+
         private class MessageBoxCenterHelper
         {
             private int messageHook;
@@ -50,40 +84,6 @@ namespace WpfHelpers.Helpers
 
                 return 0;
             }
-        }
-
-        private static class NativeMethods
-        {
-            internal struct RECT
-            {
-                public int Left;
-                public int Top;
-                public int Right;
-                public int Bottom;
-            }
-
-            internal delegate int CenterMessageCallBackDelegate(int message, int wParam, int lParam);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool UnhookWindowsHookEx(int hhk);
-
-            [DllImport("user32.dll", SetLastError = true)]
-            internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-            [DllImport("kernel32.dll")]
-            internal static extern int GetCurrentThreadId();
-
-            [DllImport("user32.dll", SetLastError = true)]
-            internal static extern IntPtr SetWindowsHookEx(int hook, CenterMessageCallBackDelegate callback, IntPtr hMod, int dwThreadId);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
         }
     }
 }

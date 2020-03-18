@@ -10,6 +10,11 @@ namespace StructureSearches
     using Newtonsoft.Json.Converters;
     using System.Globalization;
 
+    public static class Serialize
+    {
+        public static string ToJson(this StructureSearch self) => JsonConvert.SerializeObject(self, StructureSearches.Converter.Settings);
+    }
+
     public partial class StructureSearch
     {
         [JsonProperty("structure")]
@@ -19,11 +24,6 @@ namespace StructureSearches
     public partial class StructureSearch
     {
         public static StructureSearch FromJson(string json) => JsonConvert.DeserializeObject<StructureSearch>(json, StructureSearches.Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this StructureSearch self) => JsonConvert.SerializeObject(self, StructureSearches.Converter.Settings);
     }
 
     internal static class Converter

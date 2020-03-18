@@ -14,6 +14,8 @@ namespace WpfHelpers.WpfControls.Zoombox
     {
         private Size _contentSize;
 
+        public event ContentSizeChangedHandler ContentSizeChanged;
+
         public Size ContentSize
         {
             get { return _contentSize; }
@@ -26,17 +28,6 @@ namespace WpfHelpers.WpfControls.Zoombox
                 if (ContentSizeChanged != null)
                     ContentSizeChanged(this, _contentSize);
             }
-        }
-
-        public event ContentSizeChangedHandler ContentSizeChanged;
-
-        protected override Size MeasureOverride(Size constraint)
-        {
-            base.MeasureOverride(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            var max = 1000000000;
-            var x = double.IsInfinity(constraint.Width) ? max : constraint.Width;
-            var y = double.IsInfinity(constraint.Height) ? max : constraint.Height;
-            return new Size(x, y);
         }
 
         protected override Size ArrangeOverride(Size arrangeBounds)
@@ -52,6 +43,15 @@ namespace WpfHelpers.WpfControls.Zoombox
             child.Arrange(new Rect(child.DesiredSize));
 
             return arrangeBounds;
+        }
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            base.MeasureOverride(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var max = 1000000000;
+            var x = double.IsInfinity(constraint.Width) ? max : constraint.Width;
+            var y = double.IsInfinity(constraint.Height) ? max : constraint.Height;
+            return new Size(x, y);
         }
     }
 }

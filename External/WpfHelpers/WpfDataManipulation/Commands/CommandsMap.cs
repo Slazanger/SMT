@@ -24,6 +24,25 @@ namespace WpfHelpers.WpfDataManipulation.Commands
     public class CommandMap
     {
         /// <summary>
+        /// Store the commands
+        /// </summary>
+        private Dictionary<string, ICommand> _commands;
+
+        /// <summary>
+        /// Expose the dictionary of commands
+        /// </summary>
+        protected Dictionary<string, ICommand> Commands
+        {
+            get
+            {
+                if (null == _commands)
+                    _commands = new Dictionary<string, ICommand>();
+
+                return _commands;
+            }
+        }
+
+        /// <summary>
         /// Add a named command to the command map
         /// </summary>
         /// <param name="commandName">The name of the command</param>
@@ -51,70 +70,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands
         public void RemoveCommand(string commandName)
         {
             Commands.Remove(commandName);
-        }
-
-        /// <summary>
-        /// Expose the dictionary of commands
-        /// </summary>
-        protected Dictionary<string, ICommand> Commands
-        {
-            get
-            {
-                if (null == _commands)
-                    _commands = new Dictionary<string, ICommand>();
-
-                return _commands;
-            }
-        }
-
-        /// <summary>
-        /// Store the commands
-        /// </summary>
-        private Dictionary<string, ICommand> _commands;
-
-        /// <summary>
-        /// Implements ICommand in a delegate friendly way
-        /// </summary>
-        private class DelegateCommand : ICommand
-        {
-            /// <summary>
-            /// Create a command that can always be executed
-            /// </summary>
-            /// <param name="executeMethod">The method to execute when the command is called</param>
-            public DelegateCommand(Action<object> executeMethod) : this(executeMethod, null) { }
-
-            /// <summary>
-            /// Create a delegate command which executes the canExecuteMethod before executing the executeMethod
-            /// </summary>
-            /// <param name="executeMethod"></param>
-            /// <param name="canExecuteMethod"></param>
-            public DelegateCommand(Action<object> executeMethod, Predicate<object> canExecuteMethod)
-            {
-                if (null == executeMethod)
-                    throw new ArgumentNullException("executeMethod");
-
-                this._executeMethod = executeMethod;
-                this._canExecuteMethod = canExecuteMethod;
-            }
-
-            public bool CanExecute(object parameter)
-            {
-                return (null == _canExecuteMethod) ? true : _canExecuteMethod(parameter);
-            }
-
-            public event EventHandler CanExecuteChanged
-            {
-                add { CommandManager.RequerySuggested += value; }
-                remove { CommandManager.RequerySuggested -= value; }
-            }
-
-            public void Execute(object parameter)
-            {
-                _executeMethod(parameter);
-            }
-
-            private Predicate<object> _canExecuteMethod;
-            private Action<object> _executeMethod;
         }
 
         /// <summary>
@@ -157,6 +112,8 @@ namespace WpfHelpers.WpfDataManipulation.Commands
         /// </summary>
         private class CommandMapDescriptor : CustomTypeDescriptor
         {
+            private CommandMap _map;
+
             /// <summary>
             /// Store the command map for later
             /// </summary>
@@ -184,8 +141,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands
 
                 return new PropertyDescriptorCollection(props);
             }
-
-            private CommandMap _map;
         }
 
         /// <summary>
@@ -193,6 +148,11 @@ namespace WpfHelpers.WpfDataManipulation.Commands
         /// </summary>
         private class CommandPropertyDescriptor : PropertyDescriptor
         {
+            /// <summary>
+            /// Store the command which will be executed
+            /// </summary>
+            private ICommand _command;
+
             /// <summary>
             /// Construct the descriptor
             /// </summary>
@@ -204,11 +164,27 @@ namespace WpfHelpers.WpfDataManipulation.Commands
             }
 
             /// <summary>
+            /// Not needed
+            /// </summary>
+            public override Type ComponentType
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            /// <summary>
             /// Always read only in this case
             /// </summary>
             public override bool IsReadOnly
             {
                 get { return true; }
+            }
+
+            /// <summary>
+            /// Get the type of the property
+            /// </summary>
+            public override Type PropertyType
+            {
+                get { return typeof(ICommand); }
             }
 
             /// <summary>
@@ -219,14 +195,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands
             public override bool CanResetValue(object component)
             {
                 return false;
-            }
-
-            /// <summary>
-            /// Not needed
-            /// </summary>
-            public override Type ComponentType
-            {
-                get { throw new NotImplementedException(); }
             }
 
             /// <summary>
@@ -242,14 +210,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands
                     throw new ArgumentException("component is not a CommandMap instance", "component");
 
                 return map.Commands[this.Name];
-            }
-
-            /// <summary>
-            /// Get the type of the property
-            /// </summary>
-            public override Type PropertyType
-            {
-                get { return typeof(ICommand); }
             }
 
             /// <summary>
@@ -280,11 +240,52 @@ namespace WpfHelpers.WpfDataManipulation.Commands
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Implements ICommand in a delegate friendly way
+        /// </summary>
+        private class DelegateCommand : ICommand
+        {
+            private Predicate<object> _canExecuteMethod;
+
+            private Action<object> _executeMethod;
 
             /// <summary>
-            /// Store the command which will be executed
+            /// Create a command that can always be executed
             /// </summary>
-            private ICommand _command;
+            /// <param name="executeMethod">The method to execute when the command is called</param>
+            public DelegateCommand(Action<object> executeMethod) : this(executeMethod, null) { }
+
+            /// <summary>
+            /// Create a delegate command which executes the canExecuteMethod before executing the executeMethod
+            /// </summary>
+            /// <param name="executeMethod"></param>
+            /// <param name="canExecuteMethod"></param>
+            public DelegateCommand(Action<object> executeMethod, Predicate<object> canExecuteMethod)
+            {
+                if (null == executeMethod)
+                    throw new ArgumentNullException("executeMethod");
+
+                this._executeMethod = executeMethod;
+                this._canExecuteMethod = canExecuteMethod;
+            }
+
+            public event EventHandler CanExecuteChanged
+            {
+                add { CommandManager.RequerySuggested += value; }
+                remove { CommandManager.RequerySuggested -= value; }
+            }
+
+            public bool CanExecute(object parameter)
+            {
+                return (null == _canExecuteMethod) ? true : _canExecuteMethod(parameter);
+            }
+
+            public void Execute(object parameter)
+            {
+                _executeMethod(parameter);
+            }
         }
     }
 }

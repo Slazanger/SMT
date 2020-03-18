@@ -72,6 +72,25 @@ namespace WpfHelpers.WpfDataManipulation
             return returnImage;
         }
 
+        /// <summary>
+        /// Extension, converts <see cref="Bitmap"/> to another format
+        /// </summary>
+        /// <param name="bmpSource"></param>
+        /// <param name="format">Format we are looking for</param>
+        /// <returns></returns>
+        public static Bitmap ConvertTo(this Bitmap bmpSource, System.Drawing.Imaging.PixelFormat format)
+        {
+            var bmpRet = new Bitmap(bmpSource.Width, bmpSource.Height, format);
+
+            using (Graphics g = Graphics.FromImage(bmpRet))
+            {
+                g.DrawImage(bmpSource, 0, 0, new System.Drawing.Rectangle(0, 0, bmpSource.Width, bmpSource.Height), GraphicsUnit.Pixel);
+                g.Save();
+            }
+
+            return bmpRet;
+        }
+
         public static BitmapImage ToImagesSourceFormat(Image img)
         {
             if (img == null) return null;
@@ -92,25 +111,6 @@ namespace WpfHelpers.WpfDataManipulation
         public static BitmapImage ToImagesSourceFormat(byte[] arrayBytes)
         {
             return ToImagesSourceFormat(ByteArrayToBitmap(arrayBytes));
-        }
-
-        /// <summary>
-        /// Extension, converts <see cref="Bitmap"/> to another format
-        /// </summary>
-        /// <param name="bmpSource"></param>
-        /// <param name="format">Format we are looking for</param>
-        /// <returns></returns>
-        public static Bitmap ConvertTo(this Bitmap bmpSource, System.Drawing.Imaging.PixelFormat format)
-        {
-            var bmpRet = new Bitmap(bmpSource.Width, bmpSource.Height, format);
-
-            using (Graphics g = Graphics.FromImage(bmpRet))
-            {
-                g.DrawImage(bmpSource, 0, 0, new System.Drawing.Rectangle(0, 0, bmpSource.Width, bmpSource.Height), GraphicsUnit.Pixel);
-                g.Save();
-            }
-
-            return bmpRet;
         }
     }
 }

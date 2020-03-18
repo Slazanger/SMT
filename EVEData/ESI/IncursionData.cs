@@ -10,6 +10,11 @@ namespace IncursionData
     using Newtonsoft.Json.Converters;
     using System.Globalization;
 
+    public static class Serialize
+    {
+        public static string ToJson(this IncursionInfo[] self) => JsonConvert.SerializeObject(self, IncursionData.Converter.Settings);
+    }
+
     public partial class IncursionInfo
     {
         [JsonProperty("constellation_id")]
@@ -40,11 +45,6 @@ namespace IncursionData
     public partial class IncursionInfo
     {
         public static IncursionInfo[] FromJson(string json) => JsonConvert.DeserializeObject<IncursionInfo[]>(json, IncursionData.Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this IncursionInfo[] self) => JsonConvert.SerializeObject(self, IncursionData.Converter.Settings);
     }
 
     internal static class Converter

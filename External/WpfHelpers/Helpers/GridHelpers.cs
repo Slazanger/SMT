@@ -49,12 +49,6 @@ namespace WpfHelpers.Helpers
             return (int)obj.GetValue(RowCountProperty);
         }
 
-        // Set
-        public static void SetRowCount(DependencyObject obj, int value)
-        {
-            obj.SetValue(RowCountProperty, value);
-        }
-
         // Change Event - Adds the Rows
         public static void RowCountChanged(
             DependencyObject obj, DependencyPropertyChangedEventArgs e)
@@ -72,6 +66,12 @@ namespace WpfHelpers.Helpers
             SetStarRows(grid);
         }
 
+        // Set
+        public static void SetRowCount(DependencyObject obj, int value)
+        {
+            obj.SetValue(RowCountProperty, value);
+        }
+
         #endregion RowCount Property
 
         #region ColumnCount Property
@@ -84,18 +84,6 @@ namespace WpfHelpers.Helpers
             DependencyProperty.RegisterAttached(
                 "ColumnCount", typeof(int), typeof(GridHelpers),
                 new PropertyMetadata(-1, ColumnCountChanged));
-
-        // Get
-        public static int GetColumnCount(DependencyObject obj)
-        {
-            return (int)obj.GetValue(ColumnCountProperty);
-        }
-
-        // Set
-        public static void SetColumnCount(DependencyObject obj, int value)
-        {
-            obj.SetValue(ColumnCountProperty, value);
-        }
 
         // Change Event - Add the Columns
         public static void ColumnCountChanged(
@@ -112,6 +100,18 @@ namespace WpfHelpers.Helpers
                     new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
 
             SetStarColumns(grid);
+        }
+
+        // Get
+        public static int GetColumnCount(DependencyObject obj)
+        {
+            return (int)obj.GetValue(ColumnCountProperty);
+        }
+
+        // Set
+        public static void SetColumnCount(DependencyObject obj, int value)
+        {
+            obj.SetValue(ColumnCountProperty, value);
         }
 
         #endregion ColumnCount Property

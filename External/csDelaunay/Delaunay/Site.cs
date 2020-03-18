@@ -2,9 +2,79 @@
 
 namespace csDelaunay
 {
+    public class BoundsCheck
+    {
+        public const int BOTTOM = 2;
+        public const int LEFT = 4;
+        public const int RIGHT = 8;
+        public const int TOP = 1;
+        /*
+		 *
+		 * @param point
+		 * @param bounds
+		 * @return an int with the appropriate bits set if the Point lies on the corresponding bounds lines
+		 */
+
+        public static int Check(Vector2f point, Rectf bounds)
+        {
+            int value = 0;
+            if (point.x == bounds.left)
+            {
+                value |= LEFT;
+            }
+            if (point.x == bounds.right)
+            {
+                value |= RIGHT;
+            }
+            if (point.y == bounds.top)
+            {
+                value |= TOP;
+            }
+            if (point.y == bounds.bottom)
+            {
+                value |= BOTTOM;
+            }
+
+            return value;
+        }
+    }
+
     public class Site : ICoord
     {
+        private const float EPSILON = 0.005f;
         private static Queue<Site> pool = new Queue<Site>();
+
+        private Vector2f coord;
+
+        // which end of each edge hooks up with the previous edge in edges:
+        private List<LR> edgeOrientations;
+
+        // The edges that define this Site's Voronoi region:
+        private List<Edge> edges;
+
+        // ordered list of points that define the region clipped to bounds:
+        private List<Vector2f> region;
+
+        private int siteIndex;
+
+        private float weigth;
+
+        public Site(Vector2f p, int index, float weigth)
+        {
+            Init(p, index, weigth);
+        }
+
+        public Vector2f Coord { get { return coord; } set { coord = value; } }
+
+        public List<Edge> Edges { get { return edges; } }
+
+        public int SiteIndex { get { return siteIndex; } set { siteIndex = value; } }
+
+        public float Weigth { get { return weigth; } }
+
+        public float x { get { return coord.x; } }
+
+        public float y { get { return coord.y; } }
 
         public static Site Create(Vector2f p, int index, float weigth)
         {
@@ -49,6 +119,11 @@ namespace csDelaunay
             });
         }
 
+        public void AddEdge(Edge edge)
+        {
+            edges.Add(edge);
+        }
+
         public int Compare(Site s1, Site s2)
         {
             return s1.CompareTo(s2);
@@ -82,91 +157,15 @@ namespace csDelaunay
             return returnValue;
         }
 
-        private const float EPSILON = 0.005f;
-
-        private static bool CloseEnough(Vector2f p0, Vector2f p1)
-        {
-            return (p0 - p1).magnitude < EPSILON;
-        }
-
-        private int siteIndex;
-        public int SiteIndex { get { return siteIndex; } set { siteIndex = value; } }
-
-        private Vector2f coord;
-        public Vector2f Coord { get { return coord; } set { coord = value; } }
-
-        public float x { get { return coord.x; } }
-        public float y { get { return coord.y; } }
-
-        private float weigth;
-        public float Weigth { get { return weigth; } }
-
-        // The edges that define this Site's Voronoi region:
-        private List<Edge> edges;
-
-        public List<Edge> Edges { get { return edges; } }
-
-        // which end of each edge hooks up with the previous edge in edges:
-        private List<LR> edgeOrientations;
-
-        // ordered list of points that define the region clipped to bounds:
-        private List<Vector2f> region;
-
-        public Site(Vector2f p, int index, float weigth)
-        {
-            Init(p, index, weigth);
-        }
-
-        private Site Init(Vector2f p, int index, float weigth)
-        {
-            coord = p;
-            siteIndex = index;
-            this.weigth = weigth;
-            edges = new List<Edge>();
-            region = null;
-
-            return this;
-        }
-
-        public override string ToString()
-        {
-            return "Site " + siteIndex + ": " + coord;
-        }
-
-        private void Move(Vector2f p)
-        {
-            Clear();
-            coord = p;
-        }
-
         public void Dispose()
         {
             Clear();
             pool.Enqueue(this);
         }
 
-        private void Clear()
+        public float Dist(ICoord p)
         {
-            if (edges != null)
-            {
-                edges.Clear();
-                edges = null;
-            }
-            if (edgeOrientations != null)
-            {
-                edgeOrientations.Clear();
-                edgeOrientations = null;
-            }
-            if (region != null)
-            {
-                region.Clear();
-                region = null;
-            }
-        }
-
-        public void AddEdge(Edge edge)
-        {
-            edges.Add(edge);
+            return (this.Coord - p.Coord).magnitude;
         }
 
         public Edge NearestEdge()
@@ -193,19 +192,6 @@ namespace csDelaunay
             return list;
         }
 
-        private Site NeighborSite(Edge edge)
-        {
-            if (this == edge.LeftSite)
-            {
-                return edge.RightSite;
-            }
-            if (this == edge.RightSite)
-            {
-                return edge.LeftSite;
-            }
-            return null;
-        }
-
         public List<Vector2f> Region(Rectf clippingBounds)
         {
             if (edges == null || edges.Count == 0)
@@ -224,12 +210,33 @@ namespace csDelaunay
             return region;
         }
 
-        private void ReorderEdges()
+        public override string ToString()
         {
-            EdgeReorderer reorderer = new EdgeReorderer(edges, typeof(Vertex));
-            edges = reorderer.Edges;
-            edgeOrientations = reorderer.EdgeOrientations;
-            reorderer.Dispose();
+            return "Site " + siteIndex + ": " + coord;
+        }
+
+        private static bool CloseEnough(Vector2f p0, Vector2f p1)
+        {
+            return (p0 - p1).magnitude < EPSILON;
+        }
+
+        private void Clear()
+        {
+            if (edges != null)
+            {
+                edges.Clear();
+                edges = null;
+            }
+            if (edgeOrientations != null)
+            {
+                edgeOrientations.Clear();
+                edgeOrientations = null;
+            }
+            if (region != null)
+            {
+                region.Clear();
+                region = null;
+            }
         }
 
         private List<Vector2f> ClipToBounds(Rectf bounds)
@@ -419,47 +426,42 @@ namespace csDelaunay
             }
         }
 
-        public float Dist(ICoord p)
+        private Site Init(Vector2f p, int index, float weigth)
         {
-            return (this.Coord - p.Coord).magnitude;
+            coord = p;
+            siteIndex = index;
+            this.weigth = weigth;
+            edges = new List<Edge>();
+            region = null;
+
+            return this;
         }
-    }
 
-    public class BoundsCheck
-    {
-        public const int TOP = 1;
-        public const int BOTTOM = 2;
-        public const int LEFT = 4;
-        public const int RIGHT = 8;
-
-        /*
-		 *
-		 * @param point
-		 * @param bounds
-		 * @return an int with the appropriate bits set if the Point lies on the corresponding bounds lines
-		 */
-
-        public static int Check(Vector2f point, Rectf bounds)
+        private void Move(Vector2f p)
         {
-            int value = 0;
-            if (point.x == bounds.left)
-            {
-                value |= LEFT;
-            }
-            if (point.x == bounds.right)
-            {
-                value |= RIGHT;
-            }
-            if (point.y == bounds.top)
-            {
-                value |= TOP;
-            }
-            if (point.y == bounds.bottom)
-            {
-                value |= BOTTOM;
-            }
+            Clear();
+            coord = p;
+        }
 
-            return value;
+        private Site NeighborSite(Edge edge)
+        {
+            if (this == edge.LeftSite)
+            {
+                return edge.RightSite;
+            }
+            if (this == edge.RightSite)
+            {
+                return edge.LeftSite;
+            }
+            return null;
+        }
+
+        private void ReorderEdges()
+        {
+            EdgeReorderer reorderer = new EdgeReorderer(edges, typeof(Vertex));
+            edges = reorderer.Edges;
+            edgeOrientations = reorderer.EdgeOrientations;
+            reorderer.Dispose();
         }
     }
 }

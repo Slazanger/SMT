@@ -10,19 +10,9 @@ namespace StructureIDs
     using Newtonsoft.Json.Converters;
     using System.Globalization;
 
-    public partial class StructureIdData
+    public static class Serialize
     {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("position")]
-        public Position Position { get; set; }
-
-        [JsonProperty("solar_system_id")]
-        public long SolarSystemId { get; set; }
-
-        [JsonProperty("type_id")]
-        public long TypeId { get; set; }
+        public static string ToJson(this StructureIdData self) => JsonConvert.SerializeObject(self, StructureIDs.Converter.Settings);
     }
 
     public partial class Position
@@ -39,12 +29,22 @@ namespace StructureIDs
 
     public partial class StructureIdData
     {
-        public static StructureIdData FromJson(string json) => JsonConvert.DeserializeObject<StructureIdData>(json, StructureIDs.Converter.Settings);
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("position")]
+        public Position Position { get; set; }
+
+        [JsonProperty("solar_system_id")]
+        public long SolarSystemId { get; set; }
+
+        [JsonProperty("type_id")]
+        public long TypeId { get; set; }
     }
 
-    public static class Serialize
+    public partial class StructureIdData
     {
-        public static string ToJson(this StructureIdData self) => JsonConvert.SerializeObject(self, StructureIDs.Converter.Settings);
+        public static StructureIdData FromJson(string json) => JsonConvert.DeserializeObject<StructureIdData>(json, StructureIDs.Converter.Settings);
     }
 
     internal static class Converter

@@ -19,15 +19,15 @@ namespace WpfHelpers.WpfControls.Paging
         }
 
         /// <summary>
-        ///     Gets the index of the first item in the current page.
-        /// </summary>
-        /// <value>The index of the first item.</value>
-        public int StartIndex { get; private set; }
-
-        /// <summary>
         ///     Gets the count of items in the current page.
         /// </summary>
         /// <value>The item count.</value>
         public int ItemCount { get; private set; }
+
+        /// <summary>
+        ///     Gets the index of the first item in the current page.
+        /// </summary>
+        /// <value>The index of the first item.</value>
+        public int StartIndex { get; private set; }
     }
 }

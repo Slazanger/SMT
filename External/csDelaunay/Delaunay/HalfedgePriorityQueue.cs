@@ -3,13 +3,12 @@
     // Also know as heap
     public class HalfedgePriorityQueue
     {
-        private Halfedge[] hash;
         private int count;
-        private int minBucked;
-        private int hashSize;
-
-        private float ymin;
         private float deltaY;
+        private Halfedge[] hash;
+        private int hashSize;
+        private int minBucked;
+        private float ymin;
 
         public HalfedgePriorityQueue(float ymin, float deltaY, int sqrtSitesNb)
         {
@@ -27,6 +26,25 @@
                 hash[i].Dispose();
             }
             hash = null;
+        }
+
+        public bool Empty()
+        {
+            return count == 0;
+        }
+
+        public Halfedge ExtractMin()
+        {
+            Halfedge answer;
+
+            // Get the first real Halfedge in minBucket
+            answer = hash[minBucked].nextInPriorityQueue;
+
+            hash[minBucked].nextInPriorityQueue = answer.nextInPriorityQueue;
+            count--;
+            answer.nextInPriorityQueue = null;
+
+            return answer;
         }
 
         public void Init()
@@ -62,6 +80,13 @@
             count++;
         }
 
+        public Vector2f Min()
+        {
+            AdjustMinBucket();
+            Halfedge answer = hash[minBucked].nextInPriorityQueue;
+            return new Vector2f(answer.vertex.x, answer.ystar);
+        }
+
         public void Remove(Halfedge halfedge)
         {
             Halfedge previous;
@@ -82,6 +107,14 @@
             }
         }
 
+        private void AdjustMinBucket()
+        {
+            while (minBucked < hashSize - 1 && IsEmpty(minBucked))
+            {
+                minBucked++;
+            }
+        }
+
         private int Bucket(Halfedge halfedge)
         {
             int theBucket = (int)((halfedge.ystar - ymin) / deltaY * hashSize);
@@ -98,47 +131,11 @@
         /*
 		 * move minBucket until it contains an actual Halfedge (not just the dummy at the top);
 		 */
-
-        private void AdjustMinBucket()
-        {
-            while (minBucked < hashSize - 1 && IsEmpty(minBucked))
-            {
-                minBucked++;
-            }
-        }
-
-        public bool Empty()
-        {
-            return count == 0;
-        }
-
         /*
 		 * @return coordinates of the Halfedge's vertex in V*, the transformed Voronoi diagram
 		 */
-
-        public Vector2f Min()
-        {
-            AdjustMinBucket();
-            Halfedge answer = hash[minBucked].nextInPriorityQueue;
-            return new Vector2f(answer.vertex.x, answer.ystar);
-        }
-
         /*
 		 * Remove and return the min Halfedge
 		 */
-
-        public Halfedge ExtractMin()
-        {
-            Halfedge answer;
-
-            // Get the first real Halfedge in minBucket
-            answer = hash[minBucked].nextInPriorityQueue;
-
-            hash[minBucked].nextInPriorityQueue = answer.nextInPriorityQueue;
-            count--;
-            answer.nextInPriorityQueue = null;
-
-            return answer;
-        }
     }
 }

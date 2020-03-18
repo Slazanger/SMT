@@ -21,14 +21,14 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Gets or sets the name of the System this AnomData is for
-        /// </summary>
-        public string SystemName { get; set; }
-
-        /// <summary>
         /// Gets or sets the Anom signature to data dictionary
         /// </summary>
         public SerializableDictionary<string, Anom> Anoms { get; }
+
+        /// <summary>
+        /// Gets or sets the name of the System this AnomData is for
+        /// </summary>
+        public string SystemName { get; set; }
 
         /// <summary>
         /// Update the AnomData from the string (usually the clipboard)

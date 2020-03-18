@@ -9,8 +9,8 @@ namespace WpfHelpers.Collections
     /// <typeparam name="T">Type</typeparam>
     public class ObjectPool<T>
     {
-        private readonly Func<T> _objectGenerator;
         protected readonly ConcurrentBag<T> Objects;
+        private readonly Func<T> _objectGenerator;
 
         /// <summary>
         /// Ctor

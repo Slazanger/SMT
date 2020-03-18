@@ -3,31 +3,11 @@
     public class EdgeList
     {
         private float deltaX;
-        private float xmin;
-
-        private int hashSize;
         private Halfedge[] hash;
+        private int hashSize;
         private Halfedge leftEnd;
-        public Halfedge LeftEnd { get { return leftEnd; } }
         private Halfedge rightEnd;
-        public Halfedge RightEnd { get { return rightEnd; } }
-
-        public void Dispose()
-        {
-            Halfedge halfedge = leftEnd;
-            Halfedge prevHe;
-            while (halfedge != rightEnd)
-            {
-                prevHe = halfedge;
-                halfedge = halfedge.edgeListRightNeighbor;
-                prevHe.Dispose();
-            }
-            leftEnd = null;
-            rightEnd.Dispose();
-            rightEnd = null;
-
-            hash = null;
-        }
+        private float xmin;
 
         public EdgeList(float xmin, float deltaX, int sqrtSitesNb)
         {
@@ -48,38 +28,30 @@
             hash[hashSize - 1] = rightEnd;
         }
 
+        public Halfedge LeftEnd { get { return leftEnd; } }
+        public Halfedge RightEnd { get { return rightEnd; } }
+
+        public void Dispose()
+        {
+            Halfedge halfedge = leftEnd;
+            Halfedge prevHe;
+            while (halfedge != rightEnd)
+            {
+                prevHe = halfedge;
+                halfedge = halfedge.edgeListRightNeighbor;
+                prevHe.Dispose();
+            }
+            leftEnd = null;
+            rightEnd.Dispose();
+            rightEnd = null;
+
+            hash = null;
+        }
+
         /*
 		 * Insert newHalfedge to the right of lb
 		 * @param lb
 		 * @param newHalfedge
-		 */
-
-        public void Insert(Halfedge lb, Halfedge newHalfedge)
-        {
-            newHalfedge.edgeListLeftNeighbor = lb;
-            newHalfedge.edgeListRightNeighbor = lb.edgeListRightNeighbor;
-            lb.edgeListRightNeighbor.edgeListLeftNeighbor = newHalfedge;
-            lb.edgeListRightNeighbor = newHalfedge;
-        }
-
-        /*
-		 * This function only removes the Halfedge from the left-right list.
-		 * We cannot dispose it yet because we are still using it.
-		 * @param halfEdge
-		 */
-
-        public void Remove(Halfedge halfedge)
-        {
-            halfedge.edgeListLeftNeighbor.edgeListRightNeighbor = halfedge.edgeListRightNeighbor;
-            halfedge.edgeListRightNeighbor.edgeListLeftNeighbor = halfedge.edgeListLeftNeighbor;
-            halfedge.edge = Edge.DELETED;
-            halfedge.edgeListLeftNeighbor = halfedge.edgeListRightNeighbor = null;
-        }
-
-        /*
-		 * Find the rightmost Halfedge that is still elft of p
-		 * @param p
-		 * @return
 		 */
 
         public Halfedge EdgeListLeftNeighbor(Vector2f p)
@@ -130,6 +102,34 @@
             }
             return halfedge;
         }
+
+        public void Insert(Halfedge lb, Halfedge newHalfedge)
+        {
+            newHalfedge.edgeListLeftNeighbor = lb;
+            newHalfedge.edgeListRightNeighbor = lb.edgeListRightNeighbor;
+            lb.edgeListRightNeighbor.edgeListLeftNeighbor = newHalfedge;
+            lb.edgeListRightNeighbor = newHalfedge;
+        }
+
+        /*
+		 * This function only removes the Halfedge from the left-right list.
+		 * We cannot dispose it yet because we are still using it.
+		 * @param halfEdge
+		 */
+
+        public void Remove(Halfedge halfedge)
+        {
+            halfedge.edgeListLeftNeighbor.edgeListRightNeighbor = halfedge.edgeListRightNeighbor;
+            halfedge.edgeListRightNeighbor.edgeListLeftNeighbor = halfedge.edgeListLeftNeighbor;
+            halfedge.edge = Edge.DELETED;
+            halfedge.edgeListLeftNeighbor = halfedge.edgeListRightNeighbor = null;
+        }
+
+        /*
+		 * Find the rightmost Halfedge that is still elft of p
+		 * @param p
+		 * @return
+		 */
 
         // Get entry from the has table, pruning any deleted nodes
         private Halfedge GetHash(int b)

@@ -9,9 +9,8 @@ namespace csDelaunay
 
         #region Pool
 
-        private static Queue<Vertex> pool = new Queue<Vertex>();
-
         private static int nVertices = 0;
+        private static Queue<Vertex> pool = new Queue<Vertex>();
 
         private static Vertex Create(float x, float y)
         {
@@ -34,50 +33,18 @@ namespace csDelaunay
         #region Object
 
         private Vector2f coord;
-        public Vector2f Coord { get { return coord; } set { coord = value; } }
-
-        public float x { get { return coord.x; } }
-        public float y { get { return coord.y; } }
-
         private int vertexIndex;
-        public int VertexIndex { get { return vertexIndex; } }
 
         public Vertex(float x, float y)
         {
             Init(x, y);
         }
 
-        private Vertex Init(float x, float y)
-        {
-            coord = new Vector2f(x, y);
+        public Vector2f Coord { get { return coord; } set { coord = value; } }
 
-            return this;
-        }
-
-        public void Dispose()
-        {
-            coord = Vector2f.zero;
-            pool.Enqueue(this);
-        }
-
-        public void SetIndex()
-        {
-            vertexIndex = nVertices++;
-        }
-
-        public override string ToString()
-        {
-            return "Vertex (" + vertexIndex + ")";
-        }
-
-        /*
-		 * This is the only way to make a Vertex
-		 *
-		 * @param halfedge0
-		 * @param halfedge1
-		 * @return
-		 *
-		 */
+        public int VertexIndex { get { return vertexIndex; } }
+        public float x { get { return coord.x; } }
+        public float y { get { return coord.y; } }
 
         public static Vertex Intersect(Halfedge halfedge0, Halfedge halfedge1)
         {
@@ -126,6 +93,38 @@ namespace csDelaunay
 
             return Vertex.Create(intersectionX, intersectionY);
         }
+
+        public void Dispose()
+        {
+            coord = Vector2f.zero;
+            pool.Enqueue(this);
+        }
+
+        public void SetIndex()
+        {
+            vertexIndex = nVertices++;
+        }
+
+        public override string ToString()
+        {
+            return "Vertex (" + vertexIndex + ")";
+        }
+
+        private Vertex Init(float x, float y)
+        {
+            coord = new Vector2f(x, y);
+
+            return this;
+        }
+
+        /*
+		 * This is the only way to make a Vertex
+		 *
+		 * @param halfedge0
+		 * @param halfedge1
+		 * @return
+		 *
+		 */
 
         #endregion Object
     }

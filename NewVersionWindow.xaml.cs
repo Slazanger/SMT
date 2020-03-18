@@ -8,13 +8,20 @@ namespace SMT
     /// </summary>
     public partial class NewVersionWindow : Window
     {
-        public string NewVersion
+        public NewVersionWindow()
+        {
+            InitializeComponent();
+
+            DataContext = this;
+        }
+
+        public string CurrentVersion
         {
             get;
             set;
         }
 
-        public string CurrentVersion
+        public string NewVersion
         {
             get;
             set;
@@ -32,11 +39,10 @@ namespace SMT
             set;
         }
 
-        public NewVersionWindow()
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
-            InitializeComponent();
-
-            DataContext = this;
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -44,12 +50,6 @@ namespace SMT
             Window mainWindow = Application.Current.MainWindow;
             this.Left = mainWindow.Left + (mainWindow.Width - this.ActualWidth) / 2;
             this.Top = mainWindow.Top + (mainWindow.Height - this.ActualHeight) / 2;
-        }
-
-        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
-        {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
-            e.Handled = true;
         }
     }
 }

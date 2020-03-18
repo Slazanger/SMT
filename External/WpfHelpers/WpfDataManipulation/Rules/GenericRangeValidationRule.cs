@@ -3,11 +3,15 @@ using System.Windows.Controls;
 
 namespace WpfHelpers.WpfDataManipulation.Rules
 {
+    public class DecimalRangeValidationRule : GenericRangeValidationRule<decimal> { }
+
+    public class DoubleRangeValidationRule : GenericRangeValidationRule<double> { }
+
     public class GenericRangeValidationRule<T> : ValidationRule
-        where T : IComparable
+                where T : IComparable
     {
-        public T MinValue { get; set; }
         public T MaxValue { get; set; }
+        public T MinValue { get; set; }
 
         public override ValidationResult Validate(
             object value, System.Globalization.CultureInfo cultureInfo)
@@ -36,11 +40,7 @@ namespace WpfHelpers.WpfDataManipulation.Rules
 
     public class IntRangeValidationRule : GenericRangeValidationRule<int> { }
 
-    public class DoubleRangeValidationRule : GenericRangeValidationRule<double> { }
-
     public class LongRangeValidationRule : GenericRangeValidationRule<long> { }
 
     public class UIntRangeValidationRule : GenericRangeValidationRule<uint> { }
-
-    public class DecimalRangeValidationRule : GenericRangeValidationRule<decimal> { }
 }

@@ -6,20 +6,20 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
 {
     public abstract class AsyncCommandBase : IAsyncCommand
     {
-        public abstract bool CanExecute(object parameter);
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
-        public abstract Task ExecuteAsync(object parameter);
+        public abstract bool CanExecute(object parameter);
 
         public async void Execute(object parameter)
         {
             await ExecuteAsync(parameter);
         }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
+        public abstract Task ExecuteAsync(object parameter);
 
         public void RaiseCanExecuteChanged()
         {

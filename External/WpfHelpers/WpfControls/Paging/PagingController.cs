@@ -50,96 +50,11 @@ namespace WpfHelpers.WpfControls.Paging
         }
 
         /// <summary>
-        ///     Gets the command that, when executed, sets <see cref="CurrentPage" /> to 1.
+        ///     Occurs when the value of <see cref="CurrentPage" /> changes.
         /// </summary>
-        /// <value>The command that changes the current page.</value>
-        public ICommand GotoFirstPageCommand { get; }
+        public event EventHandler<CurrentPageChangedEventArgs> CurrentPageChanged;
 
-        /// <summary>
-        ///     Gets the command that, when executed, decrements <see cref="CurrentPage" /> by 1.
-        /// </summary>
-        /// <value>The command that changes the current page.</value>
-        public ICommand GotoPreviousPageCommand { get; }
-
-        /// <summary>
-        ///     Gets the command that, when executed, increments <see cref="CurrentPage" /> by 1.
-        /// </summary>
-        /// <value>The command that changes the current page.</value>
-        public ICommand GotoNextPageCommand { get; }
-
-        /// <summary>
-        ///     Gets the command that, when executed, sets <see cref="CurrentPage" /> to <see cref="PageCount" />.
-        /// </summary>
-        /// <value>The command that changes the current page.</value>
-        public ICommand GotoLastPageCommand { get; }
-
-        /// <summary>
-        ///     Gets or sets the total number of items to be divided into pages.
-        /// </summary>
-        /// <value>The item count.</value>
-        public int ItemCount
-        {
-            get { return itemCount; }
-
-            set
-            {
-                Contract.Requires(value >= 0);
-
-                itemCount = value;
-                RaisePropertyChanged(nameof(ItemCount));
-                RaisePropertyChanged(nameof(PageCount));
-                RaiseCanExecuteChanged(GotoLastPageCommand, GotoNextPageCommand);
-
-                if (CurrentPage > PageCount)
-                    CurrentPage = PageCount;
-            }
-        }
-
-        /// <summary>
-        ///     Gets or sets the number of items that each page contains.
-        /// </summary>
-        /// <value>The size of the page.</value>
-        public int PageSize
-        {
-            get { return pageSize; }
-
-            set
-            {
-                Contract.Requires(value > 0);
-
-                var oldStartIndex = CurrentPageStartIndex;
-                pageSize = value;
-                RaisePropertyChanged(nameof(PageSize));
-                RaisePropertyChanged(nameof(PageCount));
-                RaisePropertyChanged(nameof(CurrentPageStartIndex));
-                RaiseCanExecuteChanged(GotoLastPageCommand, GotoNextPageCommand);
-
-                if (oldStartIndex >= 0)
-                    CurrentPage = GetPageFromIndex(oldStartIndex);
-            }
-        }
-
-        /// <summary>
-        ///     Gets the number of pages required to contain all items.
-        /// </summary>
-        /// <value>The page count.</value>
-        public int PageCount
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<int>() == 0 || itemCount > 0);
-                Contract.Ensures(Contract.Result<int>() > 0 || itemCount == 0);
-
-                if (itemCount == 0)
-                    return 0;
-
-                var ceil = (int)Math.Ceiling((double)itemCount / pageSize);
-
-                Contract.Assume(ceil > 0);
-                // Math.Ceiling makes the static checker unable to prove the postcondition without help
-                return ceil;
-            }
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         ///     Gets or sets the current page.
@@ -182,12 +97,97 @@ namespace WpfHelpers.WpfControls.Paging
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        ///     Gets the command that, when executed, sets <see cref="CurrentPage" /> to 1.
+        /// </summary>
+        /// <value>The command that changes the current page.</value>
+        public ICommand GotoFirstPageCommand { get; }
 
         /// <summary>
-        ///     Occurs when the value of <see cref="CurrentPage" /> changes.
+        ///     Gets the command that, when executed, sets <see cref="CurrentPage" /> to <see cref="PageCount" />.
         /// </summary>
-        public event EventHandler<CurrentPageChangedEventArgs> CurrentPageChanged;
+        /// <value>The command that changes the current page.</value>
+        public ICommand GotoLastPageCommand { get; }
+
+        /// <summary>
+        ///     Gets the command that, when executed, increments <see cref="CurrentPage" /> by 1.
+        /// </summary>
+        /// <value>The command that changes the current page.</value>
+        public ICommand GotoNextPageCommand { get; }
+
+        /// <summary>
+        ///     Gets the command that, when executed, decrements <see cref="CurrentPage" /> by 1.
+        /// </summary>
+        /// <value>The command that changes the current page.</value>
+        public ICommand GotoPreviousPageCommand { get; }
+
+        /// <summary>
+        ///     Gets or sets the total number of items to be divided into pages.
+        /// </summary>
+        /// <value>The item count.</value>
+        public int ItemCount
+        {
+            get { return itemCount; }
+
+            set
+            {
+                Contract.Requires(value >= 0);
+
+                itemCount = value;
+                RaisePropertyChanged(nameof(ItemCount));
+                RaisePropertyChanged(nameof(PageCount));
+                RaiseCanExecuteChanged(GotoLastPageCommand, GotoNextPageCommand);
+
+                if (CurrentPage > PageCount)
+                    CurrentPage = PageCount;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the number of pages required to contain all items.
+        /// </summary>
+        /// <value>The page count.</value>
+        public int PageCount
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<int>() == 0 || itemCount > 0);
+                Contract.Ensures(Contract.Result<int>() > 0 || itemCount == 0);
+
+                if (itemCount == 0)
+                    return 0;
+
+                var ceil = (int)Math.Ceiling((double)itemCount / pageSize);
+
+                Contract.Assume(ceil > 0);
+                // Math.Ceiling makes the static checker unable to prove the postcondition without help
+                return ceil;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the number of items that each page contains.
+        /// </summary>
+        /// <value>The size of the page.</value>
+        public int PageSize
+        {
+            get { return pageSize; }
+
+            set
+            {
+                Contract.Requires(value > 0);
+
+                var oldStartIndex = CurrentPageStartIndex;
+                pageSize = value;
+                RaisePropertyChanged(nameof(PageSize));
+                RaisePropertyChanged(nameof(PageCount));
+                RaisePropertyChanged(nameof(CurrentPageStartIndex));
+                RaiseCanExecuteChanged(GotoLastPageCommand, GotoNextPageCommand);
+
+                if (oldStartIndex >= 0)
+                    CurrentPage = GetPageFromIndex(oldStartIndex);
+            }
+        }
 
         /// <summary>
         ///     Calls RaiseCanExecuteChanged on any number of DelegateCommand instances.

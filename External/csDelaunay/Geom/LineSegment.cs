@@ -4,21 +4,19 @@ namespace csDelaunay
 {
     public class LineSegment
     {
-        public static List<LineSegment> VisibleLineSegments(List<Edge> edges)
+        public Vector2f p0;
+
+        public Vector2f p1;
+
+        public LineSegment(Vector2f p0, Vector2f p1)
         {
-            List<LineSegment> segments = new List<LineSegment>();
+            this.p0 = p0;
+            this.p1 = p1;
+        }
 
-            foreach (Edge edge in edges)
-            {
-                if (edge.Visible())
-                {
-                    Vector2f p1 = edge.ClippedEnds[LR.LEFT];
-                    Vector2f p2 = edge.ClippedEnds[LR.RIGHT];
-                    segments.Add(new LineSegment(p1, p2));
-                }
-            }
-
-            return segments;
+        public static float CompareLengths(LineSegment edge0, LineSegment edge1)
+        {
+            return -CompareLengths_MAX(edge0, edge1);
         }
 
         public static float CompareLengths_MAX(LineSegment segment0, LineSegment segment1)
@@ -36,18 +34,21 @@ namespace csDelaunay
             return 0;
         }
 
-        public static float CompareLengths(LineSegment edge0, LineSegment edge1)
+        public static List<LineSegment> VisibleLineSegments(List<Edge> edges)
         {
-            return -CompareLengths_MAX(edge0, edge1);
-        }
+            List<LineSegment> segments = new List<LineSegment>();
 
-        public Vector2f p0;
-        public Vector2f p1;
+            foreach (Edge edge in edges)
+            {
+                if (edge.Visible())
+                {
+                    Vector2f p1 = edge.ClippedEnds[LR.LEFT];
+                    Vector2f p2 = edge.ClippedEnds[LR.RIGHT];
+                    segments.Add(new LineSegment(p1, p2));
+                }
+            }
 
-        public LineSegment(Vector2f p0, Vector2f p1)
-        {
-            this.p0 = p0;
-            this.p1 = p1;
+            return segments;
         }
     }
 }

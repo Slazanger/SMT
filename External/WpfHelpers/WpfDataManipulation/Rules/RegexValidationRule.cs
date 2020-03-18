@@ -12,6 +12,10 @@ namespace WpfHelpers.WpfDataManipulation.Rules
         private string _pattern;
         private Regex _regex;
 
+        public RegexValidationRule()
+        {
+        }
+
         public string Pattern
         {
             get { return _pattern; }
@@ -20,10 +24,6 @@ namespace WpfHelpers.WpfDataManipulation.Rules
                 _pattern = value;
                 _regex = new Regex(_pattern, RegexOptions.IgnoreCase);
             }
-        }
-
-        public RegexValidationRule()
-        {
         }
 
         public override ValidationResult Validate(object value, CultureInfo ultureInfo)

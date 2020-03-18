@@ -6,10 +6,22 @@ namespace SMT.EVEData
 {
     public class Server : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        private int m_numPlayers;
 
         private DateTime m_serverTime;
-        private int m_numPlayers;
+
+        public Server()
+        {
+            // EVE Time is basically UTC time
+            ServerTime = DateTime.UtcNow;
+
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(10000);
+            timer.Tick += new EventHandler(UpdateServerTime);
+            timer.Start();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public string Name { get; set; }
 
@@ -27,8 +39,6 @@ namespace SMT.EVEData
             }
         }
 
-        public string Version { get; set; }
-
         public DateTime ServerTime
         {
             get
@@ -42,16 +52,7 @@ namespace SMT.EVEData
             }
         }
 
-        public Server()
-        {
-            // EVE Time is basically UTC time
-            ServerTime = DateTime.UtcNow;
-
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(10000);
-            timer.Tick += new EventHandler(UpdateServerTime);
-            timer.Start();
-        }
+        public string Version { get; set; }
 
         public void UpdateServerTime(object sender, EventArgs e)
         {

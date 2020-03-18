@@ -5,7 +5,6 @@ namespace csDelaunay
     public class Triangle
     {
         private List<Site> sites;
-        public List<Site> Sites { get { return sites; } }
 
         public Triangle(Site a, Site b, Site c)
         {
@@ -14,6 +13,8 @@ namespace csDelaunay
             sites.Add(b);
             sites.Add(c);
         }
+
+        public List<Site> Sites { get { return sites; } }
 
         public void Dispose()
         {

@@ -5,63 +5,15 @@ namespace SMT
 {
     public class StaticJumpOverlay : INotifyPropertyChanged
     {
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        private bool m_Active;
 
         private string m_Name;
 
-        public string Name
-        {
-            get
-            {
-                return m_Name;
-            }
-            set
-            {
-                m_Name = value;
-                OnPropertyChanged("Name");
-            }
-        }
+        private Color m_OverlayColour;
 
         private string m_System;
 
-        public string System
-        {
-            get
-            {
-                return m_System;
-            }
-            set
-            {
-                m_System = value;
-                OnPropertyChanged("System");
-            }
-        }
-
-        private Color m_OverlayColour;
-
-        public Color OverlayColour
-        {
-            get
-            {
-                return m_OverlayColour;
-            }
-            set
-            {
-                m_OverlayColour = value;
-                OnPropertyChanged("OverlayColour");
-            }
-        }
-
-        private bool m_Active;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public bool Active
         {
@@ -77,5 +29,53 @@ namespace SMT
         }
 
         public EVEData.EveManager.JumpShip JumpShip { get; set; }
+
+        public string Name
+        {
+            get
+            {
+                return m_Name;
+            }
+            set
+            {
+                m_Name = value;
+                OnPropertyChanged("Name");
+            }
+        }
+
+        public Color OverlayColour
+        {
+            get
+            {
+                return m_OverlayColour;
+            }
+            set
+            {
+                m_OverlayColour = value;
+                OnPropertyChanged("OverlayColour");
+            }
+        }
+
+        public string System
+        {
+            get
+            {
+                return m_System;
+            }
+            set
+            {
+                m_System = value;
+                OnPropertyChanged("System");
+            }
+        }
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

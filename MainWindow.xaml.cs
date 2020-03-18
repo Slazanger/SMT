@@ -22,58 +22,19 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public string SMTVersion = "SMT_077";
-
-        /// <summary>
-        /// Main Region Manager
-        /// </summary>
-        public EVEData.EveManager EVEManager { get; set; }
-
-        public EVEData.AnomManager ANOMManager { get; set; }
-
         public static MainWindow AppWindow;
+        public string SMTVersion = "SMT_077";
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
-        private MapConfig MapConf { get; }
+        private List<UIElement> DynamicUniverseElements = new List<UIElement>();
 
-        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
+        private bool FilterByRegion = true;
 
-        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
+        private LogonWindow logonBrowserWindow;
 
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
-
-        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument FindDocWithContentID(Xceed.Wpf.AvalonDock.Layout.ILayoutElement root, string contentID)
-        {
-            Xceed.Wpf.AvalonDock.Layout.LayoutDocument content = null;
-
-            if (root is Xceed.Wpf.AvalonDock.Layout.ILayoutContainer)
-            {
-                Xceed.Wpf.AvalonDock.Layout.ILayoutContainer ic = root as Xceed.Wpf.AvalonDock.Layout.ILayoutContainer;
-                foreach (Xceed.Wpf.AvalonDock.Layout.ILayoutElement ie in ic.Children)
-                {
-                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument f = FindDocWithContentID(ie, contentID);
-                    if (f != null)
-                    {
-                        content = f;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                if (root is Xceed.Wpf.AvalonDock.Layout.LayoutDocument)
-                {
-                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument i = root as Xceed.Wpf.AvalonDock.Layout.LayoutDocument;
-                    if (i.ContentId == contentID)
-                    {
-                        content = i;
-                    }
-                }
-            }
-            return content;
-        }
 
         public MainWindow()
         {
@@ -257,399 +218,18 @@ namespace SMT
             ResetIntelSize();
         }
 
-        private void ResetIntelSize()
-        {
-            var RawIntelTextBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
-            RawIntelTextBlockFactory.SetValue(TextBlock.TextProperty, new Binding("."));
-            RawIntelTextBlockFactory.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
-            RawIntelTextBlockFactory.SetValue(TextBlock.FontSizeProperty, MapConf.IntelTextSize);
-            RawIntelTextBlockFactory.SetValue(TextBlock.ForegroundProperty, Brushes.Black);
-            var RawIntelTextTemplate = new DataTemplate();
-            RawIntelTextTemplate.VisualTree = RawIntelTextBlockFactory;
+        public EVEData.AnomManager ANOMManager { get; set; }
 
-            RawIntelBox.ItemTemplate = RawIntelTextTemplate;
-        }
+        /// <summary>
+        /// Main Region Manager
+        /// </summary>
+        public EVEData.EveManager EVEManager { get; set; }
 
-        private void CheckGitHubVersion()
-        {
-            string url = @"https://api.github.com/repos/slazanger/smt/releases/latest";
+        private MapConfig MapConf { get; }
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-            request.UserAgent = "SMT/0.xx";
+        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
 
-            request.BeginGetResponse(new AsyncCallback(CheckGitHubVersionCallback), request);
-        }
-
-        private void CheckGitHubVersionCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        GitHubRelease.Release releaseInfo = GitHubRelease.Release.FromJson(strContent);
-
-                        if (releaseInfo != null)
-                        {
-                            if (releaseInfo.TagName != SMTVersion)
-                            {
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
-                                {
-                                    NewVersionWindow nw = new NewVersionWindow();
-                                    nw.ReleaseInfo = releaseInfo.Body;
-                                    nw.CurrentVersion = SMTVersion;
-                                    nw.NewVersion = releaseInfo.TagName;
-                                    nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
-                                    nw.Show();
-                                }), DispatcherPriority.ApplicationIdle);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        private void UniverseUC_RequestRegionSystem(object sender, RoutedEventArgs e)
-        {
-            string sysName = e.OriginalSource as string;
-            RegionRC.FollowCharacter = false;
-            RegionRC.SelectSystem(sysName, true);
-
-            if (RegionLayoutDoc != null)
-            {
-                RegionLayoutDoc.IsSelected = true;
-            }
-        }
-
-        private void RegionRC_UniverseSystemSelect(object sender, RoutedEventArgs e)
-        {
-            string sysName = e.OriginalSource as string;
-            UniverseUC.ShowSystem(sysName);
-
-            if (UniverseLayoutDoc != null)
-            {
-                UniverseLayoutDoc.IsSelected = true;
-            }
-        }
-
-        private void RegionRC_CharacterSelectionChanged(object sender, PropertyChangedEventArgs e)
-        {
-            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
-        }
-
-        private void UiRefreshTimer_Tick(object sender, EventArgs e)
-        {
-            RedrawUniverse(false);
-        }
-
-        private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (RegionLayoutDoc != null)
-            {
-                RegionLayoutDoc.Title = RegionRC.Region.Name;
-            }
-
-            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
-        }
-
-        private void MapConf_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "AlwaysOnTop")
-            {
-                if (MapConf.AlwaysOnTop)
-                {
-                    this.Topmost = true;
-                }
-                else
-                {
-                    this.Topmost = false;
-                }
-            }
-
-            if (e.PropertyName == "WarningRange")
-            {
-                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
-                {
-                    lc.WarningSystemRange = MapConf.WarningRange;
-                    lc.warningSystemsNeedsUpdate = true;
-                }
-            }
-
-            if (e.PropertyName == "ShowZKillData")
-            {
-                EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
-            }
-
-            RegionRC.ReDrawMap(true);
-
-            if (e.PropertyName == "ShowRegionStandings")
-            {
-                RedrawUniverse(true);
-            }
-
-            if (e.PropertyName == "ShowUniverseRats")
-            {
-                RedrawUniverse(true);
-            }
-
-            if (e.PropertyName == "ShowUniversePods")
-            {
-                RedrawUniverse(true);
-            }
-
-            if (e.PropertyName == "ShowUniverseKills")
-            {
-                RedrawUniverse(true);
-            }
-
-            if (e.PropertyName == "UniverseDataScale")
-            {
-                RedrawUniverse(true);
-            }
-
-            if (e.PropertyName == "IntelTextSize")
-            {
-                ResetIntelSize();
-            }
-        }
-
-        private void MainWindow_Closed(object sender, EventArgs e)
-        {
-            // save off the dockmanager layout
-
-            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\Layout.dat";
-            try
-            {
-                Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
-                using (var sw = new StreamWriter(dockManagerLayoutName))
-                {
-                    ls.Serialize(sw);
-                }
-            }
-            catch
-            {
-            }
-
-            try
-            {
-                // Save the Map Colours
-                string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\MapConfig.dat";
-
-                // now serialise the class to disk
-                XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
-                using (TextWriter tw = new StreamWriter(mapConfigFileName))
-                {
-                    xms.Serialize(tw, MapConf);
-                }
-            }
-            catch
-            {
-            }
-
-            try
-            {
-                // save the Anom Data
-                // now serialise the class to disk
-                XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
-                string anomDataFilename = EVEManager.SaveDataFolder + @"\Anoms.dat";
-
-                using (TextWriter tw = new StreamWriter(anomDataFilename))
-                {
-                    anomxms.Serialize(tw, ANOMManager);
-                }
-            }
-            catch
-            { }
-
-            // save the character data
-            EVEManager.SaveData();
-            EVEManager.ShutDown();
-        }
-
-        private void RedrawUniverse(bool Redraw)
-        {
-            if (Redraw)
-            {
-                MainUniverseCanvas.Children.Clear();
-                AddRegionsToUniverse();
-            }
-            else
-            {
-                foreach (UIElement uie in DynamicUniverseElements)
-                {
-                    MainUniverseCanvas.Children.Remove(uie);
-                }
-                DynamicUniverseElements.Clear();
-            }
-
-            AddDataToUniverse();
-        }
-
-        private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "IsVisible" ||
-                e.PropertyName == "IsMouseOver" ||
-                e.PropertyName == "IsMouseCaptureWithin" ||
-                e.PropertyName == "ActualHeight" ||
-                e.PropertyName == "ActualWidth" ||
-
-                e.PropertyName == "IsKeyboardFocusWithin" ||
-                e.PropertyName == "SelectedProperty" ||
-                e.PropertyName == "SelectedPropertyItem" ||
-                e.PropertyName == "SelectedObjectType" ||
-                e.PropertyName == "SelectedObjectTypeName" ||
-                e.PropertyName == "Properties" ||
-                e.PropertyName == "SelectedObject"
-
-                )
-            {
-                return;
-            }
-
-            RegionRC.ReDrawMap(true);
-            UniverseUC.ReDrawMap(true, true, true);
-        }
-
-        private void OnIntelAdded(List<string> intelsystems)
-        {
-            bool PlaySound = false;
-
-            if (MapConf.PlayIntelSound)
-            {
-                if (MapConf.PlaySoundOnlyInDangerZone)
-                {
-                    if (MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
-                    {
-                        PlaySound = true;
-                    }
-
-                    foreach (string s in intelsystems)
-                    {
-                        foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
-                        {
-                            if (lc.WarningSystems != null)
-                            {
-                                foreach (string ls in lc.WarningSystems)
-                                {
-                                    if (ls == s)
-                                    {
-                                        PlaySound = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    PlaySound = true;
-                }
-            }
-
-            if (PlaySound)
-            {
-                Uri uri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                var player = new MediaPlayer();
-                player.Open(uri);
-                player.Play();
-            }
-        }
-
-        private void refreshData_Click(object sender, RoutedEventArgs e)
-        {
-            EVEManager.UpdateESIUniverseData();
-        }
-
-        private void ResetColourData_Click(object sender, RoutedEventArgs e)
-        {
-            MapConf.MapColours = new List<MapColours>();
-            MapConf.SetDefaultColours();
-            ColourListDropdown.ItemsSource = MapConf.MapColours;
-            ColourListDropdown.SelectedItem = MapConf.MapColours[0];
-
-            RegionRC.ReDrawMap();
-        }
-
-        private void btnHelp_Click(object sender, RoutedEventArgs e)
-        {
-            About popup = new About();
-            popup.ShowDialog();
-        }
-
-        private void ColourListDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            MapColours newSelection = ColourListDropdown.SelectedItem as MapColours;
-            if (newSelection == null)
-            {
-                return;
-            }
-
-            MapConf.ActiveColourScheme = newSelection;
-            ColoursPropertyGrid.SelectedObject = newSelection;
-            ColoursPropertyGrid.Update();
-
-            MapConf.DefaultColourSchemeName = newSelection.Name;
-        }
-
-        private void btnUpdateAnomList_Click(object sender, RoutedEventArgs e)
-        {
-            string pasteData = Clipboard.GetText();
-
-            if (pasteData != null || pasteData != string.Empty)
-            {
-                EVEData.AnomData ad = ANOMManager.ActiveSystem;
-
-                if (ad != null)
-                {
-                    ad.UpdateFromPaste(pasteData);
-                    AnomSigList.Items.Refresh();
-                    AnomSigList.UpdateLayout();
-                    CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
-                }
-            }
-        }
-
-        private void btnClearAnomList_Click(object sender, RoutedEventArgs e)
-        {
-            EVEData.AnomData ad = ANOMManager.ActiveSystem;
-            if (ad != null)
-            {
-                ad.Anoms.Clear();
-                AnomSigList.Items.Refresh();
-                AnomSigList.UpdateLayout();
-                CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
-            }
-        }
-
-        private LogonWindow logonBrowserWindow;
-
-        private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
-        {
-            string eSILogonURL = EVEManager.GetESILogonURL();
-
-            if (logonBrowserWindow != null)
-            {
-                logonBrowserWindow.Close();
-            }
-            System.Diagnostics.Process.Start(eSILogonURL);
-
-            logonBrowserWindow = new LogonWindow();
-            logonBrowserWindow.Owner = this;
-            logonBrowserWindow.ShowDialog();
-        }
+        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
 
         public Color stringToColour(string str)
         {
@@ -667,83 +247,80 @@ namespace SMT
             return Color.FromArgb(100, (byte)R, (byte)G, (byte)B);
         }
 
-        private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void AddDataToUniverse()
         {
-            if (RawIntelBox.SelectedItem == null)
+            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceRegion);
+            Brush CharacterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+
+            foreach (EVEData.MapRegion mr in EVEManager.Regions)
             {
-                return;
-            }
-
-            EVEData.IntelData intel = RawIntelBox.SelectedItem as EVEData.IntelData;
-
-            foreach (string s in intel.IntelString.Split(' '))
-            {
-                if (s == "")
+                bool AddTheraConnection = false;
+                foreach (EVEData.TheraConnection tc in EVEManager.TheraConnections)
                 {
-                    continue;
-                }
-
-                foreach (EVEData.System sys in EVEManager.Systems)
-                {
-                    if (s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(tc.Region, mr.Name, true) == 0)
                     {
-                        if (RegionRC.Region.Name != sys.Region)
-                        {
-                            RegionRC.SelectRegion(sys.Region);
-                        }
-
-                        RegionRC.SelectSystem(s);
-                        return;
+                        AddTheraConnection = true;
+                        break;
                     }
                 }
-            }
-        }
 
-        private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
-            if (c != null)
-            {
-                lock (c.ActiveRouteLock)
+                if (AddTheraConnection)
                 {
-                    c.ActiveRoute.Clear();
-                    c.Waypoints.Clear();
+                    Rectangle TheraShape = new Rectangle() { Width = 8, Height = 8 };
+
+                    TheraShape.Stroke = SysOutlineBrush;
+                    TheraShape.StrokeThickness = 1;
+                    TheraShape.StrokeLineJoin = PenLineJoin.Round;
+                    TheraShape.RadiusX = 2;
+                    TheraShape.RadiusY = 2;
+                    TheraShape.Fill = TheraBrush;
+
+                    TheraShape.DataContext = mr;
+                    TheraShape.MouseEnter += RegionThera_ShapeMouseOverHandler;
+                    TheraShape.MouseLeave += RegionThera_ShapeMouseOverHandler;
+
+                    Canvas.SetLeft(TheraShape, mr.UniverseViewX + 28);
+                    Canvas.SetTop(TheraShape, mr.UniverseViewY + 3);
+                    Canvas.SetZIndex(TheraShape, 22);
+                    MainUniverseCanvas.Children.Add(TheraShape);
+                    DynamicUniverseElements.Add(TheraShape);
                 }
-            }
-        }
 
-        private void TheraConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (sender != null)
-            {
-                DataGrid grid = sender as DataGrid;
-                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                bool AddCharacter = false;
+
+                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                 {
-                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
-                    EVEData.TheraConnection tc = dgr.Item as EVEData.TheraConnection;
-
-                    if (tc != null)
+                    EVEData.System s = EVEManager.GetEveSystem(lc.Location);
+                    if (s != null && s.Region == mr.Name)
                     {
-                        RegionRC.SelectSystem(tc.System, true);
+                        AddCharacter = true;
                     }
                 }
+
+                if (AddCharacter)
+                {
+                    Rectangle CharacterShape = new Rectangle() { Width = 8, Height = 8 };
+
+                    CharacterShape.Stroke = SysOutlineBrush;
+                    CharacterShape.StrokeThickness = 1;
+                    CharacterShape.StrokeLineJoin = PenLineJoin.Round;
+                    CharacterShape.RadiusX = 2;
+                    CharacterShape.RadiusY = 2;
+                    CharacterShape.Fill = CharacterBrush;
+
+                    CharacterShape.DataContext = mr;
+                    CharacterShape.MouseEnter += RegionCharacter_ShapeMouseOverHandler;
+                    CharacterShape.MouseLeave += RegionCharacter_ShapeMouseOverHandler;
+
+                    Canvas.SetLeft(CharacterShape, mr.UniverseViewX + 28);
+                    Canvas.SetTop(CharacterShape, mr.UniverseViewY - 11);
+                    Canvas.SetZIndex(CharacterShape, 23);
+                    MainUniverseCanvas.Children.Add(CharacterShape);
+                    DynamicUniverseElements.Add(CharacterShape);
+                }
             }
         }
-
-        private void btn_UpdateThera_Click(object sender, RoutedEventArgs e)
-        {
-            EVEManager.UpdateTheraConnections();
-        }
-
-        private void MenuItem_ViewIntelClick(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private List<UIElement> DynamicUniverseElements = new List<UIElement>();
 
         private void AddRegionsToUniverse()
         {
@@ -1005,77 +582,613 @@ namespace SMT
             }
         }
 
-        private void AddDataToUniverse()
+        private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
         {
-            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
-            Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceRegion);
-            Brush CharacterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+            string eSILogonURL = EVEManager.GetESILogonURL();
 
-            foreach (EVEData.MapRegion mr in EVEManager.Regions)
+            if (logonBrowserWindow != null)
             {
-                bool AddTheraConnection = false;
-                foreach (EVEData.TheraConnection tc in EVEManager.TheraConnections)
+                logonBrowserWindow.Close();
+            }
+            System.Diagnostics.Process.Start(eSILogonURL);
+
+            logonBrowserWindow = new LogonWindow();
+            logonBrowserWindow.Owner = this;
+            logonBrowserWindow.ShowDialog();
+        }
+
+        private void btn_UpdateThera_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.UpdateTheraConnections();
+        }
+
+        private void btnClearAnomList_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.AnomData ad = ANOMManager.ActiveSystem;
+            if (ad != null)
+            {
+                ad.Anoms.Clear();
+                AnomSigList.Items.Refresh();
+                AnomSigList.UpdateLayout();
+                CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
+            }
+        }
+
+        private void btnHelp_Click(object sender, RoutedEventArgs e)
+        {
+            About popup = new About();
+            popup.ShowDialog();
+        }
+
+        private void btnUpdateAnomList_Click(object sender, RoutedEventArgs e)
+        {
+            string pasteData = Clipboard.GetText();
+
+            if (pasteData != null || pasteData != string.Empty)
+            {
+                EVEData.AnomData ad = ANOMManager.ActiveSystem;
+
+                if (ad != null)
                 {
-                    if (string.Compare(tc.Region, mr.Name, true) == 0)
+                    ad.UpdateFromPaste(pasteData);
+                    AnomSigList.Items.Refresh();
+                    AnomSigList.UpdateLayout();
+                    CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
+                }
+            }
+        }
+
+        private void CharactersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    EVEData.LocalCharacter lc = dgr.Item as EVEData.LocalCharacter;
+
+                    if (lc != null)
                     {
-                        AddTheraConnection = true;
+                        RegionRC.SelectSystem(lc.Location, true);
+                    }
+                }
+            }
+        }
+
+        private void CheckGitHubVersion()
+        {
+            string url = @"https://api.github.com/repos/slazanger/smt/releases/latest";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+            request.UserAgent = "SMT/0.xx";
+
+            request.BeginGetResponse(new AsyncCallback(CheckGitHubVersionCallback), request);
+        }
+
+        private void CheckGitHubVersionCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        GitHubRelease.Release releaseInfo = GitHubRelease.Release.FromJson(strContent);
+
+                        if (releaseInfo != null)
+                        {
+                            if (releaseInfo.TagName != SMTVersion)
+                            {
+                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                {
+                                    NewVersionWindow nw = new NewVersionWindow();
+                                    nw.ReleaseInfo = releaseInfo.Body;
+                                    nw.CurrentVersion = SMTVersion;
+                                    nw.NewVersion = releaseInfo.TagName;
+                                    nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
+                                    nw.Show();
+                                }), DispatcherPriority.ApplicationIdle);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                EVEManager.IntelDataList.Clear();
+            }), DispatcherPriority.ApplicationIdle);
+        }
+
+        private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.JumpBridges.Clear();
+            EVEData.Navigation.ClearJumpBridges();
+        }
+
+        private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null)
+            {
+                lock (c.ActiveRouteLock)
+                {
+                    c.ActiveRoute.Clear();
+                    c.Waypoints.Clear();
+                }
+            }
+        }
+
+        private void ColourListDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MapColours newSelection = ColourListDropdown.SelectedItem as MapColours;
+            if (newSelection == null)
+            {
+                return;
+            }
+
+            MapConf.ActiveColourScheme = newSelection;
+            ColoursPropertyGrid.SelectedObject = newSelection;
+            ColoursPropertyGrid.Update();
+
+            MapConf.DefaultColourSchemeName = newSelection.Name;
+        }
+
+        private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsVisible" ||
+                e.PropertyName == "IsMouseOver" ||
+                e.PropertyName == "IsMouseCaptureWithin" ||
+                e.PropertyName == "ActualHeight" ||
+                e.PropertyName == "ActualWidth" ||
+
+                e.PropertyName == "IsKeyboardFocusWithin" ||
+                e.PropertyName == "SelectedProperty" ||
+                e.PropertyName == "SelectedPropertyItem" ||
+                e.PropertyName == "SelectedObjectType" ||
+                e.PropertyName == "SelectedObjectTypeName" ||
+                e.PropertyName == "Properties" ||
+                e.PropertyName == "SelectedObject"
+
+                )
+            {
+                return;
+            }
+
+            RegionRC.ReDrawMap(true);
+            UniverseUC.ReDrawMap(true, true, true);
+        }
+
+        private void CopyWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null)
+            {
+                string WPT = c.GetWayPointText();
+
+                try
+                {
+                    Clipboard.SetText(WPT);
+                }
+                catch { }
+            }
+        }
+
+        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument FindDocWithContentID(Xceed.Wpf.AvalonDock.Layout.ILayoutElement root, string contentID)
+        {
+            Xceed.Wpf.AvalonDock.Layout.LayoutDocument content = null;
+
+            if (root is Xceed.Wpf.AvalonDock.Layout.ILayoutContainer)
+            {
+                Xceed.Wpf.AvalonDock.Layout.ILayoutContainer ic = root as Xceed.Wpf.AvalonDock.Layout.ILayoutContainer;
+                foreach (Xceed.Wpf.AvalonDock.Layout.ILayoutElement ie in ic.Children)
+                {
+                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument f = FindDocWithContentID(ie, contentID);
+                    if (f != null)
+                    {
+                        content = f;
                         break;
                     }
                 }
-
-                if (AddTheraConnection)
+            }
+            else
+            {
+                if (root is Xceed.Wpf.AvalonDock.Layout.LayoutDocument)
                 {
-                    Rectangle TheraShape = new Rectangle() { Width = 8, Height = 8 };
+                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument i = root as Xceed.Wpf.AvalonDock.Layout.LayoutDocument;
+                    if (i.ContentId == contentID)
+                    {
+                        content = i;
+                    }
+                }
+            }
+            return content;
+        }
 
-                    TheraShape.Stroke = SysOutlineBrush;
-                    TheraShape.StrokeThickness = 1;
-                    TheraShape.StrokeLineJoin = PenLineJoin.Round;
-                    TheraShape.RadiusX = 2;
-                    TheraShape.RadiusY = 2;
-                    TheraShape.Fill = TheraBrush;
+        private async void ImportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ImportJumpGatesBtn.IsEnabled = false;
+            ClearJumpGatesBtn.IsEnabled = false;
 
-                    TheraShape.DataContext = mr;
-                    TheraShape.MouseEnter += RegionThera_ShapeMouseOverHandler;
-                    TheraShape.MouseLeave += RegionThera_ShapeMouseOverHandler;
+            foreach (EVEData.LocalCharacter c in EVEManager.LocalCharacters)
+            {
+                if (c.ESILinked)
+                {
+                    List<EVEData.JumpBridge> jbl = await c.FindJumpGates(GateSearchFilter.Text);
 
-                    Canvas.SetLeft(TheraShape, mr.UniverseViewX + 28);
-                    Canvas.SetTop(TheraShape, mr.UniverseViewY + 3);
-                    Canvas.SetZIndex(TheraShape, 22);
-                    MainUniverseCanvas.Children.Add(TheraShape);
-                    DynamicUniverseElements.Add(TheraShape);
+                    foreach (EVEData.JumpBridge jb in jbl)
+                    {
+                        bool found = false;
+
+                        foreach (EVEData.JumpBridge jbr in EVEManager.JumpBridges)
+                        {
+                            if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
+                            {
+                                found = true;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            EVEManager.JumpBridges.Add(jb);
+                        }
+                    }
+                }
+            }
+
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+
+            ImportJumpGatesBtn.IsEnabled = true;
+            ClearJumpGatesBtn.IsEnabled = true;
+        }
+
+        private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (!Clipboard.ContainsText(TextDataFormat.Text))
+            {
+                return;
+            }
+            String JBText = Clipboard.GetText(TextDataFormat.Text);
+
+            using (StringReader reader = new StringReader(JBText))
+            {
+                string line = string.Empty;
+                do
+                {
+                    line = reader.ReadLine();
+                    if (line != null)
+                    {
+                        // ignore comments
+                        if (line.StartsWith("#"))
+                        {
+                            continue;
+                        }
+
+                        string[] bits = line.Split(' ');
+                        if (bits.Length > 3)
+                        {
+                            long IDFrom = 0;
+                            long.TryParse(bits[0], out IDFrom);
+
+                            string from = bits[1];
+                            string to = bits[3];
+
+                            EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
+                        }
+                    }
+                } while (line != null);
+            }
+        }
+
+        private void MainWindow_Closed(object sender, EventArgs e)
+        {
+            // save off the dockmanager layout
+
+            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\Layout.dat";
+            try
+            {
+                Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                using (var sw = new StreamWriter(dockManagerLayoutName))
+                {
+                    ls.Serialize(sw);
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                // Save the Map Colours
+                string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\MapConfig.dat";
+
+                // now serialise the class to disk
+                XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
+                using (TextWriter tw = new StreamWriter(mapConfigFileName))
+                {
+                    xms.Serialize(tw, MapConf);
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                // save the Anom Data
+                // now serialise the class to disk
+                XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
+                string anomDataFilename = EVEManager.SaveDataFolder + @"\Anoms.dat";
+
+                using (TextWriter tw = new StreamWriter(anomDataFilename))
+                {
+                    anomxms.Serialize(tw, ANOMManager);
+                }
+            }
+            catch
+            { }
+
+            // save the character data
+            EVEManager.SaveData();
+            EVEManager.ShutDown();
+        }
+
+        private void MapConf_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "AlwaysOnTop")
+            {
+                if (MapConf.AlwaysOnTop)
+                {
+                    this.Topmost = true;
+                }
+                else
+                {
+                    this.Topmost = false;
+                }
+            }
+
+            if (e.PropertyName == "WarningRange")
+            {
+                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                {
+                    lc.WarningSystemRange = MapConf.WarningRange;
+                    lc.warningSystemsNeedsUpdate = true;
+                }
+            }
+
+            if (e.PropertyName == "ShowZKillData")
+            {
+                EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
+            }
+
+            RegionRC.ReDrawMap(true);
+
+            if (e.PropertyName == "ShowRegionStandings")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "ShowUniverseRats")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "ShowUniversePods")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "ShowUniverseKills")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "UniverseDataScale")
+            {
+                RedrawUniverse(true);
+            }
+
+            if (e.PropertyName == "IntelTextSize")
+            {
+                ResetIntelSize();
+            }
+        }
+
+        private void MenuItem_ViewIntelClick(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void OnIntelAdded(List<string> intelsystems)
+        {
+            bool PlaySound = false;
+
+            if (MapConf.PlayIntelSound)
+            {
+                if (MapConf.PlaySoundOnlyInDangerZone)
+                {
+                    if (MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
+                    {
+                        PlaySound = true;
+                    }
+
+                    foreach (string s in intelsystems)
+                    {
+                        foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                        {
+                            if (lc.WarningSystems != null)
+                            {
+                                foreach (string ls in lc.WarningSystems)
+                                {
+                                    if (ls == s)
+                                    {
+                                        PlaySound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    PlaySound = true;
+                }
+            }
+
+            if (PlaySound)
+            {
+                Uri uri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                var player = new MediaPlayer();
+                player.Open(uri);
+                player.Play();
+            }
+        }
+
+        private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (RawIntelBox.SelectedItem == null)
+            {
+                return;
+            }
+
+            EVEData.IntelData intel = RawIntelBox.SelectedItem as EVEData.IntelData;
+
+            foreach (string s in intel.IntelString.Split(' '))
+            {
+                if (s == "")
+                {
+                    continue;
                 }
 
-                bool AddCharacter = false;
+                foreach (EVEData.System sys in EVEManager.Systems)
+                {
+                    if (s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        if (RegionRC.Region.Name != sys.Region)
+                        {
+                            RegionRC.SelectRegion(sys.Region);
+                        }
+
+                        RegionRC.SelectSystem(s);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void RedrawUniverse(bool Redraw)
+        {
+            if (Redraw)
+            {
+                MainUniverseCanvas.Children.Clear();
+                AddRegionsToUniverse();
+            }
+            else
+            {
+                foreach (UIElement uie in DynamicUniverseElements)
+                {
+                    MainUniverseCanvas.Children.Remove(uie);
+                }
+                DynamicUniverseElements.Clear();
+            }
+
+            AddDataToUniverse();
+        }
+
+        private void refreshData_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.UpdateESIUniverseData();
+        }
+
+        private void RegionCharacter_ShapeMouseOverHandler(object sender, MouseEventArgs e)
+        {
+            Shape obj = sender as Shape;
+
+            EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
+
+            if (obj.IsMouseOver)
+            {
+                RegionCharacterInfo.PlacementTarget = obj;
+                RegionCharacterInfo.VerticalOffset = 5;
+                RegionCharacterInfo.HorizontalOffset = 15;
+
+                RegionCharacterInfoSP.Children.Clear();
 
                 foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                 {
                     EVEData.System s = EVEManager.GetEveSystem(lc.Location);
-                    if (s != null && s.Region == mr.Name)
+                    if (s != null && s.Region == selectedRegion.Name)
                     {
-                        AddCharacter = true;
+                        Label l = new Label();
+                        l.Content = lc.Name + " (" + lc.Location + ")";
+                        RegionCharacterInfoSP.Children.Add(l);
                     }
                 }
 
-                if (AddCharacter)
+                RegionCharacterInfo.IsOpen = true;
+            }
+            else
+            {
+                RegionCharacterInfo.IsOpen = false;
+            }
+        }
+
+        private void RegionRC_CharacterSelectionChanged(object sender, PropertyChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+        }
+
+        private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (RegionLayoutDoc != null)
+            {
+                RegionLayoutDoc.Title = RegionRC.Region.Name;
+            }
+
+            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+        }
+
+        private void RegionRC_UniverseSystemSelect(object sender, RoutedEventArgs e)
+        {
+            string sysName = e.OriginalSource as string;
+            UniverseUC.ShowSystem(sysName);
+
+            if (UniverseLayoutDoc != null)
+            {
+                UniverseLayoutDoc.IsSelected = true;
+            }
+        }
+
+        private void RegionShape_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Shape obj = sender as Shape;
+            EVEData.MapRegion mr = obj.DataContext as EVEData.MapRegion;
+            if (mr == null)
+            {
+                return;
+            }
+
+            if (e.ClickCount == 2)
+            {
+                RegionRC.SelectRegion(mr.Name);
+                if (RegionLayoutDoc != null)
                 {
-                    Rectangle CharacterShape = new Rectangle() { Width = 8, Height = 8 };
-
-                    CharacterShape.Stroke = SysOutlineBrush;
-                    CharacterShape.StrokeThickness = 1;
-                    CharacterShape.StrokeLineJoin = PenLineJoin.Round;
-                    CharacterShape.RadiusX = 2;
-                    CharacterShape.RadiusY = 2;
-                    CharacterShape.Fill = CharacterBrush;
-
-                    CharacterShape.DataContext = mr;
-                    CharacterShape.MouseEnter += RegionCharacter_ShapeMouseOverHandler;
-                    CharacterShape.MouseLeave += RegionCharacter_ShapeMouseOverHandler;
-
-                    Canvas.SetLeft(CharacterShape, mr.UniverseViewX + 28);
-                    Canvas.SetTop(CharacterShape, mr.UniverseViewY - 11);
-                    Canvas.SetZIndex(CharacterShape, 23);
-                    MainUniverseCanvas.Children.Add(CharacterShape);
-                    DynamicUniverseElements.Add(CharacterShape);
+                    RegionLayoutDoc.IsSelected = true;
                 }
             }
         }
@@ -1122,72 +1235,90 @@ namespace SMT
             }
         }
 
-        private void RegionCharacter_ShapeMouseOverHandler(object sender, MouseEventArgs e)
+        private void ResetColourData_Click(object sender, RoutedEventArgs e)
         {
-            Shape obj = sender as Shape;
+            MapConf.MapColours = new List<MapColours>();
+            MapConf.SetDefaultColours();
+            ColourListDropdown.ItemsSource = MapConf.MapColours;
+            ColourListDropdown.SelectedItem = MapConf.MapColours[0];
 
-            EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
+            RegionRC.ReDrawMap();
+        }
 
-            if (obj.IsMouseOver)
+        private void ResetIntelSize()
+        {
+            var RawIntelTextBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
+            RawIntelTextBlockFactory.SetValue(TextBlock.TextProperty, new Binding("."));
+            RawIntelTextBlockFactory.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+            RawIntelTextBlockFactory.SetValue(TextBlock.FontSizeProperty, MapConf.IntelTextSize);
+            RawIntelTextBlockFactory.SetValue(TextBlock.ForegroundProperty, Brushes.Black);
+            var RawIntelTextTemplate = new DataTemplate();
+            RawIntelTextTemplate.VisualTree = RawIntelTextBlockFactory;
+
+            RawIntelBox.ItemTemplate = RawIntelTextTemplate;
+        }
+
+        private void TheraConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
             {
-                RegionCharacterInfo.PlacementTarget = obj;
-                RegionCharacterInfo.VerticalOffset = 5;
-                RegionCharacterInfo.HorizontalOffset = 15;
-
-                RegionCharacterInfoSP.Children.Clear();
-
-                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
                 {
-                    EVEData.System s = EVEManager.GetEveSystem(lc.Location);
-                    if (s != null && s.Region == selectedRegion.Name)
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    EVEData.TheraConnection tc = dgr.Item as EVEData.TheraConnection;
+
+                    if (tc != null)
                     {
-                        Label l = new Label();
-                        l.Content = lc.Name + " (" + lc.Location + ")";
-                        RegionCharacterInfoSP.Children.Add(l);
+                        RegionRC.SelectSystem(tc.System, true);
                     }
                 }
-
-                RegionCharacterInfo.IsOpen = true;
-            }
-            else
-            {
-                RegionCharacterInfo.IsOpen = false;
             }
         }
 
-        private void RegionShape_MouseDown(object sender, MouseButtonEventArgs e)
+        private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            Shape obj = sender as Shape;
-            EVEData.MapRegion mr = obj.DataContext as EVEData.MapRegion;
-            if (mr == null)
-            {
-                return;
-            }
+            RedrawUniverse(false);
+        }
 
-            if (e.ClickCount == 2)
+        private void UniverseUC_RequestRegionSystem(object sender, RoutedEventArgs e)
+        {
+            string sysName = e.OriginalSource as string;
+            RegionRC.FollowCharacter = false;
+            RegionRC.SelectSystem(sysName, true);
+
+            if (RegionLayoutDoc != null)
             {
-                RegionRC.SelectRegion(mr.Name);
-                if (RegionLayoutDoc != null)
+                RegionLayoutDoc.IsSelected = true;
+            }
+        }
+
+        private void UpdateLocalFromClipboardBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string pasteData = Clipboard.GetText();
+
+            List<string> CharactersToResolve = new List<string>();
+            if (pasteData != null || pasteData != string.Empty)
+            {
+                string[] localItems = pasteData.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (String item in localItems)
                 {
-                    RegionLayoutDoc.IsSelected = true;
+                    if (item.All(x => char.IsLetterOrDigit(x) || char.IsWhiteSpace(x) || x == '-' || x == '\''))
+                    {
+                        CharactersToResolve.Add(item);
+                    }
                 }
             }
+
+            if (CharactersToResolve.Count > 0)
+            {
+                EVEManager.BulkUpdateCharacterCache(CharactersToResolve);
+            }
         }
 
-        private void ZKBFeed_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ZKBFeed.SelectedIndex == -1)
-            {
-                return;
-            }
-
-            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
-
-            if (zkbs != null)
-            {
-                string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
-                System.Diagnostics.Process.Start(KillURL);
-            }
         }
 
         private void ZKBContexMenu_ShowSystem_Click(object sender, RoutedEventArgs e)
@@ -1226,7 +1357,37 @@ namespace SMT
             }
         }
 
-        private bool FilterByRegion = true;
+        private void ZKBFeed_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (ZKBFeed.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+
+            if (zkbs != null)
+            {
+                string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
+                System.Diagnostics.Process.Start(KillURL);
+            }
+        }
+
+        private void ZKBFeed_MouseDoubleClick_1(object sender, MouseButtonEventArgs e)
+        {
+            if (ZKBFeed.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+
+            if (zkbs != null)
+            {
+                string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
+                System.Diagnostics.Process.Start(KillURL);
+            }
+        }
 
         private bool ZKBFeedFilter(object item)
         {
@@ -1263,168 +1424,6 @@ namespace SMT
                 {
                 }
             }
-        }
-
-        private void UpdateLocalFromClipboardBtn_Click(object sender, RoutedEventArgs e)
-        {
-            string pasteData = Clipboard.GetText();
-
-            List<string> CharactersToResolve = new List<string>();
-            if (pasteData != null || pasteData != string.Empty)
-            {
-                string[] localItems = pasteData.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (String item in localItems)
-                {
-                    if (item.All(x => char.IsLetterOrDigit(x) || char.IsWhiteSpace(x) || x == '-' || x == '\''))
-                    {
-                        CharactersToResolve.Add(item);
-                    }
-                }
-            }
-
-            if (CharactersToResolve.Count > 0)
-            {
-                EVEManager.BulkUpdateCharacterCache(CharactersToResolve);
-            }
-        }
-
-        private void ZKBFeed_MouseDoubleClick_1(object sender, MouseButtonEventArgs e)
-        {
-            if (ZKBFeed.SelectedIndex == -1)
-            {
-                return;
-            }
-
-            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
-
-            if (zkbs != null)
-            {
-                string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
-                System.Diagnostics.Process.Start(KillURL);
-            }
-        }
-
-        private void CharactersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (sender != null)
-            {
-                DataGrid grid = sender as DataGrid;
-                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
-                {
-                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
-                    EVEData.LocalCharacter lc = dgr.Item as EVEData.LocalCharacter;
-
-                    if (lc != null)
-                    {
-                        RegionRC.SelectSystem(lc.Location, true);
-                    }
-                }
-            }
-        }
-
-        private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (!Clipboard.ContainsText(TextDataFormat.Text))
-            {
-                return;
-            }
-            String JBText = Clipboard.GetText(TextDataFormat.Text);
-
-            using (StringReader reader = new StringReader(JBText))
-            {
-                string line = string.Empty;
-                do
-                {
-                    line = reader.ReadLine();
-                    if (line != null)
-                    {
-                        // ignore comments
-                        if (line.StartsWith("#"))
-                        {
-                            continue;
-                        }
-
-                        string[] bits = line.Split(' ');
-                        if (bits.Length > 3)
-                        {
-                            long IDFrom = 0;
-                            long.TryParse(bits[0], out IDFrom);
-
-                            string from = bits[1];
-                            string to = bits[3];
-
-                            EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
-                        }
-                    }
-                } while (line != null);
-            }
-        }
-
-        private async void ImportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
-        {
-            ImportJumpGatesBtn.IsEnabled = false;
-            ClearJumpGatesBtn.IsEnabled = false;
-
-            foreach (EVEData.LocalCharacter c in EVEManager.LocalCharacters)
-            {
-                if (c.ESILinked)
-                {
-                    List<EVEData.JumpBridge> jbl = await c.FindJumpGates(GateSearchFilter.Text);
-
-                    foreach (EVEData.JumpBridge jb in jbl)
-                    {
-                        bool found = false;
-
-                        foreach (EVEData.JumpBridge jbr in EVEManager.JumpBridges)
-                        {
-                            if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
-                            {
-                                found = true;
-                            }
-                        }
-
-                        if (!found)
-                        {
-                            EVEManager.JumpBridges.Add(jb);
-                        }
-                    }
-                }
-            }
-
-            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
-
-            ImportJumpGatesBtn.IsEnabled = true;
-            ClearJumpGatesBtn.IsEnabled = true;
-        }
-
-        private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
-        {
-            EVEManager.JumpBridges.Clear();
-            EVEData.Navigation.ClearJumpBridges();
-        }
-
-        private void CopyWaypointsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
-            if (c != null)
-            {
-                string WPT = c.GetWayPointText();
-
-                try
-                {
-                    Clipboard.SetText(WPT);
-                }
-                catch { }
-            }
-        }
-
-        private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                EVEManager.IntelDataList.Clear();
-            }), DispatcherPriority.ApplicationIdle);
         }
 
         /*

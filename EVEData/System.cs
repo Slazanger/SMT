@@ -57,24 +57,10 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Gets or sets the Name of the system
+        /// Gets or sets the an incursion is active in this system
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Region this system belongs to
-        /// </summary>
-        public string Region { get; set; }
-
-        /// <summary>
-        /// Gets or sets Eve's internal ID for this System
-        /// </summary>
-        public long ID { get; set; }
-
-        /// <summary>
-        /// Gets or sets EVE's internal Constellation ID
-        /// </summary>
-        public string ConstellationID { get; set; }
+        [XmlIgnoreAttribute]
+        public bool ActiveIncursion { get; set; }
 
         /// <summary>
         /// Gets or sets the X coordinate in real space for this system
@@ -92,47 +78,40 @@ namespace SMT.EVEData
         public double ActualZ { get; set; }
 
         /// <summary>
-        /// Gets or sets the Systems True Security Value
+        /// Gets or sets EVE's internal Constellation ID
         /// </summary>
-        public double TrueSec { get; set; }
+        public string ConstellationID { get; set; }
+
+        public bool HasIceBelt { get; set; }
+
+        public bool HasJoveObservatory { get; set; }
+
+        [XmlIgnoreAttribute]
+        public bool HasJumpBeacon { get; set; }
 
         /// <summary>
         /// Gets or sets if this system has an NPC Station
         /// </summary>
         public bool HasNPCStation { get; set; }
 
-        public bool HasIceBelt { get; set; }
-
-        public bool HasJoveObservatory { get; set; }
-
-        public double RadiusAU { get; set; }
+        /// <summary>
+        /// Gets or sets Eve's internal ID for this System
+        /// </summary>
+        public long ID { get; set; }
 
         [XmlIgnoreAttribute]
-        public bool HasJumpBeacon { get; set; }
+        public float IHubOccupancyLevel { get; set; }
+
+        [XmlIgnoreAttribute]
+        public DateTimeOffset IHubVunerabliltyEnd { get; set; }
+
+        [XmlIgnoreAttribute]
+        public DateTimeOffset IHubVunerabliltyStart { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of NPC Kills in the last hour
+        /// Gets or sets the list of Jumps from this system
         /// </summary>
-        [XmlIgnoreAttribute]
-        public int NPCKillsLastHour { get; set; }
-
-        /// <summary>
-        /// Gets or sets the delta of NPC Kills in the last hour
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public int NPCKillsDeltaLastHour { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of pod kills in the last hour
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public int PodKillsLastHour { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of player ships killed in the last hour
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public int ShipKillsLastHour { get; set; }
+        public List<string> Jumps { get; set; }
 
         /// <summary>
         /// Gets or sets the number of pods killed in the last hour
@@ -141,22 +120,21 @@ namespace SMT.EVEData
         public int JumpsLastHour { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the alliance holding sov in this system
+        /// Gets or sets the Name of the system
         /// </summary>
-        [XmlIgnoreAttribute]
-        public long SOVAllianceTCU { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the alliance holding sov in this system
+        /// Gets or sets the delta of NPC Kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public long SOVAllianceIHUB { get; set; }
+        public int NPCKillsDeltaLastHour { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the corporation holding sov in this system
+        /// Gets or sets the number of NPC Kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public long SOVCorp { get; set; }
+        public int NPCKillsLastHour { get; set; }
 
         /// <summary>
         /// Gets or sets the Faction of the system if owned by an NPC Corp
@@ -165,10 +143,23 @@ namespace SMT.EVEData
         public string NPCSOVFaction { get; set; }
 
         /// <summary>
-        /// Gets or sets the an incursion is active in this system
+        /// Gets or sets the number of pod kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public bool ActiveIncursion { get; set; }
+        public int PodKillsLastHour { get; set; }
+
+        public double RadiusAU { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Region this system belongs to
+        /// </summary>
+        public string Region { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of player ships killed in the last hour
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public int ShipKillsLastHour { get; set; }
 
         /// <summary>
         /// Gets or sets the an incursion is active in this system
@@ -176,28 +167,37 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public List<StructureHunter.Structures> SHStructures { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name of the alliance holding sov in this system
+        /// </summary>
         [XmlIgnoreAttribute]
-        public DateTimeOffset IHubVunerabliltyStart { get; set; }
+        public long SOVAllianceIHUB { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the alliance holding sov in this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public long SOVAllianceTCU { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the corporation holding sov in this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public long SOVCorp { get; set; }
 
         [XmlIgnoreAttribute]
-        public DateTimeOffset IHubVunerabliltyEnd { get; set; }
-
-        [XmlIgnoreAttribute]
-        public float IHubOccupancyLevel { get; set; }
-
-        [XmlIgnoreAttribute]
-        public DateTimeOffset TCUVunerabliltyStart { get; set; }
+        public float TCUOccupancyLevel { get; set; }
 
         [XmlIgnoreAttribute]
         public DateTimeOffset TCUVunerabliltyEnd { get; set; }
 
         [XmlIgnoreAttribute]
-        public float TCUOccupancyLevel { get; set; }
+        public DateTimeOffset TCUVunerabliltyStart { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of Jumps from this system
+        /// Gets or sets the Systems True Security Value
         /// </summary>
-        public List<string> Jumps { get; set; }
+        public double TrueSec { get; set; }
 
         public override string ToString()
         {

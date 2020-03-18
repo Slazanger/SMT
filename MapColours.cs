@@ -5,25 +5,37 @@ namespace SMT
 {
     public class MapColours
     {
-        public override string ToString() => Name;
+        [Category("Incursion")]
+        [DisplayName("Active Incursion")]
+        public Color ActiveIncursionColour { get; set; }
 
-        [Browsable(false)]
-        public string Name { get; set; }
+        [Category("Character")]
+        [DisplayName("Highlight")]
+        public Color CharacterHighlightColour { get; set; }
 
-        [Browsable(false)]
-        public bool UserEditable { get; set; }
+        [Category("Character")]
+        [DisplayName("Text")]
+        public Color CharacterTextColour { get; set; }
+
+        [Category("Character")]
+        [DisplayName("Text Size")]
+        public int CharacterTextSize { get; set; }
+
+        [Category("Gates")]
+        [DisplayName("Constellation")]
+        public Color ConstellationGateColour { get; set; }
+
+        [Category("SOV")]
+        [DisplayName("Constellation Highlight")]
+        public Color ConstellationHighlightColour { get; set; }
+
+        [Category("ESI Data")]
+        [DisplayName("Overlay")]
+        public Color ESIOverlayColour { get; set; }
 
         [Category("Jump Bridges")]
         [DisplayName("Friendly")]
         public Color FriendlyJumpBridgeColour { get; set; }
-
-        [Category("Systems")]
-        [DisplayName("Name Size")]
-        public int SystemTextSize { get; set; }
-
-        [Category("Systems")]
-        [DisplayName("Outline")]
-        public Color SystemOutlineColour { get; set; }
 
         [Category("Systems")]
         [DisplayName("In Region")]
@@ -33,6 +45,37 @@ namespace SMT
         [DisplayName("In Region Text")]
         public Color InRegionSystemTextColour { get; set; }
 
+        [Category("Intel")]
+        [DisplayName("Clear")]
+        public Color IntelClearOverlayColour { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Warning")]
+        public Color IntelOverlayColour { get; set; }
+
+        [Category("Navigation")]
+        [DisplayName("In Range")]
+        public Color JumpRangeInColour { get; set; }
+
+        [Category("Navigation")]
+        [DisplayName("In Range Highlight")]
+        public Color JumpRangeInColourHighlight { get; set; }
+
+        [Category("Navigation")]
+        [DisplayName("Jump Overlap Highlight")]
+        public Color JumpRangeOverlapHighlight { get; set; }
+
+        [Category("General")]
+        [DisplayName("Map Background")]
+        public Color MapBackgroundColour { get; set; }
+
+        [Browsable(false)]
+        public string Name { get; set; }
+
+        [Category("Gates")]
+        [DisplayName("Normal")]
+        public Color NormalGateColour { get; set; }
+
         [Category("Systems")]
         [DisplayName("Out of Region")]
         public Color OutRegionSystemColour { get; set; }
@@ -41,17 +84,13 @@ namespace SMT
         [DisplayName("Out of Region Text")]
         public Color OutRegionSystemTextColour { get; set; }
 
-        [Category("Gates")]
-        [DisplayName("Normal")]
-        public Color NormalGateColour { get; set; }
+        [Category("Popup")]
+        [DisplayName("Background")]
+        public Color PopupBackground { get; set; }
 
-        [Category("Gates")]
-        [DisplayName("Constellation")]
-        public Color ConstellationGateColour { get; set; }
-
-        [Category("General")]
-        [DisplayName("Map Background")]
-        public Color MapBackgroundColour { get; set; }
+        [Category("Popup")]
+        [DisplayName("Text")]
+        public Color PopupText { get; set; }
 
         [Category("General")]
         [DisplayName("Region Marker Zoomed")]
@@ -69,46 +108,6 @@ namespace SMT
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
 
-        [Category("Character")]
-        [DisplayName("Highlight")]
-        public Color CharacterHighlightColour { get; set; }
-
-        [Category("Character")]
-        [DisplayName("Text")]
-        public Color CharacterTextColour { get; set; }
-
-        [Category("Character")]
-        [DisplayName("Text Size")]
-        public int CharacterTextSize { get; set; }
-
-        [Category("ESI Data")]
-        [DisplayName("Overlay")]
-        public Color ESIOverlayColour { get; set; }
-
-        [Category("Intel")]
-        [DisplayName("Warning")]
-        public Color IntelOverlayColour { get; set; }
-
-        [Category("Intel")]
-        [DisplayName("Clear")]
-        public Color IntelClearOverlayColour { get; set; }
-
-        [Category("Navigation")]
-        [DisplayName("In Range")]
-        public Color JumpRangeInColour { get; set; }
-
-        [Category("Navigation")]
-        [DisplayName("In Range Highlight")]
-        public Color JumpRangeInColourHighlight { get; set; }
-
-        [Category("Navigation")]
-        [DisplayName("Jump Overlap Highlight")]
-        public Color JumpRangeOverlapHighlight { get; set; }
-
-        [Category("Incursion")]
-        [DisplayName("Active Incursion")]
-        public Color ActiveIncursionColour { get; set; }
-
         [Category("SOV")]
         [DisplayName("Structure Vunerable")]
         public Color SOVStructureVunerableColour { get; set; }
@@ -117,9 +116,13 @@ namespace SMT
         [DisplayName("Structure Vunerable Soon")]
         public Color SOVStructureVunerableSoonColour { get; set; }
 
-        [Category("SOV")]
-        [DisplayName("Constellation Highlight")]
-        public Color ConstellationHighlightColour { get; set; }
+        [Category("Systems")]
+        [DisplayName("Outline")]
+        public Color SystemOutlineColour { get; set; }
+
+        [Category("Systems")]
+        [DisplayName("Name Size")]
+        public int SystemTextSize { get; set; }
 
         [Category("Thera")]
         [DisplayName("Thera Entrance (Region)")]
@@ -129,17 +132,12 @@ namespace SMT
         [DisplayName("Thera Entrance (System)")]
         public Color TheraEntranceSystem { get; set; }
 
+        [Browsable(false)]
+        public bool UserEditable { get; set; }
+
         [Category("Zkill")]
         [DisplayName("Data Overlay")]
         public Color ZKillDataOverlay { get; set; }
-
-        [Category("Popup")]
-        [DisplayName("Background")]
-        public Color PopupBackground { get; set; }
-
-        [Category("Popup")]
-        [DisplayName("Text")]
-        public Color PopupText { get; set; }
 
         static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
         {
@@ -218,5 +216,7 @@ namespace SMT
 
             return secCol;
         }
+
+        public override string ToString() => Name;
     }
 }

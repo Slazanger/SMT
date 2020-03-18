@@ -7,16 +7,6 @@ namespace SMT
 {
     internal class Utils
     {
-        static public void SerializToDisk<T>(T obj, string fileName)
-        {
-            XmlSerializer xms = new XmlSerializer(typeof(T));
-
-            using (TextWriter tw = new StreamWriter(fileName))
-            {
-                xms.Serialize(tw, obj);
-            }
-        }
-
         static public T DeserializeFromDisk<T>(string filename)
         {
             try
@@ -69,6 +59,16 @@ namespace SMT
                 return Encoding.UTF32;
             }
             return Encoding.Default;
+        }
+
+        static public void SerializToDisk<T>(T obj, string fileName)
+        {
+            XmlSerializer xms = new XmlSerializer(typeof(T));
+
+            using (TextWriter tw = new StreamWriter(fileName))
+            {
+                xms.Serialize(tw, obj);
+            }
         }
     }
 }

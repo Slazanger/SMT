@@ -4,50 +4,6 @@ namespace SMT.EVEData
 {
     public class Structure
     {
-        public enum StructureType
-        {
-            // citadel
-            Astrahus,
-
-            Fortizar,
-            FactionFortizar,
-            Keepstar,
-
-            // engineering
-            Raitaru,
-
-            Azbel,
-            Sotiyo,
-
-            // refineries
-            Athanor,
-
-            Tatara,
-            NPC_Station,
-
-            // Ansiblex
-            JumpGate,
-
-            CynoBeacon,
-            CynoJammer
-        }
-
-        public enum PowerState
-        {
-            Normal,
-            LowPower,
-            Shield,
-            Armor,
-            Unknown,
-        }
-
-        public long ID { get; set; }
-        public string Name { get; set; }
-        public string System { get; set; }
-        public DateTime LastUpdate { get; set; }
-        public PowerState State { get; set; }
-        public StructureType Type { get; set; }
-
         public Structure()
         {
         }
@@ -115,5 +71,49 @@ namespace SMT.EVEData
                     break;
             }
         }
+
+        public enum PowerState
+        {
+            Normal,
+            LowPower,
+            Shield,
+            Armor,
+            Unknown,
+        }
+
+        public enum StructureType
+        {
+            // citadel
+            Astrahus,
+
+            Fortizar,
+            FactionFortizar,
+            Keepstar,
+
+            // engineering
+            Raitaru,
+
+            Azbel,
+            Sotiyo,
+
+            // refineries
+            Athanor,
+
+            Tatara,
+            NPC_Station,
+
+            // Ansiblex
+            JumpGate,
+
+            CynoBeacon,
+            CynoJammer
+        }
+
+        public long ID { get; set; }
+        public DateTime LastUpdate { get; set; }
+        public string Name { get; set; }
+        public PowerState State { get; set; }
+        public string System { get; set; }
+        public StructureType Type { get; set; }
     }
 }

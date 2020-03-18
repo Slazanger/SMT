@@ -11,9 +11,8 @@ namespace csDelaunay
     {
         #region Pool
 
-        private static Queue<Edge> pool = new Queue<Edge>();
-
         private static int nEdges = 0;
+        private static Queue<Edge> pool = new Queue<Edge>();
         /*
 		 * This is the only way to create a new Edge
 		 * @param site0
@@ -78,6 +77,8 @@ namespace csDelaunay
 
         #endregion Pool
 
+        public static readonly Edge DELETED = new Edge();
+
         public static List<Edge> SelectEdgesForSitePoint(Vector2f coord, List<Edge> edgesToTest)
         {
             return edgesToTest.FindAll(
@@ -95,46 +96,41 @@ namespace csDelaunay
             });
         }
 
-        public static readonly Edge DELETED = new Edge();
-
         #region Object
 
         // The equation of the edge: ax + by = c
         public float a, b, c;
 
+        // Once clipVertices() is called, this Disctinary will hold two Points
+        // representing the clipped coordinates of the left and the right ends...
+        private Dictionary<LR, Vector2f> clippedVertices;
+
+        private int edgeIndex;
+
         // The two Voronoi vertices that the edge connects (if one of them is null, the edge extends to infinity)
         private Vertex leftVertex;
 
-        public Vertex LeftVertex { get { return leftVertex; } }
-
         private Vertex rightVertex;
+
+        // The two input Sites for which this Edge is a bisector:
+        private Dictionary<LR, Site> sites;
+
+        public Edge()
+        {
+            edgeIndex = nEdges++;
+            Init();
+        }
+
+        public Dictionary<LR, Vector2f> ClippedEnds { get { return clippedVertices; } }
+        public int EdgeIndex { get { return edgeIndex; } }
+        public Site LeftSite { get { return sites[LR.LEFT]; } set { sites[LR.LEFT] = value; } }
+        public Vertex LeftVertex { get { return leftVertex; } }
+        public Site RightSite { get { return sites[LR.RIGHT]; } set { sites[LR.RIGHT] = value; } }
         public Vertex RightVertex { get { return rightVertex; } }
 
-        public Vertex Vertex(LR leftRight)
+        public static int CompareSitesDistances(Edge edge0, Edge edge1)
         {
-            return leftRight == LR.LEFT ? leftVertex : rightVertex;
-        }
-
-        public void SetVertex(LR leftRight, Vertex v)
-        {
-            if (leftRight == LR.LEFT)
-            {
-                leftVertex = v;
-            }
-            else
-            {
-                rightVertex = v;
-            }
-        }
-
-        public bool IsPartOfConvexHull()
-        {
-            return leftVertex == null || rightVertex == null;
-        }
-
-        public float SitesDistance()
-        {
-            return (LeftSite.Coord - RightSite.Coord).magnitude;
+            return -CompareSitesDistances_MAX(edge0, edge1);
         }
 
         public static int CompareSitesDistances_MAX(Edge edge0, Edge edge1)
@@ -151,79 +147,6 @@ namespace csDelaunay
             }
             return 0;
         }
-
-        public static int CompareSitesDistances(Edge edge0, Edge edge1)
-        {
-            return -CompareSitesDistances_MAX(edge0, edge1);
-        }
-
-        // Once clipVertices() is called, this Disctinary will hold two Points
-        // representing the clipped coordinates of the left and the right ends...
-        private Dictionary<LR, Vector2f> clippedVertices;
-
-        public Dictionary<LR, Vector2f> ClippedEnds { get { return clippedVertices; } }
-
-        // Unless the entire Edge is outside the bounds.
-        // In that case visible will be false:
-        public bool Visible()
-        {
-            return clippedVertices != null;
-        }
-
-        // The two input Sites for which this Edge is a bisector:
-        private Dictionary<LR, Site> sites;
-
-        public Site LeftSite { get { return sites[LR.LEFT]; } set { sites[LR.LEFT] = value; } }
-        public Site RightSite { get { return sites[LR.RIGHT]; } set { sites[LR.RIGHT] = value; } }
-
-        public Site Site(LR leftRight)
-        {
-            return sites[leftRight];
-        }
-
-        private int edgeIndex;
-        public int EdgeIndex { get { return edgeIndex; } }
-
-        public void Dispose()
-        {
-            leftVertex = null;
-            rightVertex = null;
-            if (clippedVertices != null)
-            {
-                clippedVertices.Clear();
-                clippedVertices = null;
-            }
-            sites.Clear();
-            sites = null;
-
-            pool.Enqueue(this);
-        }
-
-        public Edge()
-        {
-            edgeIndex = nEdges++;
-            Init();
-        }
-
-        public Edge Init()
-        {
-            sites = new Dictionary<LR, Site>();
-
-            return this;
-        }
-
-        public override string ToString()
-        {
-            return "Edge " + edgeIndex + "; sites " + sites[LR.LEFT] + ", " + sites[LR.RIGHT] +
-                "; endVertices " + (leftVertex != null ? leftVertex.VertexIndex.ToString() : "null") + ", " +
-                    (rightVertex != null ? rightVertex.VertexIndex.ToString() : "null") + "::";
-        }
-
-        /*
-		 * Set clippedVertices to contain the two ends of the portion of the Voronoi edge that is visible
-		 * within the bounds. If no part of the Edge falls within the bounds, leave clippedVertices null
-		 * @param bounds
-		 */
 
         public void ClipVertices(Rectf bounds)
         {
@@ -361,6 +284,80 @@ namespace csDelaunay
                 clippedVertices[LR.LEFT] = new Vector2f(x1, y1);
             }
         }
+
+        public void Dispose()
+        {
+            leftVertex = null;
+            rightVertex = null;
+            if (clippedVertices != null)
+            {
+                clippedVertices.Clear();
+                clippedVertices = null;
+            }
+            sites.Clear();
+            sites = null;
+
+            pool.Enqueue(this);
+        }
+
+        public Edge Init()
+        {
+            sites = new Dictionary<LR, Site>();
+
+            return this;
+        }
+
+        public bool IsPartOfConvexHull()
+        {
+            return leftVertex == null || rightVertex == null;
+        }
+
+        public void SetVertex(LR leftRight, Vertex v)
+        {
+            if (leftRight == LR.LEFT)
+            {
+                leftVertex = v;
+            }
+            else
+            {
+                rightVertex = v;
+            }
+        }
+
+        public Site Site(LR leftRight)
+        {
+            return sites[leftRight];
+        }
+
+        public float SitesDistance()
+        {
+            return (LeftSite.Coord - RightSite.Coord).magnitude;
+        }
+
+        public override string ToString()
+        {
+            return "Edge " + edgeIndex + "; sites " + sites[LR.LEFT] + ", " + sites[LR.RIGHT] +
+                "; endVertices " + (leftVertex != null ? leftVertex.VertexIndex.ToString() : "null") + ", " +
+                    (rightVertex != null ? rightVertex.VertexIndex.ToString() : "null") + "::";
+        }
+
+        public Vertex Vertex(LR leftRight)
+        {
+            return leftRight == LR.LEFT ? leftVertex : rightVertex;
+        }
+
+        // Unless the entire Edge is outside the bounds.
+        // In that case visible will be false:
+        public bool Visible()
+        {
+            return clippedVertices != null;
+        }
+
+        /*
+		 * Set clippedVertices to contain the two ends of the portion of the Voronoi edge that is visible
+		 * within the bounds. If no part of the Edge falls within the bounds, leave clippedVertices null
+		 * @param bounds
+		 */
 
         #endregion Object
     }

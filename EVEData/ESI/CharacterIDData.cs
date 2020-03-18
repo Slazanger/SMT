@@ -10,10 +10,9 @@ namespace CharacterIDs
     using Newtonsoft.Json.Converters;
     using System.Globalization;
 
-    public partial class CharacterIdData
+    public static class Serialize
     {
-        [JsonProperty("characters")]
-        public Character[] Characters { get; set; }
+        public static string ToJson(this CharacterIdData self) => JsonConvert.SerializeObject(self, CharacterIDs.Converter.Settings);
     }
 
     public partial class Character
@@ -27,12 +26,13 @@ namespace CharacterIDs
 
     public partial class CharacterIdData
     {
-        public static CharacterIdData FromJson(string json) => JsonConvert.DeserializeObject<CharacterIdData>(json, CharacterIDs.Converter.Settings);
+        [JsonProperty("characters")]
+        public Character[] Characters { get; set; }
     }
 
-    public static class Serialize
+    public partial class CharacterIdData
     {
-        public static string ToJson(this CharacterIdData self) => JsonConvert.SerializeObject(self, CharacterIDs.Converter.Settings);
+        public static CharacterIdData FromJson(string json) => JsonConvert.DeserializeObject<CharacterIdData>(json, CharacterIDs.Converter.Settings);
     }
 
     internal class Converter

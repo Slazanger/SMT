@@ -46,9 +46,20 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        ///  Gets or sets the English name of this region
+        /// Gets or sets the "Name" on Dotlan, used in URL's etc
         /// </summary>
-        public string Name { get; set; }
+        public string DotLanRef { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Regions Faction name
+        /// </summary>
+        public string Faction { get; set; }
+
+        public bool HasHighSecSystems { get; set; }
+
+        public bool HasLowSecSystems { get; set; }
+
+        public bool HasNullSecSystems { get; set; }
 
         /// <summary>
         /// Gets or sets the region ID
@@ -56,19 +67,19 @@ namespace SMT.EVEData
         public string ID { get; set; }
 
         /// <summary>
-        /// Gets or sets the Regions Faction name
+        /// Gets or sets the dictionary of systems on this map
         /// </summary>
-        public string Faction { get; set; }
+        public SerializableDictionary<string, MapSystem> MapSystems { get; set; }
 
         /// <summary>
-        /// Gets or sets the Regions X coord on the universe map
+        ///  Gets or sets the English name of this region
         /// </summary>
-        public double UniverseViewX { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the Regions Y coord on the universe map
+        /// Gets or sets the list of links to other Regions
         /// </summary>
-        public double UniverseViewY { get; set; }
+        public List<string> RegionLinks { get; set; }
 
         /// <summary>
         /// Gets or sets the Regions X coord on the universe map
@@ -86,23 +97,14 @@ namespace SMT.EVEData
         public double RegionZ { get; set; }
 
         /// <summary>
-        /// Gets or sets the "Name" on Dotlan, used in URL's etc
+        /// Gets or sets the Regions X coord on the universe map
         /// </summary>
-        public string DotLanRef { get; set; }
+        public double UniverseViewX { get; set; }
 
         /// <summary>
-        /// Gets or sets the dictionary of systems on this map
+        /// Gets or sets the Regions Y coord on the universe map
         /// </summary>
-        public SerializableDictionary<string, MapSystem> MapSystems { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of links to other Regions
-        /// </summary>
-        public List<string> RegionLinks { get; set; }
-
-        public bool HasHighSecSystems { get; set; }
-        public bool HasLowSecSystems { get; set; }
-        public bool HasNullSecSystems { get; set; }
+        public double UniverseViewY { get; set; }
 
         /// <summary>
         /// Is the System on this region map : note as we're using the dotlan layout we have out of region systems on the map for navigability reasons

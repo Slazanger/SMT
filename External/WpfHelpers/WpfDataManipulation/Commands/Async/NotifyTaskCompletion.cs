@@ -4,6 +4,22 @@ using System.Threading.Tasks;
 
 namespace WpfHelpers.WpfDataManipulation.Commands.Async
 {
+    public sealed class NotifyTaskCompletion<TResult> : NotifyTaskCompletionBase
+    {
+        public NotifyTaskCompletion(Task<TResult> task) : base(task)
+        {
+        }
+
+        public TResult Result
+        {
+            get
+            {
+                return (Task.Status == TaskStatus.RanToCompletion) ?
+                    ((Task<TResult>)Task).Result : default(TResult);
+            }
+        }
+    }
+
     public class NotifyTaskCompletionBase : INotifyPropertyChanged
     {
         public NotifyTaskCompletionBase(Task task)
@@ -12,24 +28,17 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
             TaskCompletion = WatchTaskAsync(task);
         }
 
-        public Task Task { get; protected set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public bool IsCanceled { get { return Task.IsCanceled; } }
-        public bool IsFaulted { get { return Task.IsFaulted; } }
-        public TaskStatus Status { get { return Task.Status; } }
-        public bool IsCompleted { get { return Task.IsCompleted; } }
-        public bool IsNotCompleted { get { return !Task.IsCompleted; } }
-
-        public bool IsSuccessfullyCompleted
+        public string ErrorMessage
         {
             get
             {
-                return Task.Status ==
-                       TaskStatus.RanToCompletion;
+                return (InnerException == null) ?
+                    null : InnerException.Message;
             }
         }
 
-        public Task TaskCompletion { get; protected set; }
         public AggregateException Exception { get { return Task.Exception; } }
 
         public Exception InnerException
@@ -41,14 +50,23 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
             }
         }
 
-        public string ErrorMessage
+        public bool IsCanceled { get { return Task.IsCanceled; } }
+        public bool IsCompleted { get { return Task.IsCompleted; } }
+        public bool IsFaulted { get { return Task.IsFaulted; } }
+        public bool IsNotCompleted { get { return !Task.IsCompleted; } }
+
+        public bool IsSuccessfullyCompleted
         {
             get
             {
-                return (InnerException == null) ?
-                    null : InnerException.Message;
+                return Task.Status ==
+                       TaskStatus.RanToCompletion;
             }
         }
+
+        public TaskStatus Status { get { return Task.Status; } }
+        public Task Task { get; protected set; }
+        public Task TaskCompletion { get; protected set; }
 
         protected async Task WatchTaskAsync(Task task)
         {
@@ -81,24 +99,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
             {
                 propertyChanged(this, new PropertyChangedEventArgs("IsSuccessfullyCompleted"));
                 propertyChanged(this, new PropertyChangedEventArgs("Result"));
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-    }
-
-    public sealed class NotifyTaskCompletion<TResult> : NotifyTaskCompletionBase
-    {
-        public NotifyTaskCompletion(Task<TResult> task) : base(task)
-        {
-        }
-
-        public TResult Result
-        {
-            get
-            {
-                return (Task.Status == TaskStatus.RanToCompletion) ?
-                    ((Task<TResult>)Task).Result : default(TResult);
             }
         }
     }

@@ -5,22 +5,56 @@ namespace csDelaunay
 {
     public class Voronoi
     {
-        private SiteList sites;
-        private List<Triangle> triangles;
-
         private List<Edge> edges;
-        public List<Edge> Edges { get { return edges; } }
 
         // TODO generalize this so it doesn't have to be a rectangle;
         // then we can make the fractal voronois-within-voronois
         private Rectf plotBounds;
 
-        public Rectf PlotBounds { get { return plotBounds; } }
-
+        private SiteList sites;
         private Dictionary<Vector2f, Site> sitesIndexedByLocation;
+        private List<Triangle> triangles;
+        private Random weigthDistributor;
+
+        public Voronoi(List<Vector2f> points, Rectf plotBounds)
+        {
+            weigthDistributor = new Random();
+            Init(points, plotBounds);
+        }
+
+        public Voronoi(List<Vector2f> points, Rectf plotBounds, int lloydIterations)
+        {
+            weigthDistributor = new Random();
+            Init(points, plotBounds);
+            LloydRelaxation(lloydIterations);
+        }
+
+        public List<Edge> Edges { get { return edges; } }
+        public Rectf PlotBounds { get { return plotBounds; } }
         public Dictionary<Vector2f, Site> SitesIndexedByLocation { get { return sitesIndexedByLocation; } }
 
-        private Random weigthDistributor;
+        public static int CompareByYThenX(Site s1, Site s2)
+        {
+            if (s1.y < s2.y) return -1;
+            if (s1.y > s2.y) return 1;
+            if (s1.x < s2.x) return -1;
+            if (s1.x > s2.x) return 1;
+            return 0;
+        }
+
+        public static int CompareByYThenX(Site s1, Vector2f s2)
+        {
+            if (s1.y < s2.y) return -1;
+            if (s1.y > s2.y) return 1;
+            if (s1.x < s2.x) return -1;
+            if (s1.x > s2.x) return 1;
+            return 0;
+        }
+
+        public List<Circle> Circles()
+        {
+            return sites.Circles();
+        }
 
         public void Dispose()
         {
@@ -43,101 +77,6 @@ namespace csDelaunay
             sitesIndexedByLocation.Clear();
             sitesIndexedByLocation = null;
         }
-
-        public Voronoi(List<Vector2f> points, Rectf plotBounds)
-        {
-            weigthDistributor = new Random();
-            Init(points, plotBounds);
-        }
-
-        public Voronoi(List<Vector2f> points, Rectf plotBounds, int lloydIterations)
-        {
-            weigthDistributor = new Random();
-            Init(points, plotBounds);
-            LloydRelaxation(lloydIterations);
-        }
-
-        private void Init(List<Vector2f> points, Rectf plotBounds)
-        {
-            sites = new SiteList();
-            sitesIndexedByLocation = new Dictionary<Vector2f, Site>();
-            AddSites(points);
-            this.plotBounds = plotBounds;
-            triangles = new List<Triangle>();
-            edges = new List<Edge>();
-
-            FortunesAlgorithm();
-        }
-
-        private void AddSites(List<Vector2f> points)
-        {
-            for (int i = 0; i < points.Count; i++)
-            {
-                AddSite(points[i], i);
-            }
-        }
-
-        private void AddSite(Vector2f p, int index)
-        {
-            float weigth = (float)weigthDistributor.NextDouble() * 100;
-            Site site = Site.Create(p, index, weigth);
-            sites.Add(site);
-            sitesIndexedByLocation[p] = site;
-        }
-
-        public List<Vector2f> Region(Vector2f p)
-        {
-            Site site;
-            if (sitesIndexedByLocation.TryGetValue(p, out site))
-            {
-                return site.Region(plotBounds);
-            }
-            else
-            {
-                return new List<Vector2f>();
-            }
-        }
-
-        public List<Vector2f> NeighborSitesForSite(Vector2f coord)
-        {
-            List<Vector2f> points = new List<Vector2f>();
-            Site site;
-            if (sitesIndexedByLocation.TryGetValue(coord, out site))
-            {
-                List<Site> sites = site.NeighborSites();
-                foreach (Site neighbor in sites)
-                {
-                    points.Add(neighbor.Coord);
-                }
-            }
-
-            return points;
-        }
-
-        public List<Circle> Circles()
-        {
-            return sites.Circles();
-        }
-
-        public List<LineSegment> VoronoiBoundarayForSite(Vector2f coord)
-        {
-            return LineSegment.VisibleLineSegments(Edge.SelectEdgesForSitePoint(coord, edges));
-        }
-
-        /*
-		public List<LineSegment> DelaunayLinesForSite(Vector2f coord) {
-			return DelaunayLinesForEdges(Edge.SelectEdgesForSitePoint(coord, edges));
-		}*/
-
-        public List<LineSegment> VoronoiDiagram()
-        {
-            return LineSegment.VisibleLineSegments(edges);
-        }
-
-        /*
-		public List<LineSegment> Hull() {
-			return DelaunayLinesForEdges(HullEdges());
-		}*/
 
         public List<Edge> HullEdges()
         {
@@ -169,6 +108,100 @@ namespace csDelaunay
             return points;
         }
 
+        public void LloydRelaxation(int nbIterations)
+        {
+            // Reapeat the whole process for the number of iterations asked
+            for (int i = 0; i < nbIterations; i++)
+            {
+                List<Vector2f> newPoints = new List<Vector2f>();
+                // Go thourgh all sites
+                sites.ResetListIndex();
+                Site site = sites.Next();
+
+                while (site != null)
+                {
+                    // Loop all corners of the site to calculate the centroid
+                    List<Vector2f> region = site.Region(plotBounds);
+                    if (region.Count < 1)
+                    {
+                        site = sites.Next();
+                        continue;
+                    }
+
+                    Vector2f centroid = Vector2f.zero;
+                    float signedArea = 0;
+                    float x0 = 0;
+                    float y0 = 0;
+                    float x1 = 0;
+                    float y1 = 0;
+                    float a = 0;
+                    // For all vertices except last
+                    for (int j = 0; j < region.Count - 1; j++)
+                    {
+                        x0 = region[j].x;
+                        y0 = region[j].y;
+                        x1 = region[j + 1].x;
+                        y1 = region[j + 1].y;
+                        a = x0 * y1 - x1 * y0;
+                        signedArea += a;
+                        centroid.x += (x0 + x1) * a;
+                        centroid.y += (y0 + y1) * a;
+                    }
+                    // Do last vertex
+                    x0 = region[region.Count - 1].x;
+                    y0 = region[region.Count - 1].y;
+                    x1 = region[0].x;
+                    y1 = region[0].y;
+                    a = x0 * y1 - x1 * y0;
+                    signedArea += a;
+                    centroid.x += (x0 + x1) * a;
+                    centroid.y += (y0 + y1) * a;
+
+                    signedArea *= 0.5f;
+                    centroid.x /= (6 * signedArea);
+                    centroid.y /= (6 * signedArea);
+                    // Move site to the centroid of its Voronoi cell
+                    newPoints.Add(centroid);
+                    site = sites.Next();
+                }
+
+                // Between each replacement of the cendroid of the cell,
+                // we need to recompute Voronoi diagram:
+                Rectf origPlotBounds = this.plotBounds;
+                Dispose();
+                Init(newPoints, origPlotBounds);
+            }
+        }
+
+        public List<Vector2f> NeighborSitesForSite(Vector2f coord)
+        {
+            List<Vector2f> points = new List<Vector2f>();
+            Site site;
+            if (sitesIndexedByLocation.TryGetValue(coord, out site))
+            {
+                List<Site> sites = site.NeighborSites();
+                foreach (Site neighbor in sites)
+                {
+                    points.Add(neighbor.Coord);
+                }
+            }
+
+            return points;
+        }
+
+        public List<Vector2f> Region(Vector2f p)
+        {
+            Site site;
+            if (sitesIndexedByLocation.TryGetValue(p, out site))
+            {
+                return site.Region(plotBounds);
+            }
+            else
+            {
+                return new List<Vector2f>();
+            }
+        }
+
         public List<List<Vector2f>> Regions()
         {
             return sites.Regions(plotBounds);
@@ -177,6 +210,32 @@ namespace csDelaunay
         public List<Vector2f> SiteCoords()
         {
             return sites.SiteCoords();
+        }
+
+        public List<LineSegment> VoronoiBoundarayForSite(Vector2f coord)
+        {
+            return LineSegment.VisibleLineSegments(Edge.SelectEdgesForSitePoint(coord, edges));
+        }
+
+        public List<LineSegment> VoronoiDiagram()
+        {
+            return LineSegment.VisibleLineSegments(edges);
+        }
+
+        private void AddSite(Vector2f p, int index)
+        {
+            float weigth = (float)weigthDistributor.NextDouble() * 100;
+            Site site = Site.Create(p, index, weigth);
+            sites.Add(site);
+            sitesIndexedByLocation[p] = site;
+        }
+
+        private void AddSites(List<Vector2f> points)
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                AddSite(points[i], i);
+            }
         }
 
         private void FortunesAlgorithm()
@@ -339,70 +398,26 @@ namespace csDelaunay
             vertices.Clear();
         }
 
-        public void LloydRelaxation(int nbIterations)
+        private void Init(List<Vector2f> points, Rectf plotBounds)
         {
-            // Reapeat the whole process for the number of iterations asked
-            for (int i = 0; i < nbIterations; i++)
-            {
-                List<Vector2f> newPoints = new List<Vector2f>();
-                // Go thourgh all sites
-                sites.ResetListIndex();
-                Site site = sites.Next();
+            sites = new SiteList();
+            sitesIndexedByLocation = new Dictionary<Vector2f, Site>();
+            AddSites(points);
+            this.plotBounds = plotBounds;
+            triangles = new List<Triangle>();
+            edges = new List<Edge>();
 
-                while (site != null)
-                {
-                    // Loop all corners of the site to calculate the centroid
-                    List<Vector2f> region = site.Region(plotBounds);
-                    if (region.Count < 1)
-                    {
-                        site = sites.Next();
-                        continue;
-                    }
-
-                    Vector2f centroid = Vector2f.zero;
-                    float signedArea = 0;
-                    float x0 = 0;
-                    float y0 = 0;
-                    float x1 = 0;
-                    float y1 = 0;
-                    float a = 0;
-                    // For all vertices except last
-                    for (int j = 0; j < region.Count - 1; j++)
-                    {
-                        x0 = region[j].x;
-                        y0 = region[j].y;
-                        x1 = region[j + 1].x;
-                        y1 = region[j + 1].y;
-                        a = x0 * y1 - x1 * y0;
-                        signedArea += a;
-                        centroid.x += (x0 + x1) * a;
-                        centroid.y += (y0 + y1) * a;
-                    }
-                    // Do last vertex
-                    x0 = region[region.Count - 1].x;
-                    y0 = region[region.Count - 1].y;
-                    x1 = region[0].x;
-                    y1 = region[0].y;
-                    a = x0 * y1 - x1 * y0;
-                    signedArea += a;
-                    centroid.x += (x0 + x1) * a;
-                    centroid.y += (y0 + y1) * a;
-
-                    signedArea *= 0.5f;
-                    centroid.x /= (6 * signedArea);
-                    centroid.y /= (6 * signedArea);
-                    // Move site to the centroid of its Voronoi cell
-                    newPoints.Add(centroid);
-                    site = sites.Next();
-                }
-
-                // Between each replacement of the cendroid of the cell,
-                // we need to recompute Voronoi diagram:
-                Rectf origPlotBounds = this.plotBounds;
-                Dispose();
-                Init(newPoints, origPlotBounds);
-            }
+            FortunesAlgorithm();
         }
+
+        /*
+		public List<LineSegment> DelaunayLinesForSite(Vector2f coord) {
+			return DelaunayLinesForEdges(Edge.SelectEdgesForSitePoint(coord, edges));
+		}*/
+        /*
+		public List<LineSegment> Hull() {
+			return DelaunayLinesForEdges(HullEdges());
+		}*/
 
         private Site LeftRegion(Halfedge he, Site bottomMostSite)
         {
@@ -422,24 +437,6 @@ namespace csDelaunay
                 return bottomMostSite;
             }
             return edge.Site(LR.Other(he.leftRight));
-        }
-
-        public static int CompareByYThenX(Site s1, Site s2)
-        {
-            if (s1.y < s2.y) return -1;
-            if (s1.y > s2.y) return 1;
-            if (s1.x < s2.x) return -1;
-            if (s1.x > s2.x) return 1;
-            return 0;
-        }
-
-        public static int CompareByYThenX(Site s1, Vector2f s2)
-        {
-            if (s1.y < s2.y) return -1;
-            if (s1.y > s2.y) return 1;
-            if (s1.x < s2.x) return -1;
-            if (s1.x > s2.x) return 1;
-            return 0;
         }
     }
 }

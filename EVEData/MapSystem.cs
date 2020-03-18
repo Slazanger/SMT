@@ -16,19 +16,15 @@ namespace SMT.EVEData
     public class MapSystem
     {
         /// <summary>
-        /// Gets or sets the Name of the system
+        ///  Gets or sets the actual actual eve system
         /// </summary>
-        public string Name { get; set; }
+        [XmlIgnoreAttribute]
+        public System ActualSystem { get; set; }
 
         /// <summary>
-        /// Gets or sets the region this system belongs to
+        /// Gets or sets the list of points defining the cell around this system
         /// </summary>
-        public string Region { get; set; }
-
-        /// <summary>
-        /// Gets or sets if this system is considered out of region for layout purposes
-        /// </summary>
-        public bool OutOfRegion { get; set; }
+        public List<Point> CellPoints { get; set; }
 
         /// <summary>
         /// Gets or sets the X Coordinate for the layout
@@ -41,15 +37,19 @@ namespace SMT.EVEData
         public double LayoutY { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of points defining the cell around this system
+        /// Gets or sets the Name of the system
         /// </summary>
-        public List<Point> CellPoints { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        ///  Gets or sets the actual actual eve system
+        /// Gets or sets if this system is considered out of region for layout purposes
         /// </summary>
-        [XmlIgnoreAttribute]
-        public System ActualSystem { get; set; }
+        public bool OutOfRegion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the region this system belongs to
+        /// </summary>
+        public string Region { get; set; }
 
         public override string ToString() => Name;
     }

@@ -45,14 +45,6 @@ namespace WpfHelpers.Animation
             typeof(GridLengthAnimation));
 
         /// <summary>
-        ///     Returns the type of object to animate
-        /// </summary>
-        public override Type TargetPropertyType
-        {
-            get { return typeof(GridLength); }
-        }
-
-        /// <summary>
         ///     CLR Wrapper for the From depenendency property
         /// </summary>
         public GridLength From
@@ -62,21 +54,20 @@ namespace WpfHelpers.Animation
         }
 
         /// <summary>
+        ///     Returns the type of object to animate
+        /// </summary>
+        public override Type TargetPropertyType
+        {
+            get { return typeof(GridLength); }
+        }
+
+        /// <summary>
         ///     CLR Wrapper for the To property
         /// </summary>
         public GridLength To
         {
             get { return (GridLength)GetValue(ToProperty); }
             set { SetValue(ToProperty, value); }
-        }
-
-        /// <summary>
-        ///     Creates an instance of the animation object
-        /// </summary>
-        /// <returns>Returns the instance of the GridLengthAnimation</returns>
-        protected override Freezable CreateInstanceCore()
-        {
-            return new GridLengthAnimation();
         }
 
         /// <summary>
@@ -101,6 +92,15 @@ namespace WpfHelpers.Animation
                 return new GridLength((1 - animationClock.CurrentProgress.Value) * (fromVal - toVal) + toVal,
                     GridUnitType.Star);
             return new GridLength(animationClock.CurrentProgress.Value * (toVal - fromVal) + fromVal, GridUnitType.Star);
+        }
+
+        /// <summary>
+        ///     Creates an instance of the animation object
+        /// </summary>
+        /// <returns>Returns the instance of the GridLengthAnimation</returns>
+        protected override Freezable CreateInstanceCore()
+        {
+            return new GridLengthAnimation();
         }
     }
 }

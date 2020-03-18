@@ -8,25 +8,22 @@ namespace WpfHelpers.WpfControls.EditableLabel
     [TemplatePart(Name = @"PART_mainGrid", Type = typeof(Grid))]
     public class EditableLabel : Control
     {
-        public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(EditableLabel),
-                new PropertyMetadata(default(string)));
+        public static readonly DependencyProperty EditButtonContentProperty =
+            DependencyProperty.Register("EditButtonContent", typeof(object), typeof(EditableLabel),
+                new PropertyMetadata("X"));
 
         public static readonly DependencyProperty EnableEditingProperty =
             DependencyProperty.Register("EnableEditing", typeof(bool), typeof(EditableLabel),
                 new PropertyMetadata(default(bool), EnableEdititngChanged));
 
-        public static readonly DependencyProperty EditButtonContentProperty =
-            DependencyProperty.Register("EditButtonContent", typeof(object), typeof(EditableLabel),
-                new PropertyMetadata("X"));
+        public static readonly DependencyProperty TextProperty =
+                            DependencyProperty.Register("Text", typeof(string), typeof(EditableLabel),
+                new PropertyMetadata(default(string)));
 
-        /// <summary>
-        ///     Gets or sets text
-        /// </summary>
-        public string Text
+        public object EditButtonContent
         {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            get { return GetValue(EditButtonContentProperty); }
+            set { SetValue(EditButtonContentProperty, value); }
         }
 
         /// <summary>
@@ -38,10 +35,13 @@ namespace WpfHelpers.WpfControls.EditableLabel
             set { SetValue(EnableEditingProperty, value); }
         }
 
-        public object EditButtonContent
+        /// <summary>
+        ///     Gets or sets text
+        /// </summary>
+        public string Text
         {
-            get { return GetValue(EditButtonContentProperty); }
-            set { SetValue(EditButtonContentProperty, value); }
+            get { return (string)GetValue(TextProperty); }
+            set { SetValue(TextProperty, value); }
         }
 
         public override void OnApplyTemplate()
@@ -59,28 +59,6 @@ namespace WpfHelpers.WpfControls.EditableLabel
             if (grid != null)
             {
                 grid.MouseLeftButtonDown += GridOnMouseLeftButtonDown;
-            }
-        }
-
-        private void GridOnMouseLeftButtonDown(object sender, MouseButtonEventArgs args)
-        {
-            if (args.ClickCount > 1)
-            {
-                args.Handled = true;
-                EnableEditing = true;
-            }
-        }
-
-        private void txt_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                EnableEditing = false;
-            }
-            else
-            {
-                if (!IsMouseCaptured)
-                    Mouse.Capture(this, CaptureMode.SubTree);
             }
         }
 
@@ -107,11 +85,33 @@ namespace WpfHelpers.WpfControls.EditableLabel
                 new MouseButtonEventHandler(HandleClickOutsideOfControl), true);
         }
 
+        private void GridOnMouseLeftButtonDown(object sender, MouseButtonEventArgs args)
+        {
+            if (args.ClickCount > 1)
+            {
+                args.Handled = true;
+                EnableEditing = true;
+            }
+        }
+
         private void HandleClickOutsideOfControl(object sender, MouseButtonEventArgs e)
         {
             //do stuff (eg close drop down)
             EnableEditing = false;
             ReleaseMouseCapture();
+        }
+
+        private void txt_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                EnableEditing = false;
+            }
+            else
+            {
+                if (!IsMouseCaptured)
+                    Mouse.Capture(this, CaptureMode.SubTree);
+            }
         }
     }
 }

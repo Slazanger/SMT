@@ -14,29 +14,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
     /// </summary>
     public class Tracker
     {
-        public enum SelectionType
-        {
-            /// <summary>
-            /// Fill and borders
-            /// </summary>
-            Object = 2,
-
-            /// <summary>
-            /// Только границы
-            /// </summary>
-            Graphic = 3,
-
-            /// <summary>
-            /// Точка
-            /// </summary>
-            Point = 4,
-
-            /// <summary>
-            ///     Линия - рулетка
-            /// </summary>
-            Line = 5
-        }
-
         /// <summary>
         ///     List of Corner points
         /// </summary>
@@ -47,21 +24,22 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         private readonly Polygon m_Polygon = new Polygon();
 
+        private int _cornerRadius = 1;
+
         /// <summary>
         ///     Canvas associated with a current Tracker
         /// </summary>
         private Canvas m_Canvas;
-
-        ///// <summary>
-        /////     Radius of Corner points
-        ///// </summary>
-        //private int m_CornerRadius = 5;
 
         /// <summary>
         ///     Brush used to paint Tracker interior
         /// </summary>
         private Brush m_FillBrush;
 
+        ///// <summary>
+        /////     Radius of Corner points
+        ///// </summary>
+        //private int m_CornerRadius = 5;
         /// <summary>
         ///     Brush used to paint interior when Tracker is selected
         /// </summary>
@@ -94,8 +72,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         private Brush m_StrokeBrushSelection;
 
-        private int _cornerRadius = 1;
-
         /// <summary>
         ///     Create new instance and associates it with a Canvas
         /// </summary>
@@ -109,22 +85,51 @@ namespace WpfHelpers.WpfControls.TrackerControl
             DefaultInitialization();
         }
 
+        public event EventHandler Disposed;
+
+        /// <summary>
+        ///     Triggers when tracker finished
+        /// </summary>
+        public event EventHandler NewPointAdded;
+
+        /// <summary>
+        ///     Triggers when user is moving point
+        /// </summary>
+        public event EventHandler PointMoved;
+
+        // { get; set; }
+        /// <summary>
+        ///     Triggers when user is moving whole tracker
+        /// </summary>
+        public event EventHandler TrackerMoved;
+
+        public enum SelectionType
+        {
+            /// <summary>
+            /// Fill and borders
+            /// </summary>
+            Object = 2,
+
+            /// <summary>
+            /// Только границы
+            /// </summary>
+            Graphic = 3,
+
+            /// <summary>
+            /// Точка
+            /// </summary>
+            Point = 4,
+
+            /// <summary>
+            ///     Линия - рулетка
+            /// </summary>
+            Line = 5
+        }
+
         /// <summary>
         ///     Deciphered object track attached to, can be null if was not deciphered
         /// </summary>
         public object AttachedObject { get; set; }
-
-        /// <summary>
-        ///     Some object, assosiated with <see cref="Tracker" />
-        /// </summary>
-        public object Tag { get; set; }
-
-        /// <summary>
-        ///     Brush to save default value in compare mode
-        /// </summary>
-        public Brush DefaultBrush { get; set; }
-
-        public SelectionType ModeType { get; }
 
         /// <summary>
         ///     Gets or sets Canvas to associate Tracker with
@@ -160,9 +165,30 @@ namespace WpfHelpers.WpfControls.TrackerControl
         }
 
         /// <summary>
-        ///     Gets polygon shape of this Tracker
+        ///     Gets or sets a radius of Corner points
         /// </summary>
-        public Polygon Polygon => m_Polygon;
+        public int CornerRadius
+        {
+            get { return _cornerRadius; }
+            set
+            {
+                _cornerRadius = value;
+
+                for (int i = 0; i < m_Corners.Count; i++)
+                {
+                    m_Corners[i].Width = value * 2;
+                    m_Corners[i].Height = value * 2;
+
+                    Canvas.SetLeft(m_Corners[i], m_Polygon.Points[i].X - CornerRadius);
+                    Canvas.SetTop(m_Corners[i], m_Polygon.Points[i].Y - CornerRadius);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Brush to save default value in compare mode
+        /// </summary>
+        public Brush DefaultBrush { get; set; }
 
         /// <summary>
         ///     Gets or sets Brush that specifies how the shape's interior is painted
@@ -174,6 +200,67 @@ namespace WpfHelpers.WpfControls.TrackerControl
             {
                 m_Polygon.Fill = value;
                 m_FillBrush = value;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets Brush that specifies how the shape's interior is painted
+        /// </summary>
+        public Brush FillBrushSelection
+        {
+            get { return m_FillBrushSelection; }
+            set { m_FillBrushSelection = value; }
+        }
+
+        public SelectionType ModeType { get; }
+
+        /// <summary>
+        ///     Returns a number of Tracker points
+        /// </summary>
+        public int PointCount => m_Polygon.Points.Count;
+
+        /// <summary>
+        ///     Maximum distance to a Corner from which it is considered that HitTest returns that Corner
+        /// </summary>
+        public int PointTolerance
+        {
+            get { return m_PointTolerance; }
+            set
+            {
+                m_PointTolerance = value;
+                m_PointToleranceSq = value * value;
+            }
+        }
+
+        /// <summary>
+        ///     Gets polygon shape of this Tracker
+        /// </summary>
+        public Polygon Polygon => m_Polygon;
+
+        /// <summary>
+        ///     Indicates whether the current Tracker is selected
+        /// </summary>
+        public bool Selected
+        {
+            get { return m_Selected; }
+            set
+            {
+                if (m_Selected = value)
+                {
+                    //enable selection
+                    m_Polygon.Fill = m_FillBrushSelection;
+                    m_Polygon.Stroke = m_StrokeBrushSelection;
+                    foreach (var el in m_Corners)
+                        el.Stroke = m_StrokeBrushSelection;
+                }
+                else
+                {
+                    // disable selection
+                    m_Polygon.Fill = m_FillBrush;
+                    m_Polygon.Stroke = m_StrokeBrush;
+                    foreach (var el in m_Corners)
+                        el.Stroke = m_StrokeBrush;
+                }
             }
         }
 
@@ -204,21 +291,30 @@ namespace WpfHelpers.WpfControls.TrackerControl
         }
 
         /// <summary>
-        ///     Gets or sets Brush that specifies how the shape's interior is painted
-        /// </summary>
-        public Brush FillBrushSelection
-        {
-            get { return m_FillBrushSelection; }
-            set { m_FillBrushSelection = value; }
-        }
-
-        /// <summary>
         ///     Gets or sets Brush that specifies how the shape's outline is painted
         /// </summary>
         public Brush StrokeBrushSelection
         {
             get { return m_StrokeBrushSelection; }
             set { m_StrokeBrushSelection = value; }
+        }
+
+        /// <summary>
+        ///     Gets or sets a pattern of dashes and gaps that is used to outline Tracker
+        /// </summary>
+        public DoubleCollection StrokeDashArray
+        {
+            get { return m_Polygon.StrokeDashArray; }
+            set { m_Polygon.StrokeDashArray = value; }
+        }
+
+        /// <summary>
+        ///     Gets or sets the type of join for Tracker Corners
+        /// </summary>
+        public PenLineJoin StrokeLineJoin
+        {
+            get { return m_Polygon.StrokeLineJoin; }
+            set { m_Polygon.StrokeLineJoin = value; }
         }
 
         /// <summary>
@@ -236,88 +332,9 @@ namespace WpfHelpers.WpfControls.TrackerControl
         }
 
         /// <summary>
-        ///     Gets or sets the type of join for Tracker Corners
+        ///     Some object, assosiated with <see cref="Tracker" />
         /// </summary>
-        public PenLineJoin StrokeLineJoin
-        {
-            get { return m_Polygon.StrokeLineJoin; }
-            set { m_Polygon.StrokeLineJoin = value; }
-        }
-
-        /// <summary>
-        ///     Gets or sets a pattern of dashes and gaps that is used to outline Tracker
-        /// </summary>
-        public DoubleCollection StrokeDashArray
-        {
-            get { return m_Polygon.StrokeDashArray; }
-            set { m_Polygon.StrokeDashArray = value; }
-        }
-
-        /// <summary>
-        ///     Gets or sets a radius of Corner points
-        /// </summary>
-        public int CornerRadius
-        {
-            get { return _cornerRadius; }
-            set
-            {
-                _cornerRadius = value;
-
-                for (int i = 0; i < m_Corners.Count; i++)
-                {
-                    m_Corners[i].Width = value * 2;
-                    m_Corners[i].Height = value * 2;
-
-                    Canvas.SetLeft(m_Corners[i], m_Polygon.Points[i].X - CornerRadius);
-                    Canvas.SetTop(m_Corners[i], m_Polygon.Points[i].Y - CornerRadius);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Maximum distance to a Corner from which it is considered that HitTest returns that Corner
-        /// </summary>
-        public int PointTolerance
-        {
-            get { return m_PointTolerance; }
-            set
-            {
-                m_PointTolerance = value;
-                m_PointToleranceSq = value * value;
-            }
-        }
-
-        /// <summary>
-        ///     Indicates whether the current Tracker is selected
-        /// </summary>
-        public bool Selected
-        {
-            get { return m_Selected; }
-            set
-            {
-                if (m_Selected = value)
-                {
-                    //enable selection
-                    m_Polygon.Fill = m_FillBrushSelection;
-                    m_Polygon.Stroke = m_StrokeBrushSelection;
-                    foreach (var el in m_Corners)
-                        el.Stroke = m_StrokeBrushSelection;
-                }
-                else
-                {
-                    // disable selection
-                    m_Polygon.Fill = m_FillBrush;
-                    m_Polygon.Stroke = m_StrokeBrush;
-                    foreach (var el in m_Corners)
-                        el.Stroke = m_StrokeBrush;
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Returns a number of Tracker points
-        /// </summary>
-        public int PointCount => m_Polygon.Points.Count;
+        public object Tag { get; set; }
 
         /// <summary>
         ///     Gets or sets a Tracker point
@@ -334,27 +351,154 @@ namespace WpfHelpers.WpfControls.TrackerControl
             }
         }
 
-        /// <summary>
-        ///     Triggers when user is moving point
-        /// </summary>
-        public event EventHandler PointMoved; // { get; set; }
+        // { get; set; }
 
-        public event EventHandler Disposed;
+        // { get; set; }
 
         /// <summary>
-        ///     Triggers when user is moving whole tracker
+        ///     Adds a new point to the Tracker
         /// </summary>
-        public event EventHandler TrackerMoved; // { get; set; }
+        /// <param name="pPoint">New point to add</param>
+        public void AddPoint(Point pPoint)
+        {
+            m_Polygon.Points.Add(pPoint);
+
+            var el = new Ellipse
+            {
+                Width = CornerRadius * 2,
+                Height = CornerRadius * 2,
+                Fill = StrokeBrushPoint,
+                Stroke = StrokeBrushPoint,
+                StrokeThickness = m_Polygon.StrokeThickness
+            };
+            m_Corners.Add(el);
+
+            if (m_Canvas != null)
+            {
+                m_Canvas.Children.Add(el);
+                Canvas.SetLeft(el, pPoint.X + CornerRadius);
+                Canvas.SetTop(el, pPoint.Y + CornerRadius);
+            }
+
+            OnNewPointAdded();
+        }
 
         /// <summary>
-        ///     Triggers when tracker finished
+        ///     Unlinks Tracker from the Canvas and releases used memory
         /// </summary>
-        public event EventHandler NewPointAdded; // { get; set; }
+        public void Dispose()
+        {
+            Canvas = null;
+
+            OnDisposed();
+        }
+
+        /// <summary>
+        ///     Returns element that is hit at the given point
+        /// </summary>
+        /// <returns>
+        ///     Returns -2 if nothing was hit. Returns -1 if the entire Tracker was hit. Otherwise returns index of Point that
+        ///     was hit
+        /// </returns>
+        public int HitTest(Point pPoint)
+        {
+            for (var i = 0; i < m_Polygon.Points.Count; i++)
+                if ((pPoint - m_Polygon.Points[i]).LengthSquared < m_PointToleranceSq)
+                    return i;
+
+            var res = VisualTreeHelper.HitTest(m_Polygon, pPoint);
+            if (res != null)
+                return -1;
+
+            return -2;
+        }
+
+        /// <summary>
+        ///     Returns element that is hit at the given point
+        /// </summary>
+        /// <returns>
+        ///     Returns -2 if nothing was hit. Returns -1 if the entire Tracker was hit. Otherwise returns index of Point that
+        ///     was hit
+        /// </returns>
+        public int HitTest(MouseEventArgs e)
+        {
+            for (var i = 0; i < m_Polygon.Points.Count; i++)
+                if ((e.GetPosition(m_Polygon) - m_Polygon.Points[i]).LengthSquared < m_PointToleranceSq)
+                    return i;
+
+            var res = VisualTreeHelper.HitTest(m_Polygon, e.GetPosition(m_Polygon));
+            if (res != null)
+                return -1;
+
+            return -2;
+        }
+
+        /// <summary>
+        ///     Moves the entire Tracker by a specified Vector
+        /// </summary>
+        public void Move(Vector pVector)
+        {
+            for (var i = 0; i < m_Polygon.Points.Count; i++)
+            {
+                var pt = m_Polygon.Points[i];
+                pt.X += pVector.X;
+                pt.Y += pVector.Y;
+                m_Polygon.Points[i] = pt;
+
+                Canvas.SetLeft(m_Corners[i], m_Polygon.Points[i].X + CornerRadius);
+                Canvas.SetTop(m_Corners[i], m_Polygon.Points[i].Y + CornerRadius);
+            }
+
+            OnTrackerMoved();
+        }
+
+        public virtual void RaiseOnPointMoved()
+        {
+            PointMoved?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        ///     Removes point from the Tracker
+        /// </summary>
+        /// <param name="pPoint">Point to remove from the Tracker</param>
+        public void RemovePoint(Point pPoint)
+        {
+            var ind = m_Polygon.Points.IndexOf(pPoint);
+            m_Polygon.Points.Remove(pPoint);
+            Canvas.Children.Remove(m_Corners[ind]);
+            m_Corners.RemoveAt(ind);
+        }
+
+        /// <summary>
+        ///     Removes point at a given index from the Tracker
+        /// </summary>
+        /// <param name="pIndex">Point index to remove from the Tracker</param>
+        public void RemovePointAt(int pIndex)
+        {
+            m_Polygon.Points.RemoveAt(pIndex);
+            Canvas.Children.Remove(m_Corners[pIndex]);
+            m_Corners.RemoveAt(pIndex);
+        }
 
         public void UpdateGraphics()
         {
             if (ModeType == SelectionType.Graphic)
                 DefaultInitialization();
+        }
+
+        protected virtual void OnDisposed()
+        {
+            Disposed?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnNewPointAdded()
+        {
+            NewPointAdded?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnTrackerMoved()
+        {
+            TrackerMoved?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -441,146 +585,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
                     ellipse.Visibility = Visibility.Visible;
                 else
                     ellipse.Visibility = Visibility.Collapsed;
-        }
-
-        /// <summary>
-        ///     Unlinks Tracker from the Canvas and releases used memory
-        /// </summary>
-        public void Dispose()
-        {
-            Canvas = null;
-
-            OnDisposed();
-        }
-
-        /// <summary>
-        ///     Adds a new point to the Tracker
-        /// </summary>
-        /// <param name="pPoint">New point to add</param>
-        public void AddPoint(Point pPoint)
-        {
-            m_Polygon.Points.Add(pPoint);
-
-            var el = new Ellipse
-            {
-                Width = CornerRadius * 2,
-                Height = CornerRadius * 2,
-                Fill = StrokeBrushPoint,
-                Stroke = StrokeBrushPoint,
-                StrokeThickness = m_Polygon.StrokeThickness
-            };
-            m_Corners.Add(el);
-
-            if (m_Canvas != null)
-            {
-                m_Canvas.Children.Add(el);
-                Canvas.SetLeft(el, pPoint.X + CornerRadius);
-                Canvas.SetTop(el, pPoint.Y + CornerRadius);
-            }
-
-            OnNewPointAdded();
-        }
-
-        /// <summary>
-        ///     Removes point from the Tracker
-        /// </summary>
-        /// <param name="pPoint">Point to remove from the Tracker</param>
-        public void RemovePoint(Point pPoint)
-        {
-            var ind = m_Polygon.Points.IndexOf(pPoint);
-            m_Polygon.Points.Remove(pPoint);
-            Canvas.Children.Remove(m_Corners[ind]);
-            m_Corners.RemoveAt(ind);
-        }
-
-        /// <summary>
-        ///     Removes point at a given index from the Tracker
-        /// </summary>
-        /// <param name="pIndex">Point index to remove from the Tracker</param>
-        public void RemovePointAt(int pIndex)
-        {
-            m_Polygon.Points.RemoveAt(pIndex);
-            Canvas.Children.Remove(m_Corners[pIndex]);
-            m_Corners.RemoveAt(pIndex);
-        }
-
-        /// <summary>
-        ///     Moves the entire Tracker by a specified Vector
-        /// </summary>
-        public void Move(Vector pVector)
-        {
-            for (var i = 0; i < m_Polygon.Points.Count; i++)
-            {
-                var pt = m_Polygon.Points[i];
-                pt.X += pVector.X;
-                pt.Y += pVector.Y;
-                m_Polygon.Points[i] = pt;
-
-                Canvas.SetLeft(m_Corners[i], m_Polygon.Points[i].X + CornerRadius);
-                Canvas.SetTop(m_Corners[i], m_Polygon.Points[i].Y + CornerRadius);
-            }
-
-            OnTrackerMoved();
-        }
-
-        /// <summary>
-        ///     Returns element that is hit at the given point
-        /// </summary>
-        /// <returns>
-        ///     Returns -2 if nothing was hit. Returns -1 if the entire Tracker was hit. Otherwise returns index of Point that
-        ///     was hit
-        /// </returns>
-        public int HitTest(Point pPoint)
-        {
-            for (var i = 0; i < m_Polygon.Points.Count; i++)
-                if ((pPoint - m_Polygon.Points[i]).LengthSquared < m_PointToleranceSq)
-                    return i;
-
-            var res = VisualTreeHelper.HitTest(m_Polygon, pPoint);
-            if (res != null)
-                return -1;
-
-            return -2;
-        }
-
-        /// <summary>
-        ///     Returns element that is hit at the given point
-        /// </summary>
-        /// <returns>
-        ///     Returns -2 if nothing was hit. Returns -1 if the entire Tracker was hit. Otherwise returns index of Point that
-        ///     was hit
-        /// </returns>
-        public int HitTest(MouseEventArgs e)
-        {
-            for (var i = 0; i < m_Polygon.Points.Count; i++)
-                if ((e.GetPosition(m_Polygon) - m_Polygon.Points[i]).LengthSquared < m_PointToleranceSq)
-                    return i;
-
-            var res = VisualTreeHelper.HitTest(m_Polygon, e.GetPosition(m_Polygon));
-            if (res != null)
-                return -1;
-
-            return -2;
-        }
-
-        public virtual void RaiseOnPointMoved()
-        {
-            PointMoved?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnNewPointAdded()
-        {
-            NewPointAdded?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnTrackerMoved()
-        {
-            TrackerMoved?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnDisposed()
-        {
-            Disposed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

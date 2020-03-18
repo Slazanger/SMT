@@ -25,17 +25,41 @@ namespace Bvs.Common.Utility
             RenderTransform = _trans;
         }
 
+        // Accessor for the child size dependency property
+        public double ChildSize
+        {
+            get { return (double)GetValue(ChildSizeProperty); }
+            set { SetValue(ChildSizeProperty, value); }
+        }
+
         public int VerticalOffsetLine
         {
             get { return (int)GetValue(VerticalOffsetLineProperty); }
             set { SetValue(VerticalOffsetLineProperty, value); }
         }
 
-        // Accessor for the child size dependency property
-        public double ChildSize
+        /// <summary>
+        ///     Arrange the children
+        /// </summary>
+        /// <param name="finalSize">Size available</param>
+        /// <returns>Size used</returns>
+        protected override Size ArrangeOverride(Size finalSize)
         {
-            get { return (double)GetValue(ChildSizeProperty); }
-            set { SetValue(ChildSizeProperty, value); }
+            var generator = ItemContainerGenerator;
+
+            UpdateScrollInfo(finalSize);
+
+            for (var i = 0; i < Children.Count; i++)
+            {
+                var child = Children[i];
+
+                // Map the child offset to an item offset
+                var itemIndex = generator.IndexFromGeneratorPosition(new GeneratorPosition(i, 0));
+
+                ArrangeChild(itemIndex, child, finalSize);
+            }
+
+            return finalSize;
         }
 
         /// <summary>
@@ -100,27 +124,20 @@ namespace Bvs.Common.Utility
         }
 
         /// <summary>
-        ///     Arrange the children
+        ///     When items are removed, remove the corresponding UI if necessary
         /// </summary>
-        /// <param name="finalSize">Size available</param>
-        /// <returns>Size used</returns>
-        protected override Size ArrangeOverride(Size finalSize)
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
-            var generator = ItemContainerGenerator;
-
-            UpdateScrollInfo(finalSize);
-
-            for (var i = 0; i < Children.Count; i++)
+            switch (args.Action)
             {
-                var child = Children[i];
-
-                // Map the child offset to an item offset
-                var itemIndex = generator.IndexFromGeneratorPosition(new GeneratorPosition(i, 0));
-
-                ArrangeChild(itemIndex, child, finalSize);
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                    RemoveInternalChildRange(args.Position.Index, args.ItemUICount);
+                    break;
             }
-
-            return finalSize;
         }
 
         /// <summary>
@@ -145,69 +162,10 @@ namespace Bvs.Common.Utility
             }
         }
 
-        /// <summary>
-        ///     When items are removed, remove the corresponding UI if necessary
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
-        {
-            switch (args.Action)
-            {
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
-                case NotifyCollectionChangedAction.Move:
-                    RemoveInternalChildRange(args.Position.Index, args.ItemUICount);
-                    break;
-            }
-        }
-
         #region Layout specific code
 
         // I've isolated the layout specific code to this region. If you want to do something other than tiling, this is
         // where you'll make your changes
-
-        /// <summary>
-        ///     Calculate the extent of the view based on the available size
-        /// </summary>
-        /// <param name="availableSize">available size</param>
-        /// <param name="itemCount">number of data items</param>
-        /// <returns></returns>
-        private Size CalculateExtent(Size availableSize, int itemCount)
-        {
-            var childrenPerRow = CalculateChildrenPerRow(availableSize);
-
-            // See how big we are
-            return new Size(childrenPerRow * ChildSize,
-                ChildSize * Math.Ceiling((double)itemCount / childrenPerRow));
-        }
-
-        /// <summary>
-        ///     Get the range of children that are visible
-        /// </summary>
-        /// <param name="firstVisibleItemIndex">The item index of the first visible item</param>
-        /// <param name="lastVisibleItemIndex">The item index of the last visible item</param>
-        private void GetVisibleRange(out int firstVisibleItemIndex, out int lastVisibleItemIndex)
-        {
-            var childrenPerRow = CalculateChildrenPerRow(_extent);
-
-            firstVisibleItemIndex = (int)Math.Floor(_offset.Y / ChildSize) * childrenPerRow;
-            lastVisibleItemIndex = (int)Math.Ceiling((_offset.Y + _viewport.Height) / ChildSize) * childrenPerRow - 1;
-
-            var itemsControl = ItemsControl.GetItemsOwner(this);
-            var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
-            if (lastVisibleItemIndex >= itemCount)
-                lastVisibleItemIndex = itemCount - 1;
-        }
-
-        /// <summary>
-        ///     Get the size of the children. We assume they are all the same
-        /// </summary>
-        /// <returns>The size</returns>
-        private Size GetChildSize()
-        {
-            return new Size(ChildSize, ChildSize);
-        }
 
         /// <summary>
         ///     Position a child
@@ -241,51 +199,65 @@ namespace Bvs.Common.Utility
             return childrenPerRow;
         }
 
+        /// <summary>
+        ///     Calculate the extent of the view based on the available size
+        /// </summary>
+        /// <param name="availableSize">available size</param>
+        /// <param name="itemCount">number of data items</param>
+        /// <returns></returns>
+        private Size CalculateExtent(Size availableSize, int itemCount)
+        {
+            var childrenPerRow = CalculateChildrenPerRow(availableSize);
+
+            // See how big we are
+            return new Size(childrenPerRow * ChildSize,
+                ChildSize * Math.Ceiling((double)itemCount / childrenPerRow));
+        }
+
+        /// <summary>
+        ///     Get the size of the children. We assume they are all the same
+        /// </summary>
+        /// <returns>The size</returns>
+        private Size GetChildSize()
+        {
+            return new Size(ChildSize, ChildSize);
+        }
+
+        /// <summary>
+        ///     Get the range of children that are visible
+        /// </summary>
+        /// <param name="firstVisibleItemIndex">The item index of the first visible item</param>
+        /// <param name="lastVisibleItemIndex">The item index of the last visible item</param>
+        private void GetVisibleRange(out int firstVisibleItemIndex, out int lastVisibleItemIndex)
+        {
+            var childrenPerRow = CalculateChildrenPerRow(_extent);
+
+            firstVisibleItemIndex = (int)Math.Floor(_offset.Y / ChildSize) * childrenPerRow;
+            lastVisibleItemIndex = (int)Math.Ceiling((_offset.Y + _viewport.Height) / ChildSize) * childrenPerRow - 1;
+
+            var itemsControl = ItemsControl.GetItemsOwner(this);
+            var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
+            if (lastVisibleItemIndex >= itemCount)
+                lastVisibleItemIndex = itemCount - 1;
+        }
+
         #endregion Layout specific code
 
         #region IScrollInfo implementation
 
         // See Ben Constable's series of posts at http://blogs.msdn.com/bencon/
 
-        private void UpdateScrollInfo(Size availableSize)
-        {
-            // See how many items there are
-            var itemsControl = ItemsControl.GetItemsOwner(this);
-            var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
+        private readonly TranslateTransform _trans = new TranslateTransform();
 
-            var extent = CalculateExtent(availableSize, itemCount);
-            // Update extent
-            if (extent != _extent)
-            {
-                _extent = extent;
-                if (ScrollOwner != null)
-                    ScrollOwner.InvalidateScrollInfo();
-            }
+        private Size _extent = new Size(0, 0);
 
-            // Update viewport
-            if (availableSize != _viewport)
-            {
-                _viewport = availableSize;
-                if (ScrollOwner != null)
-                    ScrollOwner.InvalidateScrollInfo();
-            }
-        }
+        private Point _offset;
 
-        public ScrollViewer ScrollOwner { get; set; }
+        private Size _viewport = new Size(0, 0);
 
         public bool CanHorizontallyScroll { get; set; } = false;
 
         public bool CanVerticallyScroll { get; set; } = false;
-
-        public double HorizontalOffset
-        {
-            get { return _offset.X; }
-        }
-
-        public double VerticalOffset
-        {
-            get { return _offset.Y; }
-        }
 
         public double ExtentHeight
         {
@@ -295,6 +267,18 @@ namespace Bvs.Common.Utility
         public double ExtentWidth
         {
             get { return _extent.Width; }
+        }
+
+        public double HorizontalOffset
+        {
+            get { return _offset.X; }
+        }
+
+        public ScrollViewer ScrollOwner { get; set; }
+
+        public double VerticalOffset
+        {
+            get { return _offset.Y; }
         }
 
         public double ViewportHeight
@@ -307,32 +291,7 @@ namespace Bvs.Common.Utility
             get { return _viewport.Width; }
         }
 
-        public void LineUp()
-        {
-            SetVerticalOffset(VerticalOffset - VerticalOffsetLine);
-        }
-
         public void LineDown()
-        {
-            SetVerticalOffset(VerticalOffset + VerticalOffsetLine);
-        }
-
-        public void PageUp()
-        {
-            SetVerticalOffset(VerticalOffset - _viewport.Height);
-        }
-
-        public void PageDown()
-        {
-            SetVerticalOffset(VerticalOffset + _viewport.Height);
-        }
-
-        public void MouseWheelUp()
-        {
-            SetVerticalOffset(VerticalOffset - VerticalOffsetLine);
-        }
-
-        public void MouseWheelDown()
         {
             SetVerticalOffset(VerticalOffset + VerticalOffsetLine);
         }
@@ -347,9 +306,19 @@ namespace Bvs.Common.Utility
             throw new InvalidOperationException();
         }
 
+        public void LineUp()
+        {
+            SetVerticalOffset(VerticalOffset - VerticalOffsetLine);
+        }
+
         public Rect MakeVisible(Visual visual, Rect rectangle)
         {
             return new Rect();
+        }
+
+        public void MouseWheelDown()
+        {
+            SetVerticalOffset(VerticalOffset + VerticalOffsetLine);
         }
 
         public void MouseWheelLeft()
@@ -362,6 +331,16 @@ namespace Bvs.Common.Utility
             throw new InvalidOperationException();
         }
 
+        public void MouseWheelUp()
+        {
+            SetVerticalOffset(VerticalOffset - VerticalOffsetLine);
+        }
+
+        public void PageDown()
+        {
+            SetVerticalOffset(VerticalOffset + _viewport.Height);
+        }
+
         public void PageLeft()
         {
             throw new InvalidOperationException();
@@ -370,6 +349,11 @@ namespace Bvs.Common.Utility
         public void PageRight()
         {
             throw new InvalidOperationException();
+        }
+
+        public void PageUp()
+        {
+            SetVerticalOffset(VerticalOffset - _viewport.Height);
         }
 
         public void SetHorizontalOffset(double offset)
@@ -400,10 +384,29 @@ namespace Bvs.Common.Utility
             InvalidateMeasure();
         }
 
-        private readonly TranslateTransform _trans = new TranslateTransform();
-        private Size _extent = new Size(0, 0);
-        private Size _viewport = new Size(0, 0);
-        private Point _offset;
+        private void UpdateScrollInfo(Size availableSize)
+        {
+            // See how many items there are
+            var itemsControl = ItemsControl.GetItemsOwner(this);
+            var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
+
+            var extent = CalculateExtent(availableSize, itemCount);
+            // Update extent
+            if (extent != _extent)
+            {
+                _extent = extent;
+                if (ScrollOwner != null)
+                    ScrollOwner.InvalidateScrollInfo();
+            }
+
+            // Update viewport
+            if (availableSize != _viewport)
+            {
+                _viewport = availableSize;
+                if (ScrollOwner != null)
+                    ScrollOwner.InvalidateScrollInfo();
+            }
+        }
 
         #endregion IScrollInfo implementation
     }

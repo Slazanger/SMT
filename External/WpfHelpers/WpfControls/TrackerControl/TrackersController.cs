@@ -13,17 +13,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
     /// </summary>
     public class TrackersController : List<Tracker>
     {
-        /// <summary>
-        /// Triggers when track change selection
-        /// </summary>
-        public event EventHandler CurrentSelectionChanged;
-
-        public bool CanMoveTrackers { get; set; }
-
-        private Brush _selectedObject = new SolidColorBrush(Color.FromArgb(40, 200, 50, 50));
-
-        private Brush _fillObjectColor = new SolidColorBrush(Color.FromArgb(92, 20, 160, 20));
-
         //Window m_Window = null;
         /// <summary>
         ///     Window that is associated with a TrackerController
@@ -33,7 +22,9 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         private readonly Canvas m_Canvas;
 
-        private Tracker.SelectionType RemoveType;
+        private Brush _fillObjectColor = new SolidColorBrush(Color.FromArgb(92, 20, 160, 20));
+
+        private Brush _selectedObject = new SolidColorBrush(Color.FromArgb(40, 200, 50, 50));
 
         /// <summary>
         ///     Indicates whether a new Tracker adding is occuring
@@ -65,6 +56,8 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         private System.Windows.Window m_Window;
 
+        private Tracker.SelectionType RemoveType;
+
         /// <summary>
         ///     Create new instance and associate it with a given Window and Canvas
         /// </summary>
@@ -75,6 +68,59 @@ namespace WpfHelpers.WpfControls.TrackerControl
             m_Window = pWnd;
             m_Canvas = pCanvas;
             CanMoveTrackers = true;
+        }
+
+        /// <summary>
+        /// Triggers when track change selection
+        /// </summary>
+        public event EventHandler CurrentSelectionChanged;
+
+        public bool CanMoveTrackers { get; set; }
+
+        public new void Add(Tracker tracker)
+        {
+            base.Add(tracker);
+        }
+
+        /// <summary>
+        ///     Starts adding a new default Tracker
+        /// </summary>
+        public Tracker AddTracker(Tracker.SelectionType type)
+        {
+            if ((m_Add) || (m_Remove))
+                return null;
+            m_Remove = false;
+            m_Add = true;
+            m_CurrentTracker = new Tracker(m_Canvas, type);
+            Add(m_CurrentTracker);
+            m_CurrentTracker.AddPoint(Mouse.GetPosition(m_Canvas));
+
+            return m_CurrentTracker;
+        }
+
+        /// <summary>
+        ///     Starts adding a new given Tracker. It should be empty (no points) but may be configured
+        /// </summary>
+        public void AddTracker(Tracker pTracker)
+        {
+            if ((m_Add) || (m_Remove))
+                return;
+
+            m_Remove = false;
+            m_Add = true;
+            m_CurrentTracker = pTracker;
+            pTracker.Canvas = m_Canvas;
+            Add(pTracker);
+            m_CurrentTracker.AddPoint(Mouse.GetPosition(m_Canvas));
+        }
+
+        public void Cancel()
+        {
+            m_CurrentTracker.Dispose();
+            m_CurrentTracker = null;
+            m_Add = false;
+            m_Drag = -2;
+            m_Remove = false;
         }
 
         public void Init()
@@ -219,25 +265,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
             }
         }
 
-        public new void Add(Tracker tracker)
-        {
-            base.Add(tracker);
-        }
-
-        public new void Remove(Tracker track)
-        {
-            track.Dispose();
-            base.Remove(track);
-        }
-
-        /// <summary>
-        ///     MouseUp event handler
-        /// </summary>
-        public void OnMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            m_Drag = -2;
-        }
-
         /// <summary>
         ///     MouseMove event handler
         /// </summary>
@@ -314,35 +341,17 @@ namespace WpfHelpers.WpfControls.TrackerControl
         }
 
         /// <summary>
-        ///     Starts adding a new default Tracker
+        ///     MouseUp event handler
         /// </summary>
-        public Tracker AddTracker(Tracker.SelectionType type)
+        public void OnMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if ((m_Add) || (m_Remove))
-                return null;
-            m_Remove = false;
-            m_Add = true;
-            m_CurrentTracker = new Tracker(m_Canvas, type);
-            Add(m_CurrentTracker);
-            m_CurrentTracker.AddPoint(Mouse.GetPosition(m_Canvas));
-
-            return m_CurrentTracker;
+            m_Drag = -2;
         }
 
-        /// <summary>
-        ///     Starts adding a new given Tracker. It should be empty (no points) but may be configured
-        /// </summary>
-        public void AddTracker(Tracker pTracker)
+        public new void Remove(Tracker track)
         {
-            if ((m_Add) || (m_Remove))
-                return;
-
-            m_Remove = false;
-            m_Add = true;
-            m_CurrentTracker = pTracker;
-            pTracker.Canvas = m_Canvas;
-            Add(pTracker);
-            m_CurrentTracker.AddPoint(Mouse.GetPosition(m_Canvas));
+            track.Dispose();
+            base.Remove(track);
         }
 
         /// <summary>
@@ -356,15 +365,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
             RemoveType = type;
             m_Remove = true;
             m_Window.Cursor = Cursors.Arrow;
-        }
-
-        public void Cancel()
-        {
-            m_CurrentTracker.Dispose();
-            m_CurrentTracker = null;
-            m_Add = false;
-            m_Drag = -2;
-            m_Remove = false;
         }
     }
 }

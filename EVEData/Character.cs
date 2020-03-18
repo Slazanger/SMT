@@ -20,14 +20,9 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Gets or sets the Name of the Character
+        /// Gets or sets the ID of the Alliance this character is in
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ID used by ESI for this character
-        /// </summary>
-        public long ID { get; set; }
+        public long AllianceID { get; set; }
 
         /// <summary>
         /// Gets or sets the ID of the Corp this character is in
@@ -35,8 +30,13 @@ namespace SMT.EVEData
         public long CorporationID { get; set; }
 
         /// <summary>
-        /// Gets or sets the ID of the Alliance this character is in
+        /// Gets or sets the ID used by ESI for this character
         /// </summary>
-        public long AllianceID { get; set; }
+        public long ID { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Name of the Character
+        /// </summary>
+        public string Name { get; set; }
     }
 }

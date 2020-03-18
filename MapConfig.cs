@@ -7,101 +7,106 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SMT
 {
+    public class JumpCharacterItemsSource : IItemsSource
+    {
+        public ItemCollection GetValues()
+        {
+            ItemCollection sizes = new ItemCollection();
+            sizes.Add("");
+
+            foreach (EVEData.LocalCharacter c in EVEData.EveManager.Instance.LocalCharacters)
+            {
+                sizes.Add(c.Name);
+            }
+            return sizes;
+        }
+    }
+
     public class MapConfig : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
-        }
-
-        private int m_WarningRange = 5;
-        private int m_MaxIntelSeconds;
-        private string m_DefaultRegion;
-
-        [Browsable(false)]
-        public string DefaultRegion
-        {
-            get
-            {
-                return m_DefaultRegion;
-            }
-            set
-            {
-                m_DefaultRegion = value;
-                OnPropertyChanged("DefaultRegion");
-            }
-        }
-
-        [Browsable(false)]
-        public string DefaultColourSchemeName { get; set; }
-
-        [Browsable(false)]
-        public List<MapColours> MapColours { get; set; }
-
         [Browsable(false)]
         public MapColours ActiveColourScheme;
 
-        private bool m_ShowZKillData;
-
-        [Category("General")]
-        [DisplayName("Show ZKillData")]
-        public bool ShowZKillData
-        {
-            get
-            {
-                return m_ShowZKillData;
-            }
-            set
-            {
-                m_ShowZKillData = value;
-                OnPropertyChanged("ShowZKillData");
-            }
-        }
-
-        [Category("General")]
-        [DisplayName("System Popup")]
-        public bool ShowSystemPopup { get; set; }
-
-        [Category("Incursions")]
-        [DisplayName("Show Active Incursions")]
-        public bool ShowActiveIncursions { get; set; }
-
-        [Category("Jove")]
-        [DisplayName("Show Observatories")]
-        public bool ShowJoveObservatories { get; set; }
-
         [Category("Navigation")]
-        [DisplayName("Show Cyno Beacons")]
-        public bool ShowCynoBeacons { get; set; }
+        public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
 
-        [Category("Navigation")]
-        [DisplayName("Show Jump Distance")]
-        public bool ShowJumpDistance { get; set; }
+        private bool m_AlwaysOnTop;
+
+        private string m_CurrentJumpCharacter;
 
         private string m_CurrentJumpSystem;
 
-        [Category("Navigation")]
-        [DisplayName("Current Jump System"), ReadOnly(true)]
-        public string CurrentJumpSystem
+        private string m_DefaultRegion;
+
+        private double m_IntelTextSize = 10;
+
+        private bool m_JumpRangeInAsOutline;
+
+        private int m_MaxIntelSeconds;
+
+        private bool m_ShowADM;
+
+        private bool m_ShowCoalition;
+
+        private bool m_ShowDangerZone = false;
+
+        private bool m_ShowIhubVunerabilities;
+
+        private bool m_ShowNegativeRattingDelta;
+
+        private bool m_ShowRattingDataAsDelta;
+
+        private bool m_ShowRegionStandings;
+
+        private bool m_ShowTCUVunerabilities;
+
+        private bool m_ShowToolBox = true;
+
+        private bool m_ShowTrueSec;
+
+        private bool m_ShowUniverseKills;
+
+        private bool m_ShowUniversePods;
+
+        private bool m_ShowUniverseRats;
+
+        private bool m_ShowZKillData;
+
+        private bool m_SOVBasedonTCU;
+
+        private bool m_SOVShowConflicts;
+
+        private double m_UniverseDataScale = 1.0f;
+
+        private float m_UniverseMaxZoomDisplaySystems;
+
+        private float m_UniverseMaxZoomDisplaySystemsText;
+
+        private int m_UpcomingSovMinutes;
+
+        private int m_WarningRange = 5;
+
+        public MapConfig()
+        {
+            SetDefaults();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [Category("General")]
+        [DisplayName("Always on top")]
+        public bool AlwaysOnTop
         {
             get
             {
-                return m_CurrentJumpSystem;
+                return m_AlwaysOnTop;
             }
             set
             {
-                m_CurrentJumpSystem = value;
-                OnPropertyChanged("CurrentJumpSystem");
+                m_AlwaysOnTop = value;
+                OnPropertyChanged("AlwaysOnTop");
             }
         }
-
-        private string m_CurrentJumpCharacter;
 
         [Category("Navigation")]
         [DisplayName("Current Jump Character")]
@@ -120,27 +125,36 @@ namespace SMT
         }
 
         [Category("Navigation")]
-        [DisplayName("Ship Type")]
-        public EVEData.EveManager.JumpShip JumpShipType { get; set; }
-
-        private bool m_JumpRangeInAsOutline;
-
-        [Category("Navigation")]
-        [DisplayName("Jump Range as Outline")]
-        public bool JumpRangeInAsOutline
+        [DisplayName("Current Jump System"), ReadOnly(true)]
+        public string CurrentJumpSystem
         {
             get
             {
-                return m_JumpRangeInAsOutline;
+                return m_CurrentJumpSystem;
             }
             set
             {
-                m_JumpRangeInAsOutline = value;
-                OnPropertyChanged("JumpRangeInAsOutline");
+                m_CurrentJumpSystem = value;
+                OnPropertyChanged("CurrentJumpSystem");
             }
         }
 
-        private double m_IntelTextSize = 10;
+        [Browsable(false)]
+        public string DefaultColourSchemeName { get; set; }
+
+        [Browsable(false)]
+        public string DefaultRegion
+        {
+            get
+            {
+                return m_DefaultRegion;
+            }
+            set
+            {
+                m_DefaultRegion = value;
+                OnPropertyChanged("DefaultRegion");
+            }
+        }
 
         [Category("Intel")]
         [DisplayName("Text Size")]
@@ -174,17 +188,27 @@ namespace SMT
             }
         }
 
-        [Category("Intel")]
-        [DisplayName("Warning Sound")]
-        public bool PlayIntelSound { get; set; }
+        [Category("Navigation")]
+        [DisplayName("Jump Range as Outline")]
+        public bool JumpRangeInAsOutline
+        {
+            get
+            {
+                return m_JumpRangeInAsOutline;
+            }
+            set
+            {
+                m_JumpRangeInAsOutline = value;
+                OnPropertyChanged("JumpRangeInAsOutline");
+            }
+        }
 
-        [Category("Intel")]
-        [DisplayName("Warning On Unknown")]
-        public bool PlayIntelSoundOnUnknown { get; set; }
+        [Category("Navigation")]
+        [DisplayName("Ship Type")]
+        public EVEData.EveManager.JumpShip JumpShipType { get; set; }
 
-        [Category("Intel")]
-        [DisplayName("Limit Sound to Dangerzone")]
-        public bool PlaySoundOnlyInDangerZone { get; set; }
+        [Browsable(false)]
+        public List<MapColours> MapColours { get; set; }
 
         [Category("Intel")]
         [DisplayName("Max Intel Time (s)")]
@@ -205,6 +229,402 @@ namespace SMT
                 {
                     m_MaxIntelSeconds = 30;
                 }
+            }
+        }
+
+        [Category("Intel")]
+        [DisplayName("Warning Sound")]
+        public bool PlayIntelSound { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Warning On Unknown")]
+        public bool PlayIntelSoundOnUnknown { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Limit Sound to Dangerzone")]
+        public bool PlaySoundOnlyInDangerZone { get; set; }
+
+        [Category("Incursions")]
+        [DisplayName("Show Active Incursions")]
+        public bool ShowActiveIncursions { get; set; }
+
+        [Category("SOV")]
+        [DisplayName("Show ADM")]
+        public bool ShowADM
+        {
+            get
+            {
+                return m_ShowADM;
+            }
+
+            set
+            {
+                m_ShowADM = value;
+                OnPropertyChanged("ShowADM");
+            }
+        }
+
+        [Category("SOV")]
+        [DisplayName("Show Coalition")]
+        public bool ShowCoalition
+        {
+            get
+            {
+                return m_ShowCoalition;
+            }
+
+            set
+            {
+                m_ShowCoalition = value;
+                OnPropertyChanged("ShowCoalition");
+            }
+        }
+
+        [Category("Navigation")]
+        [DisplayName("Show Cyno Beacons")]
+        public bool ShowCynoBeacons { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Show DangerZone")]
+        public bool ShowDangerZone
+        {
+            get
+            {
+                return m_ShowDangerZone;
+            }
+            set
+            {
+                m_ShowDangerZone = value;
+                OnPropertyChanged("ShowDangerZone");
+            }
+        }
+
+        [Category("SOV")]
+        [DisplayName("Show IHUB Timers")]
+        public bool ShowIhubVunerabilities
+        {
+            get
+            {
+                return m_ShowIhubVunerabilities;
+            }
+
+            set
+            {
+                m_ShowIhubVunerabilities = value;
+                if (m_ShowIhubVunerabilities)
+                {
+                    ShowTCUVunerabilities = false;
+                }
+
+                OnPropertyChanged("ShowIhubVunerabilities");
+            }
+        }
+
+        [Category("Jove")]
+        [DisplayName("Show Observatories")]
+        public bool ShowJoveObservatories { get; set; }
+
+        [Category("Navigation")]
+        [DisplayName("Show Jump Distance")]
+        public bool ShowJumpDistance { get; set; }
+
+        [Category("Misc")]
+        [DisplayName("Show Negative Ratting Delta")]
+        public bool ShowNegativeRattingDelta
+        {
+            get
+            {
+                return m_ShowNegativeRattingDelta;
+            }
+            set
+            {
+                m_ShowNegativeRattingDelta = value;
+                OnPropertyChanged("ShowNegativeRattingDelta");
+            }
+        }
+
+        [Category("Misc")]
+        [DisplayName("Show Ratting Data as Delta")]
+        public bool ShowRattingDataAsDelta
+        {
+            get
+            {
+                return m_ShowRattingDataAsDelta;
+            }
+            set
+            {
+                m_ShowRattingDataAsDelta = value;
+                OnPropertyChanged("ShowRattingDataAsDelta");
+            }
+        }
+
+        [Category("Regions")]
+        [DisplayName("Show RegionStandings")]
+        public bool ShowRegionStandings
+        {
+            get
+            {
+                return m_ShowRegionStandings;
+            }
+
+            set
+            {
+                m_ShowRegionStandings = value;
+
+                if (m_ShowRegionStandings)
+                {
+                    ShowUniverseRats = false;
+                    ShowUniversePods = false;
+                    ShowUniverseKills = false;
+                }
+
+                OnPropertyChanged("ShowRegionStandings");
+            }
+        }
+
+        [Category("General")]
+        [DisplayName("System Popup")]
+        public bool ShowSystemPopup { get; set; }
+
+        [Category("SOV")]
+        [DisplayName("Show TCU Timers")]
+        public bool ShowTCUVunerabilities
+        {
+            get
+            {
+                return m_ShowTCUVunerabilities;
+            }
+
+            set
+            {
+                m_ShowTCUVunerabilities = value;
+
+                if (m_ShowTCUVunerabilities)
+                {
+                    ShowIhubVunerabilities = false;
+                }
+
+                OnPropertyChanged("ShowTCUVunerabilities");
+            }
+        }
+
+        [Category("General")]
+        [DisplayName("Show Toolbox")]
+        public bool ShowToolBox
+        {
+            get
+            {
+                return m_ShowToolBox;
+            }
+            set
+            {
+                m_ShowToolBox = value;
+                OnPropertyChanged("ShowToolBox");
+            }
+        }
+
+        [Category("General")]
+        [DisplayName("Show TrueSec")]
+        public bool ShowTrueSec
+        {
+            get
+            {
+                return m_ShowTrueSec;
+            }
+            set
+            {
+                m_ShowTrueSec = value;
+                OnPropertyChanged("ShowTrueSec");
+            }
+        }
+
+        [Category("Regions")]
+        [DisplayName("Show Ship kill Stats")]
+        public bool ShowUniverseKills
+        {
+            get
+            {
+                return m_ShowUniverseKills;
+            }
+
+            set
+            {
+                m_ShowUniverseKills = value;
+
+                if (m_ShowUniverseKills)
+                {
+                    ShowRegionStandings = false;
+                    ShowUniverseRats = false;
+                    ShowUniversePods = false;
+                }
+
+                OnPropertyChanged("ShowUniverseKills");
+            }
+        }
+
+        [Category("Regions")]
+        [DisplayName("Show Pod kill Stats")]
+        public bool ShowUniversePods
+        {
+            get
+            {
+                return m_ShowUniversePods;
+            }
+
+            set
+            {
+                m_ShowUniversePods = value;
+                if (ShowUniversePods)
+                {
+                    ShowRegionStandings = false;
+                    ShowUniverseRats = false;
+                    ShowUniverseKills = false;
+                }
+
+                OnPropertyChanged("ShowUniversePods");
+            }
+        }
+
+        [Category("Regions")]
+        [DisplayName("Show Ratting Stats")]
+        public bool ShowUniverseRats
+        {
+            get
+            {
+                return m_ShowUniverseRats;
+            }
+
+            set
+            {
+                m_ShowUniverseRats = value;
+                if (m_ShowUniverseRats)
+                {
+                    ShowRegionStandings = false;
+                    ShowUniversePods = false;
+                    ShowUniverseKills = false;
+                }
+
+                OnPropertyChanged("ShowUniverseRats");
+            }
+        }
+
+        [Category("General")]
+        [DisplayName("Show ZKillData")]
+        public bool ShowZKillData
+        {
+            get
+            {
+                return m_ShowZKillData;
+            }
+            set
+            {
+                m_ShowZKillData = value;
+                OnPropertyChanged("ShowZKillData");
+            }
+        }
+
+        [Category("SOV")]
+        [DisplayName("Show Sov Based on TCU")]
+        public bool SOVBasedITCU
+        {
+            get
+            {
+                return m_SOVBasedonTCU;
+            }
+            set
+            {
+                m_SOVBasedonTCU = value;
+                OnPropertyChanged("SOVBasedITCU");
+            }
+        }
+
+        [Category("SOV")]
+        [DisplayName("Show Sov Conflicts")]
+        public bool SOVShowConflicts
+        {
+            get
+            {
+                return m_SOVShowConflicts;
+            }
+            set
+            {
+                m_SOVShowConflicts = value;
+                OnPropertyChanged("SOVShowConflicts");
+            }
+        }
+
+        [Category("Regions")]
+        [DisplayName("Universe Data Scale")]
+        public double UniverseDataScale
+        {
+            get
+            {
+                return m_UniverseDataScale;
+            }
+
+            set
+            {
+                m_UniverseDataScale = value;
+
+                if (m_UniverseDataScale < 0.01)
+                {
+                    m_UniverseDataScale = 0.01;
+                }
+
+                OnPropertyChanged("UniverseDataScale");
+            }
+        }
+
+        [Category("Universe View")]
+        [DisplayName("Systems Max Zoom")]
+        public float UniverseMaxZoomDisplaySystems
+        {
+            get
+            {
+                return m_UniverseMaxZoomDisplaySystems;
+            }
+
+            set
+            {
+                m_UniverseMaxZoomDisplaySystems = Math.Min(Math.Max(value, 0.5f), 10.0f);
+                OnPropertyChanged("UniverseMaxZoomDisplaySystems");
+            }
+        }
+
+        [Category("Universe View")]
+        [DisplayName("Systems Text Max Zoom")]
+        public float UniverseMaxZoomDisplaySystemsText
+        {
+            get
+            {
+                return m_UniverseMaxZoomDisplaySystemsText;
+            }
+
+            set
+            {
+                m_UniverseMaxZoomDisplaySystemsText = Math.Min(Math.Max(value, 0.5f), 10.0f);
+                OnPropertyChanged("UniverseMaxZoomDisplaySystemsText");
+            }
+        }
+
+        [Category("SOV")]
+        [DisplayName("Upcoming Period (Mins)")]
+        public int UpcomingSovMinutes
+        {
+            get
+            {
+                return m_UpcomingSovMinutes;
+            }
+
+            set
+            {
+                m_UpcomingSovMinutes = value;
+                if (m_UpcomingSovMinutes < 5)
+                {
+                    m_UpcomingSovMinutes = 5;
+                }
+
+                OnPropertyChanged("UpcomingSovMinutes");
             }
         }
 
@@ -239,437 +659,6 @@ namespace SMT
 
                 OnPropertyChanged("WarningRange");
             }
-        }
-
-        private bool m_ShowDangerZone = false;
-
-        [Category("Intel")]
-        [DisplayName("Show DangerZone")]
-        public bool ShowDangerZone
-        {
-            get
-            {
-                return m_ShowDangerZone;
-            }
-            set
-            {
-                m_ShowDangerZone = value;
-                OnPropertyChanged("ShowDangerZone");
-            }
-        }
-
-        private bool m_AlwaysOnTop;
-
-        [Category("General")]
-        [DisplayName("Always on top")]
-        public bool AlwaysOnTop
-        {
-            get
-            {
-                return m_AlwaysOnTop;
-            }
-            set
-            {
-                m_AlwaysOnTop = value;
-                OnPropertyChanged("AlwaysOnTop");
-            }
-        }
-
-        private bool m_ShowTrueSec;
-
-        [Category("General")]
-        [DisplayName("Show TrueSec")]
-        public bool ShowTrueSec
-        {
-            get
-            {
-                return m_ShowTrueSec;
-            }
-            set
-            {
-                m_ShowTrueSec = value;
-                OnPropertyChanged("ShowTrueSec");
-            }
-        }
-
-        private bool m_ShowToolBox = true;
-
-        [Category("General")]
-        [DisplayName("Show Toolbox")]
-        public bool ShowToolBox
-        {
-            get
-            {
-                return m_ShowToolBox;
-            }
-            set
-            {
-                m_ShowToolBox = value;
-                OnPropertyChanged("ShowToolBox");
-            }
-        }
-
-        private bool m_ShowRegionStandings;
-
-        [Category("Regions")]
-        [DisplayName("Show RegionStandings")]
-        public bool ShowRegionStandings
-        {
-            get
-            {
-                return m_ShowRegionStandings;
-            }
-
-            set
-            {
-                m_ShowRegionStandings = value;
-
-                if (m_ShowRegionStandings)
-                {
-                    ShowUniverseRats = false;
-                    ShowUniversePods = false;
-                    ShowUniverseKills = false;
-                }
-
-                OnPropertyChanged("ShowRegionStandings");
-            }
-        }
-
-        private bool m_ShowUniverseRats;
-
-        [Category("Regions")]
-        [DisplayName("Show Ratting Stats")]
-        public bool ShowUniverseRats
-        {
-            get
-            {
-                return m_ShowUniverseRats;
-            }
-
-            set
-            {
-                m_ShowUniverseRats = value;
-                if (m_ShowUniverseRats)
-                {
-                    ShowRegionStandings = false;
-                    ShowUniversePods = false;
-                    ShowUniverseKills = false;
-                }
-
-                OnPropertyChanged("ShowUniverseRats");
-            }
-        }
-
-        private bool m_ShowUniversePods;
-
-        [Category("Regions")]
-        [DisplayName("Show Pod kill Stats")]
-        public bool ShowUniversePods
-        {
-            get
-            {
-                return m_ShowUniversePods;
-            }
-
-            set
-            {
-                m_ShowUniversePods = value;
-                if (ShowUniversePods)
-                {
-                    ShowRegionStandings = false;
-                    ShowUniverseRats = false;
-                    ShowUniverseKills = false;
-                }
-
-                OnPropertyChanged("ShowUniversePods");
-            }
-        }
-
-        private bool m_ShowUniverseKills;
-
-        [Category("Regions")]
-        [DisplayName("Show Ship kill Stats")]
-        public bool ShowUniverseKills
-        {
-            get
-            {
-                return m_ShowUniverseKills;
-            }
-
-            set
-            {
-                m_ShowUniverseKills = value;
-
-                if (m_ShowUniverseKills)
-                {
-                    ShowRegionStandings = false;
-                    ShowUniverseRats = false;
-                    ShowUniversePods = false;
-                }
-
-                OnPropertyChanged("ShowUniverseKills");
-            }
-        }
-
-        private double m_UniverseDataScale = 1.0f;
-
-        [Category("Regions")]
-        [DisplayName("Universe Data Scale")]
-        public double UniverseDataScale
-        {
-            get
-            {
-                return m_UniverseDataScale;
-            }
-
-            set
-            {
-                m_UniverseDataScale = value;
-
-                if (m_UniverseDataScale < 0.01)
-                {
-                    m_UniverseDataScale = 0.01;
-                }
-
-                OnPropertyChanged("UniverseDataScale");
-            }
-        }
-
-        private bool m_ShowRattingDataAsDelta;
-
-        [Category("Misc")]
-        [DisplayName("Show Ratting Data as Delta")]
-        public bool ShowRattingDataAsDelta
-        {
-            get
-            {
-                return m_ShowRattingDataAsDelta;
-            }
-            set
-            {
-                m_ShowRattingDataAsDelta = value;
-                OnPropertyChanged("ShowRattingDataAsDelta");
-            }
-        }
-
-        private bool m_ShowNegativeRattingDelta;
-
-        [Category("Misc")]
-        [DisplayName("Show Negative Ratting Delta")]
-        public bool ShowNegativeRattingDelta
-        {
-            get
-            {
-                return m_ShowNegativeRattingDelta;
-            }
-            set
-            {
-                m_ShowNegativeRattingDelta = value;
-                OnPropertyChanged("ShowNegativeRattingDelta");
-            }
-        }
-
-        private bool m_SOVShowConflicts;
-
-        [Category("SOV")]
-        [DisplayName("Show Sov Conflicts")]
-        public bool SOVShowConflicts
-        {
-            get
-            {
-                return m_SOVShowConflicts;
-            }
-            set
-            {
-                m_SOVShowConflicts = value;
-                OnPropertyChanged("SOVShowConflicts");
-            }
-        }
-
-        private bool m_SOVBasedonTCU;
-
-        [Category("SOV")]
-        [DisplayName("Show Sov Based on TCU")]
-        public bool SOVBasedITCU
-        {
-            get
-            {
-                return m_SOVBasedonTCU;
-            }
-            set
-            {
-                m_SOVBasedonTCU = value;
-                OnPropertyChanged("SOVBasedITCU");
-            }
-        }
-
-        private bool m_ShowTCUVunerabilities;
-
-        [Category("SOV")]
-        [DisplayName("Show TCU Timers")]
-        public bool ShowTCUVunerabilities
-        {
-            get
-            {
-                return m_ShowTCUVunerabilities;
-            }
-
-            set
-            {
-                m_ShowTCUVunerabilities = value;
-
-                if (m_ShowTCUVunerabilities)
-                {
-                    ShowIhubVunerabilities = false;
-                }
-
-                OnPropertyChanged("ShowTCUVunerabilities");
-            }
-        }
-
-        private bool m_ShowIhubVunerabilities;
-
-        [Category("SOV")]
-        [DisplayName("Show IHUB Timers")]
-        public bool ShowIhubVunerabilities
-        {
-            get
-            {
-                return m_ShowIhubVunerabilities;
-            }
-
-            set
-            {
-                m_ShowIhubVunerabilities = value;
-                if (m_ShowIhubVunerabilities)
-                {
-                    ShowTCUVunerabilities = false;
-                }
-
-                OnPropertyChanged("ShowIhubVunerabilities");
-            }
-        }
-
-        private int m_UpcomingSovMinutes;
-
-        [Category("SOV")]
-        [DisplayName("Upcoming Period (Mins)")]
-        public int UpcomingSovMinutes
-        {
-            get
-            {
-                return m_UpcomingSovMinutes;
-            }
-
-            set
-            {
-                m_UpcomingSovMinutes = value;
-                if (m_UpcomingSovMinutes < 5)
-                {
-                    m_UpcomingSovMinutes = 5;
-                }
-
-                OnPropertyChanged("UpcomingSovMinutes");
-            }
-        }
-
-        private bool m_ShowCoalition;
-
-        [Category("SOV")]
-        [DisplayName("Show Coalition")]
-        public bool ShowCoalition
-        {
-            get
-            {
-                return m_ShowCoalition;
-            }
-
-            set
-            {
-                m_ShowCoalition = value;
-                OnPropertyChanged("ShowCoalition");
-            }
-        }
-
-        private bool m_ShowADM;
-
-        [Category("SOV")]
-        [DisplayName("Show ADM")]
-        public bool ShowADM
-        {
-            get
-            {
-                return m_ShowADM;
-            }
-
-            set
-            {
-                m_ShowADM = value;
-                OnPropertyChanged("ShowADM");
-            }
-        }
-
-        private float m_UniverseMaxZoomDisplaySystems;
-
-        [Category("Universe View")]
-        [DisplayName("Systems Max Zoom")]
-        public float UniverseMaxZoomDisplaySystems
-        {
-            get
-            {
-                return m_UniverseMaxZoomDisplaySystems;
-            }
-
-            set
-            {
-                m_UniverseMaxZoomDisplaySystems = Math.Min(Math.Max(value, 0.5f), 10.0f);
-                OnPropertyChanged("UniverseMaxZoomDisplaySystems");
-            }
-        }
-
-        private float m_UniverseMaxZoomDisplaySystemsText;
-
-        [Category("Universe View")]
-        [DisplayName("Systems Text Max Zoom")]
-        public float UniverseMaxZoomDisplaySystemsText
-        {
-            get
-            {
-                return m_UniverseMaxZoomDisplaySystemsText;
-            }
-
-            set
-            {
-                m_UniverseMaxZoomDisplaySystemsText = Math.Min(Math.Max(value, 0.5f), 10.0f);
-                OnPropertyChanged("UniverseMaxZoomDisplaySystemsText");
-            }
-        }
-
-        [Category("Navigation")]
-        public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
-
-        public void SetDefaults()
-        {
-            DefaultRegion = "Molden Heath";
-            ShowSystemPopup = true;
-            MaxIntelSeconds = 120;
-            UpcomingSovMinutes = 30;
-            AlwaysOnTop = false;
-            ShowToolBox = true;
-            ShowZKillData = true;
-            ShowTrueSec = true;
-            JumpRangeInAsOutline = true;
-            MapColours = new List<MapColours>();
-            ShowActiveIncursions = true;
-            CurrentJumpCharacter = "";
-            StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
-            SOVShowConflicts = true;
-            SOVBasedITCU = true;
-
-            UniverseMaxZoomDisplaySystems = 1.3f;
-            UniverseMaxZoomDisplaySystemsText = 2.0f;
-
-            WarningRange = 5;
         }
 
         public void SetDefaultColours()
@@ -887,24 +876,37 @@ namespace SMT
             ActiveColourScheme = defaultColours;
         }
 
-        public MapConfig()
+        public void SetDefaults()
         {
-            SetDefaults();
+            DefaultRegion = "Molden Heath";
+            ShowSystemPopup = true;
+            MaxIntelSeconds = 120;
+            UpcomingSovMinutes = 30;
+            AlwaysOnTop = false;
+            ShowToolBox = true;
+            ShowZKillData = true;
+            ShowTrueSec = true;
+            JumpRangeInAsOutline = true;
+            MapColours = new List<MapColours>();
+            ShowActiveIncursions = true;
+            CurrentJumpCharacter = "";
+            StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
+            SOVShowConflicts = true;
+            SOVBasedITCU = true;
+
+            UniverseMaxZoomDisplaySystems = 1.3f;
+            UniverseMaxZoomDisplaySystemsText = 2.0f;
+
+            WarningRange = 5;
         }
-    }
 
-    public class JumpCharacterItemsSource : IItemsSource
-    {
-        public ItemCollection GetValues()
+        protected void OnPropertyChanged(string name)
         {
-            ItemCollection sizes = new ItemCollection();
-            sizes.Add("");
-
-            foreach (EVEData.LocalCharacter c in EVEData.EveManager.Instance.LocalCharacters)
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
             {
-                sizes.Add(c.Name);
+                handler(this, new PropertyChangedEventArgs(name));
             }
-            return sizes;
         }
     }
 }

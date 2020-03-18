@@ -44,14 +44,14 @@ namespace SMT.EVEData
         public struct FleetMember
         {
             /// <summary>
-            /// Gets or sets Fleet Member Character name
-            /// </summary>
-            public string Name { get; set; }
-
-            /// <summary>
             /// Gets or sets Fleet member Location
             /// </summary>
             public string Location { get; set; }
+
+            /// <summary>
+            /// Gets or sets Fleet Member Character name
+            /// </summary>
+            public string Name { get; set; }
 
             public override string ToString() => Name;
         }
