@@ -2,7 +2,6 @@
 {
     public class Circle
     {
-
         public Vector2f center;
         public float radius;
 

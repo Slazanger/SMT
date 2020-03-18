@@ -61,13 +61,11 @@ namespace WpfHelpers.WpfControls.Window
             if ((ResizeMode)value == ResizeMode.NoResize)
                 return Cursors.Arrow;
 
-
             if (parameter.ToString() == "SizeWE")
                 return Cursors.SizeWE;
 
             if (parameter.ToString() == "SizeNS")
                 return Cursors.SizeNS;
-
 
             return Cursors.Arrow;
         }
@@ -267,7 +265,7 @@ namespace WpfHelpers.WpfControls.Window
                         var mouse1 = e.MouseDevice.GetPosition(w);
                         var width1 = Math.Max(w.ActualWidth - 2 * adjustment, adjustment);
                         w.WindowState = WindowState.Normal;
-                        // ISSUE: fix multiple monitors 
+                        // ISSUE: fix multiple monitors
                         var width2 = Math.Max(w.ActualWidth - 2 * adjustment, adjustment);
                         w.Left = (mouse1.X - adjustment) * (1 - width2 / width1);
                         w.Top = -7;
@@ -286,7 +284,6 @@ namespace WpfHelpers.WpfControls.Window
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
 
         private void DragSize(IntPtr handle, SizingAction sizingAction)
         {

@@ -72,7 +72,7 @@ namespace WpfHelpers.Helpers
             SetStarRows(grid);
         }
 
-        #endregion
+        #endregion RowCount Property
 
         #region ColumnCount Property
 
@@ -114,7 +114,7 @@ namespace WpfHelpers.Helpers
             SetStarColumns(grid);
         }
 
-        #endregion
+        #endregion ColumnCount Property
 
         #region StarRows Property
 
@@ -149,7 +149,7 @@ namespace WpfHelpers.Helpers
             SetStarRows((Grid)obj);
         }
 
-        #endregion
+        #endregion StarRows Property
 
         #region StarColumns Property
 
@@ -184,6 +184,6 @@ namespace WpfHelpers.Helpers
             SetStarColumns((Grid)obj);
         }
 
-        #endregion
+        #endregion StarColumns Property
     }
 }

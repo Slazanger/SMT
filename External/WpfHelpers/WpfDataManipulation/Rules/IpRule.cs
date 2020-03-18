@@ -26,5 +26,4 @@ namespace WpfHelpers.WpfDataManipulation.Rules
             return new ValidationResult(true, null);
         }
     }
-
 }

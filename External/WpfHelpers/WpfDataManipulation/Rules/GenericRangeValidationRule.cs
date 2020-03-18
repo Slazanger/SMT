@@ -35,8 +35,12 @@ namespace WpfHelpers.WpfDataManipulation.Rules
     }
 
     public class IntRangeValidationRule : GenericRangeValidationRule<int> { }
+
     public class DoubleRangeValidationRule : GenericRangeValidationRule<double> { }
+
     public class LongRangeValidationRule : GenericRangeValidationRule<long> { }
+
     public class UIntRangeValidationRule : GenericRangeValidationRule<uint> { }
+
     public class DecimalRangeValidationRule : GenericRangeValidationRule<decimal> { }
 }

@@ -9,8 +9,6 @@ namespace SMT.EVEData
     /// </summary>
     public class Character
     {
-
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
         /// </summary>

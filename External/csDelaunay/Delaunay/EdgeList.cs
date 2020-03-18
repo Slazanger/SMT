@@ -1,9 +1,7 @@
 ﻿namespace csDelaunay
 {
-
     public class EdgeList
     {
-
         private float deltaX;
         private float xmin;
 
@@ -55,6 +53,7 @@
 		 * @param lb
 		 * @param newHalfedge
 		 */
+
         public void Insert(Halfedge lb, Halfedge newHalfedge)
         {
             newHalfedge.edgeListLeftNeighbor = lb;
@@ -68,6 +67,7 @@
 		 * We cannot dispose it yet because we are still using it.
 		 * @param halfEdge
 		 */
+
         public void Remove(Halfedge halfedge)
         {
             halfedge.edgeListLeftNeighbor.edgeListRightNeighbor = halfedge.edgeListRightNeighbor;
@@ -81,6 +81,7 @@
 		 * @param p
 		 * @return
 		 */
+
         public Halfedge EdgeListLeftNeighbor(Vector2f p)
         {
             int bucket;
@@ -113,7 +114,6 @@
                     halfedge = halfedge.edgeListRightNeighbor;
                 } while (halfedge != rightEnd && halfedge.IsLeftOf(p));
                 halfedge = halfedge.edgeListLeftNeighbor;
-
             }
             else
             {

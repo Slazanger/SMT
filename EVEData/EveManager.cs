@@ -52,9 +52,7 @@ namespace SMT.EVEData
         /// </summary>
         private Dictionary<string, int> intelFileReadPos;
 
-
         private string VersionStr;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
@@ -83,7 +81,6 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(SaveDataFolder);
             }
 
-
             string webCacheFoilder = DataCacheFolder + "\\WebCache";
             if (!Directory.Exists(webCacheFoilder))
             {
@@ -105,7 +102,6 @@ namespace SMT.EVEData
             AllianceIDToName = new SerializableDictionary<long, string>();
             AllianceIDToTicker = new SerializableDictionary<long, string>();
             NameToSystem = new Dictionary<string, System>();
-
 
             ServerInfo = new EVEData.Server();
         }
@@ -141,7 +137,6 @@ namespace SMT.EVEData
         /// </summary>
         public SerializableDictionary<string, string> ShipTypes { get; set; }
 
-
         /// <summary>
         /// Gets or sets the master list of Regions
         /// </summary>
@@ -172,8 +167,6 @@ namespace SMT.EVEData
         /// </summary>
         public BindingList<EVEData.IntelData> IntelDataList { get; set; }
 
-
-
         /// <summary>
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
@@ -196,7 +189,6 @@ namespace SMT.EVEData
         /// </summary>
         public string SaveDataFolder { get; set; }
 
-
         /// <summary>
         /// Gets or sets the current list of thera connections
         /// </summary>
@@ -211,7 +203,6 @@ namespace SMT.EVEData
         /// Gets or sets the current list of Jump Bridges
         /// </summary>
         public ObservableCollection<JumpBridge> JumpBridges { get; set; }
-
 
         public List<Coalition> Coalitions { get; set; }
 
@@ -230,10 +221,8 @@ namespace SMT.EVEData
         /// </summary>
         private List<string> IntelClearFilters { get; set; }
 
-
         private bool WatcherThreadShouldTerminate = false;
         private bool BackgroundThreadShouldTerminate = false;
-
 
         public EveTrace.EveTraceFleetInfo FleetIntel;
 
@@ -320,7 +309,7 @@ namespace SMT.EVEData
             }
 
             XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
-            string dataFilename =  SaveDataFolder + @"\Characters.dat";
+            string dataFilename = SaveDataFolder + @"\Characters.dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
             {
@@ -342,12 +331,10 @@ namespace SMT.EVEData
             ZKillFeed.ShutDown();
         }
 
-
         public void InitNavigation()
         {
             Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges.ToList());
         }
-
 
         /// <summary>
         /// Load the jump bridge data from disk
@@ -355,7 +342,6 @@ namespace SMT.EVEData
         public void LoadJumpBridgeData()
         {
             JumpBridges = new ObservableCollection<JumpBridge>();
-
 
             string dataFilename = SaveDataFolder + @"\JumpBridges.dat";
             if (!File.Exists(dataFilename))
@@ -408,7 +394,6 @@ namespace SMT.EVEData
                 }
             }
 
-
             IntelClearFilters = new List<string>();
             string intelClearFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelClearFilters.txt";
 
@@ -427,8 +412,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
-
 
             intelFileReadPos = new Dictionary<string, int>();
 
@@ -453,8 +436,6 @@ namespace SMT.EVEData
             // by opening and closing them it updates the sytem meta files which
             // causes the file watcher to operate correctly otherwise this data
             // doesnt get updated until something other than the eve client reads these files
-
-
 
             new Thread(() =>
             {
@@ -670,7 +651,6 @@ namespace SMT.EVEData
                         hasIceBelt = true;
                     }
 
-
                     // SS Nodes for system nodes
                     XmlNodeList ssNodes = aNode.SelectNodes(@".//*[@class='ss']");
                     if (ssNodes[0] != null)
@@ -683,7 +663,7 @@ namespace SMT.EVEData
 
                         NameToSystem[name] = s;
 
-                        // create and add the map version 
+                        // create and add the map version
                         rd.MapSystems[name] = new MapSystem
                         {
                             Name = name,
@@ -721,9 +701,6 @@ namespace SMT.EVEData
                 }
                 // extract Ice Systems
             }
-
-
-
 
             // now open up the eve static data export and extract some info from it
             string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystems.csv";
@@ -798,9 +775,6 @@ namespace SMT.EVEData
                 // Error
             }
 
-
-
-
             string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystemJumps.csv";
             if (File.Exists(eveStaticDataJumpsFile))
             {
@@ -854,11 +828,10 @@ namespace SMT.EVEData
                 // error
             }
 
-
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
             {
-                // collect the system points to generate them from 
+                // collect the system points to generate them from
                 List<Vector2f> points = new List<Vector2f>();
 
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
@@ -896,9 +869,9 @@ namespace SMT.EVEData
                 {
                     ms.ActualSystem = GetEveSystem(ms.Name);
 
-                    if(!ms.OutOfRegion)
+                    if (!ms.OutOfRegion)
                     {
-                        if(ms.ActualSystem.TrueSec >= 0.45)
+                        if (ms.ActualSystem.TrueSec >= 0.45)
                         {
                             rr.HasHighSecSystems = true;
                         }
@@ -908,17 +881,15 @@ namespace SMT.EVEData
                             rr.HasLowSecSystems = true;
                         }
 
-                        if (ms.ActualSystem.TrueSec <= 0.0 )
+                        if (ms.ActualSystem.TrueSec <= 0.0)
                         {
                             rr.HasNullSecSystems = true;
                         }
-
-
                     }
                 }
             }
 
-            // collect the system points to generate them from 
+            // collect the system points to generate them from
             List<Vector2f> regionpoints = new List<Vector2f>();
 
             // now Generate the region links
@@ -1036,8 +1007,6 @@ namespace SMT.EVEData
                 ValidShipGroupIDs.Add("1876"); //  Engineering Complex
                 ValidShipGroupIDs.Add("1924"); //  Forward Operating Base
 
-
-
                 StreamReader file = new StreamReader(eveStaticDataItemTypesFile);
 
                 // read the headers..
@@ -1056,7 +1025,6 @@ namespace SMT.EVEData
                         continue;
                     }
 
-
                     string typeID = bits[0];
                     string groupID = bits[1];
                     string ItemName = bits[2];
@@ -1065,17 +1033,13 @@ namespace SMT.EVEData
                     {
                         ShipTypes.Add(typeID, ItemName);
                     }
-
                 }
             }
-
 
             // now add the jove systems
             string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\JoveSystems.csv";
             if (File.Exists(eveStaticDataJoveObservatories))
             {
-
-
                 StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
 
                 // read the headers..
@@ -1094,7 +1058,6 @@ namespace SMT.EVEData
                         continue;
                     }
 
-
                     string system = bits[0];
 
                     System s = GetEveSystem(system);
@@ -1104,10 +1067,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
-
-
-
 
             // now serialise the classes to disk
             Utils.SerializToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
@@ -1191,7 +1150,6 @@ namespace SMT.EVEData
                 NameToSystem[s.Name] = s;
             }
 
-
             // now add the beacons
             string cynoBeaconsFile = AppDomain.CurrentDomain.BaseDirectory + @"\CynoBeacons.txt";
             if (File.Exists(cynoBeaconsFile))
@@ -1201,8 +1159,6 @@ namespace SMT.EVEData
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-
-
                     string system = line.Trim();
 
                     System s = GetEveSystem(system);
@@ -1212,7 +1168,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
 
             Init();
         }
@@ -1271,7 +1226,6 @@ namespace SMT.EVEData
 
             return string.Empty;
         }
-
 
         /// <summary>
         /// Get the MapRegion from the name
@@ -1344,12 +1298,8 @@ namespace SMT.EVEData
             esiChar.ID = acd.CharacterID;
             esiChar.ESIAuthData = acd;
 
-
             // now to find if a matching character
-
         }
-
-
 
         /// <summary>
         /// Update the Alliance and Ticker data for all SOV owners in the specified region
@@ -1366,7 +1316,6 @@ namespace SMT.EVEData
 
             foreach (KeyValuePair<string, MapSystem> kvp in r.MapSystems)
             {
-
                 if (kvp.Value.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.Keys.Contains(kvp.Value.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceTCU))
                 {
                     IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceTCU);
@@ -1376,9 +1325,7 @@ namespace SMT.EVEData
                 {
                     IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceIHUB);
                 }
-
             }
-
 
             ResolveAllianceIDs(IDToResolve);
         }
@@ -1408,7 +1355,6 @@ namespace SMT.EVEData
                 return;
             }
 
-
             ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
             if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
             {
@@ -1417,7 +1363,6 @@ namespace SMT.EVEData
                     if (ri.Category == ResolvedInfoCategory.Alliance)
                     {
                         ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
-
 
                         if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
                         {
@@ -1432,11 +1377,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-
         }
-
-
-
 
         /// <summary>
         /// Update the current Thera Connections from EVE-Scout
@@ -1456,8 +1397,6 @@ namespace SMT.EVEData
             }), DispatcherPriority.ContextIdle, null);
 
             request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
-
-
         }
 
         /// <summary>
@@ -1487,7 +1426,6 @@ namespace SMT.EVEData
         /// </summary>
         private void Init()
         {
-
             IOptions<EsiConfig> config = Options.Create(new EsiConfig()
             {
                 EsiUrl = "https://esi.evetech.net/",
@@ -1513,9 +1451,6 @@ namespace SMT.EVEData
                 "esi-characters.read_fatigue.v1",
                 "esi-alliances.read_contacts.v1"
             };
-
-
-
 
             foreach (MapRegion rr in Regions)
             {
@@ -1658,7 +1593,6 @@ namespace SMT.EVEData
                                                 c.Region = "";
                                             }
 
-
                                             addChar = false;
                                         }
                                     }
@@ -1669,8 +1603,6 @@ namespace SMT.EVEData
                                         {
                                             LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
                                         }), DispatcherPriority.ContextIdle, null);
-
-
                                     }
 
                                     break;
@@ -1844,21 +1776,18 @@ namespace SMT.EVEData
             }
         }
 
-
         private void StartUpdateDotlanKillDeltaInfo()
         {
-
             foreach (MapRegion mr in Regions)
             {
                 // clear the data set
-                foreach(MapSystem ms in mr.MapSystems.Values)
+                foreach (MapSystem ms in mr.MapSystems.Values)
                 {
-                    if(!ms.OutOfRegion)
+                    if (!ms.OutOfRegion)
                     {
                         ms.ActualSystem.NPCKillsDeltaLastHour = 0;
                     }
                 }
-
 
                 string url = @"http://evemaps.dotlan.net/js/" + mr.DotLanRef + ".js";
 
@@ -1870,10 +1799,8 @@ namespace SMT.EVEData
                 request.BeginGetResponse(new AsyncCallback(UpdateDotlanKillDeltaInfoCallback), request);
 
                 Thread.Sleep(10);
-
             }
         }
-
 
         private void UpdateDotlanKillDeltaInfoCallback(IAsyncResult asyncResult)
         {
@@ -1891,13 +1818,12 @@ namespace SMT.EVEData
                         int substrpos = result.IndexOf("{");
                         string json = result.Substring(substrpos - 1);
 
-                        
                         var systemData = Dotlan.SystemData.FromJson(json);
 
-                        foreach(KeyValuePair<string, Dotlan.SystemData> kvp in systemData)
+                        foreach (KeyValuePair<string, Dotlan.SystemData> kvp in systemData)
                         {
                             System s = GetEveSystemFromID(long.Parse(kvp.Key));
-                            if(s != null && kvp.Value.Nd.HasValue)
+                            if (s != null && kvp.Value.Nd.HasValue)
                             {
                                 s.NPCKillsDeltaLastHour = (int)kvp.Value.Nd.Value;
                             }
@@ -1908,14 +1834,11 @@ namespace SMT.EVEData
             catch (Exception)
             {
             }
-
         }
 
         private void StartUpdateCoalitionInfo()
         {
-
             Coalitions = new List<Coalition>();
-
 
             string url = @"http://rischwa.net/api/coalitions/current";
 
@@ -1960,7 +1883,6 @@ namespace SMT.EVEData
 
                                 Coalitions.Add(c);
                             }
-
                         }
                     }
                 }
@@ -1969,7 +1891,6 @@ namespace SMT.EVEData
             {
             }
         }
-
 
         private void StartUpdateStructureHunterUpdate()
         {
@@ -2009,7 +1930,6 @@ namespace SMT.EVEData
                                     es.SHStructures.Add(s);
                                 }
                             }
-
                         }
                     }
                 }
@@ -2045,19 +1965,13 @@ namespace SMT.EVEData
                                 es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
                                 es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
                                 es.SOVAllianceIHUB = ss.AllianceId;
-
                             }
                         }
                     }
                 }
-
             }
             catch { }
-
         }
-
-
-
 
         /// <summary>
         /// Start the download for the Server Info
@@ -2080,7 +1994,6 @@ namespace SMT.EVEData
             }
         }
 
-
         /// <summary>
         /// Start the ESI download for the kill info
         /// </summary>
@@ -2102,8 +2015,6 @@ namespace SMT.EVEData
             }
         }
 
-
-
         /// <summary>
         /// Start the ESI download for the Jump info
         /// </summary>
@@ -2122,7 +2033,6 @@ namespace SMT.EVEData
                 }
             }
         }
-
 
         /// <summary>
         /// Start the ESI download for the Jump info
@@ -2149,20 +2059,14 @@ namespace SMT.EVEData
             }
             catch
             {
-
             }
         }
-
-
 
         /// <summary>
         /// Start the Low Frequency Update Thread
         /// </summary>
         private void StartBackgroundThread()
         {
-
-
-
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = false;
@@ -2173,11 +2077,10 @@ namespace SMT.EVEData
                 DateTime NextCharacterUpdate = DateTime.Now;
                 DateTime NextLowFreqUpdate = DateTime.Now;
 
-
                 // loop forever
                 while (BackgroundThreadShouldTerminate == false)
                 {
-                    // character Update 
+                    // character Update
                     if ((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)
                     {
                         NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
@@ -2188,7 +2091,6 @@ namespace SMT.EVEData
                             c.Update();
                         }
                     }
-
 
                     // low frequency update
                     if ((NextLowFreqUpdate - DateTime.Now).Minutes < 0)
@@ -2204,7 +2106,6 @@ namespace SMT.EVEData
                 }
             }).Start();
         }
-
 
         /// <summary>
         /// Start the ESI download for the kill info
@@ -2233,8 +2134,6 @@ namespace SMT.EVEData
                         sys.SOVAlliance = ss.
                     }
                 }
-
-
             }
             */
         }
@@ -2284,8 +2183,6 @@ namespace SMT.EVEData
             {
             }
         }
-
-
 
         /// <summary>
         /// Initialise the Thera Connection Data from EVE-Scout
@@ -2349,7 +2246,6 @@ namespace SMT.EVEData
 
         public CharacterIDs.Character[] BulkUpdateCharacterCache(List<string> charList)
         {
-
             CharacterIDs.CharacterIdData cd = new CharacterIDs.CharacterIdData();
 
             string esiCharString = "[";
@@ -2367,7 +2263,6 @@ namespace SMT.EVEData
 
             httpData["datasource"] = "tranquility";
 
-
             string httpDataStr = httpData.ToString();
             byte[] data = UTF8Encoding.UTF8.GetBytes(esiCharString);
 
@@ -2382,8 +2277,6 @@ namespace SMT.EVEData
             stream.Write(data, 0, data.Length);
 
             HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-
 
             if (esiResult.StatusCode != HttpStatusCode.OK)
             {
@@ -2408,7 +2301,6 @@ namespace SMT.EVEData
 
             return cd.Characters;
         }
-
 
         /// <summary>
         /// Initialise the ZKillBoard Feed

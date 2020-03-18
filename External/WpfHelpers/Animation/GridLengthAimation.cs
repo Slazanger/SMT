@@ -8,13 +8,9 @@ using System.Windows.Media.Animation;
 
 namespace WpfHelpers.Animation
 {
-
-
-
-
     /// <summary>
     ///     Animates a grid length value just like the DoubleAnimation animates a double value
-    /// 
+    ///
     /// ColumnDefinition column = parent.ColumnDefinitions.First();
     /// Storyboard storyboard = new Storyboard();
     ///
@@ -30,9 +26,9 @@ namespace WpfHelpers.Animation
     /// animation.To = new GridLength(0.0);
     /// Storyboard.SetTarget(animation, column);
     /// Storyboard.SetTargetProperty(animation, new PropertyPath("Width"));
-    /// 
+    ///
     /// storyboard.Begin();
-    /// 
+    ///
     /// </summary>
     public class GridLengthAnimation : AnimationTimeline
     {

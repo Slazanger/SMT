@@ -8,7 +8,6 @@ namespace WpfHelpers.ResourceUsage
     {
         // from http://stackoverflow.com/questions/347614/wpf-image-resources
 
-
         /// <summary>
         /// Load a resource WPF-BitmapImage (png, bmp, ...) from embedded resource defined as 'Resource' not as 'Embedded resource'.
         /// </summary>

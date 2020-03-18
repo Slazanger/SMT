@@ -44,7 +44,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         private readonly WeakFunc<T, bool> _canExecute;
 
         /// <summary>
-        /// Initializes a new instance of the RelayCommand class that 
+        /// Initializes a new instance of the RelayCommand class that
         /// can always execute.
         /// </summary>
         /// <param name="execute">The execution logic.</param>
@@ -93,6 +93,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         /// </summary>
         public event EventHandler CanExecuteChanged;
 #else
+
         /// <summary>
         /// Occurs when changes occur that affect whether the command should execute.
         /// </summary>
@@ -114,6 +115,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
                 }
             }
         }
+
 #endif
 #endif
 #endif
@@ -157,7 +159,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         /// <summary>
         /// Defines the method that determines whether the command can execute in its current state.
         /// </summary>
-        /// <param name="parameter">Data used by the command. If the command does not require data 
+        /// <param name="parameter">Data used by the command. If the command does not require data
         /// to be passed, this object can be set to a null reference</param>
         /// <returns>true if this command can be executed; otherwise, false.</returns>
         public bool CanExecute(object parameter)
@@ -186,9 +188,9 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         }
 
         /// <summary>
-        /// Defines the method to be called when the command is invoked. 
+        /// Defines the method to be called when the command is invoked.
         /// </summary>
-        /// <param name="parameter">Data used by the command. If the command does not require data 
+        /// <param name="parameter">Data used by the command. If the command does not require data
         /// to be passed, this object can be set to a null reference</param>
         public virtual void Execute(object parameter)
         {

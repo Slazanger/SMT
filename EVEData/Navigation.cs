@@ -10,16 +10,13 @@ namespace SMT
         Safest,
         PreferLow,
     }
-
 }
 
 namespace SMT.EVEData
 {
-
-
     public class Navigation
     {
-        class MapNode
+        private class MapNode
         {
             public bool HighSec { get; set; }
             public string Name { get; set; }
@@ -48,7 +45,7 @@ namespace SMT.EVEData
             JumpTo,
         }
 
-        struct JumpLink
+        private struct JumpLink
         {
             public string System;
             public double RangeLY;
@@ -68,7 +65,7 @@ namespace SMT.EVEData
                     s += " (Ansiblex)";
                 }
 
-                if(GateToTake == GateType.JumpTo && LY > 0.0)
+                if (GateToTake == GateType.JumpTo && LY > 0.0)
                 {
                     s += " (Jump To, Range " + LY.ToString("0.##") + " )";
                 }
@@ -80,7 +77,6 @@ namespace SMT.EVEData
         public static void InitNavigation(List<System> eveSystems, List<JumpBridge> jumpBridges)
         {
             MapNodes = new Dictionary<string, MapNode>();
-
 
             // build up the nav structures
             foreach (System sys in eveSystems)
@@ -105,7 +101,6 @@ namespace SMT.EVEData
                 }
 
                 MapNodes[mn.Name] = mn;
-
             }
 
             foreach (JumpBridge jb in jumpBridges)
@@ -116,21 +111,19 @@ namespace SMT.EVEData
 
             double MaxRange = 10 * 9460730472580800.0;
 
-
-
             // now create the jumpable system links
             foreach (MapNode mn in MapNodes.Values)
             {
                 foreach (System sys in eveSystems)
                 {
                     // cant jump into highsec systems
-                    if(sys.TrueSec > 0.45)
+                    if (sys.TrueSec > 0.45)
                     {
                         continue;
                     }
-                    
+
                     double Distance = EveManager.Instance.GetRangeBetweenSystems(sys.Name, mn.Name);
-                    if(Distance < MaxRange && Distance > 0)
+                    if (Distance < MaxRange && Distance > 0)
                     {
                         JumpLink jl = new JumpLink();
                         jl.System = sys.Name;
@@ -140,7 +133,6 @@ namespace SMT.EVEData
                 }
             }
         }
-
 
         public static void UpdateJumpBridges(List<JumpBridge> jumpBridges)
         {
@@ -164,23 +156,21 @@ namespace SMT.EVEData
             {
                 mn.JBConnection = null;
             }
-
         }
 
         public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
         {
-            if(MapNodes == null)
+            if (MapNodes == null)
             {
                 return sysList;
             }
 
             if (X != 0)
             {
-                if(!sysList.Contains(start))
+                if (!sysList.Contains(start))
                 {
                     sysList.Add(start);
                 }
-
 
                 MapNode mn = MapNodes[start];
 
@@ -191,16 +181,14 @@ namespace SMT.EVEData
                         sysList.Add(mm);
                     }
 
-
                     List<string> connected = GetSystemsXJumpsFrom(sysList, mm, X - 1);
-                    foreach(string s in connected)
+                    foreach (string s in connected)
                     {
-                        if(!sysList.Contains(s))
+                        if (!sysList.Contains(s))
                         {
                             sysList.Add(s);
                         }
                     }
-                    
                 }
             }
             return sysList;
@@ -208,15 +196,11 @@ namespace SMT.EVEData
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, RoutingMode routingMode)
         {
-
-
             if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
 
             {
                 return null;
             }
-
-
 
             // clear the scores, values and parents from the list
             foreach (MapNode mapNode in MapNodes.Values)
@@ -245,9 +229,7 @@ namespace SMT.EVEData
                         mapNode.Cost = 1;
                         break;
                 }
-
             }
-
 
             MapNode Start = MapNodes[From];
             MapNode End = MapNodes[To];
@@ -259,7 +241,6 @@ namespace SMT.EVEData
 
             // add the start to the open list
             OpenList.Add(Start);
-
 
             while (OpenList.Count > 0)
             {
@@ -278,7 +259,6 @@ namespace SMT.EVEData
                 {
                     MapNode CMN = MapNodes[connectionName];
 
-
                     if (CMN.Visited)
                         continue;
 
@@ -293,7 +273,6 @@ namespace SMT.EVEData
                     }
                 }
 
-
                 if (UseJumpGates && CurrentNode.JBConnection != null)
                 {
                     MapNode JMN = MapNodes[CurrentNode.JBConnection];
@@ -306,14 +285,10 @@ namespace SMT.EVEData
                             OpenList.Add(JMN);
                         }
                     }
-
                 }
 
                 CurrentNode.Visited = true;
-
             }
-
-
 
             // build the path
 
@@ -342,7 +317,7 @@ namespace SMT.EVEData
                 if (i < Route.Count - 1)
                 {
                     MapNode mn = MapNodes[RP.SystemName];
-                    if (mn.JBConnection != null && mn.JBConnection == Route[i +1])
+                    if (mn.JBConnection != null && mn.JBConnection == Route[i + 1])
                     {
                         RP.GateToTake = GateType.Ansibex;
                     }
@@ -350,10 +325,8 @@ namespace SMT.EVEData
                 ActualRoute.Add(RP);
             }
 
-
             return ActualRoute;
         }
-
 
         public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY)
         {
@@ -362,9 +335,7 @@ namespace SMT.EVEData
                 return null;
             }
 
-
             double ExtraJumpFactor = 5.0;
-
 
             // clear the scores, values and parents from the list
             foreach (MapNode mapNode in MapNodes.Values)
@@ -372,7 +343,6 @@ namespace SMT.EVEData
                 mapNode.NearestToStart = null;
                 mapNode.MinCostToStart = 0;
                 mapNode.Visited = false;
-
             }
 
             // reverse as we want the short jump at the start
@@ -386,7 +356,6 @@ namespace SMT.EVEData
 
             // add the start to the open list
             OpenList.Add(Start);
-
 
             while (OpenList.Count > 0)
             {
@@ -403,13 +372,12 @@ namespace SMT.EVEData
                 // walk the connections
                 foreach (JumpLink connection in CurrentNode.JumpableSystems)
                 {
-                    if(connection.RangeLY > MaxLY)
+                    if (connection.RangeLY > MaxLY)
                     {
                         continue;
                     }
 
                     MapNode CMN = MapNodes[connection.System];
-
 
                     if (CMN.Visited)
                         continue;
@@ -425,13 +393,8 @@ namespace SMT.EVEData
                     }
                 }
 
-
-
                 CurrentNode.Visited = true;
-
             }
-
-
 
             // build the path
 
@@ -456,25 +419,17 @@ namespace SMT.EVEData
                 RP.GateToTake = GateType.StarGate;
                 RP.LY = 0.0;
 
-                if (i>0)
+                if (i > 0)
                 {
                     RP.GateToTake = GateType.JumpTo;
-                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]) / 9460730472580800.0 ;
-
+                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]) / 9460730472580800.0;
                 }
                 ActualRoute.Add(RP);
             }
 
-
             return ActualRoute;
         }
 
-
-
-
-
-        static Dictionary<string, MapNode> MapNodes { get; set; }
-
-
+        private static Dictionary<string, MapNode> MapNodes { get; set; }
     }
 }

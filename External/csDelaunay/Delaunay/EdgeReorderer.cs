@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace csDelaunay
 {
-
     public class EdgeReorderer
     {
-
         private List<Edge> edges;
         private List<LR> edgeOrientations;
 

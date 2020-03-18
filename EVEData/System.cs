@@ -101,17 +101,14 @@ namespace SMT.EVEData
         /// </summary>
         public bool HasNPCStation { get; set; }
 
-
         public bool HasIceBelt { get; set; }
 
         public bool HasJoveObservatory { get; set; }
 
         public double RadiusAU { get; set; }
 
-
         [XmlIgnoreAttribute]
         public bool HasJumpBeacon { get; set; }
-
 
         /// <summary>
         /// Gets or sets the number of NPC Kills in the last hour
@@ -119,13 +116,11 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public int NPCKillsLastHour { get; set; }
 
-
         /// <summary>
         /// Gets or sets the delta of NPC Kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
         public int NPCKillsDeltaLastHour { get; set; }
-
 
         /// <summary>
         /// Gets or sets the number of pod kills in the last hour
@@ -156,7 +151,6 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public long SOVAllianceIHUB { get; set; }
-
 
         /// <summary>
         /// Gets or sets the name of the corporation holding sov in this system
@@ -191,7 +185,6 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public float IHubOccupancyLevel { get; set; }
 
-
         [XmlIgnoreAttribute]
         public DateTimeOffset TCUVunerabliltyStart { get; set; }
 
@@ -200,9 +193,6 @@ namespace SMT.EVEData
 
         [XmlIgnoreAttribute]
         public float TCUOccupancyLevel { get; set; }
-
-
-
 
         /// <summary>
         /// Gets or sets the list of Jumps from this system
@@ -213,6 +203,5 @@ namespace SMT.EVEData
         {
             return $"{Name} ({Region})";
         }
-
     }
 }

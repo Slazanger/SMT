@@ -42,5 +42,4 @@ namespace WpfHelpers.WpfDataManipulation.XamlConverters
             return value;
         }
     }
-
 }

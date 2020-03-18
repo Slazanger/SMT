@@ -35,11 +35,9 @@ namespace WpfHelpers.WpfControls.Zoombox
             DependencyProperty.Register("Mode", typeof(ZoomControlModes), typeof(ZoomControl),
                 new UIPropertyMetadata(ZoomControlModes.Custom, Mode_PropertyChanged));
 
-
         public static readonly DependencyProperty ZoomBoxVisibilityProperty =
             DependencyProperty.Register("ZoomBoxVisibility", typeof(Visibility), typeof(ZoomControl),
                 new UIPropertyMetadata(Visibility.Visible));
-
 
         public static readonly DependencyProperty ModifierModeProperty =
             DependencyProperty.Register("ModifierMode", typeof(ZoomViewModifierMode), typeof(ZoomControl),
@@ -57,21 +55,17 @@ namespace WpfHelpers.WpfControls.Zoombox
             DependencyProperty.Register("ZoomBoxBackground", typeof(Brush), typeof(ZoomControl),
                 new UIPropertyMetadata(null));
 
-
         public static readonly DependencyProperty ZoomBoxBorderBrushProperty =
             DependencyProperty.Register("ZoomBoxBorderBrush", typeof(Brush), typeof(ZoomControl),
                 new UIPropertyMetadata(null));
-
 
         public static readonly DependencyProperty ZoomBoxBorderThicknessProperty =
             DependencyProperty.Register("ZoomBoxBorderThickness", typeof(Thickness), typeof(ZoomControl),
                 new UIPropertyMetadata(null));
 
-
         public static readonly DependencyProperty ZoomBoxOpacityProperty =
             DependencyProperty.Register("ZoomBoxOpacity", typeof(double), typeof(ZoomControl),
                 new UIPropertyMetadata(0.5));
-
 
         public static readonly DependencyProperty ZoomBoxProperty =
             DependencyProperty.Register("ZoomBox", typeof(Rect), typeof(ZoomControl),
@@ -93,7 +87,6 @@ namespace WpfHelpers.WpfControls.Zoombox
             remove { RemoveHandler(ZoomChangedEvent, value); }
         }
 
-
         public static readonly DependencyProperty AllowAltZoomBoxProperty =
             DependencyProperty.Register("AllowAltZoomBox", typeof(bool), typeof(ZoomControl),
                 new UIPropertyMetadata(true));
@@ -108,9 +101,7 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         private bool _isZooming;
 
-
         private Point _mouseDownPos;
-
 
         private ZoomContentPresenter _presenter;
 
@@ -142,7 +133,6 @@ namespace WpfHelpers.WpfControls.Zoombox
             MouseDown += ZoomControl_MouseDown;
             MouseUp += ZoomControl_MouseUp;
         }
-
 
         public Brush ZoomBoxBackground
         {
@@ -298,11 +288,14 @@ namespace WpfHelpers.WpfControls.Zoombox
                 case ZoomControlModes.Fill:
                     zc.DoZoomToFill();
                     break;
+
                 case ZoomControlModes.Original:
                     zc.DoZoomToOriginal();
                     break;
+
                 case ZoomControlModes.Custom:
                     break;
+
                 default:
                     throw new InvalidEnumArgumentException();
             }
@@ -364,8 +357,8 @@ namespace WpfHelpers.WpfControls.Zoombox
             var plusSize = contentSize > desiredSize ? (contentSize - desiredSize) * zoom : 0.0;
 
             //is the zoomed content bigger than actual size of the zoom control?
-            /*var bigger = 
-                _presenter.ContentSize.Width * zoom > ActualWidth && 
+            /*var bigger =
+                _presenter.ContentSize.Width * zoom > ActualWidth &&
                 _presenter.ContentSize.Height * zoom > ActualHeight;*/
             /*var bigger = contentSize * zoom > actualSize;
             var m = bigger ? -1 : 1;
@@ -394,15 +387,20 @@ namespace WpfHelpers.WpfControls.Zoombox
             {
                 case ZoomViewModifierMode.None:
                     return;
+
                 case ZoomViewModifierMode.Pan:
                     break;
+
                 case ZoomViewModifierMode.ZoomIn:
                     break;
+
                 case ZoomViewModifierMode.ZoomOut:
                     break;
+
                 case ZoomViewModifierMode.ZoomBox:
                     ZoomTo(ZoomBox);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -437,15 +435,19 @@ namespace WpfHelpers.WpfControls.Zoombox
             {
                 case ZoomViewModifierMode.None:
                     return;
+
                 case ZoomViewModifierMode.Pan:
                     var translate = _startTranslate + (e.GetPosition(this) - _mouseDownPos);
                     TranslateX = translate.X;
                     TranslateY = translate.Y;
                     break;
+
                 case ZoomViewModifierMode.ZoomIn:
                     break;
+
                 case ZoomViewModifierMode.ZoomOut:
                     break;
+
                 case ZoomViewModifierMode.ZoomBox:
                     var pos = e.GetPosition(this);
                     var x = Math.Min(_mouseDownPos.X, pos.X);
@@ -454,6 +456,7 @@ namespace WpfHelpers.WpfControls.Zoombox
                     var sizeY = Math.Abs(_mouseDownPos.Y - pos.Y);
                     ZoomBox = new Rect(x, y, sizeX, sizeY);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -486,17 +489,22 @@ namespace WpfHelpers.WpfControls.Zoombox
                     if (!isPreview)
                         ModifierMode = ZoomViewModifierMode.Pan;
                     break;
+
                 case ModifierKeys.Alt:
                     if (AllowAltZoomBox)
                         ModifierMode = ZoomViewModifierMode.ZoomBox;
                     break;
+
                 case ModifierKeys.Control:
                     break;
+
                 case ModifierKeys.Shift:
                     ModifierMode = ZoomViewModifierMode.Pan;
                     break;
+
                 case ModifierKeys.Windows:
                     break;
+
                 default:
                     return;
             }

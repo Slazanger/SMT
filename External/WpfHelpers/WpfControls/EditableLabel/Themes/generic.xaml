@@ -19,13 +19,13 @@
                             Background="{TemplateBinding Background}" />
                     <DockPanel LastChildFill="True">
                         <ToggleButton Visibility="Collapsed" Name="onOffBtn" Margin="0,5,5,5" Padding="5" Width="Auto"
-                                      Focusable="False" 
+                                      Focusable="False"
                                       FontSize="{TemplateBinding FontSize}"
                                       Height="Auto" DockPanel.Dock="Right"
                                       IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableEditing, Mode=TwoWay}"
                                       Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EditButtonContent, Mode=TwoWay}" />
 
-                        <TextBox Name="PART_mainLabel" 
+                        <TextBox Name="PART_mainLabel"
                                  Focusable="True"
                                  FontSize="{TemplateBinding FontSize}"
                                  IsEnabled="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableEditing, Mode=TwoWay}"
@@ -39,7 +39,7 @@
             </ContentPresenter.Content>
         </ContentPresenter>
         <ControlTemplate.Triggers>
-            <!--<MultiDataTrigger  >
+            <!--<MultiDataTrigger>
                 <MultiDataTrigger.Setters>
                     <Setter TargetName="onOffBtn" Property="Visibility" Value="Visible" />
                 </MultiDataTrigger.Setters>

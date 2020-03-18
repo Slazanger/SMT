@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace csDelaunay
 {
-
     public class SiteList
     {
-
         private List<Site> sites;
         private int currentIndex;
 
@@ -89,10 +87,11 @@ namespace csDelaunay
         }
 
         /*
-		 * 
+		 *
 		 * @return the largest circle centered at each site that fits in its region;
 		 * if the region is infinite, return a circle of radius 0.
 		 */
+
         public List<Circle> Circles()
         {
             List<Circle> circles = new List<Circle>();

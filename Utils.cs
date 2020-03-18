@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace SMT
 {
-    class Utils
+    internal class Utils
     {
         static public void SerializToDisk<T>(T obj, string fileName)
         {

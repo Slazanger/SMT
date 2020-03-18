@@ -6,7 +6,6 @@
     <window:MouseCursorConverter x:Key="MouseCursorConverter" />
     <xamlConverters:ResizeModeToVisibilityConverter x:Key="ResizeModeToVisibilityConverter" />
 
-
     <SolidColorBrush x:Key="FlatColorTitleBar" Color="#2B2B2B"></SolidColorBrush>
 
     <SolidColorBrush x:Key="FlatColorTab" Color="#363636"></SolidColorBrush>
@@ -22,7 +21,6 @@
     <SolidColorBrush x:Key="FlatAction" Color="#4FD194"></SolidColorBrush>
 
     <SolidColorBrush x:Key="FlatActionControl" Color="#509777"></SolidColorBrush>
-
 
     <Style x:Key="AvsWindowStyle" TargetType="{x:Type Window}">
         <Style.Setters>
@@ -42,12 +40,12 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate  TargetType="{x:Type Window}">
-                        <Grid Name="PART_grid" >
+                        <Grid Name="PART_grid">
                             <Border Name="PART_Border" BorderBrush="Gray" BorderThickness="1" Width="Auto"
                                     Height="Auto" Background="{DynamicResource FlatColorBody}">
-                                <DockPanel x:Name="RootWindow" >
+                                <DockPanel x:Name="RootWindow">
                                     <DockPanel.Resources>
-                                        <Style TargetType="{x:Type Button}" >
+                                        <Style TargetType="{x:Type Button}">
                                             <Setter Property="Margin" Value="2,2" />
                                             <Setter Property="Template">
                                                 <Setter.Value>
@@ -102,7 +100,7 @@
                                                    VerticalAlignment="Center" Content="{TemplateBinding Title}" />
                                     </DockPanel>
                                     <AdornerDecorator>
-                                        <ContentPresenter  />
+                                        <ContentPresenter />
                                     </AdornerDecorator>
                                 </DockPanel>
                             </Border>

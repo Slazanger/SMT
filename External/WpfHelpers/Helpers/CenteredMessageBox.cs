@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -87,7 +86,4 @@ namespace WpfHelpers.Helpers
             internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
         }
     }
-
-
-
 }

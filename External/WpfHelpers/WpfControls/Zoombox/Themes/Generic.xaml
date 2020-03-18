@@ -29,9 +29,9 @@
                                     ToolTipService.InitialShowDelay="0">
                                 <Border.ToolTip>
                                     <StackPanel Orientation="Vertical">
-                                        <TextBlock><Run FontWeight="Bold">CTRL + Mouse wheel:</Run>  Zoom In / Out </TextBlock>
-                                        <TextBlock><Run FontWeight="Bold">ALT + Select:</Run> Zoom to selection </TextBlock>
-                                        <TextBlock><Run FontWeight="Bold">LMC + Mouse Click :</Run> Move </TextBlock>
+                                        <TextBlock><Run FontWeight="Bold">CTRL + Mouse wheel:</Run>  Zoom In / Out</TextBlock>
+                                        <TextBlock><Run FontWeight="Bold">ALT + Select:</Run> Zoom to selection</TextBlock>
+                                        <TextBlock><Run FontWeight="Bold">LMC + Mouse Click :</Run> Move</TextBlock>
                                     </StackPanel>
                                 </Border.ToolTip>
                                 <StackPanel Orientation="Vertical">
@@ -92,7 +92,7 @@
                                     <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='{}{0:F2}x'}"
                                                HorizontalAlignment="Center"
                                                FontWeight="Bold" />
-                                    <RadioButton Content="1:1"     
+                                    <RadioButton Content="1:1"
                                                  IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},
                                         Path=Mode,Converter={StaticResource equalityConverter},ConverterParameter={x:Static zoombox1:ZoomControlModes.Original}}" />
                                     <RadioButton
@@ -100,10 +100,10 @@
                                         Path=Mode,Converter={StaticResource equalityConverter},ConverterParameter={x:Static zoombox1:ZoomControlModes.Fill}}">
                                         <RadioButton.Content>
                                             <Viewbox Margin="10">
-                                                <Path Data="M11.585977,18.999021L12.999977,20.41302 3.4147511,30.000045 9.999999,30.000045 9.999999,32.000045 0,32.000045 0,22.000045 2,22.000045 2,28.586798z M20.414059,18.998996L29.999999,28.586804 29.999999,22.000045 31.999999,22.000045 31.999999,32.000045 21.999999,32.000045 21.999999,30.000045 28.585288,30.000045 18.999996,20.412996z M21.999999,0L31.999999,0 31.999999,9.999999 29.999999,9.999999 29.999999,3.4131746 20.413977,13.001045 18.999977,11.587039 28.585168,2 21.999999,2z M0,0L9.999999,0 9.999999,2 3.4148293,2 13.000021,11.587039 11.586021,13.001045 2,3.4131756 2,9.999999 0,9.999999z" 
+                                                <Path Data="M11.585977,18.999021L12.999977,20.41302 3.4147511,30.000045 9.999999,30.000045 9.999999,32.000045 0,32.000045 0,22.000045 2,22.000045 2,28.586798z M20.414059,18.998996L29.999999,28.586804 29.999999,22.000045 31.999999,22.000045 31.999999,32.000045 21.999999,32.000045 21.999999,30.000045 28.585288,30.000045 18.999996,20.412996z M21.999999,0L31.999999,0 31.999999,9.999999 29.999999,9.999999 29.999999,3.4131746 20.413977,13.001045 18.999977,11.587039 28.585168,2 21.999999,2z M0,0L9.999999,0 9.999999,2 3.4148293,2 13.000021,11.587039 11.586021,13.001045 2,3.4131756 2,9.999999 0,9.999999z"
                                                       Stretch="Uniform" Fill="Black"  Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" />
                                             </Viewbox>
-                                                <!--<TextBlock TextAlignment="Center" FontSize="8pt"><Run>Запол</Run><LineBreak /><Run>нить</Run></TextBlock>-->
+                                            <!--<TextBlock TextAlignment="Center" FontSize="8pt"><Run>Запол</Run><LineBreak /><Run>нить</Run></TextBlock>-->
                                         </RadioButton.Content>
                                     </RadioButton>
                                 </StackPanel>
@@ -155,5 +155,4 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
 </ResourceDictionary>

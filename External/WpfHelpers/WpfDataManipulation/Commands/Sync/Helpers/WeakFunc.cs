@@ -223,7 +223,7 @@ namespace GalaSoft.MvvmLight.Helpers
         }
 
         /// <summary>
-        /// Gets the Func's owner. This object is stored as a 
+        /// Gets the Func's owner. This object is stored as a
         /// <see cref="WeakReference" />.
         /// </summary>
         public object Target

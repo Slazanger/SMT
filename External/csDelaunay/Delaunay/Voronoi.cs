@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace csDelaunay
 {
-
     public class Voronoi
     {
-
         private SiteList sites;
         private List<Triangle> triangles;
 
@@ -16,6 +14,7 @@ namespace csDelaunay
         // TODO generalize this so it doesn't have to be a rectangle;
         // then we can make the fractal voronois-within-voronois
         private Rectf plotBounds;
+
         public Rectf PlotBounds { get { return plotBounds; } }
 
         private Dictionary<Vector2f, Site> sitesIndexedByLocation;
@@ -124,6 +123,7 @@ namespace csDelaunay
         {
             return LineSegment.VisibleLineSegments(Edge.SelectEdgesForSitePoint(coord, edges));
         }
+
         /*
 		public List<LineSegment> DelaunayLinesForSite(Vector2f coord) {
 			return DelaunayLinesForEdges(Edge.SelectEdgesForSitePoint(coord, edges));
@@ -133,6 +133,7 @@ namespace csDelaunay
         {
             return LineSegment.VisibleLineSegments(edges);
         }
+
         /*
 		public List<LineSegment> Hull() {
 			return DelaunayLinesForEdges(HullEdges());

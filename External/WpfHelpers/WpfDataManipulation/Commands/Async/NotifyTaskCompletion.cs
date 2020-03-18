@@ -19,6 +19,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
         public TaskStatus Status { get { return Task.Status; } }
         public bool IsCompleted { get { return Task.IsCompleted; } }
         public bool IsNotCompleted { get { return !Task.IsCompleted; } }
+
         public bool IsSuccessfullyCompleted
         {
             get
@@ -30,6 +31,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
 
         public Task TaskCompletion { get; protected set; }
         public AggregateException Exception { get { return Task.Exception; } }
+
         public Exception InnerException
         {
             get
@@ -38,6 +40,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
                     null : Exception.InnerException;
             }
         }
+
         public string ErrorMessage
         {
             get
@@ -46,7 +49,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
                     null : InnerException.Message;
             }
         }
-
 
         protected async Task WatchTaskAsync(Task task)
         {

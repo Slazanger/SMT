@@ -63,7 +63,6 @@ namespace WpfHelpers.Drawing
             }
         }
 
-
         /// <summary>
         /// Draws simple rect with checking bounds. Note! First lock wbitmap, and unlock after using this f-tion
         /// </summary>
@@ -120,7 +119,6 @@ namespace WpfHelpers.Drawing
             if (iy + iheight >= frameHeight - 1)
             {
                 iheight = frameHeight - iy;
-
             }
 
             if (iwidth <= 0)

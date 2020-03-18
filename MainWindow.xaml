@@ -12,21 +12,15 @@
         mc:Ignorable="d"
         Title="SMT" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
 
-
-
-
-
     <Window.Resources>
 
-        <local:ZKBBackgroundConverter x:Key="zkbBGConverter"/>
- 
-        <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}" >
+        <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
+
+        <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:RoutingMode"/>
+                <x:Type TypeName="local:RoutingMode" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-
-
     </Window.Resources>
     <Grid>
 
@@ -36,18 +30,16 @@
             </Button>
         </StackPanel>
 
-        <Grid x:Name="MainContent" >
+        <Grid x:Name="MainContent">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="22"/>
+                <RowDefinition Height="1" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="22" />
             </Grid.RowDefinitions>
 
-
-
-            <xcad:DockingManager x:Name="dockManager" Grid.Row="1" Grid.RowSpan="1" >
+            <xcad:DockingManager x:Name="dockManager" Grid.Row="1" Grid.RowSpan="1">
                 <xcad:DockingManager.Theme>
-                    <xcadt:MetroTheme/>
+                    <xcadt:MetroTheme />
                 </xcad:DockingManager.Theme>
 
                 <xcadl:LayoutRoot>
@@ -60,11 +52,11 @@
                                             <ScrollViewer>
                                                 <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
                                                     <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
-                                                    <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
+                                                    <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1">
                                                         <DataGrid.Columns>
                                                             <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
-                                                            <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                         <DataGrid.RowStyle>
                                                             <Style TargetType="DataGridRow">
@@ -92,14 +84,13 @@
                                     <xcadl:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                         <Grid Background="#FFE5E5E5">
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="25"/>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="25" />
                                             </Grid.RowDefinitions>
-                                            <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0"/>
+                                            <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" />
                                             <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
                                         </Grid>
                                     </xcadl:LayoutAnchorable>
-
                                 </xcadl:LayoutAnchorablePane>
 
                                 <xcadl:LayoutAnchorablePane>
@@ -122,33 +113,27 @@
                                                     <Separator />
                                                     <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
                                                 </StackPanel>
-
                                             </StackPanel>
                                         </ScrollViewer>
                                     </xcadl:LayoutAnchorable>
                                 </xcadl:LayoutAnchorablePane>
-
                             </xcadl:LayoutAnchorablePaneGroup>
 
-
-                            <xcadl:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False" >
+                            <xcadl:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False">
                                 <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Regions">
-                                    <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1" >
-                                        <Popup x:Name="RegionCharacterInfo" IsOpen="False" AllowsTransparency="True"  >
+                                    <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1">
+                                        <Popup x:Name="RegionCharacterInfo" IsOpen="False" AllowsTransparency="True">
                                             <StackPanel x:Name="RegionCharacterInfoSP" Background="Gray" />
                                         </Popup>
-                                        <Popup x:Name="RegionTheraInfo" IsOpen="False" AllowsTransparency="True"  >
+                                        <Popup x:Name="RegionTheraInfo" IsOpen="False" AllowsTransparency="True">
                                             <StackPanel x:Name="RegionTheraInfoSP" Background="Gray" />
                                         </Popup>
-
 
                                         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <Canvas x:Name="MainUniverseCanvas"   Margin="5" Width="1050" Height="800" HorizontalAlignment="Stretch" />
                                         </Viewbox>
-
                                     </Grid>
                                 </xcadl:LayoutDocument>
-
 
                                 <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
                                     <local:RegionControl x:Name="RegionRC" />
@@ -157,23 +142,13 @@
                                 <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverseViewID" Title="Universe">
                                     <local:UniverseControl x:Name="UniverseUC" />
                                 </xcadl:LayoutDocument>
-
-
-
-
                             </xcadl:LayoutDocumentPane>
                         </xcadl:LayoutPanel>
-
-
-
                     </xcadl:LayoutRoot.RootPanel>
-
-
 
                     <xcadl:LayoutRoot.RightSide>
                         <xcadl:LayoutAnchorSide>
                             <xcadl:LayoutAnchorGroup>
-
 
                                 <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -206,8 +181,8 @@
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" Width="*" />
 
-                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*"/>
-                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
+                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Grid.Row="2">
@@ -228,18 +203,15 @@
                                     </ScrollViewer>
                                 </xcadl:LayoutAnchorable>
 
-
-
-
                                 <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
                                             <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick">
 
                                                 <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*"/>
-                                                    <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*"/>
-                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*"/>
+                                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
+                                                    <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" />
+                                                    <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
@@ -250,69 +222,63 @@
                                 <xcadl:LayoutAnchorable Title="Jump Bridges" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpBridgesContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="JumpBridgeGrid">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="30"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="30"/>
-                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="25" />
+                                            <RowDefinition Height="25" />
+                                            <RowDefinition Height="25" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
                                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2">
-                                            <Label Content="Gate SearchFilter : "/>
-                                            <TextBox x:Name="GateSearchFilter" Text=" » " Width="167"/>
+                                            <Label Content="Gate SearchFilter : " />
+                                            <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
                                         </StackPanel>
-                                        <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="ImportJumpGatesBtn_Click" Margin="2" Grid.Row="1"/>
-                                        <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2"/>
-                                        <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3"/>
+                                        <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="ImportJumpGatesBtn_Click" Margin="2" Grid.Row="1" />
+                                        <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2" />
+                                        <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3" />
 
-                                        <Label Content="Ansiblex Gates" Margin="2" Grid.Row="4"/>
-                                        <ListBox x:Name="JumpBridgeList" Margin="2" Grid.Row="5"/>
-
+                                        <Label Content="Ansiblex Gates" Margin="2" Grid.Row="4" />
+                                        <ListBox x:Name="JumpBridgeList" Margin="2" Grid.Row="5" />
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
 
                                 <xcadl:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="MainRouteGrid">
                                         <ScrollViewer Background="#FFE5E5E5">
-                                            <StackPanel >
-                                                <Label Content="Navigation Options"/>
-                                                <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding Path=ActiveCharacter.UseAnsiblexGates}"/>
-                                                <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding Path=ActiveCharacter.NavigationMode}"/>
-                                                <Separator/>
-                                                <Label Content="Waypoints"/>
+                                            <StackPanel>
+                                                <Label Content="Navigation Options" />
+                                                <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding Path=ActiveCharacter.UseAnsiblexGates}" />
+                                                <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding Path=ActiveCharacter.NavigationMode}" />
+                                                <Separator />
+                                                <Label Content="Waypoints" />
                                                 <ListBox ItemsSource="{Binding Path=ActiveCharacter.Waypoints}" />
-                                                <Separator/>
-                                                <Label Content="Route"/>
-                                                <ListBox ItemsSource="{Binding Path=ActiveCharacter.ActiveRoute}"/>
-                                                <Separator/>
-                                                <Button x:Name="CopyWaypointsBtn" Click="CopyWaypointsBtn_Click" Content="Copy Waypoints"/>
-                                                <Separator/>
-                                                <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear"/>
-
+                                                <Separator />
+                                                <Label Content="Route" />
+                                                <ListBox ItemsSource="{Binding Path=ActiveCharacter.ActiveRoute}" />
+                                                <Separator />
+                                                <Button x:Name="CopyWaypointsBtn" Click="CopyWaypointsBtn_Click" Content="Copy Waypoints" />
+                                                <Separator />
+                                                <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear" />
                                             </StackPanel>
                                         </ScrollViewer>
-
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
 
- <!--   Temp Disabled   <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpPlannerContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <!--   Temp Disabled   <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpPlannerContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid x:Name="JumpPlannerGrid">
                                         <ScrollViewer Background="#FFE5E5E5">
-                                            <StackPanel >
-                                                <Label Content="Jump Planner Options"/>
-                                                <ComboBox x:Name="JPShipType"/>
-                                                <CheckBox x:Name="JPUseGates" Content="Use Gates"/>
-                                                
-                                                <Button x:Name="JPSuggestRoute" Click="JPSuggestRoute_Click" Content="Suggest Route"/>
-                                                <ListBox x:Name="JPSuggestedRoute"/>
+                                            <StackPanel>
+                                                <Label Content="Jump Planner Options" />
+                                                <ComboBox x:Name="JPShipType" />
+                                                <CheckBox x:Name="JPUseGates" Content="Use Gates" />
 
+                                                <Button x:Name="JPSuggestRoute" Click="JPSuggestRoute_Click" Content="Suggest Route" />
+                                                <ListBox x:Name="JPSuggestedRoute" />
                                             </StackPanel>
                                         </ScrollViewer>
-
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
 -->
-
 
                                 <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <ScrollViewer Background="#FFE5E5E5">
@@ -325,7 +291,7 @@
 
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
-                                                                <Setter Property="Background" Value="Red"/>
+                                                                <Setter Property="Background" Value="Red" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -334,9 +300,9 @@
                                                 <DataGrid.Columns>
                                                     <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
                                                     <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
-                                                    <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*"  />
+                                                    <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*" />
                                                     <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
-                                                    <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*"  />
+                                                    <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
 
@@ -344,17 +310,11 @@
                                         </StackPanel>
                                     </ScrollViewer>
                                 </xcadl:LayoutAnchorable>
-
-
-
                             </xcadl:LayoutAnchorGroup>
-
                         </xcadl:LayoutAnchorSide>
                     </xcadl:LayoutRoot.RightSide>
-
                 </xcadl:LayoutRoot>
             </xcad:DockingManager>
-
 
             <StatusBar Grid.Row="2" x:Name="AppStatusBar">
                 <StatusBarItem>
@@ -365,27 +325,25 @@
                     <TextBlock Text="{Binding ServerTime, StringFormat=HH:mm}" />
                 </StatusBarItem>
 
-                <Separator/>
+                <Separator />
 
                 <StatusBarItem>
                     <TextBlock>Tranquility Version:</TextBlock>
                 </StatusBarItem>
 
                 <StatusBarItem>
-                    <TextBlock Text="{Binding Version}"/>
+                    <TextBlock Text="{Binding Version}" />
                 </StatusBarItem>
 
-
-                <Separator/>
+                <Separator />
 
                 <StatusBarItem>
-                    <TextBlock Text="{Binding NumPlayers}"/>
+                    <TextBlock Text="{Binding NumPlayers}" />
                 </StatusBarItem>
 
                 <StatusBarItem>
-                    <TextBlock Text="Players"/>
+                    <TextBlock Text="Players" />
                 </StatusBarItem>
-
             </StatusBar>
         </Grid>
     </Grid>

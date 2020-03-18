@@ -8,5 +8,4 @@ namespace SMT
     public partial class App : Application
     {
     }
-
 }

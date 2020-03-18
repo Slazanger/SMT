@@ -16,8 +16,8 @@ namespace WpfHelpers.WpfDataManipulation.Rules.Converters
     ///                 < Image HorizontalAlignment="Right" VerticalAlignment="Top"
     ///                     Width="16" Height="16" Margin="0,-8,-8,0"
     ///                     Source="{StaticResource ErrorImage}"
-    ///                     ToolTip="{Binding ElementName=adornedElement, 
-    ///                          Path=AdornedElement.(Validation.Errors), 
+    ///                     ToolTip="{Binding ElementName=adornedElement,
+    ///                          Path=AdornedElement.(Validation.Errors),
     ///                          Converter={k:ValidationErrorsToStringConverter}}" />
     ///                 <Border BorderBrush="Red" BorderThickness="1" Margin="-1">
     ///                     <AdornedElementPlaceholder Name="adornedElement" />

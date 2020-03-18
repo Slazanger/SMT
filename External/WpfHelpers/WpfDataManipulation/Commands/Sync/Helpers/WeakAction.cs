@@ -230,7 +230,7 @@ namespace GalaSoft.MvvmLight.Helpers
         }
 
         /// <summary>
-        /// Gets the Action's owner. This object is stored as a 
+        /// Gets the Action's owner. This object is stored as a
         /// <see cref="WeakReference" />.
         /// </summary>
         public object Target

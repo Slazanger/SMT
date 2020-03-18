@@ -28,7 +28,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Anom signature to data dictionary
         /// </summary>
-        public SerializableDictionary<string, Anom> Anoms { get;}
+        public SerializableDictionary<string, Anom> Anoms { get; }
 
         /// <summary>
         /// Update the AnomData from the string (usually the clipboard)

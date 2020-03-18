@@ -28,7 +28,7 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool PauseUpdate { get; set; }
 
@@ -55,7 +55,6 @@ namespace SMT.EVEData
             updateThreadRunning = false;
             if (!updateThread.Join(10000))
             {
-
                 updateThread.Abort();
             }
         }
@@ -79,7 +78,6 @@ namespace SMT.EVEData
                         {
                             KillStream.Clear();
                         }), DispatcherPriority.ContextIdle, null);
-
                     }
 
                     Thread.Sleep(5000);
@@ -87,7 +85,6 @@ namespace SMT.EVEData
                 }
 
                 //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(redistURL);
                 request.Method = WebRequestMethods.Http.Get;
@@ -103,7 +100,6 @@ namespace SMT.EVEData
                 }
                 catch (Exception)
                 {
-
                     Thread.Sleep(60000);
                     continue;
                 }
@@ -116,7 +112,6 @@ namespace SMT.EVEData
                     {
                         // Need to return this response
                         string strContent = sr.ReadToEnd();
-
 
                         ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
                         if (z.Package != null)
@@ -143,8 +138,6 @@ namespace SMT.EVEData
                                 zs.ShipType = "Unknown (" + shipID + ")";
                             }
 
-
-
                             zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);
 
                             Application.Current.Dispatcher.Invoke((Action)(() =>
@@ -160,11 +153,9 @@ namespace SMT.EVEData
 
                         cleanupCounter++;
 
-
                         // now clean up the list
                         if (cleanupCounter > 5)
                         {
-
                             List<long> AllianceIDs = new List<long>();
 
                             Application.Current.Dispatcher.Invoke((Action)(() =>
@@ -192,7 +183,6 @@ namespace SMT.EVEData
                                 {
                                     EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
                                 }
-
                             }), DispatcherPriority.ContextIdle, null);
 
                             cleanupCounter = 0;
@@ -220,7 +210,6 @@ namespace SMT.EVEData
         {
             public event PropertyChangedEventHandler PropertyChanged;
 
-
             /// <summary>
             /// Gets or sets the ZKillboard Kill ID
             /// </summary>
@@ -241,8 +230,8 @@ namespace SMT.EVEData
             /// </summary>
             public long VictimAllianceID { get; set; }
 
-
             private string m_victimAllianceName;
+
             /// <summary>
             /// Gets or sets the Victims Alliance Name
             /// </summary>
@@ -259,7 +248,6 @@ namespace SMT.EVEData
                 }
             }
 
-
             /// <summary>
             /// Gets or sets the System ID the kill was in
             /// </summary>
@@ -275,8 +263,6 @@ namespace SMT.EVEData
             /// </summary>
             public DateTimeOffset KillTime { get; set; }
 
-
-
             protected void OnPropertyChanged(string name)
             {
                 PropertyChangedEventHandler handler = PropertyChanged;
@@ -285,7 +271,6 @@ namespace SMT.EVEData
                     handler(this, new PropertyChangedEventArgs(name));
                 }
             }
-
 
             public override string ToString()
             {

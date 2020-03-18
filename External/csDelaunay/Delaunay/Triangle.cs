@@ -2,10 +2,8 @@
 
 namespace csDelaunay
 {
-
     public class Triangle
     {
-
         private List<Site> sites;
         public List<Site> Sites { get { return sites; } }
 

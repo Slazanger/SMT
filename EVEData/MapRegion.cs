@@ -18,20 +18,16 @@ namespace SMT.EVEData
         {
             MapSystems = new SerializableDictionary<string, MapSystem>();
             RegionLinks = new List<string>();
+        }
 
-
-
-
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MapRegion" /> class.
-    /// </summary>
-    /// <param name="name">Name of the Region</param>
-    /// <param name="faction">Faction (if any) of the region</param>
-    /// <param name="universeViewX">X Location to render this on the universe map</param>
-    /// <param name="universeViewY">Y Location to render this on the universe map</param>
-    public MapRegion(string name, string id, string faction, double universeViewX, double universeViewY)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MapRegion" /> class.
+        /// </summary>
+        /// <param name="name">Name of the Region</param>
+        /// <param name="faction">Faction (if any) of the region</param>
+        /// <param name="universeViewX">X Location to render this on the universe map</param>
+        /// <param name="universeViewY">Y Location to render this on the universe map</param>
+        public MapRegion(string name, string id, string faction, double universeViewX, double universeViewY)
         {
             Name = name;
             DotLanRef = name.Replace(" ", "_");
@@ -47,7 +43,6 @@ namespace SMT.EVEData
             HasHighSecSystems = false;
             HasLowSecSystems = false;
             HasNullSecSystems = false;
-
         }
 
         /// <summary>
@@ -75,7 +70,6 @@ namespace SMT.EVEData
         /// </summary>
         public double UniverseViewY { get; set; }
 
-
         /// <summary>
         /// Gets or sets the Regions X coord on the universe map
         /// </summary>
@@ -90,7 +84,6 @@ namespace SMT.EVEData
         /// Gets or sets the Regions Z coord on the universe map
         /// </summary>
         public double RegionZ { get; set; }
-
 
         /// <summary>
         /// Gets or sets the "Name" on Dotlan, used in URL's etc
@@ -129,9 +122,6 @@ namespace SMT.EVEData
 
             return false;
         }
-
-
-
 
         public override string ToString() => Name;
     }

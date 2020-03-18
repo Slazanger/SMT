@@ -3,13 +3,12 @@ using System.Collections.Generic;
 
 namespace csDelaunay
 {
-
     public class Vertex : ICoord
     {
-
         public static readonly Vertex VERTEX_AT_INFINITY = new Vertex(float.NaN, float.NaN);
 
         #region Pool
+
         private static Queue<Vertex> pool = new Queue<Vertex>();
 
         private static int nVertices = 0;
@@ -29,9 +28,11 @@ namespace csDelaunay
                 return new Vertex(x, y);
             }
         }
-        #endregion
+
+        #endregion Pool
 
         #region Object
+
         private Vector2f coord;
         public Vector2f Coord { get { return coord; } set { coord = value; } }
 
@@ -71,12 +72,13 @@ namespace csDelaunay
 
         /*
 		 * This is the only way to make a Vertex
-		 * 
+		 *
 		 * @param halfedge0
 		 * @param halfedge1
 		 * @return
-		 * 
+		 *
 		 */
+
         public static Vertex Intersect(Halfedge halfedge0, Halfedge halfedge1)
         {
             Edge edge, edge0, edge1;
@@ -124,6 +126,7 @@ namespace csDelaunay
 
             return Vertex.Create(intersectionX, intersectionY);
         }
-        #endregion
+
+        #endregion Object
     }
 }

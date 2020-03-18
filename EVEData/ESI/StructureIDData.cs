@@ -6,7 +6,6 @@
 
 namespace StructureIDs
 {
-
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using System.Globalization;

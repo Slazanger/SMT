@@ -22,7 +22,7 @@ namespace SMT.EVEData
             IntelString = string.Empty;
             // text will be in the format ﻿[ 2017.05.01 18:24:28 ] Charname > blah, blah blah
             string[] bits = intelText.Split('>');
-            if(bits.Length >=1)
+            if (bits.Length >= 1)
             {
                 IntelString = bits[1];
                 IntelString.Trim();
@@ -30,7 +30,6 @@ namespace SMT.EVEData
             IntelTime = DateTime.Now;
             Systems = new List<string>();
             ClearNotification = false;
-
         }
 
         /// <summary>

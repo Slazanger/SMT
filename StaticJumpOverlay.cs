@@ -16,8 +16,8 @@ namespace SMT
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-
         private string m_Name;
+
         public string Name
         {
             get
@@ -32,6 +32,7 @@ namespace SMT
         }
 
         private string m_System;
+
         public string System
         {
             get
@@ -46,6 +47,7 @@ namespace SMT
         }
 
         private Color m_OverlayColour;
+
         public Color OverlayColour
         {
             get
@@ -56,11 +58,11 @@ namespace SMT
             {
                 m_OverlayColour = value;
                 OnPropertyChanged("OverlayColour");
-
             }
         }
 
         private bool m_Active;
+
         public bool Active
         {
             get

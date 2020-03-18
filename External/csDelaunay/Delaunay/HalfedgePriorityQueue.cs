@@ -1,10 +1,8 @@
 ﻿namespace csDelaunay
 {
-
     // Also know as heap
     public class HalfedgePriorityQueue
     {
-
         private Halfedge[] hash;
         private int count;
         private int minBucked;
@@ -100,6 +98,7 @@
         /*
 		 * move minBucket until it contains an actual Halfedge (not just the dummy at the top);
 		 */
+
         private void AdjustMinBucket()
         {
             while (minBucked < hashSize - 1 && IsEmpty(minBucked))
@@ -116,6 +115,7 @@
         /*
 		 * @return coordinates of the Halfedge's vertex in V*, the transformed Voronoi diagram
 		 */
+
         public Vector2f Min()
         {
             AdjustMinBucket();
@@ -126,6 +126,7 @@
         /*
 		 * Remove and return the min Halfedge
 		 */
+
         public Halfedge ExtractMin()
         {
             Halfedge answer;

@@ -2,11 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- From http://habrahabr.ru/post/102105/ -->
-    
-    
+
     <!-- USAGE (for example):
-            <ListBox x:Name="ItemsListBox" 
-                    Grid.Row="0" 
+            <ListBox x:Name="ItemsListBox"
+                    Grid.Row="0"
                     ItemsSource="{Binding Items, IsAsync=True}"
                     SelectedItem="{Binding SelectedItem}">
             <ListBox.Style>
@@ -20,14 +19,14 @@
             </ListBox.Style>
         </ListBox>
     -->
-    
+
     <ControlTemplate x:Key="WaitControlTemplate">
         <Border BorderThickness="1"
                 BorderBrush="{x:Static SystemColors.ControlDarkDarkBrush}" Background="#CCADAEB0">
-            <DockPanel HorizontalAlignment="Center" 
+            <DockPanel HorizontalAlignment="Center"
                        VerticalAlignment="Center">
-                <Image Width="16" 
-                       Height="16" 
+                <Image Width="16"
+                       Height="16"
                        Margin="5,0"
                        SnapsToDevicePixels="True"
                        Source="pack://application:,,,/WpfHelpers;component/WpfControls/WaitControl/loading_16.png">

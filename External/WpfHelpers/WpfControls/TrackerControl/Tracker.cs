@@ -96,7 +96,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
 
         private int _cornerRadius = 1;
 
-
         /// <summary>
         ///     Create new instance and associates it with a Canvas
         /// </summary>
@@ -159,7 +158,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
                 }
             }
         }
-
 
         /// <summary>
         ///     Gets polygon shape of this Tracker

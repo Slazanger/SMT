@@ -39,7 +39,6 @@ namespace WpfHelpers.Collections
                 {
                     throw;
                 }
-
             }
             catch (OperationCanceledException)
             {

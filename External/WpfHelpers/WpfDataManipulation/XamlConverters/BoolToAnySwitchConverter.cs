@@ -58,7 +58,7 @@ namespace WpfHelpers.WpfDataManipulation.XamlConverters
             return false;
         }
 
-        #endregion
+        #endregion Implementation of IValueConverter
     }
 
     /// <summary>

@@ -16,7 +16,7 @@
 namespace GalaSoft.MvvmLight.Helpers
 {
     /// <summary>
-    /// This interface is meant for the <see cref="WeakAction{T}" /> class and can be 
+    /// This interface is meant for the <see cref="WeakAction{T}" /> class and can be
     /// useful if you store multiple WeakAction{T} instances but don't know in advance
     /// what type T represents.
     /// </summary>

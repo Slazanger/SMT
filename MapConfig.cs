@@ -11,9 +11,6 @@ namespace SMT
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-
-
-
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -51,6 +48,7 @@ namespace SMT
         public MapColours ActiveColourScheme;
 
         private bool m_ShowZKillData;
+
         [Category("General")]
         [DisplayName("Show ZKillData")]
         public bool ShowZKillData
@@ -70,30 +68,24 @@ namespace SMT
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
 
-
         [Category("Incursions")]
         [DisplayName("Show Active Incursions")]
         public bool ShowActiveIncursions { get; set; }
-
 
         [Category("Jove")]
         [DisplayName("Show Observatories")]
         public bool ShowJoveObservatories { get; set; }
 
-
         [Category("Navigation")]
         [DisplayName("Show Cyno Beacons")]
         public bool ShowCynoBeacons { get; set; }
-
-
-
 
         [Category("Navigation")]
         [DisplayName("Show Jump Distance")]
         public bool ShowJumpDistance { get; set; }
 
-
         private string m_CurrentJumpSystem;
+
         [Category("Navigation")]
         [DisplayName("Current Jump System"), ReadOnly(true)]
         public string CurrentJumpSystem
@@ -109,13 +101,11 @@ namespace SMT
             }
         }
 
-
-
         private string m_CurrentJumpCharacter;
+
         [Category("Navigation")]
         [DisplayName("Current Jump Character")]
         [ItemsSource(typeof(JumpCharacterItemsSource))]
-
         public string CurrentJumpCharacter
         {
             get
@@ -129,12 +119,12 @@ namespace SMT
             }
         }
 
-
         [Category("Navigation")]
         [DisplayName("Ship Type")]
         public EVEData.EveManager.JumpShip JumpShipType { get; set; }
 
         private bool m_JumpRangeInAsOutline;
+
         [Category("Navigation")]
         [DisplayName("Jump Range as Outline")]
         public bool JumpRangeInAsOutline
@@ -150,19 +140,19 @@ namespace SMT
             }
         }
 
-
         private double m_IntelTextSize = 10;
+
         [Category("Intel")]
         [DisplayName("Text Size")]
-        public double IntelTextSize 
-        { 
+        public double IntelTextSize
+        {
             get
             {
                 return m_IntelTextSize;
             }
             set
             {
-                if(value > 20)
+                if (value > 20)
                 {
                     m_IntelTextSize = 20;
                 }
@@ -171,7 +161,7 @@ namespace SMT
                     m_IntelTextSize = value;
                 }
 
-                if(value < 8)
+                if (value < 8)
                 {
                     m_IntelTextSize = 8;
                 }
@@ -181,10 +171,8 @@ namespace SMT
                 }
 
                 OnPropertyChanged("IntelTextSize");
-
             }
         }
-
 
         [Category("Intel")]
         [DisplayName("Warning Sound")]
@@ -194,10 +182,9 @@ namespace SMT
         [DisplayName("Warning On Unknown")]
         public bool PlayIntelSoundOnUnknown { get; set; }
 
-
         [Category("Intel")]
         [DisplayName("Limit Sound to Dangerzone")]
-        public bool PlaySoundOnlyInDangerZone{ get; set; }
+        public bool PlaySoundOnlyInDangerZone { get; set; }
 
         [Category("Intel")]
         [DisplayName("Max Intel Time (s)")]
@@ -241,7 +228,7 @@ namespace SMT
                     m_WarningRange = 1;
                 }
 
-                if( value < 10 )
+                if (value < 10)
                 {
                     m_WarningRange = value;
                 }
@@ -254,7 +241,8 @@ namespace SMT
             }
         }
 
-        bool m_ShowDangerZone = false;
+        private bool m_ShowDangerZone = false;
+
         [Category("Intel")]
         [DisplayName("Show DangerZone")]
         public bool ShowDangerZone
@@ -270,9 +258,8 @@ namespace SMT
             }
         }
 
-
-
         private bool m_AlwaysOnTop;
+
         [Category("General")]
         [DisplayName("Always on top")]
         public bool AlwaysOnTop
@@ -288,8 +275,8 @@ namespace SMT
             }
         }
 
-
         private bool m_ShowTrueSec;
+
         [Category("General")]
         [DisplayName("Show TrueSec")]
         public bool ShowTrueSec
@@ -305,8 +292,8 @@ namespace SMT
             }
         }
 
-
         private bool m_ShowToolBox = true;
+
         [Category("General")]
         [DisplayName("Show Toolbox")]
         public bool ShowToolBox
@@ -349,6 +336,7 @@ namespace SMT
         }
 
         private bool m_ShowUniverseRats;
+
         [Category("Regions")]
         [DisplayName("Show Ratting Stats")]
         public bool ShowUniverseRats
@@ -368,12 +356,12 @@ namespace SMT
                     ShowUniverseKills = false;
                 }
 
-
                 OnPropertyChanged("ShowUniverseRats");
             }
         }
 
         private bool m_ShowUniversePods;
+
         [Category("Regions")]
         [DisplayName("Show Pod kill Stats")]
         public bool ShowUniversePods
@@ -393,12 +381,12 @@ namespace SMT
                     ShowUniverseKills = false;
                 }
 
-
                 OnPropertyChanged("ShowUniversePods");
             }
         }
 
         private bool m_ShowUniverseKills;
+
         [Category("Regions")]
         [DisplayName("Show Ship kill Stats")]
         public bool ShowUniverseKills
@@ -419,12 +407,12 @@ namespace SMT
                     ShowUniversePods = false;
                 }
 
-
                 OnPropertyChanged("ShowUniverseKills");
             }
         }
 
         private double m_UniverseDataScale = 1.0f;
+
         [Category("Regions")]
         [DisplayName("Universe Data Scale")]
         public double UniverseDataScale
@@ -443,13 +431,12 @@ namespace SMT
                     m_UniverseDataScale = 0.01;
                 }
 
-
                 OnPropertyChanged("UniverseDataScale");
             }
         }
 
-
         private bool m_ShowRattingDataAsDelta;
+
         [Category("Misc")]
         [DisplayName("Show Ratting Data as Delta")]
         public bool ShowRattingDataAsDelta
@@ -466,6 +453,7 @@ namespace SMT
         }
 
         private bool m_ShowNegativeRattingDelta;
+
         [Category("Misc")]
         [DisplayName("Show Negative Ratting Delta")]
         public bool ShowNegativeRattingDelta
@@ -481,9 +469,8 @@ namespace SMT
             }
         }
 
-
-
         private bool m_SOVShowConflicts;
+
         [Category("SOV")]
         [DisplayName("Show Sov Conflicts")]
         public bool SOVShowConflicts
@@ -499,8 +486,8 @@ namespace SMT
             }
         }
 
-
         private bool m_SOVBasedonTCU;
+
         [Category("SOV")]
         [DisplayName("Show Sov Based on TCU")]
         public bool SOVBasedITCU
@@ -516,9 +503,8 @@ namespace SMT
             }
         }
 
-
-
         private bool m_ShowTCUVunerabilities;
+
         [Category("SOV")]
         [DisplayName("Show TCU Timers")]
         public bool ShowTCUVunerabilities
@@ -542,6 +528,7 @@ namespace SMT
         }
 
         private bool m_ShowIhubVunerabilities;
+
         [Category("SOV")]
         [DisplayName("Show IHUB Timers")]
         public bool ShowIhubVunerabilities
@@ -586,8 +573,8 @@ namespace SMT
             }
         }
 
-
         private bool m_ShowCoalition;
+
         [Category("SOV")]
         [DisplayName("Show Coalition")]
         public bool ShowCoalition
@@ -604,8 +591,8 @@ namespace SMT
             }
         }
 
-
         private bool m_ShowADM;
+
         [Category("SOV")]
         [DisplayName("Show ADM")]
         public bool ShowADM
@@ -622,8 +609,8 @@ namespace SMT
             }
         }
 
-
         private float m_UniverseMaxZoomDisplaySystems;
+
         [Category("Universe View")]
         [DisplayName("Systems Max Zoom")]
         public float UniverseMaxZoomDisplaySystems
@@ -640,8 +627,8 @@ namespace SMT
             }
         }
 
-
         private float m_UniverseMaxZoomDisplaySystemsText;
+
         [Category("Universe View")]
         [DisplayName("Systems Text Max Zoom")]
         public float UniverseMaxZoomDisplaySystemsText
@@ -658,15 +645,8 @@ namespace SMT
             }
         }
 
-
-
         [Category("Navigation")]
         public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
-
-
-
-
-
 
         public void SetDefaults()
         {
@@ -690,8 +670,6 @@ namespace SMT
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 
             WarningRange = 5;
-
-
         }
 
         public void SetDefaultColours()
@@ -708,7 +686,6 @@ namespace SMT
 
             defaultColours.PopupText = Color.FromRgb(0, 0, 0);
             defaultColours.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
-
 
             defaultColours.MapBackgroundColour = (Color)ColorConverter.ConvertFromString("#5E615E");
             defaultColours.RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E");
@@ -729,7 +706,6 @@ namespace SMT
             defaultColours.JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155);
             defaultColours.JumpRangeOverlapHighlight = Colors.DarkBlue;
 
-
             defaultColours.ActiveIncursionColour = Color.FromRgb(110, 82, 77);
 
             defaultColours.SOVStructureVunerableColour = Color.FromRgb(64, 64, 64);
@@ -741,10 +717,6 @@ namespace SMT
             defaultColours.TheraEntranceSystem = Colors.YellowGreen;
 
             defaultColours.ZKillDataOverlay = Colors.Purple;
-
-
-
-
 
             MapColours.Add(defaultColours);
 
@@ -787,8 +759,6 @@ namespace SMT
             blueColours.PopupText = Color.FromRgb(0, 0, 0);
             blueColours.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
 
-
-
             MapColours.Add(blueColours);
 
             MapColours greyAndRed = new MapColours();
@@ -828,9 +798,7 @@ namespace SMT
             greyAndRed.PopupText = Color.FromRgb(0, 0, 0);
             greyAndRed.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
 
-
             greyAndRed.ZKillDataOverlay = Colors.Purple;
-
 
             MapColours.Add(greyAndRed);
 
@@ -870,7 +838,6 @@ namespace SMT
 
             defaultColours.PopupText = Color.FromRgb(0, 0, 0);
             defaultColours.PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595");
-
 
             dark.ZKillDataOverlay = Colors.Purple;
 
@@ -913,7 +880,6 @@ namespace SMT
             lateNight.PopupText = Color.FromRgb(200, 200, 200);
             lateNight.PopupBackground = Colors.DarkGray;
 
-
             lateNight.ZKillDataOverlay = Colors.Purple;
 
             MapColours.Add(lateNight);
@@ -925,9 +891,6 @@ namespace SMT
         {
             SetDefaults();
         }
-
-
-
     }
 
     public class JumpCharacterItemsSource : IItemsSource

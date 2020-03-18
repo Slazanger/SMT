@@ -20,6 +20,7 @@ using GalaSoft.MvvmLight.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
+
 #if !NET_FXCORE
 
 #endif
@@ -47,7 +48,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         private readonly WeakFunc<bool> _canExecute;
 
         /// <summary>
-        /// Initializes a new instance of the RelayCommand class that 
+        /// Initializes a new instance of the RelayCommand class that
         /// can always execute.
         /// </summary>
         /// <param name="execute">The execution logic.</param>
@@ -96,6 +97,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         /// </summary>
         public event EventHandler CanExecuteChanged;
 #else
+
         /// <summary>
         /// Occurs when changes occur that affect whether the command should execute.
         /// </summary>
@@ -117,6 +119,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
                 }
             }
         }
+
 #endif
 #endif
 #endif
@@ -170,7 +173,7 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Sync
         }
 
         /// <summary>
-        /// Defines the method to be called when the command is invoked. 
+        /// Defines the method to be called when the command is invoked.
         /// </summary>
         /// <param name="parameter">This parameter will always be ignored.</param>
         public virtual void Execute(object parameter)

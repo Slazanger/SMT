@@ -32,7 +32,7 @@ namespace SMT.EVEData
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// Gets or sets the System to AnomData 
+        /// Gets or sets the System to AnomData
         /// </summary>
         public SerializableDictionary<string, AnomData> Systems { get; set; }
 

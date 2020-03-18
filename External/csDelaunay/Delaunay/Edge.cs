@@ -2,15 +2,15 @@
 
 namespace csDelaunay
 {
-
     /*
 	 * The line segment connecting the two Sites is part of the Delaunay triangulation
 	 * The line segment connecting the two Vertices is part of the Voronoi diagram
 	 */
+
     public class Edge
     {
-
         #region Pool
+
         private static Queue<Edge> pool = new Queue<Edge>();
 
         private static int nEdges = 0;
@@ -20,6 +20,7 @@ namespace csDelaunay
 		 * @param site1
 		 * @return
 		 */
+
         public static Edge CreateBisectingEdge(Site s0, Site s1)
         {
             float dx, dy;
@@ -74,7 +75,8 @@ namespace csDelaunay
 
             return edge;
         }
-        #endregion
+
+        #endregion Pool
 
         public static List<Edge> SelectEdgesForSitePoint(Vector2f coord, List<Edge> edgesToTest)
         {
@@ -96,11 +98,13 @@ namespace csDelaunay
         public static readonly Edge DELETED = new Edge();
 
         #region Object
+
         // The equation of the edge: ax + by = c
         public float a, b, c;
 
         // The two Voronoi vertices that the edge connects (if one of them is null, the edge extends to infinity)
         private Vertex leftVertex;
+
         public Vertex LeftVertex { get { return leftVertex; } }
 
         private Vertex rightVertex;
@@ -156,6 +160,7 @@ namespace csDelaunay
         // Once clipVertices() is called, this Disctinary will hold two Points
         // representing the clipped coordinates of the left and the right ends...
         private Dictionary<LR, Vector2f> clippedVertices;
+
         public Dictionary<LR, Vector2f> ClippedEnds { get { return clippedVertices; } }
 
         // Unless the entire Edge is outside the bounds.
@@ -167,6 +172,7 @@ namespace csDelaunay
 
         // The two input Sites for which this Edge is a bisector:
         private Dictionary<LR, Site> sites;
+
         public Site LeftSite { get { return sites[LR.LEFT]; } set { sites[LR.LEFT] = value; } }
         public Site RightSite { get { return sites[LR.RIGHT]; } set { sites[LR.RIGHT] = value; } }
 
@@ -218,6 +224,7 @@ namespace csDelaunay
 		 * within the bounds. If no part of the Edge falls within the bounds, leave clippedVertices null
 		 * @param bounds
 		 */
+
         public void ClipVertices(Rectf bounds)
         {
             float xmin = bounds.x;
@@ -354,6 +361,7 @@ namespace csDelaunay
                 clippedVertices[LR.LEFT] = new Vector2f(x1, y1);
             }
         }
-        #endregion
+
+        #endregion Object
     }
 }

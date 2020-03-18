@@ -17,7 +17,6 @@ namespace SMT
         {
             InitializeComponent();
             new Task(StartServer).Start();
-
         }
 
         private void StartServer()
@@ -30,10 +29,9 @@ namespace SMT
                 listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);
                 listener.Start();
                 Console.WriteLine("Listening...");
-                // Note: The GetContext method blocks while waiting for a request. 
+                // Note: The GetContext method blocks while waiting for a request.
                 HttpListenerContext context = listener.GetContext();
                 HttpListenerRequest request = context.Request;
-
 
                 EVEData.EveManager.Instance.HandleEveAuthSMTUri(request.Url);
 
@@ -50,21 +48,16 @@ namespace SMT
                 output.Close();
                 listener.Stop();
 
-
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     // now close the window
                     Close();
-
                 }), DispatcherPriority.ContextIdle, null);
             }
             catch
             {
-
             }
-
         }
-
 
         private void Window_Closed(object sender, EventArgs e)
         {

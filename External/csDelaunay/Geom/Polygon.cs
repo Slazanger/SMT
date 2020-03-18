@@ -5,7 +5,6 @@ namespace csDelaunay
 {
     public class Polygon
     {
-
         private List<Vector2f> vertices;
 
         public Polygon(List<Vector2f> vertices)

@@ -7,7 +7,6 @@ namespace WpfHelpers.WpfDataManipulation.XamlConverters
 {
     ///http://www.codeproject.com/Articles/92944/A-Universal-Value-Converter-for-WPF
 
-
     /// <summary>
     /// Converts values by inner wpf Converter
     /// <example>Color -> SolidColorBrush</example>

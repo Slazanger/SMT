@@ -2,10 +2,8 @@
 
 namespace csDelaunay
 {
-
     public class Site : ICoord
     {
-
         private static Queue<Site> pool = new Queue<Site>();
 
         public static Site Create(Vector2f p, int index, float weigth)
@@ -85,6 +83,7 @@ namespace csDelaunay
         }
 
         private const float EPSILON = 0.005f;
+
         private static bool CloseEnough(Vector2f p0, Vector2f p1)
         {
             return (p0 - p1).magnitude < EPSILON;
@@ -104,9 +103,12 @@ namespace csDelaunay
 
         // The edges that define this Site's Voronoi region:
         private List<Edge> edges;
+
         public List<Edge> Edges { get { return edges; } }
+
         // which end of each edge hooks up with the previous edge in edges:
         private List<LR> edgeOrientations;
+
         // ordered list of points that define the region clipped to bounds:
         private List<Vector2f> region;
 
@@ -298,13 +300,11 @@ namespace csDelaunay
                         {
                             py = bounds.bottom;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.TOP) != 0)
                         {
                             py = bounds.top;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.LEFT) != 0)
                         {
@@ -328,13 +328,11 @@ namespace csDelaunay
                         {
                             py = bounds.bottom;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.TOP) != 0)
                         {
                             py = bounds.top;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.RIGHT) != 0)
                         {
@@ -358,13 +356,11 @@ namespace csDelaunay
                         {
                             px = bounds.right;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.LEFT) != 0)
                         {
                             px = bounds.left;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.BOTTOM) != 0)
                         {
@@ -388,13 +384,11 @@ namespace csDelaunay
                         {
                             px = bounds.right;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.LEFT) != 0)
                         {
                             px = bounds.left;
                             points.Add(new Vector2f(px, py));
-
                         }
                         else if ((newCheck & BoundsCheck.TOP) != 0)
                         {
@@ -439,11 +433,12 @@ namespace csDelaunay
         public const int RIGHT = 8;
 
         /*
-		 * 
+		 *
 		 * @param point
 		 * @param bounds
 		 * @return an int with the appropriate bits set if the Point lies on the corresponding bounds lines
 		 */
+
         public static int Check(Vector2f point, Rectf bounds)
         {
             int value = 0;

@@ -53,7 +53,6 @@ namespace SMT
         [DisplayName("Map Background")]
         public Color MapBackgroundColour { get; set; }
 
-
         [Category("General")]
         [DisplayName("Region Marker Zoomed")]
         public Color RegionMarkerTextColour { get; set; }
@@ -61,7 +60,6 @@ namespace SMT
         [Category("General")]
         [DisplayName("Region Marker")]
         public Color RegionMarkerTextColourFull { get; set; }
-
 
         [Category("General")]
         [DisplayName("Selected System")]
@@ -95,7 +93,6 @@ namespace SMT
         [DisplayName("Clear")]
         public Color IntelClearOverlayColour { get; set; }
 
-
         [Category("Navigation")]
         [DisplayName("In Range")]
         public Color JumpRangeInColour { get; set; }
@@ -107,8 +104,6 @@ namespace SMT
         [Category("Navigation")]
         [DisplayName("Jump Overlap Highlight")]
         public Color JumpRangeOverlapHighlight { get; set; }
-
-
 
         [Category("Incursion")]
         [DisplayName("Active Incursion")]
@@ -125,8 +120,6 @@ namespace SMT
         [Category("SOV")]
         [DisplayName("Constellation Highlight")]
         public Color ConstellationHighlightColour { get; set; }
-
-
 
         [Category("Thera")]
         [DisplayName("Thera Entrance (Region)")]

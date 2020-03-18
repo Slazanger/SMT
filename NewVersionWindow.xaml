@@ -10,21 +10,22 @@
         <ScrollViewer>
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label Content="New Version: " FontWeight="Bold"/>
-                    <Label Content="{Binding NewVersion}"/>
+                    <Label Content="New Version: " FontWeight="Bold" />
+                    <Label Content="{Binding NewVersion}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
-                    <Label Content="Current Version: " FontWeight="Bold"/>
-                    <Label Content="{Binding CurrentVersion}"/>
+                    <Label Content="Current Version: " FontWeight="Bold" />
+                    <Label Content="{Binding CurrentVersion}" />
                 </StackPanel>
-                <Separator/>
-                    <Label Content="Release Notes: " FontWeight="Bold"/>
-                <Label Content="{Binding ReleaseInfo}"/>
-                <Separator/>
-                    <Label><Hyperlink NavigateUri="{Binding ReleaseURL}" RequestNavigate="Hyperlink_RequestNavigate" >Download</Hyperlink></Label>
+                <Separator />
+                <Label Content="Release Notes: " FontWeight="Bold" />
+                <Label Content="{Binding ReleaseInfo}" />
+                <Separator />
+                <Label>
+                    <Hyperlink NavigateUri="{Binding ReleaseURL}" RequestNavigate="Hyperlink_RequestNavigate" >Download</Hyperlink>
+                </Label>
             </StackPanel>
-
         </ScrollViewer>
     </Grid>
 </Window>

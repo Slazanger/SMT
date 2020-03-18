@@ -25,6 +25,7 @@ namespace SMT.EVEData
             OutSignatureID = outID;
             EstimatedEOL = eol;
         }
+
         /// <summary>
         /// Gets or sets the system with the connection to Thera
         /// </summary>

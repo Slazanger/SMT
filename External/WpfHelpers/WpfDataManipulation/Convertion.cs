@@ -41,7 +41,7 @@ namespace WpfHelpers.WpfDataManipulation
             encoder.Save(stream);
         }
 
-        #endregion
+        #endregion Saves UI Element to file
 
         /// <summary>
         /// Converts BitmapSource to byte array
@@ -64,6 +64,7 @@ namespace WpfHelpers.WpfDataManipulation
             }
             return imageBuffer;
         }
+
         public static Bitmap ByteArrayToBitmap(byte[] byteArrayIn)
         {
             var ms = new MemoryStream(byteArrayIn);
@@ -111,6 +112,5 @@ namespace WpfHelpers.WpfDataManipulation
 
             return bmpRet;
         }
-
     }
 }

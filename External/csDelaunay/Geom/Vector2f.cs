@@ -3,7 +3,6 @@
 // Recreation of the UnityEngine.Vector2, so it can be used in other thread
 public struct Vector2f
 {
-
     public float x, y;
 
     public static readonly Vector2f zero = new Vector2f(0, 0);
@@ -20,6 +19,7 @@ public struct Vector2f
         this.x = x;
         this.y = y;
     }
+
     public Vector2f(double x, double y)
     {
         this.x = (float)x;
@@ -72,6 +72,7 @@ public struct Vector2f
     {
         return Vector2f.DistanceSquare(this, v);
     }
+
     public static float DistanceSquare(Vector2f a, Vector2f b)
     {
         float cx = b.x - a.x;
@@ -110,6 +111,7 @@ public struct Vector2f
     {
         return new Vector2f(Math.Min(a.x, b.x), Math.Min(a.y, b.y));
     }
+
     public static Vector2f Max(Vector2f a, Vector2f b)
     {
         return new Vector2f(Math.Max(a.x, b.x), Math.Max(a.y, b.y));

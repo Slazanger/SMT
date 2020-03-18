@@ -1,9 +1,7 @@
 ﻿namespace csDelaunay
 {
-
     public class LR
     {
-
         public static readonly LR LEFT = new LR("left");
         public static readonly LR RIGHT = new LR("right");
 

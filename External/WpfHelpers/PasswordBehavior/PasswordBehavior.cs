@@ -6,7 +6,7 @@ namespace WpfHelpers.PasswordBehavior
 {
     /// <summary>
     /// Used for binding PasswordBox to string
-    /// 
+    ///
     /// <example>
     ///<PasswordBox>
     ///    <i:Interaction.Behaviors>

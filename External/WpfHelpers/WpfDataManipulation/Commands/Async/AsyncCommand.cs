@@ -8,7 +8,7 @@ using System.Windows.Input;
 namespace WpfHelpers.WpfDataManipulation.Commands.Async
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class AsyncCommand : AsyncCommandBase, INotifyPropertyChanged
     {

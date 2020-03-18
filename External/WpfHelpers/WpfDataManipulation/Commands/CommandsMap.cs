@@ -117,7 +117,6 @@ namespace WpfHelpers.WpfDataManipulation.Commands
             private Action<object> _executeMethod;
         }
 
-
         /// <summary>
         /// Expose the dictionary entries of a CommandMap as properties
         /// </summary>

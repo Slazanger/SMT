@@ -16,7 +16,6 @@ namespace Bvs.Common.Utility
                 new FrameworkPropertyMetadata(200.0d, FrameworkPropertyMetadataOptions.AffectsMeasure |
                                                       FrameworkPropertyMetadataOptions.AffectsArrange));
 
-
         public static readonly DependencyProperty VerticalOffsetLineProperty = DependencyProperty.Register(
             "VerticalOffsetLine", typeof(int), typeof(VirtualizingTilePanel), new PropertyMetadata(10));
 
@@ -25,7 +24,6 @@ namespace Bvs.Common.Utility
             // For use in the IScrollInfo implementation
             RenderTransform = _trans;
         }
-
 
         public int VerticalOffsetLine
         {
@@ -243,12 +241,11 @@ namespace Bvs.Common.Utility
             return childrenPerRow;
         }
 
-        #endregion
+        #endregion Layout specific code
 
         #region IScrollInfo implementation
 
         // See Ben Constable's series of posts at http://blogs.msdn.com/bencon/
-
 
         private void UpdateScrollInfo(Size availableSize)
         {
@@ -408,6 +405,6 @@ namespace Bvs.Common.Utility
         private Size _viewport = new Size(0, 0);
         private Point _offset;
 
-        #endregion
+        #endregion IScrollInfo implementation
     }
 }

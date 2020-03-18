@@ -6,12 +6,10 @@ namespace SMT.EVEData
 {
     public class Server : INotifyPropertyChanged
     {
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         private DateTime m_serverTime;
         private int m_numPlayers;
-
 
         public string Name { get; set; }
 
@@ -30,6 +28,7 @@ namespace SMT.EVEData
         }
 
         public string Version { get; set; }
+
         public DateTime ServerTime
         {
             get
@@ -54,12 +53,10 @@ namespace SMT.EVEData
             timer.Start();
         }
 
-
         public void UpdateServerTime(object sender, EventArgs e)
         {
             ServerTime = DateTime.UtcNow;
         }
-
 
         protected void OnPropertyChanged(string name)
         {
@@ -69,6 +66,5 @@ namespace SMT.EVEData
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
-
     }
 }

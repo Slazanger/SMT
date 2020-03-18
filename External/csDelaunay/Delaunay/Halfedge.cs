@@ -2,11 +2,10 @@
 
 namespace csDelaunay
 {
-
     public class Halfedge
     {
-
         #region Pool
+
         private static Queue<Halfedge> pool = new Queue<Halfedge>();
 
         public static Halfedge Create(Edge edge, LR lr)
@@ -20,13 +19,16 @@ namespace csDelaunay
                 return new Halfedge(edge, lr);
             }
         }
+
         public static Halfedge CreateDummy()
         {
             return Create(null, null);
         }
-        #endregion
+
+        #endregion Pool
 
         #region Object
+
         public Halfedge edgeListLeftNeighbor;
         public Halfedge edgeListRightNeighbor;
         public Halfedge nextInPriorityQueue;
@@ -146,6 +148,7 @@ namespace csDelaunay
             }
             return this.leftRight == LR.LEFT ? above : !above;
         }
-        #endregion
+
+        #endregion Object
     }
 }

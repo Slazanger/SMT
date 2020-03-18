@@ -4,7 +4,6 @@ using System.Windows.Data;
 
 namespace WpfHelpers.WpfDataManipulation.XamlConverters
 {
-
     // http://www.wpftutorial.net/RadioButton.html
 
     public class EnumMatchToBooleanConverter : IValueConverter

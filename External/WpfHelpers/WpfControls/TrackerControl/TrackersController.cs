@@ -23,6 +23,7 @@ namespace WpfHelpers.WpfControls.TrackerControl
         private Brush _selectedObject = new SolidColorBrush(Color.FromArgb(40, 200, 50, 50));
 
         private Brush _fillObjectColor = new SolidColorBrush(Color.FromArgb(92, 20, 160, 20));
+
         //Window m_Window = null;
         /// <summary>
         ///     Window that is associated with a TrackerController
@@ -176,7 +177,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
                             //::Event Trigger
                             CurrentSelectionChanged?.Invoke(this, EventArgs.Empty);
 
-
                             if (m_CurrentTracker.Selected)
                                 m_CurrentTracker.FillBrush = _selectedObject;
                             else
@@ -243,7 +243,6 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
-
             if (m_Add)
             {
                 m_CurrentTracker[m_CurrentTracker.PointCount - 1] = e.GetPosition(m_Canvas);

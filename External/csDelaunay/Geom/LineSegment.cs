@@ -2,10 +2,8 @@
 
 namespace csDelaunay
 {
-
     public class LineSegment
     {
-
         public static List<LineSegment> VisibleLineSegments(List<Edge> edges)
         {
             List<LineSegment> segments = new List<LineSegment>();

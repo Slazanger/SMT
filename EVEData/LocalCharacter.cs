@@ -12,27 +12,21 @@ using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 
-
 namespace SMT.EVEData
 {
-
     //jumpclones
-
 
     public class LocalCharacter : Character, INotifyPropertyChanged
     {
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// The name of the system this character is currently in 
+        /// The name of the system this character is currently in
         /// </summary>
         private string location;
 
         [XmlIgnoreAttribute]
         public object ActiveRouteLock;
-
-
 
         /// <summary>
         /// Does the route need updating
@@ -40,7 +34,6 @@ namespace SMT.EVEData
         private bool routeNeedsUpdate = false;
 
         public bool warningSystemsNeedsUpdate = false;
-
 
         private bool esiRouteNeedsUpdate = false;
 
@@ -73,7 +66,6 @@ namespace SMT.EVEData
         }
 
         public string Region { get; set; }
-
 
         /// <summary>
         /// Gets or sets if this character is linked with ESI
@@ -116,14 +108,11 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public Dictionary<long, string> LabelNames { get; set; }
 
-
         public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
-
 
         public int WarningSystemRange { get; set; }
 
-        public List<string> WarningSystems { get; set; } 
-
+        public List<string> WarningSystems { get; set; }
 
         /// <summary>
         /// Gets or sets the current fleet info for this character
@@ -131,9 +120,8 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public Fleet FleetInfo { get; set; }
 
-
-
         private bool m_UseAnsiblexGates;
+
         public bool UseAnsiblexGates
         {
             get
@@ -154,7 +142,6 @@ namespace SMT.EVEData
             }
         }
 
-
         private RoutingMode m_NavigationMode;
 
         public RoutingMode NavigationMode
@@ -169,7 +156,6 @@ namespace SMT.EVEData
                 {
                     return;
                 }
-
 
                 m_NavigationMode = value;
                 routeNeedsUpdate = true;
@@ -193,7 +179,6 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public Dictionary<string, List<StructureIDs.StructureIdData>> DockableStructures { get; set; }
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
@@ -251,7 +236,6 @@ namespace SMT.EVEData
             ActiveRouteLock = new object();
         }
 
-
         /// <summary>
         /// To String
         /// </summary>
@@ -265,7 +249,6 @@ namespace SMT.EVEData
 
             return toStr;
         }
-
 
         /// <summary>
         /// Update the Character info
@@ -288,8 +271,8 @@ namespace SMT.EVEData
                 UpdateActiveRoute();
             }
 
-            if(warningSystemsNeedsUpdate)
-            {   
+            if (warningSystemsNeedsUpdate)
+            {
                 warningSystemsNeedsUpdate = false;
                 UpdateWarningSystems();
             }
@@ -309,7 +292,6 @@ namespace SMT.EVEData
                     Waypoints.Clear();
                     ActiveRoute.Clear();
                 }
-
             }
 
             Waypoints.Add(EveManager.Instance.SystemIDToName[systemID]);
@@ -327,7 +309,6 @@ namespace SMT.EVEData
             {
                 return;
             }
-
 
             lock (ActiveRouteLock)
             {
@@ -356,7 +337,6 @@ namespace SMT.EVEData
 
                     if (sysList != null)
                     {
-
                         foreach (Navigation.RoutePoint s in sysList)
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
@@ -366,16 +346,13 @@ namespace SMT.EVEData
                         }
                     }
                 }
-
             }
 
             if (esiRouteNeedsUpdate)
             {
-
                 esiRouteNeedsUpdate = false;
 
                 List<long> WayPointsToAdd = new List<long>();
-
 
                 lock (ActiveRouteLock)
                 {
@@ -407,7 +384,6 @@ namespace SMT.EVEData
                                         }
                                         break;
                                     }
-
                                 }
                             }
                             WayPointsToAdd.Add(wayPointSysID);
@@ -416,7 +392,6 @@ namespace SMT.EVEData
                 }
 
                 bool firstRoute = true;
-
 
                 foreach (long SysID in WayPointsToAdd)
                 {
@@ -437,16 +412,15 @@ namespace SMT.EVEData
 
         private void UpdateWarningSystems()
         {
-            if(!string.IsNullOrEmpty(Location) && WarningSystemRange > 0)
+            if (!string.IsNullOrEmpty(Location) && WarningSystemRange > 0)
             {
                 WarningSystems = Navigation.GetSystemsXJumpsFrom(new List<string>(), Location, WarningSystemRange);
             }
         }
 
-
-            /// <summary>
-            /// Refresh the ESI access token
-            /// </summary>
+        /// <summary>
+        /// Refresh the ESI access token
+        /// </summary>
         private async Task RefreshAccessToken()
         {
             if (String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
@@ -476,9 +450,7 @@ namespace SMT.EVEData
                 ESIRefreshToken = acd.RefreshToken;
                 ESILinked = true;
                 ESIAuthData = acd;
-
             }
-
             catch { }
         }
 
@@ -521,7 +493,6 @@ namespace SMT.EVEData
             catch { }
         }
 
-
         /// <summary>
         /// Update the characters FleetInfo
         /// </summary>
@@ -551,9 +522,6 @@ namespace SMT.EVEData
                         {
                             //fm.CharacterId
                         }
-
-
-
                     }
                 }
                 else
@@ -564,7 +532,6 @@ namespace SMT.EVEData
             }
             catch { }
         }
-
 
         /// <summary>
         /// Update the character info from the ESI data if linked
@@ -583,7 +550,6 @@ namespace SMT.EVEData
                 ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
-
                 //if (CorporationID == -1 || AllianceID == -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esr = await esiClient.Character.Information((int)ID);
@@ -595,7 +561,6 @@ namespace SMT.EVEData
                     }
                 }
 
-
                 // if we have an alliance, and no current standings set
                 if (AllianceID != 0 && Standings.Count == 0)
                 {
@@ -604,7 +569,6 @@ namespace SMT.EVEData
                     do
                     {
                         page++;
-
 
                         // SJS here.. list modifeied exception
 
@@ -640,11 +604,8 @@ namespace SMT.EVEData
             await EveManager.Instance.ResolveAllianceIDs(AllianceToResolve);
         }
 
-
         public async Task<List<JumpBridge>> FindJumpGates(string JumpBridgeFilterString = " » ")
         {
-
-
             List<JumpBridge> jbl = new List<JumpBridge>();
 
             if (!ESILinked)
@@ -652,7 +613,6 @@ namespace SMT.EVEData
 
             ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
             esiClient.SetCharacterData(ESIAuthData);
-
 
             Dictionary<long, ESI.NET.Models.Universe.Structure> SystemJumpGateList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
 
@@ -664,7 +624,6 @@ namespace SMT.EVEData
                 {
                     return jbl;
                 }
-
 
                 foreach (long stationID in esr.Data.Structures)
                 {
@@ -692,12 +651,10 @@ namespace SMT.EVEData
             return jbl;
         }
 
-
         public async void UpdateStructureInfoForRegion2(string Region)
         {
             if (!ESILinked)
                 return;
-
 
             MapRegion mr = EveManager.Instance.GetRegion(Region);
             // somethings gone wrong
@@ -706,26 +663,20 @@ namespace SMT.EVEData
                 return;
             }
 
-
             ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
             esiClient.SetCharacterData(ESIAuthData);
 
-
             Dictionary<long, ESI.NET.Models.Universe.Structure> SystemStructureList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
-
 
             // iterate over each structure and search for structres containing the text for each system
             foreach (MapSystem ms in mr.MapSystems.Values.ToList())
             {
-
                 if (ms.OutOfRegion)
                 {
                     continue;
                 }
 
-
                 UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/latest/characters/" + ID + "/search/");
-
 
                 esiClient.SetCharacterData(ESIAuthData);
                 ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, ms.Name, SearchCategory.Structure);
@@ -735,7 +686,6 @@ namespace SMT.EVEData
                     {
                         return;
                     }
-
 
                     foreach (long stationID in esr.Data.Structures)
                     {
@@ -753,10 +703,7 @@ namespace SMT.EVEData
                 Thread.Sleep(100);
 
                 //ssssss
-
             }
-
-
 
             string CSVPath = AppDomain.CurrentDomain.BaseDirectory + "\\Strucutres_" + mr.Name + "_" + ID + ".csv";
 
@@ -764,7 +711,6 @@ namespace SMT.EVEData
             {
                 string Header = "SolarSystem ID,StructureID,Type ID,Name,Owner";
                 w.WriteLine(Header);
-
 
                 foreach (long ID in SystemStructureList.Keys)
                 {
@@ -776,12 +722,10 @@ namespace SMT.EVEData
             }
         }
 
-
         public async void GetStructureInfoForSystem(string system)
         {
             if (!ESILinked)
                 return;
-
 
             MapRegion mr = EveManager.Instance.GetRegion(Region);
             // somethings gone wrong
@@ -793,9 +737,7 @@ namespace SMT.EVEData
             ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
             esiClient.SetCharacterData(ESIAuthData);
 
-
             Dictionary<long, ESI.NET.Models.Universe.Structure> SystemStructureList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
-
 
             esiClient.SetCharacterData(ESIAuthData);
             ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, system, SearchCategory.Structure);
@@ -805,7 +747,6 @@ namespace SMT.EVEData
                 {
                     return;
                 }
-
 
                 foreach (long stationID in esr.Data.Structures)
                 {
@@ -821,15 +762,11 @@ namespace SMT.EVEData
             }
 
             Thread.Sleep(100);
-
-
-
         }
 
         public string GetWayPointText()
         {
             string ClipboardText = "Waypoints\n==============\n";
-
 
             lock (ActiveRouteLock)
             {
@@ -840,7 +777,6 @@ namespace SMT.EVEData
                     // explicitly add interim waypoints for ansiblex gates or actual waypoints
                     if (rp.GateToTake == Navigation.GateType.Ansibex)
                     {
-
                         bool isSystemLink = true;
 
                         if (rp.GateToTake == Navigation.GateType.Ansibex)
@@ -860,7 +796,6 @@ namespace SMT.EVEData
                                     GateDesto = jb.To;
                                     break;
                                 }
-                                
 
                                 if (jb.To == rp.SystemName)
                                 {
@@ -873,7 +808,6 @@ namespace SMT.EVEData
                                     GateDesto = jb.From;
                                     break;
                                 }
-
                             }
 
                             if (isSystemLink)
@@ -899,10 +833,8 @@ namespace SMT.EVEData
                 }
             }
 
-
             return ClipboardText;
         }
-
 
         protected void OnPropertyChanged(string name)
         {
@@ -912,6 +844,5 @@ namespace SMT.EVEData
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
-
     }
 }
