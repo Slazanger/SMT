@@ -1161,6 +1161,7 @@ namespace SMT
 
             CacheMode cm = new BitmapCache(5.0);
 
+            /*
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
                 List<Point> systems = new List<Point>();
@@ -1201,6 +1202,8 @@ namespace SMT
                 drawingContext.Close();
                 VHRegionNames.AddChild(regionShapeVisual, null);
             }
+
+    */
 
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
