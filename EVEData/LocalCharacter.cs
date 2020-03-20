@@ -305,48 +305,7 @@ namespace SMT.EVEData
             return jbl;
         }
 
-        public async void GetStructureInfoForSystem(string system)
-        {
-            if (!ESILinked)
-                return;
-
-            MapRegion mr = EveManager.Instance.GetRegion(Region);
-            // somethings gone wrong
-            if (mr == null)
-            {
-                return;
-            }
-
-            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-            esiClient.SetCharacterData(ESIAuthData);
-
-            Dictionary<long, ESI.NET.Models.Universe.Structure> SystemStructureList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
-
-            esiClient.SetCharacterData(ESIAuthData);
-            ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, system, SearchCategory.Structure);
-            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
-            {
-                if (esr.Data.Structures == null)
-                {
-                    return;
-                }
-
-                foreach (long stationID in esr.Data.Structures)
-                {
-                    ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
-
-                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
-                    {
-                        SystemStructureList[stationID] = esrs.Data;
-                    }
-
-                    Thread.Sleep(20);
-                }
-            }
-
-            Thread.Sleep(100);
-        }
-
+ 
         public string GetWayPointText()
         {
             string ClipboardText = "Waypoints\n==============\n";
@@ -461,76 +420,7 @@ namespace SMT.EVEData
             }
         }
 
-        public async void UpdateStructureInfoForRegion2(string Region)
-        {
-            if (!ESILinked)
-                return;
-
-            MapRegion mr = EveManager.Instance.GetRegion(Region);
-            // somethings gone wrong
-            if (mr == null)
-            {
-                return;
-            }
-
-            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-            esiClient.SetCharacterData(ESIAuthData);
-
-            Dictionary<long, ESI.NET.Models.Universe.Structure> SystemStructureList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
-
-            // iterate over each structure and search for structres containing the text for each system
-            foreach (MapSystem ms in mr.MapSystems.Values.ToList())
-            {
-                if (ms.OutOfRegion)
-                {
-                    continue;
-                }
-
-                UriBuilder urlBuilder = new UriBuilder(@"https://esi.evetech.net/latest/characters/" + ID + "/search/");
-
-                esiClient.SetCharacterData(ESIAuthData);
-                ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, ms.Name, SearchCategory.Structure);
-                if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
-                {
-                    if (esr.Data.Structures == null)
-                    {
-                        return;
-                    }
-
-                    foreach (long stationID in esr.Data.Structures)
-                    {
-                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
-
-                        if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
-                        {
-                            SystemStructureList[stationID] = esrs.Data;
-                        }
-
-                        Thread.Sleep(20);
-                    }
-                }
-
-                Thread.Sleep(100);
-
-                //ssssss
-            }
-
-            string CSVPath = AppDomain.CurrentDomain.BaseDirectory + "\\Strucutres_" + mr.Name + "_" + ID + ".csv";
-
-            using (var w = new StreamWriter(CSVPath, false))
-            {
-                string Header = "SolarSystem ID,StructureID,Type ID,Name,Owner";
-                w.WriteLine(Header);
-
-                foreach (long ID in SystemStructureList.Keys)
-                {
-                    ESI.NET.Models.Universe.Structure s = SystemStructureList[ID];
-                    string Line = $"{s.SolarSystemId},{ID},{s.TypeId},{s.Name}";
-                    w.WriteLine(Line);
-                    w.Flush();
-                }
-            }
-        }
+        
 
         protected void OnPropertyChanged(string name)
         {
@@ -602,7 +492,7 @@ namespace SMT.EVEData
                     }
 
                     ActiveRoute.Clear();
-                }), DispatcherPriority.ApplicationIdle);
+                }), DispatcherPriority.Normal);
 
                 // loop through all the waypoints and query ESI for the route
                 for (int i = 0; i < Waypoints.Count; i++)

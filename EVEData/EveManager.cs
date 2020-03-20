@@ -1319,48 +1319,53 @@ namespace SMT.EVEData
 
             new Thread(() =>
             {
-                Thread.CurrentThread.IsBackground = false;
-
-                // loop forever
-                while (WatcherThreadShouldTerminate == false)
-                {
-                    DirectoryInfo di = new DirectoryInfo(eveLogFolder);
-                    FileInfo[] files = di.GetFiles("*.txt");
-                    foreach (FileInfo file in files)
-                    {
-                        bool readFile = false;
-                        foreach (string intelFilterStr in IntelFilters)
-                        {
-                            if (file.Name.Contains(intelFilterStr))
-                            {
-                                readFile = true;
-                                break;
-                            }
-                        }
-
-                        // local files
-                        if (file.Name.Contains("Local_"))
-                        {
-                            readFile = true;
-                        }
-
-                        // only read files from the last day
-                        if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
-                        {
-                            FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                            ifs.Seek(0, SeekOrigin.End);
-                            Thread.Sleep(100);
-                            ifs.Close();
-                            Thread.Sleep(200);
-                        }
-                    }
-
-                    Thread.Sleep(2000);
-                }
+                FileWatcher(eveLogFolder);
             }).Start();
 
             // END SUPERHACK
             // -----------------------------------------------------------------
+        }
+
+        private void FileWatcher(string eveLogFolder)
+        {
+            Thread.CurrentThread.IsBackground = false;
+
+            // loop forever
+            while (WatcherThreadShouldTerminate == false)
+            {
+                DirectoryInfo di = new DirectoryInfo(eveLogFolder);
+                FileInfo[] files = di.GetFiles("*.txt");
+                foreach (FileInfo file in files)
+                {
+                    bool readFile = false;
+                    foreach (string intelFilterStr in IntelFilters)
+                    {
+                        if (file.Name.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            readFile = true;
+                            break;
+                        }
+                    }
+
+                    // local files
+                    if (file.Name.Contains("Local_"))
+                    {
+                        readFile = true;
+                    }
+
+                    // only read files from the last day
+                    if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
+                    {
+                        FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        ifs.Seek(0, SeekOrigin.End);
+                        Thread.Sleep(100);
+                        ifs.Close();
+                        Thread.Sleep(100);
+                    }
+                }
+
+                Thread.Sleep(2000);
+            }
         }
 
         public void ShuddownIntelWatcher()
@@ -1634,7 +1639,7 @@ namespace SMT.EVEData
 
             foreach (string intelFilterStr in IntelFilters)
             {
-                if (changedFile.Contains(intelFilterStr))
+                if (changedFile.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase ) >= 0)
                 {
                     processFile = true;
                     break;
@@ -1979,8 +1984,6 @@ namespace SMT.EVEData
                 request.Proxy = null;
 
                 request.BeginGetResponse(new AsyncCallback(UpdateDotlanKillDeltaInfoCallback), request);
-
-                Thread.Sleep(10);
             }
         }
 

@@ -23,7 +23,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
         public static MainWindow AppWindow;
-        public string SMTVersion = "SMT_077";
+        public string SMTVersion = "SMT_078";
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
@@ -40,6 +40,7 @@ namespace SMT
         {
             OutputLog.Info("Starting App..");
             AppWindow = this;
+            DataContext = this;
 
             InitializeComponent();
 
@@ -84,14 +85,12 @@ namespace SMT
                 catch
                 {
                     MapConf = new MapConfig();
-                    MapConf.MapColours = new List<MapColours>();
                     MapConf.SetDefaultColours();
                 }
             }
             else
             {
                 MapConf = new MapConfig();
-                MapConf.MapColours = new List<MapColours>();
                 MapConf.SetDefaultColours();
             }
 
@@ -117,22 +116,10 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
             EVEManager.InitNavigation();
 
-            ColourListDropdown.ItemsSource = MapConf.MapColours;
             CharactersList.ItemsSource = EVEManager.LocalCharacters;
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
-
-            MapColours selectedColours = MapConf.MapColours[0];
-
-            // find the matching active colour scheme
-            foreach (MapColours mc in MapConf.MapColours)
-            {
-                if (MapConf.DefaultColourSchemeName == mc.Name)
-                {
-                    selectedColours = mc;
-                }
-            }
 
             RegionRC.MapConf = MapConf;
             RegionRC.Init();
@@ -177,12 +164,10 @@ namespace SMT
 
             AppStatusBar.DataContext = EVEManager.ServerInfo;
 
-            // ColourListDropdown.SelectedItem = selectedColours;
-            ColoursPropertyGrid.SelectedObject = selectedColours;
-            MapConf.ActiveColourScheme = selectedColours;
-            ColoursPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
+            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
+            ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
             MapConf.PropertyChanged += MapConf_PropertyChanged;
-            MapControlsPropertyGrid.PropertyChanged += ColoursPropertyGrid_PropertyChanged;
+            MapControlsPropertyGrid.PropertyValueChanged += MapControlsPropertyGrid_PropertyValueChanged;
 
             Closed += MainWindow_Closed;
 
@@ -199,12 +184,10 @@ namespace SMT
             ZKBFeed.ItemsSource = EVEManager.ZKillFeed.KillStream;
 
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
+            zKBFeedview.Refresh();
             zKBFeedview.Filter = ZKBFeedFilter;
 
-            // SJS Removed Temp            JPShipType.ItemsSource = Enum.GetValues(typeof(EVEData.EveManager.JumpShip)).Cast<EVEData.EveManager.JumpShip>();
-
             // update
-
             foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
             {
                 lc.WarningSystemRange = MapConf.WarningRange;
@@ -217,6 +200,8 @@ namespace SMT
 
             ResetIntelSize();
         }
+
+
 
         public EVEData.AnomManager ANOMManager { get; set; }
 
@@ -734,45 +719,19 @@ namespace SMT
             }
         }
 
-        private void ColourListDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
         {
-            MapColours newSelection = ColourListDropdown.SelectedItem as MapColours;
-            if (newSelection == null)
-            {
-                return;
-            }
-
-            MapConf.ActiveColourScheme = newSelection;
-            ColoursPropertyGrid.SelectedObject = newSelection;
-            ColoursPropertyGrid.Update();
-
-            MapConf.DefaultColourSchemeName = newSelection.Name;
-        }
-
-        private void ColoursPropertyGrid_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "IsVisible" ||
-                e.PropertyName == "IsMouseOver" ||
-                e.PropertyName == "IsMouseCaptureWithin" ||
-                e.PropertyName == "ActualHeight" ||
-                e.PropertyName == "ActualWidth" ||
-
-                e.PropertyName == "IsKeyboardFocusWithin" ||
-                e.PropertyName == "SelectedProperty" ||
-                e.PropertyName == "SelectedPropertyItem" ||
-                e.PropertyName == "SelectedObjectType" ||
-                e.PropertyName == "SelectedObjectTypeName" ||
-                e.PropertyName == "Properties" ||
-                e.PropertyName == "SelectedObject"
-
-                )
-            {
-                return;
-            }
-
             RegionRC.ReDrawMap(true);
             UniverseUC.ReDrawMap(true, true, true);
         }
+
+        private void MapControlsPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
+        {
+            RegionRC.ReDrawMap(true);
+            UniverseUC.ReDrawMap(false, false, true);
+        }
+
+
 
         private void CopyWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1237,12 +1196,10 @@ namespace SMT
 
         private void ResetColourData_Click(object sender, RoutedEventArgs e)
         {
-            MapConf.MapColours = new List<MapColours>();
             MapConf.SetDefaultColours();
-            ColourListDropdown.ItemsSource = MapConf.MapColours;
-            ColourListDropdown.SelectedItem = MapConf.MapColours[0];
-
-            RegionRC.ReDrawMap();
+            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
+            RegionRC.ReDrawMap(true);
+            UniverseUC.ReDrawMap(true, true, true);
         }
 
         private void ResetIntelSize()

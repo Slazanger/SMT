@@ -47,7 +47,7 @@ namespace SMT
         private bool m_ShowStandings = false;
         private bool m_ShowSystemSecurity = false;
         private long SelectedAlliance = 0;
-        private Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
+        private readonly Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
         private Brush StandingBadBrush = new SolidColorBrush(Color.FromArgb(110, 196, 72, 6));
         private Brush StandingGoodBrush = new SolidColorBrush(Color.FromArgb(110, 43, 101, 196));
         private Brush StandingNeutBrush = new SolidColorBrush(Color.FromArgb(110, 140, 140, 140));
