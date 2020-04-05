@@ -33,6 +33,8 @@ namespace SMT
 
         private LogonWindow logonBrowserWindow;
 
+        private PreferencesWindow preferencesWindow;
+
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
@@ -1381,6 +1383,21 @@ namespace SMT
                 {
                 }
             }
+        }
+
+        private void Preferences_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (preferencesWindow != null)
+            {
+                preferencesWindow.Close();
+            }
+
+            preferencesWindow = new PreferencesWindow();
+            preferencesWindow.Owner = this;
+            preferencesWindow.DataContext = MapConf;
+            preferencesWindow.MapConf = MapConf;
+            preferencesWindow.ShowDialog();
+
         }
 
         /*

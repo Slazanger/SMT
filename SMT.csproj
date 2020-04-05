@@ -209,6 +209,9 @@
     <Compile Include="NewVersionWindow.xaml.cs">
       <DependentUpon>NewVersionWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Preferences.xaml.cs">
+      <DependentUpon>Preferences.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StaticJumpOverlay.cs" />
     <Compile Include="UniverseControl.xaml.cs">
       <DependentUpon>UniverseControl.xaml</DependentUpon>
@@ -288,6 +291,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NewVersionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Preferences.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

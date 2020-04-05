@@ -76,6 +76,8 @@ namespace SMT
 
         private bool m_SOVShowConflicts;
 
+        private bool m_ShowJoveObservatories;
+
         private double m_UniverseDataScale = 1.0f;
 
         private float m_UniverseMaxZoomDisplaySystems;
@@ -319,7 +321,18 @@ namespace SMT
 
         [Category("Jove")]
         [DisplayName("Show Observatories")]
-        public bool ShowJoveObservatories { get; set; }
+        public bool ShowJoveObservatories 
+        { 
+            get
+            {
+                return m_ShowJoveObservatories;
+            }
+            set
+            {
+                m_ShowJoveObservatories = value;
+                OnPropertyChanged("ShowJoveObservatories");
+            }
+        }
 
         [Category("Navigation")]
         [DisplayName("Show Jump Distance")]
@@ -725,6 +738,7 @@ namespace SMT
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
             SOVBasedITCU = true;
+            ShowJoveObservatories = true;
 
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
