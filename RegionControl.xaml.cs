@@ -886,7 +886,7 @@ namespace SMT
                     infoSize = infoValue * ESIOverlayScale;
                 }
 
-                if (MapConf.ShowIhubVunerabilities)
+                if (ShowSystemTimers && MapConf.ShowIhubVunerabilities)
                 {
                     DateTime now = DateTime.Now;
 
@@ -908,7 +908,7 @@ namespace SMT
                     }
                 }
 
-                if (MapConf.ShowTCUVunerabilities)
+                if (ShowSystemTimers && MapConf.ShowTCUVunerabilities)
                 {
                     DateTime now = DateTime.Now;
 
@@ -1835,7 +1835,7 @@ namespace SMT
 
                 EVEData.System es = EM.GetEveSystem(SelectedSystem);
 
-                if (es != null && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities) && system.ActualSystem.ConstellationID == es.ConstellationID)
+                if (es != null && (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities) ) && system.ActualSystem.ConstellationID == es.ConstellationID)
                 {
                     {
                         Polygon poly = new Polygon();
@@ -2233,6 +2233,8 @@ namespace SMT
 
                 */
 
+                List<Label> AllianceNameListLabels = new List<Label>();
+
                 foreach (long allianceID in AlliancesKeyList)
                 {
                     string allianceName = EM.GetAllianceName(allianceID);
@@ -2249,8 +2251,21 @@ namespace SMT
                         akl.Foreground = SelectedFont;
                     }
 
-                    AllianceNameListStackPanel.Children.Insert(0, akl);
+                    AllianceNameListLabels.Add(akl);
                 }
+
+                List<Label> SortedAlliance = AllianceNameListLabels.OrderBy(an => an.Content).ToList();
+
+                foreach(Label l in SortedAlliance)
+                {
+                    AllianceNameListStackPanel.Children.Add(l);
+                }
+                
+
+
+
+
+
             }
             else
             {
@@ -2434,7 +2449,7 @@ namespace SMT
                 if (e.ClickCount == 1)
                 {
                     bool redraw = false;
-                    if (MapConf.ShowJumpDistance || MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)
+                    if (MapConf.ShowJumpDistance || (ShowSystemTimers &&  (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)) )
                     {
                         redraw = true;
                     }

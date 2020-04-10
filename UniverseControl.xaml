@@ -79,15 +79,15 @@
             </Canvas>
         </zoombox1:ZoomControl>
 
-        <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="190" Height="70" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1">
+        <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="145" Height="70" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1">
             <Canvas x:Name="ToolBoxCanvas">
-                <Grid Canvas.Left="0" Canvas.Top="2" Width="210">
+                <Grid Canvas.Left="0" Canvas.Top="2" >
 
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0" Width="190">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0" >
 
                         <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                            <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="36" Height="36">
+                            <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="30" Height="30">
                                 <Image>
                                     <Image.Style>
                                         <Style TargetType="Image">
@@ -105,7 +105,7 @@
                                 </Image>
                             </ToggleButton>
 
-                            <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour" Width="36" Height="36">
+                            <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour" Width="30" Height="30">
                                 <Image>
                                     <Image.Style>
                                         <Style TargetType="Image">
@@ -123,7 +123,7 @@
                                 </Image>
                             </ToggleButton>
 
-                            <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour" Width="36" Height="36">
+                            <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour" Width="30" Height="30">
                                 <Image>
                                     <Image.Style>
                                         <Style TargetType="Image">
@@ -141,7 +141,7 @@
                                 </Image>
                             </ToggleButton>
 
-                            <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour" Width="36" Height="36">
+                            <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour" Width="30" Height="30">
                                 <Image>
                                     <Image.Style>
                                         <Style TargetType="Image">
@@ -160,7 +160,7 @@
                             </ToggleButton>
                         </StackPanel>
 
-                        <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.2" Maximum="2" TickFrequency="0.2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" TickPlacement="Both" SmallChange="0.2" IsSnapToTickEnabled="True" />
+                        <Slider  Width="140" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.2" Maximum="2" TickFrequency="0.2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" TickPlacement="Both" SmallChange="0.2" IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </Grid>
             </Canvas>

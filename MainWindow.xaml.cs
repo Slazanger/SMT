@@ -169,7 +169,6 @@ namespace SMT
             ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
             ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
             MapConf.PropertyChanged += MapConf_PropertyChanged;
-            MapControlsPropertyGrid.PropertyValueChanged += MapControlsPropertyGrid_PropertyValueChanged;
 
             Closed += MainWindow_Closed;
 
@@ -195,8 +194,6 @@ namespace SMT
                 lc.WarningSystemRange = MapConf.WarningRange;
                 lc.Location = "";
             }
-
-            MapControlsPropertyGrid.SelectedObject = MapConf;
 
             RawIntelBox.FontSize = MapConf.IntelTextSize;
 
@@ -322,6 +319,7 @@ namespace SMT
 
             MainUniverseCanvas.Background = BackgroundColourBrush;
             MainUniverseGrid.Background = BackgroundColourBrush;
+            RegionsToolBoxCanvas.DataContext = MapConf;
 
             foreach (EVEData.MapRegion mr in EVEManager.Regions)
             {
@@ -727,14 +725,6 @@ namespace SMT
             UniverseUC.ReDrawMap(true, true, true);
         }
 
-        private void MapControlsPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
-        {
-            RegionRC.ReDrawMap(true);
-            UniverseUC.ReDrawMap(false, false, true);
-        }
-
-
-
         private void CopyWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
@@ -1071,10 +1061,7 @@ namespace SMT
             AddDataToUniverse();
         }
 
-        private void refreshData_Click(object sender, RoutedEventArgs e)
-        {
-            EVEManager.UpdateESIUniverseData();
-        }
+
 
         private void RegionCharacter_ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
@@ -1397,6 +1384,13 @@ namespace SMT
             preferencesWindow.DataContext = MapConf;
             preferencesWindow.MapConf = MapConf;
             preferencesWindow.ShowDialog();
+            preferencesWindow.Closed += PreferencesWindow_Closed;
+        }
+
+        private void PreferencesWindow_Closed(object sender, EventArgs e)
+        {
+            RegionRC.ReDrawMap(true);
+            UniverseUC.ReDrawMap(true, true, false);
         }
 
         private void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)

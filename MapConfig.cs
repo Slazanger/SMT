@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Media;
+using System.Xml.Serialization;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SMT
@@ -444,6 +445,7 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
         [Category("Regions")]
         [DisplayName("Show Ship kill Stats")]
         public bool ShowUniverseKills
@@ -468,6 +470,7 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
         [Category("Regions")]
         [DisplayName("Show Pod kill Stats")]
         public bool ShowUniversePods
@@ -491,6 +494,7 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
         [Category("Regions")]
         [DisplayName("Show Ratting Stats")]
         public bool ShowUniverseRats
@@ -559,6 +563,7 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
         [Category("Regions")]
         [DisplayName("Universe Data Scale")]
         public double UniverseDataScale

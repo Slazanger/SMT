@@ -118,31 +118,6 @@
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
                             </xcadl:LayoutAnchorablePane>
-
-                            <xcadl:LayoutAnchorablePane>
-                                <xcadl:LayoutAnchorable Title="Map Config" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapConfigContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <ScrollViewer Background="#FFE5E5E5">
-                                        <StackPanel>
-                                            <xctk:PropertyGrid x:Name="MapControlsPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" IsScrollingToTopAfterRefresh="False" IsVirtualizing="True">
-                                                <xctk:PropertyGrid.EditorDefinitions>
-                                                    <xctk:EditorTemplateDefinition TargetProperties="UniverseDataScale">
-                                                        <xctk:EditorTemplateDefinition.EditingTemplate>
-                                                            <DataTemplate>
-                                                                <Slider Minimum="0.1" Maximum="5" TickFrequency="0.1" Margin="0,2" Value="{Binding Value, Mode=TwoWay}" IsSnapToTickEnabled="True" />
-                                                            </DataTemplate>
-                                                        </xctk:EditorTemplateDefinition.EditingTemplate>
-                                                    </xctk:EditorTemplateDefinition>
-                                                </xctk:PropertyGrid.EditorDefinitions>
-                                            </xctk:PropertyGrid>
-
-                                            <StackPanel>
-                                                <Separator />
-                                                <Button x:Name="refreshData" Click="refreshData_Click" Content="Refresh ESI System Kills" Margin="0,2" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </ScrollViewer>
-                                </xcadl:LayoutAnchorable>
-                            </xcadl:LayoutAnchorablePane>
                         </xcadl:LayoutAnchorablePaneGroup>
 
                         <xcadl:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False">
@@ -156,8 +131,96 @@
                                     </Popup>
 
                                     <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Canvas x:Name="MainUniverseCanvas"   Margin="5" Width="1050" Height="800" HorizontalAlignment="Stretch" />
+                                        <Canvas x:Name="MainUniverseCanvas"   Margin="5" Width="1050" Height="800" HorizontalAlignment="Stretch">
+                                        </Canvas>
                                     </Viewbox>
+                                    <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="135" Height="65" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111">
+                                        <Canvas x:Name="RegionsToolBoxCanvas">
+                                            <Grid Canvas.Left="0" Canvas.Top="2" >
+
+                                                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,0" >
+
+                                                    <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                                                        <ToggleButton x:Name="ToggleStandingsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowRegionStandings}" ToolTip="Jumps in the Last hour" Width="30" Height="30">
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="Images/Standings.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleStandingsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="Images/Standings Inactive.png" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+                                                        </ToggleButton>
+
+                                                        <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowUniversePods}" ToolTip="Pod kills in the Last hour" Width="30" Height="30">
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="Images/Pod.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=TogglePodKillsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="Images/Pod Inactive.png" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+                                                        </ToggleButton>
+
+                                                        <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowUniverseKills}" ToolTip="Ship kill in the Last hour" Width="30" Height="30">
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="Images/Ship.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleShipKillsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="Images/Ship Inactive.png" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+                                                        </ToggleButton>
+
+                                                        <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowUniverseRats}" ToolTip="NPC Kills in the Last hour" Width="30" Height="30">
+                                                            <Image>
+                                                                <Image.Style>
+                                                                    <Style TargetType="Image">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="True">
+                                                                                <Setter Property="Image.Source" Value="Images/Rat.png" />
+                                                                            </DataTrigger>
+
+                                                                            <DataTrigger Binding="{Binding ElementName=ToggleRatKillsBtn,Path=IsChecked}" Value="false">
+                                                                                <Setter Property="Image.Source" Value="Images/Rat Inactive.png" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Image.Style>
+                                                            </Image>
+                                                        </ToggleButton>
+                                                    </StackPanel>
+
+                                                    <Slider  Width="130" Cursor="Arrow" Margin="0" Value="{Binding UniverseDataScale}" Minimum="0.1" Maximum="5" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="19" ToolTip="Overlay/Data Scale" TickPlacement="Both" SmallChange="0.2" IsSnapToTickEnabled="True" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Canvas>
+                                    </Border>
+
                                 </Grid>
                             </xcadl:LayoutDocument>
 
