@@ -347,6 +347,10 @@
     <Resource Include="Images\Security.png" />
     <Resource Include="Images\Jove_logo.png" />
     <Resource Include="Images\CynoBeacon.png" />
+    <Resource Include="Images\ADM Inactive.png" />
+    <Resource Include="Images\ADM.png" />
+    <Resource Include="Images\Timer Inactive.png" />
+    <Resource Include="Images\Timer.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>

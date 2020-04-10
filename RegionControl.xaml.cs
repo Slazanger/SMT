@@ -46,6 +46,9 @@ namespace SMT
         private bool m_ShowSovOwner = false;
         private bool m_ShowStandings = false;
         private bool m_ShowSystemSecurity = false;
+        private bool m_ShowSystemADM = false;
+        private bool m_ShowSystemTimers = false;
+
         private long SelectedAlliance = 0;
         private readonly Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
         private Brush StandingBadBrush = new SolidColorBrush(Color.FromArgb(110, 196, 72, 6));
@@ -289,6 +292,7 @@ namespace SMT
             set
             {
                 m_ShowStandings = value;
+
                 OnPropertyChanged("ShowStandings");
             }
         }
@@ -302,7 +306,41 @@ namespace SMT
             set
             {
                 m_ShowSystemSecurity = value;
+                if(m_ShowSystemSecurity)
+                {
+                    ShowSystemADM = false;
+                }
                 OnPropertyChanged("ShowSystemSecurity");
+            }
+        }
+
+        public bool ShowSystemADM
+        {
+            get
+            {
+                return m_ShowSystemADM;
+            }
+            set
+            {
+                m_ShowSystemADM = value;
+                if(m_ShowSystemADM)
+                {
+                    ShowSystemSecurity = false;
+                }
+                OnPropertyChanged("ShowSystemADM");
+            }
+        }
+
+        public bool ShowSystemTimers
+        {
+            get
+            {
+                return m_ShowSystemTimers;
+            }
+            set
+            {
+                m_ShowSystemTimers = value;
+                OnPropertyChanged("ShowSystemTimers");
             }
         }
 
@@ -1117,7 +1155,7 @@ namespace SMT
                     }
                 }
 
-                if (SystemAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null)
+                if (SystemAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null && ShowSovOwner)
                 {
                     Polygon poly = new Polygon();
                     poly.Fill = new SolidColorBrush(SystemCoalition.CoalitionColor);
@@ -1556,7 +1594,7 @@ namespace SMT
                 }
 
                 // override
-                if (MapConf.ShowADM)
+                if (ShowSystemADM)
                 {
                     shapePoints = null;
                     needsOutline = true;
@@ -1638,7 +1676,7 @@ namespace SMT
                         SystemOutline.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
                     }
 
-                    if (MapConf.ShowADM && system.ActualSystem.IHubOccupancyLevel != 0.0f)
+                    if (ShowSystemADM && system.ActualSystem.IHubOccupancyLevel != 0.0f)
                     {
                         float SovVal = system.ActualSystem.IHubOccupancyLevel;
 
@@ -1670,7 +1708,7 @@ namespace SMT
                     MainCanvas.Children.Add(SystemOutline);
                 }
 
-                if (MapConf.ShowADM && system.ActualSystem.IHubOccupancyLevel != 0.0)
+                if (ShowSystemADM && system.ActualSystem.IHubOccupancyLevel != 0.0)
                 {
                     Label sovADM = new Label();
                     sovADM.Content = "1.0";
@@ -1848,7 +1886,7 @@ namespace SMT
                     MainCanvas.Children.Add(poly);
                 }
 
-                if ((ShowSovOwner || MapConf.ShowCoalition) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
+                if ((ShowSovOwner ) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
                 {
                     Label sysRegionText = new Label();
 

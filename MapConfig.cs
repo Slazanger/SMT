@@ -310,12 +310,10 @@ namespace SMT
             set
             {
                 m_ShowIhubVunerabilities = value;
-                if (m_ShowIhubVunerabilities)
-                {
-                    ShowTCUVunerabilities = false;
-                }
+                m_ShowTCUVunerabilities = !m_ShowIhubVunerabilities;
 
                 OnPropertyChanged("ShowIhubVunerabilities");
+                OnPropertyChanged("ShowTCUVunerabilities");
             }
         }
 
@@ -407,13 +405,11 @@ namespace SMT
 
             set
             {
+
                 m_ShowTCUVunerabilities = value;
+                m_ShowIhubVunerabilities = !m_ShowTCUVunerabilities;
 
-                if (m_ShowTCUVunerabilities)
-                {
-                    ShowIhubVunerabilities = false;
-                }
-
+                OnPropertyChanged("ShowIhubVunerabilities");
                 OnPropertyChanged("ShowTCUVunerabilities");
             }
         }

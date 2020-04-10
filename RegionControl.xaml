@@ -94,7 +94,26 @@
 
                             <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                                <ToggleButton x:Name="ToggleSecurityBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemSecurity}" ToolTip="Show System Security" Width="36" Height="36">
+                                <ToggleButton x:Name="ToggleADMBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemADM}" ToolTip="Show System ADM" Width="30" Height="30">
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleADMBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="Images/ADM.png" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ElementName=ToggleADMBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="Images/ADM Inactive.png" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
+
+
+                                <ToggleButton x:Name="ToggleSecurityBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemSecurity}" ToolTip="Show System Security" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -112,7 +131,7 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSovOwner}" ToolTip="Show Sov Owners" Width="36" Height="36">
+                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSovOwner}" ToolTip="Show Sov Owners" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -130,7 +149,7 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleStandingsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Standings" Width="36" Height="36">
+                                <ToggleButton x:Name="ToggleStandingsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Standings" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -148,7 +167,7 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" Width="36" Height="36">
+                                <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -169,7 +188,26 @@
 
                             <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                                <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="36" Height="36">
+                                <ToggleButton x:Name="TogggleTimersBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemTimers}" ToolTip="Show Timers" Width="30" Height="30">
+                                    <Image>
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=TogggleTimersBtn,Path=IsChecked}" Value="True">
+                                                        <Setter Property="Image.Source" Value="Images/Timer.png" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ElementName=TogggleTimersBtn,Path=IsChecked}" Value="false">
+                                                        <Setter Property="Image.Source" Value="Images/Timer Inactive.png" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </ToggleButton>
+
+
+                                <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -187,7 +225,7 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour" Width="36" Height="36">
+                                <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -205,7 +243,7 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour" Width="36" Height="36">
+                                <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -223,7 +261,7 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour" Width="36" Height="36">
+                                <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour" Width="30" Height="30">
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
