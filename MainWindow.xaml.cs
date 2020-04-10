@@ -46,7 +46,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Mk.2 Peter Han Edition : " + SMTVersion + ")";
+            Title = "SMT (\'Predditors\' Edition : " + SMTVersion + ")";
 
             CheckGitHubVersion();
 
@@ -1397,8 +1397,14 @@ namespace SMT
             preferencesWindow.DataContext = MapConf;
             preferencesWindow.MapConf = MapConf;
             preferencesWindow.ShowDialog();
-
         }
+
+        private void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.UpdateESIUniverseData();
+        }
+
+        
 
         /*
 
