@@ -2479,8 +2479,14 @@ namespace SMT
                 MenuItem setDesto = cm.Items[2] as MenuItem;
                 MenuItem addWaypoint = cm.Items[3] as MenuItem;
 
+                MenuItem characters = cm.Items[4] as MenuItem;
+                characters.Items.Clear();
+
                 setDesto.IsEnabled = false;
                 addWaypoint.IsEnabled = false;
+                
+                characters.IsEnabled = false;
+                characters.Visibility = Visibility.Collapsed;
 
                 if (ActiveCharacter != null && ActiveCharacter.ESILinked)
                 {
@@ -2488,7 +2494,126 @@ namespace SMT
                     addWaypoint.IsEnabled = true;
                 }
 
+                // get a list of characters in this system
+                List<Character> charactersInSystem = new List<Character>();
+                foreach(LocalCharacter lc in EM.LocalCharacters)
+                {
+                    if(lc.Location == selectedSys.Name)
+                    {
+                        charactersInSystem.Add(lc);
+                    }
+                }
+
+                if(charactersInSystem.Count > 0)
+                {
+                    characters.IsEnabled = true;
+                    characters.Visibility = Visibility.Visible;
+
+                    foreach(Character lc in charactersInSystem)
+                    {
+                        MenuItem miChar = new MenuItem();
+                        miChar.Header = lc.Name;
+                        characters.Items.Add(miChar);
+
+
+                        // now create the child menu's
+                        MenuItem miAutoRange = new MenuItem();
+                        miAutoRange.Header = "Auto Jump Range";
+                        miAutoRange.DataContext = lc;
+                        miChar.Items.Add(miAutoRange);
+
+
+                        MenuItem miARNone = new MenuItem();
+                        miARNone.Header = "None";
+                        miARNone.DataContext = "0";
+                        miARNone.Click += characterRightClickAutoRange_Clicked;
+                        miAutoRange.Items.Add(miARNone);
+
+
+                        MenuItem miARSuper = new MenuItem();
+                        miARSuper.Header = "Super/Titan  (6.0LY)";
+                        miARSuper.DataContext = "6";
+                        miARSuper.Click += characterRightClickAutoRange_Clicked;
+                        miAutoRange.Items.Add(miARSuper);
+
+                        MenuItem miARCF = new MenuItem();
+                        miARCF.Header = "Carriers/Fax (7.0LY)";
+                        miARCF.DataContext = "7";
+                        miARCF.Click += characterRightClickAutoRange_Clicked;
+                        miAutoRange.Items.Add(miARCF);
+
+                        MenuItem miARBlops = new MenuItem();
+                        miARBlops.Header = "Black Ops    (8.0LY)";
+                        miARBlops.DataContext = "8";
+                        miARBlops.Click += characterRightClickAutoRange_Clicked;
+                        miAutoRange.Items.Add(miARBlops);
+
+                        MenuItem miARJFR = new MenuItem();
+                        miARJFR.Header = "JF/Rorq     (10.0LY)";
+                        miARJFR.DataContext = "10";
+                        miARJFR.Click += characterRightClickAutoRange_Clicked;
+                        miAutoRange.Items.Add(miARJFR);
+
+
+
+
+
+
+
+
+
+                    }
+
+                }
+
                 cm.IsOpen = true;
+            }
+        }
+
+        private void characterRightClickAutoRange_Clicked(object sender, RoutedEventArgs e)
+        {
+            MenuItem mi = sender as MenuItem;
+            if (mi != null)
+            {
+                EveManager.JumpShip js = EveManager.JumpShip.Super;
+
+                LocalCharacter lc = ((MenuItem)mi.Parent).DataContext as LocalCharacter;
+                    
+
+
+                if (mi.DataContext as string == "6")
+                {
+                    js = EveManager.JumpShip.Super;
+                }
+                if (mi.DataContext as string == "7")
+                {
+                    js = EveManager.JumpShip.Carrier;
+                }
+
+                if (mi.DataContext as string == "8")
+                {
+                    js = EveManager.JumpShip.Blops;
+                }
+
+                if (mi.DataContext as string == "10")
+                {
+                    js = EveManager.JumpShip.JF;
+                }
+
+
+                if (mi.DataContext as string == "0")
+                {
+                    MapConf.ShowJumpDistance = false;
+                    MapConf.CurrentJumpCharacter = "";
+                    MapConf.CurrentJumpSystem = "";
+                }
+                else
+                {
+                    MapConf.ShowJumpDistance = true;
+                    MapConf.CurrentJumpCharacter = lc.Name;
+                    MapConf.CurrentJumpSystem = lc.Location;
+                    MapConf.JumpShipType = js;
+                }
             }
         }
 
