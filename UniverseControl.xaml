@@ -30,7 +30,7 @@
             <Separator />
 
             <MenuItem Header="Show Jump Range">
-                <MenuItem Header="Remove All" DataContext="0" Click="SetJumpRange_Click" />
+                <MenuItem Header="Remove All" DataContext="-1" Click="SetJumpRange_Click" />
                 <MenuItem Header="None" DataContext="0" Click="SetJumpRange_Click" />
                 <MenuItem Header="Ansiblex  (5.0LY)" DataContext="5" Click="SetJumpRange_Click" />
                 <MenuItem Header="Super/Titan  (6.0LY)" DataContext="6" Click="SetJumpRange_Click" />
