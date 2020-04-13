@@ -424,7 +424,6 @@ namespace SMT
             EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
             BridgeInfoL1.Content = string.Empty;
-            BridgeInfoL2.Content = string.Empty;
 
             DynamicMapElements = new List<UIElement>();
 
@@ -1936,7 +1935,6 @@ namespace SMT
                 if (!MapConf.ShowJumpDistance)
                 {
                     BridgeInfoL1.Content = string.Empty;
-                    BridgeInfoL2.Content = string.Empty;
                 }
 
                 if (MapConf.ShowJumpDistance && MapConf.CurrentJumpSystem != null && system.Name != MapConf.CurrentJumpSystem && MapConf.CurrentJumpSystem != "")
@@ -1962,13 +1960,11 @@ namespace SMT
 
                     if (MapConf.CurrentJumpCharacter != "")
                     {
-                        BridgeInfoL1.Content = MapConf.JumpShipType + " range from";
-                        BridgeInfoL2.Content = MapConf.CurrentJumpCharacter + " : " + MapConf.CurrentJumpSystem + " (" + js.Region + ")";
+                        BridgeInfoL1.Content = $"{MapConf.JumpShipType} range from {MapConf.CurrentJumpCharacter} : {MapConf.CurrentJumpSystem} ({js.Region})"; 
                     }
                     else
                     {
-                        BridgeInfoL1.Content = MapConf.JumpShipType + " range from";
-                        BridgeInfoL2.Content = MapConf.CurrentJumpSystem + " (" + js.Region + ")";
+                        BridgeInfoL1.Content = $"{MapConf.JumpShipType} range from : {MapConf.CurrentJumpSystem} ({js.Region})";
                     }
 
                     if (Distance < Max && Distance > 0.0 && system.ActualSystem.TrueSec <= 0.45)

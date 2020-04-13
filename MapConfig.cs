@@ -111,6 +111,7 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
         [Category("Navigation")]
         [DisplayName("Current Jump Character")]
         [ItemsSource(typeof(JumpCharacterItemsSource))]
@@ -127,6 +128,7 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
         [Category("Navigation")]
         [DisplayName("Current Jump System"), ReadOnly(true)]
         public string CurrentJumpSystem
@@ -333,6 +335,7 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
         [Category("Navigation")]
         [DisplayName("Show Jump Distance")]
         public bool ShowJumpDistance { get; set; }
@@ -734,6 +737,8 @@ namespace SMT
             ShowZKillData = true;
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
+            ShowJumpDistance = false;
+            CurrentJumpSystem = "";
             ShowActiveIncursions = true;
             CurrentJumpCharacter = "";
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
