@@ -1897,7 +1897,7 @@ namespace SMT.EVEData
         /// </summary>
         private void StartBackgroundThread()
         {
-            new Thread(() =>
+            new Thread(async ()  =>
             {
                 Thread.CurrentThread.IsBackground = false;
 
@@ -1918,7 +1918,7 @@ namespace SMT.EVEData
                         for (int i = 0; i < LocalCharacters.Count; i++)
                         {
                             LocalCharacter c = LocalCharacters.ElementAt(i);
-                            c.Update();
+                            await c.Update();
                         }
                     }
 

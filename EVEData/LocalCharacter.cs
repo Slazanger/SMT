@@ -21,6 +21,10 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public object ActiveRouteLock;
 
+        [XmlIgnoreAttribute]
+        public SemaphoreSlim UpdateLock;
+
+
         public bool warningSystemsNeedsUpdate = false;
 
         private bool esiRouteNeedsUpdate = false;
@@ -44,37 +48,6 @@ namespace SMT.EVEData
         /// </summary>
         public LocalCharacter()
         {
-            Standings = new Dictionary<long, float>();
-
-            LabelMap = new Dictionary<long, long>();
-            LabelNames = new Dictionary<long, string>();
-
-            CorporationID = -1;
-            AllianceID = -1;
-            FleetInfo = new Fleet();
-            Waypoints = new ObservableCollection<string>();
-            ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
-            DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
-
-            UseAnsiblexGates = true;
-
-            ActiveRouteLock = new object();
-
-            KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Character" /> class.
-        /// </summary>
-        /// <param name="name">Name of Character</param>
-        /// <param name="lcf">Local Chat File Location</param>
-        /// <param name="location">Current Location of Character</param>
-        public LocalCharacter(string name, string lcf, string location)
-        {
-            Name = name;
-            LocalChatFile = lcf;
-            Location = location;
-
             UseAnsiblexGates = true;
 
             ESILinked = false;
@@ -93,6 +66,30 @@ namespace SMT.EVEData
             ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
 
             ActiveRouteLock = new object();
+            UpdateLock = new SemaphoreSlim(1);
+
+            CorporationID = -1;
+            AllianceID = -1;
+            DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
+
+            UseAnsiblexGates = true;
+
+
+            KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Character" /> class.
+        /// </summary>
+        /// <param name="name">Name of Character</param>
+        /// <param name="lcf">Local Chat File Location</param>
+        /// <param name="location">Current Location of Character</param>
+        public LocalCharacter(string name, string lcf, string location)
+            :this()
+        {
+            Name = name;
+            LocalChatFile = lcf;
+            Location = location;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -265,42 +262,49 @@ namespace SMT.EVEData
             if (!ESILinked)
                 return jbl;
 
-            ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-            esiClient.SetCharacterData(ESIAuthData);
-
-            Dictionary<long, ESI.NET.Models.Universe.Structure> SystemJumpGateList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
-
-            esiClient.SetCharacterData(ESIAuthData);
-            ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, JumpBridgeFilterString, SearchCategory.Structure);
-            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
+            await UpdateLock.WaitAsync(); 
             {
-                if (esr.Data.Structures == null)
-                {
-                    return jbl;
-                }
 
-                foreach (long stationID in esr.Data.Structures)
-                {
-                    ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
 
-                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                esiClient.SetCharacterData(ESIAuthData);
+
+                Dictionary<long, ESI.NET.Models.Universe.Structure> SystemJumpGateList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
+
+                esiClient.SetCharacterData(ESIAuthData);
+                ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, JumpBridgeFilterString, SearchCategory.Structure);
+                if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
+                {
+                    if (esr.Data.Structures == null)
                     {
-                        SystemJumpGateList[stationID] = esrs.Data;
-
-                        // found a jump gate
-                        if (esrs.Data.TypeId == 35841)
-                        {
-                            string[] parts = esrs.Data.Name.Split(' ');
-                            string from = parts[0];
-                            string to = parts[2];
-
-                            EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
-                        }
+                        return jbl;
                     }
 
-                    Thread.Sleep(10);
+                    foreach (long stationID in esr.Data.Structures)
+                    {
+                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
+
+                        if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                        {
+                            SystemJumpGateList[stationID] = esrs.Data;
+
+                            // found a jump gate
+                            if (esrs.Data.TypeId == 35841)
+                            {
+                                string[] parts = esrs.Data.Name.Split(' ');
+                                string from = parts[0];
+                                string to = parts[2];
+
+                                EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
+                            }
+                        }
+
+                        Thread.Sleep(10);
+                    }
                 }
             }
+            UpdateLock.Release();
+
 
             return jbl;
         }
@@ -395,29 +399,33 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Character info
         /// </summary>
-        public void Update()
+        public async Task Update()
         {
-            TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
-            if (ts.Minutes < 1)
+            await UpdateLock.WaitAsync();
             {
-                RefreshAccessToken().Wait();
-                UpdateInfoFromESI().Wait();
-            }
+                TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
+                if (ts.Minutes < 1)
+                {
+                    RefreshAccessToken().Wait();
+                    UpdateInfoFromESI().Wait();
+                }
 
-            UpdatePositionFromESI().Wait();
-            //UpdateFleetInfo();
+                UpdatePositionFromESI().Wait();
+                //UpdateFleetInfo();
 
-            if (routeNeedsUpdate)
-            {
-                routeNeedsUpdate = false;
-                UpdateActiveRoute();
-            }
+                if (routeNeedsUpdate)
+                {
+                    routeNeedsUpdate = false;
+                    UpdateActiveRoute();
+                }
 
-            if (warningSystemsNeedsUpdate)
-            {
-                warningSystemsNeedsUpdate = false;
-                UpdateWarningSystems();
+                if (warningSystemsNeedsUpdate)
+                {
+                    warningSystemsNeedsUpdate = false;
+                    UpdateWarningSystems();
+                }
             }
+            UpdateLock.Release();
         }
 
         
