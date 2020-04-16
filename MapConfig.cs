@@ -45,8 +45,6 @@ namespace SMT
 
         private int m_MaxIntelSeconds;
 
-        private bool m_ShowADM;
-
         private bool m_ShowCoalition;
 
         private bool m_ShowDangerZone = false;
@@ -250,21 +248,6 @@ namespace SMT
         [DisplayName("Show Active Incursions")]
         public bool ShowActiveIncursions { get; set; }
 
-        [Category("SOV")]
-        [DisplayName("Show ADM")]
-        public bool ShowADM
-        {
-            get
-            {
-                return m_ShowADM;
-            }
-
-            set
-            {
-                m_ShowADM = value;
-                OnPropertyChanged("ShowADM");
-            }
-        }
 
         [Category("SOV")]
         [DisplayName("Show Coalition")]

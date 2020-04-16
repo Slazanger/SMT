@@ -1812,7 +1812,7 @@ namespace SMT
                     MainCanvas.Children.Add(CynoBeaconLogo);
                 }
 
-                if (MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory && !MapConf.ShowADM)
+                if (MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory && !ShowSystemADM)
                 {
                     Image JoveLogo = new Image
                     {
