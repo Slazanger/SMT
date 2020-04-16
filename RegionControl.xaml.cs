@@ -526,6 +526,9 @@ namespace SMT
                 return;
             }
 
+            FollowCharacter = false;
+            
+
             // close the context menu if its open
             ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
             cm.IsOpen = false;

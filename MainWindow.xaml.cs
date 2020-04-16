@@ -1035,7 +1035,7 @@ namespace SMT
                             RegionRC.SelectRegion(sys.Region);
                         }
 
-                        RegionRC.SelectSystem(s);
+                        RegionRC.SelectSystem(s, true);
                         return;
                     }
                 }
