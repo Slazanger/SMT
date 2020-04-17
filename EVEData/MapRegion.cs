@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Windows;
 
 namespace SMT.EVEData
 {
@@ -96,6 +97,7 @@ namespace SMT.EVEData
         /// </summary>
         public double RegionZ { get; set; }
 
+        
         /// <summary>
         /// Gets or sets the Regions X coord on the universe map
         /// </summary>
@@ -105,6 +107,8 @@ namespace SMT.EVEData
         /// Gets or sets the Regions Y coord on the universe map
         /// </summary>
         public double UniverseViewY { get; set; }
+
+        public List<Point> RegionOutline { get; set; }
 
         /// <summary>
         /// Is the System on this region map : note as we're using the dotlan layout we have out of region systems on the map for navigability reasons

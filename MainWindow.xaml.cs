@@ -23,7 +23,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
         public static MainWindow AppWindow;
-        public string SMTVersion = "SMT_078";
+        public string SMTVersion = "SMT_079";
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 

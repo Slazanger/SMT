@@ -649,6 +649,69 @@ namespace SMT.EVEData
                 }
             }
 
+            // now create the region outlines
+            foreach (MapRegion mr in Regions)
+            {
+                List<nAlpha.Point> regionShapePL = new List<nAlpha.Point>();
+                foreach (System s in Systems)
+                {
+                    if (s.Region == mr.Name)
+                    {
+                        nAlpha.Point p = new nAlpha.Point(s.ActualX, s.ActualZ);
+                        regionShapePL.Add(p);
+                    }
+                }
+
+                nAlpha.AlphaShapeCalculator shapeCalc = new nAlpha.AlphaShapeCalculator();
+                shapeCalc.Alpha = 1/(20 * 9460730472580800.0);
+                shapeCalc.CloseShape = true;
+
+                nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
+
+                mr.RegionOutline = new List<Point>();
+
+
+                List<Tuple<int, int>> processed = new List<Tuple<int, int>>();
+                
+                int CurrentPoint = 0;
+                int count = 0;
+                int edgeCount = ns.Edges.Length;
+                while(count < edgeCount)
+                {
+                    foreach(Tuple<int,int> i in ns.Edges)
+                    {
+                        if (processed.Contains(i))
+                            continue;
+
+
+                        if(i.Item1 == CurrentPoint)
+                        {
+                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
+                            CurrentPoint = i.Item2;
+                            processed.Add(i);
+                            break;
+                        }
+
+                        if (i.Item2 == CurrentPoint)
+                        {
+                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
+                            CurrentPoint = i.Item1;
+                            processed.Add(i);
+                            break;
+                        }
+
+                    }
+
+                    count++;
+
+                }
+
+
+
+            }
+
+
+
             foreach (System s in Systems)
             {
                 NameToSystem[s.Name] = s;

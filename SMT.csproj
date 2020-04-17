@@ -205,6 +205,10 @@
     <Compile Include="EVEData\Navigation.cs" />
     <Compile Include="EVEData\Server.cs" />
     <Compile Include="EVEData\Structure.cs" />
+    <Compile Include="External\nAlpha\AlphaShapeCalculator.cs" />
+    <Compile Include="External\nAlpha\Point.cs" />
+    <Compile Include="External\nAlpha\Shape.cs" />
+    <Compile Include="External\nAlpha\VertexCounter.cs" />
     <Compile Include="GitHubRelease.cs" />
     <Compile Include="NewVersionWindow.xaml.cs">
       <DependentUpon>NewVersionWindow.xaml</DependentUpon>

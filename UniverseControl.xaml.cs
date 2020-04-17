@@ -275,6 +275,8 @@ namespace SMT
         private VisualHost VHRangeHighlights;
         private VisualHost VHDataSpheres;
         private VisualHost VHCapRoute;
+        private VisualHost VHRegionShapes;
+
 
         private VisualHost VHCharacters;
         private VisualHost VHZKB;
@@ -310,6 +312,9 @@ namespace SMT
             VHCharacters = new VisualHost();
             VHZKB = new VisualHost();
             VHCapRoute = new VisualHost();
+            VHRegionShapes = new VisualHost();
+
+            UniverseMainCanvas.Children.Add(VHRegionShapes);
 
             UniverseMainCanvas.Children.Add(VHRangeSpheres);
             UniverseMainCanvas.Children.Add(VHDataSpheres);
@@ -687,6 +692,7 @@ namespace SMT
         private Brush JumpBridgeColourBrush;
         private Brush DataColourBrush;
         private Brush BackgroundColourBrush;
+        private Brush RegionShapeColourBrush;
 
         /// <summary>
         /// Redraw the map
@@ -717,6 +723,16 @@ namespace SMT
                 DataColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
                 BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
 
+                Color RegionShapeFillCol = MapConf.ActiveColourScheme.MapBackgroundColour;
+                RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.9);
+                RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.9);
+                RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.9);
+
+
+
+                RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
+
+
                 SystemColourBrush.Freeze();
                 ConstellationColourBrush.Freeze();
                 SystemTextColourBrush.Freeze();
@@ -726,6 +742,7 @@ namespace SMT
                 DataColourBrush.Freeze();
                 BackgroundColourBrush.Freeze();
                 RegionTextZoomedOutColourBrush.Freeze();
+                RegionShapeColourBrush.Freeze();
             }
 
             SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
@@ -747,6 +764,7 @@ namespace SMT
             {
                 VHLinks.ClearAllChildren();
                 VHNames.ClearAllChildren();
+                VHRegionShapes.ClearAllChildren();
 
                 ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
 
@@ -849,6 +867,45 @@ namespace SMT
 
                     systemTextDrawingContext.Close();
                     VHNames.AddChild(SystemTextVisual, null);
+                }
+
+
+                Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
+                foreach(EVEData.MapRegion mr in EM.Regions)
+                {
+
+                    List<Point> scaledRegionPoints = new List<Point>();
+
+                    foreach( Point p in mr.RegionOutline)
+                    {
+                        double X = (p.X - universeXMin) * universeScale;
+
+                        // need to invert Z
+                        double Z = (universeDepth - (p.Y - universeZMin)) * universeScale;
+
+                        scaledRegionPoints.Add(new Point(X, Z));
+                    }
+
+
+                    StreamGeometry sg = new StreamGeometry();
+                    sg.FillRule = FillRule.Nonzero;
+
+                    using (StreamGeometryContext sgc = sg.Open())
+                    {
+                        sgc.BeginFigure(scaledRegionPoints[0], true, true);
+                        sgc.PolyLineTo(scaledRegionPoints.Skip(1).ToArray(), true, false);
+                    }
+
+
+                    System.Windows.Media.DrawingVisual RegionShapeVisual = new System.Windows.Media.DrawingVisual();
+                    RegionShapeVisual.CacheMode = cm;
+                    DrawingContext regionShapeDrawingContext = RegionShapeVisual.RenderOpen();
+
+                    regionShapeDrawingContext.DrawGeometry(RegionShapeColourBrush, RegionShapePen, sg);
+
+                    regionShapeDrawingContext.Close();
+                    VHRegionShapes.AddChild(RegionShapeVisual, null);
+
                 }
             }
 
@@ -1124,10 +1181,14 @@ namespace SMT
             {
                 VHSystems.Visibility = Visibility.Hidden;
                 ReCreateRegionMarkers(true);
+                VHRegionShapes.Visibility = Visibility.Visible;
+                VHLinks.Visibility = Visibility.Hidden;
             }
             else
             {
                 VHSystems.Visibility = Visibility.Visible;
+                VHRegionShapes.Visibility = Visibility.Hidden;
+                VHLinks.Visibility = Visibility.Visible;
                 ReCreateRegionMarkers(false);
             }
         }
