@@ -46,7 +46,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (\'Predditors\' Edition : " + SMTVersion + ")";
+            Title = "SMT (CYNO23 NEWS : " + SMTVersion + ")";
 
             CheckGitHubVersion();
 
