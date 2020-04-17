@@ -445,6 +445,7 @@ namespace SMT
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+           
 
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;

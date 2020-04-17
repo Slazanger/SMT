@@ -485,7 +485,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            lock (ActiveRouteLock)
+
             {
                 // new routing
 
@@ -494,9 +494,12 @@ namespace SMT.EVEData
 
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
-                    if (Location == Waypoints[0])
+                    lock (ActiveRouteLock)
                     {
-                        Waypoints.RemoveAt(0);
+                        if (Location == Waypoints[0])
+                        {
+                            Waypoints.RemoveAt(0);
+                        }
                     }
 
                     ActiveRoute.Clear();
@@ -512,13 +515,18 @@ namespace SMT.EVEData
 
                     if (sysList != null)
                     {
-                        foreach (Navigation.RoutePoint s in sysList)
+
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            lock (ActiveRouteLock)
                             {
-                                ActiveRoute.Add(s);
-                            }), DispatcherPriority.ContextIdle, null);
-                        }
+                                foreach (Navigation.RoutePoint s in sysList)
+                                {
+                                    ActiveRoute.Add(s);
+                                }
+                            }
+                        }), DispatcherPriority.ContextIdle, null);
+                        
                     }
                 }
             }

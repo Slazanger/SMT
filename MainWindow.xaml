@@ -6,6 +6,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:SMT"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
         xmlns:xcad="clr-namespace:Xceed.Wpf.AvalonDock;assembly=Xceed.Wpf.AvalonDock"
         xmlns:xcadl="clr-namespace:Xceed.Wpf.AvalonDock.Layout;assembly=Xceed.Wpf.AvalonDock"
         xmlns:xcadt="clr-namespace:Xceed.Wpf.AvalonDock.Themes;assembly=Xceed.Wpf.AvalonDock.Themes.Metro"
@@ -333,19 +334,42 @@
                                 <Grid x:Name="MainRouteGrid">
                                     <ScrollViewer Background="#FFE5E5E5">
                                         <StackPanel>
-                                            <Label Content="Navigation Options" />
-                                            <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding Path=ActiveCharacter.UseAnsiblexGates}" />
-                                            <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding Path=ActiveCharacter.NavigationMode}" />
-                                            <Separator />
-                                            <Label Content="Waypoints" />
-                                            <ListBox ItemsSource="{Binding Path=ActiveCharacter.Waypoints}" />
-                                            <Separator />
-                                            <Label Content="Route" />
-                                            <ListBox ItemsSource="{Binding Path=ActiveCharacter.ActiveRoute}" />
-                                            <Separator />
-                                            <Button x:Name="CopyWaypointsBtn" Click="CopyWaypointsBtn_Click" Content="Copy Waypoints" />
-                                            <Separator />
-                                            <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear" />
+
+                                            <GroupBox Header="Navigation Options">
+                                                <StackPanel Margin="4">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Content="Mode"/>
+                                                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding Path=ActiveCharacter.NavigationMode}" Margin="2" Width="150"/>
+                                                    </StackPanel>
+
+                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding Path=ActiveCharacter.UseAnsiblexGates}" Margin="2"/>
+
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="WayPoints">
+                                                <StackPanel Margin="4">
+                                                    <ListBox ItemsSource="{Binding Path=ActiveCharacter.Waypoints}" MinHeight="50" Margin="2"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" FontSize="12" Width="156" SelectionChanged="RouteSystemDropDownAC_SelectionChanged"/>
+                                                        <Button x:Name="AddWaypointsBtn" Click="AddWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
+                                                    </StackPanel>
+
+                                                    <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear All" Margin="2"/>
+
+                                                </StackPanel>
+                                            </GroupBox>
+
+                                            <GroupBox Header="Route">
+                                                <StackPanel Margin="4">
+                                                    <ListBox ItemsSource="{Binding Path=ActiveCharacter.ActiveRoute}" MinHeight="50"/>
+
+                                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                                        <Label Content="Total number of jumps : "/>
+                                                        <Label Content="{Binding Path=ActiveCharacter.ActiveRoute.Count}"/>
+                                                    </StackPanel>
+                                                    <Button x:Name="CopyRouteBtn" Click="CopyRouteBtn_Click" Content="Copy Route" Margin="2" />
+                                                </StackPanel>
+                                            </GroupBox>
                                         </StackPanel>
                                     </ScrollViewer>
                                 </Grid>

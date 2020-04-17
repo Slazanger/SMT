@@ -166,6 +166,12 @@ namespace SMT
 
             AppStatusBar.DataContext = EVEManager.ServerInfo;
 
+            List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
+            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
+            RouteSystemDropDownAC.ItemsSource = globalSystemList;
+
+
+
             ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
             ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
             MapConf.PropertyChanged += MapConf_PropertyChanged;
@@ -725,7 +731,7 @@ namespace SMT
             UniverseUC.ReDrawMap(true, true, true);
         }
 
-        private void CopyWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null)
@@ -1398,7 +1404,32 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
         }
 
-        
+        private void RouteSystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void AddWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(RegionRC.ActiveCharacter == null)
+            {
+                return;
+            }
+
+            if(RouteSystemDropDownAC.SelectedItem == null)
+            {
+                return;
+            }
+            EVEData.System s = RouteSystemDropDownAC.SelectedItem as EVEData.System;
+            
+
+            if(s != null)
+            {
+                RegionRC.ActiveCharacter.AddDestination(s.ID, false);
+            }
+        }
+
+
 
         /*
 
