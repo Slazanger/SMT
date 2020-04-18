@@ -103,10 +103,10 @@ namespace SMT.EVEData
         public float IHubOccupancyLevel { get; set; }
 
         [XmlIgnoreAttribute]
-        public DateTimeOffset IHubVunerabliltyEnd { get; set; }
+        public DateTime IHubVunerabliltyEnd { get; set; }
 
         [XmlIgnoreAttribute]
-        public DateTimeOffset IHubVunerabliltyStart { get; set; }
+        public DateTime IHubVunerabliltyStart { get; set; }
 
         /// <summary>
         /// Gets or sets the list of Jumps from this system
@@ -189,10 +189,10 @@ namespace SMT.EVEData
         public float TCUOccupancyLevel { get; set; }
 
         [XmlIgnoreAttribute]
-        public DateTimeOffset TCUVunerabliltyEnd { get; set; }
+        public DateTime TCUVunerabliltyEnd { get; set; }
 
         [XmlIgnoreAttribute]
-        public DateTimeOffset TCUVunerabliltyStart { get; set; }
+        public DateTime TCUVunerabliltyStart { get; set; }
 
         /// <summary>
         /// Gets or sets the Systems True Security Value
