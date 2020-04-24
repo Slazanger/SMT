@@ -55,7 +55,7 @@ namespace SMT
             {
                 try
                 {
-                    Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                    AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
                     using (var sr = new StreamReader(dockManagerLayoutName))
                     {
                         ls.Deserialize(sr);
@@ -217,9 +217,9 @@ namespace SMT
 
         private MapConfig MapConf { get; }
 
-        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
+        private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
 
-        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
+        private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
 
         public Color stringToColour(string str)
         {
@@ -746,16 +746,16 @@ namespace SMT
             }
         }
 
-        private Xceed.Wpf.AvalonDock.Layout.LayoutDocument FindDocWithContentID(Xceed.Wpf.AvalonDock.Layout.ILayoutElement root, string contentID)
+        private AvalonDock.Layout.LayoutDocument FindDocWithContentID(AvalonDock.Layout.ILayoutElement root, string contentID)
         {
-            Xceed.Wpf.AvalonDock.Layout.LayoutDocument content = null;
+            AvalonDock.Layout.LayoutDocument content = null;
 
-            if (root is Xceed.Wpf.AvalonDock.Layout.ILayoutContainer)
+            if (root is AvalonDock.Layout.ILayoutContainer)
             {
-                Xceed.Wpf.AvalonDock.Layout.ILayoutContainer ic = root as Xceed.Wpf.AvalonDock.Layout.ILayoutContainer;
-                foreach (Xceed.Wpf.AvalonDock.Layout.ILayoutElement ie in ic.Children)
+                AvalonDock.Layout.ILayoutContainer ic = root as AvalonDock.Layout.ILayoutContainer;
+                foreach (AvalonDock.Layout.ILayoutElement ie in ic.Children)
                 {
-                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument f = FindDocWithContentID(ie, contentID);
+                    AvalonDock.Layout.LayoutDocument f = FindDocWithContentID(ie, contentID);
                     if (f != null)
                     {
                         content = f;
@@ -765,9 +765,9 @@ namespace SMT
             }
             else
             {
-                if (root is Xceed.Wpf.AvalonDock.Layout.LayoutDocument)
+                if (root is AvalonDock.Layout.LayoutDocument)
                 {
-                    Xceed.Wpf.AvalonDock.Layout.LayoutDocument i = root as Xceed.Wpf.AvalonDock.Layout.LayoutDocument;
+                    AvalonDock.Layout.LayoutDocument i = root as AvalonDock.Layout.LayoutDocument;
                     if (i.ContentId == contentID)
                     {
                         content = i;
@@ -859,7 +859,7 @@ namespace SMT
             string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\Layout.dat";
             try
             {
-                Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new Xceed.Wpf.AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
                 using (var sw = new StreamWriter(dockManagerLayoutName))
                 {
                     ls.Serialize(sw);
