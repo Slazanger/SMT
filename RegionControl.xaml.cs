@@ -2430,6 +2430,8 @@ namespace SMT
                     MapConf.CurrentJumpSystem = eveSys.Name;
                     MapConf.JumpShipType = js;
                 }
+
+                ReDrawMap(true);
             }
         }
 
