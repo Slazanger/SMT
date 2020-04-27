@@ -746,9 +746,11 @@
 
                         </Storyboard>
                         <Storyboard x:Key="SelectedOn">
+
                             <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRectangle" Storyboard.TargetProperty="(UIElement.Opacity)">
                                 <SplineDoubleKeyFrame KeyTime="00:00:00.1000000" Value="1"/>
                             </DoubleAnimationUsingKeyFrames>
+
                         </Storyboard>
                         <Storyboard x:Key="SelectedOff">
 
@@ -772,7 +774,7 @@
                         <Rectangle x:Name="Background" IsHitTestVisible="False" Opacity="0.25" Fill="{StaticResource NormalBrush}" RadiusX="1" RadiusY="1"/>
                         <Rectangle x:Name="HoverRectangle" IsHitTestVisible="False" Opacity="0" Fill="{StaticResource NormalBrush}" RadiusX="1" RadiusY="1"/>
                         <Rectangle x:Name="SelectedRectangle" IsHitTestVisible="False" Opacity="0" Fill="{StaticResource SelectedBackgroundBrush}" RadiusX="1" RadiusY="1"/>
-                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="{TemplateBinding Padding}" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2"/>
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="5,2,0,2" x:Name="contentPresenter" />
                         <Rectangle x:Name="FocusVisualElement" Stroke="{StaticResource HoverShineBrush}" StrokeThickness="1" RadiusX="1" RadiusY="1" Opacity="0"/>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -788,13 +790,10 @@
 
                             <Trigger.ExitActions>
                                 <BeginStoryboard x:Name="SelectedOff_BeginStoryboard" Storyboard="{StaticResource SelectedOff}"/>
-
                             </Trigger.ExitActions>
                             <Trigger.EnterActions>
                                 <BeginStoryboard x:Name="SelectedOn_BeginStoryboard" Storyboard="{StaticResource SelectedOn}"/>
-
                             </Trigger.EnterActions>
-
 
                         </Trigger>
                         <MultiTrigger>
@@ -821,14 +820,20 @@
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}" />
                         </Trigger>
-
-
-
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Style.Triggers>
+            <Trigger Property="Selector.IsSelected" Value="True">
+                <Setter Property="Foreground">
+                    <Setter.Value>
+                        <SolidColorBrush Color="{DynamicResource BlackColor}" />
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     
@@ -2781,7 +2786,7 @@
                             <Rectangle x:Name="Background" IsHitTestVisible="False" Opacity="0.25" Fill="{StaticResource NormalBrush}" RadiusX="1" RadiusY="1"/>
                             <Rectangle x:Name="HoverRectangle" IsHitTestVisible="False" Opacity="0" Fill="{StaticResource NormalBrush}" RadiusX="1" RadiusY="1"/>
                             <Rectangle x:Name="SelectedRectangle" IsHitTestVisible="False" Opacity="0" Fill="{StaticResource SelectedBackgroundBrush}" RadiusX="1" RadiusY="1"/>
-                            <ContentControl SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="0,2,0,2" VerticalAlignment="Stretch"/>
+                            <ContentControl SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="0,2,0,2" VerticalAlignment="Stretch" Content="{Binding}" />
                         </Grid>
 
                     </Border>

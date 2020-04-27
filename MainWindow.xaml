@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:SMT"
+        xmlns:localEveData="clr-namespace:SMT.EVEData"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
         xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
@@ -25,8 +26,16 @@
         </ObjectDataProvider>
 
 
+        <DataTemplate DataType="{x:Type localEveData:IntelData}">
+            <StackPanel Orientation="Horizontal" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}},Path=ActualWidth}">
+                <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME', diag:PresentationTraceSources.TraceLevel=High}" Foreground="Yellow" Padding="0,0,5,0"/>
+                <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="Wrap"/>
+            </StackPanel>
+        </DataTemplate>
+
     </Window.Resources>
     <DockPanel>
+
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click"/>
@@ -112,20 +121,18 @@
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
                                 <xcadl:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <Grid >
+                                    <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="25" />
                                         </Grid.RowDefinitions>
-                                        <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" >
+                                        <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0">
                                             <ListView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Border>
-                                                        <StackPanel Orientation="Vertical" MinHeight="10">
-                                                            <TextBlock Text="{Binding IntelText}" Foreground="HotPink"/>
-                                                            <TextBlock Text="5678" Foreground="White" />
-                                                        </StackPanel>
-                                                    </Border>
+                                                <DataTemplate >
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME', diag:PresentationTraceSources.TraceLevel=High}" Foreground="Red" Padding="0,0,5,0"/>
+                                                        <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" />
+                                                    </StackPanel>
                                                 </DataTemplate>
                                             </ListView.ItemTemplate>
                                         </ListView>
