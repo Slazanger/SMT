@@ -2317,13 +2317,13 @@ namespace SMT.EVEData
             {
                 ServerInfo.Name = "Tranquility";
                 ServerInfo.NumPlayers = esr.Data.Players;
-                ServerInfo.Version = esr.Data.ServerVersion.ToString();
+                ServerInfo.ServerVersion = esr.Data.ServerVersion;
             }
             else
             {
                 ServerInfo.Name = "Tranquility";
                 ServerInfo.NumPlayers = 0;
-                ServerInfo.Version = "??????";
+                ServerInfo.ServerVersion = 0;
             }
         }
 

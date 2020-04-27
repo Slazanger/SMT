@@ -7,6 +7,7 @@ namespace SMT.EVEData
     public class Server : INotifyPropertyChanged
     {
         private int m_numPlayers;
+        private int m_serverVersion;
 
         private DateTime m_serverTime;
 
@@ -52,7 +53,18 @@ namespace SMT.EVEData
             }
         }
 
-        public string Version { get; set; }
+        public int ServerVersion 
+        { 
+            get
+            {
+                return m_serverVersion;
+            }
+            set
+            {
+                m_serverVersion = value;
+                OnPropertyChanged("ServerVersion");
+            }
+        }
 
         public void UpdateServerTime(object sender, EventArgs e)
         {
