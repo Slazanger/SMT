@@ -91,7 +91,7 @@
                                         <ScrollViewer>
                                             <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
                                                 <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
-                                                <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1"   >
+                                                <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" HeadersVisibility="Column"  >
                                                     <DataGrid.Columns>
                                                         <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
                                                         <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
@@ -313,7 +313,7 @@
                                         <Label Content="{Binding Path=ANOMManager.ActiveSystem.SystemName}" FontSize="18" FontWeight="Bold" />
                                     </StackPanel>
 
-                                    <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ANOMManager.ActiveSystem.Anoms.Values}">
+                                    <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ANOMManager.ActiveSystem.Anoms.Values}" HeadersVisibility="Column">
 
                                         <DataGrid.RowStyle>
                                             <Style TargetType="DataGridRow">
@@ -355,7 +355,7 @@
                             <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer >
                                     <StackPanel>
-                                        <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick">
+                                        <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column">
 
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
@@ -456,7 +456,7 @@
                                 <ScrollViewer>
                                     <StackPanel>
 
-                                        <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick">
+                                        <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick" HeadersVisibility="Column">
 
                                             <DataGrid.RowStyle>
                                                 <Style TargetType="DataGridRow">

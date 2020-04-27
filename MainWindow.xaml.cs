@@ -1471,7 +1471,7 @@ namespace SMT
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             EVEData.ZKillRedisQ.ZKBDataSimple zs = value as EVEData.ZKillRedisQ.ZKBDataSimple;
-            Color rowCol = Colors.WhiteSmoke;
+            Color rowCol = (Color)ColorConverter.ConvertFromString("#FF333333");
             if (zs != null)
             {
                 float Standing = 0.0f;

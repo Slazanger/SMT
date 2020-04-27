@@ -6,6 +6,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/WpfHelpers;component/WpfControls/Zoombox/Themes/Generic.xaml" />
                 <ResourceDictionary Source="Themes/ExpressionDark.xaml" />
+                <ResourceDictionary Source="/DataGridThemes;component/ExpressionDark.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
