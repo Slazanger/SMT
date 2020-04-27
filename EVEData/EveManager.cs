@@ -1848,13 +1848,24 @@ namespace SMT.EVEData
                             {
                                 // check if it is in the intel list already (ie if you have multiple clients running)
                                 bool addToIntel = true;
-                                foreach (EVEData.IntelData idl in IntelDataList)
+
+                                int start = line.IndexOf('>') + 1;
+                                string newIntelString = line.Substring(start);
+
+                                if (newIntelString != null)
                                 {
-                                    if (idl.RawIntelString == line)
+                                    foreach (EVEData.IntelData idl in IntelDataList)
                                     {
-                                        addToIntel = false;
-                                        break;
+                                        if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5 )
+                                        {
+                                            addToIntel = false;
+                                            break;
+                                        }
                                     }
+                                }
+                                else
+                                {
+                                    addToIntel = false;
                                 }
 
                                 if (addToIntel)

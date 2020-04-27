@@ -27,10 +27,10 @@
 
 
         <DataTemplate DataType="{x:Type localEveData:IntelData}">
-            <StackPanel Orientation="Horizontal" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}},Path=ActualWidth}">
+            <DockPanel >
                 <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME', diag:PresentationTraceSources.TraceLevel=High}" Foreground="Yellow" Padding="0,0,5,0"/>
-                <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="Wrap"/>
-            </StackPanel>
+                <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="WrapWithOverflow"/>
+            </DockPanel>
         </DataTemplate>
 
     </Window.Resources>
@@ -130,8 +130,8 @@
                                             <ListView.ItemTemplate>
                                                 <DataTemplate >
                                                     <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME', diag:PresentationTraceSources.TraceLevel=High}" Foreground="Red" Padding="0,0,5,0"/>
-                                                        <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" />
+                                                        <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME', diag:PresentationTraceSources.TraceLevel=High}" Foreground="Red" Padding="0,0,5,0" />
+                                                        <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="WrapWithOverflow"/>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </ListView.ItemTemplate>

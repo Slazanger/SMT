@@ -19,14 +19,9 @@ namespace SMT.EVEData
         public IntelData(string intelText)
         {
             RawIntelString = intelText;
-            IntelString = string.Empty;
             // text will be in the format ﻿[ 2017.05.01 18:24:28 ] Charname > blah, blah blah
-            string[] bits = intelText.Split('>');
-            if (bits.Length >= 1)
-            {
-                IntelString = bits[1];
-                IntelString.Trim();
-            }
+            int start = intelText.IndexOf('>') + 1;
+            IntelString = intelText.Substring(start);
             IntelTime = DateTime.Now;
             Systems = new List<string>();
             ClearNotification = false;
