@@ -113,6 +113,13 @@ namespace SMT
             EVEManager.SetupIntelWatcher();
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
 
+             //object t = FindResource("IntelDataTemplate");
+            //RawIntelBox.ItemTemplate = t as DataTemplate;
+            //CollectionViewSource.GetDefaultView(RawIntelBox.ItemsSource).Refresh();
+
+
+
+
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.UpdateESIUniverseData();
@@ -159,12 +166,7 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
-            MainAnomGrid.DataContext = ANOMManager;
             RegionRC.ANOMManager = ANOMManager;
-
-            MainRouteGrid.DataContext = RegionRC;
-
-            AppStatusBar.DataContext = EVEManager.ServerInfo;
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
@@ -215,7 +217,7 @@ namespace SMT
         /// </summary>
         public EVEData.EveManager EVEManager { get; set; }
 
-        private MapConfig MapConf { get; }
+        public MapConfig MapConf { get; }
 
         private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
 
@@ -325,7 +327,6 @@ namespace SMT
 
             MainUniverseCanvas.Background = BackgroundColourBrush;
             MainUniverseGrid.Background = BackgroundColourBrush;
-            RegionsToolBoxCanvas.DataContext = MapConf;
 
             foreach (EVEData.MapRegion mr in EVEManager.Regions)
             {

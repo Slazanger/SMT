@@ -8,10 +8,10 @@
         mc:Ignorable="d"
         Title="Preferences" Height="455" Width="600">
     <Grid>
-        <DockPanel>
+        <DockPanel Background="{DynamicResource NormalBrush}">
             <TabControl x:Name="tabControl" DockPanel.Dock="Top" >
                 <TabItem Header="General">
-                    <Grid Background="#FFE5E5E5">
+                    <Grid >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
                             <ColumnDefinition Width="50*" />
@@ -25,7 +25,7 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Region/Universe" HorizontalAlignment="Left" >
-                    <Grid Background="#FFE5E5E5">
+                    <Grid >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
                             <ColumnDefinition Width="50*" />
@@ -74,7 +74,7 @@
                 </TabItem>
 
                 <TabItem Header="Intel">
-                    <Grid Background="#FFE5E5E5">
+                    <Grid >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
                             <ColumnDefinition Width="50*" />
@@ -121,7 +121,7 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="SOV">
-                    <Grid Background="#FFE5E5E5">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
                             <ColumnDefinition Width="50*" />

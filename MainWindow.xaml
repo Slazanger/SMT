@@ -9,9 +9,10 @@
         xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
         xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
         xmlns:xcadl="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
-        xmlns:xcadt="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Metro"
+        xmlns:xcadt="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Expression"
         mc:Ignorable="d"
-        Title="SMT" Height="850" Width="1124" Background="#FFEEEEEE" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
 
@@ -22,6 +23,8 @@
                 <x:Type TypeName="local:RoutingMode" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+
+
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -35,13 +38,13 @@
             </MenuItem>
 
         </Menu>
-        <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom">
+        <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom" Background="{DynamicResource NormalBrush}">
             <StatusBarItem>
                 <TextBlock>EVE Time :</TextBlock>
             </StatusBarItem>
 
             <StatusBarItem>
-                <TextBlock Text="{Binding ServerTime, StringFormat=HH:mm}" />
+                <TextBlock Text="{Binding Path=EVEManager.ServerInfo.ServerTime, StringFormat=HH:mm}" Foreground="White" />
             </StatusBarItem>
 
             <Separator />
@@ -51,22 +54,22 @@
             </StatusBarItem>
 
             <StatusBarItem>
-                <TextBlock Text="{Binding Version}" />
+                <TextBlock Text="{Binding Path=EVEManager.ServerInfo.ServerVersion, diag:PresentationTraceSources.TraceLevel=High}" Foreground="White"/>
             </StatusBarItem>
 
             <Separator />
 
             <StatusBarItem>
-                <TextBlock Text="{Binding NumPlayers}" />
+                <TextBlock Text="{Binding Path=EVEManager.ServerInfo.NumPlayers, diag:PresentationTraceSources.TraceLevel=High}" Foreground="White"/>
             </StatusBarItem>
 
-            <StatusBarItem>
+            <StatusBarItem >
                 <TextBlock Text="Players" />
             </StatusBarItem>
         </StatusBar>
         <xcad:DockingManager x:Name="dockManager" >
             <xcad:DockingManager.Theme>
-                <xcadt:MetroTheme />
+                <xcadt:ExpressionDarkTheme/>
             </xcad:DockingManager.Theme>
 
             <xcadl:LayoutRoot>
@@ -75,11 +78,11 @@
                         <xcadl:LayoutAnchorablePaneGroup DockWidth="250" DockMinWidth="250" Orientation="Vertical">
                             <xcadl:LayoutAnchorablePane>
                                 <xcadl:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <Grid Background="#FFE5E5E5">
+                                    <Grid>
                                         <ScrollViewer>
                                             <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
                                                 <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
-                                                <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" >
+                                                <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1"   >
                                                     <DataGrid.Columns>
                                                         <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
                                                         <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
@@ -109,12 +112,23 @@
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
                                 <xcadl:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <Grid Background="#FFE5E5E5">
+                                    <Grid >
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="25" />
                                         </Grid.RowDefinitions>
-                                        <ListBox x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" />
+                                        <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" >
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border>
+                                                        <StackPanel Orientation="Vertical" MinHeight="10">
+                                                            <TextBlock Text="{Binding IntelText}" Foreground="HotPink"/>
+                                                            <TextBlock Text="5678" Foreground="White" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
                                         <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
@@ -125,10 +139,10 @@
                             <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Regions">
                                 <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1">
                                     <Popup x:Name="RegionCharacterInfo" IsOpen="False" AllowsTransparency="True">
-                                        <StackPanel x:Name="RegionCharacterInfoSP" Background="Gray" />
+                                        <StackPanel x:Name="RegionCharacterInfoSP" />
                                     </Popup>
                                     <Popup x:Name="RegionTheraInfo" IsOpen="False" AllowsTransparency="True">
-                                        <StackPanel x:Name="RegionTheraInfoSP" Background="Gray" />
+                                        <StackPanel x:Name="RegionTheraInfoSP" />
                                     </Popup>
 
                                     <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -143,7 +157,17 @@
 
                                                     <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                                                        <ToggleButton x:Name="ToggleStandingsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowRegionStandings}" ToolTip="Show Region Standings" Width="30" Height="30">
+                                                        <ToggleButton x:Name="ToggleStandingsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=MapConf.ShowRegionStandings}" ToolTip="Show Region Standings" Width="30" Height="30"  >
+                                                            <ToggleButton.Style>
+                                                                <Style TargetType="{x:Type ToggleButton}">
+                                                                    <Setter Property="Background">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush Color="Transparent" >
+                                                                            </SolidColorBrush>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Style>
+                                                            </ToggleButton.Style>
                                                             <Image>
                                                                 <Image.Style>
                                                                     <Style TargetType="Image">
@@ -161,7 +185,17 @@
                                                             </Image>
                                                         </ToggleButton>
 
-                                                        <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowUniversePods}" ToolTip="Pod kills in the Last hour" Width="30" Height="30">
+                                                        <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=MapConf.ShowUniversePods}" ToolTip="Pod kills in the Last hour" Width="30" Height="30">
+                                                            <ToggleButton.Style>
+                                                                <Style TargetType="{x:Type ToggleButton}">
+                                                                    <Setter Property="Background">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush Color="Transparent" >
+                                                                            </SolidColorBrush>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Style>
+                                                            </ToggleButton.Style>
                                                             <Image>
                                                                 <Image.Style>
                                                                     <Style TargetType="Image">
@@ -179,7 +213,17 @@
                                                             </Image>
                                                         </ToggleButton>
 
-                                                        <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowUniverseKills}" ToolTip="Ship kill in the Last hour" Width="30" Height="30">
+                                                        <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="Transparent" Foreground="Transparent" IsChecked="{Binding Path=MapConf.ShowUniverseKills}" ToolTip="Ship kill in the Last hour" Width="30" Height="30" >
+                                                            <ToggleButton.Style>
+                                                                <Style TargetType="{x:Type ToggleButton}">
+                                                                    <Setter Property="Background">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush Color="Transparent" >
+                                                                            </SolidColorBrush>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Style>
+                                                            </ToggleButton.Style>
                                                             <Image>
                                                                 <Image.Style>
                                                                     <Style TargetType="Image">
@@ -197,7 +241,17 @@
                                                             </Image>
                                                         </ToggleButton>
 
-                                                        <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowUniverseRats}" ToolTip="NPC Kills in the Last hour" Width="30" Height="30">
+                                                        <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=MapConf.ShowUniverseRats}" ToolTip="NPC Kills in the Last hour" Width="30" Height="30">
+                                                            <ToggleButton.Style>
+                                                                <Style TargetType="{x:Type ToggleButton}">
+                                                                    <Setter Property="Background">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush Color="Transparent" >
+                                                                            </SolidColorBrush>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Style>
+                                                            </ToggleButton.Style>
                                                             <Image>
                                                                 <Image.Style>
                                                                     <Style TargetType="Image">
@@ -216,7 +270,7 @@
                                                         </ToggleButton>
                                                     </StackPanel>
 
-                                                    <Slider  Width="130" Cursor="Arrow" Margin="0" Value="{Binding UniverseDataScale}" Minimum="0.1" Maximum="5" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="19" ToolTip="Overlay/Data Scale" TickPlacement="Both" SmallChange="0.2" IsSnapToTickEnabled="True" />
+                                                    <Slider  Width="130" Cursor="Arrow" Margin="0" Value="{Binding MapConf.UniverseDataScale}" Minimum="0.1" Maximum="5" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="19" ToolTip="Overlay/Data Scale" TickPlacement="Both" SmallChange="0.2" IsSnapToTickEnabled="True" />
                                                 </StackPanel>
                                             </Grid>
                                         </Canvas>
@@ -241,7 +295,7 @@
                         <xcadl:LayoutAnchorGroup>
 
                             <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <Grid x:Name="MainAnomGrid" Background="#FFE5E5E5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <Grid x:Name="MainAnomGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="60" />
                                         <RowDefinition Height="*" />
@@ -249,10 +303,10 @@
                                     </Grid.RowDefinitions>
                                     <StackPanel Grid.Row="0">
                                         <Button x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" />
-                                        <Label Content="{Binding Path=ActiveSystem.SystemName}" FontSize="18" FontWeight="Bold" />
+                                        <Label Content="{Binding Path=ANOMManager.ActiveSystem.SystemName}" FontSize="18" FontWeight="Bold" />
                                     </StackPanel>
 
-                                    <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ActiveSystem.Anoms.Values}">
+                                    <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ANOMManager.ActiveSystem.Anoms.Values}">
 
                                         <DataGrid.RowStyle>
                                             <Style TargetType="DataGridRow">
@@ -282,7 +336,7 @@
                             </xcadl:LayoutAnchorable>
 
                             <xcadl:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer Background="#FFE5E5E5">
+                                <ScrollViewer >
                                     <StackPanel>
                                         <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
                                         <Separator />
@@ -292,7 +346,7 @@
                             </xcadl:LayoutAnchorable>
 
                             <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer Background="#FFE5E5E5">
+                                <ScrollViewer >
                                     <StackPanel>
                                         <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick">
 
@@ -332,23 +386,23 @@
 
                             <xcadl:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid x:Name="MainRouteGrid">
-                                    <ScrollViewer Background="#FFE5E5E5">
+                                    <ScrollViewer>
                                         <StackPanel>
 
                                             <GroupBox Header="Navigation Options">
                                                 <StackPanel Margin="4">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Label Content="Mode"/>
-                                                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding Path=ActiveCharacter.NavigationMode}" Margin="2" Width="150"/>
+                                                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ElementName=RegionRC, Path=ActiveCharacter.NavigationMode}" Margin="2" Width="150"/>
                                                     </StackPanel>
 
-                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding Path=ActiveCharacter.UseAnsiblexGates}" Margin="2"/>
+                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ElementName=RegionRC, Path=ActiveCharacter.UseAnsiblexGates}" Margin="2"/>
 
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding Path=ActiveCharacter.Waypoints}" MinHeight="50" Margin="2"/>
+                                                    <ListBox ItemsSource="{Binding ElementName=RegionRC, Path=ActiveCharacter.Waypoints}" MinHeight="50" Margin="2"/>
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" FontSize="12" Width="156" SelectionChanged="RouteSystemDropDownAC_SelectionChanged"/>
                                                         <Button x:Name="AddWaypointsBtn" Click="AddWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
@@ -361,11 +415,11 @@
 
                                             <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding Path=ActiveCharacter.ActiveRoute}" MinHeight="50"/>
+                                                    <ListBox ItemsSource="{Binding ElementName=RegionRC, Path=ActiveCharacter.ActiveRoute}" MinHeight="50"/>
 
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <Label Content="Total number of jumps : "/>
-                                                        <Label Content="{Binding Path=ActiveCharacter.ActiveRoute.Count}"/>
+                                                        <Label Content="{Binding ElementName=RegionRC, Path=ActiveCharacter.ActiveRoute.Count}"/>
                                                     </StackPanel>
                                                     <Button x:Name="CopyRouteBtn" Click="CopyRouteBtn_Click" Content="Copy Route" Margin="2" />
                                                 </StackPanel>
@@ -392,7 +446,7 @@
 -->
 
                             <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer Background="#FFE5E5E5">
+                                <ScrollViewer>
                                     <StackPanel>
 
                                         <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick">

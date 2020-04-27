@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
         Title="Update Available" Height="300" Width="400" ResizeMode="NoResize" Loaded="Window_Loaded">
-    <Grid Background="#FFF1F1F1">
-        <ScrollViewer>
+    <Grid>
+        <ScrollViewer Background="{DynamicResource NormalBrush}">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Content="New Version: " FontWeight="Bold" />

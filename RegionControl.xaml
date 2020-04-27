@@ -65,8 +65,8 @@
             <ComboBox x:Name="CharacterDropDown"  Width="150"  Margin="5,0" HorizontalAlignment="Center" SelectionChanged="CharacterDropDown_SelectionChanged" DropDownClosed="CharacterDropDown_DropDownClosed" />
             <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
             <Separator />
-            <Label Content="Search :" />
-            <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged">
+            <Label Content="Search :" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged" Template="{DynamicResource ComboBoxTemplate}">
                 <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
@@ -76,18 +76,23 @@
         </StackPanel>
 
         <Grid x:Name="MainCanvasGrid" ClipToBounds="True" Grid.Row="1">
-            <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="600*"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="193*"/>
+            </Grid.ColumnDefinitions>
+            <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" Grid.ColumnSpan="3">
                 <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
             </zoombox1:ZoomControl>
-            <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,50,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" />
+            <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,0,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" Grid.Column="2" />
 
             <Label x:Name="BridgeInfoL1" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="20,0,0,20" VerticalAlignment="Bottom" FontSize="14" Panel.ZIndex="50" FontWeight="Bold" RenderTransformOrigin="-4.3,7.3" />
-            <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3" />
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,160" x:Name="AllianceNameList" Visibility="Visible" Width="190" Panel.ZIndex="111">
+            <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3" Grid.ColumnSpan="3" />
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,160" x:Name="AllianceNameList" Visibility="Visible" Width="190" Panel.ZIndex="111" Grid.ColumnSpan="3">
                 <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom" />
             </Border>
 
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="190" Height="130" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}">
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="190" Height="130" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}" Grid.ColumnSpan="3">
                 <Canvas x:Name="ToolBoxCanvas">
                     <Grid Canvas.Left="0" Canvas.Top="2" Width="210">
 
@@ -97,6 +102,17 @@
                             <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
                                 <ToggleButton x:Name="ToggleADMBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemADM}" ToolTip="Show System ADM" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -116,6 +132,17 @@
 
 
                                 <ToggleButton x:Name="ToggleSecurityBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemSecurity}" ToolTip="Show System Security" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -133,7 +160,17 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSovOwner}" ToolTip="Show Sov Owners" Width="30" Height="30">
+                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" BorderThickness="0" IsChecked="{Binding Path=ShowSovOwner}" ToolTip="Show Sov Owners" Width="30" Height="30" >
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -152,6 +189,17 @@
                                 </ToggleButton>
 
                                 <ToggleButton x:Name="ToggleStandingsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowStandings}" ToolTip="Show Standings" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -170,6 +218,17 @@
                                 </ToggleButton>
 
                                 <ToggleButton x:Name="ToggleJumpBridgesBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowJumpBridges}" ToolTip="Show Jump Bridges" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -191,6 +250,17 @@
                             <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
                                 <ToggleButton x:Name="TogggleTimersBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemTimers}" ToolTip="Show Timers" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -210,6 +280,17 @@
 
 
                                 <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -228,6 +309,17 @@
                                 </ToggleButton>
 
                                 <ToggleButton x:Name="TogglePodKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowPodKills}" ToolTip="Pod kills in the Last hour" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -246,6 +338,17 @@
                                 </ToggleButton>
 
                                 <ToggleButton x:Name="ToggleShipKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Foreground="{x:Null}" IsChecked="{Binding Path=ShowShipKills}" ToolTip="Ship kill in the Last hour" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">
@@ -264,6 +367,17 @@
                                 </ToggleButton>
 
                                 <ToggleButton x:Name="ToggleRatKillsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowNPCKills}" ToolTip="NPC Kills in the Last hour" Width="30" Height="30">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" >
+                                                    </SolidColorBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+
                                     <Image>
                                         <Image.Style>
                                             <Style TargetType="Image">

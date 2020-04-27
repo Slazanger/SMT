@@ -20,8 +20,8 @@ namespace SMT
     {
         public static readonly RoutedEvent UniverseSystemSelectEvent = EventManager.RegisterRoutedEvent("UniverseSystemSelect", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
         private const int SYSTEM_LINK_INDEX = 19;
-        private const double SYSTEM_REGION_TEXT_X_OFFSET = 5;
-        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 2;
+        private const double SYSTEM_REGION_TEXT_X_OFFSET = 9;
+        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 5;
         private const double SYSTEM_SHAPE_OFFSET = SYSTEM_SHAPE_SIZE / 2;
         private const double SYSTEM_SHAPE_SIZE = 20;
         private const double SYSTEM_TEXT_TEXT_SIZE = 7;
@@ -113,6 +113,7 @@ namespace SMT
         public RegionControl()
         {
             InitializeComponent();
+            DataContext = this;
         }
 
         public event PropertyChangedEventHandler CharacterSelectionChanged;
@@ -439,8 +440,6 @@ namespace SMT
             uiRefreshTimer.Start();
 
             DataContext = this;
-
-            //ToolBoxCanvas.DataContext = this;
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
@@ -1422,6 +1421,8 @@ namespace SMT
 
             Brush ConstellationHighlight = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationHighlightColour);
 
+            Brush DarkTextColourBrush = new SolidColorBrush(Colors.Black);
+
             Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
             bgtc.A = 192;
             Brush SysTextBackgroundBrush = new SolidColorBrush(bgtc);
@@ -1715,9 +1716,16 @@ namespace SMT
                 {
                     Label sovADM = new Label();
                     sovADM.Content = "1.0";
-                    sovADM.FontSize = 8;
+                    sovADM.FontSize = 9;
                     sovADM.IsHitTestVisible = false;
                     sovADM.Content = $"{system.ActualSystem.IHubOccupancyLevel:f1}";
+                    sovADM.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    sovADM.VerticalContentAlignment = VerticalAlignment.Center;
+                    sovADM.Width = SYSTEM_SHAPE_SIZE;
+                    sovADM.Height = SYSTEM_SHAPE_SIZE;
+                    sovADM.Foreground = DarkTextColourBrush;
+
+
                     Canvas.SetLeft(sovADM, system.LayoutX - SYSTEM_SHAPE_OFFSET);
                     Canvas.SetTop(sovADM, system.LayoutY - SYSTEM_SHAPE_OFFSET);
                     Canvas.SetZIndex(sovADM, SYSTEM_Z_INDEX - 1);
@@ -1979,7 +1987,8 @@ namespace SMT
 
                         DistanceText.Content = JD;
                         DistanceText.FontSize = 9;
-                        regionMarkerOffset += 8;
+                        DistanceText.Foreground = DarkTextColourBrush;
+                        regionMarkerOffset += 10;
 
                         Canvas.SetLeft(DistanceText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
                         Canvas.SetTop(DistanceText, system.LayoutY + SYSTEM_REGION_TEXT_Y_OFFSET);

@@ -125,6 +125,7 @@ namespace SMT
         public UniverseControl()
         {
             InitializeComponent();
+            DataContext = this;
         }
 
         private struct GateHelper
