@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Auth.." Height="120" Width="250" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closed="Window_Closed">
     <Grid>
-        <StackPanel>
+        <StackPanel Background="#FF232223">
             <Label>logon using the browser that opened...</Label>
         </StackPanel>
     </Grid>

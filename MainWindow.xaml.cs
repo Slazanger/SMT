@@ -23,7 +23,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
         public static MainWindow AppWindow;
-        public string SMTVersion = "SMT_079";
+        public string SMTVersion = "SMT_080";
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
@@ -547,7 +547,7 @@ namespace SMT
                     FactionText.VerticalContentAlignment = VerticalAlignment.Bottom;
 
                     Canvas.SetLeft(FactionText, mr.UniverseViewX - 40);
-                    Canvas.SetTop(FactionText, mr.UniverseViewY - 15);
+                    Canvas.SetTop(FactionText, mr.UniverseViewY - 20);
                     Canvas.SetZIndex(FactionText, 23);
                     MainUniverseCanvas.Children.Add(FactionText);
                 }
@@ -1427,6 +1427,22 @@ namespace SMT
             if(s != null)
             {
                 RegionRC.ActiveCharacter.AddDestination(s.ID, false);
+            }
+        }
+
+        private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if(miFullScreenToggle.IsChecked)
+            {
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+
+            }
+            else
+            {
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                WindowState = WindowState.Normal;
+
             }
         }
 

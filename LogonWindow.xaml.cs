@@ -52,7 +52,7 @@ namespace SMT
                 {
                     // now close the window
                     Close();
-                }), DispatcherPriority.ContextIdle, null);
+                }), DispatcherPriority.Normal, null);
             }
             catch
             {
