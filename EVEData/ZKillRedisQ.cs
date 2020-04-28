@@ -20,17 +20,10 @@ namespace SMT.EVEData
     /// </summary>
     public class ZKillRedisQ
     {
-        private Thread updateThread;
-        private bool updateThreadRunning = true;
         private BackgroundWorker backgroundWorker;
 
 
-        ~ZKillRedisQ()
-        {
-            updateThreadRunning = false;
-        }
-
-        /// <summary>
+         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
         /// </summary>
         public ObservableCollection<ZKBDataSimple> KillStream { get; set; }

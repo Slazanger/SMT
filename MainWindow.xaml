@@ -57,7 +57,7 @@
             </StatusBarItem>
 
             <StatusBarItem>
-                <TextBlock Text="{Binding Path=EVEManager.ServerInfo.ServerTime, StringFormat=HH:mm}" Foreground="White" />
+                <TextBlock Text="{Binding Path=ServerTime, StringFormat=HH:mm}" Foreground="White" />
             </StatusBarItem>
 
             <Separator />
@@ -67,13 +67,13 @@
             </StatusBarItem>
 
             <StatusBarItem>
-                <TextBlock Text="{Binding Path=EVEManager.ServerInfo.ServerVersion}" Foreground="White"/>
+                <TextBlock Text="{Binding Path=ServerVersion}" Foreground="White"/>
             </StatusBarItem>
 
             <Separator />
 
             <StatusBarItem>
-                <TextBlock Text="{Binding Path=EVEManager.ServerInfo.NumPlayers}" Foreground="White"/>
+                <TextBlock Text="{Binding Path=NumPlayers}" Foreground="White"/>
             </StatusBarItem>
 
             <StatusBarItem >

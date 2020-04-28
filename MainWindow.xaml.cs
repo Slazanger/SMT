@@ -44,7 +44,10 @@ namespace SMT
             AppWindow = this;
             DataContext = this;
 
+
             InitializeComponent();
+
+
 
             Title = "SMT (CYNO23 NEWS : " + SMTVersion + ")";
 
@@ -141,6 +144,8 @@ namespace SMT
             UniverseUC.MapConf = MapConf;
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+
+            AppStatusBar.DataContext = EVEManager.ServerInfo;
 
             // load the anom data
             string anomDataFilename = EVEManager.SaveDataFolder + @"\Anoms.dat";
