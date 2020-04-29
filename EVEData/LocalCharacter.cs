@@ -525,7 +525,7 @@ namespace SMT.EVEData
                                     ActiveRoute.Add(s);
                                 }
                             }
-                        }), DispatcherPriority.ContextIdle, null);
+                        }), DispatcherPriority.Normal, null);
                         
                     }
                 }

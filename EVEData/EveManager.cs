@@ -65,7 +65,7 @@ namespace SMT.EVEData
         /// </summary>
         public EveManager(string version)
         {
-            LocalCharacters = new ObservableCollection<LocalCharacter>();
+            LocalCharacters = new BindingList<LocalCharacter>();
             VersionStr = version;
 
             // ensure we have the cache folder setup
@@ -191,7 +191,7 @@ namespace SMT.EVEData
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<LocalCharacter> LocalCharacters { get; set; }
+        public BindingList<LocalCharacter> LocalCharacters { get; set; }
 
         /// <summary>
         /// Gets or sets the master list of Regions
@@ -1117,7 +1117,7 @@ namespace SMT.EVEData
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     LocalCharacters.Add(esiChar);
-                }), DispatcherPriority.ContextIdle, null);
+                }), DispatcherPriority.Normal, null);
             }
 
             esiChar.ESIRefreshToken = acd.RefreshToken;
@@ -1463,7 +1463,6 @@ namespace SMT.EVEData
             //StartUpdateStructureHunterUpdate();
 
             StartUpdateSovStructureUpdate();
-
             StartUpdateDotlanKillDeltaInfo();
         }
 
@@ -1511,7 +1510,7 @@ namespace SMT.EVEData
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 TheraConnections.Clear();
-            }), DispatcherPriority.ContextIdle, null);
+            }), DispatcherPriority.Normal, null);
 
             request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
         }
@@ -1783,7 +1782,7 @@ namespace SMT.EVEData
                                         Application.Current.Dispatcher.Invoke((Action)(() =>
                                         {
                                             LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        }), DispatcherPriority.ContextIdle, null);
+                                        }), DispatcherPriority.Normal, null);
                                     }
 
                                     break;
@@ -1839,7 +1838,7 @@ namespace SMT.EVEData
                                             c.Location = system;
                                         }
                                     }
-                                }), DispatcherPriority.ContextIdle, null);
+                                }), DispatcherPriority.Normal, null);
                             }
                         }
                         else
@@ -1907,7 +1906,7 @@ namespace SMT.EVEData
                                 {
                                     outputLog.Info("Already have Line : {0} ", line);
                                 }
-                            }), DispatcherPriority.ContextIdle, null);
+                            }), DispatcherPriority.Normal, null);
                         }
 
                         line = file.ReadLine();
@@ -2377,7 +2376,7 @@ namespace SMT.EVEData
                                     Application.Current.Dispatcher.Invoke((Action)(() =>
                                     {
                                         TheraConnections.Add(tc);
-                                    }), DispatcherPriority.ContextIdle, null);
+                                    }), DispatcherPriority.Normal, null);
                                 }
                             }
                         }

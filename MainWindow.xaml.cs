@@ -213,8 +213,6 @@ namespace SMT
             ResetIntelSize();
         }
 
-
-
         public EVEData.AnomManager ANOMManager { get; set; }
 
         /// <summary>
@@ -1527,7 +1525,7 @@ namespace SMT
 
                     if (Standing == 10.0)
                     {
-                        rowCol = Colors.CornflowerBlue;
+                        rowCol = Colors.Blue;
                     }
                 }
 
