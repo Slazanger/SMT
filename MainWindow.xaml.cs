@@ -23,7 +23,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
         public static MainWindow AppWindow;
-        public string SMTVersion = "SMT_080";
+        public string SMTVersion = "SMT_081";
 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
@@ -115,12 +115,6 @@ namespace SMT
 
             EVEManager.SetupIntelWatcher();
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
-
-             //object t = FindResource("IntelDataTemplate");
-            //RawIntelBox.ItemTemplate = t as DataTemplate;
-            //CollectionViewSource.GetDefaultView(RawIntelBox.ItemsSource).Refresh();
-
-
 
 
             // load jump bridge data
