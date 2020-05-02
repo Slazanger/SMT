@@ -727,6 +727,9 @@ namespace SMT
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
             SOVBasedITCU = true;
+
+            ShowIhubVunerabilities = true;
+
             ShowJoveObservatories = true;
 
             UniverseMaxZoomDisplaySystems = 1.3f;
