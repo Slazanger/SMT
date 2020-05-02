@@ -2244,6 +2244,9 @@ namespace SMT
 
                 List<Label> AllianceNameListLabels = new List<Label>();
 
+                Thickness p = new Thickness(3);
+
+
                 foreach (long allianceID in AlliancesKeyList)
                 {
                     string allianceName = EM.GetAllianceName(allianceID);
@@ -2254,6 +2257,7 @@ namespace SMT
                     akl.DataContext = allianceID.ToString();
                     akl.Content = $"{allianceTicker}\t{allianceName}";
                     akl.Foreground = fontColour;
+                    akl.Margin = p; 
 
                     if (allianceID == SelectedAlliance)
                     {
