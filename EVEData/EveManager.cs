@@ -1098,6 +1098,11 @@ namespace SMT.EVEData
             string code = query["code"];
 
             SsoToken sst = await ESIClient.SSO.GetToken(GrantType.AuthorizationCode, code);
+            if(sst == null || sst.ExpiresIn == 0)
+            {
+                return;
+            }
+
             AuthorizedCharacterData acd = await ESIClient.SSO.Verify(sst);
 
             // now find the matching character and update..
