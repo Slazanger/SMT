@@ -24,6 +24,7 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public SemaphoreSlim UpdateLock;
 
+        public static readonly string SaveVersion = "01";
 
         public bool warningSystemsNeedsUpdate = false;
 

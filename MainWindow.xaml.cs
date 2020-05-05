@@ -142,7 +142,7 @@ namespace SMT
             AppStatusBar.DataContext = EVEManager.ServerInfo;
 
             // load the anom data
-            string anomDataFilename = EVEManager.SaveDataFolder + @"\Anoms.dat";
+            string anomDataFilename = EVEManager.SaveDataVersionFolder + @"\Anoms.dat";
             if (File.Exists(anomDataFilename))
             {
                 try
@@ -888,7 +888,7 @@ namespace SMT
                 // save the Anom Data
                 // now serialise the class to disk
                 XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
-                string anomDataFilename = EVEManager.SaveDataFolder + @"\Anoms.dat";
+                string anomDataFilename = EVEManager.SaveDataVersionFolder + @"\Anoms.dat";
 
                 using (TextWriter tw = new StreamWriter(anomDataFilename))
                 {
