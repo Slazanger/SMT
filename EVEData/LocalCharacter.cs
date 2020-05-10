@@ -512,7 +512,7 @@ namespace SMT.EVEData
                     start = end;
                     end = Waypoints[i];
 
-                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, NavigationMode);
+                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, false, NavigationMode);
 
                     if (sysList != null)
                     {

@@ -7,8 +7,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Preferences" Height="455" Width="600">
-    <Grid>
-        <DockPanel Background="{DynamicResource NormalBrush}">
+    <Grid Background="{DynamicResource ButtonBorder}">
+        <DockPanel>
             <TabControl x:Name="tabControl" DockPanel.Dock="Top" >
                 <TabItem Header="General">
                     <Grid >
@@ -55,12 +55,12 @@
                             <GroupBox Header="Universe" Margin="4" Height="355">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,0">
-                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" />
+                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White"/>
                                         <Label Content="Systems Max Zoom"/>
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,0" >
-                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1"/>
+                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White"/>
                                         <Label Content="Text Max Zoom"/>
                                     </StackPanel>
 
@@ -89,12 +89,12 @@
 
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=IntelTextSize}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="8" Maximum="20" />
+                                        <xctk:IntegerUpDown Value="{Binding Path=IntelTextSize}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="8" Maximum="20" Background="Transparent"  Foreground="White" />
                                         <Label Content="Intel Text Size"/>
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=MaxIntelSeconds}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="30" Maximum="1200"/>
+                                        <xctk:IntegerUpDown Value="{Binding Path=MaxIntelSeconds}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="30" Maximum="1200" Background="Transparent"  Foreground="White"/>
                                         <Label Content="Intel Max Time (s)"/>
                                     </StackPanel>
 
@@ -110,7 +110,7 @@
                                     <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2">Limit Sound to Dangerzone</CheckBox>
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=WarningRange}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="50" Minimum="1" MaxLength="5"/>
+                                        <xctk:IntegerUpDown Value="{Binding Path=WarningRange}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="50" Minimum="1" MaxLength="5" Background="Transparent"  Foreground="White"/>
                                         <Label Content="DangerZone Size"/>
                                     </StackPanel>
                                 </StackPanel>
@@ -138,7 +138,7 @@
                                     <CheckBox IsChecked="{Binding Path=ShowTCUVunerabilities}" Margin="0,2">Show TCU Timer</CheckBox>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=UpcomingSovMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="360" />
+                                        <xctk:IntegerUpDown Value="{Binding Path=UpcomingSovMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="360" Background="Transparent"  Foreground="White" />
                                         <Label Content="Upcoming Period (Mins)"/>
                                     </StackPanel>
                                 </StackPanel>

@@ -80,12 +80,6 @@
     <Reference Include="AvalonDock.Themes.Expression, Version=4.10.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>packages\Dirkster.AvalonDock.Themes.Expression.4.10.0\lib\net40\AvalonDock.Themes.Expression.dll</HintPath>
     </Reference>
-    <Reference Include="AvalonDock.Themes.Metro, Version=4.10.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>packages\Dirkster.AvalonDock.Themes.Metro.4.10.0\lib\net40\AvalonDock.Themes.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="AvalonDock.Themes.VS2013, Version=4.10.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>packages\Dirkster.AvalonDock.Themes.VS2013.4.10.0\lib\net40\AvalonDock.Themes.VS2013.dll</HintPath>
-    </Reference>
     <Reference Include="DataGridThemes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DataGridThemes.1.0.0\lib\net40\DataGridThemes.dll</HintPath>
     </Reference>
@@ -223,6 +217,8 @@
       <DependentUpon>Preferences.xaml</DependentUpon>
     </Compile>
     <Compile Include="StaticJumpOverlay.cs" />
+    <Compile Include="Themes\LeftMarginMultiplierConverter.cs" />
+    <Compile Include="Themes\TreeViewItemExtensions.cs" />
     <Compile Include="UniverseControl.xaml.cs">
       <DependentUpon>UniverseControl.xaml</DependentUpon>
     </Compile>
@@ -312,7 +308,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\ExpressionDark.xaml">
+    <Page Include="Themes\Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

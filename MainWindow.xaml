@@ -11,6 +11,7 @@
         xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
         xmlns:xcadl="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
         xmlns:xcadt="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Expression"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
         Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip">
 
@@ -25,14 +26,18 @@
         </ObjectDataProvider>
 
 
-        <DataTemplate DataType="{x:Type localEveData:IntelData}">
+
+        <DataTemplate DataType="{x:Type localEveData:IntelData}" x:Key="intelDataDataTemplate">
             <DockPanel >
                 <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME'}" Foreground="Yellow" Padding="0,0,5,0"/>
                 <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="WrapWithOverflow"/>
             </DockPanel>
         </DataTemplate>
-
+        
+        
     </Window.Resources>
+
+    
     <DockPanel>
 
         <Menu DockPanel.Dock="Top">
@@ -92,9 +97,9 @@
                             <xcadl:LayoutAnchorablePane>
                                 <xcadl:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                     <Grid>
-                                        <ScrollViewer>
+                                        <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                             <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
-                                                <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" />
+                                                <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" Margin="4"/>
                                                 <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None"  MinHeight="200">
                                                     <DataGrid.Columns>
                                                         <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
@@ -130,15 +135,16 @@
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="25" />
                                         </Grid.RowDefinitions>
-                                        <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0">
-                                            <ListView.ItemTemplate>
+                                        <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemsSource="{Binding}" ItemTemplate="{StaticResource intelDataDataTemplate}">
+<!--                                            <ListView.ItemTemplate>
                                                 <DataTemplate >
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME'}" Foreground="Red" Padding="0,0,5,0" />
+                                                    <DockPanel >
+                                                        <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME', diag:PresentationTraceSources.TraceLevel=High}" Foreground="Red" Padding="0,0,5,0" />
                                                         <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="WrapWithOverflow"/>
-                                                    </StackPanel>
+                                                    </DockPanel>
                                                 </DataTemplate>
                                             </ListView.ItemTemplate>
+-->                                            
                                         </ListView>
                                         <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
                                     </Grid>
@@ -319,8 +325,8 @@
 
                                     <DataGrid  x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=ANOMManager.ActiveSystem.Anoms.Values}" HeadersVisibility="Column" >
 
-                                        <DataGrid.RowStyle>
-                                            <Style TargetType="DataGridRow">
+                                        <DataGrid.CellStyle>
+                                            <Style TargetType="DataGridCell">
 
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Type}" Value="Unknown">
@@ -331,7 +337,7 @@
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
-                                        </DataGrid.RowStyle>
+                                        </DataGrid.CellStyle>
 
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" Width="*" />
@@ -347,7 +353,7 @@
                             </xcadl:LayoutAnchorable>
 
                             <xcadl:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer >
+                                <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                     <StackPanel>
                                         <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" ShowTitle="False" ShowSummary="False" />
                                         <Separator />
@@ -357,7 +363,7 @@
                             </xcadl:LayoutAnchorable>
 
                             <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer >
+                                <ScrollViewer Background="{DynamicResource ButtonBackground}" >
                                     <StackPanel>
                                         <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False" >
 
@@ -397,10 +403,10 @@
 
                             <xcadl:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid x:Name="MainRouteGrid">
-                                    <ScrollViewer>
+                                    <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                         <StackPanel>
 
-                                            <GroupBox Header="Navigation Options" Background="{DynamicResource SolidBorderBrush}">
+                                            <GroupBox Header="Navigation Options">
                                                 <StackPanel Margin="4">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Label Content="Mode"/>
@@ -411,7 +417,7 @@
 
                                                 </StackPanel>
                                             </GroupBox>
-                                            <GroupBox Header="WayPoints" Background="{DynamicResource SolidBorderBrush}">
+                                            <GroupBox Header="WayPoints" >
                                                 <StackPanel Margin="4">
                                                     <ListBox ItemsSource="{Binding ElementName=RegionRC, Path=ActiveCharacter.Waypoints}" MinHeight="50" Margin="2"/>
                                                     <StackPanel Orientation="Horizontal" Margin="2">
@@ -424,7 +430,7 @@
                                                 </StackPanel>
                                             </GroupBox>
 
-                                            <GroupBox Header="Route" Background="{DynamicResource SolidBorderBrush}">
+                                            <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
                                                     <ListBox ItemsSource="{Binding ElementName=RegionRC, Path=ActiveCharacter.ActiveRoute}" MinHeight="50"/>
 
@@ -456,14 +462,13 @@
                                 </xcadl:LayoutAnchorable>
 -->
 
-                            <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer>
+                            <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" >
+                                <ScrollViewer >
                                     <StackPanel>
 
-                                        <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick" HeadersVisibility="Column" >
-
-                                            <DataGrid.RowStyle>
-                                                <Style TargetType="DataGridRow">
+                                        <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue" >
+                                            <DataGrid.CellStyle>
+                                                <Style TargetType="DataGridCell">
 
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
@@ -471,7 +476,7 @@
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
-                                            </DataGrid.RowStyle>
+                                            </DataGrid.CellStyle>
 
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />

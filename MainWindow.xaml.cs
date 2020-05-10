@@ -114,7 +114,8 @@ namespace SMT
             }
 
             EVEManager.SetupIntelWatcher();
-            RawIntelBox.ItemsSource = EVEManager.IntelDataList;
+
+            RawIntelBox.DataContext = EVEManager.IntelDataList;
 
 
             // load jump bridge data
