@@ -71,7 +71,7 @@ namespace SMT.EVEData
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(redistURL);
             request.Method = WebRequestMethods.Http.Get;
             request.Timeout = 60000;
-            request.UserAgent = "SMT/0.60";
+            request.UserAgent = "SMT/0.82";
             request.KeepAlive = true;
             request.Proxy = null;
             HttpWebResponse response;
