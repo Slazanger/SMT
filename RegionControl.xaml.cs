@@ -20,8 +20,8 @@ namespace SMT
     {
         public static readonly RoutedEvent UniverseSystemSelectEvent = EventManager.RegisterRoutedEvent("UniverseSystemSelect", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
         private const int SYSTEM_LINK_INDEX = 19;
-        private const double SYSTEM_REGION_TEXT_X_OFFSET = 9;
-        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 5;
+        private const double SYSTEM_REGION_TEXT_X_OFFSET = 6;
+        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 2;
         private const double SYSTEM_SHAPE_OFFSET = SYSTEM_SHAPE_SIZE / 2;
         private const double SYSTEM_SHAPE_SIZE = 20;
         private const double SYSTEM_TEXT_TEXT_SIZE = 7;

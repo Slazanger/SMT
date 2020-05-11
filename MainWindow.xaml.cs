@@ -533,7 +533,7 @@ namespace SMT
                     FactionText.Height = 30;
                     FactionText.Content = mr.Faction;
                     FactionText.Foreground = SysOutlineBrush;
-                    FactionText.FontSize = 5;
+                    FactionText.FontSize = 6;
                     FactionText.HorizontalAlignment = HorizontalAlignment.Center;
                     FactionText.VerticalAlignment = VerticalAlignment.Center;
                     FactionText.IsHitTestVisible = false;
@@ -542,7 +542,7 @@ namespace SMT
                     FactionText.VerticalContentAlignment = VerticalAlignment.Bottom;
 
                     Canvas.SetLeft(FactionText, mr.UniverseViewX - 40);
-                    Canvas.SetTop(FactionText, mr.UniverseViewY - 20);
+                    Canvas.SetTop(FactionText, mr.UniverseViewY - 15);
                     Canvas.SetZIndex(FactionText, 23);
                     MainUniverseCanvas.Children.Add(FactionText);
                 }
