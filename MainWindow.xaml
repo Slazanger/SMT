@@ -18,23 +18,24 @@
     <Window.Resources>
 
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
-
+            
         <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:RoutingMode" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
-
-
-        <DataTemplate DataType="{x:Type localEveData:IntelData}" x:Key="intelDataDataTemplate">
+        <DataTemplate x:Key="intelDataDataTemplate">
             <DockPanel >
-                <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME'}" Foreground="Yellow" Padding="0,0,5,0"/>
-                <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="WrapWithOverflow"/>
+                <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME'}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding RelativeSource={RelativeSource FindAncestor, 
+AncestorType={x:Type Window}}, Path=MapConf.IntelTextSize}"/>
+                <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding RelativeSource={RelativeSource FindAncestor, 
+AncestorType={x:Type Window}}, Path=MapConf.IntelTextSize}"/>
             </DockPanel>
         </DataTemplate>
-        
-        
+
+
+
     </Window.Resources>
 
     
@@ -56,7 +57,7 @@
 
 
         </Menu>
-        <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom" Background="{DynamicResource NormalBrush}">
+        <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom">
             <StatusBarItem>
                 <TextBlock>EVE Time :</TextBlock>
             </StatusBarItem>
@@ -135,17 +136,7 @@
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="25" />
                                         </Grid.RowDefinitions>
-                                        <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemsSource="{Binding}" ItemTemplate="{StaticResource intelDataDataTemplate}">
-<!--                                            <ListView.ItemTemplate>
-                                                <DataTemplate >
-                                                    <DockPanel >
-                                                        <TextBlock Text="{Binding Path=IntelTime, StringFormat='HH:mm', FallbackValue='TIME', diag:PresentationTraceSources.TraceLevel=High}" Foreground="Red" Padding="0,0,5,0" />
-                                                        <TextBlock Text="{Binding Path=IntelString, FallbackValue='Intel Data'}" Foreground="White" TextWrapping="WrapWithOverflow"/>
-                                                    </DockPanel>
-                                                </DataTemplate>
-                                            </ListView.ItemTemplate>
--->                                            
-                                        </ListView>
+                                        <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource intelDataDataTemplate}" />
                                         <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
                                     </Grid>
                                 </xcadl:LayoutAnchorable>
@@ -421,7 +412,7 @@
                                                 <StackPanel Margin="4">
                                                     <ListBox ItemsSource="{Binding ElementName=RegionRC, Path=ActiveCharacter.Waypoints}" MinHeight="50" Margin="2"/>
                                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" FontSize="12" Width="156" SelectionChanged="RouteSystemDropDownAC_SelectionChanged" Template="{DynamicResource ComboBoxTemplate}"/>
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" FontSize="12" Width="156" SelectionChanged="RouteSystemDropDownAC_SelectionChanged"/>
                                                         <Button x:Name="AddWaypointsBtn" Click="AddWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
                                                     </StackPanel>
 

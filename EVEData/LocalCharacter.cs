@@ -676,17 +676,25 @@ namespace SMT.EVEData
                         esiClient.SetCharacterData(ESIAuthData);
                         ESI.NET.EsiResponse<List<ESI.NET.Models.Contacts.Contact>> esr = await esiClient.Contacts.ListForAlliance(page);
 
+
                         if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
                         {
                             if (esr.Pages.HasValue)
                             {
                                 maxPageCount = (int)esr.Pages;
                             }
+                            
+                            if(esr.Data == null)
+                            {
+                                // in an alliance with no contacts
+                                continue;
+                            }
+
 
                             foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
                             {
                                 Standings[con.ContactId] = (float)con.Standing;
-                                LabelMap[con.ContactId] = con.LabelId;
+                                LabelMap[con.ContactId] = con.LabelIds;
 
                                 if (con.ContactType == "alliance")
                                 {

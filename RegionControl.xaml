@@ -66,7 +66,7 @@
             <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
             <Separator />
             <Label Content="Search :" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged" Template="{DynamicResource ComboBoxTemplate}">
+            <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged" Foreground="Black">
                 <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
@@ -396,7 +396,7 @@
                                 </ToggleButton>
                             </StackPanel>
 
-                            <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" IsSnapToTickEnabled="True" />
+                            <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Height="18" ToolTip="Overlay/Data Scale" IsSnapToTickEnabled="True" />
                         </StackPanel>
                     </Grid>
                 </Canvas>

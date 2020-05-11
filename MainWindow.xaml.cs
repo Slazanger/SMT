@@ -22,9 +22,10 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
+
         public static MainWindow AppWindow;
         public string SMTVersion = "SMT_081";
-
+ 
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
         private List<UIElement> DynamicUniverseElements = new List<UIElement>();
@@ -115,8 +116,7 @@ namespace SMT
 
             EVEManager.SetupIntelWatcher();
 
-            RawIntelBox.DataContext = EVEManager.IntelDataList;
-
+            RawIntelBox.ItemsSource = EVEManager.IntelDataList;
 
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
@@ -203,9 +203,6 @@ namespace SMT
                 lc.Location = "";
             }
 
-            RawIntelBox.FontSize = MapConf.IntelTextSize;
-
-            ResetIntelSize();
         }
 
         public EVEData.AnomManager ANOMManager { get; set; }
@@ -958,11 +955,6 @@ namespace SMT
             {
                 RedrawUniverse(true);
             }
-
-            if (e.PropertyName == "IntelTextSize")
-            {
-                ResetIntelSize();
-            }
         }
 
         private void MenuItem_ViewIntelClick(object sender, RoutedEventArgs e)
@@ -1196,19 +1188,6 @@ namespace SMT
             UniverseUC.ReDrawMap(true, true, true);
         }
 
-        private void ResetIntelSize()
-        {
-            var RawIntelTextBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
-            RawIntelTextBlockFactory.SetValue(TextBlock.TextProperty, new Binding("."));
-            RawIntelTextBlockFactory.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
-            RawIntelTextBlockFactory.SetValue(TextBlock.FontSizeProperty, MapConf.IntelTextSize);
-            RawIntelTextBlockFactory.SetValue(TextBlock.ForegroundProperty, Brushes.Black);
-            var RawIntelTextTemplate = new DataTemplate();
-            RawIntelTextTemplate.VisualTree = RawIntelTextBlockFactory;
-
-            RawIntelBox.ItemTemplate = RawIntelTextTemplate;
-        }
-
         private void TheraConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (sender != null)
@@ -1410,19 +1389,19 @@ namespace SMT
 
         private void AddWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
-            if(RegionRC.ActiveCharacter == null)
+            if (RegionRC.ActiveCharacter == null)
             {
                 return;
             }
 
-            if(RouteSystemDropDownAC.SelectedItem == null)
+            if (RouteSystemDropDownAC.SelectedItem == null)
             {
                 return;
             }
             EVEData.System s = RouteSystemDropDownAC.SelectedItem as EVEData.System;
-            
 
-            if(s != null)
+
+            if (s != null)
             {
                 RegionRC.ActiveCharacter.AddDestination(s.ID, false);
             }
@@ -1430,7 +1409,7 @@ namespace SMT
 
         private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if(miFullScreenToggle.IsChecked)
+            if (miFullScreenToggle.IsChecked)
             {
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
@@ -1535,4 +1514,5 @@ namespace SMT
             return null;
         }
     }
+
 }
