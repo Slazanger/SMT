@@ -24,7 +24,7 @@ namespace SMT
     {
 
         public static MainWindow AppWindow;
-        public string SMTVersion = "SMT_081";
+        public string SMTVersion = "SMT_082";
  
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
