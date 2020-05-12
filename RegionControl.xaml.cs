@@ -1414,6 +1414,7 @@ namespace SMT
             Brush SysOutRegionTextBrush = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
 
             Brush FriendlyJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+            Brush DisabledJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.DisabledJumpBridgeColour);
 
             Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
 
@@ -2153,7 +2154,14 @@ namespace SMT
 
                             MainCanvas.Children.Add(jbOutofSystemBlob);
 
-                            jbOutofSystemBlob.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+                            if(jb.Disabled)
+                            {
+                                jbOutofSystemBlob.Stroke = DisabledJumpBridgeBrush;
+                            }
+                            else
+                            {
+                                jbOutofSystemBlob.Stroke = FriendlyJumpBridgeBrush;
+                            }
                             jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
                         }
                         else
@@ -2186,13 +2194,25 @@ namespace SMT
                         System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
                         path.Data = pathGeometry;
 
-                        path.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+                        
 
                         path.StrokeThickness = 2;
 
                         DoubleCollection dashes = new DoubleCollection();
-                        dashes.Add(1.0);
-                        dashes.Add(1.0);
+
+                        if(!jb.Disabled)
+                        {
+                            dashes.Add(1.0);
+                            dashes.Add(1.0);
+                            path.Stroke = FriendlyJumpBridgeBrush;
+
+                        }
+                        else
+                        {
+                            dashes.Add(1.0);
+                            dashes.Add(3.0);
+                            path.Stroke = DisabledJumpBridgeBrush;
+                        }
 
                         path.StrokeDashArray = dashes;
 

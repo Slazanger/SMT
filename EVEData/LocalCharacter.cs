@@ -310,7 +310,12 @@ namespace SMT.EVEData
             return jbl;
         }
 
- 
+        public void RecalcRoute()
+        {
+            routeNeedsUpdate = true;
+            esiRouteNeedsUpdate = true;
+        }
+
         public string GetWayPointText()
         {
             string ClipboardText = "Waypoints\n==============\n";
@@ -506,7 +511,7 @@ namespace SMT.EVEData
                     ActiveRoute.Clear();
                 }), DispatcherPriority.Normal);
 
-                // loop through all the waypoints and query ESI for the route
+                // loop through all the waypoints 
                 for (int i = 0; i < Waypoints.Count; i++)
                 {
                     start = end;

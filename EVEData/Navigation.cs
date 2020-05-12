@@ -103,11 +103,7 @@ namespace SMT.EVEData
                 MapNodes[mn.Name] = mn;
             }
 
-            foreach (JumpBridge jb in jumpBridges)
-            {
-                MapNodes[jb.From].JBConnection = jb.To;
-                MapNodes[jb.To].JBConnection = jb.From;
-            }
+            UpdateJumpBridges(jumpBridges);
 
             double MaxRange = 10 * 9460730472580800.0;
 
@@ -399,15 +395,13 @@ namespace SMT.EVEData
         {
             foreach (JumpBridge jb in jumpBridges)
             {
-                if (jb.FromID != 0)
+                if(jb.Disabled)
                 {
-                    MapNodes[jb.From].JBConnection = jb.To;
+                    continue;
                 }
 
-                if (jb.ToID != 0)
-                {
-                    MapNodes[jb.To].JBConnection = jb.From;
-                }
+                MapNodes[jb.From].JBConnection = jb.To;
+                MapNodes[jb.To].JBConnection = jb.From;
             }
         }
 

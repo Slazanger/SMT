@@ -2,12 +2,15 @@
 // Jump Bridge
 //-----------------------------------------------------------------------
 
+using System.ComponentModel;
+using System.Xml.Serialization;
+
 namespace SMT.EVEData
 {
     /// <summary>
     /// A Player owned link between systems
     /// </summary>
-    public class JumpBridge
+    public class JumpBridge : INotifyPropertyChanged
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JumpBridge" /> class.
@@ -28,7 +31,24 @@ namespace SMT.EVEData
         }
 
 
-       
+        private bool m_Disabled;
+
+        [XmlIgnoreAttribute]
+        public bool Disabled
+        {
+            get
+            {
+                return m_Disabled;
+            }
+            set
+            {
+                m_Disabled = value;
+
+                OnPropertyChanged("Disabled");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
 
         /// <summary>
@@ -54,6 +74,16 @@ namespace SMT.EVEData
         public override string ToString()
         {
             return $"{From} <==> {To}";
+        }
+
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
         }
     }
 }

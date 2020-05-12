@@ -682,7 +682,8 @@ namespace SMT
                                     nw.CurrentVersion = SMTVersion;
                                     nw.NewVersion = releaseInfo.TagName;
                                     nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
-                                    nw.Show();
+                                    nw.Owner = this;
+                                    nw.ShowDialog();
                                 }), DispatcherPriority.ApplicationIdle);
                             }
                         }
@@ -715,11 +716,23 @@ namespace SMT
             {
                 lock (c.ActiveRouteLock)
                 {
+
                     c.ActiveRoute.Clear();
                     c.Waypoints.Clear();
                 }
             }
         }
+
+        private void ReCalculateRouteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null && c.Waypoints.Count > 0)
+            {
+                c.RecalcRoute();
+            }
+        }
+
+
 
         private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
         {
@@ -804,7 +817,9 @@ namespace SMT
                 }
             }
 
+            EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            RegionRC.ReDrawMap(true);
 
             ImportJumpGatesBtn.IsEnabled = true;
             ClearJumpGatesBtn.IsEnabled = true;
@@ -846,6 +861,11 @@ namespace SMT
                     }
                 } while (line != null);
             }
+
+            EVEData.Navigation.ClearJumpBridges();
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            RegionRC.ReDrawMap(true);
+
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -1422,6 +1442,51 @@ namespace SMT
 
             }
         }
+
+        private void DeleteJumpBridgeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (JumpBridgeList.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.JumpBridge jb = JumpBridgeList.SelectedItem as EVEData.JumpBridge;
+
+            EVEManager.JumpBridges.Remove(jb);
+
+            EVEData.Navigation.ClearJumpBridges();
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            RegionRC.ReDrawMap(true);
+
+            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null && c.Waypoints.Count > 0)
+            {
+                c.RecalcRoute();
+            }
+        }
+
+        private void EnableDisableJumpBridgeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (JumpBridgeList.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.JumpBridge jb = JumpBridgeList.SelectedItem as EVEData.JumpBridge;
+
+            jb.Disabled = !jb.Disabled;
+
+            EVEData.Navigation.ClearJumpBridges();
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            RegionRC.ReDrawMap(true);
+
+            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null && c.Waypoints.Count > 0)
+            {
+                c.RecalcRoute();
+            }
+        }
+
 
 
 

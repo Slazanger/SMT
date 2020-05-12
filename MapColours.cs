@@ -37,6 +37,11 @@ namespace SMT
         [DisplayName("Friendly")]
         public Color FriendlyJumpBridgeColour { get; set; }
 
+        [Category("Jump Bridges")]
+        [DisplayName("Disabled")]
+        public Color DisabledJumpBridgeColour { get; set; }
+
+
         [Category("Systems")]
         [DisplayName("In Region")]
         public Color InRegionSystemColour { get; set; }
