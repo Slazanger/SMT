@@ -144,7 +144,7 @@ namespace SMT
         [DisplayName("Data Overlay")]
         public Color ZKillDataOverlay { get; set; }
 
-        static public Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
+        public static Color GetSecStatusColour(double secStatus, bool GradeTrueSec)
         {
             /*
                Note : these are rounded to the nearest 0.1..
