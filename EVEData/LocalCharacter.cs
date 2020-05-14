@@ -224,6 +224,8 @@ namespace SMT.EVEData
             }
         }
 
+        public bool DeepSearchEnabled { get; set; }
+
         public int WarningSystemRange { get; set; }
 
         public List<string> WarningSystems { get; set; }
@@ -300,7 +302,7 @@ namespace SMT.EVEData
                             }
                         }
 
-                        Thread.Sleep(10);
+                        Thread.Sleep(100);
                     }
                 }
             }

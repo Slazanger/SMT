@@ -19,6 +19,7 @@
                         <GroupBox Header="General" Margin="4" Height="355">
                             <StackPanel>
                                 <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3">Always on top</CheckBox>
+                                <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
                             </StackPanel>
                         </GroupBox>
 

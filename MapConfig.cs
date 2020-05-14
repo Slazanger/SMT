@@ -658,6 +658,20 @@ namespace SMT
             }
         }
 
+        private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
+        public bool SyncActiveCharacterBasedOnActiveEVEClient
+        {
+            get 
+            {
+                return m_SyncActiveCharacterBasedOnActiveEVEClient;
+            }
+            set
+            {
+                m_SyncActiveCharacterBasedOnActiveEVEClient = value;
+                OnPropertyChanged("SyncActiveCharacterBasedOnActiveEVEClient");
+            }
+        }
+
         public void SetDefaultColours()
         {
             MapColours defaultColours = new MapColours

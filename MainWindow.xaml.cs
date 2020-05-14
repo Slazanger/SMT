@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,7 +28,7 @@ namespace SMT
 
         public static MainWindow AppWindow;
         public string SMTVersion = "SMT_082";
- 
+
         private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
 
         private List<UIElement> DynamicUniverseElements = new List<UIElement>();
@@ -187,7 +190,7 @@ namespace SMT
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
-            uiRefreshTimer.Interval = new TimeSpan(0, 0, 5);
+            uiRefreshTimer.Interval = new TimeSpan(0, 0, 1);
             uiRefreshTimer.Start();
 
             ZKBFeed.ItemsSource = EVEManager.ZKillFeed.KillStream;
@@ -790,28 +793,71 @@ namespace SMT
         {
             ImportJumpGatesBtn.IsEnabled = false;
             ClearJumpGatesBtn.IsEnabled = false;
+            JumpBridgeList.IsEnabled = false;
+            ImportPasteJumpGatesBtn.IsEnabled = false;
+            ExportJumpGatesBtn.IsEnabled = false;
+
+
 
             foreach (EVEData.LocalCharacter c in EVEManager.LocalCharacters)
             {
+
                 if (c.ESILinked)
                 {
-                    List<EVEData.JumpBridge> jbl = await c.FindJumpGates(GateSearchFilter.Text);
-
-                    foreach (EVEData.JumpBridge jb in jbl)
+                    if (c.DeepSearchEnabled)
                     {
-                        bool found = false;
+                        string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+                        string basesearch = " » ";
 
-                        foreach (EVEData.JumpBridge jbr in EVEManager.JumpBridges)
+                        foreach (char cc in chars)
                         {
-                            if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
+                            string search = basesearch + cc;
+                            List<EVEData.JumpBridge> jbl = await c.FindJumpGates(search);
+
+                            foreach (EVEData.JumpBridge jb in jbl)
                             {
-                                found = true;
+                                bool found = false;
+
+                                foreach (EVEData.JumpBridge jbr in EVEManager.JumpBridges)
+                                {
+                                    if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
+                                    {
+                                        found = true;
+                                    }
+                                }
+
+                                if (!found)
+                                {
+                                    EVEManager.JumpBridges.Add(jb);
+                                }
                             }
+
+                            Thread.Sleep(2000);
                         }
 
-                        if (!found)
+
+
+                    }
+                    else
+                    {
+                        List<EVEData.JumpBridge> jbl = await c.FindJumpGates(GateSearchFilter.Text);
+
+                        foreach (EVEData.JumpBridge jb in jbl)
                         {
-                            EVEManager.JumpBridges.Add(jb);
+                            bool found = false;
+
+                            foreach (EVEData.JumpBridge jbr in EVEManager.JumpBridges)
+                            {
+                                if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
+                                {
+                                    found = true;
+                                }
+                            }
+
+                            if (!found)
+                            {
+                                EVEManager.JumpBridges.Add(jb);
+                            }
                         }
                     }
                 }
@@ -823,6 +869,10 @@ namespace SMT
 
             ImportJumpGatesBtn.IsEnabled = true;
             ClearJumpGatesBtn.IsEnabled = true;
+            JumpBridgeList.IsEnabled = true;
+            ImportPasteJumpGatesBtn.IsEnabled = true;
+            ExportJumpGatesBtn.IsEnabled = true;
+
         }
 
         private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
@@ -975,10 +1025,6 @@ namespace SMT
             {
                 RedrawUniverse(true);
             }
-        }
-
-        private void MenuItem_ViewIntelClick(object sender, RoutedEventArgs e)
-        {
         }
 
         private void OnIntelAdded(List<string> intelsystems)
@@ -1226,9 +1272,40 @@ namespace SMT
             }
         }
 
+        private int UI_RefreshCounter = 0;
+
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            RedrawUniverse(false);
+            UI_RefreshCounter++;
+            if (UI_RefreshCounter == 5)
+            {
+                RedrawUniverse(false);
+                UI_RefreshCounter = 0;
+            }
+            if (MapConf.SyncActiveCharacterBasedOnActiveEVEClient)
+            {
+                UpdateCharacterSelectionBasedOnActiveWindow();
+            }
+        }
+
+        private void UpdateCharacterSelectionBasedOnActiveWindow()
+        {
+            string ActiveWindowText = Utils.GetCaptionOfActiveWindow();
+
+            if (ActiveWindowText.Contains("EVE - "))
+            {
+                string characterName = ActiveWindowText.Substring(6);
+                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                {
+                    if (lc.Name == characterName)
+                    {
+                        RegionRC.CharacterDropDown.SelectedItem = lc;
+                        RegionRC.ActiveCharacter = lc;
+                        break;
+                    }
+                }
+            }
+
         }
 
         private void UniverseUC_RequestRegionSystem(object sender, RoutedEventArgs e)
@@ -1487,42 +1564,50 @@ namespace SMT
             }
         }
 
-
-
-
-        /*
-
-        private void JPSuggestRoute_Click(object sender, RoutedEventArgs e)
+        private void ExportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (JPShipType.SelectedItem == null)
+            string ExportText = "";
+
+            foreach (EVEData.MapRegion mr in EVEManager.Regions)
             {
-                return;
+                ExportText += "# " + mr.Name + "\n";
+
+                foreach (EVEData.JumpBridge jb in EVEManager.JumpBridges)
+                {
+                    EVEData.System es = EVEManager.GetEveSystem(jb.From);
+                    if (es.Region == mr.Name)
+                    {
+                        ExportText += $"{jb.FromID} {jb.From} --> {jb.To}\n";
+                    }
+
+                    es = EVEManager.GetEveSystem(jb.To);
+                    if (es.Region == mr.Name)
+                    {
+                        ExportText += $"{jb.ToID} {jb.To} --> {jb.From}\n";
+                    }
+                }
+
+                ExportText += "\n";
             }
 
-            EVEData.EveManager.JumpShip js = (EVEData.EveManager.JumpShip)JPShipType.SelectedItem;
-            double JumpDistance = 0.0;
 
-            switch (js)
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text file (*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == true)
             {
-                case EVEData.EveManager.JumpShip.Super: { JumpDistance = 6.0; } break;
-                case EVEData.EveManager.JumpShip.Titan: { JumpDistance = 6.0; } break;
-                case EVEData.EveManager.JumpShip.Dread: { JumpDistance = 7.0; } break;
-                case EVEData.EveManager.JumpShip.Carrier: { JumpDistance = 7.0; } break;
-                case EVEData.EveManager.JumpShip.FAX: { JumpDistance = 7.0; } break;
-                case EVEData.EveManager.JumpShip.Blops: { JumpDistance = 8.0; } break;
-                case EVEData.EveManager.JumpShip.Rorqual: { JumpDistance = 10.0; } break;
-                case EVEData.EveManager.JumpShip.JF: { JumpDistance = 10.0; } break;
-            }
-            {
-                List<EVEData.Navigation.RoutePoint> rpl = EVEData.Navigation.NavigateCapitals("B-II34", "Obe", JumpDistance);
-                JPSuggestedRoute.ItemsSource = rpl;
+                try
+                {
+                    File.WriteAllText(saveFileDialog.FileName, ExportText);
+                }
+                catch { }
 
-                UniverseUC.ActiveRoute = rpl;
             }
+
+
         }
-
-        */
     }
+
+
 
     public class ZKBBackgroundConverter : IValueConverter
     {
@@ -1581,3 +1666,4 @@ namespace SMT
     }
 
 }
+
