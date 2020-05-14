@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -86,7 +85,7 @@ namespace SMT.EVEData
         /// <param name="lcf">Local Chat File Location</param>
         /// <param name="location">Current Location of Character</param>
         public LocalCharacter(string name, string lcf, string location)
-            :this()
+            : this()
         {
             Name = name;
             LocalChatFile = lcf;
@@ -265,7 +264,7 @@ namespace SMT.EVEData
             if (!ESILinked)
                 return jbl;
 
-            await UpdateLock.WaitAsync(); 
+            await UpdateLock.WaitAsync();
             {
 
 
@@ -436,7 +435,7 @@ namespace SMT.EVEData
             UpdateLock.Release();
         }
 
-        
+
 
         protected void OnPropertyChanged(string name)
         {
@@ -534,7 +533,7 @@ namespace SMT.EVEData
                                 }
                             }
                         }), DispatcherPriority.Normal, null);
-                        
+
                     }
                 }
             }
@@ -690,8 +689,8 @@ namespace SMT.EVEData
                             {
                                 maxPageCount = (int)esr.Pages;
                             }
-                            
-                            if(esr.Data == null)
+
+                            if (esr.Data == null)
                             {
                                 // in an alliance with no contacts
                                 continue;

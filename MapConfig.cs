@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Media;
@@ -305,8 +304,8 @@ namespace SMT
 
         [Category("Jove")]
         [DisplayName("Show Observatories")]
-        public bool ShowJoveObservatories 
-        { 
+        public bool ShowJoveObservatories
+        {
             get
             {
                 return m_ShowJoveObservatories;
@@ -661,7 +660,7 @@ namespace SMT
         private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
         public bool SyncActiveCharacterBasedOnActiveEVEClient
         {
-            get 
+            get
             {
                 return m_SyncActiveCharacterBasedOnActiveEVEClient;
             }

@@ -671,7 +671,7 @@ namespace SMT.EVEData
                 }
 
                 nAlpha.AlphaShapeCalculator shapeCalc = new nAlpha.AlphaShapeCalculator();
-                shapeCalc.Alpha = 1/(20 * 9460730472580800.0);
+                shapeCalc.Alpha = 1 / (20 * 9460730472580800.0);
                 shapeCalc.CloseShape = true;
 
                 nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
@@ -680,19 +680,19 @@ namespace SMT.EVEData
 
 
                 List<Tuple<int, int>> processed = new List<Tuple<int, int>>();
-                
+
                 int CurrentPoint = 0;
                 int count = 0;
                 int edgeCount = ns.Edges.Length;
-                while(count < edgeCount)
+                while (count < edgeCount)
                 {
-                    foreach(Tuple<int,int> i in ns.Edges)
+                    foreach (Tuple<int, int> i in ns.Edges)
                     {
                         if (processed.Contains(i))
                             continue;
 
 
-                        if(i.Item1 == CurrentPoint)
+                        if (i.Item1 == CurrentPoint)
                         {
                             mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
                             CurrentPoint = i.Item2;
@@ -1106,7 +1106,7 @@ namespace SMT.EVEData
             string code = query["code"];
 
             SsoToken sst = await ESIClient.SSO.GetToken(GrantType.AuthorizationCode, code);
-            if(sst == null || sst.ExpiresIn == 0)
+            if (sst == null || sst.ExpiresIn == 0)
             {
                 return;
             }
@@ -1714,7 +1714,7 @@ namespace SMT.EVEData
 
             foreach (string intelFilterStr in IntelFilters)
             {
-                if (changedFile.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase ) >= 0)
+                if (changedFile.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     processFile = true;
                     break;
@@ -1868,7 +1868,7 @@ namespace SMT.EVEData
                                 {
                                     foreach (EVEData.IntelData idl in IntelDataList)
                                     {
-                                        if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5 )
+                                        if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
                                         {
                                             addToIntel = false;
                                             break;
@@ -1983,7 +1983,7 @@ namespace SMT.EVEData
         /// </summary>
         private void StartBackgroundThread()
         {
-            new Thread(async ()  =>
+            new Thread(async () =>
             {
                 Thread.CurrentThread.IsBackground = false;
 

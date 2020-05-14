@@ -307,7 +307,7 @@ namespace SMT
             set
             {
                 m_ShowSystemSecurity = value;
-                if(m_ShowSystemSecurity)
+                if (m_ShowSystemSecurity)
                 {
                     ShowSystemADM = false;
                 }
@@ -324,7 +324,7 @@ namespace SMT
             set
             {
                 m_ShowSystemADM = value;
-                if(m_ShowSystemADM)
+                if (m_ShowSystemADM)
                 {
                     ShowSystemSecurity = false;
                 }
@@ -444,7 +444,7 @@ namespace SMT
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
-           
+
 
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
@@ -527,7 +527,7 @@ namespace SMT
             }
 
             FollowCharacter = false;
-            
+
 
             // close the context menu if its open
             ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
@@ -1847,7 +1847,7 @@ namespace SMT
 
                 EVEData.System es = EM.GetEveSystem(SelectedSystem);
 
-                if (es != null && (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities) ) && system.ActualSystem.ConstellationID == es.ConstellationID)
+                if (es != null && (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)) && system.ActualSystem.ConstellationID == es.ConstellationID)
                 {
                     {
                         Polygon poly = new Polygon();
@@ -1898,7 +1898,7 @@ namespace SMT
                     MainCanvas.Children.Add(poly);
                 }
 
-                if ((ShowSovOwner ) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
+                if ((ShowSovOwner) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
                 {
                     Label sysRegionText = new Label();
 
@@ -1973,7 +1973,7 @@ namespace SMT
 
                     if (MapConf.CurrentJumpCharacter != "")
                     {
-                        BridgeInfoL1.Content = $"{MapConf.JumpShipType} range from {MapConf.CurrentJumpCharacter} : {MapConf.CurrentJumpSystem} ({js.Region})"; 
+                        BridgeInfoL1.Content = $"{MapConf.JumpShipType} range from {MapConf.CurrentJumpCharacter} : {MapConf.CurrentJumpSystem} ({js.Region})";
                     }
                     else
                     {
@@ -2154,7 +2154,7 @@ namespace SMT
 
                             MainCanvas.Children.Add(jbOutofSystemBlob);
 
-                            if(jb.Disabled)
+                            if (jb.Disabled)
                             {
                                 jbOutofSystemBlob.Stroke = DisabledJumpBridgeBrush;
                             }
@@ -2194,13 +2194,13 @@ namespace SMT
                         System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
                         path.Data = pathGeometry;
 
-                        
+
 
                         path.StrokeThickness = 2;
 
                         DoubleCollection dashes = new DoubleCollection();
 
-                        if(!jb.Disabled)
+                        if (!jb.Disabled)
                         {
                             dashes.Add(1.0);
                             dashes.Add(1.0);
@@ -2277,7 +2277,7 @@ namespace SMT
                     akl.DataContext = allianceID.ToString();
                     akl.Content = $"{allianceTicker}\t{allianceName}";
                     akl.Foreground = fontColour;
-                    akl.Margin = p; 
+                    akl.Margin = p;
 
                     if (allianceID == SelectedAlliance)
                     {
@@ -2289,11 +2289,11 @@ namespace SMT
 
                 List<Label> SortedAlliance = AllianceNameListLabels.OrderBy(an => an.Content).ToList();
 
-                foreach(Label l in SortedAlliance)
+                foreach (Label l in SortedAlliance)
                 {
                     AllianceNameListStackPanel.Children.Add(l);
                 }
-                
+
 
 
 
@@ -2484,7 +2484,7 @@ namespace SMT
                 if (e.ClickCount == 1)
                 {
                     bool redraw = false;
-                    if (MapConf.ShowJumpDistance || (ShowSystemTimers &&  (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)) )
+                    if (MapConf.ShowJumpDistance || (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)))
                     {
                         redraw = true;
                     }
@@ -2523,7 +2523,7 @@ namespace SMT
 
                 setDesto.IsEnabled = false;
                 addWaypoint.IsEnabled = false;
-                
+
                 characters.IsEnabled = false;
                 characters.Visibility = Visibility.Collapsed;
 
@@ -2535,20 +2535,20 @@ namespace SMT
 
                 // get a list of characters in this system
                 List<Character> charactersInSystem = new List<Character>();
-                foreach(LocalCharacter lc in EM.LocalCharacters)
+                foreach (LocalCharacter lc in EM.LocalCharacters)
                 {
-                    if(lc.Location == selectedSys.Name)
+                    if (lc.Location == selectedSys.Name)
                     {
                         charactersInSystem.Add(lc);
                     }
                 }
 
-                if(charactersInSystem.Count > 0)
+                if (charactersInSystem.Count > 0)
                 {
                     characters.IsEnabled = true;
                     characters.Visibility = Visibility.Visible;
 
-                    foreach(Character lc in charactersInSystem)
+                    foreach (Character lc in charactersInSystem)
                     {
                         MenuItem miChar = new MenuItem();
                         miChar.Header = lc.Name;
@@ -2617,7 +2617,7 @@ namespace SMT
                 EveManager.JumpShip js = EveManager.JumpShip.Super;
 
                 LocalCharacter lc = ((MenuItem)mi.Parent).DataContext as LocalCharacter;
-                    
+
 
 
                 if (mi.DataContext as string == "6")

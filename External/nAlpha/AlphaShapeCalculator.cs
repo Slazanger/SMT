@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace nAlpha
 {
@@ -10,7 +8,7 @@ namespace nAlpha
     {
         public double Alpha { get; set; }
         public bool CloseShape { get; set; }
-        public double Radius => 1/Alpha;
+        public double Radius => 1 / Alpha;
 
         private List<Tuple<int, int>> resultingEdges = new List<Tuple<int, int>>();
         private List<Point> resultingVertices = new List<Point>();
@@ -60,7 +58,7 @@ namespace nAlpha
 
         private VertexCounter CountVertices()
         {
-            
+
             VertexCounter counter = new VertexCounter();
 
             foreach (var edge in resultingEdges)
@@ -76,7 +74,7 @@ namespace nAlpha
         {
             var vertexPoint = GetVertex(vertexIndex);
             var vertexIndicesWithDistance =
-                vertices.Where(v => v != vertexIndex).Select(v => new {Index = v, Distance = resultingVertices[v].DistanceTo(vertexPoint)});
+                vertices.Where(v => v != vertexIndex).Select(v => new { Index = v, Distance = resultingVertices[v].DistanceTo(vertexPoint) });
             return vertexIndicesWithDistance.Aggregate((a, b) => a.Distance < b.Distance ? a : b).Index;
         }
 
@@ -135,8 +133,8 @@ namespace nAlpha
 
         private Point[] NearbyPoints(Point point)
         {
-                var nearbyPoints = points.Where(p => p.DistanceTo(point) <= Radius && p != point).ToArray();
-              return nearbyPoints;
+            var nearbyPoints = points.Where(p => p.DistanceTo(point) <= Radius && p != point).ToArray();
+            return nearbyPoints;
 
             //return points;
 
@@ -145,7 +143,7 @@ namespace nAlpha
         private Tuple<Point, Point> CalculateAlphaDiskCenters(Point p1, Point p2)
         {
             double distanceBetweenPoints = p1.DistanceTo(p2);
-            double distanceFromConnectionLine = Math.Sqrt(Radius*Radius - distanceBetweenPoints*distanceBetweenPoints/4);
+            double distanceFromConnectionLine = Math.Sqrt(Radius * Radius - distanceBetweenPoints * distanceBetweenPoints / 4);
 
             Point centerOfConnectionLine = p1.CenterTo(p2);
             Point vector = p1.VectorTo(p2);
@@ -158,10 +156,10 @@ namespace nAlpha
             Point normalVector = new Point(vector.Y, -vector.X);
             return
                 new Tuple<Point, Point>(
-                    new Point(center.X + normalVector.X*distanceFromConnectionLine,
-                        center.Y + normalVector.Y*distanceFromConnectionLine),
-                    new Point(center.X - normalVector.X*distanceFromConnectionLine,
-                        center.Y - normalVector.Y*distanceFromConnectionLine));
+                    new Point(center.X + normalVector.X * distanceFromConnectionLine,
+                        center.Y + normalVector.Y * distanceFromConnectionLine),
+                    new Point(center.X - normalVector.X * distanceFromConnectionLine,
+                        center.Y - normalVector.Y * distanceFromConnectionLine));
         }
 
         private Shape GetShape()

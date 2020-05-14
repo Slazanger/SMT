@@ -97,7 +97,7 @@ namespace SMT.EVEData
         /// </summary>
         public double RegionZ { get; set; }
 
-        
+
         /// <summary>
         /// Gets or sets the Regions X coord on the universe map
         /// </summary>

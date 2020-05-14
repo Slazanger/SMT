@@ -50,8 +50,8 @@ namespace SMT.EVEData
         /// </summary>
         public List<string> Systems { get; set; }
 
-       // public override string ToString() => "[" + IntelTime.ToString("HH:mm") + "] " + IntelString;
+        // public override string ToString() => "[" + IntelTime.ToString("HH:mm") + "] " + IntelString;
 
- 
+
     }
 }

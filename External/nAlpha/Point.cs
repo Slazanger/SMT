@@ -12,14 +12,14 @@ namespace nAlpha
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            return obj is Point && Equals((Point) obj);
+            return obj is Point && Equals((Point)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (X.GetHashCode()*397) ^ Y.GetHashCode();
+                return (X.GetHashCode() * 397) ^ Y.GetHashCode();
             }
         }
 
@@ -55,14 +55,14 @@ namespace nAlpha
 
         public Point CenterTo(Point p)
         {
-            return new Point((X + p.X)/2, (Y + p.Y)/2);
+            return new Point((X + p.X) / 2, (Y + p.Y) / 2);
         }
 
         public Point VectorTo(Point p)
         {
             double d = DistanceTo(p);
-            return new Point((p.X - X)/d, 
-                (p.Y - Y)/d);
+            return new Point((p.X - X) / d,
+                (p.Y - Y) / d);
         }
     }
 }

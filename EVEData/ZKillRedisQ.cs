@@ -8,9 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Threading;
 
 namespace SMT.EVEData
@@ -23,7 +21,7 @@ namespace SMT.EVEData
         private BackgroundWorker backgroundWorker;
 
 
-         /// <summary>
+        /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
         /// </summary>
         public ObservableCollection<ZKBDataSimple> KillStream { get; set; }
@@ -53,10 +51,10 @@ namespace SMT.EVEData
             dp.Start();
         }
 
- 
+
         private void Dp_Tick(object sender, EventArgs e)
         {
-            if(!backgroundWorker.IsBusy && !PauseUpdate)
+            if (!backgroundWorker.IsBusy && !PauseUpdate)
             {
                 backgroundWorker.RunWorkerAsync();
             }
@@ -181,7 +179,7 @@ namespace SMT.EVEData
             backgroundWorker.CancelAsync();
         }
 
-  
+
 
         /// <summary>
         /// A simple class with the Kill Highlights

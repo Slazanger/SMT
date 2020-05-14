@@ -53,8 +53,8 @@ namespace SMT.EVEData
             }
         }
 
-        public int ServerVersion 
-        { 
+        public int ServerVersion
+        {
             get
             {
                 return m_serverVersion;

@@ -139,7 +139,7 @@ namespace SMT.EVEData
                 mapNode.TheraOutSig = string.Empty;
             }
 
-            foreach(TheraConnection tc in theraList)
+            foreach (TheraConnection tc in theraList)
             {
                 MapNode mn = MapNodes[tc.System];
                 mn.TheraInSig = tc.InSignatureID;
@@ -243,7 +243,7 @@ namespace SMT.EVEData
                     }
                 }
 
-                if(UseThera && CurrentNode.TheraInSig != string.Empty)
+                if (UseThera && CurrentNode.TheraInSig != string.Empty)
                 {
                     //SJS HERE ERROR
                 }
@@ -395,7 +395,7 @@ namespace SMT.EVEData
         {
             foreach (JumpBridge jb in jumpBridges)
             {
-                if(jb.Disabled)
+                if (jb.Disabled)
                 {
                     continue;
                 }

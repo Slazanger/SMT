@@ -872,12 +872,12 @@ namespace SMT
 
 
                 Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
-                foreach(EVEData.MapRegion mr in EM.Regions)
+                foreach (EVEData.MapRegion mr in EM.Regions)
                 {
 
                     List<Point> scaledRegionPoints = new List<Point>();
 
-                    foreach( Point p in mr.RegionOutline)
+                    foreach (Point p in mr.RegionOutline)
                     {
                         double X = (p.X - universeXMin) * universeScale;
 
