@@ -9,7 +9,7 @@ namespace SMT
 {
     internal class Utils
     {
-        static public T DeserializeFromDisk<T>(string filename)
+        public static T DeserializeFromDisk<T>(string filename)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace SMT
             return Encoding.Default;
         }
 
-        static public void SerializToDisk<T>(T obj, string fileName)
+        public static void SerializeToDisk<T>(T obj, string fileName)
         {
             XmlSerializer xms = new XmlSerializer(typeof(T));
 
@@ -83,7 +83,7 @@ namespace SMT
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         static extern int GetWindowTextLength(IntPtr hWnd);
 
-        static public string GetCaptionOfActiveWindow()
+        public static string GetCaptionOfActiveWindow()
         {
             var strTitle = string.Empty;
             var handle = GetForegroundWindow();

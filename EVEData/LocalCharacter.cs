@@ -266,8 +266,6 @@ namespace SMT.EVEData
 
             await UpdateLock.WaitAsync();
             {
-
-
                 ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 

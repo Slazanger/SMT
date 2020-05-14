@@ -932,9 +932,9 @@ namespace SMT.EVEData
             }
 
             // now serialise the classes to disk
-            Utils.SerializToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
-            Utils.SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            Utils.SerializToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            Utils.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
+            Utils.SerializeToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
+            Utils.SerializeToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
             Init();
         }
@@ -1319,10 +1319,10 @@ namespace SMT.EVEData
             }
 
             // now serialise the caches to disk
-            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
-            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
+            Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
+            Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
 
-            Utils.SerializToDisk<ObservableCollection<JumpBridge>>(JumpBridges, SaveDataVersionFolder + @"\JumpBridges.dat");
+            Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, SaveDataVersionFolder + @"\JumpBridges.dat");
         }
 
         /// <summary>
