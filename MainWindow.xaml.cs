@@ -28,8 +28,6 @@ namespace SMT
         public static MainWindow AppWindow;
         public string SMTVersion = "SMT_082";
 
-        private static NLog.Logger OutputLog = NLog.LogManager.GetCurrentClassLogger();
-
         private List<UIElement> DynamicUniverseElements = new List<UIElement>();
 
         private bool FilterByRegion = true;
@@ -43,7 +41,6 @@ namespace SMT
 
         public MainWindow()
         {
-            OutputLog.Info("Starting App..");
             AppWindow = this;
             DataContext = this;
 
@@ -77,7 +74,6 @@ namespace SMT
 
             // load any custom map settings off disk
             string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMTVersion + "\\MapConfig.dat";
-            OutputLog.Info("Loading Map config from {0}", mapConfigFileName);
 
             if (File.Exists(mapConfigFileName))
             {

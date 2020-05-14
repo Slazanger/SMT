@@ -39,11 +39,6 @@ namespace SMT.EVEData
         /// </summary>
         private static EveManager instance;
 
-        /// <summary>
-        /// Debug output log
-        /// </summary>
-        private static NLog.Logger outputLog = NLog.LogManager.GetCurrentClassLogger();
-
         private bool BackgroundThreadShouldTerminate = false;
 
         /// <summary>
@@ -1334,7 +1329,6 @@ namespace SMT.EVEData
             IntelDataList = new BindingList<IntelData>();
             string intelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
 
-            outputLog.Info("Loading Intel File Filer from  {0}", intelFileFilter);
             if (File.Exists(intelFileFilter))
             {
                 StreamReader file = new StreamReader(intelFileFilter);
@@ -1344,7 +1338,6 @@ namespace SMT.EVEData
                     line.Trim();
                     if (line != string.Empty)
                     {
-                        outputLog.Info("adding intel filer : {0}", line);
                         IntelFilters.Add(line);
                     }
                 }
@@ -1353,7 +1346,6 @@ namespace SMT.EVEData
             IntelClearFilters = new List<string>();
             string intelClearFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelClearFilters.txt";
 
-            outputLog.Info("intelClearFileFilter Intel Filter File from  {0}", intelClearFileFilter);
             if (File.Exists(intelClearFileFilter))
             {
                 StreamReader file = new StreamReader(intelClearFileFilter);
@@ -1363,7 +1355,6 @@ namespace SMT.EVEData
                     line.Trim();
                     if (line != string.Empty)
                     {
-                        outputLog.Info("adding clear intel filer : {0}", line);
                         IntelClearFilters.Add(line);
                     }
                 }
@@ -1374,8 +1365,6 @@ namespace SMT.EVEData
             string eveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
             if (Directory.Exists(eveLogFolder))
             {
-                outputLog.Info("adding file watcher to : {0}", eveLogFolder);
-
                 intelFileWatcher = new FileSystemWatcher(eveLogFolder)
                 {
                     Filter = "*.txt",
@@ -1707,8 +1696,6 @@ namespace SMT.EVEData
         {
             string changedFile = e.FullPath;
 
-            outputLog.Info("File Watcher triggered : {0}", changedFile);
-
             bool processFile = false;
             bool localChat = false;
 
@@ -1734,8 +1721,6 @@ namespace SMT.EVEData
                     Encoding fe = Utils.GetEncoding(changedFile);
                     FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-                    outputLog.Info("Log File Encoding : {0}", fe.ToString());
-
                     StreamReader file = new StreamReader(ifs, fe);
 
                     int fileReadFrom = 0;
@@ -1749,7 +1734,6 @@ namespace SMT.EVEData
                     {
                         if (localChat)
                         {
-                            outputLog.Info("Processing file : {0}", changedFile);
                             string system = string.Empty;
                             string characterName = string.Empty;
 
@@ -1846,8 +1830,6 @@ namespace SMT.EVEData
                                     {
                                         if (c.LocalChatFile == changedFile)
                                         {
-                                            outputLog.Info("Character {0} moved from {1} to {2}", c.Name, c.Location, system);
-
                                             c.Location = system;
                                         }
                                     }
@@ -1915,10 +1897,6 @@ namespace SMT.EVEData
                                         IntelAddedEvent(id.Systems);
                                     }
                                 }
-                                else
-                                {
-                                    outputLog.Info("Already have Line : {0} ", line);
-                                }
                             }), DispatcherPriority.Normal, null);
                         }
 
@@ -1928,16 +1906,13 @@ namespace SMT.EVEData
                     ifs.Close();
 
                     intelFileReadPos[changedFile] = fileReadFrom;
-                    outputLog.Info("File Read pos : {0} {1}", changedFile, fileReadFrom);
                 }
                 catch (Exception ex)
                 {
-                    outputLog.Info("Intel Process Failed : {0}", ex.ToString());
                 }
             }
             else
             {
-                outputLog.Info("Skipping File : {0}", changedFile);
             }
         }
 
