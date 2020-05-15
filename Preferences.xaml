@@ -14,15 +14,25 @@
                     <Grid >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*"/>
                         </Grid.ColumnDefinitions>
-                        <GroupBox Header="General" Margin="4" Height="355">
-                            <StackPanel>
-                                <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3">Always on top</CheckBox>
-                                <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
-                            </StackPanel>
-                        </GroupBox>
 
+                        <StackPanel Grid.Column="0">
+                            <GroupBox Header="General" Margin="4" Height="355">
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="Always on top"/>
+                                    <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <GroupBox Header="Performance" Margin="4" Height="355">
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3">Disable jump bridges path animation</CheckBox>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Region/Universe" HorizontalAlignment="Left" >
@@ -124,11 +134,12 @@
                 <TabItem Header="SOV">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="29*" />
+                            <ColumnDefinition Width="262*"/>
+                            <ColumnDefinition Width="291*" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0">
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="2">
                             <GroupBox Header="General" Margin="4" Height="355">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=ShowCoalition}" Margin="0,2">Show SOV as Coalitions</CheckBox>

@@ -671,6 +671,17 @@ namespace SMT
             }
         }
 
+        private bool m_DisableJumpBridgesPathAnimation;
+        public bool DisableJumpBridgesPathAnimation
+        {
+            get => m_DisableJumpBridgesPathAnimation;
+            set
+            {
+                m_DisableJumpBridgesPathAnimation = value;
+                OnPropertyChanged("DisableJumpBridgesPathAnimation");
+            }
+        }
+
         public void SetDefaultColours()
         {
             MapColours defaultColours = new MapColours

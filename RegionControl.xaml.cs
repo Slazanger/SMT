@@ -1,4 +1,4 @@
-﻿using SMT.EVEData;
+using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -2194,8 +2194,6 @@ namespace SMT
                         System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
                         path.Data = pathGeometry;
 
-
-
                         path.StrokeThickness = 2;
 
                         DoubleCollection dashes = new DoubleCollection();
@@ -2230,7 +2228,12 @@ namespace SMT
                         // sb.Children.Add(da);
 
                         path.StrokeDashArray = dashes;
-                        path.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+                        if (!MapConf.DisableJumpBridgesPathAnimation)
+                        {
+                            path.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                        }
+                        
                         // path.BeginStoryboard(sb);
 
                         Canvas.SetZIndex(path, 19);

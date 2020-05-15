@@ -755,8 +755,6 @@ namespace SMT
             MainZoomControl.Background = BackgroundColourBrush;
             UniverseMainCanvas.Background = BackgroundColourBrush;
 
-            CacheMode cm = new BitmapCache(5.0);
-
             System.Windows.FontStyle fontStyle = FontStyles.Normal;
             FontWeight fontWeight = FontWeights.Medium;
             Typeface tf = new Typeface("Verdana");
@@ -773,7 +771,6 @@ namespace SMT
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
 
                 System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
-                gatesDrawingVisual.CacheMode = cm;
                 DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
 
                 foreach (GateHelper gh in universeSysLinksCache)
@@ -801,7 +798,6 @@ namespace SMT
                     p.DashStyle = DashStyles.Dot;
 
                     System.Windows.Media.DrawingVisual jbDrawingVisual = new System.Windows.Media.DrawingVisual();
-                    jbDrawingVisual.CacheMode = cm;
                     DrawingContext drawingContext;
                     drawingContext = jbDrawingVisual.RenderOpen();
 
@@ -831,7 +827,6 @@ namespace SMT
                 foreach (EVEData.System sys in EM.Systems)
                 {
                     System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
-                    SystemTextVisual.CacheMode = cm;
                     DrawingContext systemTextDrawingContext = SystemTextVisual.RenderOpen();
 
                     double X = (sys.ActualX - universeXMin) * universeScale;
@@ -840,7 +835,6 @@ namespace SMT
                     double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
 
                     System.Windows.Media.DrawingVisual systemShapeVisual = new System.Windows.Media.DrawingVisual();
-                    systemShapeVisual.CacheMode = cm;
 
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = systemShapeVisual.RenderOpen();
@@ -899,7 +893,6 @@ namespace SMT
 
 
                     System.Windows.Media.DrawingVisual RegionShapeVisual = new System.Windows.Media.DrawingVisual();
-                    RegionShapeVisual.CacheMode = cm;
                     DrawingContext regionShapeDrawingContext = RegionShapeVisual.RenderOpen();
 
                     regionShapeDrawingContext.DrawGeometry(RegionShapeColourBrush, RegionShapePen, sg);
@@ -1221,8 +1214,6 @@ namespace SMT
                 UniverseMainCanvas.Children.Insert(0, VHRegionNames);
             }
 
-            CacheMode cm = new BitmapCache(5.0);
-
             /*
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
@@ -1273,7 +1264,6 @@ namespace SMT
                 double Z = (universeDepth - (mr.RegionZ - universeZMin)) * universeScale;
 
                 System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
-                SystemTextVisual.CacheMode = cm;
                 DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
 #pragma warning disable CS0618
