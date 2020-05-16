@@ -205,7 +205,6 @@ namespace SMT.EVEData
         /// </summary>
         public string SaveDataRootFolder { get; set; }
 
-
         public EVEData.Server ServerInfo { get; set; }
 
         /// <summary>
@@ -673,7 +672,6 @@ namespace SMT.EVEData
 
                 mr.RegionOutline = new List<Point>();
 
-
                 List<Tuple<int, int>> processed = new List<Tuple<int, int>>();
 
                 int CurrentPoint = 0;
@@ -685,7 +683,6 @@ namespace SMT.EVEData
                     {
                         if (processed.Contains(i))
                             continue;
-
 
                         if (i.Item1 == CurrentPoint)
                         {
@@ -702,18 +699,11 @@ namespace SMT.EVEData
                             processed.Add(i);
                             break;
                         }
-
                     }
 
                     count++;
-
                 }
-
-
-
             }
-
-
 
             foreach (System s in Systems)
             {

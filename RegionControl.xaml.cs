@@ -604,21 +604,6 @@ namespace SMT
             ///AnomSigList.ItemsSource = system.Anoms.Values;
         }
 
-        public Color stringToColour(string str)
-        {
-            int hash = 0;
-
-            foreach (char c in str.ToCharArray())
-            {
-                hash = c + ((hash << 5) - hash);
-            }
-
-            double R = (((byte)(hash & 0xff) / 255.0) * 80.0) + 127.0;
-            double G = (((byte)((hash >> 8) & 0xff) / 255.0) * 80.0) + 127.0;
-            double B = (((byte)((hash >> 16) & 0xff) / 255.0) * 80.0) + 127.0;
-
-            return Color.FromArgb(100, (byte)R, (byte)G, (byte)B);
-        }
 
         protected void OnCharacterSelectionChanged(string name)
         {

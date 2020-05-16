@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Media;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -25,6 +26,19 @@ namespace SMT
                 return default(T);
             }
         }
+
+
+        public static void SerializeToDisk<T>(T obj, string fileName)
+        {
+            XmlSerializer xms = new XmlSerializer(typeof(T));
+
+            using (TextWriter tw = new StreamWriter(fileName))
+            {
+                xms.Serialize(tw, obj);
+            }
+        }
+
+
 
         public static Encoding GetEncoding(string filename)
         {
@@ -63,15 +77,25 @@ namespace SMT
             return Encoding.Default;
         }
 
-        public static void SerializeToDisk<T>(T obj, string fileName)
+        /// <summary>
+        /// Create a colour from any string
+        /// </summary>
+        public static Color stringToColour(string str)
         {
-            XmlSerializer xms = new XmlSerializer(typeof(T));
+            int hash = 0;
 
-            using (TextWriter tw = new StreamWriter(fileName))
+            foreach (char c in str.ToCharArray())
             {
-                xms.Serialize(tw, obj);
+                hash = c + ((hash << 5) - hash);
             }
+
+            double R = (((byte)(hash & 0xff) / 255.0) * 80.0) + 127.0;
+            double G = (((byte)((hash >> 8) & 0xff) / 255.0) * 80.0) + 127.0;
+            double B = (((byte)((hash >> 16) & 0xff) / 255.0) * 80.0) + 127.0;
+
+            return Color.FromArgb(100, (byte)R, (byte)G, (byte)B);
         }
+
 
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
