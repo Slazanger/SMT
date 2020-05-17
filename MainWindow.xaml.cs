@@ -28,9 +28,6 @@ namespace SMT
 
         public const string SMT_VERSION = "SMT_082";
 
-        private List<UIElement> dynamicRegionsViewElements = new List<UIElement>();
-
-        private bool filterByRegion = true;
 
         private LogonWindow logonBrowserWindow;
 
@@ -128,17 +125,21 @@ namespace SMT
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
 
-            RegionRC.MapConf = MapConf;
-            RegionRC.Init();
-            RegionRC.SelectRegion(MapConf.DefaultRegion);
+            RegionUC.MapConf = MapConf;
+            RegionUC.Init();
+            RegionUC.SelectRegion(MapConf.DefaultRegion);
 
-            RegionRC.RegionChanged += RegionRC_RegionChanged;
-            RegionRC.CharacterSelectionChanged += RegionRC_CharacterSelectionChanged;
-            RegionRC.UniverseSystemSelect += RegionRC_UniverseSystemSelect;
+            RegionUC.RegionChanged += RegionRC_RegionChanged;
+            RegionUC.CharacterSelectionChanged += RegionRC_CharacterSelectionChanged;
+            RegionUC.UniverseSystemSelect += RegionRC_UniverseSystemSelect;
 
             UniverseUC.MapConf = MapConf;
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+
+            RegionsViewUC.MapConf = MapConf;
+            RegionsViewUC.Init();
+            RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
 
             AppStatusBar.DataContext = EVEManager.ServerInfo;
 
@@ -166,7 +167,7 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
-            RegionRC.ANOMManager = ANOMManager;
+            RegionUC.ANOMManager = ANOMManager;
 
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
@@ -181,7 +182,7 @@ namespace SMT
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
 
-            AddRegionsToUniverse();
+
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
@@ -202,6 +203,7 @@ namespace SMT
 
         }
 
+
         /// <summary>
         /// Anom Manager
         /// </summary>
@@ -220,348 +222,7 @@ namespace SMT
         private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
         private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
 
-        /// <summary>
-        /// Add Data to the Universe (Thera, Characters etc)
-        /// </summary>
-        private void AddDataToUniverse()
-        {
-            Brush sysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
-            Brush theraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceRegion);
-            Brush characterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
-
-            foreach (EVEData.MapRegion mr in EVEManager.Regions)
-            {
-                bool addTheraConnection = false;
-                foreach (EVEData.TheraConnection tc in EVEManager.TheraConnections)
-                {
-                    if (string.Compare(tc.Region, mr.Name, true) == 0)
-                    {
-                        addTheraConnection = true;
-                        break;
-                    }
-                }
-
-                if (addTheraConnection)
-                {
-                    Rectangle theraShape = new Rectangle() { Width = 8, Height = 8 };
-
-                    theraShape.Stroke = sysOutlineBrush;
-                    theraShape.StrokeThickness = 1;
-                    theraShape.StrokeLineJoin = PenLineJoin.Round;
-                    theraShape.RadiusX = 2;
-                    theraShape.RadiusY = 2;
-                    theraShape.Fill = theraBrush;
-
-                    theraShape.DataContext = mr;
-                    theraShape.MouseEnter += RegionThera_ShapeMouseOverHandler;
-                    theraShape.MouseLeave += RegionThera_ShapeMouseOverHandler;
-
-                    Canvas.SetLeft(theraShape, mr.UniverseViewX + 28);
-                    Canvas.SetTop(theraShape, mr.UniverseViewY + 3);
-                    Canvas.SetZIndex(theraShape, 22);
-                    MainUniverseCanvas.Children.Add(theraShape);
-                    dynamicRegionsViewElements.Add(theraShape);
-                }
-
-                bool addCharacter = false;
-
-                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
-                {
-                    EVEData.System s = EVEManager.GetEveSystem(lc.Location);
-                    if (s != null && s.Region == mr.Name)
-                    {
-                        addCharacter = true;
-                    }
-                }
-
-                if (addCharacter)
-                {
-                    Rectangle characterShape = new Rectangle() { Width = 8, Height = 8 };
-
-                    characterShape.Stroke = sysOutlineBrush;
-                    characterShape.StrokeThickness = 1;
-                    characterShape.StrokeLineJoin = PenLineJoin.Round;
-                    characterShape.RadiusX = 2;
-                    characterShape.RadiusY = 2;
-                    characterShape.Fill = characterBrush;
-
-                    characterShape.DataContext = mr;
-                    characterShape.MouseEnter += RegionCharacter_ShapeMouseOverHandler;
-                    characterShape.MouseLeave += RegionCharacter_ShapeMouseOverHandler;
-
-                    Canvas.SetLeft(characterShape, mr.UniverseViewX + 28);
-                    Canvas.SetTop(characterShape, mr.UniverseViewY - 11);
-                    Canvas.SetZIndex(characterShape, 23);
-                    MainUniverseCanvas.Children.Add(characterShape);
-                    dynamicRegionsViewElements.Add(characterShape);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Add the regions to the universe view
-        /// </summary>
-        private void AddRegionsToUniverse()
-        {
-            Brush sysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
-            Brush sysInRegionBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
-            Brush backgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
-
-            Brush amarrBg = new SolidColorBrush(Color.FromArgb(255, 126, 110, 95));
-            Brush minmatarBg = new SolidColorBrush(Color.FromArgb(255, 143, 120, 120));
-            Brush gallenteBg = new SolidColorBrush(Color.FromArgb(255, 127, 139, 137));
-            Brush caldariBg = new SolidColorBrush(Color.FromArgb(255, 149, 159, 171));
-
-            MainUniverseCanvas.Background = backgroundColourBrush;
-            MainUniverseGrid.Background = backgroundColourBrush;
-
-            foreach (EVEData.MapRegion mr in EVEManager.Regions)
-            {
-                // add circle for system
-                Rectangle regionShape = new Rectangle() { Height = 30, Width = 80 };
-                regionShape.Stroke = sysOutlineBrush;
-                regionShape.StrokeThickness = 1.5;
-                regionShape.StrokeLineJoin = PenLineJoin.Round;
-                regionShape.RadiusX = 5;
-                regionShape.RadiusY = 5;
-                regionShape.Fill = sysInRegionBrush;
-                regionShape.MouseDown += RegionShape_MouseDown;
-                regionShape.DataContext = mr;
-
-                if (mr.Faction == "Amarr")
-                {
-                    regionShape.Fill = amarrBg;
-                }
-                if (mr.Faction == "Gallente")
-                {
-                    regionShape.Fill = gallenteBg;
-                }
-                if (mr.Faction == "Minmatar")
-                {
-                    regionShape.Fill = minmatarBg;
-                }
-                if (mr.Faction == "Caldari")
-                {
-                    regionShape.Fill = caldariBg;
-                }
-
-                if (mr.HasHighSecSystems)
-                {
-                    regionShape.StrokeThickness = 2.0;
-                }
-
-                if (RegionRC.ActiveCharacter != null && RegionRC.ActiveCharacter.ESILinked && MapConf.ShowRegionStandings)
-                {
-                    float averageStanding = 0.0f;
-                    float numSystems = 0;
-
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
-                    {
-                        if (s.OutOfRegion)
-                            continue;
-
-                        numSystems++;
-
-                        if (MapConf.SOVBasedITCU)
-                        {
-                            if (RegionRC.ActiveCharacter.AllianceID != 0 && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceTCU)
-                            {
-                                averageStanding += 10.0f;
-                            }
-
-                            if (s.ActualSystem.SOVAllianceTCU != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceTCU))
-                            {
-                                averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVAllianceTCU];
-                            }
-                        }
-                        else
-                        {
-                            if (RegionRC.ActiveCharacter.AllianceID != 0 && RegionRC.ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceIHUB)
-                            {
-                                averageStanding += 10.0f;
-                            }
-
-                            if (s.ActualSystem.SOVAllianceTCU != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceIHUB))
-                            {
-                                averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVAllianceIHUB];
-                            }
-                        }
-
-                        if (s.ActualSystem.SOVCorp != 0 && RegionRC.ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
-                        {
-                            averageStanding += RegionRC.ActiveCharacter.Standings[s.ActualSystem.SOVCorp];
-                        }
-                    }
-
-                    averageStanding = averageStanding / numSystems;
-
-                    if (averageStanding > 0.5)
-                    {
-                        Color blueIsh = Colors.Gray;
-                        blueIsh.B += (byte)((255 - blueIsh.B) * (averageStanding / 10.0f));
-                        regionShape.Fill = new SolidColorBrush(blueIsh);
-                    }
-                    else if (averageStanding < -0.5)
-                    {
-                        averageStanding *= -1;
-                        Color redIsh = Colors.Gray;
-                        redIsh.R += (byte)((255 - redIsh.R) * (averageStanding / 10.0f));
-                        regionShape.Fill = new SolidColorBrush(redIsh);
-                    }
-                    else
-                    {
-                        regionShape.Fill = new SolidColorBrush(Colors.Gray);
-                    }
-
-                    if (mr.HasHighSecSystems)
-                    {
-                        regionShape.Fill = new SolidColorBrush(Colors.LightGray);
-                    }
-                }
-
-                if (MapConf.ShowUniverseRats)
-                {
-                    double numRatkills = 0.0f;
-
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
-                    {
-                        if (s.OutOfRegion)
-                            continue;
-
-                        numRatkills += s.ActualSystem.NPCKillsLastHour;
-                    }
-                    byte b = 255;
-
-                    double ratScale = numRatkills / (15000 * MapConf.UniverseDataScale);
-                    ratScale = Math.Min(Math.Max(0.0, ratScale), 1.0);
-                    b = (byte)(255.0 * (ratScale));
-
-                    Color c = new Color();
-                    c.A = b;
-                    c.B = b;
-                    c.G = b;
-                    c.A = 255;
-
-                    regionShape.Fill = new SolidColorBrush(c);
-                }
-
-                if (MapConf.ShowUniversePods)
-                {
-                    float numPodKills = 0.0f;
-
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
-                    {
-                        if (s.OutOfRegion)
-                            continue;
-
-                        numPodKills += s.ActualSystem.PodKillsLastHour;
-                    }
-                    byte b = 255;
-
-                    double podScale = numPodKills / (50 * MapConf.UniverseDataScale);
-                    podScale = Math.Min(Math.Max(0.0, podScale), 1.0);
-                    b = (byte)(255.0 * (podScale));
-
-                    Color c = new Color();
-                    c.A = b;
-                    c.R = b;
-                    c.G = b;
-                    c.A = 255;
-
-                    regionShape.Fill = new SolidColorBrush(c);
-                }
-
-                if (MapConf.ShowUniverseKills)
-                {
-                    float numShipKills = 0.0f;
-
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
-                    {
-                        if (s.OutOfRegion)
-                            continue;
-
-                        numShipKills += s.ActualSystem.ShipKillsLastHour;
-                    }
-                    byte b = 255;
-                    double shipScale = numShipKills / (100 * MapConf.UniverseDataScale);
-                    shipScale = Math.Min(Math.Max(0.0, shipScale), 1.0);
-                    b = (byte)(255.0 * (shipScale));
-
-                    Color c = new Color();
-                    c.A = b;
-                    c.R = b;
-                    c.B = b;
-                    c.A = 255;
-                    regionShape.Fill = new SolidColorBrush(c);
-                }
-
-                Canvas.SetLeft(regionShape, mr.UniverseViewX - 40);
-                Canvas.SetTop(regionShape, mr.UniverseViewY - 15);
-                Canvas.SetZIndex(regionShape, 22);
-                MainUniverseCanvas.Children.Add(regionShape);
-
-                Label regionText = new Label();
-                regionText.Width = 80;
-                regionText.Height = 27;
-                regionText.Content = mr.Name;
-                regionText.Foreground = sysOutlineBrush;
-                regionText.FontSize = 10;
-                regionText.HorizontalAlignment = HorizontalAlignment.Center;
-                regionText.VerticalAlignment = VerticalAlignment.Center;
-                regionText.IsHitTestVisible = false;
-
-                regionText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                regionText.VerticalContentAlignment = VerticalAlignment.Center;
-
-                Canvas.SetLeft(regionText, mr.UniverseViewX - 40);
-                Canvas.SetTop(regionText, mr.UniverseViewY - 15);
-                Canvas.SetZIndex(regionText, 23);
-                MainUniverseCanvas.Children.Add(regionText);
-
-                if (!string.IsNullOrEmpty(mr.Faction))
-                {
-                    Label factionText = new Label();
-                    factionText.Width = 80;
-                    factionText.Height = 30;
-                    factionText.Content = mr.Faction;
-                    factionText.Foreground = sysOutlineBrush;
-                    factionText.FontSize = 6;
-                    factionText.HorizontalAlignment = HorizontalAlignment.Center;
-                    factionText.VerticalAlignment = VerticalAlignment.Center;
-                    factionText.IsHitTestVisible = false;
-
-                    factionText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                    factionText.VerticalContentAlignment = VerticalAlignment.Bottom;
-
-                    Canvas.SetLeft(factionText, mr.UniverseViewX - 40);
-                    Canvas.SetTop(factionText, mr.UniverseViewY - 15);
-                    Canvas.SetZIndex(factionText, 23);
-                    MainUniverseCanvas.Children.Add(factionText);
-                }
-
-                // now add all the region links : TODO :  this will end up adding 2 lines, region a -> b and b -> a
-                foreach (string s in mr.RegionLinks)
-                {
-                    EVEData.MapRegion or = EVEManager.GetRegion(s);
-                    Line regionLink = new Line();
-
-                    regionLink.X1 = mr.UniverseViewX;
-                    regionLink.Y1 = mr.UniverseViewY;
-
-                    regionLink.X2 = or.UniverseViewX;
-                    regionLink.Y2 = or.UniverseViewY;
-
-                    regionLink.Stroke = sysOutlineBrush;
-                    regionLink.StrokeThickness = 1;
-                    regionLink.Visibility = Visibility.Visible;
-
-                    Canvas.SetZIndex(regionLink, 21);
-                    MainUniverseCanvas.Children.Add(regionLink);
-                }
-            }
-        }
-
-        private AvalonDock.Layout.LayoutDocument FindDocWithContentID(AvalonDock.Layout.ILayoutElement root, string contentID)
+         private AvalonDock.Layout.LayoutDocument FindDocWithContentID(AvalonDock.Layout.ILayoutElement root, string contentID)
         {
             AvalonDock.Layout.LayoutDocument content = null;
 
@@ -646,119 +307,6 @@ namespace SMT
             EVEManager.ShutDown();
         }
 
-
-        private void RedrawUniverse(bool redraw)
-        {
-            if (redraw)
-            {
-                MainUniverseCanvas.Children.Clear();
-                AddRegionsToUniverse();
-            }
-            else
-            {
-                foreach (UIElement uie in dynamicRegionsViewElements)
-                {
-                    MainUniverseCanvas.Children.Remove(uie);
-                }
-                dynamicRegionsViewElements.Clear();
-            }
-
-            AddDataToUniverse();
-        }
-
-        private void RegionCharacter_ShapeMouseOverHandler(object sender, MouseEventArgs e)
-        {
-            Shape obj = sender as Shape;
-
-            EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
-
-            if (obj.IsMouseOver)
-            {
-                RegionCharacterInfo.PlacementTarget = obj;
-                RegionCharacterInfo.VerticalOffset = 5;
-                RegionCharacterInfo.HorizontalOffset = 15;
-
-                RegionCharacterInfoSP.Children.Clear();
-
-                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
-                {
-                    EVEData.System s = EVEManager.GetEveSystem(lc.Location);
-                    if (s != null && s.Region == selectedRegion.Name)
-                    {
-                        Label l = new Label();
-                        l.Content = lc.Name + " (" + lc.Location + ")";
-                        RegionCharacterInfoSP.Children.Add(l);
-                    }
-                }
-
-                RegionCharacterInfo.IsOpen = true;
-            }
-            else
-            {
-                RegionCharacterInfo.IsOpen = false;
-            }
-        }
-
-        private void RegionShape_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Shape obj = sender as Shape;
-            EVEData.MapRegion mr = obj.DataContext as EVEData.MapRegion;
-            if (mr == null)
-            {
-                return;
-            }
-
-            if (e.ClickCount == 2)
-            {
-                RegionRC.SelectRegion(mr.Name);
-                if (RegionLayoutDoc != null)
-                {
-                    RegionLayoutDoc.IsSelected = true;
-                }
-            }
-        }
-
-        private void RegionThera_ShapeMouseOverHandler(object sender, MouseEventArgs e)
-        {
-            Shape obj = sender as Shape;
-
-            EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
-
-            if (obj.IsMouseOver)
-            {
-                RegionTheraInfo.PlacementTarget = obj;
-                RegionTheraInfo.VerticalOffset = 5;
-                RegionTheraInfo.HorizontalOffset = 15;
-
-                RegionTheraInfoSP.Children.Clear();
-
-                Label header = new Label();
-                header.Content = "Thera Connections";
-                header.FontWeight = FontWeights.Bold;
-                header.Margin = new Thickness(1);
-                header.Padding = new Thickness(1);
-                RegionTheraInfoSP.Children.Add(header);
-
-                foreach (EVEData.TheraConnection tc in EVEManager.TheraConnections)
-                {
-                    if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
-                    {
-                        Label l = new Label();
-                        l.Content = $"    {tc.System}";
-                        l.Margin = new Thickness(1);
-                        l.Padding = new Thickness(1);
-
-                        RegionTheraInfoSP.Children.Add(l);
-                    }
-                }
-
-                RegionTheraInfo.IsOpen = true;
-            }
-            else
-            {
-                RegionTheraInfo.IsOpen = false;
-            }
-        }
         private int uiRefreshCounter = 0;
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
@@ -766,7 +314,6 @@ namespace SMT
             uiRefreshCounter++;
             if (uiRefreshCounter == 5)
             {
-                RedrawUniverse(false);
                 uiRefreshCounter = 0;
             }
             if (MapConf.SyncActiveCharacterBasedOnActiveEVEClient)
@@ -775,7 +322,22 @@ namespace SMT
             }
         }
 
+        #region RegionsView Control
 
+        private void RegionsViewUC_RequestRegion(object sender, RoutedEventArgs e)
+        {
+            string regionName = e.OriginalSource as string;
+            RegionUC.FollowCharacter = false;
+            RegionUC.SelectRegion(regionName);
+
+            if (RegionLayoutDoc != null)
+            {
+                RegionLayoutDoc.IsSelected = true;
+            }
+        }
+
+
+        #endregion
 
         #region Region Control
 
@@ -807,31 +369,31 @@ namespace SMT
                 EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
             }
 
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
 
             if (e.PropertyName == "ShowRegionStandings")
             {
-                RedrawUniverse(true);
+                RegionsViewUC.Redraw(true);
             }
 
             if (e.PropertyName == "ShowUniverseRats")
             {
-                RedrawUniverse(true);
+                RegionsViewUC.Redraw(true);
             }
 
             if (e.PropertyName == "ShowUniversePods")
             {
-                RedrawUniverse(true);
+                RegionsViewUC.Redraw(true);
             }
 
             if (e.PropertyName == "ShowUniverseKills")
             {
-                RedrawUniverse(true);
+                RegionsViewUC.Redraw(true);
             }
 
             if (e.PropertyName == "UniverseDataScale")
             {
-                RedrawUniverse(true);
+                RegionsViewUC.Redraw(true);
             }
         }
 
@@ -845,7 +407,7 @@ namespace SMT
         {
             if (RegionLayoutDoc != null)
             {
-                RegionLayoutDoc.Title = RegionRC.Region.Name;
+                RegionLayoutDoc.Title = RegionUC.Region.Name;
             }
 
             CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
@@ -869,8 +431,8 @@ namespace SMT
         private void UniverseUC_RequestRegionSystem(object sender, RoutedEventArgs e)
         {
             string sysName = e.OriginalSource as string;
-            RegionRC.FollowCharacter = false;
-            RegionRC.SelectSystem(sysName, true);
+            RegionUC.FollowCharacter = false;
+            RegionUC.SelectSystem(sysName, true);
 
             if (RegionLayoutDoc != null)
             {
@@ -884,7 +446,7 @@ namespace SMT
 
         private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
         {
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
             UniverseUC.ReDrawMap(true, true, true);
         }
 
@@ -892,7 +454,7 @@ namespace SMT
         {
             MapConf.SetDefaultColours();
             ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
             UniverseUC.ReDrawMap(true, true, true);
         }
 
@@ -913,7 +475,7 @@ namespace SMT
 
         private void PreferencesWindow_Closed(object sender, EventArgs e)
         {
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
             UniverseUC.ReDrawMap(true, true, false);
         }
 
@@ -1009,8 +571,8 @@ namespace SMT
                 {
                     if (lc.Name == characterName)
                     {
-                        RegionRC.CharacterDropDown.SelectedItem = lc;
-                        RegionRC.ActiveCharacter = lc;
+                        RegionUC.CharacterDropDown.SelectedItem = lc;
+                        RegionUC.ActiveCharacter = lc;
                         break;
                     }
                 }
@@ -1047,7 +609,7 @@ namespace SMT
 
                     if (lc != null)
                     {
-                        RegionRC.SelectSystem(lc.Location, true);
+                        RegionUC.SelectSystem(lc.Location, true);
                     }
                 }
             }
@@ -1078,12 +640,12 @@ namespace SMT
                 {
                     if (s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        if (RegionRC.Region.Name != sys.Region)
+                        if (RegionUC.Region.Name != sys.Region)
                         {
-                            RegionRC.SelectRegion(sys.Region);
+                            RegionUC.SelectRegion(sys.Region);
                         }
 
-                        RegionRC.SelectSystem(s, true);
+                        RegionUC.SelectSystem(s, true);
                         return;
                     }
                 }
@@ -1171,7 +733,7 @@ namespace SMT
 
                     if (tc != null)
                     {
-                        RegionRC.SelectSystem(tc.System, true);
+                        RegionUC.SelectSystem(tc.System, true);
                     }
                 }
             }
@@ -1183,7 +745,7 @@ namespace SMT
 
         private void AddWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (RegionRC.ActiveCharacter == null)
+            if (RegionUC.ActiveCharacter == null)
             {
                 return;
             }
@@ -1197,14 +759,14 @@ namespace SMT
 
             if (s != null)
             {
-                RegionRC.ActiveCharacter.AddDestination(s.ID, false);
+                RegionUC.ActiveCharacter.AddDestination(s.ID, false);
             }
         }
 
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null)
             {
                 lock (c.ActiveRouteLock)
@@ -1218,7 +780,7 @@ namespace SMT
 
         private void ReCalculateRouteBtn_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null && c.Waypoints.Count > 0)
             {
                 c.RecalcRoute();
@@ -1227,7 +789,7 @@ namespace SMT
 
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null)
             {
                 string WPT = c.GetWayPointText();
@@ -1317,7 +879,7 @@ namespace SMT
 
             EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
 
             ImportJumpGatesBtn.IsEnabled = true;
             ClearJumpGatesBtn.IsEnabled = true;
@@ -1366,7 +928,7 @@ namespace SMT
 
             EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
 
         }
 
@@ -1384,9 +946,9 @@ namespace SMT
 
             EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
 
-            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null && c.Waypoints.Count > 0)
             {
                 c.RecalcRoute();
@@ -1407,9 +969,9 @@ namespace SMT
 
             EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
-            RegionRC.ReDrawMap(true);
+            RegionUC.ReDrawMap(true);
 
-            EVEData.LocalCharacter c = RegionRC.ActiveCharacter as EVEData.LocalCharacter;
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null && c.Waypoints.Count > 0)
             {
                 c.RecalcRoute();
@@ -1467,6 +1029,9 @@ namespace SMT
 
         #region ZKillBoard
 
+        private bool zkbFilterByRegion = true;
+
+
         private void ZKBContexMenu_ShowSystem_Click(object sender, RoutedEventArgs e)
         {
             if (ZKBFeed.SelectedIndex == -1)
@@ -1478,7 +1043,7 @@ namespace SMT
 
             if (zkbs != null)
             {
-                RegionRC.SelectSystem(zkbs.SystemName, true);
+                RegionUC.SelectSystem(zkbs.SystemName, true);
 
                 if (RegionLayoutDoc != null)
                 {
@@ -1537,7 +1102,7 @@ namespace SMT
 
         private bool ZKBFeedFilter(object item)
         {
-            if (filterByRegion == false)
+            if (zkbFilterByRegion == false)
             {
                 return true;
             }
@@ -1548,7 +1113,7 @@ namespace SMT
                 return false;
             }
 
-            if (RegionRC.Region.IsSystemOnMap(zs.SystemName))
+            if (RegionUC.Region.IsSystemOnMap(zs.SystemName))
             {
                 return true;
             }
@@ -1558,7 +1123,7 @@ namespace SMT
 
         private void ZKBFeedFilterViewChk_Checked(object sender, RoutedEventArgs e)
         {
-            filterByRegion = (bool)ZKBFeedFilterViewChk.IsChecked;
+            zkbFilterByRegion = (bool)ZKBFeedFilterViewChk.IsChecked;
 
             if (ZKBFeed != null)
             {
@@ -1632,7 +1197,7 @@ namespace SMT
             {
                 float Standing = 0.0f;
 
-                EVEData.LocalCharacter c = MainWindow.AppWindow.RegionRC.ActiveCharacter;
+                EVEData.LocalCharacter c = MainWindow.AppWindow.RegionUC.ActiveCharacter;
                 if (c != null && c.ESILinked)
                 {
                     if (c.AllianceID != 0 && c.AllianceID == zs.VictimAllianceID)
