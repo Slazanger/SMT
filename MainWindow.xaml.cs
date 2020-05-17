@@ -1023,13 +1023,12 @@ namespace SMT
         /// </summary>
         private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
         {
-            string esiLogonURL = EVEManager.GetESILogonURL();
 
             if (logonBrowserWindow != null)
             {
                 logonBrowserWindow.Close();
             }
-            System.Diagnostics.Process.Start(esiLogonURL);
+
 
             logonBrowserWindow = new LogonWindow();
             logonBrowserWindow.Owner = this;

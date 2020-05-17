@@ -965,9 +965,9 @@ namespace SMT.EVEData
         /// <summary>
         /// Get the ESI Logon URL String
         /// </summary>
-        public string GetESILogonURL()
+        public string GetESILogonURL(string challengeCode)
         {
-            return ESIClient.SSO.CreateAuthenticationUrl(ESIScopes);
+            return ESIClient.SSO.CreateAuthenticationUrlV2(ESIScopes, challengeCode, VersionStr);
         }
 
         /// <summary>
@@ -1078,7 +1078,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Hand the custom smtauth- url we get back from the logon screen
         /// </summary>
-        public async void HandleEveAuthSMTUri(Uri uri)
+        public async void HandleEveAuthSMTUri(Uri uri, string challengeCode)
         {
             // parse the uri
             var query = HttpUtility.ParseQueryString(uri.Query);
@@ -1090,7 +1090,7 @@ namespace SMT.EVEData
 
             string code = query["code"];
 
-            SsoToken sst = await ESIClient.SSO.GetToken(GrantType.AuthorizationCode, code);
+            SsoToken sst = await ESIClient.SSO.GetTokenV2(GrantType.AuthorizationCode, code, challengeCode);
             if (sst == null || sst.ExpiresIn == 0)
             {
                 return;
