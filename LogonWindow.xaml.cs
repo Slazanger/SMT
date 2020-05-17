@@ -58,7 +58,7 @@ namespace SMT
                     Close();
                 }), DispatcherPriority.Normal, null);
             }
-            catch (Exception ex)
+            catch
             {
             }
         }

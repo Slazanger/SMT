@@ -1090,7 +1090,7 @@ namespace SMT.EVEData
 
             string code = query["code"];
 
-            SsoToken sst = await ESIClient.SSO.GetTokenV2(GrantType.AuthorizationCode, code, challengeCode);
+            SsoToken sst = await ESIClient.SSO.GetTokenV2(GrantType.AuthorizationCode, code, challengeCode, null);
             if (sst == null || sst.ExpiresIn == 0)
             {
                 return;
@@ -1897,7 +1897,7 @@ namespace SMT.EVEData
 
                     intelFileReadPos[changedFile] = fileReadFrom;
                 }
-                catch (Exception ex)
+                catch
                 {
                 }
             }
