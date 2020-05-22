@@ -121,6 +121,7 @@ namespace SMT
             EVEManager.InitNavigation();
 
             CharactersList.ItemsSource = EVEManager.LocalCharacters;
+            CurrentActiveCharacterCombo.ItemsSource = EVEManager.LocalCharacters;
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
@@ -202,6 +203,12 @@ namespace SMT
             }
 
         }
+
+        private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
+
 
 
         /// <summary>
@@ -1178,7 +1185,18 @@ namespace SMT
             }
         }
         #endregion Anoms
+                
 
+        private void CurrentActiveCharacterCombo_Selected(object sender, SelectionChangedEventArgs e)
+        {
+            if (CurrentActiveCharacterCombo.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            RegionsViewUC.ActiveCharacter = CurrentActiveCharacterCombo.SelectedItem as EVEData.LocalCharacter;
+
+        }
     }
 
 

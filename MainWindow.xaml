@@ -35,11 +35,10 @@
     </Window.Resources>
 
     <DockPanel>
-
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
-                <MenuItem Header="Exit" />
+                <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
             </MenuItem>
 
             <MenuItem Header="Data">
@@ -49,7 +48,12 @@
             <MenuItem Header="View">
                 <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
             </MenuItem>
+
+            <ComboBox x:Name="CurrentActiveCharacterCombo" Width="180" Margin="0,-3,0,-1" IsReadOnly="True" SelectionChanged="CurrentActiveCharacterCombo_Selected"/>
         </Menu>
+
+
+
         <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom">
             <StatusBarItem>
                 <TextBlock><Run Text="EVE Time :" /></TextBlock>
@@ -358,7 +362,7 @@
 
                     <xcadl:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False">
                         <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Regions">
-                            <Grid x:Name="MainUniverseGrid"  ClipToBounds="True" Grid.Row="1">
+                            <Grid>
                                 <local:RegionsViewControl x:Name="RegionsViewUC" />
                             </Grid>
                         </xcadl:LayoutDocument>
@@ -371,7 +375,10 @@
                             <local:UniverseControl x:Name="UniverseUC" />
                         </xcadl:LayoutDocument>
                     </xcadl:LayoutDocumentPane>
+
                 </xcadl:LayoutPanel>
+
+
             </xcadl:LayoutRoot>
         </xcad:DockingManager>
     </DockPanel>
