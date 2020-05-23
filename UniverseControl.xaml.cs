@@ -245,6 +245,18 @@ namespace SMT
             }
         }
 
+        public EVEData.LocalCharacter ActiveCharacter { get; set; }
+
+        public void UpdateActiveCharacter(EVEData.LocalCharacter lc)
+        {
+            ActiveCharacter = lc;
+
+            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            {
+                CentreMapOnActiveCharacter();
+            }
+        }
+
         public static readonly RoutedEvent RequestRegionSystemSelectEvent = EventManager.RegisterRoutedEvent("RequestRegionSystem", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
 
         public event RoutedEventHandler RequestRegionSystem
@@ -560,6 +572,10 @@ namespace SMT
                 DataRedraw = false;
             }
 
+            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            {
+                CentreMapOnActiveCharacter();
+            }
             ReDrawMap(FullRedraw, DataRedraw, FastUpdate);
         }
 
@@ -1093,8 +1109,7 @@ namespace SMT
                     }
                 }
 
-                /*
-                if (ActiveRoute != null)
+/*                if (ActiveRoute != null)
                 {
                     if (ActiveRoute.Count > 1)
                     {
@@ -1214,50 +1229,6 @@ namespace SMT
                 UniverseMainCanvas.Children.Insert(0, VHRegionNames);
             }
 
-            /*
-            foreach (EVEData.MapRegion mr in EM.Regions)
-            {
-                List<Point> systems = new List<Point>();
-
-                foreach (EVEData.MapSystem ms in mr.MapSystems.Values)
-                {
-                    if (ms.OutOfRegion)
-                    {
-                        continue;
-                    }
-
-                    double X = (ms.ActualSystem.ActualX - universeXMin) * universeScale;
-
-                    // need to invert Z
-                    double Z = (universeDepth - (ms.ActualSystem.ActualZ - universeZMin)) * universeScale;
-
-                    Point p = new Point(X, Z);
-                    systems.Add(p);
-                }
-
-                List<Point> regionCH = ConvexHull(systems);
-                Point pStart = regionCH[0];
-                regionCH.RemoveAt(0);
-                StreamGeometry streamGeometry = new StreamGeometry();
-                using (StreamGeometryContext geometryContext = streamGeometry.Open())
-                {
-                    geometryContext.BeginFigure(pStart, true, true);
-                    PointCollection points = new PointCollection(regionCH);
-                    geometryContext.PolyLineTo(points, true, true);
-                }
-
-                System.Windows.Media.DrawingVisual regionShapeVisual = new System.Windows.Media.DrawingVisual();
-                //regionShapeVisual.CacheMode = cm;
-
-                // Retrieve the DrawingContext in order to create new drawing content.
-                DrawingContext drawingContext = regionShapeVisual.RenderOpen();
-                drawingContext.DrawGeometry(Brushes.LightGreen, new Pen(Brushes.White, 2), streamGeometry);
-                drawingContext.Close();
-                VHRegionNames.AddChild(regionShapeVisual, null);
-            }
-
-    */
-
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
                 double X = (mr.RegionX - universeXMin) * universeScale; ;
@@ -1347,6 +1318,31 @@ namespace SMT
 
             RoutedEventArgs newEventArgs = new RoutedEventArgs(RequestRegionSystemSelectEvent, s.Name);
             RaiseEvent(newEventArgs);
+        }
+
+        private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)
+        {
+            CentreMapOnActiveCharacter();
+        }
+
+        private void CentreMapOnActiveCharacter()
+        {
+            if(ActiveCharacter == null || string.IsNullOrEmpty(ActiveCharacter.Location))
+            {
+                return;
+            }
+
+            EVEData.System s = EM.GetEveSystem(ActiveCharacter.Location);
+
+            if (s != null)
+            {
+                // actual
+                double X1 = (s.ActualX - universeXMin) * universeScale;
+                double Y1 = (universeDepth - (s.ActualZ - universeZMin)) * universeScale;
+
+                MainZoomControl.Show(X1, Y1, MainZoomControl.Zoom);
+            }
+
         }
     }
 }

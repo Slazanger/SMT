@@ -228,7 +228,7 @@ namespace SMT
         private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
         private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
 
-         private AvalonDock.Layout.LayoutDocument FindDocWithContentID(AvalonDock.Layout.ILayoutElement root, string contentID)
+        private AvalonDock.Layout.LayoutDocument FindDocWithContentID(AvalonDock.Layout.ILayoutElement root, string contentID)
         {
             AvalonDock.Layout.LayoutDocument content = null;
 
@@ -305,7 +305,7 @@ namespace SMT
                 }
             }
             catch
-            { 
+            {
             }
 
             // save the character data
@@ -579,7 +579,9 @@ namespace SMT
                     if (lc.Name == characterName)
                     {
                         CurrentActiveCharacterCombo.SelectedItem = lc;
-                        RegionUC.ActiveCharacter = lc;
+                        RegionUC.UpdateActiveCharacter(lc);
+                        UniverseUC.UpdateActiveCharacter(lc);
+
                         break;
                     }
                 }
@@ -592,7 +594,6 @@ namespace SMT
         /// </summary>
         private void btn_AddCharacter_Click(object sender, RoutedEventArgs e)
         {
-
             if (logonBrowserWindow != null)
             {
                 logonBrowserWindow.Close();
@@ -621,6 +622,46 @@ namespace SMT
                 }
             }
         }
+
+        private void CurrentActiveCharacterCombo_Selected(object sender, SelectionChangedEventArgs e)
+        {
+            if (CurrentActiveCharacterCombo.SelectedIndex == -1)
+            {
+                RegionsViewUC.ActiveCharacter = null;
+                RegionUC.ActiveCharacter = null;
+                RegionUC.UpdateActiveCharacter();
+                UniverseUC.UpdateActiveCharacter(null);
+            }
+            else
+            {
+                EVEData.LocalCharacter lc = CurrentActiveCharacterCombo.SelectedItem as EVEData.LocalCharacter;
+                RegionsViewUC.ActiveCharacter = lc;
+                RegionUC.UpdateActiveCharacter(lc);
+                UniverseUC.UpdateActiveCharacter(lc);
+            }
+
+            OnCharacterSelectionChanged();
+        }
+
+        private void CharactersListMenuItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (CharactersList.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
+
+            CurrentActiveCharacterCombo.SelectedIndex = -1;
+            RegionsViewUC.ActiveCharacter = null;
+            RegionUC.ActiveCharacter = null;
+            RegionUC.UpdateActiveCharacter();
+            UniverseUC.ActiveCharacter = null;
+            OnCharacterSelectionChanged();
+
+            EVEManager.LocalCharacters.Remove(lc);
+        }
+
 
 
         #endregion
@@ -1185,43 +1226,8 @@ namespace SMT
             }
         }
         #endregion Anoms
-                
 
-        private void CurrentActiveCharacterCombo_Selected(object sender, SelectionChangedEventArgs e)
-        {
-            if (CurrentActiveCharacterCombo.SelectedIndex == -1)
-            {
-                RegionsViewUC.ActiveCharacter = null;
-                RegionUC.ActiveCharacter = null;
-                RegionUC.UpdateActiveCharacter();
-            }
-            else
-            {
-                EVEData.LocalCharacter lc = CurrentActiveCharacterCombo.SelectedItem as EVEData.LocalCharacter;
-                RegionsViewUC.ActiveCharacter = lc;
-                RegionUC.UpdateActiveCharacter(lc);
-            }
 
-            OnCharacterSelectionChanged();
-        }
-
-        private void CharactersListMenuItemDelete_Click(object sender, RoutedEventArgs e)
-        {
-            if (CharactersList.SelectedIndex == -1)
-            {
-                return;
-            }
-
-            EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
-
-            CurrentActiveCharacterCombo.SelectedIndex = -1;
-            RegionsViewUC.ActiveCharacter = null;
-            RegionUC.ActiveCharacter = null;
-            RegionUC.UpdateActiveCharacter();
-            OnCharacterSelectionChanged();
-
-            EVEManager.LocalCharacters.Remove(lc);
-        }
     }
 
 
