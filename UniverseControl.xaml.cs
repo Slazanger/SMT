@@ -1344,5 +1344,18 @@ namespace SMT
             }
 
         }
+
+         private void MainZoomControl_ContentDragFinished(object sender, RoutedEventArgs e)
+        {
+            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            {
+                FollowCharacterChk.IsChecked = false;
+            }
+        }
+
+        private void RecentreBtn_Click(object sender, RoutedEventArgs e)
+        {
+            CentreMapOnActiveCharacter();
+        }
     }
 }

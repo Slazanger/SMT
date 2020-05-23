@@ -68,11 +68,15 @@
                     </ItemsPanelTemplate>
                 </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
             </dotNetKitControls:AutoCompleteComboBox>
+            <Button x:Name="RecentreBtn" Click="RecentreBtn_Click" Padding="0">
+                <Image Source="Images/recentre.png"/>
+            </Button>
+
             <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Auto Follow Active Character" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
 
         </StackPanel>
 
-        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2">
+        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2" ContentDragFinished="MainZoomControl_ContentDragFinished">
             <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
         </zoombox1:ZoomControl>
 
