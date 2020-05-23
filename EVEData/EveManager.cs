@@ -495,7 +495,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystems.csv";
+            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapSolarSystems.csv";
             if (File.Exists(eveStaticDataSolarSystemFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
@@ -535,7 +535,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export for the regions and extract some info from it
-            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapRegions.csv";
+            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapRegions.csv";
             if (File.Exists(eveStaticDataRegionFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataRegionFile);
@@ -567,7 +567,7 @@ namespace SMT.EVEData
                 // Error
             }
 
-            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystemJumps.csv";
+            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapSolarSystemJumps.csv";
             if (File.Exists(eveStaticDataJumpsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsFile);
@@ -594,7 +594,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\staStations.csv";
+            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\staStations.csv";
             if (File.Exists(eveStaticDataStationsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataStationsFile);
@@ -768,7 +768,7 @@ namespace SMT.EVEData
             }
 
             // now get the ships
-            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\invTypes.csv";
+            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\invTypes.csv";
             if (File.Exists(eveStaticDataItemTypesFile))
             {
                 ShipTypes = new SerializableDictionary<string, string>();
@@ -883,7 +883,7 @@ namespace SMT.EVEData
             }
 
             // now add the jove systems
-            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\JoveSystems.csv";
+            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\JoveSystems.csv";
             if (File.Exists(eveStaticDataJoveObservatories))
             {
                 StreamReader file = new StreamReader(eveStaticDataJoveObservatories);

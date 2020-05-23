@@ -1280,6 +1280,7 @@ namespace SMT
 
             if (sd != null)
             {
+                FollowCharacterChk.IsChecked = false;
                 ShowSystem(sd.Name);
             }
         }
