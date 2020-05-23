@@ -26,7 +26,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
 
-        public const string SMT_VERSION = "SMT_082";
+        public const string SMT_VERSION = "SMT_083";
 
 
         private LogonWindow logonBrowserWindow;
@@ -131,7 +131,6 @@ namespace SMT
             RegionUC.SelectRegion(MapConf.DefaultRegion);
 
             RegionUC.RegionChanged += RegionRC_RegionChanged;
-            RegionUC.CharacterSelectionChanged += RegionRC_CharacterSelectionChanged;
             RegionUC.UniverseSystemSelect += RegionRC_UniverseSystemSelect;
 
             UniverseUC.MapConf = MapConf;
@@ -404,11 +403,12 @@ namespace SMT
             }
         }
 
-
-        private void RegionRC_CharacterSelectionChanged(object sender, PropertyChangedEventArgs e)
+        private void OnCharacterSelectionChanged()
         {
             CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+
         }
+
 
         private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -578,7 +578,7 @@ namespace SMT
                 {
                     if (lc.Name == characterName)
                     {
-                        RegionUC.CharacterDropDown.SelectedItem = lc;
+                        CurrentActiveCharacterCombo.SelectedItem = lc;
                         RegionUC.ActiveCharacter = lc;
                         break;
                     }
@@ -1191,11 +1191,36 @@ namespace SMT
         {
             if (CurrentActiveCharacterCombo.SelectedIndex == -1)
             {
+                RegionsViewUC.ActiveCharacter = null;
+                RegionUC.ActiveCharacter = null;
+                RegionUC.UpdateActiveCharacter();
+            }
+            else
+            {
+                EVEData.LocalCharacter lc = CurrentActiveCharacterCombo.SelectedItem as EVEData.LocalCharacter;
+                RegionsViewUC.ActiveCharacter = lc;
+                RegionUC.UpdateActiveCharacter(lc);
+            }
+
+            OnCharacterSelectionChanged();
+        }
+
+        private void CharactersListMenuItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (CharactersList.SelectedIndex == -1)
+            {
                 return;
             }
 
-            RegionsViewUC.ActiveCharacter = CurrentActiveCharacterCombo.SelectedItem as EVEData.LocalCharacter;
+            EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
 
+            CurrentActiveCharacterCombo.SelectedIndex = -1;
+            RegionsViewUC.ActiveCharacter = null;
+            RegionUC.ActiveCharacter = null;
+            RegionUC.UpdateActiveCharacter();
+            OnCharacterSelectionChanged();
+
+            EVEManager.LocalCharacters.Remove(lc);
         }
     }
 

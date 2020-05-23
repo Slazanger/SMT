@@ -116,8 +116,6 @@ namespace SMT
             DataContext = this;
         }
 
-        public event PropertyChangedEventHandler CharacterSelectionChanged;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public event PropertyChangedEventHandler RegionChanged;
@@ -345,44 +343,7 @@ namespace SMT
             }
         }
 
-        public void AddEveTraceFleetsToMap()
-        {
-            Brush TheraBrush = new SolidColorBrush(Colors.OrangeRed);
-
-            if (EM.FleetIntel == null)
-            {
-                return;
-            }
-
-            foreach (EveTrace.FleetInstance fi in EM.FleetIntel.FleetInstances)
-            {
-                EVEData.System s = EM.GetEveSystemFromID(fi.System);
-                if (s == null)
-                {
-                    continue;
-                }
-
-                if (Region.IsSystemOnMap(s.Name))
-                {
-                    int size = 2;
-
-                    Shape ETShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + size, Width = SYSTEM_SHAPE_SIZE + size }; ;
-                    ETShape.Stroke = TheraBrush;
-                    ETShape.StrokeThickness = 1.5;
-                    ETShape.StrokeLineJoin = PenLineJoin.Round;
-                    ETShape.Fill = TheraBrush;
-
-                    MapSystem ms = Region.MapSystems[s.Name];
-
-                    Canvas.SetLeft(ETShape, ms.LayoutX - (ETShape.Width / 2));
-                    Canvas.SetTop(ETShape, ms.LayoutY - (ETShape.Height / 2));
-                    Canvas.SetZIndex(ETShape, SYSTEM_Z_INDEX - 3);
-                    MainCanvas.Children.Add(ETShape);
-                }
-            }
-        }
-
-        public void AddTheraSystemsToMap()
+         public void AddTheraSystemsToMap()
         {
             Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
 
@@ -428,7 +389,6 @@ namespace SMT
 
             DynamicMapElements = new List<UIElement>();
 
-            CharacterDropDown.ItemsSource = EM.LocalCharacters;
             ActiveCharacter = null;
 
             RegionSelectCB.ItemsSource = EM.Regions;
@@ -460,7 +420,7 @@ namespace SMT
         {
             if (ActiveCharacter != null && FollowCharacter == true)
             {
-                HandleCharacterSelectionChange();
+                UpdateActiveCharacter();
             }
 
             if (FullRedraw)
@@ -511,7 +471,6 @@ namespace SMT
             AddHighlightToSystem(SelectedSystem);
             AddRouteToMap();
             AddTheraSystemsToMap();
-            AddEveTraceFleetsToMap();
         }
 
         /// <summary>
@@ -604,15 +563,6 @@ namespace SMT
             ///AnomSigList.ItemsSource = system.Anoms.Values;
         }
 
-
-        protected void OnCharacterSelectionChanged(string name)
-        {
-            PropertyChangedEventHandler handler = CharacterSelectionChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
-        }
 
         protected void OnPropertyChanged(string name)
         {
@@ -2281,12 +2231,6 @@ namespace SMT
                 {
                     AllianceNameListStackPanel.Children.Add(l);
                 }
-
-
-
-
-
-
             }
             else
             {
@@ -2319,16 +2263,6 @@ namespace SMT
             }
         }
 
-        private void CharacterDropDown_DropDownClosed(object sender, EventArgs e)
-        {
-            HandleCharacterSelectionChange();
-        }
-
-        private void CharacterDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            HandleCharacterSelectionChange();
-        }
-
         private Color DarkenColour(Color inCol)
         {
             Color Dark = inCol;
@@ -2340,7 +2274,7 @@ namespace SMT
 
         private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)
         {
-            HandleCharacterSelectionChange();
+            UpdateActiveCharacter();
         }
 
         private void GlobalSystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -2357,18 +2291,16 @@ namespace SMT
             }
         }
 
-        private void HandleCharacterSelectionChange()
+        public void UpdateActiveCharacter(EVEData.LocalCharacter c = null )
         {
-            EVEData.LocalCharacter c = CharacterDropDown.SelectedItem as EVEData.LocalCharacter;
-            if (ActiveCharacter != c)
+            if (ActiveCharacter != c && c !=null)
             {
                 ActiveCharacter = c;
-                OnCharacterSelectionChanged(c.Name);
             }
 
-            if (c != null && FollowCharacter)
+            if (ActiveCharacter != null && FollowCharacter)
             {
-                EVEData.System s = EM.GetEveSystem(c.Location);
+                EVEData.System s = EM.GetEveSystem(ActiveCharacter.Location);
                 if (s != null)
                 {
                     if (s.Region != Region.Name)
@@ -2377,9 +2309,7 @@ namespace SMT
                         SelectRegion(s.Region);
                     }
 
-                    SelectSystem(c.Location);
-
-                    CharacterDropDown.SelectedItem = c;
+                    SelectSystem(ActiveCharacter.Location);
 
                     // force the follow as this will be reset by the region change
                     FollowCharacter = true;

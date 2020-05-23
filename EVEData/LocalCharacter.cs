@@ -645,6 +645,10 @@ namespace SMT.EVEData
         {
             if (ID == 0 || !ESILinked || ESIAuthData == null)
             {
+                if(ESILinked)
+                {
+                    ESIAccessTokenExpiry = DateTime.Now;
+                }
                 return;
             }
 
@@ -698,7 +702,7 @@ namespace SMT.EVEData
                             foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
                             {
                                 Standings[con.ContactId] = (float)con.Standing;
-                                LabelMap[con.ContactId] = con.LabelIds;
+                                // Removed LabelMap[con.ContactId] = con.LabelIds;
 
                                 if (con.ContactType == "alliance")
                                 {

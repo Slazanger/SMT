@@ -32,8 +32,6 @@ namespace SMT.EVEData
     /// </summary>
     public class EveManager
     {
-        public EveTrace.EveTraceFleetInfo FleetIntel;
-
         /// <summary>
         /// singleton instance of this class
         /// </summary>
@@ -1451,7 +1449,6 @@ namespace SMT.EVEData
             StartUpdateSOVFromESI();
             StartUpdateIncursionsFromESI();
             // temp disabled
-            //StartEveTraceFleetUpdate();
             //StartUpdateStructureHunterUpdate();
 
             StartUpdateSovStructureUpdate();
@@ -1576,33 +1573,6 @@ namespace SMT.EVEData
                                     }
                                 }
                             }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        private void EveTraceFleetUpdateCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        EveTrace.EveTraceFleetInfo fleetInfo = EveTrace.EveTraceFleetInfo.FromJson(strContent);
-
-                        if (fleetInfo != null)
-                        {
-                            FleetIntel = fleetInfo;
                         }
                     }
                 }
@@ -1988,18 +1958,6 @@ namespace SMT.EVEData
             }).Start();
         }
 
-        private void StartEveTraceFleetUpdate()
-        {
-            string url = @"https://api.evetrace.com/api/v1/fleet/";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(EveTraceFleetUpdateCallback), request);
-        }
-
         private void StartUpdateCoalitionInfo()
         {
             Coalitions = new List<Coalition>();
@@ -2120,21 +2078,6 @@ namespace SMT.EVEData
 
             request.BeginGetResponse(new AsyncCallback(ESIUpdateSovCallback), request);
 
-            /*
-            This need expanding; awaiting fix
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.SystemSovereignty>> esr = await ESIClient.Sovereignty.Systems();
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.SystemSovereignty>>(esr))
-            {
-                foreach (ESI.NET.Models.Sovereignty.SystemSovereignty ss in esr.Data)
-                {
-                    EVEData.System sys = GetEveSystemFromID(ss.SystemId);
-                    if(sys != null)
-                    {
-                        sys.SOVAlliance = ss.
-                    }
-                }
-            }
-            */
         }
 
         private async void StartUpdateSovStructureUpdate()
