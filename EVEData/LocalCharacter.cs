@@ -272,36 +272,45 @@ namespace SMT.EVEData
                 Dictionary<long, ESI.NET.Models.Universe.Structure> SystemJumpGateList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
 
                 esiClient.SetCharacterData(ESIAuthData);
-                ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, JumpBridgeFilterString, SearchCategory.Structure);
-                if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
+
+                try
                 {
-                    if (esr.Data.Structures == null)
+                    ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, JumpBridgeFilterString, SearchCategory.Structure);
+                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
                     {
-                        return jbl;
-                    }
-
-                    foreach (long stationID in esr.Data.Structures)
-                    {
-                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
-
-                        if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                        if (esr.Data.Structures == null)
                         {
-                            SystemJumpGateList[stationID] = esrs.Data;
-
-                            // found a jump gate
-                            if (esrs.Data.TypeId == 35841)
-                            {
-                                string[] parts = esrs.Data.Name.Split(' ');
-                                string from = parts[0];
-                                string to = parts[2];
-
-                                EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
-                            }
+                            return jbl;
                         }
 
-                        Thread.Sleep(100);
+                        foreach (long stationID in esr.Data.Structures)
+                        {
+                            ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
+
+                            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                            {
+                                SystemJumpGateList[stationID] = esrs.Data;
+
+                                // found a jump gate
+                                if (esrs.Data.TypeId == 35841)
+                                {
+                                    string[] parts = esrs.Data.Name.Split(' ');
+                                    string from = parts[0];
+                                    string to = parts[2];
+
+                                    EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
+                                }
+                            }
+
+                            Thread.Sleep(100);
+                        }
                     }
                 }
+                catch
+                {
+                    // ESI-Search failed
+                }
+
             }
             UpdateLock.Release();
 
@@ -461,6 +470,11 @@ namespace SMT.EVEData
                 sst = await EveManager.Instance.ESIClient.SSO.GetTokenV2(GrantType.RefreshToken, ESIRefreshToken, string.Empty, null);
                 if (sst == null || sst.RefreshToken == null)
                 {
+                    // we have a valid refresh token BUT it failed to auth; we need to force 
+                    // a reauth
+                    ESIRefreshToken = "";
+                    ESILinked = false;
+
                     return;
                 }
 
@@ -593,7 +607,7 @@ namespace SMT.EVEData
                     }
                     firstRoute = false;
 
-                    //Thread.Sleep(50);
+                    Thread.Sleep(50);
                 }
             }
         }
