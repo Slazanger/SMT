@@ -617,7 +617,13 @@ namespace SMT
 
                     if (lc != null)
                     {
+                        CurrentActiveCharacterCombo.SelectedItem = lc;
+                        RegionUC.FollowCharacter = true;
                         RegionUC.SelectSystem(lc.Location, true);
+
+                        UniverseUC.FollowCharacter = true;
+                        UniverseUC.UpdateActiveCharacter(lc);
+
                     }
                 }
             }

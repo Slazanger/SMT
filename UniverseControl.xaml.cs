@@ -122,6 +122,18 @@ namespace SMT
 
         public List<EVEData.Navigation.RoutePoint> ActiveRoute { get; set; }
 
+        public bool FollowCharacter
+        {
+            get
+            {
+                return FollowCharacterChk.IsChecked.Value;
+            }
+            set
+            {
+                FollowCharacterChk.IsChecked = value;
+            }
+        }
+
         public UniverseControl()
         {
             InitializeComponent();
