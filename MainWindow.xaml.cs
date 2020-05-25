@@ -130,8 +130,8 @@ namespace SMT
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
 
-            RegionUC.RegionChanged += RegionRC_RegionChanged;
-            RegionUC.UniverseSystemSelect += RegionRC_UniverseSystemSelect;
+            RegionUC.RegionChanged += RegionUC_RegionChanged;
+            RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
 
             UniverseUC.MapConf = MapConf;
             UniverseUC.Init();
@@ -410,7 +410,7 @@ namespace SMT
         }
 
 
-        private void RegionRC_RegionChanged(object sender, PropertyChangedEventArgs e)
+        private void RegionUC_RegionChanged(object sender, PropertyChangedEventArgs e)
         {
             if (RegionLayoutDoc != null)
             {
@@ -420,7 +420,7 @@ namespace SMT
             CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
         }
 
-        private void RegionRC_UniverseSystemSelect(object sender, RoutedEventArgs e)
+        private void RegionUC_UniverseSystemSelect(object sender, RoutedEventArgs e)
         {
             string sysName = e.OriginalSource as string;
             UniverseUC.ShowSystem(sysName);
@@ -567,6 +567,9 @@ namespace SMT
 
         #region Characters
 
+        public EVEData.LocalCharacter ActiveCharacter { get; set; }
+
+
         private void UpdateCharacterSelectionBasedOnActiveWindow()
         {
             string ActiveWindowText = Utils.GetCaptionOfActiveWindow();
@@ -578,6 +581,7 @@ namespace SMT
                 {
                     if (lc.Name == characterName)
                     {
+                        ActiveCharacter = lc;
                         CurrentActiveCharacterCombo.SelectedItem = lc;
                         RegionUC.UpdateActiveCharacter(lc);
                         UniverseUC.UpdateActiveCharacter(lc);
@@ -617,6 +621,7 @@ namespace SMT
 
                     if (lc != null)
                     {
+                        ActiveCharacter = lc;
                         CurrentActiveCharacterCombo.SelectedItem = lc;
                         RegionUC.FollowCharacter = true;
                         RegionUC.SelectSystem(lc.Location, true);
@@ -641,6 +646,7 @@ namespace SMT
             else
             {
                 EVEData.LocalCharacter lc = CurrentActiveCharacterCombo.SelectedItem as EVEData.LocalCharacter;
+                ActiveCharacter = lc;
                 RegionsViewUC.ActiveCharacter = lc;
                 RegionUC.UpdateActiveCharacter(lc);
                 UniverseUC.UpdateActiveCharacter(lc);
@@ -658,6 +664,7 @@ namespace SMT
 
             EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
 
+            ActiveCharacter = null;
             CurrentActiveCharacterCombo.SelectedIndex = -1;
             RegionsViewUC.ActiveCharacter = null;
             RegionUC.ActiveCharacter = null;

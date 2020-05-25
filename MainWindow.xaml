@@ -246,12 +246,12 @@
                                                         <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ActiveCharacter.NavigationMode, ElementName=RegionRC}" Margin="2" Width="150" />
                                                     </StackPanel>
 
-                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionRC}" Margin="2" />
+                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionRC}" Margin="2"/>
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding ActiveCharacter.Waypoints, ElementName=RegionRC}" MinHeight="50" Margin="2" />
+                                                    <ListBox ItemsSource="{Binding ActiveCharacter.Waypoints, ElementName=RegionUC}" MinHeight="50" Margin="2" />
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" FontSize="12" Width="156" />
                                                         <Button x:Name="AddWaypointsBtn" Click="AddWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
@@ -264,11 +264,11 @@
 
                                             <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding ActiveCharacter.ActiveRoute, ElementName=RegionRC}" MinHeight="50" />
+                                                    <ListBox ItemsSource="{Binding ActiveCharacter.ActiveRoute, ElementName=RegionUC}" MinHeight="50" />
 
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <Label Content="Total number of jumps : " />
-                                                        <Label Content="{Binding ActiveCharacter.ActiveRoute.Count, ElementName=RegionRC}" />
+                                                        <Label Content="{Binding ActiveCharacter.ActiveRoute.Count, ElementName=RegionUC}" />
                                                     </StackPanel>
                                                     <Button x:Name="CopyRouteBtn" Click="CopyRouteBtn_Click" Content="Copy Route" Margin="2" />
                                                 </StackPanel>
