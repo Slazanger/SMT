@@ -35,6 +35,7 @@ namespace SMT
 
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
+        private MediaPlayer mediaPlayer;
         /// <summary>
         /// Main Window
         /// </summary>
@@ -42,6 +43,12 @@ namespace SMT
         {
             AppWindow = this;
             DataContext = this;
+
+            mediaPlayer = new MediaPlayer();
+            Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+            mediaPlayer.Open(woopUri);
+
+
 
             InitializeComponent();
 
@@ -751,12 +758,11 @@ namespace SMT
                 }
             }
 
-            if (playSound)
+            if (playSound )
             {
-                Uri uri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                var player = new MediaPlayer();
-                player.Open(uri);
-                player.Play();
+                mediaPlayer.Stop();
+                mediaPlayer.Position = new TimeSpan(0, 0, 0);
+                mediaPlayer.Play(); 
             }
         }
 
