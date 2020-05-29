@@ -54,6 +54,8 @@ namespace SMT
 
         private bool m_ShowRattingDataAsDelta;
 
+        private bool m_ShowSimpleSecurityView;
+
         private bool m_ShowRegionStandings;
 
         private bool m_ShowTCUVunerabilities;
@@ -351,6 +353,22 @@ namespace SMT
                 OnPropertyChanged("ShowRattingDataAsDelta");
             }
         }
+
+        [Category("Misc")]
+        [DisplayName("Simple Security View")]
+        public bool ShowSimpleSecurityView
+        {
+            get
+            {
+                return m_ShowSimpleSecurityView;
+            }
+            set
+            {
+                m_ShowSimpleSecurityView = value;
+                OnPropertyChanged("ShowSimpleSecurityView");
+            }
+        }
+
 
         [Category("Regions")]
         [DisplayName("Show RegionStandings")]

@@ -1389,6 +1389,28 @@ namespace SMT
 
                 Coalition SystemCoalition = null;
 
+
+                double trueSecVal = system.ActualSystem.TrueSec;
+                bool gradeTruesec = MapConf.ShowTrueSec;
+                if (MapConf.ShowSimpleSecurityView)
+                {
+                    // gradeTruesec = false;
+                    if (system.ActualSystem.TrueSec >= 0.45)
+                    {
+                        trueSecVal = 1.0;
+                    }
+                    else if (system.ActualSystem.TrueSec > 0.0)
+                    {
+                        trueSecVal = 0.4;
+                    }
+                    else
+                    {
+                        trueSecVal = 0.0;
+                    }
+                }
+
+                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, gradeTruesec));
+
                 if (MapConf.SOVBasedITCU)
                 {
                     if (system.ActualSystem.SOVAllianceTCU != 0)
@@ -1567,7 +1589,7 @@ namespace SMT
                     // override with sec status colours
                     if (ShowSystemSecurity)
                     {
-                        systemShape.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
+                        systemShape.Fill = securityColorFill;
                     }
 
                     if (!needsOutline)
@@ -1613,7 +1635,7 @@ namespace SMT
                     // override with sec status colours
                     if (ShowSystemSecurity)
                     {
-                        SystemOutline.Fill = new SolidColorBrush(MapColours.GetSecStatusColour(system.ActualSystem.TrueSec, MapConf.ShowTrueSec));
+                        SystemOutline.Fill = securityColorFill;
                     }
 
                     if (ShowSystemADM && system.ActualSystem.IHubOccupancyLevel != 0.0f)

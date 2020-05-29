@@ -56,6 +56,8 @@
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowZKillData}" Content="Show ZKill Data"/>
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowNegativeRattingDelta}" Content="Show Negative Ratting Delta"/>
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowRattingDataAsDelta}" Content="Show Ratting Data as Delta"/>
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSimpleSecurityView}" Content="Show Simple Security View (Just HS/LS/null)"/>
+                                    
 
                                 </StackPanel>
                             </GroupBox>
