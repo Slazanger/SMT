@@ -26,7 +26,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
 
-        public const string SMT_VERSION = "SMT_084";
+        public const string SMT_VERSION = "SMT_085";
 
 
         private LogonWindow logonBrowserWindow;
@@ -132,6 +132,8 @@ namespace SMT
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
+
+            SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
 
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
@@ -334,6 +336,27 @@ namespace SMT
                 UpdateCharacterSelectionBasedOnActiveWindow();
             }
         }
+
+        private void SovCampaignList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+
+                    KeyValuePair<int, EVEData.SOVCampaign> sc = (KeyValuePair<int, EVEData.SOVCampaign>)dgr.Item;
+
+                    if (sc.Value != null)
+                    {
+                        RegionUC.SelectSystem(sc.Value.System, true);
+                    }
+                }
+            }
+        }
+
+
 
         #region RegionsView Control
 
@@ -1244,12 +1267,54 @@ namespace SMT
                 }
             }
         }
+
         #endregion Anoms
+
+
 
 
     }
 
 
+
+    /// <summary>
+    /// TimeSpanConverter Sec statuc colour converter
+    /// </summary>
+    public class TimeSpanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            TimeSpan ts = (TimeSpan) value;
+
+
+            string Output = "";
+
+            if(ts.Ticks < 0)
+            {
+                Output += "-";
+            }
+
+            if(ts.Days != 0)
+            {
+                Output += Math.Abs(ts.Days) + "d ";
+            }
+
+            if (ts.Hours != 0)
+            {
+                Output += Math.Abs(ts.Hours) + "h ";
+            }
+            
+            Output += Math.Abs(ts.Minutes) + "m ";
+
+
+            return Output;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
 
 
     /// <summary>

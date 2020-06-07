@@ -19,6 +19,7 @@
     <Window.Resources>
 
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
+        <local:TimeSpanConverter x:Key="timeSpanConverter" />
 
         <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -323,6 +324,47 @@
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
+                            <xcadl:LayoutAnchorable Title="SOV Campaigns" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer>
+                                    <StackPanel>
+
+                                        <DataGrid  x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
+
+                                            <DataGrid.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}">
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Value.IsActive}" Value="true">
+                                                            <Setter Property="Background" Value="DarkRed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGrid.CellStyle>
+
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="System" Binding="{Binding Value.System}" Width="*" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Value.Region}" Width="*" />
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Value.Type}" Width="*" />
+                                                <DataGridTemplateColumn  Header="Defenders Score"  Width="*" >
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Grid>
+                                                                <ProgressBar Value="{Binding Value.DefendersScore, Mode=OneWay}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding Value.State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100"/>
+                                                                <TextBlock Text="{Binding Value.DefendersScore, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Value.TimeToStart, Converter={StaticResource timeSpanConverter}}" SortDirection="Ascending"  Width="*" />
+                                                <DataGridTextColumn Header="Defenders" Binding="{Binding Value.DefendingAllianceName}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+
                         </xcadl:LayoutAnchorGroup>
                     </xcadl:LayoutAnchorSide>
                 </xcadl:LayoutRoot.RightSide>
