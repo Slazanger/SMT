@@ -134,7 +134,8 @@ namespace SMT
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
 
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
-
+            EVEManager.ActiveSovCampaigns.CollectionChanged += ActiveSovCampaigns_CollectionChanged;
+           
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
@@ -211,6 +212,12 @@ namespace SMT
             }
 
         }
+
+        private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+        }
+
 
         private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -346,12 +353,18 @@ namespace SMT
                 {
                     DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
 
-                    KeyValuePair<int, EVEData.SOVCampaign> sc = (KeyValuePair<int, EVEData.SOVCampaign>)dgr.Item;
+                    EVEData.SOVCampaign sc = dgr.Item as EVEData.SOVCampaign;
 
-                    if (sc.Value != null)
+                    if (sc != null)
                     {
-                        RegionUC.SelectSystem(sc.Value.System, true);
+                        RegionUC.SelectSystem(sc.System, true);
                     }
+
+                    if (RegionLayoutDoc != null)
+                    {
+                        RegionLayoutDoc.IsSelected = true;
+                    }
+
                 }
             }
         }
@@ -1268,10 +1281,10 @@ namespace SMT
             }
         }
 
+
+
+
         #endregion Anoms
-
-
-
 
     }
 

@@ -225,7 +225,7 @@ namespace SMT.EVEData
         /// </summary>
         public ObservableCollection<TheraConnection> TheraConnections { get; set; }
 
-        public Dictionary<int, SOVCampaign> ActiveSovCampaigns { get; set; }
+        public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
 
 
         /// <summary>
@@ -1629,7 +1629,7 @@ namespace SMT.EVEData
 
             InitTheraConnections();
 
-            ActiveSovCampaigns = new Dictionary<int, SOVCampaign>();
+            ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
 
             InitZKillFeed();
             StartUpdateCoalitionInfo();
@@ -1930,7 +1930,7 @@ namespace SMT.EVEData
 
                 TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
                 TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
-                TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(45);
+                TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
 
                 DateTime NextCharacterUpdate = DateTime.Now;
                 DateTime NextLowFreqUpdate = DateTime.Now;
@@ -1940,7 +1940,7 @@ namespace SMT.EVEData
                 while (BackgroundThreadShouldTerminate == false)
                 {
                     // character Update
-                    if ((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)
+                    if ((NextCharacterUpdate - DateTime.Now).Ticks < 0)
                     {
                         NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
 
@@ -1952,7 +1952,7 @@ namespace SMT.EVEData
                     }
 
                     // sov update
-                    if ((NextSOVCampaignUpdate - DateTime.Now).Milliseconds < 100)
+                    if ((NextSOVCampaignUpdate - DateTime.Now).Ticks < 0)
                     {
                         NextSOVCampaignUpdate = DateTime.Now + SOVCampaignUpdateRate;
                         StartUpdateSovCampaigns();
@@ -2133,7 +2133,10 @@ namespace SMT.EVEData
         {
             try
             {
-                foreach(SOVCampaign sc in ActiveSovCampaigns.Values)
+
+ 
+
+                foreach(SOVCampaign sc in ActiveSovCampaigns)
                 {
                     sc.Valid = false;
                 }
@@ -2147,16 +2150,26 @@ namespace SMT.EVEData
                     foreach (ESI.NET.Models.Sovereignty.Campaign c in esr.Data)
                     {
 
-                        if (!ActiveSovCampaigns.Keys.Contains(c.CampaignId))
-                        {
+                        SOVCampaign ss = null;
 
+                        foreach (SOVCampaign asc in ActiveSovCampaigns)
+                        {
+                            if(asc.CampaignID == c.CampaignId )
+                            {
+                                ss = asc;
+                            }
+                        }
+
+
+                        if (ss == null)
+                        {
                             System sys = GetEveSystemFromID(c.SolarSystemId);
                             if (sys == null)
                             {
                                 continue;
                             }
 
-                            SOVCampaign s = new SOVCampaign
+                            ss = new SOVCampaign
                             {
                                 CampaignID = c.CampaignId,
                                 DefendingAllianceID = c.DefenderId,
@@ -2169,19 +2182,22 @@ namespace SMT.EVEData
 
                             if(c.EventType == "ihub_defense")
                             {
-                                s.Type = "IHub";
+                                ss.Type = "IHub";
                             }
 
                             if(c.EventType == "tcu_defense")
                             {
-                                s.Type = "TCU";
+                                ss.Type = "TCU";
                             }
 
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                ActiveSovCampaigns.Add(ss);
+                            }), DispatcherPriority.Normal, null);
 
-                            ActiveSovCampaigns[s.CampaignID] = s;
+
                         }
 
-                        SOVCampaign ss = ActiveSovCampaigns[c.CampaignId];
                         ss.AttackersScore = c.AttackersScore;
                         ss.DefendersScore = c.DefenderScore;
                         ss.Valid = true;
@@ -2224,7 +2240,7 @@ namespace SMT.EVEData
                 }
 
 
-                foreach (SOVCampaign sc in ActiveSovCampaigns.Values)
+                foreach (SOVCampaign sc in ActiveSovCampaigns.ToList())
                 {
                     if (string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.Keys.Contains(sc.DefendingAllianceID))
                     {
@@ -2234,10 +2250,28 @@ namespace SMT.EVEData
 
                     if (sc.Valid == false)
                     {
-                        ActiveSovCampaigns.Remove(sc.CampaignID);
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        {
+                            ActiveSovCampaigns.Remove(sc);
+                        }), DispatcherPriority.Normal, null);
                     }
                 }
 
+
+
+                // super hack : I want to update the both the times and filter colour that
+                // this gets used for but the binding neither seem to propigate the change
+                // but this forces a listchanged which ultimately triggers a refresh
+                // ugly and to be fixed after some investigation
+                {
+                    SOVCampaign hackSC = new SOVCampaign();
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        ActiveSovCampaigns.Add(hackSC);
+                        ActiveSovCampaigns.Remove(hackSC);
+                    }), DispatcherPriority.Normal, null);
+
+                }
             }
             catch { }
         }

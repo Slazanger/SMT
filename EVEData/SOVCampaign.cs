@@ -56,7 +56,7 @@ namespace SMT.EVEData
             set
             {
                 m_isActive = value;
-                OnPropertyChanged("isValid");
+                OnPropertyChanged("IsActive");
             }
         }
 

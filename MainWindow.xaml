@@ -328,13 +328,13 @@
                                 <ScrollViewer>
                                     <StackPanel>
 
-                                        <DataGrid  x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
+                                        <DataGrid x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column" >
 
                                             <DataGrid.CellStyle>
                                                 <Style TargetType="{x:Type DataGridCell}">
 
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Value.IsActive}" Value="true">
+                                                        <DataTrigger Binding="{Binding Path=IsActive, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged}" Value="true">
                                                             <Setter Property="Background" Value="DarkRed" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -343,21 +343,21 @@
 
 
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="System" Binding="{Binding Value.System}" Width="*" />
-                                                <DataGridTextColumn Header="Region" Binding="{Binding Value.Region}" Width="*" />
-                                                <DataGridTextColumn Header="Type" Binding="{Binding Value.Type}" Width="*" />
+                                                <DataGridTextColumn Header="System" Binding="{Binding Path=System, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Path=Region, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Path=Type, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                                                 <DataGridTemplateColumn  Header="Defenders Score"  Width="*" >
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <Grid>
-                                                                <ProgressBar Value="{Binding Value.DefendersScore, Mode=OneWay}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding Value.State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100"/>
-                                                                <TextBlock Text="{Binding Value.DefendersScore, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False"/>
+                                                                <ProgressBar Value="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100"/>
+                                                                <TextBlock Text="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False"/>
                                                             </Grid>
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
-                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Value.TimeToStart, Converter={StaticResource timeSpanConverter}}" SortDirection="Ascending"  Width="*" />
-                                                <DataGridTextColumn Header="Defenders" Binding="{Binding Value.DefendingAllianceName}" Width="*" />
+                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Path=TimeToStart, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource timeSpanConverter}}" Width="*"/>
+                                                <DataGridTextColumn Header="Defenders" Binding="{Binding Path=DefendingAllianceName, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
 
