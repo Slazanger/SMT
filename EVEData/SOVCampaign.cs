@@ -61,8 +61,23 @@ namespace SMT.EVEData
         }
 
 
+
+
         public DateTime StartTime { get; set; }
-        public TimeSpan TimeToStart { get; set; }
+
+        private TimeSpan m_TimeToStart;
+        public TimeSpan TimeToStart 
+        { 
+            get
+            {
+                return m_TimeToStart;
+            }
+            set
+            {
+                m_TimeToStart = value;
+                OnPropertyChanged("TimeToStart");
+            }
+        }
 
         private bool m_Valid;
         public bool Valid
