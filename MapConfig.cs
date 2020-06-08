@@ -742,7 +742,7 @@ namespace SMT
                 SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178),
 
 
-                ConstellationHighlightColour = Color.FromRgb(78, 134, 180),
+                ConstellationHighlightColour = Color.FromRgb(147, 131, 131),
 
                 TheraEntranceRegion = Colors.YellowGreen,
                 TheraEntranceSystem = Colors.YellowGreen,

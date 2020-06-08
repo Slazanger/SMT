@@ -343,7 +343,7 @@ namespace SMT
             }
         }
 
-         public void AddTheraSystemsToMap()
+        public void AddTheraSystemsToMap()
         {
             Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
 
@@ -368,8 +368,6 @@ namespace SMT
                     TheraShape.StrokeLineJoin = PenLineJoin.Round;
                     TheraShape.Fill = TheraBrush;
 
-                    // add the hover over and click handlers
-
                     Canvas.SetLeft(TheraShape, ms.LayoutX - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(TheraShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX - 3);
@@ -377,6 +375,64 @@ namespace SMT
                 }
             }
         }
+
+
+        public void AddSovConflictsToMap()
+        {
+            if(!ShowSystemTimers)
+            {
+                return;
+            }
+
+            Brush ActiveSovFightBrush = new SolidColorBrush(Colors.DarkRed);
+
+            foreach (SOVCampaign sc in EM.ActiveSovCampaigns)
+            {
+                if (Region.IsSystemOnMap(sc.System))
+                {
+                    MapSystem ms = Region.MapSystems[sc.System];
+
+
+
+                    Image SovFightLogo = new Image
+                    {
+                        Width = 10,
+                        Height = 10,
+                        Name = "JoveLogo",
+                        Source = ResourceLoader.LoadBitmapFromResource("Images/Fight.png"),
+                        Stretch = Stretch.Uniform,
+                        IsHitTestVisible = false,
+                    };
+
+                    
+
+                    SovFightLogo.IsHitTestVisible = false;
+
+                    Canvas.SetLeft(SovFightLogo, ms.LayoutX - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetTop(SovFightLogo, ms.LayoutY - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetZIndex(SovFightLogo, SYSTEM_Z_INDEX + 5);
+                    MainCanvas.Children.Add(SovFightLogo);
+
+
+                    if(sc.IsActive || sc.Type == "IHub")
+                    {
+                        Shape activeSovFightShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 18, Width = SYSTEM_SHAPE_SIZE + 18 };
+                        
+
+                        activeSovFightShape.Stroke = ActiveSovFightBrush;
+                        activeSovFightShape.StrokeThickness = 9;
+                        activeSovFightShape.StrokeLineJoin = PenLineJoin.Round;
+                        activeSovFightShape.Fill = ActiveSovFightBrush;
+
+                        Canvas.SetLeft(activeSovFightShape, ms.LayoutX - (SYSTEM_SHAPE_OFFSET + 9));
+                        Canvas.SetTop(activeSovFightShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 9));
+                        Canvas.SetZIndex(activeSovFightShape, SYSTEM_Z_INDEX - 3);
+                        MainCanvas.Children.Add(activeSovFightShape);
+                    }     
+                }
+            }
+        }
+
 
         /// <summary>
         /// Initialise the control
@@ -471,6 +527,7 @@ namespace SMT
             AddHighlightToSystem(SelectedSystem);
             AddRouteToMap();
             AddTheraSystemsToMap();
+            AddSovConflictsToMap();
         }
 
         /// <summary>
@@ -1670,7 +1727,7 @@ namespace SMT
                     MainCanvas.Children.Add(SystemOutline);
                 }
 
-                if (ShowSystemADM && system.ActualSystem.IHubOccupancyLevel != 0.0)
+                if (ShowSystemADM && system.ActualSystem.IHubOccupancyLevel != 0.0 && !ShowSystemTimers)
                 {
                     Label sovADM = new Label();
                     sovADM.Content = "1.0";
@@ -1679,13 +1736,13 @@ namespace SMT
                     sovADM.Content = $"{system.ActualSystem.IHubOccupancyLevel:f1}";
                     sovADM.HorizontalContentAlignment = HorizontalAlignment.Center;
                     sovADM.VerticalContentAlignment = VerticalAlignment.Center;
-                    sovADM.Width = SYSTEM_SHAPE_SIZE;
-                    sovADM.Height = SYSTEM_SHAPE_SIZE;
+                    sovADM.Width = SYSTEM_SHAPE_SIZE+2;
+                    sovADM.Height = SYSTEM_SHAPE_SIZE+2;
                     sovADM.Foreground = DarkTextColourBrush;
 
 
-                    Canvas.SetLeft(sovADM, system.LayoutX - SYSTEM_SHAPE_OFFSET);
-                    Canvas.SetTop(sovADM, system.LayoutY - SYSTEM_SHAPE_OFFSET);
+                    Canvas.SetLeft(sovADM, system.LayoutX - (SYSTEM_SHAPE_OFFSET+1));
+                    Canvas.SetTop(sovADM, system.LayoutY - (SYSTEM_SHAPE_OFFSET+1));
                     Canvas.SetZIndex(sovADM, SYSTEM_Z_INDEX - 1);
                     MainCanvas.Children.Add(sovADM);
                 }
@@ -1782,7 +1839,7 @@ namespace SMT
                     MainCanvas.Children.Add(CynoBeaconLogo);
                 }
 
-                if (MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory && !ShowSystemADM)
+                if (MapConf.ShowJoveObservatories && system.ActualSystem.HasJoveObservatory && !ShowSystemADM && !ShowSystemTimers)
                 {
                     Image JoveLogo = new Image
                     {
