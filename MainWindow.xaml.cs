@@ -52,7 +52,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (CYNO23 NEWS : " + SMT_VERSION + ")";
+            Title = "SMT (Crystal Vagooey : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
