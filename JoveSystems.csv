@@ -65,6 +65,7 @@ System;Constelation;Space;Region
 4DTQ-K;KWCZ-A;Null;Branch
 4E-EZS;7VJ-7M;Null;Scalding Pass
 4K0N-J;RJ-1R7;Null;Geminate
+4LJ6-Q;N-APJ8;Null;Etherium Reach
 4M-P1I;DYK-G8;Null;Great Wildlands
 4NDT-W;5F8-PZ;Null;Detorid
 4O-ZRI;KPU3-3;Null;Outer Passage
@@ -150,6 +151,7 @@ A1RR-M;2-ZRM0;Null;Tenal
 A3-LOG;H-6HGD;Null;Querious
 Abai;Rifenda;High;Tash-Murkon
 Abha;Mal;Low;Derelik
+Abhan;Charak;High;Genesis
 Abudban;Ortner;High;Heimatar
 AC-7LZ;EL8Z-M;Null;Immensea
 AC2E-3;Wyvern;Null;Fountain
@@ -167,7 +169,6 @@ AH-B84;304-QS;Null;Branch
 Aharalel;Megeh;High;Kador
 Ahkour;Rifenda;High;Tash-Murkon
 Ahrosseas;Sanair;High;Tash-Murkon
-Ahtulaima;Ruomo;High;The Forge
 Aikoro;Arekin;High;The Citadel
 Aivoli;Malariya;High;Lonetrek
 Aivonen;Ishaga;Low;Black Rise
@@ -203,7 +204,6 @@ Arbaz;Parud;High;Domain
 ARBX-9;17K-QM;Null;Paragon Soul
 Ardar;Tiat;Low;Metropolis
 Ardhis;Favo;Low;Kador
-Ardishapur Prime;Sosarir;High;Domain
 Arifsdald;Fribrodi;Low;Metropolis
 Arnon;Peccanouette;High;Essence
 Arnstur;Aldodan;Low;Metropolis
@@ -263,7 +263,6 @@ C3J0-O;U-HSM3;Null;The Kalevala Expanse
 C6C-K9;OC-TTA;Null;The Spire
 C8VC-S;03C-SU;Null;Tribute
 Cailanar;Yestadan;High;Domain
-Central Point;EVE;Low;Genesis
 CHA2-Q;Satyr;Null;Fountain
 Chamja;Mih;Low;Genesis
 Chamume;Emsek;Low;Tash-Murkon
@@ -288,6 +287,7 @@ CT8K-0;1VN-XC;Null;Etherium Reach
 Cumemare;Alselbosier;Low;Placid
 CX-1XF;GP-GIU;Null;Branch
 D-0UI0;PR-ACX;Null;Detorid
+D-6H64;BVA-Y;Null;Cache
 D-6WS1;I9B-8X;Null;Providence
 D-FVI7;Q-2BI6;Null;Esoteria
 D-I9HJ;KR-XF4;Null;Geminate
@@ -332,6 +332,7 @@ Ekura;Okela;High;Lonetrek
 Enaluri;Ishaga;Low;Black Rise
 EOY-BG;M-J57M;Null;Tenal
 EPCD-D;3NA-Z1;Null;The Kalevala Expanse
+Eram;Meinigefur;High;Metropolis
 Erindur;Hulf;High;Metropolis
 Erstet;Ergruk;Low;Metropolis
 Erstur;Aptetter;High;Metropolis
@@ -345,6 +346,7 @@ EU0I-T;SKX-PL;Null;Syndicate
 EUU-4N;0-YMZM;Null;Insmother
 Evaulon;Amevync;Low;Placid
 EX-0LQ;ZW-BY5;Null;Catch
+Eygfe;Ankard;High;Metropolis
 Eygfe;Ankard;High;Metropolis
 Eystur;Sveipar;High;Heimatar
 F-749O;X-VN63;Null;Tribute
@@ -499,6 +501,11 @@ Iyen-Oursta;Gallente Border Zone;High;Sinq Laison
 J-AYLV;V-H3V0;Null;Stain
 J-OAH2;2Q-8WA;Null;The Kalevala Expanse
 J-RXYN;760-9C;Null;Wicked Creek
+J055520;K-C00334;W-Space;K-R00033
+J110145;K-C00334;W-Space;K-R00033
+J164710;K-C00334;W-Space;K-R00033
+J174618;K-C00334;W-Space;K-R00033
+J200727;K-C00334;W-Space;K-R00033
 J52-BH;BI-NFW;Null;Branch
 J7-BDX;0FC-ZX;Null;Wicked Creek
 J7A-UR;Paradise;Null;Curse
@@ -619,6 +626,8 @@ MGAM-4;88G-M4;Null;Vale of the Silent
 MH9C-S;4BZ-R3;Null;Providence
 Miah;Parrosa;High;Kador
 MJ-5F9;VT-LHB;Null;Perrigen Falls
+MJYW-3;Prelle;Null;Cloud Ring
+MJYW-3;Prelle;Null;Cloud Ring
 MKD-O8;A-Z7C9;Null;Querious
 Moclinamaud;Pegeler;Low;Placid
 MOCW-2;0-YMZM;Null;Insmother
@@ -656,7 +665,6 @@ NE-3GR;K-DLD2;Null;Great Wildlands
 Nedegulf;Gedur;High;Metropolis
 NEH-CS;XPBM-F;Null;Branch
 Nema;Tid;Low;Aridia
-New Eden;EVE;Low;Genesis
 NG-M8K;MRC-29;Null;Cache
 Nidebora;Enka;High;Devoid
 Nifshed;Sosarir;High;Domain
@@ -688,6 +696,7 @@ Obanen;Onirvura;High;The Forge
 Oberen;Heti;Low;Kador
 Obrolber;Osta;High;Heimatar
 Odin;Ryra;High;Devoid
+Odinesyn;Orvanne;High;Solitude
 Odinesyn;Orvanne;High;Solitude
 Ogaria;Elerelle;Low;Solitude
 OGL8-Q;XR9-LP;Null;Catch
@@ -781,7 +790,6 @@ RD-FWY;N5V-Y0;Null;Insmother
 Remoriu;Nasorin;High;Tash-Murkon
 Reteka;Amdimmah;High;Khanid
 RF-CN3;F-RA63;Null;Querious
-Rimbah;Armi;Low;Domain
 RJBC-I;S-Q02B;Null;Oasa
 RO-0PZ;M9-AN3;Null;Etherium Reach
 Rokofur;Wiedadur;High;Heimatar
@@ -815,7 +823,6 @@ Sasta;San Matar;High;Derelik
 Sazre;Nohshayess;High;Khanid
 Scolluzer;Ancbeu;High;Verge Vendor
 Scuelazyns;Elalan;High;Everyshore
-Seiradih;Mulata;High;Domain
 Sendaya;Anares;Low;Derelik
 Serad;Mal;High;Derelik
 Seshala;Seevadin;Low;Khanid
@@ -825,11 +832,9 @@ Shach;Mal;Low;Derelik
 Shaha;Finena;High;Kor-Azor
 Shala;Mossas;High;Derelik
 Shamahi;Anares;Low;Derelik
-Sharji;Yekti;High;Domain
 Sharuveil;Disier;Low;Sinq Laison
 Shenela;Anares;High;Derelik
 Shihuken;Anttanen;High;The Forge
-Shuria;Mobit;High;Domain
 Sibe;Ashela;High;Genesis
 Sigga;Ekrin;High;Genesis
 Simela;Aven;High;Genesis
@@ -838,8 +843,6 @@ Sist;Osta;High;Heimatar
 Situner;Stadakorn;High;Metropolis
 SN9S-N;E-ILCH;Null;Esoteria
 SNFV-I;A-JI5E;Null;Catch
-Sobenah;Armi;Low;Domain
-Somouh;Hoosa;High;Domain
 Sosan;Jayai;Low;Devoid
 Sotrentaira;Haurala;High;Lonetrek
 Soza;Maal;Low;Aridia
@@ -906,7 +909,6 @@ Unel;Agiesseson;High;Sinq Laison
 UNJ-GX;V-4QJC;Null;Great Wildlands
 Uotila;Santenpaa;High;The Citadel
 Uoyonen;Okomon;High;The Forge
-Uplingur;Hevaka;Low;Derelik
 Ustnia;Moghiz;High;Kador
 UT-UZB;V-LQBF;Null;Great Wildlands
 Uusanen;Vaarma;Low;The Bleak Lands
@@ -918,7 +920,6 @@ V0DF-2;1P-VL2;Null;Tribute
 V6-NY1;Minotaur;Null;Fountain
 V7D-JD;Paradise;Null;Curse
 V89M-R;HRJG-D;Null;Great Wildlands
-Valmu;Kashag;Low;Domain
 Varigne;Besateoden;High;Molden Heath
 VBPT-T;N5V-Y0;Null;Insmother
 Vecamia;Nazdirer;Low;Genesis
@@ -979,13 +980,11 @@ Y4-GQV;V-LQBF;Null;Great Wildlands
 Y6-HPG;1G-8KY;Null;Venal
 Yashunen;Caldari Border Zone;High;The Citadel
 Yeder;Tsemshatel;High;Tash-Murkon
-Yeeramoun;Chardu;High;Domain
 YG-82V;E-312G;Null;Branch
 Yoma;Asalola;High;Lonetrek
 YQM-P1;J33-JR;Null;Outer Passage
 YRNJ-8;Taurus;Null;Fountain
 YRV-MZ;FY6-NK;Null;Esoteria
-Yuhelia;Maseend;High;Domain
 YUY-LM;K-DLD2;Null;Great Wildlands
 Yuzier;San Matar;High;Derelik
 Yvelet;Goins;High;Solitude
@@ -1003,11 +1002,8 @@ Z3V-1W;XPJ1-6;Null;Delve
 Z9PP-H;Centaur;Null;Fountain
 ZA0L-U;F-V9QW;Null;Vale of the Silent
 Zahefeus;Homroon;Low;Khanid
-Zaimeth;Zemont;High;Domain
 ZD1-Z2;CL-QB2;Null;Tenerifis
 ZID-LE;3-PC31;Null;Feythabolis
-Ziona;Mobit;High;Domain
-Ziriert;Jakemhih;Low;Domain
 ZK-YQ3;O-EOI9;Null;Tenal
 ZM-DNR;BB8E-G;Null;Great Wildlands
 ZN0-SR;Y4Y7-Q;Null;Syndicate
