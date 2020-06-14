@@ -26,7 +26,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
 
-        public const string SMT_VERSION = "SMT_084";
+        public const string SMT_VERSION = "SMT_085";
 
 
         private LogonWindow logonBrowserWindow;
@@ -52,7 +52,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (CYNO23 NEWS : " + SMT_VERSION + ")";
+            Title = "SMT (Crystal Vagooey : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
@@ -133,6 +133,9 @@ namespace SMT
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
 
+            SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
+            EVEManager.ActiveSovCampaigns.CollectionChanged += ActiveSovCampaigns_CollectionChanged;
+           
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
@@ -209,6 +212,12 @@ namespace SMT
             }
 
         }
+
+        private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+        }
+
 
         private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -334,6 +343,33 @@ namespace SMT
                 UpdateCharacterSelectionBasedOnActiveWindow();
             }
         }
+
+        private void SovCampaignList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+
+                    EVEData.SOVCampaign sc = dgr.Item as EVEData.SOVCampaign;
+
+                    if (sc != null)
+                    {
+                        RegionUC.SelectSystem(sc.System, true);
+                    }
+
+                    if (RegionLayoutDoc != null)
+                    {
+                        RegionLayoutDoc.IsSelected = true;
+                    }
+
+                }
+            }
+        }
+
+
 
         #region RegionsView Control
 
@@ -1244,12 +1280,54 @@ namespace SMT
                 }
             }
         }
-        #endregion Anoms
 
+
+
+
+        #endregion Anoms
 
     }
 
 
+
+    /// <summary>
+    /// TimeSpanConverter Sec statuc colour converter
+    /// </summary>
+    public class TimeSpanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            TimeSpan ts = (TimeSpan) value;
+
+
+            string Output = "";
+
+            if(ts.Ticks < 0)
+            {
+                Output += "-";
+            }
+
+            if(ts.Days != 0)
+            {
+                Output += Math.Abs(ts.Days) + "d ";
+            }
+
+            if (ts.Hours != 0)
+            {
+                Output += Math.Abs(ts.Hours) + "h ";
+            }
+            
+            Output += Math.Abs(ts.Minutes) + "m ";
+
+
+            return Output;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
 
 
     /// <summary>

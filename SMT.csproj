@@ -223,6 +223,7 @@
     <Compile Include="EVEData\LocalCharacter.cs" />
     <Compile Include="EVEData\Navigation.cs" />
     <Compile Include="EVEData\Server.cs" />
+    <Compile Include="EVEData\SOVCampaign.cs" />
     <Compile Include="EVEData\Structure.cs" />
     <Compile Include="External\nAlpha\AlphaShapeCalculator.cs" />
     <Compile Include="External\nAlpha\Point.cs" />
@@ -430,6 +431,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\recentre.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\fight.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
