@@ -19,6 +19,7 @@
     <Window.Resources>
 
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
+        <local:TimeSpanConverter x:Key="timeSpanConverter" />
 
         <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -323,6 +324,47 @@
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
+                            <xcadl:LayoutAnchorable Title="SOV Campaigns" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer>
+                                    <StackPanel>
+
+                                        <DataGrid x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column" >
+
+                                            <DataGrid.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}">
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=IsActive, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                                            <Setter Property="Background" Value="DarkRed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGrid.CellStyle>
+
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="System" Binding="{Binding Path=System, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Path=Region, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Path=Type, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTemplateColumn  Header="Defenders Score"  Width="*" >
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Grid>
+                                                                <ProgressBar Value="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100"/>
+                                                                <TextBlock Text="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Path=TimeToStart, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource timeSpanConverter}}" Width="*"/>
+                                                <DataGridTextColumn Header="Defenders" Binding="{Binding Path=DefendingAllianceName, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+
                         </xcadl:LayoutAnchorGroup>
                     </xcadl:LayoutAnchorSide>
                 </xcadl:LayoutRoot.RightSide>

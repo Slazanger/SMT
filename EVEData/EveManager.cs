@@ -225,6 +225,9 @@ namespace SMT.EVEData
         /// </summary>
         public ObservableCollection<TheraConnection> TheraConnections { get; set; }
 
+        public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
+
+
         /// <summary>
         /// Gets or sets the current list of ZKillData
         /// </summary>
@@ -1625,6 +1628,9 @@ namespace SMT.EVEData
             LoadCharacters();
 
             InitTheraConnections();
+
+            ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
+
             InitZKillFeed();
             StartUpdateCoalitionInfo();
 
@@ -1924,15 +1930,17 @@ namespace SMT.EVEData
 
                 TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
                 TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
+                TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
 
                 DateTime NextCharacterUpdate = DateTime.Now;
                 DateTime NextLowFreqUpdate = DateTime.Now;
+                DateTime NextSOVCampaignUpdate = DateTime.Now;
 
                 // loop forever
                 while (BackgroundThreadShouldTerminate == false)
                 {
                     // character Update
-                    if ((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)
+                    if ((NextCharacterUpdate - DateTime.Now).Ticks < 0)
                     {
                         NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
 
@@ -1941,6 +1949,13 @@ namespace SMT.EVEData
                             LocalCharacter c = LocalCharacters.ElementAt(i);
                             await c.Update();
                         }
+                    }
+
+                    // sov update
+                    if ((NextSOVCampaignUpdate - DateTime.Now).Ticks < 0)
+                    {
+                        NextSOVCampaignUpdate = DateTime.Now + SOVCampaignUpdateRate;
+                        StartUpdateSovCampaigns();
                     }
 
                     // low frequency update
@@ -2113,6 +2128,154 @@ namespace SMT.EVEData
             }
             catch { }
         }
+
+        private async void StartUpdateSovCampaigns()
+        {
+            try
+            {
+
+ 
+
+                foreach(SOVCampaign sc in ActiveSovCampaigns)
+                {
+                    sc.Valid = false;
+                }
+
+                List<long> allianceIDsToResolve = new List<long>();
+
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Campaign>> esr = await ESIClient.Sovereignty.Campaigns();
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Campaign>>(esr))
+                {
+
+                    foreach (ESI.NET.Models.Sovereignty.Campaign c in esr.Data)
+                    {
+
+                        SOVCampaign ss = null;
+
+                        foreach (SOVCampaign asc in ActiveSovCampaigns)
+                        {
+                            if(asc.CampaignID == c.CampaignId )
+                            {
+                                ss = asc;
+                            }
+                        }
+
+
+                        if (ss == null)
+                        {
+                            System sys = GetEveSystemFromID(c.SolarSystemId);
+                            if (sys == null)
+                            {
+                                continue;
+                            }
+
+                            ss = new SOVCampaign
+                            {
+                                CampaignID = c.CampaignId,
+                                DefendingAllianceID = c.DefenderId,
+                                System = sys.Name,
+                                Region = sys.Region,
+                                StartTime = c.StartTime,
+                                DefendingAllianceName = "",
+
+                            };
+
+                            if(c.EventType == "ihub_defense")
+                            {
+                                ss.Type = "IHub";
+                            }
+
+                            if(c.EventType == "tcu_defense")
+                            {
+                                ss.Type = "TCU";
+                            }
+
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                ActiveSovCampaigns.Add(ss);
+                            }), DispatcherPriority.Normal, null);
+
+
+                        }
+
+                        ss.AttackersScore = c.AttackersScore;
+                        ss.DefendersScore = c.DefenderScore;
+                        ss.Valid = true;
+
+                        if (AllianceIDToName.Keys.Contains(ss.DefendingAllianceID))
+                        {
+                            ss.DefendingAllianceName = AllianceIDToName[ss.DefendingAllianceID];
+                        }
+                        else
+                        {
+                            if(!allianceIDsToResolve.Contains(ss.DefendingAllianceID))
+                            {
+                                allianceIDsToResolve.Add(ss.DefendingAllianceID);
+                            }
+
+                        }
+
+                        int NodesToWin = (int)Math.Ceiling(ss.DefendersScore / 0.07);
+                        int NodesToDefend = (int)Math.Ceiling(ss.AttackersScore / 0.07);
+                        ss.State = $"Nodes Remaining\nAttackers : {NodesToWin}\nDefenders : {NodesToDefend}";
+
+                        ss.TimeToStart = ss.StartTime - DateTime.UtcNow;
+
+                        if (ss.StartTime < DateTime.UtcNow)
+                        {
+                            ss.IsActive = true;
+
+                        }
+                        else
+                        {
+                            ss.IsActive = false;
+                        }
+
+                    }
+                }
+
+                if (allianceIDsToResolve.Count > 0)
+                {
+                    await ResolveAllianceIDs(allianceIDsToResolve);
+                }
+
+
+                foreach (SOVCampaign sc in ActiveSovCampaigns.ToList())
+                {
+                    if (string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.Keys.Contains(sc.DefendingAllianceID))
+                    {
+                        sc.DefendingAllianceName = AllianceIDToName[sc.DefendingAllianceID];
+                    }
+
+
+                    if (sc.Valid == false)
+                    {
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        {
+                            ActiveSovCampaigns.Remove(sc);
+                        }), DispatcherPriority.Normal, null);
+                    }
+                }
+
+
+
+                // super hack : I want to update the both the times and filter colour that
+                // this gets used for but the binding neither seem to propigate the change
+                // but this forces a listchanged which ultimately triggers a refresh
+                // ugly and to be fixed after some investigation
+                {
+                    SOVCampaign hackSC = new SOVCampaign();
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        ActiveSovCampaigns.Add(hackSC);
+                        ActiveSovCampaigns.Remove(hackSC);
+                    }), DispatcherPriority.Normal, null);
+
+                }
+            }
+            catch { }
+        }
+
 
         private void StartUpdateStructureHunterUpdate()
         {
