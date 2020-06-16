@@ -424,7 +424,10 @@ namespace SMT.EVEData
                     UpdateInfoFromESI().Wait();
                 }
 
-                UpdatePositionFromESI().Wait();
+                if(EveManager.Instance.UseESIForCharacterPositions)
+                {
+                    UpdatePositionFromESI().Wait();
+                }
                 //UpdateFleetInfo();
 
                 if (routeNeedsUpdate)

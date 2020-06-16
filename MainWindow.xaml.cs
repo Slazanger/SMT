@@ -108,6 +108,8 @@ namespace SMT
             EVEManager = new EVEData.EveManager(SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
 
+            EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
+
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
             bool initFromScratch = false;
             if (initFromScratch)
@@ -294,6 +296,9 @@ namespace SMT
 
             try
             {
+                // Save off any explicit items
+                MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
+
                 // Save the Map Colours
                 string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
 

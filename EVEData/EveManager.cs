@@ -145,6 +145,9 @@ namespace SMT.EVEData
             }
         }
 
+
+        public bool UseESIForCharacterPositions { get; set; }
+
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using SMT.EVEData;
+using System.Windows;
 
 namespace SMT
 {
@@ -12,6 +13,8 @@ namespace SMT
         public PreferencesWindow()
         {
             InitializeComponent();
+
+            syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
         }
 
         private void Prefs_OK_Click(object sender, RoutedEventArgs e)
@@ -25,6 +28,11 @@ namespace SMT
             {
                 MapConf.SetDefaults();
             }
+        }
+
+        private void syncESIPositionChk_Checked(object sender, RoutedEventArgs e)
+        {
+            EveManager.Instance.UseESIForCharacterPositions = (bool)syncESIPositionChk.IsChecked;
         }
     }
 }

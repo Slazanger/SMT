@@ -675,6 +675,9 @@ namespace SMT
             }
         }
 
+        public bool UseESIForCharacterPositions { get; set; }
+
+
         private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
         public bool SyncActiveCharacterBasedOnActiveEVEClient
         {
@@ -771,6 +774,7 @@ namespace SMT
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
             SOVBasedITCU = true;
+            UseESIForCharacterPositions = true;
 
             ShowIhubVunerabilities = true;
 
