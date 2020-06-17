@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -63,8 +64,6 @@ namespace SMT.EVEData
         private async void zkb_DoWork(object sender, DoWorkEventArgs e)
         {
             string redistURL = @"https://redisq.zkillboard.com/listen.php";
-
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(redistURL);
             request.Method = WebRequestMethods.Http.Get;

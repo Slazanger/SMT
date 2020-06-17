@@ -83,6 +83,9 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public static readonly RoutedEvent ZoomChangedEvent = EventManager.RegisterRoutedEvent("ZoomChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(ZoomControl));
 
+        public static readonly RoutedEvent ContentDragFinishedEvent = EventManager.RegisterRoutedEvent("ContentDragFinished", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(ZoomControl));
+
+
         public static readonly DependencyProperty ZoomDeltaMultiplierProperty =
             DependencyProperty.Register("ZoomDeltaMultiplier", typeof(double), typeof(ZoomControl),
                 new UIPropertyMetadata(100.0));
@@ -133,6 +136,13 @@ namespace WpfHelpers.WpfControls.Zoombox
             add { AddHandler(ZoomChangedEvent, value); }
             remove { RemoveHandler(ZoomChangedEvent, value); }
         }
+
+        public event RoutedEventHandler ContentDragFinished
+        {
+            add { AddHandler(ContentDragFinishedEvent, value); }
+            remove { RemoveHandler(ContentDragFinishedEvent, value); }
+        }
+
 
         public bool AllowAltZoomBox
         {
@@ -384,6 +394,7 @@ namespace WpfHelpers.WpfControls.Zoombox
             zc._translateTransform.X = (double)e.NewValue;
             if (!zc._isZooming)
                 zc.Mode = ZoomControlModes.Custom;
+
         }
 
         private static object TranslateY_Coerce(DependencyObject d, object basevalue)
@@ -400,6 +411,7 @@ namespace WpfHelpers.WpfControls.Zoombox
             zc._translateTransform.Y = (double)e.NewValue;
             if (!zc._isZooming)
                 zc.Mode = ZoomControlModes.Custom;
+
         }
 
         private static void Zoom_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -665,6 +677,10 @@ namespace WpfHelpers.WpfControls.Zoombox
             ModifierMode = ZoomViewModifierMode.None;
             PreviewMouseMove -= ZoomControl_PreviewMouseMove;
             ReleaseMouseCapture();
+
+
+            RoutedEventArgs newEventArgs = new RoutedEventArgs(ContentDragFinishedEvent);
+            RaiseEvent(newEventArgs);
         }
 
         private void ZoomControl_MouseWheel(object sender, MouseWheelEventArgs e)

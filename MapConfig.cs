@@ -54,6 +54,8 @@ namespace SMT
 
         private bool m_ShowRattingDataAsDelta;
 
+        private bool m_ShowSimpleSecurityView;
+
         private bool m_ShowRegionStandings;
 
         private bool m_ShowTCUVunerabilities;
@@ -351,6 +353,22 @@ namespace SMT
                 OnPropertyChanged("ShowRattingDataAsDelta");
             }
         }
+
+        [Category("Misc")]
+        [DisplayName("Simple Security View")]
+        public bool ShowSimpleSecurityView
+        {
+            get
+            {
+                return m_ShowSimpleSecurityView;
+            }
+            set
+            {
+                m_ShowSimpleSecurityView = value;
+                OnPropertyChanged("ShowSimpleSecurityView");
+            }
+        }
+
 
         [Category("Regions")]
         [DisplayName("Show RegionStandings")]
@@ -657,6 +675,9 @@ namespace SMT
             }
         }
 
+        public bool UseESIForCharacterPositions { get; set; }
+
+
         private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
         public bool SyncActiveCharacterBasedOnActiveEVEClient
         {
@@ -668,6 +689,17 @@ namespace SMT
             {
                 m_SyncActiveCharacterBasedOnActiveEVEClient = value;
                 OnPropertyChanged("SyncActiveCharacterBasedOnActiveEVEClient");
+            }
+        }
+
+        private bool m_DisableJumpBridgesPathAnimation;
+        public bool DisableJumpBridgesPathAnimation
+        {
+            get => m_DisableJumpBridgesPathAnimation;
+            set
+            {
+                m_DisableJumpBridgesPathAnimation = value;
+                OnPropertyChanged("DisableJumpBridgesPathAnimation");
             }
         }
 
@@ -712,7 +744,8 @@ namespace SMT
                 SOVStructureVunerableColour = Color.FromRgb(64, 64, 64),
                 SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178),
 
-                ConstellationHighlightColour = Color.FromRgb(148, 200, 180),
+
+                ConstellationHighlightColour = Color.FromRgb(147, 131, 131),
 
                 TheraEntranceRegion = Colors.YellowGreen,
                 TheraEntranceSystem = Colors.YellowGreen,
@@ -741,6 +774,7 @@ namespace SMT
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
             SOVBasedITCU = true;
+            UseESIForCharacterPositions = true;
 
             ShowIhubVunerabilities = true;
 

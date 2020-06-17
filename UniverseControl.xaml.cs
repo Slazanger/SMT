@@ -122,6 +122,18 @@ namespace SMT
 
         public List<EVEData.Navigation.RoutePoint> ActiveRoute { get; set; }
 
+        public bool FollowCharacter
+        {
+            get
+            {
+                return FollowCharacterChk.IsChecked.Value;
+            }
+            set
+            {
+                FollowCharacterChk.IsChecked = value;
+            }
+        }
+
         public UniverseControl()
         {
             InitializeComponent();
@@ -242,6 +254,18 @@ namespace SMT
                 }
 
                 OnPropertyChanged("ShowShipJumps");
+            }
+        }
+
+        public EVEData.LocalCharacter ActiveCharacter { get; set; }
+
+        public void UpdateActiveCharacter(EVEData.LocalCharacter lc)
+        {
+            ActiveCharacter = lc;
+
+            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            {
+                CentreMapOnActiveCharacter();
             }
         }
 
@@ -560,6 +584,10 @@ namespace SMT
                 DataRedraw = false;
             }
 
+            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            {
+                CentreMapOnActiveCharacter();
+            }
             ReDrawMap(FullRedraw, DataRedraw, FastUpdate);
         }
 
@@ -755,8 +783,6 @@ namespace SMT
             MainZoomControl.Background = BackgroundColourBrush;
             UniverseMainCanvas.Background = BackgroundColourBrush;
 
-            CacheMode cm = new BitmapCache(5.0);
-
             System.Windows.FontStyle fontStyle = FontStyles.Normal;
             FontWeight fontWeight = FontWeights.Medium;
             Typeface tf = new Typeface("Verdana");
@@ -773,7 +799,6 @@ namespace SMT
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
 
                 System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
-                gatesDrawingVisual.CacheMode = cm;
                 DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
 
                 foreach (GateHelper gh in universeSysLinksCache)
@@ -801,7 +826,6 @@ namespace SMT
                     p.DashStyle = DashStyles.Dot;
 
                     System.Windows.Media.DrawingVisual jbDrawingVisual = new System.Windows.Media.DrawingVisual();
-                    jbDrawingVisual.CacheMode = cm;
                     DrawingContext drawingContext;
                     drawingContext = jbDrawingVisual.RenderOpen();
 
@@ -831,7 +855,6 @@ namespace SMT
                 foreach (EVEData.System sys in EM.Systems)
                 {
                     System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
-                    SystemTextVisual.CacheMode = cm;
                     DrawingContext systemTextDrawingContext = SystemTextVisual.RenderOpen();
 
                     double X = (sys.ActualX - universeXMin) * universeScale;
@@ -840,7 +863,6 @@ namespace SMT
                     double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
 
                     System.Windows.Media.DrawingVisual systemShapeVisual = new System.Windows.Media.DrawingVisual();
-                    systemShapeVisual.CacheMode = cm;
 
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = systemShapeVisual.RenderOpen();
@@ -899,7 +921,6 @@ namespace SMT
 
 
                     System.Windows.Media.DrawingVisual RegionShapeVisual = new System.Windows.Media.DrawingVisual();
-                    RegionShapeVisual.CacheMode = cm;
                     DrawingContext regionShapeDrawingContext = RegionShapeVisual.RenderOpen();
 
                     regionShapeDrawingContext.DrawGeometry(RegionShapeColourBrush, RegionShapePen, sg);
@@ -1100,8 +1121,7 @@ namespace SMT
                     }
                 }
 
-                /*
-                if (ActiveRoute != null)
+/*                if (ActiveRoute != null)
                 {
                     if (ActiveRoute.Count > 1)
                     {
@@ -1221,59 +1241,12 @@ namespace SMT
                 UniverseMainCanvas.Children.Insert(0, VHRegionNames);
             }
 
-            CacheMode cm = new BitmapCache(5.0);
-
-            /*
-            foreach (EVEData.MapRegion mr in EM.Regions)
-            {
-                List<Point> systems = new List<Point>();
-
-                foreach (EVEData.MapSystem ms in mr.MapSystems.Values)
-                {
-                    if (ms.OutOfRegion)
-                    {
-                        continue;
-                    }
-
-                    double X = (ms.ActualSystem.ActualX - universeXMin) * universeScale;
-
-                    // need to invert Z
-                    double Z = (universeDepth - (ms.ActualSystem.ActualZ - universeZMin)) * universeScale;
-
-                    Point p = new Point(X, Z);
-                    systems.Add(p);
-                }
-
-                List<Point> regionCH = ConvexHull(systems);
-                Point pStart = regionCH[0];
-                regionCH.RemoveAt(0);
-                StreamGeometry streamGeometry = new StreamGeometry();
-                using (StreamGeometryContext geometryContext = streamGeometry.Open())
-                {
-                    geometryContext.BeginFigure(pStart, true, true);
-                    PointCollection points = new PointCollection(regionCH);
-                    geometryContext.PolyLineTo(points, true, true);
-                }
-
-                System.Windows.Media.DrawingVisual regionShapeVisual = new System.Windows.Media.DrawingVisual();
-                //regionShapeVisual.CacheMode = cm;
-
-                // Retrieve the DrawingContext in order to create new drawing content.
-                DrawingContext drawingContext = regionShapeVisual.RenderOpen();
-                drawingContext.DrawGeometry(Brushes.LightGreen, new Pen(Brushes.White, 2), streamGeometry);
-                drawingContext.Close();
-                VHRegionNames.AddChild(regionShapeVisual, null);
-            }
-
-    */
-
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
                 double X = (mr.RegionX - universeXMin) * universeScale; ;
                 double Z = (universeDepth - (mr.RegionZ - universeZMin)) * universeScale;
 
                 System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
-                SystemTextVisual.CacheMode = cm;
                 DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
 #pragma warning disable CS0618
@@ -1319,6 +1292,7 @@ namespace SMT
 
             if (sd != null)
             {
+                FollowCharacterChk.IsChecked = false;
                 ShowSystem(sd.Name);
             }
         }
@@ -1357,6 +1331,44 @@ namespace SMT
 
             RoutedEventArgs newEventArgs = new RoutedEventArgs(RequestRegionSystemSelectEvent, s.Name);
             RaiseEvent(newEventArgs);
+        }
+
+        private void FollowCharacterChk_Checked(object sender, RoutedEventArgs e)
+        {
+            CentreMapOnActiveCharacter();
+        }
+
+        private void CentreMapOnActiveCharacter()
+        {
+            if(ActiveCharacter == null || string.IsNullOrEmpty(ActiveCharacter.Location))
+            {
+                return;
+            }
+
+            EVEData.System s = EM.GetEveSystem(ActiveCharacter.Location);
+
+            if (s != null)
+            {
+                // actual
+                double X1 = (s.ActualX - universeXMin) * universeScale;
+                double Y1 = (universeDepth - (s.ActualZ - universeZMin)) * universeScale;
+
+                MainZoomControl.Show(X1, Y1, MainZoomControl.Zoom);
+            }
+
+        }
+
+         private void MainZoomControl_ContentDragFinished(object sender, RoutedEventArgs e)
+        {
+            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            {
+                FollowCharacterChk.IsChecked = false;
+            }
+        }
+
+        private void RecentreBtn_Click(object sender, RoutedEventArgs e)
+        {
+            CentreMapOnActiveCharacter();
         }
     }
 }

@@ -32,17 +32,10 @@ namespace SMT.EVEData
     /// </summary>
     public class EveManager
     {
-        public EveTrace.EveTraceFleetInfo FleetIntel;
-
         /// <summary>
         /// singleton instance of this class
         /// </summary>
         private static EveManager instance;
-
-        /// <summary>
-        /// Debug output log
-        /// </summary>
-        private static NLog.Logger outputLog = NLog.LogManager.GetCurrentClassLogger();
 
         private bool BackgroundThreadShouldTerminate = false;
 
@@ -152,6 +145,9 @@ namespace SMT.EVEData
             }
         }
 
+
+        public bool UseESIForCharacterPositions { get; set; }
+
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
@@ -210,7 +206,6 @@ namespace SMT.EVEData
         /// </summary>
         public string SaveDataRootFolder { get; set; }
 
-
         public EVEData.Server ServerInfo { get; set; }
 
         /// <summary>
@@ -232,6 +227,9 @@ namespace SMT.EVEData
         /// Gets or sets the current list of thera connections
         /// </summary>
         public ObservableCollection<TheraConnection> TheraConnections { get; set; }
+
+        public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
+
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -503,7 +501,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystems.csv";
+            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapSolarSystems.csv";
             if (File.Exists(eveStaticDataSolarSystemFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
@@ -543,7 +541,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export for the regions and extract some info from it
-            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapRegions.csv";
+            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapRegions.csv";
             if (File.Exists(eveStaticDataRegionFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataRegionFile);
@@ -575,7 +573,7 @@ namespace SMT.EVEData
                 // Error
             }
 
-            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\mapSolarSystemJumps.csv";
+            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapSolarSystemJumps.csv";
             if (File.Exists(eveStaticDataJumpsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsFile);
@@ -602,7 +600,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\staStations.csv";
+            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\staStations.csv";
             if (File.Exists(eveStaticDataStationsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataStationsFile);
@@ -678,7 +676,6 @@ namespace SMT.EVEData
 
                 mr.RegionOutline = new List<Point>();
 
-
                 List<Tuple<int, int>> processed = new List<Tuple<int, int>>();
 
                 int CurrentPoint = 0;
@@ -690,7 +687,6 @@ namespace SMT.EVEData
                     {
                         if (processed.Contains(i))
                             continue;
-
 
                         if (i.Item1 == CurrentPoint)
                         {
@@ -707,18 +703,11 @@ namespace SMT.EVEData
                             processed.Add(i);
                             break;
                         }
-
                     }
 
                     count++;
-
                 }
-
-
-
             }
-
-
 
             foreach (System s in Systems)
             {
@@ -785,7 +774,7 @@ namespace SMT.EVEData
             }
 
             // now get the ships
-            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\invTypes.csv";
+            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\invTypes.csv";
             if (File.Exists(eveStaticDataItemTypesFile))
             {
                 ShipTypes = new SerializableDictionary<string, string>();
@@ -900,7 +889,7 @@ namespace SMT.EVEData
             }
 
             // now add the jove systems
-            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\JoveSystems.csv";
+            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\JoveSystems.csv";
             if (File.Exists(eveStaticDataJoveObservatories))
             {
                 StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
@@ -932,9 +921,9 @@ namespace SMT.EVEData
             }
 
             // now serialise the classes to disk
-            Utils.SerializToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
-            Utils.SerializToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            Utils.SerializToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            Utils.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
+            Utils.SerializeToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
+            Utils.SerializeToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
             Init();
         }
@@ -980,9 +969,9 @@ namespace SMT.EVEData
         /// <summary>
         /// Get the ESI Logon URL String
         /// </summary>
-        public string GetESILogonURL()
+        public string GetESILogonURL(string challengeCode)
         {
-            return ESIClient.SSO.CreateAuthenticationUrl(ESIScopes);
+            return ESIClient.SSO.CreateAuthenticationUrlV2(ESIScopes, challengeCode, VersionStr);
         }
 
         /// <summary>
@@ -1093,7 +1082,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Hand the custom smtauth- url we get back from the logon screen
         /// </summary>
-        public async void HandleEveAuthSMTUri(Uri uri)
+        public async void HandleEveAuthSMTUri(Uri uri, string challengeCode)
         {
             // parse the uri
             var query = HttpUtility.ParseQueryString(uri.Query);
@@ -1105,7 +1094,7 @@ namespace SMT.EVEData
 
             string code = query["code"];
 
-            SsoToken sst = await ESIClient.SSO.GetToken(GrantType.AuthorizationCode, code);
+            SsoToken sst = await ESIClient.SSO.GetTokenV2(GrantType.AuthorizationCode, code, challengeCode, null);
             if (sst == null || sst.ExpiresIn == 0)
             {
                 return;
@@ -1319,10 +1308,10 @@ namespace SMT.EVEData
             }
 
             // now serialise the caches to disk
-            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
-            Utils.SerializToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
+            Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
+            Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
 
-            Utils.SerializToDisk<ObservableCollection<JumpBridge>>(JumpBridges, SaveDataVersionFolder + @"\JumpBridges.dat");
+            Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, SaveDataVersionFolder + @"\JumpBridges.dat");
         }
 
         /// <summary>
@@ -1334,7 +1323,6 @@ namespace SMT.EVEData
             IntelDataList = new BindingList<IntelData>();
             string intelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
 
-            outputLog.Info("Loading Intel File Filer from  {0}", intelFileFilter);
             if (File.Exists(intelFileFilter))
             {
                 StreamReader file = new StreamReader(intelFileFilter);
@@ -1344,7 +1332,6 @@ namespace SMT.EVEData
                     line.Trim();
                     if (line != string.Empty)
                     {
-                        outputLog.Info("adding intel filer : {0}", line);
                         IntelFilters.Add(line);
                     }
                 }
@@ -1353,7 +1340,6 @@ namespace SMT.EVEData
             IntelClearFilters = new List<string>();
             string intelClearFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelClearFilters.txt";
 
-            outputLog.Info("intelClearFileFilter Intel Filter File from  {0}", intelClearFileFilter);
             if (File.Exists(intelClearFileFilter))
             {
                 StreamReader file = new StreamReader(intelClearFileFilter);
@@ -1363,7 +1349,6 @@ namespace SMT.EVEData
                     line.Trim();
                     if (line != string.Empty)
                     {
-                        outputLog.Info("adding clear intel filer : {0}", line);
                         IntelClearFilters.Add(line);
                     }
                 }
@@ -1374,8 +1359,6 @@ namespace SMT.EVEData
             string eveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
             if (Directory.Exists(eveLogFolder))
             {
-                outputLog.Info("adding file watcher to : {0}", eveLogFolder);
-
                 intelFileWatcher = new FileSystemWatcher(eveLogFolder)
                 {
                     Filter = "*.txt",
@@ -1472,7 +1455,6 @@ namespace SMT.EVEData
             StartUpdateSOVFromESI();
             StartUpdateIncursionsFromESI();
             // temp disabled
-            //StartEveTraceFleetUpdate();
             //StartUpdateStructureHunterUpdate();
 
             StartUpdateSovStructureUpdate();
@@ -1606,33 +1588,6 @@ namespace SMT.EVEData
             }
         }
 
-        private void EveTraceFleetUpdateCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        EveTrace.EveTraceFleetInfo fleetInfo = EveTrace.EveTraceFleetInfo.FromJson(strContent);
-
-                        if (fleetInfo != null)
-                        {
-                            FleetIntel = fleetInfo;
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
         /// <summary>
         /// Initialise the eve manager
         /// </summary>
@@ -1676,6 +1631,9 @@ namespace SMT.EVEData
             LoadCharacters();
 
             InitTheraConnections();
+
+            ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
+
             InitZKillFeed();
             StartUpdateCoalitionInfo();
 
@@ -1707,8 +1665,6 @@ namespace SMT.EVEData
         {
             string changedFile = e.FullPath;
 
-            outputLog.Info("File Watcher triggered : {0}", changedFile);
-
             bool processFile = false;
             bool localChat = false;
 
@@ -1734,8 +1690,6 @@ namespace SMT.EVEData
                     Encoding fe = Utils.GetEncoding(changedFile);
                     FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-                    outputLog.Info("Log File Encoding : {0}", fe.ToString());
-
                     StreamReader file = new StreamReader(ifs, fe);
 
                     int fileReadFrom = 0;
@@ -1749,7 +1703,6 @@ namespace SMT.EVEData
                     {
                         if (localChat)
                         {
-                            outputLog.Info("Processing file : {0}", changedFile);
                             string system = string.Empty;
                             string characterName = string.Empty;
 
@@ -1846,8 +1799,6 @@ namespace SMT.EVEData
                                     {
                                         if (c.LocalChatFile == changedFile)
                                         {
-                                            outputLog.Info("Character {0} moved from {1} to {2}", c.Name, c.Location, system);
-
                                             c.Location = system;
                                         }
                                     }
@@ -1876,6 +1827,11 @@ namespace SMT.EVEData
                                     }
                                 }
                                 else
+                                {
+                                    addToIntel = false;
+                                }
+
+                                if(line.Contains("Channel MOTD:"))
                                 {
                                     addToIntel = false;
                                 }
@@ -1915,10 +1871,6 @@ namespace SMT.EVEData
                                         IntelAddedEvent(id.Systems);
                                     }
                                 }
-                                else
-                                {
-                                    outputLog.Info("Already have Line : {0} ", line);
-                                }
                             }), DispatcherPriority.Normal, null);
                         }
 
@@ -1928,16 +1880,13 @@ namespace SMT.EVEData
                     ifs.Close();
 
                     intelFileReadPos[changedFile] = fileReadFrom;
-                    outputLog.Info("File Read pos : {0} {1}", changedFile, fileReadFrom);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    outputLog.Info("Intel Process Failed : {0}", ex.ToString());
                 }
             }
             else
             {
-                outputLog.Info("Skipping File : {0}", changedFile);
             }
         }
 
@@ -1989,15 +1938,17 @@ namespace SMT.EVEData
 
                 TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
                 TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
+                TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
 
                 DateTime NextCharacterUpdate = DateTime.Now;
                 DateTime NextLowFreqUpdate = DateTime.Now;
+                DateTime NextSOVCampaignUpdate = DateTime.Now;
 
                 // loop forever
                 while (BackgroundThreadShouldTerminate == false)
                 {
                     // character Update
-                    if ((NextCharacterUpdate - DateTime.Now).Milliseconds < 100)
+                    if ((NextCharacterUpdate - DateTime.Now).Ticks < 0)
                     {
                         NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
 
@@ -2006,6 +1957,13 @@ namespace SMT.EVEData
                             LocalCharacter c = LocalCharacters.ElementAt(i);
                             await c.Update();
                         }
+                    }
+
+                    // sov update
+                    if ((NextSOVCampaignUpdate - DateTime.Now).Ticks < 0)
+                    {
+                        NextSOVCampaignUpdate = DateTime.Now + SOVCampaignUpdateRate;
+                        StartUpdateSovCampaigns();
                     }
 
                     // low frequency update
@@ -2021,18 +1979,6 @@ namespace SMT.EVEData
                     Thread.Sleep(100);
                 }
             }).Start();
-        }
-
-        private void StartEveTraceFleetUpdate()
-        {
-            string url = @"https://api.evetrace.com/api/v1/fleet/";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(EveTraceFleetUpdateCallback), request);
         }
 
         private void StartUpdateCoalitionInfo()
@@ -2155,21 +2101,6 @@ namespace SMT.EVEData
 
             request.BeginGetResponse(new AsyncCallback(ESIUpdateSovCallback), request);
 
-            /*
-            This need expanding; awaiting fix
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.SystemSovereignty>> esr = await ESIClient.Sovereignty.Systems();
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.SystemSovereignty>>(esr))
-            {
-                foreach (ESI.NET.Models.Sovereignty.SystemSovereignty ss in esr.Data)
-                {
-                    EVEData.System sys = GetEveSystemFromID(ss.SystemId);
-                    if(sys != null)
-                    {
-                        sys.SOVAlliance = ss.
-                    }
-                }
-            }
-            */
         }
 
         private async void StartUpdateSovStructureUpdate()
@@ -2205,6 +2136,154 @@ namespace SMT.EVEData
             }
             catch { }
         }
+
+        private async void StartUpdateSovCampaigns()
+        {
+            try
+            {
+
+ 
+
+                foreach(SOVCampaign sc in ActiveSovCampaigns)
+                {
+                    sc.Valid = false;
+                }
+
+                List<long> allianceIDsToResolve = new List<long>();
+
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Campaign>> esr = await ESIClient.Sovereignty.Campaigns();
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Campaign>>(esr))
+                {
+
+                    foreach (ESI.NET.Models.Sovereignty.Campaign c in esr.Data)
+                    {
+
+                        SOVCampaign ss = null;
+
+                        foreach (SOVCampaign asc in ActiveSovCampaigns)
+                        {
+                            if(asc.CampaignID == c.CampaignId )
+                            {
+                                ss = asc;
+                            }
+                        }
+
+
+                        if (ss == null)
+                        {
+                            System sys = GetEveSystemFromID(c.SolarSystemId);
+                            if (sys == null)
+                            {
+                                continue;
+                            }
+
+                            ss = new SOVCampaign
+                            {
+                                CampaignID = c.CampaignId,
+                                DefendingAllianceID = c.DefenderId,
+                                System = sys.Name,
+                                Region = sys.Region,
+                                StartTime = c.StartTime,
+                                DefendingAllianceName = "",
+
+                            };
+
+                            if(c.EventType == "ihub_defense")
+                            {
+                                ss.Type = "IHub";
+                            }
+
+                            if(c.EventType == "tcu_defense")
+                            {
+                                ss.Type = "TCU";
+                            }
+
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                ActiveSovCampaigns.Add(ss);
+                            }), DispatcherPriority.Normal, null);
+
+
+                        }
+
+                        ss.AttackersScore = c.AttackersScore;
+                        ss.DefendersScore = c.DefenderScore;
+                        ss.Valid = true;
+
+                        if (AllianceIDToName.Keys.Contains(ss.DefendingAllianceID))
+                        {
+                            ss.DefendingAllianceName = AllianceIDToName[ss.DefendingAllianceID];
+                        }
+                        else
+                        {
+                            if(!allianceIDsToResolve.Contains(ss.DefendingAllianceID))
+                            {
+                                allianceIDsToResolve.Add(ss.DefendingAllianceID);
+                            }
+
+                        }
+
+                        int NodesToWin = (int)Math.Ceiling(ss.DefendersScore / 0.07);
+                        int NodesToDefend = (int)Math.Ceiling(ss.AttackersScore / 0.07);
+                        ss.State = $"Nodes Remaining\nAttackers : {NodesToWin}\nDefenders : {NodesToDefend}";
+
+                        ss.TimeToStart = ss.StartTime - DateTime.UtcNow;
+
+                        if (ss.StartTime < DateTime.UtcNow)
+                        {
+                            ss.IsActive = true;
+
+                        }
+                        else
+                        {
+                            ss.IsActive = false;
+                        }
+
+                    }
+                }
+
+                if (allianceIDsToResolve.Count > 0)
+                {
+                    await ResolveAllianceIDs(allianceIDsToResolve);
+                }
+
+
+                foreach (SOVCampaign sc in ActiveSovCampaigns.ToList())
+                {
+                    if (string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.Keys.Contains(sc.DefendingAllianceID))
+                    {
+                        sc.DefendingAllianceName = AllianceIDToName[sc.DefendingAllianceID];
+                    }
+
+
+                    if (sc.Valid == false)
+                    {
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        {
+                            ActiveSovCampaigns.Remove(sc);
+                        }), DispatcherPriority.Normal, null);
+                    }
+                }
+
+
+
+                // super hack : I want to update the both the times and filter colour that
+                // this gets used for but the binding neither seem to propigate the change
+                // but this forces a listchanged which ultimately triggers a refresh
+                // ugly and to be fixed after some investigation
+                {
+                    SOVCampaign hackSC = new SOVCampaign();
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        ActiveSovCampaigns.Add(hackSC);
+                        ActiveSovCampaigns.Remove(hackSC);
+                    }), DispatcherPriority.Normal, null);
+
+                }
+            }
+            catch { }
+        }
+
 
         private void StartUpdateStructureHunterUpdate()
         {

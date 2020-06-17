@@ -60,11 +60,7 @@
 
         <StackPanel Margin="4,2,1,2"  Orientation="Horizontal" HorizontalAlignment="Left">
             <ComboBox x:Name="RegionSelectCB"  Width="120" Margin="5,0" FontSize="12" SelectionChanged="RegionSelectCB_SelectionChanged" />
-
-            <ComboBox x:Name="SystemDropDownAC" Width="100" FontSize="12" Margin="5,0" SelectionChanged="SystemDropDownAC_SelectionChanged" />
-            <ComboBox x:Name="CharacterDropDown"  Width="150"  Margin="5,0" HorizontalAlignment="Center" SelectionChanged="CharacterDropDown_SelectionChanged" DropDownClosed="CharacterDropDown_DropDownClosed" />
-            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Follow?" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
-            <Separator />
+            <ComboBox x:Name="SystemDropDownAC" IsEditable="True" Text="System"  Width="100" FontSize="12" Margin="5,0" SelectionChanged="SystemDropDownAC_SelectionChanged"/>
             <Label Content="Search :" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged" Foreground="Black">
                 <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
@@ -73,6 +69,9 @@
                     </ItemsPanelTemplate>
                 </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
             </dotNetKitControls:AutoCompleteComboBox>
+
+            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Auto Follow Active Character" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
+            <Separator />
         </StackPanel>
 
         <Grid x:Name="MainCanvasGrid" ClipToBounds="True" Grid.Row="1">

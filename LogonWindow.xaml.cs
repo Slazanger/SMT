@@ -23,6 +23,10 @@ namespace SMT
         {
             // create the http Server
             listener = new HttpListener();
+            string challengeCode = Utils.RandomString(32);
+            string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
+            System.Diagnostics.Process.Start(esiLogonURL);
+
 
             try
             {
@@ -33,7 +37,7 @@ namespace SMT
                 HttpListenerContext context = listener.GetContext();
                 HttpListenerRequest request = context.Request;
 
-                EVEData.EveManager.Instance.HandleEveAuthSMTUri(request.Url);
+                EVEData.EveManager.Instance.HandleEveAuthSMTUri(request.Url, challengeCode);
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
