@@ -29,6 +29,11 @@
 
             <Separator />
 
+            <MenuItem Header="Set Destination" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
+            <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
+
+            <Separator/>
+
             <MenuItem Header="Show Jump Range">
                 <MenuItem Header="Remove All" DataContext="-1" Click="SetJumpRange_Click" />
                 <MenuItem Header="None" DataContext="0" Click="SetJumpRange_Click" />

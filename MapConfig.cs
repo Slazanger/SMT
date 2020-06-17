@@ -693,6 +693,8 @@ namespace SMT
         }
 
         private bool m_DisableJumpBridgesPathAnimation;
+        private bool m_DisableRoutePathAnimation;
+
         public bool DisableJumpBridgesPathAnimation
         {
             get => m_DisableJumpBridgesPathAnimation;
@@ -700,6 +702,16 @@ namespace SMT
             {
                 m_DisableJumpBridgesPathAnimation = value;
                 OnPropertyChanged("DisableJumpBridgesPathAnimation");
+            }
+        }
+        
+        public bool DisableRoutePathAnimation
+        {
+            get => m_DisableRoutePathAnimation;
+            set
+            {
+                m_DisableRoutePathAnimation = value;
+                OnPropertyChanged("DisableRoutePathAnimation");
             }
         }
 
