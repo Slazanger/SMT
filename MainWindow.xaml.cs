@@ -26,7 +26,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
 
-        public const string SMT_VERSION = "SMT_085";
+        public const string SMT_VERSION = "SMT_086";
 
 
         private LogonWindow logonBrowserWindow;
