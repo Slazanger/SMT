@@ -1831,6 +1831,11 @@ namespace SMT.EVEData
                                     addToIntel = false;
                                 }
 
+                                if(line.Contains("Channel MOTD:"))
+                                {
+                                    addToIntel = false;
+                                }
+
                                 if (addToIntel)
                                 {
                                     EVEData.IntelData id = new EVEData.IntelData(line);
