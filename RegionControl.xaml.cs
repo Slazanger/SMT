@@ -1268,7 +1268,6 @@ namespace SMT
             Brush RouteBrush = new SolidColorBrush(Colors.Yellow);
             Brush RouteAnsiblexBrush = new SolidColorBrush(Colors.DarkMagenta);
 
-            Brush WaypointBrush = new SolidColorBrush(Colors.DarkGray);
 
             // no active route
             if (ActiveCharacter.ActiveRoute.Count == 0)

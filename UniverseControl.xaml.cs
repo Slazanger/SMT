@@ -299,7 +299,7 @@ namespace SMT
         private VisualHost VHRangeSpheres;
         private VisualHost VHRangeHighlights;
         private VisualHost VHDataSpheres;
-        private VisualHost VHCapRoute;
+        private VisualHost VHRoute;
         private VisualHost VHRegionShapes;
 
 
@@ -336,7 +336,7 @@ namespace SMT
             VHRangeHighlights = new VisualHost();
             VHCharacters = new VisualHost();
             VHZKB = new VisualHost();
-            VHCapRoute = new VisualHost();
+            VHRoute = new VisualHost();
             VHRegionShapes = new VisualHost();
 
             UniverseMainCanvas.Children.Add(VHRegionShapes);
@@ -347,7 +347,7 @@ namespace SMT
             UniverseMainCanvas.Children.Add(VHRangeHighlights);
 
             UniverseMainCanvas.Children.Add(VHLinks);
-            UniverseMainCanvas.Children.Add(VHCapRoute);
+            UniverseMainCanvas.Children.Add(VHRoute);
             UniverseMainCanvas.Children.Add(VHNames);
             UniverseMainCanvas.Children.Add(VHCharacters);
             UniverseMainCanvas.Children.Add(VHSystems);
@@ -786,7 +786,8 @@ namespace SMT
             SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
             SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
 
-            SolidColorBrush CapRouteColor = new SolidColorBrush(Colors.Yellow);
+            SolidColorBrush activeRouteColour = new SolidColorBrush(Colors.Yellow);
+            SolidColorBrush activeRouteAniblexColour = new SolidColorBrush(Colors.DarkMagenta);
 
             // update the background colours
             MainZoomControl.Background = BackgroundColourBrush;
@@ -1019,7 +1020,7 @@ namespace SMT
             {
                 VHCharacters.ClearAllChildren();
                 VHZKB.ClearAllChildren();
-                VHCapRoute.ClearAllChildren();
+                VHRoute.ClearAllChildren();
 
                 float characterNametextXOffset = 3;
                 float characterNametextYOffset = -16;
@@ -1134,11 +1135,24 @@ namespace SMT
                 {
                     if (ActiveCharacter.ActiveRoute.Count > 1)
                     {
-                        Pen RoutePen = new Pen(CapRouteColor, 2);
-                        RoutePen.DashStyle = DashStyles.Dot;
+                        Pen dashedRoutePen = new Pen(activeRouteColour, 2);
+                        dashedRoutePen.DashStyle = DashStyles.Dot;
 
+                        Pen dashedRouteAnsiblexPen = new Pen(activeRouteAniblexColour, 2);
+                        dashedRouteAnsiblexPen.DashStyle = DashStyles.Dot;
+
+                        Pen outlinePen = new Pen(activeRouteColour, 2);
+                        
+
+                        // add the lines
                         for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
                         {
+                            Pen linePen = dashedRoutePen;
+                            if(ActiveCharacter.ActiveRoute[i-1].GateToTake == EVEData.Navigation.GateType.Ansibex)
+                            {
+                                linePen = dashedRouteAnsiblexPen;
+                            }
+
                             EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i - 1].SystemName);
                             EVEData.System sysB = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
 
@@ -1150,20 +1164,23 @@ namespace SMT
                                 double X2 = (sysB.ActualX - universeXMin) * universeScale;
                                 double Y2 = (universeDepth - (sysB.ActualZ - universeZMin)) * universeScale;
 
-                                System.Windows.Media.DrawingVisual capJumpRouteVisual = new System.Windows.Media.DrawingVisual();
+                                System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
 
                                 //Retrieve the DrawingContext in order to create new drawing content.
-                                DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
+                                DrawingContext drawingContext = routeVisual.RenderOpen();
+
 
                                 //Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawLine(RoutePen, new Point(X1, Y1), new Point(X2, Y2));
+                                drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
 
                                 drawingContext.Close();
 
-                                VHCapRoute.AddChild(capJumpRouteVisual, "ActiveRoute");
+                                VHRoute.AddChild(routeVisual, "ActiveRoute");
                             }
                         }
 
+
+                        // add system highlights
                         for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
                         {
                             EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
@@ -1173,19 +1190,23 @@ namespace SMT
                                 double X1 = (sysA.ActualX - universeXMin) * universeScale; ;
                                 double Y1 = (universeDepth - (sysA.ActualZ - universeZMin)) * universeScale;
 
-                                System.Windows.Media.DrawingVisual capJumpRouteVisual = new System.Windows.Media.DrawingVisual();
+                                System.Windows.Media.DrawingVisual jumpRouteVisual = new System.Windows.Media.DrawingVisual();
 
                                 //Retrieve the DrawingContext in order to create new drawing content.
-                                DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
+                                DrawingContext drawingContext = jumpRouteVisual.RenderOpen();
 
+                                double rectSize = 7;
+                                double rectHalfSize = rectSize / 2;
+                                
                                 //Pen p = new Pen(CapRouteColor, 1);
+                                Rect r = new Rect(X1 - rectHalfSize, Y1 - rectHalfSize, rectSize, rectSize);
 
                                 //Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawEllipse(CapRouteColor, RoutePen, new Point(X1, Y1), 10, 10);
+                                drawingContext.DrawRectangle(activeRouteColour, outlinePen, r);
 
                                 drawingContext.Close();
 
-                                VHCapRoute.AddChild(capJumpRouteVisual, "ActiveRoute");
+                                VHRoute.AddChild(jumpRouteVisual, "ActiveRoute");
                             }
                         }
                     }
