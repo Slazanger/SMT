@@ -1329,7 +1329,11 @@ namespace SMT
                     Timeline.SetDesiredFrameRate(da, 20);
 
                     routeLine.StrokeDashArray = dashes;
-                    routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+                    if (!MapConf.DisableRoutePathAnimation)
+                    {
+                        routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                    }
 
                     Canvas.SetZIndex(routeLine, 18);
                     MainCanvas.Children.Add(routeLine);

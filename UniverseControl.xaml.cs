@@ -584,7 +584,7 @@ namespace SMT
                 DataRedraw = false;
             }
 
-            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 CentreMapOnActiveCharacter();
             }
@@ -600,8 +600,17 @@ namespace SMT
             cm.DataContext = sys;
             cm.IsOpen = true;
 
+            MenuItem setDesto = cm.Items[2] as MenuItem;
+            MenuItem addWaypoint = cm.Items[3] as MenuItem;
+
+            if (ActiveCharacter != null && ActiveCharacter.ESILinked)
+            {
+                setDesto.IsEnabled = true;
+                addWaypoint.IsEnabled = true;
+            }
+
             // update SOV
-            MenuItem SovHeader = cm.Items[3] as MenuItem;
+            MenuItem SovHeader = cm.Items[6] as MenuItem;
             SovHeader.Items.Clear();
             SovHeader.IsEnabled = false;
 
@@ -626,7 +635,7 @@ namespace SMT
             }
 
             // update stats
-            MenuItem StatsHeader = cm.Items[4] as MenuItem;
+            MenuItem StatsHeader = cm.Items[7] as MenuItem;
             StatsHeader.Items.Clear();
             StatsHeader.IsEnabled = false;
 
@@ -1121,17 +1130,17 @@ namespace SMT
                     }
                 }
 
-/*                if (ActiveRoute != null)
+                if (ActiveCharacter?.ActiveRoute != null)
                 {
-                    if (ActiveRoute.Count > 1)
+                    if (ActiveCharacter.ActiveRoute.Count > 1)
                     {
                         Pen RoutePen = new Pen(CapRouteColor, 2);
                         RoutePen.DashStyle = DashStyles.Dot;
 
-                        for (int i = 1; i < ActiveRoute.Count; i++)
+                        for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
                         {
-                            EVEData.System sysA = EM.GetEveSystem(ActiveRoute[i - 1].SystemName);
-                            EVEData.System sysB = EM.GetEveSystem(ActiveRoute[i].SystemName);
+                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i - 1].SystemName);
+                            EVEData.System sysB = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
 
                             if (sysA != null && sysB != null)
                             {
@@ -1143,10 +1152,10 @@ namespace SMT
 
                                 System.Windows.Media.DrawingVisual capJumpRouteVisual = new System.Windows.Media.DrawingVisual();
 
-                                // Retrieve the DrawingContext in order to create new drawing content.
+                                //Retrieve the DrawingContext in order to create new drawing content.
                                 DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
 
-                                // Create a rectangle and draw it in the DrawingContext.
+                                //Create a rectangle and draw it in the DrawingContext.
                                 drawingContext.DrawLine(RoutePen, new Point(X1, Y1), new Point(X2, Y2));
 
                                 drawingContext.Close();
@@ -1155,9 +1164,9 @@ namespace SMT
                             }
                         }
 
-                        for (int i = 0; i < ActiveRoute.Count; i++)
+                        for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
                         {
-                            EVEData.System sysA = EM.GetEveSystem(ActiveRoute[i].SystemName);
+                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
 
                             if (sysA != null)
                             {
@@ -1166,12 +1175,12 @@ namespace SMT
 
                                 System.Windows.Media.DrawingVisual capJumpRouteVisual = new System.Windows.Media.DrawingVisual();
 
-                                // Retrieve the DrawingContext in order to create new drawing content.
+                                //Retrieve the DrawingContext in order to create new drawing content.
                                 DrawingContext drawingContext = capJumpRouteVisual.RenderOpen();
 
                                 //Pen p = new Pen(CapRouteColor, 1);
 
-                                // Create a rectangle and draw it in the DrawingContext.
+                                //Create a rectangle and draw it in the DrawingContext.
                                 drawingContext.DrawEllipse(CapRouteColor, RoutePen, new Point(X1, Y1), 10, 10);
 
                                 drawingContext.Close();
@@ -1181,7 +1190,7 @@ namespace SMT
                         }
                     }
                 }
-                */
+
             }
         }
 
@@ -1340,7 +1349,7 @@ namespace SMT
 
         private void CentreMapOnActiveCharacter()
         {
-            if(ActiveCharacter == null || string.IsNullOrEmpty(ActiveCharacter.Location))
+            if (ActiveCharacter == null || string.IsNullOrEmpty(ActiveCharacter.Location))
             {
                 return;
             }
@@ -1358,9 +1367,9 @@ namespace SMT
 
         }
 
-         private void MainZoomControl_ContentDragFinished(object sender, RoutedEventArgs e)
+        private void MainZoomControl_ContentDragFinished(object sender, RoutedEventArgs e)
         {
-            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 FollowCharacterChk.IsChecked = false;
             }
@@ -1369,6 +1378,24 @@ namespace SMT
         private void RecentreBtn_Click(object sender, RoutedEventArgs e)
         {
             CentreMapOnActiveCharacter();
+        }
+
+        private void SysContexMenuItemSetDestination_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            if (ActiveCharacter != null)
+            {
+                ActiveCharacter.AddDestination(eveSys.ID, true);
+            }
+        }
+
+        private void SysContexMenuItemAddWaypoint_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            if (ActiveCharacter != null)
+            {
+                ActiveCharacter.AddDestination(eveSys.ID, false);
+            }
         }
     }
 }

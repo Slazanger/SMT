@@ -31,6 +31,7 @@
                             <GroupBox Header="Performance" Margin="4" Height="355">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3">Disable jump bridges path animation</CheckBox>
+                                    <CheckBox IsChecked="{Binding Path=DisableRoutePathAnimation}" Margin="0,3">Disable route path animation</CheckBox>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
