@@ -118,7 +118,7 @@
                             </ToggleButton>
                         </StackPanel>
 
-                        <Slider  Width="130" Cursor="Arrow" Margin="0" Value="{Binding MapConf.UniverseDataScale}" Minimum="0.1" Maximum="5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="19" ToolTip="Overlay/Data Scale" SmallChange="0.2" IsSnapToTickEnabled="True" TickFrequency="0.2" />
+                        <Slider  Width="130" Cursor="Arrow" Margin="0" Value="{Binding MapConf.UniverseDataScale}" Minimum="0.1" Maximum="5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="19" ToolTip="Overlay/Data Scale" SmallChange="0.2" IsSnapToTickEnabled="True" TickFrequency="0.2" IsMoveToPointEnabled="True"/>
                     </StackPanel>
                 </Grid>
             </Canvas>

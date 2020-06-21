@@ -395,7 +395,7 @@
                                 </ToggleButton>
                             </StackPanel>
 
-                            <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Height="18" ToolTip="Overlay/Data Scale" IsSnapToTickEnabled="True" />
+                            <Slider  Width="170" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.1" Maximum="2" TickFrequency="0.1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Height="18" ToolTip="Overlay/Data Scale" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" />
                         </StackPanel>
                     </Grid>
                 </Canvas>

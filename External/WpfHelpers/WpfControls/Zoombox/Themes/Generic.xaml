@@ -88,7 +88,9 @@
                                             TickFrequency="1"
                                             LargeChange="1"
                                             SmallChange="0.1"
-                                            Orientation="Vertical" />
+                                            Orientation="Vertical" 
+                                            IsMoveToPointEnabled="True"
+                                            />
                                     <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='{}{0:F2}x'}"
                                                HorizontalAlignment="Center"
                                                FontWeight="Bold" />

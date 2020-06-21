@@ -210,7 +210,7 @@
                             </ToggleButton>
                         </StackPanel>
 
-                        <Slider  Width="140" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.2" Maximum="2" TickFrequency="0.2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" SmallChange="0.2" IsSnapToTickEnabled="True" />
+                        <Slider  Width="140" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.2" Maximum="2" TickFrequency="0.2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" SmallChange="0.2" IsSnapToTickEnabled="True"  IsMoveToPointEnabled="True"/>
                     </StackPanel>
                 </Grid>
             </Canvas>
