@@ -28,7 +28,8 @@ namespace SMT
         private const double SYSTEM_TEXT_X_OFFSET = 10;
         private const double SYSTEM_TEXT_Y_OFFSET = 2;
         private const int SYSTEM_Z_INDEX = 22;
-        private Dictionary<string, List<EVEData.LocalCharacter>> CharacterTrackingLocationMap = new Dictionary<string, List<EVEData.LocalCharacter>>();
+
+        private Dictionary<string, List<KeyValuePair<bool, string>>> NameTrackingLocationMap = new Dictionary<string, List<KeyValuePair<bool, string>>>();
 
         // Store the Dynamic Map elements so they can seperately be cleared
         private List<System.Windows.UIElement> DynamicMapElements;
@@ -645,7 +646,8 @@ namespace SMT
         private void AddCharactersToMap()
         {
             // Cache all characters in the same system so we can render them on seperate lines
-            CharacterTrackingLocationMap.Clear();
+
+            NameTrackingLocationMap.Clear();
 
             foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
             {
@@ -655,19 +657,128 @@ namespace SMT
                     continue;
                 }
 
-                if (!CharacterTrackingLocationMap.ContainsKey(c.Location))
+                if (!NameTrackingLocationMap.ContainsKey(c.Location))
                 {
-                    CharacterTrackingLocationMap[c.Location] = new List<EVEData.LocalCharacter>();
+                    NameTrackingLocationMap[c.Location] = new List<KeyValuePair<bool, string>>();
                 }
-                CharacterTrackingLocationMap[c.Location].Add(c);
+                NameTrackingLocationMap[c.Location].Add(new KeyValuePair<bool, string>(true, c.Name));
             }
 
-            foreach (List<EVEData.LocalCharacter> lc in CharacterTrackingLocationMap.Values)
+            if(ActiveCharacter != null)
             {
+                foreach (Fleet.FleetMember fm in ActiveCharacter.FleetInfo.Members)
+                {
+
+                    if (!Region.IsSystemOnMap(fm.Location))
+                    {
+                        continue;
+                    }
+
+                    // check its not one of our characters
+                    bool addFleetMember = true;
+                    foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
+                    {
+                        if (c.Name == fm.Name)
+                        {
+                            addFleetMember = false;
+                            break;
+                        }
+                    }
+
+                    if (addFleetMember)
+                    {
+                        // ignore characters out of this Map..
+                        if (!Region.IsSystemOnMap(fm.Location))
+                        {
+                            continue;
+                        }
+
+                        if (!NameTrackingLocationMap.ContainsKey(fm.Location))
+                        {
+                            NameTrackingLocationMap[fm.Location] = new List<KeyValuePair<bool, string>>();
+                        }
+                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<bool, string>(false, fm.Name));
+                    }
+                }
+            }
+
+
+            foreach (string lkvpk in NameTrackingLocationMap.Keys)
+            {
+                List<KeyValuePair<bool, string>> lkvp = NameTrackingLocationMap[lkvpk];
+                EVEData.MapSystem ms = Region.MapSystems[lkvpk];
+
+
+                bool addIndividualFleetMembers = true;
+                int fleetMemberCount = 0;
+                foreach(KeyValuePair<bool, string> kvp in lkvp)
+                {
+                    if(kvp.Key == false)
+                    {
+                        fleetMemberCount++;
+                    }
+                }
+
+                if(fleetMemberCount > MapConf.FleetMaxMembersPerSystem)
+                {
+                    addIndividualFleetMembers = false;
+                }
+
                 double textYOffset = -24;
                 double textXOffset = 6;
 
-                EVEData.MapSystem ms = Region.MapSystems[lc[0].Location];
+
+                SolidColorBrush fleetMemberText = new SolidColorBrush(MapConf.ActiveColourScheme.FleetMemberTextColour);
+                SolidColorBrush localCharacterText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+
+                foreach (KeyValuePair<bool, string> kvp in lkvp)
+                {
+                    if(kvp.Key || kvp.Key == false && addIndividualFleetMembers)
+                    {
+                        Label charText = new Label();
+                        charText.Content = kvp.Value;
+                        charText.Foreground = kvp.Key ? localCharacterText : fleetMemberText;
+                        charText.IsHitTestVisible = false;
+
+                        if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                        {
+                            charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
+                        }
+
+                        Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
+                        Canvas.SetTop(charText, ms.LayoutY + textYOffset);
+                        Canvas.SetZIndex(charText, 20);
+                        MainCanvas.Children.Add(charText);
+                        DynamicMapElements.Add(charText);
+
+                        textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
+
+                    }
+
+                }
+
+                if (!addIndividualFleetMembers)
+                {
+                    Label charText = new Label();
+                    charText.Content = "Fleet (" + fleetMemberCount + ")";
+                    charText.Foreground = fleetMemberText;
+                    charText.IsHitTestVisible = false;
+
+                    if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                    {
+                        charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
+                    }
+
+                    Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
+                    Canvas.SetTop(charText, ms.LayoutY + textYOffset);
+                    Canvas.SetZIndex(charText, 20);
+                    MainCanvas.Children.Add(charText);
+                    DynamicMapElements.Add(charText);
+
+                    textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
+                }
+
+                    
 
                 // add circle for system
 
@@ -709,60 +820,44 @@ namespace SMT
                 RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
                 eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
 
-                List<string> WarningZoneHighlights = new List<string>();
+            }
 
-                foreach (EVEData.LocalCharacter c in lc)
+            List<string> WarningZoneHighlights = new List<string>();
+
+            foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
+            {
+                if (MapConf.ShowDangerZone && c.WarningSystems != null)
                 {
-                    Label charText = new Label();
-                    charText.Content = c.Name;
-                    charText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
-                    charText.IsHitTestVisible = false;
-
-                    if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                    foreach (string s in c.WarningSystems)
                     {
-                        charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
-                    }
-
-                    Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
-                    Canvas.SetTop(charText, ms.LayoutY + textYOffset);
-                    Canvas.SetZIndex(charText, 20);
-                    MainCanvas.Children.Add(charText);
-                    DynamicMapElements.Add(charText);
-
-                    textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
-
-                    if (MapConf.ShowDangerZone && c.WarningSystems != null)
-                    {
-                        foreach (string s in c.WarningSystems)
+                        if (!WarningZoneHighlights.Contains(s))
                         {
-                            if (!WarningZoneHighlights.Contains(s))
-                            {
-                                WarningZoneHighlights.Add(s);
-                            }
+                            WarningZoneHighlights.Add(s);
                         }
                     }
                 }
+            }
 
-                double warningCircleSize = 40;
-                double warningCircleSizeOffset = warningCircleSize / 2;
+            double warningCircleSize = 40;
+            double warningCircleSizeOffset = warningCircleSize / 2;
 
-                foreach (string s in WarningZoneHighlights)
+            foreach (string s in WarningZoneHighlights)
+            {
+                if (Region.IsSystemOnMap(s))
                 {
-                    if (Region.IsSystemOnMap(s))
-                    {
-                        EVEData.MapSystem mss = Region.MapSystems[s];
-                        Shape WarninghighlightSystemCircle = new Ellipse() { Height = warningCircleSize, Width = warningCircleSize };
-                        WarninghighlightSystemCircle.Stroke = new SolidColorBrush(Colors.IndianRed);
-                        WarninghighlightSystemCircle.StrokeThickness = 3;
+                    EVEData.MapSystem mss = Region.MapSystems[s];
+                    Shape WarninghighlightSystemCircle = new Ellipse() { Height = warningCircleSize, Width = warningCircleSize };
+                    WarninghighlightSystemCircle.Stroke = new SolidColorBrush(Colors.IndianRed);
+                    WarninghighlightSystemCircle.StrokeThickness = 3;
 
-                        Canvas.SetLeft(WarninghighlightSystemCircle, mss.LayoutX - warningCircleSizeOffset);
-                        Canvas.SetTop(WarninghighlightSystemCircle, mss.LayoutY - warningCircleSizeOffset);
-                        Canvas.SetZIndex(WarninghighlightSystemCircle, 24);
-                        MainCanvas.Children.Add(WarninghighlightSystemCircle);
-                        DynamicMapElements.Add(WarninghighlightSystemCircle);
-                    }
+                    Canvas.SetLeft(WarninghighlightSystemCircle, mss.LayoutX - warningCircleSizeOffset);
+                    Canvas.SetTop(WarninghighlightSystemCircle, mss.LayoutY - warningCircleSizeOffset);
+                    Canvas.SetZIndex(WarninghighlightSystemCircle, 24);
+                    MainCanvas.Children.Add(WarninghighlightSystemCircle);
+                    DynamicMapElements.Add(WarninghighlightSystemCircle);
                 }
             }
+
         }
 
         private void AddDataToMap()

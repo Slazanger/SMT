@@ -18,6 +18,11 @@ namespace SMT
         public Color CharacterTextColour { get; set; }
 
         [Category("Character")]
+        [DisplayName("Fleet Member Text")]
+        public Color FleetMemberTextColour { get; set; }
+
+
+        [Category("Character")]
         [DisplayName("Text Size")]
         public int CharacterTextSize { get; set; }
 

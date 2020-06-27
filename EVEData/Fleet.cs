@@ -2,7 +2,9 @@
 // Fleet
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace SMT.EVEData
 {
@@ -12,6 +14,10 @@ namespace SMT.EVEData
     public class Fleet
     {
         public const string NoFleet = "Not in Fleet";
+
+        public bool IsFleetBoss { get; set; }
+
+        public DateTime NextFleetMembershipCheck { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Fleet" /> class.
@@ -41,16 +47,16 @@ namespace SMT.EVEData
         /// <summary>
         /// Fleet member info
         /// </summary>
-        public struct FleetMember
+        public class FleetMember
         {
-            /// <summary>
-            /// Gets or sets Fleet member Location
-            /// </summary>
+            public bool IsValid { get; set; }
+
+            public string ShipType { get; set; }
+
             public string Location { get; set; }
 
-            /// <summary>
-            /// Gets or sets Fleet Member Character name
-            /// </summary>
+            public long CharacterID { get; set; }
+
             public string Name { get; set; }
 
             public override string ToString() => Name;

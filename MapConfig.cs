@@ -88,6 +88,10 @@ namespace SMT
 
         private int m_WarningRange = 5;
 
+        private int m_FleetMaxMembersPerSystem = 5;
+
+        private bool m_FleetShowOnMap = true;
+
         public MapConfig()
         {
             SetDefaults();
@@ -675,6 +679,50 @@ namespace SMT
             }
         }
 
+        [Category("Fleet")]
+        [DisplayName("Show On Map")]
+        public bool FleetShowOnMap
+        {
+            get
+            {
+                return m_FleetShowOnMap;
+            }
+            set
+            {
+                m_FleetShowOnMap = value;
+                OnPropertyChanged("FleetShowOnMap");
+            }
+        }
+
+
+        [Category("Fleet")]
+        [DisplayName("Max Fleet Per System")]
+        public int FleetMaxMembersPerSystem
+        {
+            get
+            {
+                return m_FleetMaxMembersPerSystem;
+            }
+            set
+            {
+                // clamp to 1 miniumum
+                if (value > 0)
+                {
+                    m_FleetMaxMembersPerSystem = value;
+                }
+                else
+                {
+                    m_FleetMaxMembersPerSystem = 1;
+                }
+
+
+
+                OnPropertyChanged("FleetMaxMembersPerSystem");
+            }
+        }
+
+
+
         public bool UseESIForCharacterPositions { get; set; }
 
 
@@ -746,6 +794,8 @@ namespace SMT
                 CharacterTextColour = Color.FromRgb(240, 190, 10),
                 CharacterTextSize = 11,
                 SystemTextSize = 12,
+
+                FleetMemberTextColour = Colors.White,
 
                 JumpRangeInColour = Color.FromRgb(255, 165, 0),
                 JumpRangeInColourHighlight = Color.FromArgb(156, 82, 135, 155),

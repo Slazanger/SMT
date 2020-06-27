@@ -13,7 +13,7 @@ namespace SMT.EVEData
                 return true;
             }
 
-            Console.WriteLine("ESI Error : " + esiR.Message);
+            Console.WriteLine("ESI Error : " + esiR.Message + " Error Limit Remaining : " + esiR.ErrorLimitRemain);
             return false;
         }
     }
