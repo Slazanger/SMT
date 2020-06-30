@@ -647,7 +647,7 @@ namespace SMT.EVEData
                 if (FleetInfo.NextFleetMembershipCheck < DateTime.Now)
                 {
                     // route is cached for 60s, however checking this can hit the rate limit
-                    FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(120);
+                    FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(240);
 
                     ESI.NET.EsiResponse<ESI.NET.Models.Fleets.FleetInfo> esr = await esiClient.Fleets.FleetInfo();
 
@@ -722,51 +722,6 @@ namespace SMT.EVEData
                             {
                                 characterIDsToResolve.Add(esifm.CharacterId);
                             }
-                        }
-
-                        for(int i = 0; i < 20; i++ )
-                        {
-                            Fleet.FleetMember fmTest1 = new Fleet.FleetMember();
-                            fmTest1.Name = "Test Slaz FleetMember" + i;
-                            fmTest1.Location = "Hophib";
-                            fmTest1.ShipType = "Borg Cube";
-                            fmTest1.IsValid = true;
-
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                FleetInfo.Members.Add(fmTest1);
-                            }), DispatcherPriority.Normal);
-
-
-                        }
-
-                        for (int i = 0; i < 10; i++)
-                        {
-                            Fleet.FleetMember fmTest1 = new Fleet.FleetMember();
-                            fmTest1.Name = "Test2 Slaz FleetMember" + i;
-                            fmTest1.Location = "Karan";
-                            fmTest1.ShipType = "Enterprise";
-                            fmTest1.IsValid = true;
-
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                FleetInfo.Members.Add(fmTest1);
-                            }), DispatcherPriority.Normal);
-
-                        }
-
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Fleet.FleetMember fmTest1 = new Fleet.FleetMember();
-                            fmTest1.Name = "Test3 Slaz FleetMember" + i;
-                            fmTest1.Location = "Huna";
-                            fmTest1.ShipType = "Y-Wing";
-                            fmTest1.IsValid = true;
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                FleetInfo.Members.Add(fmTest1);
-                            }), DispatcherPriority.Normal);
-
                         }
 
                         if (characterIDsToResolve.Count > 0)
