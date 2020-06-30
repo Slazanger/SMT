@@ -92,6 +92,9 @@ namespace SMT
 
         private bool m_FleetShowOnMap = true;
 
+        private bool m_FleetShowShipType = false;
+
+
         public MapConfig()
         {
             SetDefaults();
@@ -694,6 +697,20 @@ namespace SMT
             }
         }
 
+        [Category("Fleet")]
+        [DisplayName("Show Ship Type")]
+        public bool FleetShowShipType
+        {
+            get
+            {
+                return m_FleetShowShipType;
+            }
+            set
+            {
+                m_FleetShowShipType = value;
+                OnPropertyChanged("FleetShowShipType");
+            }
+        }
 
         [Category("Fleet")]
         [DisplayName("Max Fleet Per System")]

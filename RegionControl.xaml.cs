@@ -697,7 +697,13 @@ namespace SMT
                         {
                             NameTrackingLocationMap[fm.Location] = new List<KeyValuePair<bool, string>>();
                         }
-                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<bool, string>(false, fm.Name));
+
+                        string displayName = fm.Name;
+                        if(MapConf.FleetShowShipType)
+                        {
+                            displayName += " (" + fm.ShipType + ")";
+                        }
+                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<bool, string>(false, displayName));
                     }
                 }
             }
