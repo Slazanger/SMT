@@ -664,7 +664,7 @@ namespace SMT
                 NameTrackingLocationMap[c.Location].Add(new KeyValuePair<bool, string>(true, c.Name));
             }
 
-            if(ActiveCharacter != null)
+            if (ActiveCharacter != null && MapConf.FleetShowOnMap)
             {
                 foreach (Fleet.FleetMember fm in ActiveCharacter.FleetInfo.Members)
                 {
