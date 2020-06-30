@@ -31,11 +31,7 @@ namespace SMT
         public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
 
         private bool m_AlwaysOnTop;
-
-        private string m_CurrentJumpCharacter;
-
-        private string m_CurrentJumpSystem;
-
+        
         private string m_DefaultRegion;
 
         private double m_IntelTextSize = 10;
@@ -117,38 +113,6 @@ namespace SMT
             }
         }
 
-        [XmlIgnoreAttribute]
-        [Category("Navigation")]
-        [DisplayName("Current Jump Character")]
-        [ItemsSource(typeof(JumpCharacterItemsSource))]
-        public string CurrentJumpCharacter
-        {
-            get
-            {
-                return m_CurrentJumpCharacter;
-            }
-            set
-            {
-                m_CurrentJumpCharacter = value;
-                OnPropertyChanged("CurrentJumpCharacter");
-            }
-        }
-
-        [XmlIgnoreAttribute]
-        [Category("Navigation")]
-        [DisplayName("Current Jump System"), ReadOnly(true)]
-        public string CurrentJumpSystem
-        {
-            get
-            {
-                return m_CurrentJumpSystem;
-            }
-            set
-            {
-                m_CurrentJumpSystem = value;
-                OnPropertyChanged("CurrentJumpSystem");
-            }
-        }
 
         [Browsable(false)]
         public string DefaultColourSchemeName { get; set; }
@@ -325,11 +289,6 @@ namespace SMT
                 OnPropertyChanged("ShowJoveObservatories");
             }
         }
-
-        [XmlIgnoreAttribute]
-        [Category("Navigation")]
-        [DisplayName("Show Jump Distance")]
-        public bool ShowJumpDistance { get; set; }
 
         [Category("Misc")]
         [DisplayName("Show Negative Ratting Delta")]
@@ -846,10 +805,7 @@ namespace SMT
             ShowZKillData = true;
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
-            ShowJumpDistance = false;
-            CurrentJumpSystem = "";
             ShowActiveIncursions = true;
-            CurrentJumpCharacter = "";
             StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
             SOVBasedITCU = true;

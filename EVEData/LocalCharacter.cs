@@ -740,6 +740,17 @@ namespace SMT.EVEData
                             }
                         }
                     }
+                    else
+                    {
+                        // something went wrong (probably lost fleet_commander), reset this check
+                        FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(60);
+                        FleetInfo.FleetID = 0;
+
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        {
+                            FleetInfo.Members.Clear();
+                        }), DispatcherPriority.Normal);
+                    }
 
                 }
             }

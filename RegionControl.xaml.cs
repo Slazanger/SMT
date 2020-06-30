@@ -108,6 +108,17 @@ namespace SMT
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
+        private string currentJumpCharacter;
+
+        private EVEData.EveManager.JumpShip jumpShipType;
+
+        private string currentJumpSystem;
+
+        private bool showJumpDistance;
+
+        private List<KeyValuePair<string, EVEData.EveManager.JumpShip>> activeJumpSpheres;
+
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -115,7 +126,11 @@ namespace SMT
         {
             InitializeComponent();
             DataContext = this;
+
+            activeJumpSpheres = new List<KeyValuePair<string, EveManager.JumpShip>>();
         }
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -2063,19 +2078,19 @@ namespace SMT
                     */
                 }
 
-                if (!MapConf.ShowJumpDistance)
+                if (!showJumpDistance)
                 {
                     BridgeInfoL1.Content = string.Empty;
                 }
 
-                if (MapConf.ShowJumpDistance && MapConf.CurrentJumpSystem != null && system.Name != MapConf.CurrentJumpSystem && MapConf.CurrentJumpSystem != "")
+                if (showJumpDistance && currentJumpSystem != null && system.Name != currentJumpSystem && currentJumpSystem != "")
                 {
-                    double Distance = EM.GetRangeBetweenSystems(MapConf.CurrentJumpSystem, system.Name);
+                    double Distance = EM.GetRangeBetweenSystems(currentJumpSystem, system.Name);
                     Distance = Distance / 9460730472580800.0;
 
                     double Max = 0.1f;
 
-                    switch (MapConf.JumpShipType)
+                    switch (jumpShipType)
                     {
                         case EVEData.EveManager.JumpShip.Super: { Max = 6.0; } break;
                         case EVEData.EveManager.JumpShip.Titan: { Max = 6.0; } break;
@@ -2087,15 +2102,15 @@ namespace SMT
                         case EVEData.EveManager.JumpShip.JF: { Max = 10.0; } break;
                     }
 
-                    EVEData.System js = EM.GetEveSystem(MapConf.CurrentJumpSystem);
+                    EVEData.System js = EM.GetEveSystem(currentJumpSystem);
 
-                    if (MapConf.CurrentJumpCharacter != "")
+                    if (currentJumpCharacter != "")
                     {
-                        BridgeInfoL1.Content = $"{MapConf.JumpShipType} range from {MapConf.CurrentJumpCharacter} : {MapConf.CurrentJumpSystem} ({js.Region})";
+                        BridgeInfoL1.Content = $"{jumpShipType} range from {currentJumpCharacter} : {currentJumpSystem} ({js.Region})";
                     }
                     else
                     {
-                        BridgeInfoL1.Content = $"{MapConf.JumpShipType} range from : {MapConf.CurrentJumpSystem} ({js.Region})";
+                        BridgeInfoL1.Content = $"{jumpShipType} range from : {currentJumpSystem} ({js.Region})";
                     }
 
                     if (Distance < Max && Distance > 0.0 && system.ActualSystem.TrueSec <= 0.45)
@@ -2532,6 +2547,10 @@ namespace SMT
             {
                 EveManager.JumpShip js = EveManager.JumpShip.Super;
 
+                showJumpDistance = true;
+                currentJumpCharacter = "";
+                currentJumpSystem = eveSys.Name;
+
                 if (mi.DataContext as string == "6")
                 {
                     js = EveManager.JumpShip.Super;
@@ -2553,17 +2572,21 @@ namespace SMT
 
                 if (mi.DataContext as string == "0")
                 {
-                    MapConf.ShowJumpDistance = false;
-                    MapConf.CurrentJumpCharacter = "";
-                    MapConf.CurrentJumpSystem = "";
+                    showJumpDistance = false;
+                    currentJumpCharacter = "";
+                    currentJumpSystem = "";
                 }
-                else
+
+                if (mi.DataContext as string == "-1")
                 {
-                    MapConf.ShowJumpDistance = true;
-                    MapConf.CurrentJumpCharacter = "";
-                    MapConf.CurrentJumpSystem = eveSys.Name;
-                    MapConf.JumpShipType = js;
+                    activeJumpSpheres.Clear();
+                    showJumpDistance = false;
+                    currentJumpCharacter = "";
+                    currentJumpSystem = "";
                 }
+
+                jumpShipType = js;
+
 
                 ReDrawMap(true);
             }
@@ -2585,7 +2608,7 @@ namespace SMT
                 if (e.ClickCount == 1)
                 {
                     bool redraw = false;
-                    if (MapConf.ShowJumpDistance || (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)))
+                    if (showJumpDistance || (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)))
                     {
                         redraw = true;
                     }
@@ -2743,16 +2766,16 @@ namespace SMT
 
                 if (mi.DataContext as string == "0")
                 {
-                    MapConf.ShowJumpDistance = false;
-                    MapConf.CurrentJumpCharacter = "";
-                    MapConf.CurrentJumpSystem = "";
+                    showJumpDistance = false;
+                    currentJumpCharacter = "";
+                    currentJumpSystem = "";
                 }
                 else
                 {
-                    MapConf.ShowJumpDistance = true;
-                    MapConf.CurrentJumpCharacter = lc.Name;
-                    MapConf.CurrentJumpSystem = lc.Location;
-                    MapConf.JumpShipType = js;
+                    showJumpDistance = true;
+                    currentJumpCharacter = lc.Name;
+                    currentJumpSystem = lc.Location;
+                    jumpShipType = js;
                 }
             }
         }
@@ -3020,13 +3043,13 @@ namespace SMT
         /// <param name="e"></param>
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (MapConf.CurrentJumpCharacter != "")
+            if (currentJumpCharacter != "")
             {
                 foreach (LocalCharacter c in EM.LocalCharacters)
                 {
-                    if (c.Name == MapConf.CurrentJumpCharacter)
+                    if (c.Name == currentJumpCharacter)
                     {
-                        MapConf.CurrentJumpSystem = c.Location;
+                        currentJumpSystem = c.Location;
                     }
                 }
             }
