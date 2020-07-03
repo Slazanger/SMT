@@ -660,6 +660,12 @@ namespace SMT
         private void AddCharactersToMap()
         {
             // Cache all characters in the same system so we can render them on seperate lines
+            if(!MapConf.ShowCharacterNamesOnMap)
+            {
+                return;
+            }
+
+
 
             NameTrackingLocationMap.Clear();
 
@@ -917,7 +923,17 @@ namespace SMT
             if (!string.IsNullOrEmpty(currentJumpCharacter))
             {
                 EVEData.System js = EM.GetEveSystem(currentCharacterJumpSystem);
-                string text = $"{jumpShipType} range from {currentJumpCharacter} : {currentCharacterJumpSystem} ({js.Region})";
+                string text = "";
+                if (MapConf.ShowCharacterNamesOnMap)
+                {
+                    text = $"{jumpShipType} range from {currentJumpCharacter} : {currentCharacterJumpSystem} ({js.Region})";
+                }
+                else
+                {
+                    text = $"{jumpShipType} range from {currentCharacterJumpSystem} ({js.Region})";
+                }
+                    
+                    
 
                 Label l = new Label();
                 l.Content = text;

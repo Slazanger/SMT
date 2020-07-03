@@ -86,6 +86,8 @@ namespace SMT
 
         private int m_FleetMaxMembersPerSystem = 5;
 
+        private bool m_ShowCharacterNamesOnMap = true;
+
         private bool m_FleetShowOnMap = true;
 
         private bool m_FleetShowShipType = false;
@@ -701,6 +703,20 @@ namespace SMT
 
         public bool UseESIForCharacterPositions { get; set; }
 
+        public bool ShowCharacterNamesOnMap 
+        { 
+            get
+            {
+                return m_ShowCharacterNamesOnMap;
+            }
+            set
+            {
+                m_ShowCharacterNamesOnMap = value;
+                OnPropertyChanged("ShowCharacterNamesOnMap");
+            }
+        
+        }
+
 
         private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
         public bool SyncActiveCharacterBasedOnActiveEVEClient
@@ -810,7 +826,7 @@ namespace SMT
             SOVShowConflicts = true;
             SOVBasedITCU = true;
             UseESIForCharacterPositions = true;
-
+            ShowCharacterNamesOnMap = true;
             ShowIhubVunerabilities = true;
 
             ShowJoveObservatories = true;

@@ -1028,64 +1028,70 @@ namespace SMT
                 Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 
-                Pen p = new Pen(CharacterNameSysHighlightBrush, 1.0);
 
-                Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
-
-                // add the characters
-                foreach (EVEData.LocalCharacter lc in EM.LocalCharacters)
+                if (MapConf.ShowCharacterNamesOnMap)
                 {
-                    if (!string.IsNullOrEmpty(lc.Location))
+                    Pen p = new Pen(CharacterNameSysHighlightBrush, 1.0);
+
+                    Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
+
+                    // add the characters
+                    foreach (EVEData.LocalCharacter lc in EM.LocalCharacters)
                     {
-                        if (!MapCharacters.ContainsKey(lc.Location))
+                        if (!string.IsNullOrEmpty(lc.Location))
                         {
-                            MapCharacters.Add(lc.Location, new List<string>());
+                            if (!MapCharacters.ContainsKey(lc.Location))
+                            {
+                                MapCharacters.Add(lc.Location, new List<string>());
+                            }
+                            MapCharacters[lc.Location].Add(lc.Name);
                         }
-                        MapCharacters[lc.Location].Add(lc.Name);
                     }
-                }
 
-                foreach (KeyValuePair<string, List<string>> kvp in MapCharacters)
-                {
-                    EVEData.System sys = EM.GetEveSystem(kvp.Key);
-                    if (sys == null)
+                    foreach (KeyValuePair<string, List<string>> kvp in MapCharacters)
                     {
-                        continue;
-                    }
-                    double X = (sys.ActualX - universeXMin) * universeScale;
-                    // need to invert Z
-                    double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+                        EVEData.System sys = EM.GetEveSystem(kvp.Key);
+                        if (sys == null)
+                        {
+                            continue;
+                        }
+                        double X = (sys.ActualX - universeXMin) * universeScale;
+                        // need to invert Z
+                        double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
 
-                    double charTextOffset = 0;
+                        double charTextOffset = 0;
 
-                    // Create an instance of a DrawingVisual.
-                    System.Windows.Media.DrawingVisual nameTextVisual = new System.Windows.Media.DrawingVisual();
+                        // Create an instance of a DrawingVisual.
+                        System.Windows.Media.DrawingVisual nameTextVisual = new System.Windows.Media.DrawingVisual();
 
-                    // Retrieve the DrawingContext from the DrawingVisual.
-                    DrawingContext dc = nameTextVisual.RenderOpen();
+                        // Retrieve the DrawingContext from the DrawingVisual.
+                        DrawingContext dc = nameTextVisual.RenderOpen();
 
-                    // draw a circle around the system
-                    dc.DrawEllipse(CharacterNameSysHighlightBrush, p, new Point(X, Z), 6, 6);
+                        // draw a circle around the system
+                        dc.DrawEllipse(CharacterNameSysHighlightBrush, p, new Point(X, Z), 6, 6);
 
-                    foreach (string name in kvp.Value)
-                    {
+                        foreach (string name in kvp.Value)
+                        {
 #pragma warning disable CS0618
-                        // Draw a formatted text string into the DrawingContext.
-                        dc.DrawText(
-                            new FormattedText(name,
-                                CultureInfo.GetCultureInfo("en-us"),
-                                FlowDirection.LeftToRight,
-                                tf,
-                                CharacterTextSize, CharacterNameBrush),
-                            new Point(X + characterNametextXOffset, Z + characterNametextYOffset + charTextOffset));
+                            // Draw a formatted text string into the DrawingContext.
+                            dc.DrawText(
+                                new FormattedText(name,
+                                    CultureInfo.GetCultureInfo("en-us"),
+                                    FlowDirection.LeftToRight,
+                                    tf,
+                                    CharacterTextSize, CharacterNameBrush),
+                                new Point(X + characterNametextXOffset, Z + characterNametextYOffset + charTextOffset));
 #pragma warning restore CS0618
 
-                        charTextOffset -= (CharacterTextSize + 2);
+                            charTextOffset -= (CharacterTextSize + 2);
+                        }
+
+                        dc.Close();
+                        VHCharacters.AddChild(nameTextVisual);
                     }
 
-                    dc.Close();
-                    VHCharacters.AddChild(nameTextVisual);
                 }
+
 
                 // now add the zkill data
                 Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();

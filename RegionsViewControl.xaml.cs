@@ -225,7 +225,7 @@ namespace SMT
                     }
                 }
 
-                if (addCharacter)
+                if (addCharacter && MapConf.ShowCharacterNamesOnMap)
                 {
                     Rectangle characterShape = new Rectangle() { Width = 8, Height = 8 };
 
