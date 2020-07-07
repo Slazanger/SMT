@@ -1737,6 +1737,7 @@ namespace SMT.EVEData
         private void InitZKillFeed()
         {
             ZKillFeed = new ZKillRedisQ();
+            ZKillFeed.VerString = VersionStr;
             ZKillFeed.Initialise();
         }
 

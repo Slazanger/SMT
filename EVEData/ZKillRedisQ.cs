@@ -21,6 +21,8 @@ namespace SMT.EVEData
     {
         private BackgroundWorker backgroundWorker;
 
+        public string VerString = "ABC123";
+
 
         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
@@ -68,7 +70,7 @@ namespace SMT.EVEData
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(redistURL);
             request.Method = WebRequestMethods.Http.Get;
             request.Timeout = 60000;
-            request.UserAgent = "SMT/0.82";
+            request.UserAgent = VerString;
             request.KeepAlive = true;
             request.Proxy = null;
             HttpWebResponse response;
@@ -77,7 +79,7 @@ namespace SMT.EVEData
             {
                 response = request.GetResponse() as HttpWebResponse;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 e.Result = -1;
                 return;
