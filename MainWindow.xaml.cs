@@ -26,7 +26,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
 
-        public const string SMT_VERSION = "SMT_088";
+        public const string SMT_VERSION = "SMT_089";
 
 
         private LogonWindow logonBrowserWindow;
@@ -52,7 +52,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Pathos' Crash Test Dummy : " + SMT_VERSION + ")";
+            Title = "SMT (Pathos, Crashier Test Dummy : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
@@ -703,8 +703,6 @@ namespace SMT
                 RegionsViewUC.ActiveCharacter = null;
                 RegionUC.ActiveCharacter = null;
                 FleetMembersList.ItemsSource = null;
-                CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
-
                 RegionUC.UpdateActiveCharacter();
                 UniverseUC.UpdateActiveCharacter(null);
             }
@@ -733,9 +731,11 @@ namespace SMT
 
             EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
 
+
+
             ActiveCharacter = null;
             FleetMembersList.ItemsSource = null;
-            CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+
 
             CurrentActiveCharacterCombo.SelectedIndex = -1;
             RegionsViewUC.ActiveCharacter = null;
