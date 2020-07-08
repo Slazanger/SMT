@@ -1508,14 +1508,14 @@ namespace SMT
             EVEData.MapSystem selectedSys = Region.MapSystems[name];
             if (selectedSys != null)
             {
-                double circleSize = 30;
+                double circleSize = 32;
                 double circleOffset = circleSize / 2;
 
                 // add circle for system
                 Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
                 highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
 
-                highlightSystemCircle.StrokeThickness = 3;
+                highlightSystemCircle.StrokeThickness = 5;
 
                 RotateTransform rt = new RotateTransform();
                 rt.CenterX = circleSize / 2;
