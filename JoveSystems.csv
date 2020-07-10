@@ -151,7 +151,6 @@ A1RR-M;2-ZRM0;Null;Tenal
 A3-LOG;H-6HGD;Null;Querious
 Abai;Rifenda;High;Tash-Murkon
 Abha;Mal;Low;Derelik
-Abhan;Charak;High;Genesis
 Abudban;Ortner;High;Heimatar
 AC-7LZ;EL8Z-M;Null;Immensea
 AC2E-3;Wyvern;Null;Fountain
@@ -169,6 +168,7 @@ AH-B84;304-QS;Null;Branch
 Aharalel;Megeh;High;Kador
 Ahkour;Rifenda;High;Tash-Murkon
 Ahrosseas;Sanair;High;Tash-Murkon
+Ahtulaima;Ruomo;High;The Forge
 Aikoro;Arekin;High;The Citadel
 Aivoli;Malariya;High;Lonetrek
 Aivonen;Ishaga;Low;Black Rise
@@ -667,6 +667,7 @@ NE-3GR;K-DLD2;Null;Great Wildlands
 Nedegulf;Gedur;High;Metropolis
 NEH-CS;XPBM-F;Null;Branch
 Nema;Tid;Low;Aridia
+New Eden;EVE;Low;Genesis
 NG-M8K;MRC-29;Null;Cache
 Nidebora;Enka;High;Devoid
 Nifshed;Sosarir;High;Domain
