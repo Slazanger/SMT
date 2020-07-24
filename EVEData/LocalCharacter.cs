@@ -30,6 +30,8 @@ namespace SMT.EVEData
 
         private bool esiRouteNeedsUpdate = false;
 
+        private bool esiRouteUpdating = false;
+
         /// <summary>
         /// The name of the system this character is currently in
         /// </summary>
@@ -566,9 +568,10 @@ namespace SMT.EVEData
                 }
             }
 
-            if (esiRouteNeedsUpdate)
+            if (esiRouteNeedsUpdate && !esiRouteUpdating)
             {
                 esiRouteNeedsUpdate = false;
+                esiRouteUpdating = true;
 
                 List<long> WayPointsToAdd = new List<long>();
 
@@ -623,8 +626,10 @@ namespace SMT.EVEData
                     }
                     firstRoute = false;
 
-                    Thread.Sleep(50);
+                    Thread.Sleep(200);
                 }
+
+                esiRouteUpdating = false;
             }
         }
 
