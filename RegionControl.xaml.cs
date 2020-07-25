@@ -33,6 +33,9 @@ namespace SMT
 
         // Store the Dynamic Map elements so they can seperately be cleared
         private List<System.Windows.UIElement> DynamicMapElements;
+        private List<System.Windows.UIElement> DynamicMapElementsRangeMarkers;
+        private List<System.Windows.UIElement> DynamicMapElementsRouteHighlight;
+        private List<System.Windows.UIElement> DynamicMapElementsCharacters;
 
         private LocalCharacter m_ActiveCharacter;
 
@@ -459,6 +462,10 @@ namespace SMT
             SelectedSystem = string.Empty;
 
             DynamicMapElements = new List<UIElement>();
+            DynamicMapElementsRangeMarkers = new List<UIElement>();
+            DynamicMapElementsRouteHighlight = new List<UIElement>();
+            DynamicMapElementsCharacters = new List<UIElement>();
+
 
             ActiveCharacter = null;
 
@@ -534,6 +541,24 @@ namespace SMT
                     MainCanvas.Children.Remove(uie);
                 }
                 DynamicMapElements.Clear();
+
+                foreach (UIElement uie in DynamicMapElementsRangeMarkers)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElementsRangeMarkers.Clear();
+
+                foreach (UIElement uie in DynamicMapElementsRouteHighlight)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElementsRouteHighlight.Clear();
+
+                foreach (UIElement uie in DynamicMapElementsCharacters)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElementsCharacters.Clear();
             }
 
             AddCharactersToMap();
@@ -1538,7 +1563,7 @@ namespace SMT
                 DoubleAnimation da = new DoubleAnimation();
                 da.From = 0;
                 da.To = 360;
-                da.Duration = new Duration(TimeSpan.FromSeconds(12));
+                da.Duration = new Duration(TimeSpan.FromSeconds(6));
                 Timeline.SetDesiredFrameRate(da, 20);
 
                 try
@@ -2347,14 +2372,17 @@ namespace SMT
                     if (Region.IsSystemOnMap(jb.From) || Region.IsSystemOnMap(jb.To))
                     {
                         EVEData.MapSystem from;
+                        EVEData.System to;
 
                         if (!Region.IsSystemOnMap(jb.From))
                         {
                             from = Region.MapSystems[jb.To];
+                            to = EM.GetEveSystem(jb.From);
                         }
                         else
                         {
                             from = Region.MapSystems[jb.From];
+                            to = EM.GetEveSystem(jb.To);
                         }
 
                         Point startPoint = new Point(from.LayoutX, from.LayoutY);
@@ -2371,22 +2399,40 @@ namespace SMT
 
                             MainCanvas.Children.Add(jbOutofSystemBlob);
 
+                            Label jbOutofRegionText = new Label();
+
+
                             if (jb.Disabled)
                             {
                                 jbOutofSystemBlob.Stroke = DisabledJumpBridgeBrush;
+                                jbOutofRegionText.Foreground = DisabledJumpBridgeBrush;
                             }
                             else
                             {
                                 jbOutofSystemBlob.Stroke = FriendlyJumpBridgeBrush;
+                                jbOutofRegionText.Foreground = FriendlyJumpBridgeBrush;
                             }
                             jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
+
+                            jbOutofRegionText.Content = $"{to.Name}\n({to.Region})";
+                            jbOutofRegionText.FontSize = SYSTEM_TEXT_TEXT_SIZE+1;
+                            jbOutofRegionText.IsHitTestVisible = false;
+
+                            Canvas.SetLeft(jbOutofRegionText, from.LayoutX - 20);
+                            Canvas.SetTop(jbOutofRegionText, from.LayoutY - 60);
+                            Canvas.SetZIndex(jbOutofRegionText, SYSTEM_Z_INDEX);
+
+                            MainCanvas.Children.Add(jbOutofRegionText);
+
+
                         }
                         else
                         {
-                            EVEData.MapSystem to = Region.MapSystems[jb.To];
-                            endPoint = new Point(to.LayoutX, to.LayoutY);
+                            EVEData.MapSystem toSys = Region.MapSystems[jb.To];
+                            endPoint = new Point(toSys.LayoutX, toSys.LayoutY);
                         }
 
+                        
                         Vector dir = Point.Subtract(startPoint, endPoint);
 
                         double jbDistance = Point.Subtract(startPoint, endPoint).Length;
@@ -2430,6 +2476,7 @@ namespace SMT
                         }
 
                         path.StrokeDashArray = dashes;
+
 
                         // animate the jump bridges
                         DoubleAnimation da = new DoubleAnimation();
@@ -2953,13 +3000,22 @@ namespace SMT
                 {
                     foreach (EVEData.JumpBridge jb in EM.JumpBridges)
                     {
+
                         if (selectedSys.Name == jb.From)
                         {
                             Label jbl = new Label();
                             jbl.Padding = one;
                             jbl.Margin = one;
-                            jbl.Content = $"JB\t: {jb.To}";
                             jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+
+                            jbl.Content = $"JB\t: {jb.To}";
+
+                            if(!Region.IsSystemOnMap(jb.To))
+                            {
+                                EVEData.System sys = EM.GetEveSystem(jb.To);
+                                jbl.Content += $" ({sys.Region})";
+                            }
+
                             SystemInfoPopupSP.Children.Add(jbl);
                         }
 
@@ -2968,10 +3024,20 @@ namespace SMT
                             Label jbl = new Label();
                             jbl.Padding = one;
                             jbl.Margin = one;
-                            jbl.Content = $"JB\t: {jb.From}";
                             jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+
+                            jbl.Content = $"JB\t: {jb.From}";
+
+                            if (!Region.IsSystemOnMap(jb.From))
+                            {
+                                EVEData.System sys = EM.GetEveSystem(jb.From);
+                                jbl.Content += $" ({sys.Region})";
+                            }
+
                             SystemInfoPopupSP.Children.Add(jbl);
                         }
+
+
                     }
                 }
 
