@@ -1583,7 +1583,7 @@ namespace SMT
                 return;
 
             Brush RouteBrush = new SolidColorBrush(Colors.Yellow);
-            Brush RouteAnsiblexBrush = new SolidColorBrush(Colors.DarkMagenta);
+            Brush RouteAnsiblexBrush = new SolidColorBrush(Colors.DarkGray);
 
 
             // no active route
@@ -1618,6 +1618,7 @@ namespace SMT
                     routeLine.X2 = to.LayoutX;
                     routeLine.Y2 = to.LayoutY;
 
+
                     routeLine.StrokeThickness = 5;
                     routeLine.Visibility = Visibility.Visible;
                     if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == Navigation.GateType.Ansibex)
@@ -1651,7 +1652,7 @@ namespace SMT
                         routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
                     }
 
-                    Canvas.SetZIndex(routeLine, 18);
+                    Canvas.SetZIndex(routeLine, 19);
                     MainCanvas.Children.Add(routeLine);
 
                     DynamicMapElements.Add(routeLine);
@@ -2432,32 +2433,19 @@ namespace SMT
                             endPoint = new Point(toSys.LayoutX, toSys.LayoutY);
                         }
 
-                        
-                        Vector dir = Point.Subtract(startPoint, endPoint);
 
-                        double jbDistance = Point.Subtract(startPoint, endPoint).Length;
+                        Line jbLine = new Line();
 
-                        Size arcSize = new Size(jbDistance + 60, jbDistance + 60);
+                        jbLine.X1 = startPoint.X;
+                        jbLine.Y1 = startPoint.Y;
 
-                        ArcSegment arcseg = new ArcSegment(endPoint, arcSize, 140, false, SweepDirection.Clockwise, true);
+                        jbLine.X2 = endPoint.X;
+                        jbLine.Y2 = endPoint.Y;
 
-                        PathSegmentCollection pscollection = new PathSegmentCollection();
-                        pscollection.Add(arcseg);
 
-                        PathFigure pf = new PathFigure();
-                        pf.Segments = pscollection;
-                        pf.StartPoint = startPoint;
 
-                        PathFigureCollection pfcollection = new PathFigureCollection();
-                        pfcollection.Add(pf);
 
-                        PathGeometry pathGeometry = new PathGeometry();
-                        pathGeometry.Figures = pfcollection;
-
-                        System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
-                        path.Data = pathGeometry;
-
-                        path.StrokeThickness = 2;
+                        jbLine.StrokeThickness = 2;
 
                         DoubleCollection dashes = new DoubleCollection();
 
@@ -2465,18 +2453,17 @@ namespace SMT
                         {
                             dashes.Add(1.0);
                             dashes.Add(1.0);
-                            path.Stroke = FriendlyJumpBridgeBrush;
+                            jbLine.Stroke = FriendlyJumpBridgeBrush;
 
                         }
                         else
                         {
                             dashes.Add(1.0);
                             dashes.Add(3.0);
-                            path.Stroke = DisabledJumpBridgeBrush;
+                            jbLine.Stroke = DisabledJumpBridgeBrush;
                         }
 
-                        path.StrokeDashArray = dashes;
-
+                        jbLine.StrokeDashArray = dashes;
 
                         // animate the jump bridges
                         DoubleAnimation da = new DoubleAnimation();
@@ -2486,23 +2473,16 @@ namespace SMT
                         da.Duration = new Duration(TimeSpan.FromSeconds(100));
                         da.RepeatBehavior = RepeatBehavior.Forever;
                         Timeline.SetDesiredFrameRate(da, 20);
-                        // Storyboard.SetTargetProperty(path, new PropertyPath(Shape.StrokeDashOffsetProperty));
-                        // Storyboard.SetTargetName()
-                        // Storyboard sb = new Storyboard();
-                        // sb.Children.Add(da);
-
-                        path.StrokeDashArray = dashes;
 
                         if (!MapConf.DisableJumpBridgesPathAnimation)
                         {
-                            path.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                            jbLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
                         }
                         
-                        // path.BeginStoryboard(sb);
 
-                        Canvas.SetZIndex(path, 19);
+                        Canvas.SetZIndex(jbLine, 19);
 
-                        MainCanvas.Children.Add(path);
+                        MainCanvas.Children.Add(jbLine);
                     }
                 }
             }

@@ -761,7 +761,7 @@ namespace SMT
             {
                 Name = "Default",
                 UserEditable = false,
-                FriendlyJumpBridgeColour = Color.FromRgb(102, 205, 170),
+                FriendlyJumpBridgeColour = Colors.Gray,
                 DisabledJumpBridgeColour = Color.FromRgb(205, 55, 50),
                 SystemOutlineColour = Color.FromRgb(0, 0, 0),
                 InRegionSystemColour = Color.FromRgb(255, 239, 213),
