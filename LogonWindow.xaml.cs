@@ -23,6 +23,7 @@ namespace SMT
         {
             // create the http Server
             listener = new HttpListener();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             string challengeCode = Utils.RandomString(32);
             string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
             System.Diagnostics.Process.Start(esiLogonURL);

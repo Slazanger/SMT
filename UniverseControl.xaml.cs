@@ -414,6 +414,8 @@ namespace SMT
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
 
+
+
             ReDrawMap(true);
         }
 
