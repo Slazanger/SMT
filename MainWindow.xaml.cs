@@ -26,7 +26,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
 
-        public const string SMT_VERSION = "SMT_089";
+        public const string SMT_VERSION = "SMT_090";
 
 
         private LogonWindow logonBrowserWindow;
@@ -52,7 +52,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Pathos, Crashier Test Dummy : " + SMT_VERSION + ")";
+            Title = "SMT (BugSpray : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
