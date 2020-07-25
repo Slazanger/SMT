@@ -626,6 +626,7 @@ namespace SMT.EVEData
                     }
                     firstRoute = false;
 
+                    // with a shorter wait, ive found the occasional out of order route
                     Thread.Sleep(200);
                 }
 
