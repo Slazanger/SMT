@@ -99,7 +99,6 @@ namespace SMT.EVEData
                     mn.Connections.Add(s);
                 }
 
-
                 MapNodes[mn.Name] = mn;
             }
 
@@ -147,7 +146,6 @@ namespace SMT.EVEData
 
                 TheraLinks.Add(tc.System);
             }
-
         }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)

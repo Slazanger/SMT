@@ -28,7 +28,6 @@ namespace SMT
             string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
             System.Diagnostics.Process.Start(esiLogonURL);
 
-
             try
             {
                 listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);

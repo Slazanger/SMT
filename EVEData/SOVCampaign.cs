@@ -6,12 +6,12 @@ namespace SMT.EVEData
     public class SOVCampaign : INotifyPropertyChanged
     {
         private double m_AttackersScore;
-        public double AttackersScore 
-        { 
+
+        public double AttackersScore
+        {
             get
             {
                 return m_AttackersScore;
-
             }
             set
             {
@@ -21,12 +21,12 @@ namespace SMT.EVEData
         }
 
         private double m_DefendersScore;
+
         public double DefendersScore
         {
             get
             {
                 return m_DefendersScore;
-
             }
             set
             {
@@ -34,8 +34,6 @@ namespace SMT.EVEData
                 OnPropertyChanged("DefendersScore");
             }
         }
-
-
 
         public int CampaignID { get; set; }
         public long DefendingAllianceID { get; set; }
@@ -47,8 +45,8 @@ namespace SMT.EVEData
 
         private bool m_isActive;
 
-        public bool IsActive 
-        { 
+        public bool IsActive
+        {
             get
             {
                 return m_isActive;
@@ -60,14 +58,12 @@ namespace SMT.EVEData
             }
         }
 
-
-
-
         public DateTime StartTime { get; set; }
 
         private TimeSpan m_TimeToStart;
-        public TimeSpan TimeToStart 
-        { 
+
+        public TimeSpan TimeToStart
+        {
             get
             {
                 return m_TimeToStart;
@@ -80,6 +76,7 @@ namespace SMT.EVEData
         }
 
         private bool m_Valid;
+
         public bool Valid
         {
             get
@@ -103,6 +100,5 @@ namespace SMT.EVEData
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
-
     }
 }

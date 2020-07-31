@@ -45,7 +45,7 @@ namespace SMT.EVEData
                 string[] words = line.Split('\t');
                 if (words.Length == 6)
                 {
-                    // only care about "Cosmic Anomaly" 
+                    // only care about "Cosmic Anomaly"
                     if (words[1] == "Cosmic Anomaly")
                     {
                         validPaste = true;

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Update Available" Height="300" Width="400" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <ScrollViewer >
+        <ScrollViewer>
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Content="New Version: " FontWeight="Bold" />

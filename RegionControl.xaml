@@ -35,7 +35,6 @@
 
             <MenuItem Header="Characters" IsEnabled="False" />
 
-
             <MenuItem Header="Show Jump Range">
                 <MenuItem Header="Remove All" DataContext="-1" Click="SetJumpRange_Click" />
                 <MenuItem Header="None" DataContext="0" Click="SetJumpRange_Click" />
@@ -61,7 +60,7 @@
 
         <StackPanel Margin="4,2,1,2"  Orientation="Horizontal" HorizontalAlignment="Left">
             <ComboBox x:Name="RegionSelectCB"  Width="120" Margin="5,0" FontSize="12" SelectionChanged="RegionSelectCB_SelectionChanged" />
-            <ComboBox x:Name="SystemDropDownAC" IsEditable="True" Text="System"  Width="100" FontSize="12" Margin="5,0" SelectionChanged="SystemDropDownAC_SelectionChanged"/>
+            <ComboBox x:Name="SystemDropDownAC" IsEditable="True" Text="System"  Width="100" FontSize="12" Margin="5,0" SelectionChanged="SystemDropDownAC_SelectionChanged" />
             <Label Content="Search :" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged" Foreground="Black" TextSearch.TextPath="Name">
                 <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
@@ -77,9 +76,9 @@
 
         <Grid x:Name="MainCanvasGrid" ClipToBounds="True" Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="600*"/>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="193*"/>
+                <ColumnDefinition Width="600*" />
+                <ColumnDefinition Width="7*" />
+                <ColumnDefinition Width="193*" />
             </Grid.ColumnDefinitions>
             <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" Grid.ColumnSpan="3">
                 <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
@@ -87,7 +86,7 @@
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,0,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" Grid.Column="2" />
 
             <StackPanel x:Name="BridgeInfoStackPanel" HorizontalAlignment="Left" Margin="20,0,0,20" VerticalAlignment="Bottom"  Panel.ZIndex="50" />
-            
+
             <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3" Grid.ColumnSpan="3" />
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,160" x:Name="AllianceNameList" Visibility="Visible" Width="190" Panel.ZIndex="111" Grid.ColumnSpan="3">
                 <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom" />
@@ -107,7 +106,7 @@
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -131,13 +130,12 @@
                                     </Image>
                                 </ToggleButton>
 
-
                                 <ToggleButton x:Name="ToggleSecurityBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowSystemSecurity}" ToolTip="Show System Security" Width="30" Height="30">
                                     <ToggleButton.Style>
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -161,12 +159,12 @@
                                     </Image>
                                 </ToggleButton>
 
-                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" BorderThickness="0" IsChecked="{Binding Path=ShowSovOwner}" ToolTip="Show Sov Owners" Width="30" Height="30" >
+                                <ToggleButton x:Name="ToggleSOVBtn" Margin="1,0" BorderThickness="0" IsChecked="{Binding Path=ShowSovOwner}" ToolTip="Show Sov Owners" Width="30" Height="30">
                                     <ToggleButton.Style>
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -194,7 +192,7 @@
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -223,7 +221,7 @@
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -255,7 +253,7 @@
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -279,13 +277,12 @@
                                     </Image>
                                 </ToggleButton>
 
-
                                 <ToggleButton x:Name="ToggleJumpsBtn" Margin="1,0" Background="{x:Null}" BorderThickness="0" IsChecked="{Binding Path=ShowShipJumps}" ToolTip="Jumps in the Last hour" Width="30" Height="30">
                                     <ToggleButton.Style>
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -314,7 +311,7 @@
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -343,7 +340,7 @@
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>
@@ -372,7 +369,7 @@
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="Transparent" >
+                                                    <SolidColorBrush Color="Transparent">
                                                     </SolidColorBrush>
                                                 </Setter.Value>
                                             </Setter>

@@ -28,7 +28,6 @@ namespace SMT
             }
         }
 
-
         public static void SerializeToDisk<T>(T obj, string fileName)
         {
             XmlSerializer xms = new XmlSerializer(typeof(T));
@@ -38,8 +37,6 @@ namespace SMT
                 xms.Serialize(tw, obj);
             }
         }
-
-
 
         public static Encoding GetEncoding(string filename)
         {
@@ -97,22 +94,20 @@ namespace SMT
             return Color.FromArgb(100, (byte)R, (byte)G, (byte)B);
         }
 
-
-
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern IntPtr GetForegroundWindow();
+        private static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern int GetWindowTextLength(IntPtr hWnd);
+        private static extern int GetWindowTextLength(IntPtr hWnd);
 
         public static string GetCaptionOfActiveWindow()
         {
             var strTitle = string.Empty;
             var handle = GetForegroundWindow();
-            // Obtain the length of the text   
+            // Obtain the length of the text
             var intLength = GetWindowTextLength(handle) + 1;
             var stringBuilder = new StringBuilder(intLength);
             if (GetWindowText(handle, stringBuilder, intLength) > 0)
@@ -123,16 +118,12 @@ namespace SMT
         }
 
         private static Random random = new Random();
+
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-
     }
 }
-
-
-
-

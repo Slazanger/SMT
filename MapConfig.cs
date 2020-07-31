@@ -31,7 +31,7 @@ namespace SMT
         public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
 
         private bool m_AlwaysOnTop;
-        
+
         private string m_DefaultRegion;
 
         private double m_IntelTextSize = 10;
@@ -92,7 +92,6 @@ namespace SMT
 
         private bool m_FleetShowShipType = false;
 
-
         public MapConfig()
         {
             SetDefaults();
@@ -114,7 +113,6 @@ namespace SMT
                 OnPropertyChanged("AlwaysOnTop");
             }
         }
-
 
         [Browsable(false)]
         public string DefaultColourSchemeName { get; set; }
@@ -221,7 +219,6 @@ namespace SMT
         [Category("Incursions")]
         [DisplayName("Show Active Incursions")]
         public bool ShowActiveIncursions { get; set; }
-
 
         [Category("SOV")]
         [DisplayName("Show Coalition")]
@@ -337,7 +334,6 @@ namespace SMT
             }
         }
 
-
         [Category("Regions")]
         [DisplayName("Show RegionStandings")]
         public bool ShowRegionStandings
@@ -377,7 +373,6 @@ namespace SMT
 
             set
             {
-
                 m_ShowTCUVunerabilities = value;
                 m_ShowIhubVunerabilities = !m_ShowTCUVunerabilities;
 
@@ -693,18 +688,14 @@ namespace SMT
                     m_FleetMaxMembersPerSystem = 1;
                 }
 
-
-
                 OnPropertyChanged("FleetMaxMembersPerSystem");
             }
         }
 
-
-
         public bool UseESIForCharacterPositions { get; set; }
 
-        public bool ShowCharacterNamesOnMap 
-        { 
+        public bool ShowCharacterNamesOnMap
+        {
             get
             {
                 return m_ShowCharacterNamesOnMap;
@@ -714,11 +705,10 @@ namespace SMT
                 m_ShowCharacterNamesOnMap = value;
                 OnPropertyChanged("ShowCharacterNamesOnMap");
             }
-        
         }
 
-
         private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
+
         public bool SyncActiveCharacterBasedOnActiveEVEClient
         {
             get
@@ -744,7 +734,7 @@ namespace SMT
                 OnPropertyChanged("DisableJumpBridgesPathAnimation");
             }
         }
-        
+
         public bool DisableRoutePathAnimation
         {
             get => m_DisableRoutePathAnimation;
@@ -797,7 +787,6 @@ namespace SMT
 
                 SOVStructureVunerableColour = Color.FromRgb(64, 64, 64),
                 SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178),
-
 
                 ConstellationHighlightColour = Color.FromRgb(147, 131, 131),
 

@@ -136,7 +136,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public Canvas Canvas
         {
-            get { return m_Canvas; }
+            get
+            {
+                return m_Canvas;
+            }
             set
             {
                 if (m_Canvas != null && m_Canvas != value)
@@ -169,7 +172,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public int CornerRadius
         {
-            get { return _cornerRadius; }
+            get
+            {
+                return _cornerRadius;
+            }
             set
             {
                 _cornerRadius = value;
@@ -195,7 +201,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public Brush FillBrush
         {
-            get { return m_Polygon.Fill; }
+            get
+            {
+                return m_Polygon.Fill;
+            }
             set
             {
                 m_Polygon.Fill = value;
@@ -224,7 +233,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public int PointTolerance
         {
-            get { return m_PointTolerance; }
+            get
+            {
+                return m_PointTolerance;
+            }
             set
             {
                 m_PointTolerance = value;
@@ -242,7 +254,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public bool Selected
         {
-            get { return m_Selected; }
+            get
+            {
+                return m_Selected;
+            }
             set
             {
                 if (m_Selected = value)
@@ -269,7 +284,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public Brush StrokeBrush
         {
-            get { return m_Polygon.Stroke; }
+            get
+            {
+                return m_Polygon.Stroke;
+            }
             set
             {
                 m_Polygon.Stroke = value;
@@ -281,7 +299,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
 
         public Brush StrokeBrushPoint
         {
-            get { return m_StrokeBrushPoint; }
+            get
+            {
+                return m_StrokeBrushPoint;
+            }
             set
             {
                 foreach (var el in m_Corners)
@@ -322,7 +343,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// </summary>
         public double StrokeThickness
         {
-            get { return m_Polygon.StrokeThickness; }
+            get
+            {
+                return m_Polygon.StrokeThickness;
+            }
             set
             {
                 m_Polygon.StrokeThickness = value;
@@ -342,7 +366,10 @@ namespace WpfHelpers.WpfControls.TrackerControl
         /// <param name="index">Point index</param>
         public Point this[int index]
         {
-            get { return m_Polygon.Points[index]; }
+            get
+            {
+                return m_Polygon.Points[index];
+            }
             set
             {
                 m_Polygon.Points[index] = value;

@@ -146,16 +146,12 @@ namespace SMT.EVEData
             }
         }
 
-
         public bool UseESIForCharacterPositions { get; set; }
-
-
 
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
         public SerializableDictionary<long, string> CharacterIDToName { get; set; }
-
 
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
@@ -238,7 +234,6 @@ namespace SMT.EVEData
         public ObservableCollection<TheraConnection> TheraConnections { get; set; }
 
         public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
-
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -943,7 +938,6 @@ namespace SMT.EVEData
         /// <param name="name">Name (not ID) of the system</param>
         public bool DoesSystemExist(string name) => GetEveSystem(name) != null;
 
-
         public string GetCharacterName(long id)
         {
             string name = string.Empty;
@@ -954,7 +948,6 @@ namespace SMT.EVEData
 
             return name;
         }
-
 
         /// <summary>
         /// Get the alliance name from the alliance ID
@@ -1192,7 +1185,6 @@ namespace SMT.EVEData
                 CharacterIDToName = new SerializableDictionary<long, string>();
             }
 
-
             if (File.Exists(SaveDataVersionFolder + @"\AllianceNames.dat"))
             {
                 AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceNames.dat");
@@ -1274,7 +1266,6 @@ namespace SMT.EVEData
             }
         }
 
-
         /// <summary>
         /// Update the Character ID data for specified list
         /// </summary>
@@ -1312,7 +1303,6 @@ namespace SMT.EVEData
                 }
             }
         }
-
 
         /// <summary>
         /// Update the Alliance and Ticker data for specified list
@@ -1391,7 +1381,6 @@ namespace SMT.EVEData
             Utils.SerializeToDisk<SerializableDictionary<long, string>>(CharacterIDToName, SaveDataVersionFolder + @"\CharacterNames.dat");
             Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
             Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
-
 
             Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, SaveDataVersionFolder + @"\JumpBridges.dat");
         }
@@ -1914,7 +1903,7 @@ namespace SMT.EVEData
                                     addToIntel = false;
                                 }
 
-                                if(line.Contains("Channel MOTD:"))
+                                if (line.Contains("Channel MOTD:"))
                                 {
                                     addToIntel = false;
                                 }
@@ -2183,7 +2172,6 @@ namespace SMT.EVEData
             request.Proxy = null;
 
             request.BeginGetResponse(new AsyncCallback(ESIUpdateSovCallback), request);
-
         }
 
         private async void StartUpdateSovStructureUpdate()
@@ -2224,10 +2212,7 @@ namespace SMT.EVEData
         {
             try
             {
-
- 
-
-                foreach(SOVCampaign sc in ActiveSovCampaigns)
+                foreach (SOVCampaign sc in ActiveSovCampaigns)
                 {
                     sc.Valid = false;
                 }
@@ -2237,20 +2222,17 @@ namespace SMT.EVEData
                 ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Campaign>> esr = await ESIClient.Sovereignty.Campaigns();
                 if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Campaign>>(esr))
                 {
-
                     foreach (ESI.NET.Models.Sovereignty.Campaign c in esr.Data)
                     {
-
                         SOVCampaign ss = null;
 
                         foreach (SOVCampaign asc in ActiveSovCampaigns)
                         {
-                            if(asc.CampaignID == c.CampaignId )
+                            if (asc.CampaignID == c.CampaignId)
                             {
                                 ss = asc;
                             }
                         }
-
 
                         if (ss == null)
                         {
@@ -2268,15 +2250,14 @@ namespace SMT.EVEData
                                 Region = sys.Region,
                                 StartTime = c.StartTime,
                                 DefendingAllianceName = "",
-
                             };
 
-                            if(c.EventType == "ihub_defense")
+                            if (c.EventType == "ihub_defense")
                             {
                                 ss.Type = "IHub";
                             }
 
-                            if(c.EventType == "tcu_defense")
+                            if (c.EventType == "tcu_defense")
                             {
                                 ss.Type = "TCU";
                             }
@@ -2285,8 +2266,6 @@ namespace SMT.EVEData
                             {
                                 ActiveSovCampaigns.Add(ss);
                             }), DispatcherPriority.Normal, null);
-
-
                         }
 
                         ss.AttackersScore = c.AttackersScore;
@@ -2299,11 +2278,10 @@ namespace SMT.EVEData
                         }
                         else
                         {
-                            if(!allianceIDsToResolve.Contains(ss.DefendingAllianceID))
+                            if (!allianceIDsToResolve.Contains(ss.DefendingAllianceID))
                             {
                                 allianceIDsToResolve.Add(ss.DefendingAllianceID);
                             }
-
                         }
 
                         int NodesToWin = (int)Math.Ceiling(ss.DefendersScore / 0.07);
@@ -2315,13 +2293,11 @@ namespace SMT.EVEData
                         if (ss.StartTime < DateTime.UtcNow)
                         {
                             ss.IsActive = true;
-
                         }
                         else
                         {
                             ss.IsActive = false;
                         }
-
                     }
                 }
 
@@ -2329,7 +2305,6 @@ namespace SMT.EVEData
                 {
                     await ResolveAllianceIDs(allianceIDsToResolve);
                 }
-
 
                 foreach (SOVCampaign sc in ActiveSovCampaigns.ToList())
                 {
@@ -2347,7 +2322,6 @@ namespace SMT.EVEData
                     }
                 }
 
-
                 // super hack : I want to update the both the times and filter colour that
                 // this gets used for but the binding neither seem to propigate the change
                 // but this forces a listchanged which ultimately triggers a refresh
@@ -2359,12 +2333,10 @@ namespace SMT.EVEData
                         ActiveSovCampaigns.Add(hackSC);
                         ActiveSovCampaigns.Remove(hackSC);
                     }), DispatcherPriority.Normal, null);
-
                 }
             }
             catch { }
         }
-
 
         private void StartUpdateStructureHunterUpdate()
         {

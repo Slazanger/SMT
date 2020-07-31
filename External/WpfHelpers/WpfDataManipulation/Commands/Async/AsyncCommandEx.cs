@@ -35,7 +35,10 @@ namespace WpfHelpers.WpfDataManipulation.Commands.Async
 
         public NotifyTaskCompletionBase Execution
         {
-            get { return _execution; }
+            get
+            {
+                return _execution;
+            }
             private set
             {
                 _execution = value;

@@ -13,7 +13,7 @@ using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
-    //jumpclones 
+    //jumpclones
 
     public class LocalCharacter : Character, INotifyPropertyChanged
     {
@@ -63,7 +63,6 @@ namespace SMT.EVEData
             LabelMap = new Dictionary<long, long>();
             LabelNames = new Dictionary<long, string>();
 
-
             FleetInfo = new Fleet();
 
             FleetInfo.IsFleetBoss = false;
@@ -73,7 +72,6 @@ namespace SMT.EVEData
             Random R = new Random();
             int randomOffset = R.Next(90);
             FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(randomOffset);
-
 
             Waypoints = new ObservableCollection<string>();
             ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
@@ -86,7 +84,6 @@ namespace SMT.EVEData
             DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
 
             UseAnsiblexGates = true;
-
 
             KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
         }
@@ -296,6 +293,8 @@ namespace SMT.EVEData
                             return jbl;
                         }
 
+                        int debugText = 0;
+
                         foreach (long stationID in esr.Data.Structures)
                         {
                             ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
@@ -314,6 +313,10 @@ namespace SMT.EVEData
                                     EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
                                 }
                             }
+                            else
+                            {
+                                debugText++;
+                            }
 
                             Thread.Sleep(100);
                         }
@@ -323,10 +326,8 @@ namespace SMT.EVEData
                 {
                     // ESI-Search failed
                 }
-
             }
             UpdateLock.Release();
-
 
             return jbl;
         }
@@ -437,11 +438,10 @@ namespace SMT.EVEData
                     UpdateInfoFromESI().Wait();
                 }
 
-                if(EveManager.Instance.UseESIForCharacterPositions)
+                if (EveManager.Instance.UseESIForCharacterPositions)
                 {
                     UpdatePositionFromESI().Wait();
                 }
-
 
                 UpdateFleetInfo().Wait();
 
@@ -459,8 +459,6 @@ namespace SMT.EVEData
             }
             UpdateLock.Release();
         }
-
-
 
         protected void OnPropertyChanged(string name)
         {
@@ -488,7 +486,7 @@ namespace SMT.EVEData
                 sst = await EveManager.Instance.ESIClient.SSO.GetTokenV2(GrantType.RefreshToken, ESIRefreshToken, string.Empty, null);
                 if (sst == null || sst.RefreshToken == null)
                 {
-                    // we have a valid refresh token BUT it failed to auth; we need to force 
+                    // we have a valid refresh token BUT it failed to auth; we need to force
                     // a reauth
                     ESIRefreshToken = "";
                     ESILinked = false;
@@ -522,7 +520,6 @@ namespace SMT.EVEData
                 return;
             }
 
-
             {
                 // new routing
 
@@ -542,7 +539,7 @@ namespace SMT.EVEData
                     ActiveRoute.Clear();
                 }), DispatcherPriority.Normal);
 
-                // loop through all the waypoints 
+                // loop through all the waypoints
                 for (int i = 0; i < Waypoints.Count; i++)
                 {
                     start = end;
@@ -552,7 +549,6 @@ namespace SMT.EVEData
 
                     if (sysList != null)
                     {
-
                         Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
                             lock (ActiveRouteLock)
@@ -563,7 +559,6 @@ namespace SMT.EVEData
                                 }
                             }
                         }), DispatcherPriority.Normal, null);
-
                     }
                 }
             }
@@ -649,7 +644,6 @@ namespace SMT.EVEData
                 ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
-
                 if (FleetInfo.NextFleetMembershipCheck < DateTime.Now)
                 {
                     // route is cached for 60s, however checking this can hit the rate limit
@@ -667,40 +661,38 @@ namespace SMT.EVEData
                         FleetInfo.FleetID = 0;
 
                         Application.Current.Dispatcher.Invoke((Action)(() =>
-                        { 
+                        {
                             FleetInfo.Members.Clear();
                         }), DispatcherPriority.Normal);
-
                     }
                 }
 
-                if(FleetInfo.FleetID != 0 && FleetInfo.IsFleetBoss)
+                if (FleetInfo.FleetID != 0 && FleetInfo.IsFleetBoss)
                 {
                     List<long> characterIDsToResolve = new List<long>();
 
                     ESI.NET.EsiResponse<List<ESI.NET.Models.Fleets.Member>> esrf = await esiClient.Fleets.Members(FleetInfo.FleetID);
                     if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Fleets.Member>>(esrf))
                     {
-                        foreach(Fleet.FleetMember ff in FleetInfo.Members)
+                        foreach (Fleet.FleetMember ff in FleetInfo.Members)
                         {
                             ff.IsValid = false;
                         }
 
                         foreach (ESI.NET.Models.Fleets.Member esifm in esrf.Data)
                         {
-
                             Fleet.FleetMember fm = null;
 
                             foreach (Fleet.FleetMember ff in FleetInfo.Members)
                             {
-                                if(ff.CharacterID == esifm.CharacterId)
+                                if (ff.CharacterID == esifm.CharacterId)
                                 {
                                     fm = ff;
                                     fm.IsValid = true;
                                 }
                             }
 
-                            if(fm == null)
+                            if (fm == null)
                             {
                                 fm = new Fleet.FleetMember();
                                 fm.IsValid = true;
@@ -709,7 +701,6 @@ namespace SMT.EVEData
                                 {
                                     FleetInfo.Members.Add(fm);
                                 }), DispatcherPriority.Normal);
-
                             }
 
                             fm.Name = EveManager.Instance.GetCharacterName(esifm.CharacterId);
@@ -757,7 +748,6 @@ namespace SMT.EVEData
                             FleetInfo.Members.Clear();
                         }), DispatcherPriority.Normal);
                     }
-
                 }
             }
             catch { }
@@ -770,7 +760,7 @@ namespace SMT.EVEData
         {
             if (ID == 0 || !ESILinked || ESIAuthData == null)
             {
-                if(ESILinked)
+                if (ESILinked)
                 {
                     ESIAccessTokenExpiry = DateTime.Now;
                 }
@@ -809,7 +799,6 @@ namespace SMT.EVEData
                         esiClient.SetCharacterData(ESIAuthData);
                         ESI.NET.EsiResponse<List<ESI.NET.Models.Contacts.Contact>> esr = await esiClient.Contacts.ListForAlliance(page);
 
-
                         if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
                         {
                             if (esr.Pages.HasValue)
@@ -822,7 +811,6 @@ namespace SMT.EVEData
                                 // in an alliance with no contacts
                                 continue;
                             }
-
 
                             foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
                             {

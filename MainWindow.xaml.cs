@@ -12,7 +12,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
@@ -28,7 +27,6 @@ namespace SMT
 
         public const string SMT_VERSION = "SMT_090";
 
-
         private LogonWindow logonBrowserWindow;
 
         private PreferencesWindow preferencesWindow;
@@ -36,6 +34,7 @@ namespace SMT
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
         private MediaPlayer mediaPlayer;
+
         /// <summary>
         /// Main Window
         /// </summary>
@@ -47,8 +46,6 @@ namespace SMT
             mediaPlayer = new MediaPlayer();
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
             mediaPlayer.Open(woopUri);
-
-
 
             InitializeComponent();
 
@@ -139,7 +136,7 @@ namespace SMT
 
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
             EVEManager.ActiveSovCampaigns.CollectionChanged += ActiveSovCampaigns_CollectionChanged;
-           
+
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
@@ -183,7 +180,6 @@ namespace SMT
 
             RegionUC.ANOMManager = ANOMManager;
 
-
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             RouteSystemDropDownAC.ItemsSource = globalSystemList;
@@ -195,8 +191,6 @@ namespace SMT
             Closed += MainWindow_Closed;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
-
-
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
@@ -214,7 +208,6 @@ namespace SMT
                 lc.WarningSystemRange = MapConf.WarningRange;
                 lc.Location = "";
             }
-
         }
 
         private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -222,13 +215,10 @@ namespace SMT
             CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
         }
 
-
         private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
         }
-
-
 
         /// <summary>
         /// Anom Manager
@@ -344,11 +334,10 @@ namespace SMT
             if (uiRefreshCounter == 5)
             {
                 uiRefreshCounter = 0;
-                if(FleetMembersList.ItemsSource != null)
+                if (FleetMembersList.ItemsSource != null)
                 {
                     CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
                 }
-
             }
             if (MapConf.SyncActiveCharacterBasedOnActiveEVEClient)
             {
@@ -376,12 +365,9 @@ namespace SMT
                     {
                         RegionLayoutDoc.IsSelected = true;
                     }
-
                 }
             }
         }
-
-
 
         #region RegionsView Control
 
@@ -397,8 +383,7 @@ namespace SMT
             }
         }
 
-
-        #endregion
+        #endregion RegionsView Control
 
         #region Region Control
 
@@ -461,9 +446,7 @@ namespace SMT
         private void OnCharacterSelectionChanged()
         {
             CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
-
         }
-
 
         private void RegionUC_RegionChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -486,9 +469,9 @@ namespace SMT
             }
         }
 
-        #endregion
+        #endregion Region Control
 
-        #region Universe Control 
+        #region Universe Control
 
         private void UniverseUC_RequestRegionSystem(object sender, RoutedEventArgs e)
         {
@@ -502,7 +485,7 @@ namespace SMT
             }
         }
 
-        #endregion
+        #endregion Universe Control
 
         #region Preferences & Options
 
@@ -552,13 +535,11 @@ namespace SMT
             {
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
-
             }
             else
             {
                 WindowStyle = WindowStyle.SingleBorderWindow;
                 WindowState = WindowState.Normal;
-
             }
         }
 
@@ -618,12 +599,11 @@ namespace SMT
             }
         }
 
-        #endregion
+        #endregion NewVersion
 
         #region Characters
 
         public EVEData.LocalCharacter ActiveCharacter { get; set; }
-
 
         private void UpdateCharacterSelectionBasedOnActiveWindow()
         {
@@ -647,7 +627,6 @@ namespace SMT
                     }
                 }
             }
-
         }
 
         /// <summary>
@@ -659,7 +638,6 @@ namespace SMT
             {
                 logonBrowserWindow.Close();
             }
-
 
             logonBrowserWindow = new LogonWindow();
             logonBrowserWindow.Owner = this;
@@ -684,13 +662,11 @@ namespace SMT
                         FleetMembersList.ItemsSource = lc.FleetInfo.Members;
                         CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
 
-
                         RegionUC.FollowCharacter = true;
                         RegionUC.SelectSystem(lc.Location, true);
 
                         UniverseUC.FollowCharacter = true;
                         UniverseUC.UpdateActiveCharacter(lc);
-
                     }
                 }
             }
@@ -731,11 +707,8 @@ namespace SMT
 
             EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
 
-
-
             ActiveCharacter = null;
             FleetMembersList.ItemsSource = null;
-
 
             CurrentActiveCharacterCombo.SelectedIndex = -1;
             RegionsViewUC.ActiveCharacter = null;
@@ -747,9 +720,7 @@ namespace SMT
             EVEManager.LocalCharacters.Remove(lc);
         }
 
-
-
-        #endregion
+        #endregion Characters
 
         #region intel
 
@@ -784,7 +755,6 @@ namespace SMT
                 }
             }
         }
-
 
         private void OnIntelAdded(List<string> intelsystems)
         {
@@ -823,11 +793,11 @@ namespace SMT
                 }
             }
 
-            if (playSound )
+            if (playSound)
             {
                 mediaPlayer.Stop();
                 mediaPlayer.Position = new TimeSpan(0, 0, 0);
-                mediaPlayer.Play(); 
+                mediaPlayer.Play();
             }
         }
 
@@ -838,7 +808,6 @@ namespace SMT
                 EVEManager.IntelDataList.Clear();
             }), DispatcherPriority.ApplicationIdle);
         }
-
 
         #endregion intel
 
@@ -851,7 +820,6 @@ namespace SMT
         {
             EVEManager.UpdateTheraConnections();
         }
-
 
         private void TheraConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -888,13 +856,11 @@ namespace SMT
             }
             EVEData.System s = RouteSystemDropDownAC.SelectedItem as EVEData.System;
 
-
             if (s != null)
             {
                 RegionUC.ActiveCharacter.AddDestination(s.ID, false);
             }
         }
-
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -903,7 +869,6 @@ namespace SMT
             {
                 lock (c.ActiveRouteLock)
                 {
-
                     c.ActiveRoute.Clear();
                     c.Waypoints.Clear();
                 }
@@ -934,12 +899,11 @@ namespace SMT
             }
         }
 
-
         #endregion Route
 
         #region JumpBridges
 
-        private async void ImportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        private async void FindJumpGatesBtn_Click(object sender, RoutedEventArgs e)
         {
             ImportJumpGatesBtn.IsEnabled = false;
             ClearJumpGatesBtn.IsEnabled = false;
@@ -951,9 +915,10 @@ namespace SMT
             {
                 if (c.ESILinked)
                 {
+                    bool forceTest = false;
 
                     // This should never be set due to https://developers.eveonline.com/blog/article/the-esi-api-is-a-shared-resource-do-not-abuse-it
-                    if (c.DeepSearchEnabled)
+                    if (c.DeepSearchEnabled && forceTest)
                     {
                         string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
                         string basesearch = " » ";
@@ -986,7 +951,7 @@ namespace SMT
 
                         foreach (char cc in chars)
                         {
-                            string search = cc+ basesearch;
+                            string search = cc + basesearch;
                             List<EVEData.JumpBridge> jbl = await c.FindJumpGates(search);
 
                             foreach (EVEData.JumpBridge jb in jbl)
@@ -1044,7 +1009,6 @@ namespace SMT
             JumpBridgeList.IsEnabled = true;
             ImportPasteJumpGatesBtn.IsEnabled = true;
             ExportJumpGatesBtn.IsEnabled = true;
-
         }
 
         private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
@@ -1087,9 +1051,7 @@ namespace SMT
             EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
             RegionUC.ReDrawMap(true);
-
         }
-
 
         private void DeleteJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1112,7 +1074,6 @@ namespace SMT
                 c.RecalcRoute();
             }
         }
-
 
         private void EnableDisableJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1162,7 +1123,6 @@ namespace SMT
                 ExportText += "\n";
             }
 
-
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Text file (*.txt)|*.txt";
             if (saveFileDialog.ShowDialog() == true)
@@ -1172,7 +1132,6 @@ namespace SMT
                     File.WriteAllText(saveFileDialog.FileName, ExportText);
                 }
                 catch { }
-
             }
         }
 
@@ -1182,13 +1141,11 @@ namespace SMT
             EVEData.Navigation.ClearJumpBridges();
         }
 
-
         #endregion JumpBridges
 
         #region ZKillBoard
 
         private bool zkbFilterByRegion = true;
-
 
         private void ZKBContexMenu_ShowSystem_Click(object sender, RoutedEventArgs e)
         {
@@ -1295,8 +1252,7 @@ namespace SMT
             }
         }
 
-
-        #endregion ZKillboard
+        #endregion ZKillBoard
 
         #region Anoms
 
@@ -1336,14 +1292,8 @@ namespace SMT
             }
         }
 
-
-
-
         #endregion Anoms
-
     }
-
-
 
     /// <summary>
     /// TimeSpanConverter Sec statuc colour converter
@@ -1352,17 +1302,16 @@ namespace SMT
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            TimeSpan ts = (TimeSpan) value;
-
+            TimeSpan ts = (TimeSpan)value;
 
             string Output = "";
 
-            if(ts.Ticks < 0)
+            if (ts.Ticks < 0)
             {
                 Output += "-";
             }
 
-            if(ts.Days != 0)
+            if (ts.Days != 0)
             {
                 Output += Math.Abs(ts.Days) + "d ";
             }
@@ -1371,9 +1320,8 @@ namespace SMT
             {
                 Output += Math.Abs(ts.Hours) + "h ";
             }
-            
-            Output += Math.Abs(ts.Minutes) + "m ";
 
+            Output += Math.Abs(ts.Minutes) + "m ";
 
             return Output;
         }
@@ -1383,7 +1331,6 @@ namespace SMT
             return null;
         }
     }
-
 
     /// <summary>
     /// ZKillboard Sec statuc colour converter
@@ -1443,8 +1390,4 @@ namespace SMT
             return null;
         }
     }
-
-
-
 }
-

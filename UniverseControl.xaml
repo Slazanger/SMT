@@ -32,7 +32,7 @@
             <MenuItem Header="Set Destination" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
             <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
 
-            <Separator/>
+            <Separator />
 
             <MenuItem Header="Show Jump Range">
                 <MenuItem Header="Remove All" DataContext="-1" Click="SetJumpRange_Click" />
@@ -74,22 +74,21 @@
                 </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
             </dotNetKitControls:AutoCompleteComboBox>
             <Button x:Name="RecentreBtn" Click="RecentreBtn_Click" Padding="0">
-                <Image Source="Images/recentre.png"/>
+                <Image Source="Images/recentre.png" />
             </Button>
 
             <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Auto Follow Active Character" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
-
         </StackPanel>
 
         <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2" ContentDragFinished="MainZoomControl_ContentDragFinished">
-            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" />
         </zoombox1:ZoomControl>
 
         <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="145" Height="70" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1">
             <Canvas x:Name="ToolBoxCanvas">
-                <Grid Canvas.Left="0" Canvas.Top="2" >
+                <Grid Canvas.Left="0" Canvas.Top="2">
 
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0" >
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0">
 
                         <StackPanel Orientation="Horizontal" Margin="1,1" HorizontalAlignment="Center" VerticalAlignment="Center">
 
@@ -98,7 +97,7 @@
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Background">
                                             <Setter.Value>
-                                                <SolidColorBrush Color="Transparent" >
+                                                <SolidColorBrush Color="Transparent">
                                                 </SolidColorBrush>
                                             </Setter.Value>
                                         </Setter>
@@ -127,7 +126,7 @@
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Background">
                                             <Setter.Value>
-                                                <SolidColorBrush Color="Transparent" >
+                                                <SolidColorBrush Color="Transparent">
                                                 </SolidColorBrush>
                                             </Setter.Value>
                                         </Setter>
@@ -156,7 +155,7 @@
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Background">
                                             <Setter.Value>
-                                                <SolidColorBrush Color="Transparent" >
+                                                <SolidColorBrush Color="Transparent">
                                                 </SolidColorBrush>
                                             </Setter.Value>
                                         </Setter>
@@ -185,7 +184,7 @@
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Background">
                                             <Setter.Value>
-                                                <SolidColorBrush Color="Transparent" >
+                                                <SolidColorBrush Color="Transparent">
                                                 </SolidColorBrush>
                                             </Setter.Value>
                                         </Setter>
@@ -210,7 +209,7 @@
                             </ToggleButton>
                         </StackPanel>
 
-                        <Slider  Width="140" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.2" Maximum="2" TickFrequency="0.2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" SmallChange="0.2" IsSnapToTickEnabled="True"  IsMoveToPointEnabled="True"/>
+                        <Slider  Width="140" Cursor="Arrow" Margin="0,2" Value="{Binding ESIOverlayScale}" Minimum="0.2" Maximum="2" TickFrequency="0.2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Height="18" ToolTip="Overlay/Data Scale" SmallChange="0.2" IsSnapToTickEnabled="True"  IsMoveToPointEnabled="True" />
                     </StackPanel>
                 </Grid>
             </Canvas>

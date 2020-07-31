@@ -18,7 +18,10 @@ namespace WpfHelpers.WpfDataManipulation.Rules
 
         public string Pattern
         {
-            get { return _pattern; }
+            get
+            {
+                return _pattern;
+            }
             set
             {
                 _pattern = value;

@@ -302,7 +302,6 @@ namespace SMT
         private VisualHost VHRoute;
         private VisualHost VHRegionShapes;
 
-
         private VisualHost VHCharacters;
         private VisualHost VHZKB;
 
@@ -413,8 +412,6 @@ namespace SMT
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
-
-
 
             ReDrawMap(true);
         }
@@ -768,10 +765,7 @@ namespace SMT
                 RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.9);
                 RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.9);
 
-
-
                 RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
-
 
                 SystemColourBrush.Freeze();
                 ConstellationColourBrush.Freeze();
@@ -904,11 +898,9 @@ namespace SMT
                     VHNames.AddChild(SystemTextVisual, null);
                 }
 
-
                 Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
                 foreach (EVEData.MapRegion mr in EM.Regions)
                 {
-
                     List<Point> scaledRegionPoints = new List<Point>();
 
                     foreach (Point p in mr.RegionOutline)
@@ -921,7 +913,6 @@ namespace SMT
                         scaledRegionPoints.Add(new Point(X, Z));
                     }
 
-
                     StreamGeometry sg = new StreamGeometry();
                     sg.FillRule = FillRule.Nonzero;
 
@@ -931,7 +922,6 @@ namespace SMT
                         sgc.PolyLineTo(scaledRegionPoints.Skip(1).ToArray(), true, false);
                     }
 
-
                     System.Windows.Media.DrawingVisual RegionShapeVisual = new System.Windows.Media.DrawingVisual();
                     DrawingContext regionShapeDrawingContext = RegionShapeVisual.RenderOpen();
 
@@ -939,7 +929,6 @@ namespace SMT
 
                     regionShapeDrawingContext.Close();
                     VHRegionShapes.AddChild(RegionShapeVisual, null);
-
                 }
             }
 
@@ -1030,7 +1019,6 @@ namespace SMT
                 Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 
-
                 if (MapConf.ShowCharacterNamesOnMap)
                 {
                     Pen p = new Pen(CharacterNameSysHighlightBrush, 1.0);
@@ -1091,9 +1079,7 @@ namespace SMT
                         dc.Close();
                         VHCharacters.AddChild(nameTextVisual);
                     }
-
                 }
-
 
                 // now add the zkill data
                 Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
@@ -1150,13 +1136,12 @@ namespace SMT
                         dashedRouteAnsiblexPen.DashStyle = DashStyles.Dot;
 
                         Pen outlinePen = new Pen(activeRouteColour, 2);
-                        
 
                         // add the lines
                         for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
                         {
                             Pen linePen = dashedRoutePen;
-                            if(ActiveCharacter.ActiveRoute[i-1].GateToTake == EVEData.Navigation.GateType.Ansibex)
+                            if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == EVEData.Navigation.GateType.Ansibex)
                             {
                                 linePen = dashedRouteAnsiblexPen;
                             }
@@ -1177,7 +1162,6 @@ namespace SMT
                                 //Retrieve the DrawingContext in order to create new drawing content.
                                 DrawingContext drawingContext = routeVisual.RenderOpen();
 
-
                                 //Create a rectangle and draw it in the DrawingContext.
                                 drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
 
@@ -1186,7 +1170,6 @@ namespace SMT
                                 VHRoute.AddChild(routeVisual, "ActiveRoute");
                             }
                         }
-
 
                         // add system highlights
                         for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
@@ -1205,7 +1188,7 @@ namespace SMT
 
                                 double rectSize = 7;
                                 double rectHalfSize = rectSize / 2;
-                                
+
                                 //Pen p = new Pen(CapRouteColor, 1);
                                 Rect r = new Rect(X1 - rectHalfSize, Y1 - rectHalfSize, rectSize, rectSize);
 
@@ -1219,7 +1202,6 @@ namespace SMT
                         }
                     }
                 }
-
             }
         }
 
@@ -1393,7 +1375,6 @@ namespace SMT
 
                 MainZoomControl.Show(X1, Y1, MainZoomControl.Zoom);
             }
-
         }
 
         private void MainZoomControl_ContentDragFinished(object sender, RoutedEventArgs e)

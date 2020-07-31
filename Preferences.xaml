@@ -9,18 +9,18 @@
         Title="Preferences" Height="455" Width="600">
     <Grid Background="{DynamicResource ButtonBorder}">
         <DockPanel>
-            <TabControl x:Name="tabControl" DockPanel.Dock="Top" >
+            <TabControl x:Name="tabControl" DockPanel.Dock="Top">
                 <TabItem Header="General">
-                    <Grid >
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="50*"/>
+                            <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
                             <GroupBox Header="General" Margin="4" Height="355">
                                 <StackPanel>
-                                    <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="Always on top"/>
+                                    <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="Always on top" />
                                     <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
                                     <CheckBox x:Name="syncESIPositionChk" Margin="0,3" Checked="syncESIPositionChk_Checked" Unchecked="syncESIPositionChk_Checked">Use ESI for character positions</CheckBox>
                                 </StackPanel>
@@ -37,59 +37,50 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Region/Universe" HorizontalAlignment="Left" >
-                    <Grid >
+                <TabItem Header="Region/Universe" HorizontalAlignment="Left">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
                             <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
-
-
                         <StackPanel Grid.Column="0">
                             <GroupBox Header="Region" Margin="4" Height="355">
                                 <StackPanel>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowActiveIncursions}" Content="Show Active Incursions"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowJoveObservatories}" Content="Show Jove Observatories"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowToolBox}" Content="Show Toolbox"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrueSec}" Content="Show TrueSec"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSystemPopup}" Content="Show System Popups"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowZKillData}" Content="Show ZKill Data"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowNegativeRattingDelta}" Content="Show Negative Ratting Delta"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowRattingDataAsDelta}" Content="Show Ratting Data as Delta"/>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSimpleSecurityView}" Content="Show Simple Security View (Just HS/LS/null)"/>
-                                    
-
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowActiveIncursions}" Content="Show Active Incursions" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowJoveObservatories}" Content="Show Jove Observatories" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowToolBox}" Content="Show Toolbox" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrueSec}" Content="Show TrueSec" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSystemPopup}" Content="Show System Popups" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowZKillData}" Content="Show ZKill Data" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowNegativeRattingDelta}" Content="Show Negative Ratting Delta" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowRattingDataAsDelta}" Content="Show Ratting Data as Delta" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSimpleSecurityView}" Content="Show Simple Security View (Just HS/LS/null)" />
                                 </StackPanel>
                             </GroupBox>
-
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
                             <GroupBox Header="Universe" Margin="4" Height="355">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,0">
-                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White"/>
-                                        <Label Content="Systems Max Zoom"/>
+                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
+                                        <Label Content="Systems Max Zoom" />
                                     </StackPanel>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,0" >
-                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White"/>
-                                        <Label Content="Text Max Zoom"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0">
+                                        <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
+                                        <Label Content="Text Max Zoom" />
                                     </StackPanel>
-
                                 </StackPanel>
                             </GroupBox>
-
                         </StackPanel>
-
-
                     </Grid>
                 </TabItem>
 
                 <TabItem Header="Intel">
-                    <Grid >
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
                             <ColumnDefinition Width="50*" />
@@ -102,20 +93,17 @@
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2">Warning on Unknown</CheckBox>
 
-
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <xctk:IntegerUpDown Value="{Binding Path=IntelTextSize}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="8" Maximum="20" Background="Transparent"  Foreground="White" />
-                                        <Label Content="Intel Text Size"/>
+                                        <Label Content="Intel Text Size" />
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=MaxIntelSeconds}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="30" Maximum="1200" Background="Transparent"  Foreground="White"/>
-                                        <Label Content="Intel Max Time (s)"/>
+                                        <xctk:IntegerUpDown Value="{Binding Path=MaxIntelSeconds}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="30" Maximum="1200" Background="Transparent"  Foreground="White" />
+                                        <Label Content="Intel Max Time (s)" />
                                     </StackPanel>
-
                                 </StackPanel>
                             </GroupBox>
-
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
@@ -125,14 +113,12 @@
                                     <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2">Limit Sound to Dangerzone</CheckBox>
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=WarningRange}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="50" Minimum="1" MaxLength="5" Background="Transparent"  Foreground="White"/>
-                                        <Label Content="DangerZone Size"/>
+                                        <xctk:IntegerUpDown Value="{Binding Path=WarningRange}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="50" Minimum="1" MaxLength="5" Background="Transparent"  Foreground="White" />
+                                        <Label Content="DangerZone Size" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
-
                         </StackPanel>
-
                     </Grid>
                 </TabItem>
                 <TabItem Header="SOV">
@@ -154,7 +140,7 @@
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <xctk:IntegerUpDown Value="{Binding Path=UpcomingSovMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="360" Background="Transparent"  Foreground="White" />
-                                        <Label Content="Upcoming Period (Mins)"/>
+                                        <Label Content="Upcoming Period (Mins)" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
@@ -173,25 +159,21 @@
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=FleetShowOnMap}" Margin="0,2">Show Fleet Members</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=FleetShowShipType}" Margin="0,2">Show Fleet Member Ship Type</CheckBox>
-                                    
+
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <xctk:IntegerUpDown Value="{Binding Path=FleetMaxMembersPerSystem}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="1" Maximum="30" Background="Transparent"  Foreground="White" />
-                                        <Label Content="Max Fleet Members Display"/>
+                                        <Label Content="Max Fleet Members Display" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
                     </Grid>
                 </TabItem>
-
-
-
             </TabControl>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,2">
-                <Button Content="Default" Margin="3,0" Width="55" Click="Prefs_Default_Click"/>
-                <Button Content="OK" Margin="3,0" Width="55" Click="Prefs_OK_Click"/>
+                <Button Content="Default" Margin="3,0" Width="55" Click="Prefs_Default_Click" />
+                <Button Content="OK" Margin="3,0" Width="55" Click="Prefs_OK_Click" />
             </StackPanel>
         </DockPanel>
-
     </Grid>
 </Window>

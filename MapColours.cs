@@ -21,7 +21,6 @@ namespace SMT
         [DisplayName("Fleet Member Text")]
         public Color FleetMemberTextColour { get; set; }
 
-
         [Category("Character")]
         [DisplayName("Text Size")]
         public int CharacterTextSize { get; set; }
@@ -45,7 +44,6 @@ namespace SMT
         [Category("Jump Bridges")]
         [DisplayName("Disabled")]
         public Color DisabledJumpBridgeColour { get; set; }
-
 
         [Category("Systems")]
         [DisplayName("In Region")]

@@ -30,7 +30,6 @@ namespace SMT.EVEData
             To = t;
         }
 
-
         private bool m_Disabled;
 
         [XmlIgnoreAttribute]
@@ -49,7 +48,6 @@ namespace SMT.EVEData
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
 
         /// <summary>
         /// Gets or sets the starting System
@@ -75,7 +73,6 @@ namespace SMT.EVEData
         {
             return $"{From} <==> {To}";
         }
-
 
         protected void OnPropertyChanged(string name)
         {

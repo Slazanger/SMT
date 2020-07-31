@@ -36,27 +36,25 @@
     </Window.Resources>
 
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Background="{DynamicResource MenuBackground}" Height="27" >
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Background="{DynamicResource MenuBackground}" Height="27">
             <Menu Style="{DynamicResource ResourceKey={x:Type Menu}}">
-                <MenuItem Header="File" >
+                <MenuItem Header="File">
                     <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
                     <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
                 </MenuItem>
 
-                <MenuItem Header="Data" >
+                <MenuItem Header="Data">
                     <MenuItem Header="Force ESI Update" Click="ForceESIUpdate_MenuItem_Click" />
                 </MenuItem>
 
                 <MenuItem Header="View">
-                    <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click"/>
+                    <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
                 </MenuItem>
             </Menu>
 
             <Label Margin="30,0,0,0" Padding="7">Active Character :</Label>
-            <ComboBox x:Name="CurrentActiveCharacterCombo" Width="180"  IsReadOnly="True" SelectionChanged="CurrentActiveCharacterCombo_Selected"  Height="18"/>
-
+            <ComboBox x:Name="CurrentActiveCharacterCombo" Width="180"  IsReadOnly="True" SelectionChanged="CurrentActiveCharacterCombo_Selected"  Height="18" />
         </StackPanel>
-
 
         <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom">
             <StatusBarItem>
@@ -162,10 +160,9 @@
 
                                             <DataGrid.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem Header="Delete" Click="CharactersListMenuItemDelete_Click"/>
+                                                    <MenuItem Header="Delete" Click="CharactersListMenuItemDelete_Click" />
                                                 </ContextMenu>
                                             </DataGrid.ContextMenu>
-
 
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
@@ -173,7 +170,7 @@
                                                 <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                        <CheckBox Content="Show Characters On Map" IsChecked="{Binding MapConf.ShowCharacterNamesOnMap}" Margin="3"/>
+                                        <CheckBox Content="Show Characters On Map" IsChecked="{Binding MapConf.ShowCharacterNamesOnMap}" Margin="3" />
                                         <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
                                     </StackPanel>
                                 </ScrollViewer>
@@ -194,7 +191,7 @@
                                         <Label Content="Gate SearchFilter : " />
                                         <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
                                     </StackPanel>
-                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="ImportJumpGatesBtn_Click" Margin="2" Grid.Row="1" />
+                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" Grid.Row="1" />
                                     <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2" />
                                     <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3" />
                                     <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" Grid.Row="4" />
@@ -248,7 +245,7 @@
                                                         <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ActiveCharacter.NavigationMode, ElementName=RegionRC}" Margin="2" Width="150" />
                                                     </StackPanel>
 
-                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionRC}" Margin="2"/>
+                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionRC}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">
@@ -329,7 +326,7 @@
                                 <ScrollViewer>
                                     <StackPanel>
 
-                                        <DataGrid x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column" >
+                                        <DataGrid x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column">
 
                                             <DataGrid.CellStyle>
                                                 <Style TargetType="{x:Type DataGridCell}">
@@ -342,26 +339,24 @@
                                                 </Style>
                                             </DataGrid.CellStyle>
 
-
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="System" Binding="{Binding Path=System, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                                                 <DataGridTextColumn Header="Region" Binding="{Binding Path=Region, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                                                 <DataGridTextColumn Header="Type" Binding="{Binding Path=Type, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-                                                <DataGridTemplateColumn  Header="Defenders Score"  Width="*" >
+                                                <DataGridTemplateColumn  Header="Defenders Score"  Width="*">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <Grid>
-                                                                <ProgressBar Value="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100"/>
-                                                                <TextBlock Text="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False"/>
+                                                                <ProgressBar Value="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100" />
+                                                                <TextBlock Text="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False" />
                                                             </Grid>
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
-                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Path=TimeToStart, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource timeSpanConverter}}" Width="*"/>
+                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Path=TimeToStart, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource timeSpanConverter}}" Width="*" />
                                                 <DataGridTextColumn Header="Defenders" Binding="{Binding Path=DefendingAllianceName, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
-
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
@@ -377,7 +372,6 @@
                                     </DataGrid>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
-
                         </xcadl:LayoutAnchorGroup>
                     </xcadl:LayoutAnchorSide>
                 </xcadl:LayoutRoot.RightSide>
@@ -440,10 +434,7 @@
                             <local:UniverseControl x:Name="UniverseUC" />
                         </xcadl:LayoutDocument>
                     </xcadl:LayoutDocumentPane>
-
                 </xcadl:LayoutPanel>
-
-
             </xcadl:LayoutRoot>
         </xcad:DockingManager>
     </DockPanel>

@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 
-
 namespace SMT.EVEData
 {
     /// <summary>
@@ -51,7 +50,5 @@ namespace SMT.EVEData
         public List<string> Systems { get; set; }
 
         // public override string ToString() => "[" + IntelTime.ToString("HH:mm") + "] " + IntelString;
-
-
     }
 }

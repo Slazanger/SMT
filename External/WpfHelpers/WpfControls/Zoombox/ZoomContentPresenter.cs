@@ -18,7 +18,10 @@ namespace WpfHelpers.WpfControls.Zoombox
 
         public Size ContentSize
         {
-            get { return _contentSize; }
+            get
+            {
+                return _contentSize;
+            }
             private set
             {
                 if (value == _contentSize)

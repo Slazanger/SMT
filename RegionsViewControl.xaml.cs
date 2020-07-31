@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace SMT
@@ -27,7 +21,6 @@ namespace SMT
 
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
-
         public static readonly RoutedEvent RequestRegionSelectEvent = EventManager.RegisterRoutedEvent("RequestRegion", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
 
         public event RoutedEventHandler RequestRegion
@@ -35,7 +28,6 @@ namespace SMT
             add { AddHandler(RequestRegionSelectEvent, value); }
             remove { RemoveHandler(RequestRegionSelectEvent, value); }
         }
-
 
         public RegionsViewControl()
         {
@@ -51,7 +43,6 @@ namespace SMT
 
             AddRegions();
         }
-
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
@@ -124,9 +115,7 @@ namespace SMT
                 RoutedEventArgs newEventArgs = new RoutedEventArgs(RequestRegionSelectEvent, mr.Name);
                 RaiseEvent(newEventArgs);
             }
-
         }
-
 
         private void RegionThera_ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
@@ -169,7 +158,6 @@ namespace SMT
                 RegionTheraInfo.IsOpen = false;
             }
         }
-
 
         /// <summary>
         /// Add Data to the Universe (Thera, Characters etc)
@@ -300,7 +288,6 @@ namespace SMT
                 {
                     regionShape.StrokeThickness = 2.0;
                 }
-
 
                 if (ActiveCharacter != null && ActiveCharacter.ESILinked && MapConf.ShowRegionStandings)
                 {
@@ -512,6 +499,5 @@ namespace SMT
                 }
             }
         }
-
     }
 }

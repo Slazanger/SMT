@@ -58,7 +58,6 @@ namespace nAlpha
 
         private VertexCounter CountVertices()
         {
-
             VertexCounter counter = new VertexCounter();
 
             foreach (var edge in resultingEdges)
@@ -137,7 +136,6 @@ namespace nAlpha
             return nearbyPoints;
 
             //return points;
-
         }
 
         private Tuple<Point, Point> CalculateAlphaDiskCenters(Point p1, Point p2)

@@ -62,7 +62,10 @@ namespace WpfHelpers.WpfControls.Paging
         /// <value>The current page.</value>
         public int CurrentPage
         {
-            get { return currentPage; }
+            get
+            {
+                return currentPage;
+            }
 
             set
             {
@@ -127,7 +130,10 @@ namespace WpfHelpers.WpfControls.Paging
         /// <value>The item count.</value>
         public int ItemCount
         {
-            get { return itemCount; }
+            get
+            {
+                return itemCount;
+            }
 
             set
             {
@@ -171,7 +177,10 @@ namespace WpfHelpers.WpfControls.Paging
         /// <value>The size of the page.</value>
         public int PageSize
         {
-            get { return pageSize; }
+            get
+            {
+                return pageSize;
+            }
 
             set
             {

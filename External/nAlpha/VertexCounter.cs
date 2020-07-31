@@ -5,7 +5,7 @@ namespace nAlpha
 {
     internal class VertexCounter
     {
-        Dictionary<int, int> vertexCounts = new Dictionary<int, int>();
+        private Dictionary<int, int> vertexCounts = new Dictionary<int, int>();
 
         public void IncreaseForIndex(int index)
         {

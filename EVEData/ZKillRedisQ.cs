@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -23,7 +22,6 @@ namespace SMT.EVEData
 
         public string VerString = "ABC123";
 
-
         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
         /// </summary>
@@ -33,7 +31,6 @@ namespace SMT.EVEData
         ///
         /// </summary>
         public bool PauseUpdate { get; set; }
-
 
         /// <summary>
         /// Initialise the ZKB feed system
@@ -53,7 +50,6 @@ namespace SMT.EVEData
             dp.Tick += Dp_Tick;
             dp.Start();
         }
-
 
         private void Dp_Tick(object sender, EventArgs e)
         {
@@ -137,8 +133,6 @@ namespace SMT.EVEData
             e.Result = 0;
         }
 
-
-
         private void zkb_DoWorkComplete(object sender, RunWorkerCompletedEventArgs e)
         {
             List<long> AllianceIDs = new List<long>();
@@ -159,28 +153,22 @@ namespace SMT.EVEData
 
                 if (KillStream[i].KillTime + TimeSpan.FromMinutes(30) < DateTimeOffset.Now)
                 {
-
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         KillStream.RemoveAt(i);
                     }));
-
                 }
             }
             if (AllianceIDs.Count > 0)
             {
                 EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
             }
-
         }
-
 
         public void ShutDown()
         {
             backgroundWorker.CancelAsync();
         }
-
-
 
         /// <summary>
         /// A simple class with the Kill Highlights
