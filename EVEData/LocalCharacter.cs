@@ -293,8 +293,6 @@ namespace SMT.EVEData
                             return jbl;
                         }
 
-                        int debugText = 0;
-
                         foreach (long stationID in esr.Data.Structures)
                         {
                             ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
@@ -312,10 +310,6 @@ namespace SMT.EVEData
 
                                     EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
                                 }
-                            }
-                            else
-                            {
-                                debugText++;
                             }
 
                             Thread.Sleep(100);

@@ -488,8 +488,12 @@ namespace WpfHelpers.WpfControls.Zoombox
                 ActualWidth / _presenter.ContentSize.Width,
                 ActualHeight / _presenter.ContentSize.Height);
 
+
             var initialTranslate = GetInitialTranslate();
-            DoZoomAnimation(deltaZoom, initialTranslate.X * deltaZoom, initialTranslate.Y * deltaZoom);
+            initialTranslate.X *= deltaZoom;
+            initialTranslate.Y *= deltaZoom;
+
+            DoZoomAnimation(deltaZoom, initialTranslate.X , initialTranslate.Y );
         }
 
         private void DoZoomToOriginal()
@@ -497,7 +501,12 @@ namespace WpfHelpers.WpfControls.Zoombox
             if (_presenter == null)
                 return;
 
-            var initialTranslate = GetInitialTranslate();
+            //var initialTranslate = GetInitialTranslate();
+
+            Vector initialTranslate = new Vector(); 
+            initialTranslate.X = 80;
+            initialTranslate.Y = 10;
+
             DoZoomAnimation(1.0, initialTranslate.X, initialTranslate.Y);
         }
 
@@ -573,13 +582,14 @@ namespace WpfHelpers.WpfControls.Zoombox
         {
             if (_presenter == null)
                 return new Vector(0.0, 0.0);
+
             var w = _presenter.ContentSize.Width - _presenter.DesiredSize.Width;
             var h = _presenter.ContentSize.Height - _presenter.DesiredSize.Height;
             var tX = -w / 2.0;
             var tY = -h / 2.0;
 
             return new Vector(tX, tY);
-            //return new Vector(0, 0);
+
         }
 
         private void OnMouseDown(MouseButtonEventArgs e, bool isPreview)
