@@ -1736,6 +1736,7 @@ namespace SMT.EVEData
         private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             string changedFile = e.FullPath;
+            string channelName = e.Name.Substring(0, e.Name.IndexOf("_"));
 
             bool processFile = false;
             bool localChat = false;
@@ -1910,7 +1911,7 @@ namespace SMT.EVEData
 
                                 if (addToIntel)
                                 {
-                                    EVEData.IntelData id = new EVEData.IntelData(line);
+                                    EVEData.IntelData id = new EVEData.IntelData(line, channelName);
 
                                     foreach (string s in id.IntelString.Split(' '))
                                     {

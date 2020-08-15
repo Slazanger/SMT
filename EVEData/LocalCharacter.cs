@@ -86,6 +86,8 @@ namespace SMT.EVEData
             UseAnsiblexGates = true;
 
             KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
+
+            IsOnline = true;
         }
 
         /// <summary>
@@ -100,6 +102,7 @@ namespace SMT.EVEData
             Name = name;
             LocalChatFile = lcf;
             Location = location;
+            IsOnline = true;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -163,6 +166,9 @@ namespace SMT.EVEData
         /// Gets or sets the The location of the local file bound to this session's "Local" chat channel
         /// </summary>
         public string LocalChatFile { get; set; }
+
+
+        public bool IsOnline { get; set; }
 
         /// <summary>
         /// Gets or sets the location of the character
@@ -436,6 +442,8 @@ namespace SMT.EVEData
                 {
                     UpdatePositionFromESI().Wait();
                 }
+
+                UpdateOnlineStatus().Wait();
 
                 UpdateFleetInfo().Wait();
 
@@ -863,9 +871,38 @@ namespace SMT.EVEData
                         Region = "";
                     }
                 }
+
+
+
             }
             catch { }
         }
+
+
+        /// <summary>
+        /// Update the characters logged on status from ESI
+        /// </summary>
+        private async Task UpdateOnlineStatus()
+        {
+            if (ID == 0 || !ESILinked || ESIAuthData == null)
+            {
+                return;
+            }
+
+            try
+            {
+                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                esiClient.SetCharacterData(ESIAuthData);
+                ESI.NET.EsiResponse<ESI.NET.Models.Location.Activity> esr = await esiClient.Location.Online();
+
+                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Activity>(esr))
+                {
+                    IsOnline = esr.Data.Online;
+                }
+            }
+            catch { }
+        }
+
 
         private void UpdateWarningSystems()
         {

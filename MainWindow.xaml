@@ -29,6 +29,7 @@
 
         <DataTemplate x:Key="intelDataDataTemplate">
             <DockPanel>
+                <TextBlock Text="{Binding IntelChannel, FallbackValue=''}" Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
                 <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
                 <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
             </DockPanel>
@@ -157,6 +158,22 @@
                                 <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                     <StackPanel>
                                         <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False">
+
+                                            <DataGrid.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}">
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsOnline}" Value="False">
+                                                            <Setter Property="Background" Value="DarkGray" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+                                                        </DataTrigger>
+
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGrid.CellStyle>
 
                                             <DataGrid.ContextMenu>
                                                 <ContextMenu>

@@ -38,6 +38,7 @@ namespace SMT
         private List<System.Windows.UIElement> DynamicMapElementsRangeMarkers;
         private List<System.Windows.UIElement> DynamicMapElementsRouteHighlight;
         private List<System.Windows.UIElement> DynamicMapElementsCharacters;
+        private List<System.Windows.UIElement> DynamicMapElementsJBHighlight;
 
         private LocalCharacter m_ActiveCharacter;
 
@@ -456,6 +457,7 @@ namespace SMT
             DynamicMapElementsRangeMarkers = new List<UIElement>();
             DynamicMapElementsRouteHighlight = new List<UIElement>();
             DynamicMapElementsCharacters = new List<UIElement>();
+            DynamicMapElementsJBHighlight = new List<UIElement>();
 
             ActiveCharacter = null;
 
@@ -548,6 +550,16 @@ namespace SMT
                     MainCanvas.Children.Remove(uie);
                 }
                 DynamicMapElementsCharacters.Clear();
+
+/*
+                foreach (UIElement uie in DynamicMapElementsJBHighlight)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElementsJBHighlight.Clear();
+*/
+
+
             }
 
             AddCharactersToMap();
@@ -2905,6 +2917,11 @@ namespace SMT
 
                 if (ShowJumpBridges)
                 {
+
+                    Point from = new Point();
+                    Point to = new Point(); ;
+                    bool AddJBHighlight = false;
+
                     foreach (EVEData.JumpBridge jb in EM.JumpBridges)
                     {
                         if (selectedSys.Name == jb.From)
@@ -2923,6 +2940,21 @@ namespace SMT
                             }
 
                             SystemInfoPopupSP.Children.Add(jbl);
+
+
+                            from.X = selectedSys.LayoutX;
+                            from.Y = selectedSys.LayoutY;
+
+
+                            if (Region.IsSystemOnMap(jb.To) && !jb.Disabled)
+                            {
+                                MapSystem ms = Region.MapSystems[jb.To];
+                                to.X = ms.LayoutX;
+                                to.Y = ms.LayoutY;
+                                AddJBHighlight = true;
+                            }
+
+
                         }
 
                         if (selectedSys.Name == jb.To)
@@ -2941,7 +2973,70 @@ namespace SMT
                             }
 
                             SystemInfoPopupSP.Children.Add(jbl);
+
+                            from.X = selectedSys.LayoutX;
+                            from.Y = selectedSys.LayoutY;
+
+                            if (Region.IsSystemOnMap(jb.From) && !jb.Disabled)
+                            {
+                                MapSystem ms = Region.MapSystems[jb.From];
+                                to.X = ms.LayoutX;
+                                to.Y = ms.LayoutY;
+                                AddJBHighlight = true;
+                            }
+
                         }
+                    }
+
+                    if(AddJBHighlight)
+                    {
+                        Line jbHighlight = new Line();
+
+                        Brush highlightBrush = new SolidColorBrush(Colors.Yellow);
+
+                        jbHighlight.X1 = from.X;
+                        jbHighlight.Y1 = from.Y;
+
+                        jbHighlight.X2 = to.X;
+                        jbHighlight.Y2 = to.Y;
+
+                        jbHighlight.StrokeThickness = 5;
+                        jbHighlight.Visibility = Visibility.Visible;
+                        jbHighlight.IsHitTestVisible = false;
+                        jbHighlight.Stroke = highlightBrush;
+                        jbHighlight.StrokeThickness = 5;
+
+                        DoubleCollection dashes = new DoubleCollection();
+                        dashes.Add(1.0);
+                        dashes.Add(1.0);
+                        jbHighlight.StrokeDashArray = dashes;
+
+                        DynamicMapElementsJBHighlight.Add(jbHighlight);
+
+                        Canvas.SetZIndex(jbHighlight, 19);
+
+                        MainCanvas.Children.Add(jbHighlight);
+
+
+                        double circleSize = 30;
+                        double circleOffset = circleSize / 2;
+
+                        Shape jbhighlightEndPointCircle = new Ellipse() { Height = circleSize, Width = circleSize };
+
+                        jbhighlightEndPointCircle.Stroke = highlightBrush;
+                        jbhighlightEndPointCircle.StrokeThickness = 1.5;
+                        jbhighlightEndPointCircle.StrokeLineJoin = PenLineJoin.Round;
+
+                        Canvas.SetLeft(jbhighlightEndPointCircle, to.X - circleOffset);
+                        Canvas.SetTop(jbhighlightEndPointCircle, to.Y - circleOffset);
+
+
+                        DynamicMapElementsJBHighlight.Add(jbhighlightEndPointCircle);
+
+                        Canvas.SetZIndex(jbhighlightEndPointCircle, 19);
+
+                        MainCanvas.Children.Add(jbhighlightEndPointCircle);
+
                     }
                 }
 
@@ -3001,6 +3096,14 @@ namespace SMT
             else
             {
                 SystemInfoPopup.IsOpen = false;
+
+                foreach(UIElement uie in DynamicMapElementsJBHighlight)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+
+                DynamicMapElementsJBHighlight.Clear();
+
             }
         }
 

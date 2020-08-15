@@ -33,6 +33,7 @@ namespace SMT
                 listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);
                 listener.Start();
                 Console.WriteLine("Listening...");
+
                 // Note: The GetContext method blocks while waiting for a request.
                 HttpListenerContext context = listener.GetContext();
                 HttpListenerRequest request = context.Request;
