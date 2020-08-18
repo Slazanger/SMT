@@ -109,6 +109,12 @@
     <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=4.6.82.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>packages\DotNetProjects.Extended.Wpf.Toolkit.4.6.82\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
     </Reference>
+    <Reference Include="HelixToolkit, Version=2.12.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>packages\HelixToolkit.2.12.0\lib\netstandard1.1\HelixToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit.Wpf, Version=2.12.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>packages\HelixToolkit.Wpf.2.12.0\lib\net45\HelixToolkit.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=3.1.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Configuration.3.1.6\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
     </Reference>
@@ -238,6 +244,9 @@
     <Compile Include="StaticJumpOverlay.cs" />
     <Compile Include="Themes\LeftMarginMultiplierConverter.cs" />
     <Compile Include="Themes\TreeViewItemExtensions.cs" />
+    <Compile Include="Universe3dControl.xaml.cs">
+      <DependentUpon>Universe3dControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UniverseControl.xaml.cs">
       <DependentUpon>UniverseControl.xaml</DependentUpon>
     </Compile>
@@ -325,6 +334,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Universe3dControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

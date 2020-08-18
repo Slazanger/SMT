@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -124,6 +125,75 @@ namespace SMT
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+
+        private static Model3DGroup CreateTriangle(Point3D p0, Point3D p1, Point3D p2, Brush fill)
+        {
+            MeshGeometry3D triMesh = new MeshGeometry3D();
+            triMesh.Positions.Add(p0);
+            triMesh.Positions.Add(p1);
+            triMesh.Positions.Add(p2);
+            triMesh.TriangleIndices.Add(0);
+            triMesh.TriangleIndices.Add(1);
+            triMesh.TriangleIndices.Add(2);
+
+            // calculate the normal for the tri
+            Vector3D v0 = new Vector3D(p1.X - p0.X, p1.Y - p0.Y, p1.Z - p0.Z);
+            Vector3D v1 = new Vector3D(p2.X - p1.X, p2.Y - p1.Y, p2.Z - p1.Z);
+            Vector3D normal = Vector3D.CrossProduct(v0, v1);
+
+            triMesh.Normals.Add(normal);
+            triMesh.Normals.Add(normal);
+            triMesh.Normals.Add(normal);
+
+            Material material = new DiffuseMaterial(fill);
+            GeometryModel3D model = new GeometryModel3D(triMesh, material);
+            Model3DGroup group = new Model3DGroup();
+            group.Children.Add(model);
+            return group;
+        }
+
+        public static ModelVisual3D CreateCube(double x, double y, double z, double size, Brush fill)
+        {
+            Model3DGroup cube = new Model3DGroup();
+
+            Point3D p0 = new Point3D(x,         y,          z);
+            Point3D p1 = new Point3D(x + size,  y,          z);
+            Point3D p2 = new Point3D(x + size,  y,          z + size);
+            Point3D p3 = new Point3D(x,         y,          z + size);
+            Point3D p4 = new Point3D(x,         y + size,   z);
+            Point3D p5 = new Point3D(x + size,  y + size,   z);
+            Point3D p6 = new Point3D(x + size,  y + size,   z + size);
+            Point3D p7 = new Point3D(x,         y + size,   z + size);
+
+            //front
+            cube.Children.Add(CreateTriangle(p3, p2, p6, fill));
+            cube.Children.Add(CreateTriangle(p3, p6, p7, fill));
+
+            //right
+            cube.Children.Add(CreateTriangle(p2, p1, p5, fill));
+            cube.Children.Add(CreateTriangle(p2, p5, p6, fill));
+
+            //back
+            cube.Children.Add(CreateTriangle(p1, p0, p4, fill));
+            cube.Children.Add(CreateTriangle(p1, p4, p5, fill));
+
+            //left
+            cube.Children.Add(CreateTriangle(p0, p3, p7, fill));
+            cube.Children.Add(CreateTriangle(p0, p7, p4, fill));
+
+            //top
+            cube.Children.Add(CreateTriangle(p7, p6, p5, fill));
+            cube.Children.Add(CreateTriangle(p7, p5, p4, fill));
+
+            //bottom
+            cube.Children.Add(CreateTriangle(p2, p3, p0, fill));
+            cube.Children.Add(CreateTriangle(p2, p0, p1, fill));
+
+            ModelVisual3D model = new ModelVisual3D();
+            model.Content = cube;
+            return model;
         }
     }
 }

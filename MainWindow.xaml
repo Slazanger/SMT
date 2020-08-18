@@ -450,6 +450,11 @@
                         <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverseViewID" Title="Universe">
                             <local:UniverseControl x:Name="UniverseUC" />
                         </xcadl:LayoutDocument>
+
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverse3DViewID" Title="Universe (3d)">
+                            <local:Universe3DControl x:Name="Universe3DUC" />
+                        </xcadl:LayoutDocument>
+
                     </xcadl:LayoutDocumentPane>
                 </xcadl:LayoutPanel>
             </xcadl:LayoutRoot>

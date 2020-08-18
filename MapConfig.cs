@@ -694,6 +694,24 @@ namespace SMT
 
         public bool UseESIForCharacterPositions { get; set; }
 
+
+        private bool m_ShowOfflineCharactersOnMap;
+        public bool ShowOfflineCharactersOnMap 
+        { 
+            get
+            {
+                return m_ShowOfflineCharactersOnMap;
+            }
+            set
+            {
+                m_ShowOfflineCharactersOnMap = value;
+                OnPropertyChanged("ShowOfflineCharactersOnMap");
+            }
+
+
+        }
+
+
         public bool ShowCharacterNamesOnMap
         {
             get
@@ -816,12 +834,15 @@ namespace SMT
             SOVBasedITCU = true;
             UseESIForCharacterPositions = true;
             ShowCharacterNamesOnMap = true;
+            ShowOfflineCharactersOnMap = true;
             ShowIhubVunerabilities = true;
 
             ShowJoveObservatories = true;
 
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
+
+
 
             WarningRange = 5;
         }

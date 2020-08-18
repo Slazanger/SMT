@@ -2144,19 +2144,26 @@ namespace SMT.EVEData
         /// </summary>
         private async void StartUpdateKillsFromESI()
         {
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.Kills>> esr = await ESIClient.Universe.Kills();
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.Kills>>(esr))
+            try
             {
-                foreach (ESI.NET.Models.Universe.Kills k in esr.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.Kills>> esr = await ESIClient.Universe.Kills();
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.Kills>>(esr))
                 {
-                    EVEData.System es = GetEveSystemFromID(k.SystemId);
-                    if (es != null)
+                    foreach (ESI.NET.Models.Universe.Kills k in esr.Data)
                     {
-                        es.NPCKillsLastHour = k.NpcKills;
-                        es.PodKillsLastHour = k.PodKills;
-                        es.ShipKillsLastHour = k.ShipKills;
+                        EVEData.System es = GetEveSystemFromID(k.SystemId);
+                        if (es != null)
+                        {
+                            es.NPCKillsLastHour = k.NpcKills;
+                            es.PodKillsLastHour = k.PodKills;
+                            es.ShipKillsLastHour = k.ShipKills;
+                        }
                     }
                 }
+            }
+            catch
+            {
+
             }
         }
 

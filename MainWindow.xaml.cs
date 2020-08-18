@@ -25,7 +25,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
 
-        public const string SMT_VERSION = "SMT_090";
+        public const string SMT_VERSION = "SMT_091";
 
         private LogonWindow logonBrowserWindow;
 
@@ -147,6 +147,12 @@ namespace SMT
             UniverseUC.MapConf = MapConf;
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+
+            Universe3DUC.MapConf = MapConf;
+            Universe3DUC.Init();
+            Universe3DUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+
+
 
             RegionsViewUC.MapConf = MapConf;
             RegionsViewUC.Init();
