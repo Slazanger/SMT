@@ -9,6 +9,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:ht="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf" 
+             xmlns:hx="http://helix-toolkit.org/wpf/SharpDX"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
@@ -82,9 +83,28 @@
         </StackPanel>
 
 
-        <ht:HelixViewport3D x:Name="UniverseMain3DViewPort" Grid.Row="1" >
-            <ht:DefaultLights/>
-        </ht:HelixViewport3D>
-        
+
+
+        <hx:Viewport3DX x:Name="UniverseMain3DViewPort" Grid.Row="1" Background="DarkGray" Camera="{Binding Camera}" EffectsManager="{Binding EffectsManager}">
+
+            <hx:Viewport3DX.InputBindings>
+                <KeyBinding Key="B" Command="hx:ViewportCommands.BackView" />
+                <KeyBinding Key="F" Command="hx:ViewportCommands.FrontView" />
+                <KeyBinding Key="U" Command="hx:ViewportCommands.TopView" />
+                <KeyBinding Key="D" Command="hx:ViewportCommands.BottomView" />
+                <KeyBinding Key="L" Command="hx:ViewportCommands.LeftView" />
+                <KeyBinding Key="R" Command="hx:ViewportCommands.RightView" />
+                <KeyBinding Command="hx:ViewportCommands.ZoomExtents" Gesture="Control+E" />
+                <MouseBinding Command="hx:ViewportCommands.Rotate" Gesture="RightClick" />
+                <MouseBinding Command="hx:ViewportCommands.Zoom" Gesture="MiddleClick" />
+                <MouseBinding Command="hx:ViewportCommands.Pan" Gesture="Shift+RightClick" />
+            </hx:Viewport3DX.InputBindings>
+
+            <hx:AmbientLight3D Color="#515151" />
+            <hx:DirectionalLight3D Direction="-1, -1, 0" Color="Green" />
+        </hx:Viewport3DX>
+
+
+
     </Grid>
 </UserControl>

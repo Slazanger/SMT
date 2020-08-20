@@ -1,4 +1,5 @@
-﻿using HelixToolkit.Wpf;
+﻿using HelixToolkit.Wpf.SharpDX;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,102 +18,7 @@ namespace SMT
     /// </summary>
     public partial class Universe3DControl : UserControl, INotifyPropertyChanged
     {
-        private class VisualHost : FrameworkElement
-        {
-            // Create a collection of child visual objects.
-            private VisualCollection Children;
-
-            private Dictionary<Visual, Object> DataContextData;
-
-            public void AddChild(Visual vis, object dataContext = null)
-            {
-                Children.Add(vis);
-                DataContextData.Add(vis, dataContext);
-            }
-
-            public void RemoveChild(Visual vis, object dataContext = null)
-            {
-                Children.Remove(vis);
-                DataContextData.Remove(vis);
-            }
-
-            public void ClearAllChildren()
-            {
-                Children.Clear();
-                DataContextData.Clear();
-            }
-
-            public bool HitTestEnabled
-            {
-                get;
-                set;
-            }
-
-            public VisualHost()
-            {
-                Children = new VisualCollection(this);
-                DataContextData = new Dictionary<Visual, object>();
-
-                HitTestEnabled = false;
-
-                UseLayoutRounding = true;
-
-                MouseRightButtonUp += VisualHost_MouseButtonUp;
-            }
-
-            private void VisualHost_MouseButtonUp(object sender, MouseButtonEventArgs e)
-            {
-                // Retreive the coordinates of the mouse button event.
-                Point pt = e.GetPosition((UIElement)sender);
-
-                if (HitTestEnabled)
-                {
-                    // Initiate the hit test by setting up a hit test result callback method.
-                    VisualTreeHelper.HitTest(this, null, HitTestCheck, new PointHitTestParameters(pt));
-                }
-            }
-
-            // Provide a required override for the VisualChildrenCount property.
-            protected override int VisualChildrenCount => Children.Count;
-
-            // Provide a required override for the GetVisualChild method.
-            protected override Visual GetVisualChild(int index)
-            {
-                if (index < 0 || index >= Children.Count)
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-
-                return Children[index];
-            }
-
-            public HitTestResultBehavior HitTestCheck(HitTestResult result)
-            {
-                System.Windows.Media.DrawingVisual dv = null;
-                if (result.VisualHit.GetType() == typeof(System.Windows.Media.DrawingVisual))
-                {
-                    dv = (System.Windows.Media.DrawingVisual)result.VisualHit;
-                }
-
-                if (dv != null && DataContextData.ContainsKey(dv))
-                {
-                    RoutedEventArgs newEventArgs = new RoutedEventArgs(MouseClickedEvent, DataContextData[dv]);
-                    RaiseEvent(newEventArgs);
-                }
-
-                // Stop the hit test enumeration of objects in the visual tree.
-                return HitTestResultBehavior.Stop;
-            }
-
-            public static readonly RoutedEvent MouseClickedEvent = EventManager.RegisterRoutedEvent("MouseClicked", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(VisualHost));
-
-            public event RoutedEventHandler MouseClicked
-            {
-                add { AddHandler(MouseClickedEvent, value); }
-                remove { RemoveHandler(MouseClickedEvent, value); }
-            }
-        }
-
+  
         private double m_ESIOverlayScale = 1.0f;
         private bool m_ShowNPCKills = false;
         private bool m_ShowPodKills = false;
@@ -136,7 +42,7 @@ namespace SMT
             }
         }
 
-        public Universe3DControl()
+        public Universe3DControl() 
         {
             InitializeComponent();
             DataContext = this;
@@ -404,6 +310,26 @@ namespace SMT
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
 
+
+            UniverseMain3DViewPort.EffectsManager = new DefaultEffectsManager();
+
+
+
+            HelixToolkit.Wpf.SharpDX.PerspectiveCamera pc = new HelixToolkit.Wpf.SharpDX.PerspectiveCamera();
+            pc.NearPlaneDistance = 0.1;
+            pc.FarPlaneDistance = 100000;
+
+            pc.Position = new Point3D(4000, 4000, 10000);
+
+            pc.UpDirection = new Vector3D(0,0,1);
+            pc.LookDirection = new Vector3D(-1,0, 0);
+
+            pc.LookAt(new Point3D(4000, 4000, 4000), 1);
+
+
+            UniverseMain3DViewPort.Camera = pc;
+
+
             ReDrawMap(true);
         }
 
@@ -570,6 +496,8 @@ namespace SMT
         /// <param name="FullRedraw">Clear all the static items or not</param>
         public void ReDrawMap(bool FullRedraw = false, bool DataRedraw = false, bool FastUpdate = false)
         {
+
+            
             double Size = 8000;
             double XScale = Size / universeWidth;
             double ZScale = Size / universeDepth;
@@ -590,43 +518,27 @@ namespace SMT
                 double Y2 = (gh.to.ActualZ - universeZMin) * universeScale;
                 double Z2 = (gh.to.ActualY - universeYMin) * universeScale;
 
-//                LinesVisual3D line = new LinesVisual3D();
-//                line.Color = Colors.Black;
-//                line.Thickness = 2;
-
-
-
-//                HelixToolkit.Wpf.LinesVisual3D linesVisual3D = new HelixToolkit.Wpf.LinesVisual3D();
-//                linesVisual3D.Points.Add(new System.Windows.Media.Media3D.Point3D(Y1, X1, Z1));
-//                linesVisual3D.Points.Add(new System.Windows.Media.Media3D.Point3D(Y2, X2, Z2));
 
                 if(gh.RegionalGate)
                 {
-                    mbRegion.AddCylinder(new System.Windows.Media.Media3D.Point3D(X1, Y1, Z1), new System.Windows.Media.Media3D.Point3D(X2, Y2, Z2), 1, 4);
+                    mbRegion.AddCylinder(new Vector3((float)X1, (float)Y1, (float)Z1), new Vector3((float)X2, (float)Y2, (float)Z2), 1, 4);
                 }
                 else
                 {
-                    mb.AddCylinder(new System.Windows.Media.Media3D.Point3D(X1, Y1, Z1), new System.Windows.Media.Media3D.Point3D(X2, Y2, Z2), 1, 4);
+                    mb.AddCylinder(new Vector3((float)X1, (float)Y1, (float)Z1), new Vector3((float)X2, (float)Y2, (float)Z2), 1, 4);
                 }
-
-
-
-//                UniverseMain3DViewPort.Children.Add(linesVisual3D);
             }
 
-            EmissiveMaterial em = new EmissiveMaterial(Brushes.Gray);
-            EmissiveMaterial emrg = new EmissiveMaterial(Brushes.DarkRed);
+            PhongMaterial em = PhongMaterials.Gray;
+            PhongMaterial emrg = PhongMaterials.Red;
 
 
-            GeometryModel3D geomModelGates = new GeometryModel3D { Geometry = mb.ToMesh(), Material = em, BackMaterial = em };
-            ModelVisual3D mvg = new ModelVisual3D();
-            mvg.Content = geomModelGates;
-            UniverseMain3DViewPort.Children.Add(mvg);
+            MeshGeometryModel3D geomModelGates = new MeshGeometryModel3D { Geometry = mb.ToMeshGeometry3D(), Material = em };
+            UniverseMain3DViewPort.Items.Add(geomModelGates);
 
-            GeometryModel3D geomModelRegionalGates = new GeometryModel3D { Geometry = mbRegion.ToMesh(), Material = emrg, BackMaterial = emrg };
-            ModelVisual3D mvrg = new ModelVisual3D();
-            mvrg.Content = geomModelRegionalGates;
-            UniverseMain3DViewPort.Children.Add(mvrg);
+            MeshGeometryModel3D geomModelRegionalGates = new MeshGeometryModel3D { Geometry = mbRegion.ToMesh(), Material = emrg };
+            UniverseMain3DViewPort.Items.Add(geomModelRegionalGates);
+
 
             var mbSystems = new MeshBuilder();
 
@@ -636,7 +548,7 @@ namespace SMT
                 double Y1 = (sys.ActualZ - universeZMin) * universeScale;
                 double Z1 = (sys.ActualY - universeYMin) * universeScale;
 
-                Point3D sysCentre = new Point3D(X1, Y1, Z1);
+                Vector3 sysCentre = new Vector3((float)X1, (float)Y1, (float)Z1);
 
                 mbSystems.AddBox(sysCentre, 10, 10, 10);
 
@@ -650,16 +562,20 @@ namespace SMT
 
             }
 
-            DiffuseMaterial emsys = new DiffuseMaterial(Brushes.Black);
-            GeometryModel3D geomModelSystems = new GeometryModel3D { Geometry = mbSystems.ToMesh(), Material = emsys, BackMaterial = emsys };
-            ModelVisual3D mvsys = new ModelVisual3D();
-            mvsys.Content = geomModelSystems;
-            UniverseMain3DViewPort.Children.Add(mvsys);
 
 
 
+            PhongMaterial emsys = PhongMaterials.White;
+            MeshGeometryModel3D geomModelSystems = new MeshGeometryModel3D { Geometry = mbSystems.ToMesh(), Material = emsys};
+
+            UniverseMain3DViewPort.Items.Add(geomModelSystems);
+
+//            UniverseMain3DViewPort.Camera.Position = new Point3D(4000, 4000, 1000);
+//            UniverseMain3DViewPort.Camera.LookAt(new Point3D(0, 0, 0), 1);
 
             //            UniverseMain3DViewPort.Camera.ZoomExtents();
+
+
 
         }
 
