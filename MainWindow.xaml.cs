@@ -148,12 +148,6 @@ namespace SMT
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
 
-            Universe3DUC.MapConf = MapConf;
-            Universe3DUC.Init();
-            Universe3DUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
-
-
-
             RegionsViewUC.MapConf = MapConf;
             RegionsViewUC.Init();
             RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
