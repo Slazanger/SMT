@@ -144,7 +144,7 @@ namespace SMT
             activeJumpSpheres = new Dictionary<string, EVEData.EveManager.JumpShip>();
 
             joveLogoImage = ResourceLoader.LoadBitmapFromResource("Images/Jove_logo.png");
-            trigLogoImage = ResourceLoader.LoadBitmapFromResource("Images/triglavian.png");
+            trigLogoImage = ResourceLoader.LoadBitmapFromResource("Images/TrigTile.png");
             edencomLogoImage = ResourceLoader.LoadBitmapFromResource("Images/edencom.png");
             fightImage = ResourceLoader.LoadBitmapFromResource("Images/fight.png");
 
@@ -379,9 +379,22 @@ namespace SMT
 
         public void AddTrigInvasionSytemsToMap()
         {
-            Brush trigBrush = new SolidColorBrush(Colors.GreenYellow);
-            Brush trigOutlineBrush = new SolidColorBrush(Colors.DarkGreen);
-            Brush trigSecStatusChangeBrush = new SolidColorBrush(Colors.Black);
+            if(! MapConf.ShowTrigInvasions)
+            {
+                return;
+            }
+
+
+            Brush trigBrush = new SolidColorBrush(Colors.DarkRed);
+            Brush trigOutlineBrush = new SolidColorBrush(Colors.Black);
+            Brush trigSecStatusChangeBrush = new SolidColorBrush(Colors.Orange);
+
+
+            ImageBrush ib = new ImageBrush();
+            ib.TileMode = TileMode.Tile;
+            ib.Stretch = Stretch.None;
+            ib.ImageSource = trigLogoImage;
+
 
             foreach (Triangles.Invasion ti in EM.TrigInvasions)
             {
@@ -390,65 +403,50 @@ namespace SMT
                     MapSystem ms = Region.MapSystems[ti.SystemName];
 
 
-                    Image trigLogo = new Image
+                    bool addTriangle = true;
+                    if(MapConf.ShowOnlyFinalLiminality && ti.Status != Triangles.Status.FinalLiminality)
                     {
-                        Width = 10,
-                        Height = 10,
-                        Name = "TrigLogo",
-                        Source = trigLogoImage,
-                        Stretch = Stretch.Uniform,
-                        IsHitTestVisible = false,
-                    };
+                        addTriangle = false;
+                    }
+
+                    if(addTriangle)
+                    {
+                        Polygon TrigShape;
+                        TrigShape = new Polygon();
+                        TrigShape.Points.Add(new Point(ms.LayoutX - 13, ms.LayoutY + 6));
+                        TrigShape.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 14));
+                        TrigShape.Points.Add(new Point(ms.LayoutX + 13, ms.LayoutY + 6));
 
 
-                    RenderOptions.SetBitmapScalingMode(trigLogo, BitmapScalingMode.NearestNeighbor);
+                        TrigShape.Stroke = trigOutlineBrush;
+                        TrigShape.StrokeThickness = 1;
+                        TrigShape.StrokeLineJoin = PenLineJoin.Round;
+                        TrigShape.Fill = trigBrush;
 
-                    Canvas.SetLeft(trigLogo, ms.LayoutX - SYSTEM_SHAPE_OFFSET + 5);
-                    Canvas.SetTop(trigLogo, ms.LayoutY - SYSTEM_SHAPE_OFFSET + 6);
-                    Canvas.SetZIndex(trigLogo, SYSTEM_Z_INDEX + 5);
-                    MainCanvas.Children.Add(trigLogo);
+                        Canvas.SetZIndex(TrigShape, SYSTEM_Z_INDEX - 3);
 
+                        MainCanvas.Children.Add(TrigShape);
+                        DynamicMapElements.Add(TrigShape);
+                    }
 
+                    if (ti.DerivedSecurityStatus != null)
+                    {
+                        Label TrigSecChangeHighlight = new Label();
+                        TrigSecChangeHighlight.Content = "»";
+                        TrigSecChangeHighlight.Foreground = trigSecStatusChangeBrush;
+                        TrigSecChangeHighlight.IsHitTestVisible = false;
+                        TrigSecChangeHighlight.RenderTransform = new RotateTransform(90);
+                        TrigSecChangeHighlight.FontSize = 15;
+                        TrigSecChangeHighlight.FontWeight = FontWeights.Bold;
 
-                    /*                    Polygon TrigShape;
-                                        TrigShape = new Polygon();
-                                        TrigShape.Points.Add(new Point(ms.LayoutX - 14, ms.LayoutY + 8));
-                                        TrigShape.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 14));
-                                        TrigShape.Points.Add(new Point(ms.LayoutX + 14, ms.LayoutY + 8));
-
-
-                                        TrigShape.Stroke = trigOutlineBrush;
-                                        TrigShape.StrokeThickness = 1;
-                                        TrigShape.StrokeLineJoin = PenLineJoin.Round;
-                                        TrigShape.Fill = trigBrush;
-
-                                        Canvas.SetZIndex(TrigShape, SYSTEM_Z_INDEX - 3);
-                                        MainCanvas.Children.Add(TrigShape);
-
-                                        if(ti.DerivedSecurityStatus != null)
-                                        {
-                                            Polygon TrigSecChangeHighlight;
-                                            TrigSecChangeHighlight = new Polygon();
-                                            TrigSecChangeHighlight.Points.Add(new Point(ms.LayoutX - 17, ms.LayoutY + 10));
-                                            TrigSecChangeHighlight.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 17));
-                                            TrigSecChangeHighlight.Points.Add(new Point(ms.LayoutX + 17, ms.LayoutY + 10));
-
-
-                                            TrigSecChangeHighlight.Stroke = trigSecStatusChangeBrush;
-                                            TrigSecChangeHighlight.StrokeThickness = 1;
-                                            TrigSecChangeHighlight.StrokeLineJoin = PenLineJoin.Round;
-
-                                            Canvas.SetZIndex(TrigSecChangeHighlight, SYSTEM_Z_INDEX - 3);
-                                            MainCanvas.Children.Add(TrigSecChangeHighlight);
-
-
-                                        }
-
-                    */
+                        Canvas.SetLeft(TrigSecChangeHighlight, ms.LayoutX + 28);
+                        Canvas.SetTop(TrigSecChangeHighlight, ms.LayoutY - 18);
+                        Canvas.SetZIndex(TrigSecChangeHighlight, SYSTEM_Z_INDEX - 3);
+                        MainCanvas.Children.Add(TrigSecChangeHighlight);
+                        DynamicMapElements.Add(TrigSecChangeHighlight);
+                    }
                 }
             }
-
-
         }
 
         public void AddTheraSystemsToMap()

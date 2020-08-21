@@ -740,6 +740,7 @@ namespace SMT
             }
         }
 
+
         private bool m_DisableJumpBridgesPathAnimation;
         private bool m_DisableRoutePathAnimation;
 
@@ -762,6 +763,37 @@ namespace SMT
                 OnPropertyChanged("DisableRoutePathAnimation");
             }
         }
+
+
+        private bool m_ShowTrigInvasions = true;
+        private bool m_ShowOnlyFinalLiminality = false;
+
+        public bool ShowTrigInvasions
+        {
+            get
+            {
+                return m_ShowTrigInvasions;
+            }
+            set
+            {
+                m_ShowTrigInvasions = value;
+                OnPropertyChanged("ShowTrigInvasions");
+            }
+        }
+
+        public bool ShowOnlyFinalLiminality
+        {
+            get
+            {
+                return m_ShowOnlyFinalLiminality;
+            }
+            set
+            {
+                m_ShowOnlyFinalLiminality = value;
+                OnPropertyChanged("ShowOnlyFinalLiminality");
+            }
+        }
+
 
         public void SetDefaultColours()
         {
