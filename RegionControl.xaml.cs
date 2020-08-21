@@ -124,6 +124,15 @@ namespace SMT
 
         private Dictionary<string, EVEData.EveManager.JumpShip> activeJumpSpheres;
 
+        private System.Windows.Media.Imaging.BitmapImage joveLogoImage;
+
+        private System.Windows.Media.Imaging.BitmapImage trigLogoImage;
+
+        private System.Windows.Media.Imaging.BitmapImage edencomLogoImage;
+
+        private System.Windows.Media.Imaging.BitmapImage fightImage;
+
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -133,6 +142,12 @@ namespace SMT
             DataContext = this;
 
             activeJumpSpheres = new Dictionary<string, EVEData.EveManager.JumpShip>();
+
+            joveLogoImage = ResourceLoader.LoadBitmapFromResource("Images/Jove_logo.png");
+            trigLogoImage = ResourceLoader.LoadBitmapFromResource("Images/triglavian.png");
+            edencomLogoImage = ResourceLoader.LoadBitmapFromResource("Images/edencom.png");
+            fightImage = ResourceLoader.LoadBitmapFromResource("Images/fight.png");
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -362,6 +377,80 @@ namespace SMT
             }
         }
 
+        public void AddTrigInvasionSytemsToMap()
+        {
+            Brush trigBrush = new SolidColorBrush(Colors.GreenYellow);
+            Brush trigOutlineBrush = new SolidColorBrush(Colors.DarkGreen);
+            Brush trigSecStatusChangeBrush = new SolidColorBrush(Colors.Black);
+
+            foreach (Triangles.Invasion ti in EM.TrigInvasions)
+            {
+                if (Region.IsSystemOnMap(ti.SystemName))
+                {
+                    MapSystem ms = Region.MapSystems[ti.SystemName];
+
+
+                    Image trigLogo = new Image
+                    {
+                        Width = 10,
+                        Height = 10,
+                        Name = "TrigLogo",
+                        Source = trigLogoImage,
+                        Stretch = Stretch.Uniform,
+                        IsHitTestVisible = false,
+                    };
+
+
+                    RenderOptions.SetBitmapScalingMode(trigLogo, BitmapScalingMode.NearestNeighbor);
+
+                    Canvas.SetLeft(trigLogo, ms.LayoutX - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetTop(trigLogo, ms.LayoutY - SYSTEM_SHAPE_OFFSET + 6);
+                    Canvas.SetZIndex(trigLogo, SYSTEM_Z_INDEX + 5);
+                    MainCanvas.Children.Add(trigLogo);
+
+
+
+                    /*                    Polygon TrigShape;
+                                        TrigShape = new Polygon();
+                                        TrigShape.Points.Add(new Point(ms.LayoutX - 14, ms.LayoutY + 8));
+                                        TrigShape.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 14));
+                                        TrigShape.Points.Add(new Point(ms.LayoutX + 14, ms.LayoutY + 8));
+
+
+                                        TrigShape.Stroke = trigOutlineBrush;
+                                        TrigShape.StrokeThickness = 1;
+                                        TrigShape.StrokeLineJoin = PenLineJoin.Round;
+                                        TrigShape.Fill = trigBrush;
+
+                                        Canvas.SetZIndex(TrigShape, SYSTEM_Z_INDEX - 3);
+                                        MainCanvas.Children.Add(TrigShape);
+
+                                        if(ti.DerivedSecurityStatus != null)
+                                        {
+                                            Polygon TrigSecChangeHighlight;
+                                            TrigSecChangeHighlight = new Polygon();
+                                            TrigSecChangeHighlight.Points.Add(new Point(ms.LayoutX - 17, ms.LayoutY + 10));
+                                            TrigSecChangeHighlight.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 17));
+                                            TrigSecChangeHighlight.Points.Add(new Point(ms.LayoutX + 17, ms.LayoutY + 10));
+
+
+                                            TrigSecChangeHighlight.Stroke = trigSecStatusChangeBrush;
+                                            TrigSecChangeHighlight.StrokeThickness = 1;
+                                            TrigSecChangeHighlight.StrokeLineJoin = PenLineJoin.Round;
+
+                                            Canvas.SetZIndex(TrigSecChangeHighlight, SYSTEM_Z_INDEX - 3);
+                                            MainCanvas.Children.Add(TrigSecChangeHighlight);
+
+
+                                        }
+
+                    */
+                }
+            }
+
+
+        }
+
         public void AddTheraSystemsToMap()
         {
             Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
@@ -414,8 +503,8 @@ namespace SMT
                     {
                         Width = 10,
                         Height = 10,
-                        Name = "JoveLogo",
-                        Source = ResourceLoader.LoadBitmapFromResource("Images/Fight.png"),
+                        Name = "FightLogo",
+                        Source = fightImage,
                         Stretch = Stretch.Uniform,
                         IsHitTestVisible = false,
                     };
@@ -569,6 +658,7 @@ namespace SMT
             AddRouteToMap();
             AddTheraSystemsToMap();
             AddSovConflictsToMap();
+            AddTrigInvasionSytemsToMap();
         }
 
         /// <summary>
@@ -2138,7 +2228,7 @@ namespace SMT
                         Width = 10,
                         Height = 9,
                         Name = "JoveLogo",
-                        Source = ResourceLoader.LoadBitmapFromResource("Images/Jove_logo.png"),
+                        Source = joveLogoImage,
                         Stretch = Stretch.Uniform,
                         IsHitTestVisible = false,
                     };

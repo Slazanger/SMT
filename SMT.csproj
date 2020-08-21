@@ -221,6 +221,7 @@
     <Compile Include="EVEData\Server.cs" />
     <Compile Include="EVEData\SOVCampaign.cs" />
     <Compile Include="EVEData\Structure.cs" />
+    <Compile Include="EVEData\TrigInvasion.cs" />
     <Compile Include="External\nAlpha\AlphaShapeCalculator.cs" />
     <Compile Include="External\nAlpha\Point.cs" />
     <Compile Include="External\nAlpha\Shape.cs" />
@@ -437,6 +438,10 @@
   </ItemGroup>
   <ItemGroup>
     <SplashScreen Include="SplashScreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\edencom.png" />
+    <Resource Include="Images\triglavian.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

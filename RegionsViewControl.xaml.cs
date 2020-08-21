@@ -167,6 +167,8 @@ namespace SMT
             Brush sysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
             Brush theraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceRegion);
             Brush characterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+            
+
 
             foreach (EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
             {

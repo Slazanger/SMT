@@ -137,6 +137,8 @@ namespace SMT
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
             EVEManager.ActiveSovCampaigns.CollectionChanged += ActiveSovCampaigns_CollectionChanged;
 
+            TrigInvasionsList.ItemsSource = EVEManager.TrigInvasions;
+
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
@@ -1293,6 +1295,24 @@ namespace SMT
         }
 
         #endregion Anoms
+
+        private void TrigInvasionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    Triangles.Invasion tc = dgr.Item as Triangles.Invasion;
+
+                    if (tc != null)
+                    {
+                        RegionUC.SelectSystem(tc.SystemName, true);
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>

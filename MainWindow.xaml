@@ -378,6 +378,24 @@
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
 
+                            <xcadl:LayoutAnchorable Title="Trig Invasions" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TrigInvasionsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer>
+                                    <StackPanel>
+
+                                        <DataGrid x:Name="TrigInvasionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TrigInvasionsList_MouseDoubleClick" HeadersVisibility="Column">
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="System" Binding="{Binding Path=SystemName, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Status" Binding="{Binding Path=Status, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Sec" Binding="{Binding Path=DerivedSecurityStatus, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+
+
+
                             <xcadl:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                     <DataGrid  x:Name="FleetMembersList"  Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False">

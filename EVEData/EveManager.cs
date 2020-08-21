@@ -233,6 +233,8 @@ namespace SMT.EVEData
         /// </summary>
         public ObservableCollection<TheraConnection> TheraConnections { get; set; }
 
+        public ObservableCollection<Triangles.Invasion> TrigInvasions { get; set; }
+
         public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
 
         /// <summary>
@@ -1581,6 +1583,31 @@ namespace SMT.EVEData
             request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
         }
 
+        /// <summary>
+        /// Update the current Trig Invasions
+        /// </summary>
+        public void UpdateTrigInvasions()
+        {
+            try
+            {
+                string trigApiURL = "https://kybernaut.space/invasions.json";
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(trigApiURL);
+                request.Method = WebRequestMethods.Http.Get;
+                request.Timeout = 20000;
+                request.Proxy = null;
+
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    TrigInvasions.Clear();
+                }), DispatcherPriority.Normal, null);
+
+                request.BeginGetResponse(new AsyncCallback(UpdateTrigInvasionsCallback), request);
+            }
+            catch {}
+        }
+
+
         internal void AddUpdateJumpBridge(string from, string to, long stationID)
         {
             // validate
@@ -1702,6 +1729,7 @@ namespace SMT.EVEData
             LoadCharacters();
 
             InitTheraConnections();
+            InitTrigInvasions();
 
             ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
 
@@ -1718,6 +1746,13 @@ namespace SMT.EVEData
         {
             TheraConnections = new ObservableCollection<TheraConnection>();
             UpdateTheraConnections();
+        }
+
+
+        private void InitTrigInvasions()
+        {
+            TrigInvasions = new ObservableCollection<Triangles.Invasion>();
+            UpdateTrigInvasions();
         }
 
         /// <summary>
@@ -2532,6 +2567,40 @@ namespace SMT.EVEData
                                     }), DispatcherPriority.Normal, null);
                                 }
                             }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+
+        /// <summary>
+        ///  Update Trig Invasions Connections Callback
+        /// </summary>
+        private void UpdateTrigInvasionsCallback(IAsyncResult asyncResult)
+        {
+            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(responseStream))
+                    {
+                        // Need to return this response
+                        string strContent = sr.ReadToEnd();
+
+                        var invasions = Triangles.Invasion.FromJson(strContent);
+                        foreach(Triangles.Invasion ti in invasions)
+                        {
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                TrigInvasions.Add(ti);
+                            }), DispatcherPriority.Normal, null);
+
                         }
                     }
                 }
