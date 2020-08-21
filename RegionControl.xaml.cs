@@ -1829,10 +1829,8 @@ namespace SMT
                 Coalition SystemCoalition = null;
 
                 double trueSecVal = system.ActualSystem.TrueSec;
-                bool gradeTruesec = MapConf.ShowTrueSec;
                 if (MapConf.ShowSimpleSecurityView)
                 {
-                    // gradeTruesec = false;
                     if (system.ActualSystem.TrueSec >= 0.45)
                     {
                         trueSecVal = 1.0;
@@ -1841,13 +1839,9 @@ namespace SMT
                     {
                         trueSecVal = 0.4;
                     }
-                    else
-                    {
-                        trueSecVal = 0.0;
-                    }
                 }
 
-                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, gradeTruesec));
+                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
 
                 if (MapConf.SOVBasedITCU)
                 {
