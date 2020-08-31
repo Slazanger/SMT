@@ -96,6 +96,13 @@ namespace Triangles
                     return Status.StellarReconnaissance;
                 case "triglavian_minor_victory":
                     return Status.TriglavianMinorVictory;
+                case "bulwark":
+                    return Status.EdencomMinorVictory;
+                case "redoubt":
+                    return Status.EdencomMinorVictory;
+
+
+
             }
             throw new Exception("Cannot unmarshal type Status");
         }
