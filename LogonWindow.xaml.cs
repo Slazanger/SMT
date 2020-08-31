@@ -66,10 +66,18 @@ namespace SMT
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (listener != null)
+            try
             {
-                listener.Stop();
+                if (listener != null && listener.IsListening)
+                {
+                    listener.Stop();
+                }
             }
+            catch
+            {
+
+            }
+
         }
-    }
+}
 }
