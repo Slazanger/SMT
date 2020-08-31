@@ -809,11 +809,18 @@ namespace SMT
                 OutRegionSystemColour = Color.FromRgb(218, 165, 32),
                 OutRegionSystemTextColour = Color.FromRgb(0, 0, 0),
 
+                UniverseSystemColour = Colors.SlateGray,
+                UniverseConstellationGateColour = Colors.SlateGray,
+                UniverseSystemTextColour = Colors.BlanchedAlmond,
+                UniverseGateColour = Colors.DarkSlateBlue,
+                UniverseRegionGateColour = Color.FromRgb(128, 64, 64),
+                UniverseMapBackgroundColour = Color.FromRgb(43,43,48),
+
                 PopupText = Color.FromRgb(0, 0, 0),
                 PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595"),
 
                 MapBackgroundColour = (Color)ColorConverter.ConvertFromString("#FF4E5B68"),
-                RegionMarkerTextColour = (Color)ColorConverter.ConvertFromString("#6E716E"),
+                RegionMarkerTextColour = Color.FromRgb(49, 49, 53),
                 RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0),
                 ESIOverlayColour = Color.FromRgb(188, 143, 143),
                 IntelOverlayColour = Color.FromRgb(178, 34, 34),

@@ -726,6 +726,7 @@ namespace SMT
         private Brush RegionTextColourBrush;
         private Brush RegionTextZoomedOutColourBrush;
         private Brush GateColourBrush;
+        private Brush RegionGateColourBrush;
         private Brush JumpBridgeColourBrush;
         private Brush DataColourBrush;
         private Brush BackgroundColourBrush;
@@ -738,7 +739,7 @@ namespace SMT
         public void ReDrawMap(bool FullRedraw = false, bool DataRedraw = false, bool FastUpdate = false)
         {
             double textXOffset = 3;
-            double textYOffset = 2;
+            double textYOffset = 0;
 
             double SystemTextSize = 5;
             double CharacterTextSize = 6;
@@ -750,17 +751,18 @@ namespace SMT
             // recreate the brushes on a full draw
             if (FullRedraw)
             {
-                SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
-                ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
-                SystemTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+                SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemColour);
+                ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseConstellationGateColour);
+                SystemTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemTextColour);
                 RegionTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
                 RegionTextZoomedOutColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColourFull);
-                GateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+                GateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseGateColour);
                 JumpBridgeColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
                 DataColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
-                BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
+                BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseMapBackgroundColour);
+                RegionGateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseRegionGateColour);
 
-                Color RegionShapeFillCol = MapConf.ActiveColourScheme.MapBackgroundColour;
+                Color RegionShapeFillCol = MapConf.ActiveColourScheme.UniverseMapBackgroundColour;
                 RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.9);
                 RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.9);
                 RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.9);
@@ -803,6 +805,7 @@ namespace SMT
 
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
+                Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
 
                 System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
@@ -816,10 +819,16 @@ namespace SMT
                     double Y2 = (universeDepth - (gh.to.ActualZ - universeZMin)) * universeScale;
                     Pen p = GatePen;
 
-                    if (gh.from.Region != gh.to.Region || gh.from.ConstellationID != gh.to.ConstellationID)
+                    if (gh.from.ConstellationID != gh.to.ConstellationID)
                     {
                         p = ConstGatePen;
                     }
+
+                    if (gh.from.Region != gh.to.Region)
+                    {
+                        p = RegionGatePen;
+                    }
+
                     gatesDrawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
                 }
 
@@ -874,7 +883,7 @@ namespace SMT
                     DrawingContext drawingContext = systemShapeVisual.RenderOpen();
 
                     // Create a rectangle and draw it in the DrawingContext.
-                    Rect rect = new Rect(X - 3, Z - 3, 6, 6);
+                    Rect rect = new Rect(X - 2, Z - 2, 4, 4);
                     drawingContext.DrawRectangle(SystemColourBrush, null, rect);
 
                     // Persist the drawing content.

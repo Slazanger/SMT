@@ -524,7 +524,6 @@ namespace SMT.EVEData
 
             {
                 // new routing
-
                 string start = string.Empty;
                 string end = Location;
 

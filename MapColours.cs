@@ -45,6 +45,33 @@ namespace SMT
         [DisplayName("Disabled")]
         public Color DisabledJumpBridgeColour { get; set; }
 
+        [Category("Universe")]
+        [DisplayName("System")]
+        public Color UniverseSystemColour { get; set; }
+
+        [Category("Universe")]
+        [DisplayName("Constellation Gate")]
+        public Color UniverseConstellationGateColour { get; set; }
+
+        [Category("Universe")]
+        [DisplayName("Region Gate")]
+        public Color UniverseRegionGateColour { get; set; }
+
+
+        [Category("Universe")]
+        [DisplayName("Gate")]
+        public Color UniverseGateColour { get; set; }
+
+        [Category("Universe")]
+        [DisplayName("System Text")]
+        public Color UniverseSystemTextColour { get; set; }
+
+
+        [Category("Universe")]
+        [DisplayName("Map Background")]
+        public Color UniverseMapBackgroundColour { get; set; }
+
+
         [Category("Systems")]
         [DisplayName("In Region")]
         public Color InRegionSystemColour { get; set; }
