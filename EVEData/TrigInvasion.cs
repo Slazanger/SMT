@@ -100,6 +100,8 @@ namespace Triangles
                     return Status.EdencomMinorVictory;
                 case "redoubt":
                     return Status.EdencomMinorVictory;
+                case "first_liminality":
+                    return Status.TriglavianMinorVictory;
 
 
 
