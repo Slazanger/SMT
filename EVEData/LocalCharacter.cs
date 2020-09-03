@@ -485,7 +485,8 @@ namespace SMT.EVEData
             {
                 SsoToken sst;
                 AuthorizedCharacterData acd;
-                sst = await EveManager.Instance.ESIClient.SSO.GetTokenV2(GrantType.RefreshToken, ESIRefreshToken, string.Empty, null);
+
+                sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
                 if (sst == null || sst.RefreshToken == null)
                 {
                     // we have a valid refresh token BUT it failed to auth; we need to force
@@ -509,7 +510,10 @@ namespace SMT.EVEData
                 ESILinked = true;
                 ESIAuthData = acd;
             }
-            catch { }
+            catch(Exception ex)
+            { 
+
+            }
         }
 
         /// <summary>

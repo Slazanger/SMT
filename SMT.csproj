@@ -109,6 +109,9 @@
     <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=4.6.82.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>packages\DotNetProjects.Extended.Wpf.Toolkit.4.6.82\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
     </Reference>
+    <Reference Include="ESI.NET, Version=2020.7.22.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\ESI.NET.2020.7.22\lib\net471\ESI.NET.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=3.1.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Configuration.3.1.6\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
     </Reference>
@@ -149,6 +152,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
@@ -421,10 +425,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ESI.Net\ESI.NET\ESI.NET.csproj">
-      <Project>{9b2b2831-3c63-4914-bdf2-8bc1a6b6c5c4}</Project>
-      <Name>ESI.NET</Name>
-    </ProjectReference>
     <ProjectReference Include="External\WpfHelpers\WpfHelpers.csproj">
       <Project>{2d1e6ac7-6fb8-42e6-a1d8-754951a99428}</Project>
       <Name>WpfHelpers</Name>
