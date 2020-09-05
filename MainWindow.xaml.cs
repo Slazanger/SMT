@@ -210,6 +210,7 @@ namespace SMT
                 lc.WarningSystemRange = MapConf.WarningRange;
                 lc.Location = "";
             }
+
         }
 
         private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -917,10 +918,8 @@ namespace SMT
             {
                 if (c.ESILinked)
                 {
-                    bool forceTest = false;
-
                     // This should never be set due to https://developers.eveonline.com/blog/article/the-esi-api-is-a-shared-resource-do-not-abuse-it
-                    if (c.DeepSearchEnabled && forceTest)
+                    if (c.DeepSearchEnabled && GateSearchFilter.Text == " » ")
                     {
                         string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
                         string basesearch = " » ";
