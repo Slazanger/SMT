@@ -794,8 +794,10 @@ namespace SMT
             }
         }
 
+ 
 
-        public void SetDefaultColours()
+
+ public void SetDefaultColours()
         {
             MapColours defaultColours = new MapColours
             {
@@ -833,6 +835,7 @@ namespace SMT
                 CharacterTextColour = Color.FromRgb(240, 190, 10),
                 CharacterTextSize = 11,
                 SystemTextSize = 12,
+                SystemSubTextSize = 7,
 
                 FleetMemberTextColour = Colors.White,
 

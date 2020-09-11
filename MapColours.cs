@@ -159,6 +159,13 @@ namespace SMT
         [DisplayName("Name Size")]
         public int SystemTextSize { get; set; }
 
+        [Category("Systems")]
+        [DisplayName("Name Subtext Size")]
+        public int SystemSubTextSize { get; set; }
+
+
+
+
         [Category("Thera")]
         [DisplayName("Thera Entrance (Region)")]
         public Color TheraEntranceRegion { get; set; }
