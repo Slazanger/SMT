@@ -497,6 +497,8 @@ namespace SMT
                     Canvas.SetTop(TheraShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX - 3);
                     MainCanvas.Children.Add(TheraShape);
+
+
                 }
             }
         }
@@ -509,6 +511,7 @@ namespace SMT
             }
 
             Brush ActiveSovFightBrush = new SolidColorBrush(Colors.DarkRed);
+
 
             foreach (SOVCampaign sc in EM.ActiveSovCampaigns)
             {
@@ -525,13 +528,13 @@ namespace SMT
                         Stretch = Stretch.Uniform,
                         IsHitTestVisible = false,
                     };
-
                     SovFightLogo.IsHitTestVisible = false;
 
                     Canvas.SetLeft(SovFightLogo, ms.LayoutX - SYSTEM_SHAPE_OFFSET + 5);
                     Canvas.SetTop(SovFightLogo, ms.LayoutY - SYSTEM_SHAPE_OFFSET + 5);
                     Canvas.SetZIndex(SovFightLogo, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(SovFightLogo);
+                    DynamicMapElements.Add(SovFightLogo);
 
                     if (sc.IsActive || sc.Type == "IHub")
                     {
@@ -546,6 +549,7 @@ namespace SMT
                         Canvas.SetTop(activeSovFightShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 9));
                         Canvas.SetZIndex(activeSovFightShape, SYSTEM_Z_INDEX - 3);
                         MainCanvas.Children.Add(activeSovFightShape);
+                        DynamicMapElements.Add(activeSovFightShape);
                     }
                 }
             }
