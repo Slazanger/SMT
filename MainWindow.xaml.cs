@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -729,31 +731,49 @@ namespace SMT
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (RawIntelBox.SelectedItem == null)
+            if (RawChatBox.SelectedItem == null)
             {
                 return;
             }
 
-            EVEData.IntelData intel = RawIntelBox.SelectedItem as EVEData.IntelData;
+            EVEData.IntelData chat = RawChatBox.SelectedItem as EVEData.IntelData;
 
-            foreach (string s in intel.IntelString.Split(' '))
+            bool selectedSystem = false;
+
+            foreach (string s in chat.IntelString.Split(' '))
             {
                 if (s == "")
                 {
                     continue;
                 }
-
-                foreach (EVEData.System sys in EVEManager.Systems)
+                var linkParser = new Regex(@"\b(?:https?://|www\.)\S+\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                foreach (Match m in linkParser.Matches(s))
                 {
-                    if (s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                    string url = m.Value;
+                    if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
                     {
-                        if (RegionUC.Region.Name != sys.Region)
+                        url = "http://" + url;
+                    }
+                    if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                    {
+                        Process.Start(url);
+                    }
+                }
+                // only select the first system
+                if (!selectedSystem)
+                {
+                    foreach (EVEData.System sys in EVEManager.Systems)
+                    {
+                        if (s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            RegionUC.SelectRegion(sys.Region);
-                        }
+                            if (RegionUC.Region.Name != sys.Region)
+                            {
+                                RegionUC.SelectRegion(sys.Region);
+                            }
 
-                        RegionUC.SelectSystem(s, true);
-                        return;
+                            RegionUC.SelectSystem(s, true);
+                            selectedSystem = true;
+                        }
                     }
                 }
             }
