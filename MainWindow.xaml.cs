@@ -731,12 +731,12 @@ namespace SMT
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (RawChatBox.SelectedItem == null)
+            if (RawIntelBox.SelectedItem == null)
             {
                 return;
             }
 
-            EVEData.IntelData chat = RawChatBox.SelectedItem as EVEData.IntelData;
+            EVEData.IntelData chat = RawIntelBox.SelectedItem as EVEData.IntelData;
 
             bool selectedSystem = false;
 
