@@ -34,30 +34,38 @@ namespace SMT
 
         private string m_DefaultRegion;
 
+        private bool m_DisableJumpBridgesPathAnimation;
+        private bool m_DisableRoutePathAnimation;
+        private int m_FleetMaxMembersPerSystem = 5;
+        private bool m_FleetShowOnMap = true;
+        private bool m_FleetShowShipType;
         private double m_IntelTextSize = 10;
 
         private bool m_JumpRangeInAsOutline;
 
         private int m_MaxIntelSeconds;
 
+        private bool m_ShowCharacterNamesOnMap = true;
         private bool m_ShowCoalition;
 
-        private bool m_ShowDangerZone = false;
+        private bool m_ShowDangerZone;
 
         private bool m_ShowIhubVunerabilities;
 
+        private bool m_ShowJoveObservatories;
         private bool m_ShowNegativeRattingDelta;
 
+        private bool m_ShowOfflineCharactersOnMap;
+        private bool m_ShowOnlyFinalLiminality;
         private bool m_ShowRattingDataAsDelta;
 
-        private bool m_ShowSimpleSecurityView;
-
         private bool m_ShowRegionStandings;
-
+        private bool m_ShowSimpleSecurityView;
         private bool m_ShowTCUVunerabilities;
 
         private bool m_ShowToolBox = true;
 
+        private bool m_ShowTrigInvasions = true;
         private bool m_ShowTrueSec;
 
         private bool m_ShowUniverseKills;
@@ -71,9 +79,7 @@ namespace SMT
         private bool m_SOVBasedonTCU;
 
         private bool m_SOVShowConflicts;
-
-        private bool m_ShowJoveObservatories;
-
+        private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
         private double m_UniverseDataScale = 1.0f;
 
         private float m_UniverseMaxZoomDisplaySystems;
@@ -83,14 +89,6 @@ namespace SMT
         private int m_UpcomingSovMinutes;
 
         private int m_WarningRange = 5;
-
-        private int m_FleetMaxMembersPerSystem = 5;
-
-        private bool m_ShowCharacterNamesOnMap = true;
-
-        private bool m_FleetShowOnMap = true;
-
-        private bool m_FleetShowShipType = false;
 
         public MapConfig()
         {
@@ -128,6 +126,80 @@ namespace SMT
             {
                 m_DefaultRegion = value;
                 OnPropertyChanged("DefaultRegion");
+            }
+        }
+
+        public bool DisableJumpBridgesPathAnimation
+        {
+            get => m_DisableJumpBridgesPathAnimation;
+            set
+            {
+                m_DisableJumpBridgesPathAnimation = value;
+                OnPropertyChanged("DisableJumpBridgesPathAnimation");
+            }
+        }
+
+        public bool DisableRoutePathAnimation
+        {
+            get => m_DisableRoutePathAnimation;
+            set
+            {
+                m_DisableRoutePathAnimation = value;
+                OnPropertyChanged("DisableRoutePathAnimation");
+            }
+        }
+
+        [Category("Fleet")]
+        [DisplayName("Max Fleet Per System")]
+        public int FleetMaxMembersPerSystem
+        {
+            get
+            {
+                return m_FleetMaxMembersPerSystem;
+            }
+            set
+            {
+                // clamp to 1 miniumum
+                if (value > 0)
+                {
+                    m_FleetMaxMembersPerSystem = value;
+                }
+                else
+                {
+                    m_FleetMaxMembersPerSystem = 1;
+                }
+
+                OnPropertyChanged("FleetMaxMembersPerSystem");
+            }
+        }
+
+        [Category("Fleet")]
+        [DisplayName("Show On Map")]
+        public bool FleetShowOnMap
+        {
+            get
+            {
+                return m_FleetShowOnMap;
+            }
+            set
+            {
+                m_FleetShowOnMap = value;
+                OnPropertyChanged("FleetShowOnMap");
+            }
+        }
+
+        [Category("Fleet")]
+        [DisplayName("Show Ship Type")]
+        public bool FleetShowShipType
+        {
+            get
+            {
+                return m_FleetShowShipType;
+            }
+            set
+            {
+                m_FleetShowShipType = value;
+                OnPropertyChanged("FleetShowShipType");
             }
         }
 
@@ -220,6 +292,19 @@ namespace SMT
         [DisplayName("Show Active Incursions")]
         public bool ShowActiveIncursions { get; set; }
 
+        public bool ShowCharacterNamesOnMap
+        {
+            get
+            {
+                return m_ShowCharacterNamesOnMap;
+            }
+            set
+            {
+                m_ShowCharacterNamesOnMap = value;
+                OnPropertyChanged("ShowCharacterNamesOnMap");
+            }
+        }
+
         [Category("SOV")]
         [DisplayName("Show Coalition")]
         public bool ShowCoalition
@@ -304,6 +389,32 @@ namespace SMT
             }
         }
 
+        public bool ShowOfflineCharactersOnMap
+        {
+            get
+            {
+                return m_ShowOfflineCharactersOnMap;
+            }
+            set
+            {
+                m_ShowOfflineCharactersOnMap = value;
+                OnPropertyChanged("ShowOfflineCharactersOnMap");
+            }
+        }
+
+        public bool ShowOnlyFinalLiminality
+        {
+            get
+            {
+                return m_ShowOnlyFinalLiminality;
+            }
+            set
+            {
+                m_ShowOnlyFinalLiminality = value;
+                OnPropertyChanged("ShowOnlyFinalLiminality");
+            }
+        }
+
         [Category("Misc")]
         [DisplayName("Show Ratting Data as Delta")]
         public bool ShowRattingDataAsDelta
@@ -316,21 +427,6 @@ namespace SMT
             {
                 m_ShowRattingDataAsDelta = value;
                 OnPropertyChanged("ShowRattingDataAsDelta");
-            }
-        }
-
-        [Category("Misc")]
-        [DisplayName("Simple Security View")]
-        public bool ShowSimpleSecurityView
-        {
-            get
-            {
-                return m_ShowSimpleSecurityView;
-            }
-            set
-            {
-                m_ShowSimpleSecurityView = value;
-                OnPropertyChanged("ShowSimpleSecurityView");
             }
         }
 
@@ -355,6 +451,21 @@ namespace SMT
                 }
 
                 OnPropertyChanged("ShowRegionStandings");
+            }
+        }
+
+        [Category("Misc")]
+        [DisplayName("Simple Security View")]
+        public bool ShowSimpleSecurityView
+        {
+            get
+            {
+                return m_ShowSimpleSecurityView;
+            }
+            set
+            {
+                m_ShowSimpleSecurityView = value;
+                OnPropertyChanged("ShowSimpleSecurityView");
             }
         }
 
@@ -393,6 +504,19 @@ namespace SMT
             {
                 m_ShowToolBox = value;
                 OnPropertyChanged("ShowToolBox");
+            }
+        }
+
+        public bool ShowTrigInvasions
+        {
+            get
+            {
+                return m_ShowTrigInvasions;
+            }
+            set
+            {
+                m_ShowTrigInvasions = value;
+                OnPropertyChanged("ShowTrigInvasions");
             }
         }
 
@@ -529,6 +653,19 @@ namespace SMT
             }
         }
 
+        public bool SyncActiveCharacterBasedOnActiveEVEClient
+        {
+            get
+            {
+                return m_SyncActiveCharacterBasedOnActiveEVEClient;
+            }
+            set
+            {
+                m_SyncActiveCharacterBasedOnActiveEVEClient = value;
+                OnPropertyChanged("SyncActiveCharacterBasedOnActiveEVEClient");
+            }
+        }
+
         [XmlIgnoreAttribute]
         [Category("Regions")]
         [DisplayName("Universe Data Scale")]
@@ -605,6 +742,8 @@ namespace SMT
             }
         }
 
+        public bool UseESIForCharacterPositions { get; set; }
+
         [Category("Intel")]
         [DisplayName("Warning Range")]
         public int WarningRange
@@ -635,157 +774,6 @@ namespace SMT
                 }
 
                 OnPropertyChanged("WarningRange");
-            }
-        }
-
-        [Category("Fleet")]
-        [DisplayName("Show On Map")]
-        public bool FleetShowOnMap
-        {
-            get
-            {
-                return m_FleetShowOnMap;
-            }
-            set
-            {
-                m_FleetShowOnMap = value;
-                OnPropertyChanged("FleetShowOnMap");
-            }
-        }
-
-        [Category("Fleet")]
-        [DisplayName("Show Ship Type")]
-        public bool FleetShowShipType
-        {
-            get
-            {
-                return m_FleetShowShipType;
-            }
-            set
-            {
-                m_FleetShowShipType = value;
-                OnPropertyChanged("FleetShowShipType");
-            }
-        }
-
-        [Category("Fleet")]
-        [DisplayName("Max Fleet Per System")]
-        public int FleetMaxMembersPerSystem
-        {
-            get
-            {
-                return m_FleetMaxMembersPerSystem;
-            }
-            set
-            {
-                // clamp to 1 miniumum
-                if (value > 0)
-                {
-                    m_FleetMaxMembersPerSystem = value;
-                }
-                else
-                {
-                    m_FleetMaxMembersPerSystem = 1;
-                }
-
-                OnPropertyChanged("FleetMaxMembersPerSystem");
-            }
-        }
-
-        public bool UseESIForCharacterPositions { get; set; }
-
-        private bool m_ShowOfflineCharactersOnMap;
-
-        public bool ShowOfflineCharactersOnMap
-        {
-            get
-            {
-                return m_ShowOfflineCharactersOnMap;
-            }
-            set
-            {
-                m_ShowOfflineCharactersOnMap = value;
-                OnPropertyChanged("ShowOfflineCharactersOnMap");
-            }
-        }
-
-        public bool ShowCharacterNamesOnMap
-        {
-            get
-            {
-                return m_ShowCharacterNamesOnMap;
-            }
-            set
-            {
-                m_ShowCharacterNamesOnMap = value;
-                OnPropertyChanged("ShowCharacterNamesOnMap");
-            }
-        }
-
-        private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
-
-        public bool SyncActiveCharacterBasedOnActiveEVEClient
-        {
-            get
-            {
-                return m_SyncActiveCharacterBasedOnActiveEVEClient;
-            }
-            set
-            {
-                m_SyncActiveCharacterBasedOnActiveEVEClient = value;
-                OnPropertyChanged("SyncActiveCharacterBasedOnActiveEVEClient");
-            }
-        }
-
-        private bool m_DisableJumpBridgesPathAnimation;
-        private bool m_DisableRoutePathAnimation;
-
-        public bool DisableJumpBridgesPathAnimation
-        {
-            get => m_DisableJumpBridgesPathAnimation;
-            set
-            {
-                m_DisableJumpBridgesPathAnimation = value;
-                OnPropertyChanged("DisableJumpBridgesPathAnimation");
-            }
-        }
-
-        public bool DisableRoutePathAnimation
-        {
-            get => m_DisableRoutePathAnimation;
-            set
-            {
-                m_DisableRoutePathAnimation = value;
-                OnPropertyChanged("DisableRoutePathAnimation");
-            }
-        }
-
-        private bool m_ShowTrigInvasions = true;
-        private bool m_ShowOnlyFinalLiminality = false;
-
-        public bool ShowTrigInvasions
-        {
-            get
-            {
-                return m_ShowTrigInvasions;
-            }
-            set
-            {
-                m_ShowTrigInvasions = value;
-                OnPropertyChanged("ShowTrigInvasions");
-            }
-        }
-
-        public bool ShowOnlyFinalLiminality
-        {
-            get
-            {
-                return m_ShowOnlyFinalLiminality;
-            }
-            set
-            {
-                m_ShowOnlyFinalLiminality = value;
-                OnPropertyChanged("ShowOnlyFinalLiminality");
             }
         }
 

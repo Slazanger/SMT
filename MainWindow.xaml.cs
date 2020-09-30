@@ -26,17 +26,15 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static MainWindow AppWindow;
-
         public const string SMT_VERSION = "SMT_092";
-
+        public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
+        private MediaPlayer mediaPlayer;
         private PreferencesWindow preferencesWindow;
 
+        private int uiRefreshCounter = 0;
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
-
-        private MediaPlayer mediaPlayer;
 
         /// <summary>
         /// Main Window
@@ -216,29 +214,6 @@ namespace SMT
             }
         }
 
-        private void DangerzoneChanged(object sender, RoutedEventArgs e)
-        {
-            LocalCharacter selected = (LocalCharacter)CharactersList.SelectedItem;
-            if (selected == null) return;
-            var lc = EVEManager.LocalCharacters.FirstOrDefault(x => x.Name == selected.Name);
-            if (lc == null) return;
-            var idx = EVEManager.LocalCharacters.IndexOf(lc);
-            CheckBox cb = (CheckBox)((DataGridCell)sender).Content;
-            lc.DangerzoneActive = (bool)cb.IsChecked;
-            lc.warningSystemsNeedsUpdate = true;
-            EVEManager.LocalCharacters[idx] = lc;
-        }
-
-        private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
-        }
-
-        private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Application.Current.Shutdown();
-        }
-
         /// <summary>
         /// Anom Manager
         /// </summary>
@@ -255,7 +230,31 @@ namespace SMT
         public MapConfig MapConf { get; }
 
         private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
+
         private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
+
+        private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+        }
+
+        private void DangerzoneChanged(object sender, RoutedEventArgs e)
+        {
+            LocalCharacter selected = (LocalCharacter)CharactersList.SelectedItem;
+            if (selected == null) return;
+            var lc = EVEManager.LocalCharacters.FirstOrDefault(x => x.Name == selected.Name);
+            if (lc == null) return;
+            var idx = EVEManager.LocalCharacters.IndexOf(lc);
+            CheckBox cb = (CheckBox)((DataGridCell)sender).Content;
+            lc.DangerzoneActive = (bool)cb.IsChecked;
+            lc.warningSystemsNeedsUpdate = true;
+            EVEManager.LocalCharacters[idx] = lc;
+        }
+
+        private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
 
         private AvalonDock.Layout.LayoutDocument FindDocWithContentID(AvalonDock.Layout.ILayoutElement root, string contentID)
         {
@@ -345,25 +344,6 @@ namespace SMT
             EVEManager.ShutDown();
         }
 
-        private int uiRefreshCounter = 0;
-
-        private void UiRefreshTimer_Tick(object sender, EventArgs e)
-        {
-            uiRefreshCounter++;
-            if (uiRefreshCounter == 5)
-            {
-                uiRefreshCounter = 0;
-                if (FleetMembersList.ItemsSource != null)
-                {
-                    CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
-                }
-            }
-            if (MapConf.SyncActiveCharacterBasedOnActiveEVEClient)
-            {
-                UpdateCharacterSelectionBasedOnActiveWindow();
-            }
-        }
-
         private void SovCampaignList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (sender != null)
@@ -385,6 +365,41 @@ namespace SMT
                         RegionLayoutDoc.IsSelected = true;
                     }
                 }
+            }
+        }
+
+        private void TrigInvasionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    Triangles.Invasion tc = dgr.Item as Triangles.Invasion;
+
+                    if (tc != null)
+                    {
+                        RegionUC.SelectSystem(tc.SystemName, true);
+                    }
+                }
+            }
+        }
+
+        private void UiRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            uiRefreshCounter++;
+            if (uiRefreshCounter == 5)
+            {
+                uiRefreshCounter = 0;
+                if (FleetMembersList.ItemsSource != null)
+                {
+                    CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+                }
+            }
+            if (MapConf.SyncActiveCharacterBasedOnActiveEVEClient)
+            {
+                UpdateCharacterSelectionBasedOnActiveWindow();
             }
         }
 
@@ -515,12 +530,23 @@ namespace SMT
             UniverseUC.ReDrawMap(true, true, true);
         }
 
-        private void ResetColourData_Click(object sender, RoutedEventArgs e)
+        private void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MapConf.SetDefaultColours();
-            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
-            RegionUC.ReDrawMap(true);
-            UniverseUC.ReDrawMap(true, true, true);
+            EVEManager.UpdateESIUniverseData();
+        }
+
+        private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (miFullScreenToggle.IsChecked)
+            {
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+            }
+            else
+            {
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                WindowState = WindowState.Normal;
+            }
         }
 
         private void Preferences_MenuItem_Click(object sender, RoutedEventArgs e)
@@ -544,23 +570,12 @@ namespace SMT
             UniverseUC.ReDrawMap(true, true, false);
         }
 
-        private void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)
+        private void ResetColourData_Click(object sender, RoutedEventArgs e)
         {
-            EVEManager.UpdateESIUniverseData();
-        }
-
-        private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (miFullScreenToggle.IsChecked)
-            {
-                WindowStyle = WindowStyle.None;
-                WindowState = WindowState.Maximized;
-            }
-            else
-            {
-                WindowStyle = WindowStyle.SingleBorderWindow;
-                WindowState = WindowState.Normal;
-            }
+            MapConf.SetDefaultColours();
+            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
+            RegionUC.ReDrawMap(true);
+            UniverseUC.ReDrawMap(true, true, true);
         }
 
         #endregion Preferences & Options
@@ -625,30 +640,6 @@ namespace SMT
 
         public EVEData.LocalCharacter ActiveCharacter { get; set; }
 
-        private void UpdateCharacterSelectionBasedOnActiveWindow()
-        {
-            string ActiveWindowText = Utils.GetCaptionOfActiveWindow();
-
-            if (ActiveWindowText.Contains("EVE - "))
-            {
-                string characterName = ActiveWindowText.Substring(6);
-                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
-                {
-                    if (lc.Name == characterName)
-                    {
-                        ActiveCharacter = lc;
-                        CurrentActiveCharacterCombo.SelectedItem = lc;
-                        FleetMembersList.ItemsSource = lc.FleetInfo.Members;
-                        CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
-                        RegionUC.UpdateActiveCharacter(lc);
-                        UniverseUC.UpdateActiveCharacter(lc);
-
-                        break;
-                    }
-                }
-            }
-        }
-
         /// <summary>
         ///  Add Character Button Clicked
         /// </summary>
@@ -692,6 +683,28 @@ namespace SMT
             }
         }
 
+        private void CharactersListMenuItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (CharactersList.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
+
+            ActiveCharacter = null;
+            FleetMembersList.ItemsSource = null;
+
+            CurrentActiveCharacterCombo.SelectedIndex = -1;
+            RegionsViewUC.ActiveCharacter = null;
+            RegionUC.ActiveCharacter = null;
+            RegionUC.UpdateActiveCharacter();
+            UniverseUC.ActiveCharacter = null;
+            OnCharacterSelectionChanged();
+
+            EVEManager.LocalCharacters.Remove(lc);
+        }
+
         private void CurrentActiveCharacterCombo_Selected(object sender, SelectionChangedEventArgs e)
         {
             if (CurrentActiveCharacterCombo.SelectedIndex == -1)
@@ -718,31 +731,86 @@ namespace SMT
             OnCharacterSelectionChanged();
         }
 
-        private void CharactersListMenuItemDelete_Click(object sender, RoutedEventArgs e)
+        private void UpdateCharacterSelectionBasedOnActiveWindow()
         {
-            if (CharactersList.SelectedIndex == -1)
+            string ActiveWindowText = Utils.GetCaptionOfActiveWindow();
+
+            if (ActiveWindowText.Contains("EVE - "))
             {
-                return;
+                string characterName = ActiveWindowText.Substring(6);
+                foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                {
+                    if (lc.Name == characterName)
+                    {
+                        ActiveCharacter = lc;
+                        CurrentActiveCharacterCombo.SelectedItem = lc;
+                        FleetMembersList.ItemsSource = lc.FleetInfo.Members;
+                        CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+                        RegionUC.UpdateActiveCharacter(lc);
+                        UniverseUC.UpdateActiveCharacter(lc);
+
+                        break;
+                    }
+                }
             }
-
-            EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
-
-            ActiveCharacter = null;
-            FleetMembersList.ItemsSource = null;
-
-            CurrentActiveCharacterCombo.SelectedIndex = -1;
-            RegionsViewUC.ActiveCharacter = null;
-            RegionUC.ActiveCharacter = null;
-            RegionUC.UpdateActiveCharacter();
-            UniverseUC.ActiveCharacter = null;
-            OnCharacterSelectionChanged();
-
-            EVEManager.LocalCharacters.Remove(lc);
         }
 
         #endregion Characters
 
         #region intel
+
+        private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                EVEManager.IntelDataList.Clear();
+            }), DispatcherPriority.ApplicationIdle);
+        }
+
+        private void OnIntelAdded(List<string> intelsystems)
+        {
+            bool playSound = false;
+
+            if (MapConf.PlayIntelSound)
+            {
+                if (MapConf.PlaySoundOnlyInDangerZone)
+                {
+                    if (MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
+                    {
+                        playSound = true;
+                    }
+
+                    foreach (string s in intelsystems)
+                    {
+                        foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                        {
+                            if (lc.WarningSystems != null && lc.DangerzoneActive)
+                            {
+                                foreach (string ls in lc.WarningSystems)
+                                {
+                                    if (ls == s)
+                                    {
+                                        playSound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    playSound = true;
+                }
+            }
+
+            if (playSound)
+            {
+                mediaPlayer.Stop();
+                mediaPlayer.Position = new TimeSpan(0, 0, 0);
+                mediaPlayer.Play();
+            }
+        }
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -792,59 +860,6 @@ namespace SMT
                     }
                 }
             }
-        }
-
-        private void OnIntelAdded(List<string> intelsystems)
-        {
-            bool playSound = false;
-
-            if (MapConf.PlayIntelSound)
-            {
-                if (MapConf.PlaySoundOnlyInDangerZone)
-                {
-                    if (MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
-                    {
-                        playSound = true;
-                    }
-
-                    foreach (string s in intelsystems)
-                    {
-                        foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
-                        {
-                            if (lc.WarningSystems != null && lc.DangerzoneActive)
-                            {
-                                foreach (string ls in lc.WarningSystems)
-                                {
-                                    if (ls == s)
-                                    {
-                                        playSound = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    playSound = true;
-                }
-            }
-
-            if (playSound)
-            {
-                mediaPlayer.Stop();
-                mediaPlayer.Position = new TimeSpan(0, 0, 0);
-                mediaPlayer.Play();
-            }
-        }
-
-        private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                EVEManager.IntelDataList.Clear();
-            }), DispatcherPriority.ApplicationIdle);
         }
 
         #endregion intel
@@ -913,15 +928,6 @@ namespace SMT
             }
         }
 
-        private void ReCalculateRouteBtn_Click(object sender, RoutedEventArgs e)
-        {
-            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
-            if (c != null && c.Waypoints.Count > 0)
-            {
-                c.RecalcRoute();
-            }
-        }
-
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
@@ -937,9 +943,106 @@ namespace SMT
             }
         }
 
+        private void ReCalculateRouteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null && c.Waypoints.Count > 0)
+            {
+                c.RecalcRoute();
+            }
+        }
+
         #endregion Route
 
         #region JumpBridges
+
+        private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.JumpBridges.Clear();
+            EVEData.Navigation.ClearJumpBridges();
+        }
+
+        private void DeleteJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (JumpBridgeList.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.JumpBridge jb = JumpBridgeList.SelectedItem as EVEData.JumpBridge;
+
+            EVEManager.JumpBridges.Remove(jb);
+
+            EVEData.Navigation.ClearJumpBridges();
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            RegionUC.ReDrawMap(true);
+
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null && c.Waypoints.Count > 0)
+            {
+                c.RecalcRoute();
+            }
+        }
+
+        private void EnableDisableJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (JumpBridgeList.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            EVEData.JumpBridge jb = JumpBridgeList.SelectedItem as EVEData.JumpBridge;
+
+            jb.Disabled = !jb.Disabled;
+
+            EVEData.Navigation.ClearJumpBridges();
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            RegionUC.ReDrawMap(true);
+
+            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
+            if (c != null && c.Waypoints.Count > 0)
+            {
+                c.RecalcRoute();
+            }
+        }
+
+        private void ExportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string ExportText = "";
+
+            foreach (EVEData.MapRegion mr in EVEManager.Regions)
+            {
+                ExportText += "# " + mr.Name + "\n";
+
+                foreach (EVEData.JumpBridge jb in EVEManager.JumpBridges)
+                {
+                    EVEData.System es = EVEManager.GetEveSystem(jb.From);
+                    if (es.Region == mr.Name)
+                    {
+                        ExportText += $"{jb.FromID} {jb.From} --> {jb.To}\n";
+                    }
+
+                    es = EVEManager.GetEveSystem(jb.To);
+                    if (es.Region == mr.Name)
+                    {
+                        ExportText += $"{jb.ToID} {jb.To} --> {jb.From}\n";
+                    }
+                }
+
+                ExportText += "\n";
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text file (*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    File.WriteAllText(saveFileDialog.FileName, ExportText);
+                }
+                catch { }
+            }
+        }
 
         private async void FindJumpGatesBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1089,94 +1192,6 @@ namespace SMT
             RegionUC.ReDrawMap(true);
         }
 
-        private void DeleteJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (JumpBridgeList.SelectedIndex == -1)
-            {
-                return;
-            }
-
-            EVEData.JumpBridge jb = JumpBridgeList.SelectedItem as EVEData.JumpBridge;
-
-            EVEManager.JumpBridges.Remove(jb);
-
-            EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
-            RegionUC.ReDrawMap(true);
-
-            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
-            if (c != null && c.Waypoints.Count > 0)
-            {
-                c.RecalcRoute();
-            }
-        }
-
-        private void EnableDisableJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (JumpBridgeList.SelectedIndex == -1)
-            {
-                return;
-            }
-
-            EVEData.JumpBridge jb = JumpBridgeList.SelectedItem as EVEData.JumpBridge;
-
-            jb.Disabled = !jb.Disabled;
-
-            EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
-            RegionUC.ReDrawMap(true);
-
-            EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
-            if (c != null && c.Waypoints.Count > 0)
-            {
-                c.RecalcRoute();
-            }
-        }
-
-        private void ExportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
-        {
-            string ExportText = "";
-
-            foreach (EVEData.MapRegion mr in EVEManager.Regions)
-            {
-                ExportText += "# " + mr.Name + "\n";
-
-                foreach (EVEData.JumpBridge jb in EVEManager.JumpBridges)
-                {
-                    EVEData.System es = EVEManager.GetEveSystem(jb.From);
-                    if (es.Region == mr.Name)
-                    {
-                        ExportText += $"{jb.FromID} {jb.From} --> {jb.To}\n";
-                    }
-
-                    es = EVEManager.GetEveSystem(jb.To);
-                    if (es.Region == mr.Name)
-                    {
-                        ExportText += $"{jb.ToID} {jb.To} --> {jb.From}\n";
-                    }
-                }
-
-                ExportText += "\n";
-            }
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Text file (*.txt)|*.txt";
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    File.WriteAllText(saveFileDialog.FileName, ExportText);
-                }
-                catch { }
-            }
-        }
-
-        private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
-        {
-            EVEManager.JumpBridges.Clear();
-            EVEData.Navigation.ClearJumpBridges();
-        }
-
         #endregion JumpBridges
 
         #region ZKillBoard
@@ -1313,8 +1328,7 @@ namespace SMT
         private void btnUpdateAnomList_Click(object sender, RoutedEventArgs e)
         {
             string pasteData = Clipboard.GetText();
-
-            if (pasteData != null || pasteData != string.Empty)
+            if (!string.IsNullOrEmpty(pasteData))
             {
                 EVEData.AnomData ad = ANOMManager.ActiveSystem;
 
@@ -1329,24 +1343,6 @@ namespace SMT
         }
 
         #endregion Anoms
-
-        private void TrigInvasionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (sender != null)
-            {
-                DataGrid grid = sender as DataGrid;
-                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
-                {
-                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
-                    Triangles.Invasion tc = dgr.Item as Triangles.Invasion;
-
-                    if (tc != null)
-                    {
-                        RegionUC.SelectSystem(tc.SystemName, true);
-                    }
-                }
-            }
-        }
     }
 
     /// <summary>

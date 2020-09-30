@@ -100,7 +100,7 @@ namespace SMT.EVEData
             Athanor,
 
             Tatara,
-            NPC_Station,
+            NPCStation,
 
             // Ansiblex
             JumpGate,

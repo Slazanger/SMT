@@ -18,9 +18,8 @@ namespace SMT.EVEData
     /// </summary>
     public class ZKillRedisQ
     {
-        private BackgroundWorker backgroundWorker;
-
         public string VerString = "ABC123";
+        private BackgroundWorker backgroundWorker;
 
         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
@@ -51,6 +50,11 @@ namespace SMT.EVEData
             dp.Start();
         }
 
+        public void ShutDown()
+        {
+            backgroundWorker.CancelAsync();
+        }
+
         private void Dp_Tick(object sender, EventArgs e)
         {
             if (!backgroundWorker.IsBusy && !PauseUpdate)
@@ -59,7 +63,7 @@ namespace SMT.EVEData
             }
         }
 
-        private async void zkb_DoWork(object sender, DoWorkEventArgs e)
+        private void zkb_DoWork(object sender, DoWorkEventArgs e)
         {
             string redistURL = @"https://redisq.zkillboard.com/listen.php";
 
@@ -75,7 +79,7 @@ namespace SMT.EVEData
             {
                 response = request.GetResponse() as HttpWebResponse;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 e.Result = -1;
                 return;
@@ -163,11 +167,6 @@ namespace SMT.EVEData
             {
                 EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
             }
-        }
-
-        public void ShutDown()
-        {
-            backgroundWorker.CancelAsync();
         }
 
         /// <summary>

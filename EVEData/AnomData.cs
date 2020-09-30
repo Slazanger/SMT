@@ -66,7 +66,7 @@ namespace SMT.EVEData
                                 an.Type = Anom.GetTypeFromString(sigType);
                             }
 
-                            if (sigName != string.Empty)
+                            if (!string.IsNullOrEmpty(sigName))
                             {
                                 an.Name = sigName;
                             }
@@ -76,12 +76,12 @@ namespace SMT.EVEData
                             Anom an = new Anom();
                             an.Signature = sigID;
 
-                            if (sigType != string.Empty)
+                            if (!string.IsNullOrEmpty(sigType))
                             {
                                 an.Type = Anom.GetTypeFromString(sigType);
                             }
 
-                            if (sigName != string.Empty)
+                            if (!string.IsNullOrEmpty(sigName))
                             {
                                 an.Name = sigName;
                             }

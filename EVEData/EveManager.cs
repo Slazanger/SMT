@@ -37,7 +37,7 @@ namespace SMT.EVEData
         /// </summary>
         private static EveManager instance;
 
-        private bool BackgroundThreadShouldTerminate = false;
+        private bool BackgroundThreadShouldTerminate;
 
         /// <summary>
         /// Read position map for the intel files
@@ -51,9 +51,7 @@ namespace SMT.EVEData
 
         private string VersionStr;
 
-        private bool WatcherThreadShouldTerminate = false;
-
-        public int WarningSystemRange { get; set; }
+        private bool WatcherThreadShouldTerminate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
@@ -148,12 +146,7 @@ namespace SMT.EVEData
             }
         }
 
-        public bool UseESIForCharacterPositions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Alliance ID to Name dictionary
-        /// </summary>
-        public SerializableDictionary<long, string> CharacterIDToName { get; set; }
+        public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
 
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
@@ -171,6 +164,11 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public SerializableDictionary<string, Character> CharacterCache { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Alliance ID to Name dictionary
+        /// </summary>
+        public SerializableDictionary<long, string> CharacterIDToName { get; set; }
+
         public List<Coalition> Coalitions { get; set; }
 
         /// <summary>
@@ -179,7 +177,6 @@ namespace SMT.EVEData
         public string DataCacheFolder { get; set; }
 
         public ESI.NET.EsiClient ESIClient { get; set; }
-
         public List<string> ESIScopes { get; set; }
 
         /// <summary>
@@ -206,12 +203,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the folder to cache dotland svg's etc to
         /// </summary>
-        public string SaveDataVersionFolder { get; set; }
+        public string SaveDataRootFolder { get; set; }
 
         /// <summary>
         /// Gets or sets the folder to cache dotland svg's etc to
         /// </summary>
-        public string SaveDataRootFolder { get; set; }
+        public string SaveDataVersionFolder { get; set; }
 
         public EVEData.Server ServerInfo { get; set; }
 
@@ -236,8 +233,8 @@ namespace SMT.EVEData
         public ObservableCollection<TheraConnection> TheraConnections { get; set; }
 
         public ObservableCollection<Triangles.Invasion> TrigInvasions { get; set; }
-
-        public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
+        public bool UseESIForCharacterPositions { get; set; }
+        public int WarningSystemRange { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -874,7 +871,7 @@ namespace SMT.EVEData
                 line = file.ReadLine();
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line == string.Empty)
+                    if (string.IsNullOrEmpty(line))
                     {
                         continue;
                     }
@@ -907,7 +904,7 @@ namespace SMT.EVEData
                 line = file.ReadLine();
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line == string.Empty)
+                    if (string.IsNullOrEmpty(line))
                     {
                         continue;
                     }
@@ -942,17 +939,6 @@ namespace SMT.EVEData
         /// <param name="name">Name (not ID) of the system</param>
         public bool DoesSystemExist(string name) => GetEveSystem(name) != null;
 
-        public string GetCharacterName(long id)
-        {
-            string name = string.Empty;
-            if (CharacterIDToName.Keys.Contains(id))
-            {
-                name = CharacterIDToName[id];
-            }
-
-            return name;
-        }
-
         /// <summary>
         /// Get the alliance name from the alliance ID
         /// </summary>
@@ -983,6 +969,17 @@ namespace SMT.EVEData
             }
 
             return ticker;
+        }
+
+        public string GetCharacterName(long id)
+        {
+            string name = string.Empty;
+            if (CharacterIDToName.Keys.Contains(id))
+            {
+                name = CharacterIDToName[id];
+            }
+
+            return name;
         }
 
         /// <summary>
@@ -1271,44 +1268,6 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Update the Character ID data for specified list
-        /// </summary>
-        public async Task ResolveCharacterIDs(List<long> IDs)
-        {
-            if (IDs.Count == 0)
-            {
-                return;
-            }
-
-            // strip out any ID's we already know..
-            List<long> UnknownIDs = new List<long>();
-            foreach (long l in IDs)
-            {
-                if (!CharacterIDToName.ContainsKey(l))
-                {
-                    UnknownIDs.Add(l);
-                }
-            }
-
-            if (UnknownIDs.Count == 0)
-            {
-                return;
-            }
-
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
-            {
-                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
-                {
-                    if (ri.Category == ResolvedInfoCategory.Character)
-                    {
-                        CharacterIDToName[ri.Id] = ri.Name;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Update the Alliance and Ticker data for specified list
         /// </summary>
         public async Task ResolveAllianceIDs(List<long> IDs)
@@ -1358,6 +1317,44 @@ namespace SMT.EVEData
         }
 
         /// <summary>
+        /// Update the Character ID data for specified list
+        /// </summary>
+        public async Task ResolveCharacterIDs(List<long> IDs)
+        {
+            if (IDs.Count == 0)
+            {
+                return;
+            }
+
+            // strip out any ID's we already know..
+            List<long> UnknownIDs = new List<long>();
+            foreach (long l in IDs)
+            {
+                if (!CharacterIDToName.ContainsKey(l))
+                {
+                    UnknownIDs.Add(l);
+                }
+            }
+
+            if (UnknownIDs.Count == 0)
+            {
+                return;
+            }
+
+            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+            {
+                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                {
+                    if (ri.Category == ResolvedInfoCategory.Character)
+                    {
+                        CharacterIDToName[ri.Id] = ri.Name;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Save the Data to disk
         /// </summary>
         public void SaveData()
@@ -1367,7 +1364,7 @@ namespace SMT.EVEData
 
             foreach (LocalCharacter c in LocalCharacters)
             {
-                if (c.ESIRefreshToken != string.Empty)
+                if (!string.IsNullOrEmpty(c.ESIRefreshToken))
                 {
                     saveList.Add(c);
                 }
@@ -1404,8 +1401,8 @@ namespace SMT.EVEData
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    line.Trim();
-                    if (line != string.Empty)
+                    line = line.Trim();
+                    if (!string.IsNullOrEmpty(line))
                     {
                         IntelFilters.Add(line);
                     }
@@ -1421,8 +1418,8 @@ namespace SMT.EVEData
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    line.Trim();
-                    if (line != string.Empty)
+                    line = line.Trim();
+                    if (!string.IsNullOrEmpty(line))
                     {
                         IntelClearFilters.Add(line);
                     }
@@ -1458,48 +1455,6 @@ namespace SMT.EVEData
 
             // END SUPERHACK
             // -----------------------------------------------------------------
-        }
-
-        private void FileWatcher(string eveLogFolder)
-        {
-            Thread.CurrentThread.IsBackground = false;
-
-            // loop forever
-            while (WatcherThreadShouldTerminate == false)
-            {
-                DirectoryInfo di = new DirectoryInfo(eveLogFolder);
-                FileInfo[] files = di.GetFiles("*.txt");
-                foreach (FileInfo file in files)
-                {
-                    bool readFile = false;
-                    foreach (string intelFilterStr in IntelFilters)
-                    {
-                        if (file.Name.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            readFile = true;
-                            break;
-                        }
-                    }
-
-                    // local files
-                    if (file.Name.Contains("Local_"))
-                    {
-                        readFile = true;
-                    }
-
-                    // only read files from the last day
-                    if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
-                    {
-                        FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        ifs.Seek(0, SeekOrigin.End);
-                        Thread.Sleep(100);
-                        ifs.Close();
-                        Thread.Sleep(100);
-                    }
-                }
-
-                Thread.Sleep(2000);
-            }
         }
 
         public void ShuddownIntelWatcher()
@@ -1684,6 +1639,48 @@ namespace SMT.EVEData
             }
             catch (Exception)
             {
+            }
+        }
+
+        private void FileWatcher(string eveLogFolder)
+        {
+            Thread.CurrentThread.IsBackground = false;
+
+            // loop forever
+            while (WatcherThreadShouldTerminate == false)
+            {
+                DirectoryInfo di = new DirectoryInfo(eveLogFolder);
+                FileInfo[] files = di.GetFiles("*.txt");
+                foreach (FileInfo file in files)
+                {
+                    bool readFile = false;
+                    foreach (string intelFilterStr in IntelFilters)
+                    {
+                        if (file.Name.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            readFile = true;
+                            break;
+                        }
+                    }
+
+                    // local files
+                    if (file.Name.Contains("Local_"))
+                    {
+                        readFile = true;
+                    }
+
+                    // only read files from the last day
+                    if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
+                    {
+                        FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        ifs.Seek(0, SeekOrigin.End);
+                        Thread.Sleep(100);
+                        ifs.Close();
+                        Thread.Sleep(100);
+                    }
+                }
+
+                Thread.Sleep(2000);
             }
         }
 
@@ -2204,55 +2201,6 @@ namespace SMT.EVEData
             }
         }
 
-        /// <summary>
-        /// Start the ESI download for the kill info
-        /// </summary>
-        private void StartUpdateSOVFromESI()
-        {
-            string url = @"https://esi.evetech.net/v1/sovereignty/map/?datasource=tranquility";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Get;
-            request.Timeout = 20000;
-            request.Proxy = null;
-
-            request.BeginGetResponse(new AsyncCallback(ESIUpdateSovCallback), request);
-        }
-
-        private async void StartUpdateSovStructureUpdate()
-        {
-            try
-            {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Structure>> esr = await ESIClient.Sovereignty.Structures();
-                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Structure>>(esr))
-                {
-                    foreach (ESI.NET.Models.Sovereignty.Structure ss in esr.Data)
-                    {
-                        EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
-                        if (es != null)
-                        {
-                            if (ss.TypeId == 32226)
-                            {
-                                es.TCUVunerabliltyStart = ss.VulnerableStartTime;
-                                es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
-                                es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
-                                es.SOVAllianceTCU = ss.AllianceId;
-                            }
-
-                            if (ss.TypeId == 32458)
-                            {
-                                es.IHubVunerabliltyStart = ss.VulnerableStartTime;
-                                es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
-                                es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
-                                es.SOVAllianceIHUB = ss.AllianceId;
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-        }
-
         private async void StartUpdateSovCampaigns()
         {
             try
@@ -2378,6 +2326,55 @@ namespace SMT.EVEData
                         ActiveSovCampaigns.Add(hackSC);
                         ActiveSovCampaigns.Remove(hackSC);
                     }), DispatcherPriority.Normal, null);
+                }
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Start the ESI download for the kill info
+        /// </summary>
+        private void StartUpdateSOVFromESI()
+        {
+            string url = @"https://esi.evetech.net/v1/sovereignty/map/?datasource=tranquility";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Get;
+            request.Timeout = 20000;
+            request.Proxy = null;
+
+            request.BeginGetResponse(new AsyncCallback(ESIUpdateSovCallback), request);
+        }
+
+        private async void StartUpdateSovStructureUpdate()
+        {
+            try
+            {
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Structure>> esr = await ESIClient.Sovereignty.Structures();
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Structure>>(esr))
+                {
+                    foreach (ESI.NET.Models.Sovereignty.Structure ss in esr.Data)
+                    {
+                        EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
+                        if (es != null)
+                        {
+                            if (ss.TypeId == 32226)
+                            {
+                                es.TCUVunerabliltyStart = ss.VulnerableStartTime;
+                                es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
+                                es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                                es.SOVAllianceTCU = ss.AllianceId;
+                            }
+
+                            if (ss.TypeId == 32458)
+                            {
+                                es.IHubVunerabliltyStart = ss.VulnerableStartTime;
+                                es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
+                                es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                                es.SOVAllianceIHUB = ss.AllianceId;
+                            }
+                        }
+                    }
                 }
             }
             catch { }

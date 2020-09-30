@@ -129,25 +129,6 @@ namespace SMT.EVEData
             }
         }
 
-        public static void UpdateTheraInfo(List<TheraConnection> theraList)
-        {
-            TheraLinks.Clear();
-            foreach (MapNode mapNode in MapNodes.Values)
-            {
-                mapNode.TheraInSig = string.Empty;
-                mapNode.TheraOutSig = string.Empty;
-            }
-
-            foreach (TheraConnection tc in theraList)
-            {
-                MapNode mn = MapNodes[tc.System];
-                mn.TheraInSig = tc.InSignatureID;
-                mn.TheraOutSig = tc.OutSignatureID;
-
-                TheraLinks.Add(tc.System);
-            }
-        }
-
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)
         {
             if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
@@ -241,10 +222,12 @@ namespace SMT.EVEData
                     }
                 }
 
-                if (UseThera && CurrentNode.TheraInSig != string.Empty)
+                /* Todo :  Additional error checking
+                if (UseThera && !string.IsNullOrEmptyCurrent(Node.TheraInSig))
                 {
                     //SJS HERE ERROR
                 }
+                */
 
                 CurrentNode.Visited = true;
             }
@@ -403,6 +386,25 @@ namespace SMT.EVEData
             }
         }
 
+        public static void UpdateTheraInfo(List<TheraConnection> theraList)
+        {
+            TheraLinks.Clear();
+            foreach (MapNode mapNode in MapNodes.Values)
+            {
+                mapNode.TheraInSig = string.Empty;
+                mapNode.TheraOutSig = string.Empty;
+            }
+
+            foreach (TheraConnection tc in theraList)
+            {
+                MapNode mn = MapNodes[tc.System];
+                mn.TheraInSig = tc.InSignatureID;
+                mn.TheraOutSig = tc.OutSignatureID;
+
+                TheraLinks.Add(tc.System);
+            }
+        }
+
         private struct JumpLink
         {
             public double RangeLY;
@@ -439,15 +441,13 @@ namespace SMT.EVEData
             public string JBConnection;
             public double MinCostToStart;
             public MapNode NearestToStart;
+            public string TheraInSig;
+            public string TheraOutSig;
             public bool Visited;
             public double X;
             public double Y;
             public double Z;
             public List<string> Connections { get; set; }
-
-            public string TheraInSig;
-            public string TheraOutSig;
-
             public bool HighSec { get; set; }
             public List<JumpLink> JumpableSystems { get; set; }
             public string Name { get; set; }

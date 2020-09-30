@@ -112,10 +112,10 @@ namespace SMT
         }
 
         private double m_ESIOverlayScale = 1.0f;
-        private bool m_ShowNPCKills = false;
-        private bool m_ShowPodKills = false;
-        private bool m_ShowShipKills = false;
-        private bool m_ShowShipJumps = false;
+        private bool m_ShowNPCKills;
+        private bool m_ShowPodKills;
+        private bool m_ShowShipKills;
+        private bool m_ShowShipJumps;
         private bool m_ShowJumpBridges = true;
 
         public MapConfig MapConf { get; set; }
