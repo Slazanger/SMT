@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,7 +18,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using SMT.EVEData;
 
 namespace SMT
 {
@@ -214,7 +214,6 @@ namespace SMT
                 lc.WarningSystemRange = MapConf.WarningRange;
                 lc.Location = "";
             }
-
         }
 
         private void DangerzoneChanged(object sender, RoutedEventArgs e)
@@ -229,6 +228,7 @@ namespace SMT
             lc.warningSystemsNeedsUpdate = true;
             EVEManager.LocalCharacters[idx] = lc;
         }
+
         private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();

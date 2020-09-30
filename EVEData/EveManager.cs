@@ -54,6 +54,7 @@ namespace SMT.EVEData
         private bool WatcherThreadShouldTerminate = false;
 
         public int WarningSystemRange { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
@@ -989,7 +990,7 @@ namespace SMT.EVEData
         /// </summary>
         public string GetESILogonURL(string challengeCode)
         {
-            return ESIClient.SSO.CreateAuthenticationUrl(ESIScopes, VersionStr, challengeCode );
+            return ESIClient.SSO.CreateAuthenticationUrl(ESIScopes, VersionStr, challengeCode);
         }
 
         /// <summary>
@@ -1605,9 +1606,8 @@ namespace SMT.EVEData
 
                 request.BeginGetResponse(new AsyncCallback(UpdateTrigInvasionsCallback), request);
             }
-            catch {}
+            catch { }
         }
-
 
         internal void AddUpdateJumpBridge(string from, string to, long stationID)
         {
@@ -1701,7 +1701,6 @@ namespace SMT.EVEData
                 CallbackUrl = EveAppConfig.CallbackURL,
                 UserAgent = "SMT-map-app",
                 AuthVersion = AuthVersion.v2
-
             });
 
             ESIClient = new ESI.NET.EsiClient(config);
@@ -1750,7 +1749,6 @@ namespace SMT.EVEData
             TheraConnections = new ObservableCollection<TheraConnection>();
             UpdateTheraConnections();
         }
-
 
         private void InitTrigInvasions()
         {
@@ -2203,7 +2201,6 @@ namespace SMT.EVEData
             }
             catch
             {
-
             }
         }
 
@@ -2581,7 +2578,6 @@ namespace SMT.EVEData
             }
         }
 
-
         /// <summary>
         ///  Update Trig Invasions Connections Callback
         /// </summary>
@@ -2599,13 +2595,12 @@ namespace SMT.EVEData
                         string strContent = sr.ReadToEnd();
 
                         var invasions = Triangles.Invasion.FromJson(strContent);
-                        foreach(Triangles.Invasion ti in invasions)
+                        foreach (Triangles.Invasion ti in invasions)
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
                                 TrigInvasions.Add(ti);
                             }), DispatcherPriority.Normal, null);
-
                         }
                     }
                 }

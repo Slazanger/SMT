@@ -694,10 +694,10 @@ namespace SMT
 
         public bool UseESIForCharacterPositions { get; set; }
 
-
         private bool m_ShowOfflineCharactersOnMap;
-        public bool ShowOfflineCharactersOnMap 
-        { 
+
+        public bool ShowOfflineCharactersOnMap
+        {
             get
             {
                 return m_ShowOfflineCharactersOnMap;
@@ -707,10 +707,7 @@ namespace SMT
                 m_ShowOfflineCharactersOnMap = value;
                 OnPropertyChanged("ShowOfflineCharactersOnMap");
             }
-
-
         }
-
 
         public bool ShowCharacterNamesOnMap
         {
@@ -740,7 +737,6 @@ namespace SMT
             }
         }
 
-
         private bool m_DisableJumpBridgesPathAnimation;
         private bool m_DisableRoutePathAnimation;
 
@@ -763,7 +759,6 @@ namespace SMT
                 OnPropertyChanged("DisableRoutePathAnimation");
             }
         }
-
 
         private bool m_ShowTrigInvasions = true;
         private bool m_ShowOnlyFinalLiminality = false;
@@ -794,10 +789,7 @@ namespace SMT
             }
         }
 
- 
-
-
- public void SetDefaultColours()
+        public void SetDefaultColours()
         {
             MapColours defaultColours = new MapColours
             {
@@ -816,7 +808,7 @@ namespace SMT
                 UniverseSystemTextColour = Colors.BlanchedAlmond,
                 UniverseGateColour = Colors.DarkSlateBlue,
                 UniverseRegionGateColour = Color.FromRgb(128, 64, 64),
-                UniverseMapBackgroundColour = Color.FromRgb(43,43,48),
+                UniverseMapBackgroundColour = Color.FromRgb(43, 43, 48),
 
                 PopupText = Color.FromRgb(0, 0, 0),
                 PopupBackground = (Color)ColorConverter.ConvertFromString("#FF959595"),
@@ -883,8 +875,6 @@ namespace SMT
 
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
-
-
 
             WarningRange = 5;
         }

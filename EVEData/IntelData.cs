@@ -30,7 +30,6 @@ namespace SMT.EVEData
 
         public bool ClearNotification { get; set; }
 
-
         public string IntelChannel { get; set; }
 
         /// <summary>

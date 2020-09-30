@@ -87,40 +87,40 @@
 
             <StackPanel x:Name="BridgeInfoStackPanel" HorizontalAlignment="Left" Margin="20,0,0,20" VerticalAlignment="Bottom"  Panel.ZIndex="50" />
 
-            <Ellipse x:Name="helpIcon" Width="20" Height="20" Fill="Black" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="20"/>
-            <Label Content="?" Width="18" Height="26" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="0,17,20,0" IsHitTestVisible="false" FontSize="14" FontWeight="Bold" x:Name="HelpQM"/>
+            <Ellipse x:Name="helpIcon" Width="20" Height="20" Fill="Black" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="20" />
+            <Label Content="?" Width="18" Height="26" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="0,17,20,0" IsHitTestVisible="false" FontSize="14" FontWeight="Bold" x:Name="HelpQM" />
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="top" Margin="0,46,20,0" x:Name="HelpList" Visibility="Hidden" Width="175" Panel.ZIndex="111" Grid.Column="2">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="30" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Ellipse Width="15" Height="15" Fill="LightGray" Stroke="Black" StrokeThickness="2" Grid.Row="0" Grid.Column="0"/>
-                    <Label Content="System" Grid.Row="0" Grid.Column="1"/>
-                    <Rectangle Width="15" Height="15" Fill="LightGray" Stroke="Black" StrokeThickness="2" Grid.Row="1" Grid.Column="0"/>
-                    <Label Content="System with NPC Station" Grid.Row="1" Grid.Column="1"/>
-                    <Rectangle Width="20" Height="20" Fill="LightGray" StrokeThickness="2" Grid.Row="2" Grid.Column="0"/>
-                    <Image Source="Images/Jove_logo.png" Grid.Row="2" Grid.Column="0" Width="15" Height="15" SnapsToDevicePixels="True"/>
-                    <Label Content="Jove Observatory" Grid.Row="2" Grid.Column="1"/>
-                    <Ellipse Width="20" Height="20" Stroke="Green" StrokeThickness="2.5" Grid.Row="3" Grid.Column="0"/>
-                    <Label Content="Thera Entrance" Grid.Row="3" Grid.Column="1"/>
-                    <Rectangle Width="15" Height="15" Fill="LightBlue" StrokeThickness="2" Grid.Row="4" Grid.Column="0"/>
-                    <Label Content="Ice Belts" Grid.Row="4" Grid.Column="1"/>
-                    <Polygon Points="0,14,7,0,14,14" Width="15" Height="15" Fill="DarkRed" Stroke="Black" StrokeThickness="2" Grid.Row="5" Grid.Column="0"/>
-                    <Label Content="Trig Invasion" Grid.Row="5" Grid.Column="1"/>
+                    <Ellipse Width="15" Height="15" Fill="LightGray" Stroke="Black" StrokeThickness="2" Grid.Row="0" Grid.Column="0" />
+                    <Label Content="System" Grid.Row="0" Grid.Column="1" />
+                    <Rectangle Width="15" Height="15" Fill="LightGray" Stroke="Black" StrokeThickness="2" Grid.Row="1" Grid.Column="0" />
+                    <Label Content="System with NPC Station" Grid.Row="1" Grid.Column="1" />
+                    <Rectangle Width="20" Height="20" Fill="LightGray" StrokeThickness="2" Grid.Row="2" Grid.Column="0" />
+                    <Image Source="Images/Jove_logo.png" Grid.Row="2" Grid.Column="0" Width="15" Height="15" SnapsToDevicePixels="True" />
+                    <Label Content="Jove Observatory" Grid.Row="2" Grid.Column="1" />
+                    <Ellipse Width="20" Height="20" Stroke="Green" StrokeThickness="2.5" Grid.Row="3" Grid.Column="0" />
+                    <Label Content="Thera Entrance" Grid.Row="3" Grid.Column="1" />
+                    <Rectangle Width="15" Height="15" Fill="LightBlue" StrokeThickness="2" Grid.Row="4" Grid.Column="0" />
+                    <Label Content="Ice Belts" Grid.Row="4" Grid.Column="1" />
+                    <Polygon Points="0,14,7,0,14,14" Width="15" Height="15" Fill="DarkRed" Stroke="Black" StrokeThickness="2" Grid.Row="5" Grid.Column="0" />
+                    <Label Content="Trig Invasion" Grid.Row="5" Grid.Column="1" />
                 </Grid>
-            </Border>            
-            
+            </Border>
+
             <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3" Grid.ColumnSpan="3" />
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,160" x:Name="AllianceNameList" Visibility="Visible" Width="190" Panel.ZIndex="111" Grid.ColumnSpan="3">
                 <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom" />

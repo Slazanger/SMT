@@ -57,7 +57,6 @@ namespace SMT
         [DisplayName("Region Gate")]
         public Color UniverseRegionGateColour { get; set; }
 
-
         [Category("Universe")]
         [DisplayName("Gate")]
         public Color UniverseGateColour { get; set; }
@@ -66,11 +65,9 @@ namespace SMT
         [DisplayName("System Text")]
         public Color UniverseSystemTextColour { get; set; }
 
-
         [Category("Universe")]
         [DisplayName("Map Background")]
         public Color UniverseMapBackgroundColour { get; set; }
-
 
         [Category("Systems")]
         [DisplayName("In Region")]
@@ -162,9 +159,6 @@ namespace SMT
         [Category("Systems")]
         [DisplayName("Name Subtext Size")]
         public int SystemSubTextSize { get; set; }
-
-
-
 
         [Category("Thera")]
         [DisplayName("Thera Entrance (Region)")]

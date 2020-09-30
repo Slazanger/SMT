@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -132,7 +131,6 @@ namespace SMT
 
         private System.Windows.Media.Imaging.BitmapImage fightImage;
 
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -153,7 +151,7 @@ namespace SMT
 
         private void HelpIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if(HelpList.Visibility == Visibility.Hidden)
+            if (HelpList.Visibility == Visibility.Hidden)
             {
                 HelpList.Visibility = Visibility.Visible;
                 helpIcon.Fill = new SolidColorBrush(Colors.Yellow);
@@ -166,8 +164,6 @@ namespace SMT
                 HelpQM.Foreground = new SolidColorBrush(Colors.White);
             }
         }
-
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -398,22 +394,19 @@ namespace SMT
 
         public void AddTrigInvasionSytemsToMap()
         {
-            if(! MapConf.ShowTrigInvasions)
+            if (!MapConf.ShowTrigInvasions)
             {
                 return;
             }
-
 
             Brush trigBrush = new SolidColorBrush(Colors.DarkRed);
             Brush trigOutlineBrush = new SolidColorBrush(Colors.Black);
             Brush trigSecStatusChangeBrush = new SolidColorBrush(Colors.Orange);
 
-
             ImageBrush ib = new ImageBrush();
             ib.TileMode = TileMode.Tile;
             ib.Stretch = Stretch.None;
             ib.ImageSource = trigLogoImage;
-
 
             foreach (Triangles.Invasion ti in EM.TrigInvasions)
             {
@@ -421,21 +414,19 @@ namespace SMT
                 {
                     MapSystem ms = Region.MapSystems[ti.SystemName];
 
-
                     bool addTriangle = true;
-                    if(MapConf.ShowOnlyFinalLiminality && ti.Status != Triangles.Status.FinalLiminality)
+                    if (MapConf.ShowOnlyFinalLiminality && ti.Status != Triangles.Status.FinalLiminality)
                     {
                         addTriangle = false;
                     }
 
-                    if(addTriangle)
+                    if (addTriangle)
                     {
                         Polygon TrigShape;
                         TrigShape = new Polygon();
                         TrigShape.Points.Add(new Point(ms.LayoutX - 13, ms.LayoutY + 6));
                         TrigShape.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 14));
                         TrigShape.Points.Add(new Point(ms.LayoutX + 13, ms.LayoutY + 6));
-
 
                         TrigShape.Stroke = trigOutlineBrush;
                         TrigShape.StrokeThickness = 1;
@@ -497,8 +488,6 @@ namespace SMT
                     Canvas.SetTop(TheraShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX - 3);
                     MainCanvas.Children.Add(TheraShape);
-
-
                 }
             }
         }
@@ -511,7 +500,6 @@ namespace SMT
             }
 
             Brush ActiveSovFightBrush = new SolidColorBrush(Colors.DarkRed);
-
 
             foreach (SOVCampaign sc in EM.ActiveSovCampaigns)
             {
@@ -661,15 +649,13 @@ namespace SMT
                 }
                 DynamicMapElementsCharacters.Clear();
 
-/*
-                foreach (UIElement uie in DynamicMapElementsJBHighlight)
-                {
-                    MainCanvas.Children.Remove(uie);
-                }
-                DynamicMapElementsJBHighlight.Clear();
-*/
-
-
+                /*
+                                foreach (UIElement uie in DynamicMapElementsJBHighlight)
+                                {
+                                    MainCanvas.Children.Remove(uie);
+                                }
+                                DynamicMapElementsJBHighlight.Clear();
+                */
             }
 
             AddCharactersToMap();
@@ -2363,7 +2349,7 @@ namespace SMT
                 {
                     Label sysSubText = new Label();
                     sysSubText.Content = SystemSubText;
-                    if(MapConf.ActiveColourScheme.SystemSubTextSize > 0)
+                    if (MapConf.ActiveColourScheme.SystemSubTextSize > 0)
                     {
                         sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                     }
@@ -2992,7 +2978,6 @@ namespace SMT
 
                 if (ShowJumpBridges)
                 {
-
                     Point from = new Point();
                     Point to = new Point(); ;
                     bool AddJBHighlight = false;
@@ -3016,10 +3001,8 @@ namespace SMT
 
                             SystemInfoPopupSP.Children.Add(jbl);
 
-
                             from.X = selectedSys.LayoutX;
                             from.Y = selectedSys.LayoutY;
-
 
                             if (Region.IsSystemOnMap(jb.To) && !jb.Disabled)
                             {
@@ -3028,8 +3011,6 @@ namespace SMT
                                 to.Y = ms.LayoutY;
                                 AddJBHighlight = true;
                             }
-
-
                         }
 
                         if (selectedSys.Name == jb.To)
@@ -3059,11 +3040,10 @@ namespace SMT
                                 to.Y = ms.LayoutY;
                                 AddJBHighlight = true;
                             }
-
                         }
                     }
 
-                    if(AddJBHighlight)
+                    if (AddJBHighlight)
                     {
                         Line jbHighlight = new Line();
 
@@ -3092,7 +3072,6 @@ namespace SMT
 
                         MainCanvas.Children.Add(jbHighlight);
 
-
                         double circleSize = 30;
                         double circleOffset = circleSize / 2;
 
@@ -3105,13 +3084,11 @@ namespace SMT
                         Canvas.SetLeft(jbhighlightEndPointCircle, to.X - circleOffset);
                         Canvas.SetTop(jbhighlightEndPointCircle, to.Y - circleOffset);
 
-
                         DynamicMapElementsJBHighlight.Add(jbhighlightEndPointCircle);
 
                         Canvas.SetZIndex(jbhighlightEndPointCircle, 19);
 
                         MainCanvas.Children.Add(jbhighlightEndPointCircle);
-
                     }
                 }
 
@@ -3162,7 +3139,6 @@ namespace SMT
                         tl.Content = $"Thera\t: out {tc.OutSignatureID}";
                         tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
-
                     }
                 }
 
@@ -3172,13 +3148,12 @@ namespace SMT
             {
                 SystemInfoPopup.IsOpen = false;
 
-                foreach(UIElement uie in DynamicMapElementsJBHighlight)
+                foreach (UIElement uie in DynamicMapElementsJBHighlight)
                 {
                     MainCanvas.Children.Remove(uie);
                 }
 
                 DynamicMapElementsJBHighlight.Clear();
-
             }
         }
 

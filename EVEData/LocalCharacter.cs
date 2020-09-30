@@ -47,6 +47,7 @@ namespace SMT.EVEData
         private bool routeNeedsUpdate = false;
 
         public bool DangerzoneActive { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
         /// </summary>
@@ -167,7 +168,6 @@ namespace SMT.EVEData
         /// Gets or sets the The location of the local file bound to this session's "Local" chat channel
         /// </summary>
         public string LocalChatFile { get; set; }
-
 
         public bool IsOnline { get; set; }
 
@@ -511,9 +511,8 @@ namespace SMT.EVEData
                 ESILinked = true;
                 ESIAuthData = acd;
             }
-            catch(Exception ex)
-            { 
-
+            catch (Exception ex)
+            {
             }
         }
 
@@ -875,13 +874,9 @@ namespace SMT.EVEData
                         Region = "";
                     }
                 }
-
-
-
             }
             catch { }
         }
-
 
         /// <summary>
         /// Update the characters logged on status from ESI
@@ -906,7 +901,6 @@ namespace SMT.EVEData
             }
             catch { }
         }
-
 
         private void UpdateWarningSystems()
         {

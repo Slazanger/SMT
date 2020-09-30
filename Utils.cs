@@ -127,7 +127,6 @@ namespace SMT
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-
         private static Model3DGroup CreateTriangle(Point3D p0, Point3D p1, Point3D p2, Brush fill)
         {
             MeshGeometry3D triMesh = new MeshGeometry3D();
@@ -158,14 +157,14 @@ namespace SMT
         {
             Model3DGroup cube = new Model3DGroup();
 
-            Point3D p0 = new Point3D(x,         y,          z);
-            Point3D p1 = new Point3D(x + size,  y,          z);
-            Point3D p2 = new Point3D(x + size,  y,          z + size);
-            Point3D p3 = new Point3D(x,         y,          z + size);
-            Point3D p4 = new Point3D(x,         y + size,   z);
-            Point3D p5 = new Point3D(x + size,  y + size,   z);
-            Point3D p6 = new Point3D(x + size,  y + size,   z + size);
-            Point3D p7 = new Point3D(x,         y + size,   z + size);
+            Point3D p0 = new Point3D(x, y, z);
+            Point3D p1 = new Point3D(x + size, y, z);
+            Point3D p2 = new Point3D(x + size, y, z + size);
+            Point3D p3 = new Point3D(x, y, z + size);
+            Point3D p4 = new Point3D(x, y + size, z);
+            Point3D p5 = new Point3D(x + size, y + size, z);
+            Point3D p6 = new Point3D(x + size, y + size, z + size);
+            Point3D p7 = new Point3D(x, y + size, z + size);
 
             //front
             cube.Children.Add(CreateTriangle(p3, p2, p6, fill));

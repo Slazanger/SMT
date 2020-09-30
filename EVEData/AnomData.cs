@@ -46,7 +46,7 @@ namespace SMT.EVEData
                 if (words.Length == 6)
                 {
                     // only care about "Cosmic Signature"
-                    if ( words[1] == "Cosmic Signature")
+                    if (words[1] == "Cosmic Signature")
                     {
                         validPaste = true;
 
