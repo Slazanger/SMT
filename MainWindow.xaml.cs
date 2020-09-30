@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using SMT.EVEData;
 
 namespace SMT
 {
@@ -105,6 +106,7 @@ namespace SMT
             // Create the main EVE manager
 
             EVEManager = new EVEData.EveManager(SMT_VERSION);
+            EVEManager.WarningSystemRange = MapConf.WarningRange;
             EVEData.EveManager.Instance = EVEManager;
 
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
@@ -215,6 +217,18 @@ namespace SMT
 
         }
 
+        private void DangerzoneChanged(object sender, RoutedEventArgs e)
+        {
+            LocalCharacter selected = (LocalCharacter)CharactersList.SelectedItem;
+            if (selected == null) return;
+            var lc = EVEManager.LocalCharacters.FirstOrDefault(x => x.Name == selected.Name);
+            if (lc == null) return;
+            var idx = EVEManager.LocalCharacters.IndexOf(lc);
+            CheckBox cb = (CheckBox)((DataGridCell)sender).Content;
+            lc.DangerzoneActive = (bool)cb.IsChecked;
+            lc.warningSystemsNeedsUpdate = true;
+            EVEManager.LocalCharacters[idx] = lc;
+        }
         private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
@@ -408,9 +422,10 @@ namespace SMT
 
             if (e.PropertyName == "WarningRange")
             {
+                EVEManager.WarningSystemRange = MapConf.WarningRange;
                 foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                 {
-                    lc.WarningSystemRange = MapConf.WarningRange;
+                    lc.WarningSystemRange = EVEManager.WarningSystemRange;
                     lc.warningSystemsNeedsUpdate = true;
                 }
             }
@@ -796,7 +811,7 @@ namespace SMT
                     {
                         foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                         {
-                            if (lc.WarningSystems != null)
+                            if (lc.WarningSystems != null && lc.DangerzoneActive)
                             {
                                 foreach (string ls in lc.WarningSystems)
                                 {

@@ -53,6 +53,7 @@ namespace SMT.EVEData
 
         private bool WatcherThreadShouldTerminate = false;
 
+        public int WarningSystemRange { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
@@ -2065,6 +2066,8 @@ namespace SMT.EVEData
                         for (int i = 0; i < LocalCharacters.Count; i++)
                         {
                             LocalCharacter c = LocalCharacters.ElementAt(i);
+                            if (c.WarningSystemRange != WarningSystemRange)
+                                c.WarningSystemRange = WarningSystemRange;
                             await c.Update();
                         }
                     }
