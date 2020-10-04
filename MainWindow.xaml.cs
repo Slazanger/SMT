@@ -26,7 +26,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_092";
+        public const string SMT_VERSION = "SMT_093";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -50,7 +50,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Delve Deeper : " + SMT_VERSION + ")";
+            Title = "SMT (Andals Landing : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
