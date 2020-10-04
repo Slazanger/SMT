@@ -920,11 +920,7 @@ namespace SMT
             EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
             if (c != null)
             {
-                lock (c.ActiveRouteLock)
-                {
-                    c.ActiveRoute.Clear();
-                    c.Waypoints.Clear();
-                }
+                c.ClearAllWaypoints();
             }
         }
 
