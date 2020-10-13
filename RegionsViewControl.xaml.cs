@@ -334,17 +334,17 @@ namespace SMT
 
                     averageStanding = averageStanding / numSystems;
 
-                    if (averageStanding > 0.5)
+                    if (averageStanding > 0.55)
                     {
-                        Color blueIsh = Colors.Gray;
-                        blueIsh.B += (byte)((255 - blueIsh.B) * (averageStanding / 10.0f));
+                        Color blueIsh = Colors.Black;
+                        blueIsh.B = (byte)(255 * (averageStanding / 10.0f));
                         regionShape.Fill = new SolidColorBrush(blueIsh);
                     }
-                    else if (averageStanding < -0.5)
+                    else if (averageStanding < -0.55)
                     {
                         averageStanding *= -1;
-                        Color redIsh = Colors.Gray;
-                        redIsh.R += (byte)((255 - redIsh.R) * (averageStanding / 10.0f));
+                        Color redIsh = Colors.Black;
+                        redIsh.R = (byte)(255 * (averageStanding / 10.0f));
                         regionShape.Fill = new SolidColorBrush(redIsh);
                     }
                     else
