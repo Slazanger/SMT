@@ -1,0 +1,2619 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg version="1.1"
+     id="svgdoc"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1024" height="768"
+     viewBox="0 0 1024 768"
+     style="background: #ffffff"
+     onload="init(evt)"
+>
+
+
+<style type="text/css">
+<![CDATA[
+/* jumps */
+.j	{ stroke: #000000; stroke-width: 1; }
+.jc	{ stroke: #FF0000; stroke-width: 1; }
+.jr	{ stroke: #800080; stroke-width: 1; }
+.jx	{ stroke: #000000; stroke-width: 3; }
+.jxc	{ stroke: #FF0000; stroke-width: 3; }
+.jxr	{ stroke: #800080; stroke-width: 3; }
+.jb	{ stroke: #0000FF; stroke-width: 3; fill: none; }
+
+/* external system */
+.eh	{ stroke: #00B000; stroke-width: 1; fill: #CCCCCC; }
+.el	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 4; fill: #CCCCCC; }
+.e	{ stroke: #000000; stroke-width: 1; fill: #CCCCCC; }
+.exh	{ stroke: #00B000; stroke-width: 2; fill: #CCCCCC; }
+.exl	{ stroke: #F00000; stroke-width: 2; stroke-dasharray: 8, 3; fill: #CCCCCC; }
+.ex	{ stroke: #000000; stroke-width: 2; fill: #CCCCCC; }
+
+/* external system text */
+.es	{ font-size: 9px; font-family: Arial, Helvetica, sans-serif; fill: #000000; }
+.er	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
+
+/* system */
+.sh	{ stroke: #00B000; stroke-width: 1; }
+.sl	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 3; }
+.s	{ stroke: #000000; stroke-width: 1; }
+.sc	{ stroke-width: 1.2; stroke-dasharray: 4, 3; }
+.sx	{ stroke-width: 2.5; }
+
+.scl	{ stroke: transparent; stroke-width: 2; fill: transparent; }
+
+/* system text */
+.ss	{ font-family: Arial, Helvetica, sans-serif; font-size: 9px; fill: #000000; }
+.st	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
+.so	{ fill: #ff0000; }
+.i	{ stroke: #0080FF; stroke-width: 1; fill: none; }
+
+/* station */
+.o	{ fill: #ffffff; }
+.oc	{ fill: #0000FF; }
+.oa	{ fill: #FFDC00; }
+.og	{ fill: #00FF00; }
+.om	{ fill: #FF0000; }
+.o1	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
+.o2	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
+.oo	{ fill: none; stroke: #000000; stroke-width: 1; }
+
+/* station services */
+.v1	{ fill: #FF0000; }
+.v2	{ fill: #00FF00; }
+.v3	{ fill: #FFDC00; }
+.v4	{ fill: #0000FF; }
+
+/* legend */
+.lb	{ stroke-width: 1; stroke: #000000; fill: #ffffff; }
+.lbt	{ stroke-width: 1; stroke: #000000; fill: #ffffff; }
+.lt	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 12px; }
+.lc	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 11px; }
+.l	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 10px; }
+
+/* highlight */
+.h	{ fill: none; stroke-width: 3; stroke: #000000; }
+.hw	{ fill: none; stroke-width: 2; stroke: #00AA00; }
+.hl	{ fill: none; stroke-width: 2; stroke: #F00000; }
+.hg	{ fill: none; stroke-width: 2; stroke: #00B000; }
+
+/* incursion */
+.inc	{ fill: url(#incBg); }
+.incs	{ fill: url(#incStBg); }
+
+/* contested */
+.con	{ fill: url(#conBg); }
+
+/* sov campaign triggered */
+.cam		{ fill: url(#camBg); }
+.cam-active	{ fill: url(#camActiveBg); }
+]]>
+</style>
+
+<g id="map">
+<g id="legend">
+<rect x="860.5" y="575.5" width="160" height="188" class="lb" />
+<rect x="860.5" y="860.5" width="160" height="20" class="lbt" />
+<text x="942.5" y="590.5" class="lt" text-anchor="middle">Metropolis</text>
+<rect x="860.5" y="595.5" width="160" height="148" class="lb" />
+<rect x="860.5" y="743.5" width="160" height="20" class="lb" />
+<text x="942.5" y="757.5" class="lc" text-anchor="middle"> 	&#169; by Wollari &amp; CCP</text>
+
+<rect x="875" y="600" rx="9.35" ry="9.35" width="50" height="22"  class="s" style="fill: #FFFFFF;" /><text x="900" y="611" class="ss" text-anchor="middle">XXXXX</text><text x="900" y="618.7" class="st so" text-anchor="middle">YYYYY (Z)</text>
+<rect x="920.6" y="605.5" height="11" width="11" class="o" /><polygon points="922.8,611 929.4,607.7 929.4,614.3 922.8,611"  class="o1" /><rect x="920.6" y="605.5" height="11" width="11"  class="oo" />
+<text x="877" y="639.4" class="l" text-anchor="start">X</text><text x="890" y="639.4" class="l" text-anchor="start">= System</text>
+<text x="877" y="654.8" class="l" text-anchor="start">Y</text><text x="890" y="654.8" class="l" text-anchor="start">= Alliance</text>
+<text x="877" y="670.2" class="l" text-anchor="start">Z</text><text x="890" y="670.2" class="l" text-anchor="start">= Sov. Lvl</text>
+<rect x="874" y="679.8" height="11" width="11" class="o" /><polygon points="876.2,685.3 882.8,682 882.8,688.6 876.2,685.3"  class="o1" /><rect x="874" y="679.8" height="11" width="11"  class="oo" /><text x="890" y="687.8" class="l" text-anchor="start">= Outpost</text>
+<rect x="874" y="695.2" height="11" width="11" class="o" /><rect x="877.3" y="698.5" height="4.4" width="4.4" class="o2" /><rect x="874" y="695.2" height="11" width="11"  class="oo" /><text x="890" y="703.2" class="l" text-anchor="start">= Cq Stat.</text>
+<rect x="874" y="710.6" height="11" width="11" class="o" /><rect x="874" y="710.6" height="11" width="11"  class="oo" /><text x="890" y="718.6" class="l" text-anchor="start">= NPC Stat.</text>
+<rect x="872" y="726" rx="5.5" ry="5.5" width="15.4" height="11" class="i" /><text x="890" y="734" class="l" text-anchor="start">= Icebelt</text>
+
+<rect x="947" y="603" height="11" width="11" class="om" /><polygon points="949.2,608.5 955.8,605.2 955.8,611.8 949.2,608.5"  class="o1" /><rect x="947" y="603" height="11" width="11"  class="oo" /><text x="963" y="611" class="l" text-anchor="start">= Refinery</text>
+<rect x="947" y="618.4" height="11" width="11" class="oa" /><polygon points="949.2,623.9 955.8,620.6 955.8,627.2 949.2,623.9"  class="o1" /><rect x="947" y="618.4" height="11" width="11"  class="oo" /><text x="963" y="626.4" class="l" text-anchor="start">= Factory</text>
+<rect x="947" y="633.8" height="11" width="11" class="oc" /><polygon points="949.2,639.3 955.8,636 955.8,642.6 949.2,639.3"  class="o1" /><rect x="947" y="633.8" height="11" width="11"  class="oo" /><text x="963" y="641.8" class="l" text-anchor="start">= Research</text>
+<rect x="947" y="649.2" height="11" width="11" class="og" /><polygon points="949.2,654.7 955.8,651.4 955.8,658 949.2,654.7"  class="o1" /><rect x="947" y="649.2" height="11" width="11"  class="oo" /><text x="963" y="657.2" class="l" text-anchor="start">= Offices</text>
+<rect x="947" y="664.6" height="11" width="11" class="o" /><polygon points="947,664.6 958,664.6 952.5,670.1 947,664.6" class="v1" /><rect x="947" y="664.6" height="11" width="11"  class="oo" /><text x="963" y="672.6" class="l" text-anchor="start">= Refining</text>
+<rect x="947" y="680" height="11" width="11" class="o" /><polygon points="958,691 952.5,685.5 947,691 958,691" class="v3" /><rect x="947" y="680" height="11" width="11"  class="oo" /><text x="963" y="688" class="l" text-anchor="start">= Industry</text>
+<rect x="947" y="695.4" height="11" width="11" class="o" /><polygon points="947,706.4 952.5,700.9 947,695.4 947,706.4" class="v4" /><rect x="947" y="695.4" height="11" width="11"  class="oo" /><text x="963" y="703.4" class="l" text-anchor="start">= Research</text>
+<rect x="947" y="710.8" height="11" width="11" class="o" /><polygon points="958,710.8 952.5,716.3 958,721.8 958,710.8" class="v2" /><rect x="947" y="710.8" height="11" width="11"  class="oo" /><text x="963" y="718.8" class="l" text-anchor="start">= Cloning</text>
+<rect x="945" y="726.2" rx="5.5" ry="5.5" width="15.4" height="11" class="sl" style="fill: #ffa0ff;" /><text x="963" y="734.2" class="l" text-anchor="start">= Contested</text>
+
+</g>
+
+<defs>
+  <symbol id="def30002053">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hek" class="sys link-5-30002053" target="_top">
+      <rect id="rect30002053" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hek</text>
+      <text id="txt30002053" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002054">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hror" class="sys link-5-30002054" target="_top">
+      <rect id="rect30002054" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hror</text>
+      <text id="txt30002054" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002056">
+    <a xlink:href="http://evemaps.dotlan.net/system/Resbroko" class="sys link-5-30002056" target="_top">
+      <rect id="rect30002056" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Resbroko</text>
+      <text id="txt30002056" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002057">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hadozeko" class="sys link-5-30002057" target="_top">
+      <rect id="rect30002057" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hadozeko</text>
+      <text id="txt30002057" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002091">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ontorn" class="sys link-5-30002091" target="_top">
+      <rect id="rect30002091" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-60);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ontorn</text>
+      <text id="txt30002091" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002072">
+    <a xlink:href="http://evemaps.dotlan.net/system/Inder" class="sys link-5-30002072" target="_top">
+      <rect id="rect30002072" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Inder</text>
+      <text id="txt30002072" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002070">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uriok" class="sys link-5-30002070" target="_top">
+      <rect id="rect30002070" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Uriok</text>
+      <text id="txt30002070" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002093">
+    <a xlink:href="http://evemaps.dotlan.net/system/Gebuladi" class="sys link-5-30002093" target="_top">
+      <rect id="rect30002093" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-60);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Gebuladi</text>
+      <text id="txt30002093" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002055">
+    <a xlink:href="http://evemaps.dotlan.net/system/Amo" class="sys link-5-30002055" target="_top">
+      <rect id="rect30002055" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Amo</text>
+      <text id="txt30002055" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002097">
+    <a xlink:href="http://evemaps.dotlan.net/system/Klogori" class="sys link-5-30002097" target="_top">
+      <rect id="rect30002097" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Klogori</text>
+      <text id="txt30002097" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002058">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ardar" class="sys link-5-30002058" target="_top">
+      <rect id="rect30002058" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ardar</text>
+      <text id="txt30002058" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002059">
+    <a xlink:href="http://evemaps.dotlan.net/system/Auner" class="sys link-5-30002059" target="_top">
+      <rect id="rect30002059" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Auner</text>
+      <text id="txt30002059" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002096">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hofjaldgund" class="sys link-5-30002096" target="_top">
+      <rect id="rect30002096" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hofjaldgund</text>
+      <text id="txt30002096" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+  </symbol>
+  <symbol id="def30002068">
+    <a xlink:href="http://evemaps.dotlan.net/system/Nakugard" class="sys link-5-30002068" target="_top">
+    <rect id="ice30002068" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002068" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Nakugard</text>
+      <text id="txt30002068" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002069">
+    <a xlink:href="http://evemaps.dotlan.net/system/Traun" class="sys link-5-30002069" target="_top">
+      <rect id="rect30002069" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Traun</text>
+      <text id="txt30002069" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002090">
+    <a xlink:href="http://evemaps.dotlan.net/system/Frerstorn" class="sys link-5-30002090" target="_top">
+      <rect id="rect30002090" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Frerstorn</text>
+      <text id="txt30002090" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002095">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eszur" class="sys link-5-30002095" target="_top">
+    <rect id="ice30002095" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002095" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-60);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eszur</text>
+      <text id="txt30002095" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002075">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hjoramold" class="sys link-5-30002075" target="_top">
+      <rect id="rect30002075" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hjoramold</text>
+      <text id="txt30002075" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002098">
+    <a xlink:href="http://evemaps.dotlan.net/system/Orfrold" class="sys link-5-30002098" target="_top">
+      <rect id="rect30002098" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Orfrold</text>
+      <text id="txt30002098" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002079">
+    <a xlink:href="http://evemaps.dotlan.net/system/Krirald" class="sys link-5-30002079" target="_top">
+    <rect id="ice30002079" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002079" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Krirald</text>
+      <text id="txt30002079" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002081">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ansen" class="sys link-5-30002081" target="_top">
+      <rect id="rect30002081" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ansen</text>
+      <text id="txt30002081" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002101">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ualkin" class="sys link-5-30002101" target="_top">
+      <rect id="rect30002101" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ualkin</text>
+      <text id="txt30002101" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002049">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uttindar" class="sys link-5-30002049" target="_top">
+      <rect id="rect30002049" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Uttindar</text>
+      <text id="txt30002049" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002094">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ebolfer" class="sys link-5-30002094" target="_top">
+      <rect id="rect30002094" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-60);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ebolfer</text>
+      <text id="txt30002094" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003383">
+    <a xlink:href="http://evemaps.dotlan.net/system/Todrir" class="sys link-5-30003383" target="_top">
+      <rect id="rect30003383" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Todrir</text>
+      <text id="txt30003383" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002092">
+    <a xlink:href="http://evemaps.dotlan.net/system/Sirekur" class="sys link-5-30002092" target="_top">
+    <rect id="ice30002092" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002092" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Sirekur</text>
+      <text id="txt30002092" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002073">
+    <a xlink:href="http://evemaps.dotlan.net/system/Tvink" class="sys link-5-30002073" target="_top">
+      <rect id="rect30002073" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Tvink</text>
+      <text id="txt30002073" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002071">
+    <a xlink:href="http://evemaps.dotlan.net/system/Barkrik" class="sys link-5-30002071" target="_top">
+    <rect id="ice30002071" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002071" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Barkrik</text>
+      <text id="txt30002071" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002099">
+    <a xlink:href="http://evemaps.dotlan.net/system/Egmar" class="sys link-5-30002099" target="_top">
+    <rect id="ice30002099" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002099" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-20);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Egmar</text>
+      <text id="txt30002099" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002100">
+    <a xlink:href="http://evemaps.dotlan.net/system/Taff" class="sys link-5-30002100" target="_top">
+      <rect id="rect30002100" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Taff</text>
+      <text id="txt30002100" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002080">
+    <a xlink:href="http://evemaps.dotlan.net/system/Arifsdald" class="sys link-5-30002080" target="_top">
+      <rect id="rect30002080" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Arifsdald</text>
+      <text id="txt30002080" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002078">
+    <a xlink:href="http://evemaps.dotlan.net/system/Arwa" class="sys link-5-30002078" target="_top">
+      <rect id="rect30002078" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Arwa</text>
+      <text id="txt30002078" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002102">
+    <a xlink:href="http://evemaps.dotlan.net/system/Gukarla" class="sys link-5-30002102" target="_top">
+      <rect id="rect30002102" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Gukarla</text>
+      <text id="txt30002102" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003381">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eust" class="sys link-5-30003381" target="_top">
+      <rect id="rect30003381" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eust</text>
+      <text id="txt30003381" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003386">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ongund" class="sys link-5-30003386" target="_top">
+      <rect id="rect30003386" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ongund</text>
+      <text id="txt30003386" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002074">
+    <a xlink:href="http://evemaps.dotlan.net/system/Lanngisi" class="sys link-5-30002074" target="_top">
+      <rect id="rect30002074" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Lanngisi</text>
+      <text id="txt30002074" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002088">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vimeini" class="sys link-5-30002088" target="_top">
+      <rect id="rect30002088" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-0);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Vimeini</text>
+      <text id="txt30002088" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002065">
+    <a xlink:href="http://evemaps.dotlan.net/system/Lasleinur" class="sys link-5-30002065" target="_top">
+      <rect id="rect30002065" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Lasleinur</text>
+      <text id="txt30002065" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002048">
+    <a xlink:href="http://evemaps.dotlan.net/system/Bei" class="sys link-5-30002048" target="_top">
+      <rect id="rect30002048" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Bei</text>
+      <text id="txt30002048" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002076">
+    <a xlink:href="http://evemaps.dotlan.net/system/Dudreda" class="sys link-5-30002076" target="_top">
+      <rect id="rect30002076" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Dudreda</text>
+      <text id="txt30002076" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002082">
+    <a xlink:href="http://evemaps.dotlan.net/system/Floseswin" class="sys link-5-30002082" target="_top">
+      <rect id="rect30002082" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-0);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Floseswin</text>
+      <text id="txt30002082" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002066">
+    <a xlink:href="http://evemaps.dotlan.net/system/Arnher" class="sys link-5-30002066" target="_top">
+      <rect id="rect30002066" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Arnher</text>
+      <text id="txt30002066" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002084">
+    <a xlink:href="http://evemaps.dotlan.net/system/Aset" class="sys link-5-30002084" target="_top">
+      <rect id="rect30002084" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-0);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Aset</text>
+      <text id="txt30002084" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002077">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hakisalki" class="sys link-5-30002077" target="_top">
+      <rect id="rect30002077" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hakisalki</text>
+      <text id="txt30002077" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003382">
+    <a xlink:href="http://evemaps.dotlan.net/system/Flost" class="sys link-5-30003382" target="_top">
+      <rect id="rect30003382" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Flost</text>
+      <text id="txt30003382" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003385">
+    <a xlink:href="http://evemaps.dotlan.net/system/Evuldgenzo" class="sys link-5-30003385" target="_top">
+      <rect id="rect30003385" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Evuldgenzo</text>
+      <text id="txt30003385" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002061">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ofstold" class="sys link-5-30002061" target="_top">
+      <rect id="rect30002061" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-60);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ofstold</text>
+      <text id="txt30002061" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002087">
+    <a xlink:href="http://evemaps.dotlan.net/system/Isbrabata" class="sys link-5-30002087" target="_top">
+      <rect id="rect30002087" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-20);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Isbrabata</text>
+      <text id="txt30002087" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002050">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hagilur" class="sys link-5-30002050" target="_top">
+      <rect id="rect30002050" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hagilur</text>
+      <text id="txt30002050" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002063">
+    <a xlink:href="http://evemaps.dotlan.net/system/Helgatild" class="sys link-5-30002063" target="_top">
+    <rect id="ice30002063" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002063" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Helgatild</text>
+      <text id="txt30002063" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002060">
+    <a xlink:href="http://evemaps.dotlan.net/system/Evati" class="sys link-5-30002060" target="_top">
+      <rect id="rect30002060" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-40);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Evati</text>
+      <text id="txt30002060" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003387">
+    <a xlink:href="http://evemaps.dotlan.net/system/Jondik" class="sys link-5-30003387" target="_top">
+      <rect id="rect30003387" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Jondik</text>
+      <text id="txt30003387" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002051">
+    <a xlink:href="http://evemaps.dotlan.net/system/Anher" class="sys link-5-30002051" target="_top">
+      <rect id="rect30002051" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Anher</text>
+      <text id="txt30002051" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002062">
+    <a xlink:href="http://evemaps.dotlan.net/system/Todifrauan" class="sys link-5-30002062" target="_top">
+    <rect id="ice30002062" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002062" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500002-20);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Todifrauan</text>
+      <text id="txt30002062" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002067">
+    <a xlink:href="http://evemaps.dotlan.net/system/Brin" class="sys link-5-30002067" target="_top">
+      <rect id="rect30002067" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Brin</text>
+      <text id="txt30002067" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002086">
+    <a xlink:href="http://evemaps.dotlan.net/system/Turnur" class="sys link-5-30002086" target="_top">
+    <rect id="ice30002086" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002086" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-20);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Turnur</text>
+      <text id="txt30002086" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002089">
+    <a xlink:href="http://evemaps.dotlan.net/system/Avenod" class="sys link-5-30002089" target="_top">
+      <rect id="rect30002089" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-20);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Avenod</text>
+      <text id="txt30002089" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002064">
+    <a xlink:href="http://evemaps.dotlan.net/system/Arnstur" class="sys link-5-30002064" target="_top">
+      <rect id="rect30002064" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Arnstur</text>
+      <text id="txt30002064" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002083">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uisper" class="sys link-5-30002083" target="_top">
+    <rect id="ice30002083" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30002083" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-20);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Uisper</text>
+      <text id="txt30002083" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002052">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ragnarg" class="sys link-5-30002052" target="_top">
+      <rect id="rect30002052" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ragnarg</text>
+      <text id="txt30002052" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002085">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eytjangard" class="sys link-5-30002085" target="_top">
+      <rect id="rect30002085" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: url(#fw500003-0);" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eytjangard</text>
+      <text id="txt30002085" x="24.25" y="18.895" class="st" text-anchor="middle">Amarr</text>
+    </a>
+  </symbol>
+  <symbol id="def30003384">
+    <a xlink:href="http://evemaps.dotlan.net/system/Asgeir" class="sys link-5-30003384" target="_top">
+    <rect id="ice30003384" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003384" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Asgeir</text>
+      <text id="txt30003384" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003428">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hilfhurmur" class="sys link-5-30003428" target="_top">
+      <rect id="rect30003428" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hilfhurmur</text>
+      <text id="txt30003428" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003395">
+    <a xlink:href="http://evemaps.dotlan.net/system/Roleinn" class="sys link-5-30003395" target="_top">
+      <rect id="rect30003395" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Roleinn</text>
+      <text id="txt30003395" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003393">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eiluvodi" class="sys link-5-30003393" target="_top">
+      <rect id="rect30003393" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eiluvodi</text>
+      <text id="txt30003393" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003396">
+    <a xlink:href="http://evemaps.dotlan.net/system/Maturat" class="sys link-5-30003396" target="_top">
+      <rect id="rect30003396" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Maturat</text>
+      <text id="txt30003396" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003430">
+    <a xlink:href="http://evemaps.dotlan.net/system/Oppold" class="sys link-5-30003430" target="_top">
+    <rect id="ice30003430" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003430" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Oppold</text>
+      <text id="txt30003430" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003447">
+    <a xlink:href="http://evemaps.dotlan.net/system/Josekorn" class="sys link-5-30003447" target="_top">
+      <rect id="rect30003447" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Josekorn</text>
+      <text id="txt30003447" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003452">
+    <a xlink:href="http://evemaps.dotlan.net/system/Irgrus" class="sys link-5-30003452" target="_top">
+      <rect id="rect30003452" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Irgrus</text>
+      <text id="txt30003452" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30043410">
+    <a xlink:href="http://evemaps.dotlan.net/system/Fildar" class="sys link-5-30043410" target="_top">
+      <rect id="rect30043410" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Fildar</text>
+      <text id="txt30043410" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003388">
+    <a xlink:href="http://evemaps.dotlan.net/system/Olbra" class="sys link-5-30003388" target="_top">
+      <rect id="rect30003388" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Olbra</text>
+      <text id="txt30003388" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003399">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vorsk" class="sys link-5-30003399" target="_top">
+      <rect id="rect30003399" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Vorsk</text>
+      <text id="txt30003399" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003433">
+    <a xlink:href="http://evemaps.dotlan.net/system/Gedugaud" class="sys link-5-30003433" target="_top">
+    <rect id="ice30003433" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003433" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Gedugaud</text>
+      <text id="txt30003433" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003448">
+    <a xlink:href="http://evemaps.dotlan.net/system/Nifflung" class="sys link-5-30003448" target="_top">
+      <rect id="rect30003448" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Nifflung</text>
+      <text id="txt30003448" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003397">
+    <a xlink:href="http://evemaps.dotlan.net/system/Bongveber" class="sys link-5-30003397" target="_top">
+      <rect id="rect30003397" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Bongveber</text>
+      <text id="txt30003397" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003394">
+    <a xlink:href="http://evemaps.dotlan.net/system/Freatlidur" class="sys link-5-30003394" target="_top">
+      <rect id="rect30003394" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Freatlidur</text>
+      <text id="txt30003394" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003449">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hakeri" class="sys link-5-30003449" target="_top">
+      <rect id="rect30003449" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hakeri</text>
+      <text id="txt30003449" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003429">
+    <a xlink:href="http://evemaps.dotlan.net/system/Geffur" class="sys link-5-30003429" target="_top">
+      <rect id="rect30003429" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Geffur</text>
+      <text id="txt30003429" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003420">
+    <a xlink:href="http://evemaps.dotlan.net/system/Fredagod" class="sys link-5-30003420" target="_top">
+      <rect id="rect30003420" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Fredagod</text>
+      <text id="txt30003420" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003431">
+    <a xlink:href="http://evemaps.dotlan.net/system/Tratokard" class="sys link-5-30003431" target="_top">
+      <rect id="rect30003431" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Tratokard</text>
+      <text id="txt30003431" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003432">
+    <a xlink:href="http://evemaps.dotlan.net/system/Lumegen" class="sys link-5-30003432" target="_top">
+      <rect id="rect30003432" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Lumegen</text>
+      <text id="txt30003432" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003418">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hardbako" class="sys link-5-30003418" target="_top">
+      <rect id="rect30003418" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hardbako</text>
+      <text id="txt30003418" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003450">
+    <a xlink:href="http://evemaps.dotlan.net/system/Oraekja" class="sys link-5-30003450" target="_top">
+      <rect id="rect30003450" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Oraekja</text>
+      <text id="txt30003450" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003440">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ansher" class="sys link-5-30003440" target="_top">
+      <rect id="rect30003440" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ansher</text>
+      <text id="txt30003440" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003435">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hebisa" class="sys link-5-30003435" target="_top">
+      <rect id="rect30003435" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hebisa</text>
+      <text id="txt30003435" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003391">
+    <a xlink:href="http://evemaps.dotlan.net/system/Reset" class="sys link-5-30003391" target="_top">
+      <rect id="rect30003391" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Reset</text>
+      <text id="txt30003391" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003398">
+    <a xlink:href="http://evemaps.dotlan.net/system/Anbald" class="sys link-5-30003398" target="_top">
+      <rect id="rect30003398" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Anbald</text>
+      <text id="txt30003398" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003451">
+    <a xlink:href="http://evemaps.dotlan.net/system/Dantbeinn" class="sys link-5-30003451" target="_top">
+    <rect id="ice30003451" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003451" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Dantbeinn</text>
+      <text id="txt30003451" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003434">
+    <a xlink:href="http://evemaps.dotlan.net/system/Polstodur" class="sys link-5-30003434" target="_top">
+      <rect id="rect30003434" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Polstodur</text>
+      <text id="txt30003434" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003390">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vilur" class="sys link-5-30003390" target="_top">
+      <rect id="rect30003390" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Vilur</text>
+      <text id="txt30003390" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003389">
+    <a xlink:href="http://evemaps.dotlan.net/system/Altrinur" class="sys link-5-30003389" target="_top">
+      <rect id="rect30003389" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Altrinur</text>
+      <text id="txt30003389" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003416">
+    <a xlink:href="http://evemaps.dotlan.net/system/Aldrat" class="sys link-5-30003416" target="_top">
+      <rect id="rect30003416" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Aldrat</text>
+      <text id="txt30003416" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003407">
+    <a xlink:href="http://evemaps.dotlan.net/system/Tamekamur" class="sys link-5-30003407" target="_top">
+      <rect id="rect30003407" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Tamekamur</text>
+      <text id="txt30003407" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003408">
+    <a xlink:href="http://evemaps.dotlan.net/system/Evettullur" class="sys link-5-30003408" target="_top">
+      <rect id="rect30003408" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Evettullur</text>
+      <text id="txt30003408" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003417">
+    <a xlink:href="http://evemaps.dotlan.net/system/Urnhard" class="sys link-5-30003417" target="_top">
+      <rect id="rect30003417" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Urnhard</text>
+      <text id="txt30003417" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003438">
+    <a xlink:href="http://evemaps.dotlan.net/system/Earled" class="sys link-5-30003438" target="_top">
+      <rect id="rect30003438" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Earled</text>
+      <text id="txt30003438" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003436">
+    <a xlink:href="http://evemaps.dotlan.net/system/Tollus" class="sys link-5-30003436" target="_top">
+      <rect id="rect30003436" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Tollus</text>
+      <text id="txt30003436" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30022505">
+    <a xlink:href="http://evemaps.dotlan.net/system/Orgron" class="sys link-5-30022505" target="_top">
+      <rect id="rect30022505" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Orgron</text>
+      <text id="txt30022505" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003401">
+    <a xlink:href="http://evemaps.dotlan.net/system/Egbonbet" class="sys link-5-30003401" target="_top">
+      <rect id="rect30003401" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Egbonbet</text>
+      <text id="txt30003401" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003404">
+    <a xlink:href="http://evemaps.dotlan.net/system/Agtver" class="sys link-5-30003404" target="_top">
+      <rect id="rect30003404" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Agtver</text>
+      <text id="txt30003404" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003423">
+    <a xlink:href="http://evemaps.dotlan.net/system/Nein" class="sys link-5-30003423" target="_top">
+    <rect id="ice30003423" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003423" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Nein</text>
+      <text id="txt30003423" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003422">
+    <a xlink:href="http://evemaps.dotlan.net/system/Wirdalen" class="sys link-5-30003422" target="_top">
+      <rect id="rect30003422" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Wirdalen</text>
+      <text id="txt30003422" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003392">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eygfe" class="sys link-5-30003392" target="_top">
+    <rect id="ice30003392" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003392" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eygfe</text>
+      <text id="txt30003392" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003425">
+    <a xlink:href="http://evemaps.dotlan.net/system/Erstet" class="sys link-5-30003425" target="_top">
+      <rect id="rect30003425" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Erstet</text>
+      <text id="txt30003425" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003419">
+    <a xlink:href="http://evemaps.dotlan.net/system/Erstur" class="sys link-5-30003419" target="_top">
+      <rect id="rect30003419" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Erstur</text>
+      <text id="txt30003419" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003405">
+    <a xlink:href="http://evemaps.dotlan.net/system/Datulen" class="sys link-5-30003405" target="_top">
+      <rect id="rect30003405" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Datulen</text>
+      <text id="txt30003405" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003400">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hjortur" class="sys link-5-30003400" target="_top">
+      <rect id="rect30003400" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hjortur</text>
+      <text id="txt30003400" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003437">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ogoten" class="sys link-5-30003437" target="_top">
+      <rect id="rect30003437" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ogoten</text>
+      <text id="txt30003437" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003374">
+    <a xlink:href="http://evemaps.dotlan.net/system/Arlulf" class="sys link-5-30003374" target="_top">
+      <rect id="rect30003374" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Arlulf</text>
+      <text id="txt30003374" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003402">
+    <a xlink:href="http://evemaps.dotlan.net/system/Totkubad" class="sys link-5-30003402" target="_top">
+      <rect id="rect30003402" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Totkubad</text>
+      <text id="txt30003402" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003376">
+    <a xlink:href="http://evemaps.dotlan.net/system/Stirht" class="sys link-5-30003376" target="_top">
+      <rect id="rect30003376" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Stirht</text>
+      <text id="txt30003376" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003424">
+    <a xlink:href="http://evemaps.dotlan.net/system/Enden" class="sys link-5-30003424" target="_top">
+      <rect id="rect30003424" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Enden</text>
+      <text id="txt30003424" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003439">
+    <a xlink:href="http://evemaps.dotlan.net/system/Aderkan" class="sys link-5-30003439" target="_top">
+    <rect id="ice30003439" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003439" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Aderkan</text>
+      <text id="txt30003439" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003426">
+    <a xlink:href="http://evemaps.dotlan.net/system/Anstard" class="sys link-5-30003426" target="_top">
+      <rect id="rect30003426" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Anstard</text>
+      <text id="txt30003426" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003445">
+    <a xlink:href="http://evemaps.dotlan.net/system/Iluin" class="sys link-5-30003445" target="_top">
+      <rect id="rect30003445" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Iluin</text>
+      <text id="txt30003445" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003406">
+    <a xlink:href="http://evemaps.dotlan.net/system/Situner" class="sys link-5-30003406" target="_top">
+      <rect id="rect30003406" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Situner</text>
+      <text id="txt30003406" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003403">
+    <a xlink:href="http://evemaps.dotlan.net/system/Meimungen" class="sys link-5-30003403" target="_top">
+      <rect id="rect30003403" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Meimungen</text>
+      <text id="txt30003403" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003421">
+    <a xlink:href="http://evemaps.dotlan.net/system/Libold" class="sys link-5-30003421" target="_top">
+      <rect id="rect30003421" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Libold</text>
+      <text id="txt30003421" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003427">
+    <a xlink:href="http://evemaps.dotlan.net/system/Osvestmunnur" class="sys link-5-30003427" target="_top">
+      <rect id="rect30003427" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Osvestmunnur</text>
+      <text id="txt30003427" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003375">
+    <a xlink:href="http://evemaps.dotlan.net/system/Brundakur" class="sys link-5-30003375" target="_top">
+      <rect id="rect30003375" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Brundakur</text>
+      <text id="txt30003375" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003377">
+    <a xlink:href="http://evemaps.dotlan.net/system/Illuin" class="sys link-5-30003377" target="_top">
+      <rect id="rect30003377" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Illuin</text>
+      <text id="txt30003377" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003443">
+    <a xlink:href="http://evemaps.dotlan.net/system/Moselgi" class="sys link-5-30003443" target="_top">
+      <rect id="rect30003443" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Moselgi</text>
+      <text id="txt30003443" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003380">
+    <a xlink:href="http://evemaps.dotlan.net/system/Alf" class="sys link-5-30003380" target="_top">
+      <rect id="rect30003380" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Alf</text>
+      <text id="txt30003380" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003441">
+    <a xlink:href="http://evemaps.dotlan.net/system/Earwik" class="sys link-5-30003441" target="_top">
+      <rect id="rect30003441" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Earwik</text>
+      <text id="txt30003441" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30033410">
+    <a xlink:href="http://evemaps.dotlan.net/system/Erego" class="sys link-5-30033410" target="_top">
+      <rect id="rect30033410" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Erego</text>
+      <text id="txt30033410" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003409">
+    <a xlink:href="http://evemaps.dotlan.net/system/Leurtmar" class="sys link-5-30003409" target="_top">
+      <rect id="rect30003409" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Leurtmar</text>
+      <text id="txt30003409" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003442">
+    <a xlink:href="http://evemaps.dotlan.net/system/Finanar" class="sys link-5-30003442" target="_top">
+    <rect id="ice30003442" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003442" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Finanar</text>
+      <text id="txt30003442" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003410">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ryddinjorn" class="sys link-5-30003410" target="_top">
+      <rect id="rect30003410" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ryddinjorn</text>
+      <text id="txt30003410" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003446">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ofage" class="sys link-5-30003446" target="_top">
+      <rect id="rect30003446" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ofage</text>
+      <text id="txt30003446" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003411">
+    <a xlink:href="http://evemaps.dotlan.net/system/Arlek" class="sys link-5-30003411" target="_top">
+      <rect id="rect30003411" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Arlek</text>
+      <text id="txt30003411" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30023410">
+    <a xlink:href="http://evemaps.dotlan.net/system/Embod" class="sys link-5-30023410" target="_top">
+      <rect id="rect30023410" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Embod</text>
+      <text id="txt30023410" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003444">
+    <a xlink:href="http://evemaps.dotlan.net/system/Mateber" class="sys link-5-30003444" target="_top">
+      <rect id="rect30003444" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Mateber</text>
+      <text id="txt30003444" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003415">
+    <a xlink:href="http://evemaps.dotlan.net/system/Aldagolf" class="sys link-5-30003415" target="_top">
+      <rect id="rect30003415" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Aldagolf</text>
+      <text id="txt30003415" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003378">
+    <a xlink:href="http://evemaps.dotlan.net/system/Nedegulf" class="sys link-5-30003378" target="_top">
+      <rect id="rect30003378" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Nedegulf</text>
+      <text id="txt30003378" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003379">
+    <a xlink:href="http://evemaps.dotlan.net/system/Aldilur" class="sys link-5-30003379" target="_top">
+      <rect id="rect30003379" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Aldilur</text>
+      <text id="txt30003379" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30013410">
+    <a xlink:href="http://evemaps.dotlan.net/system/Abrat" class="sys link-5-30013410" target="_top">
+      <rect id="rect30013410" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Abrat</text>
+      <text id="txt30013410" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003412">
+    <a xlink:href="http://evemaps.dotlan.net/system/Elgoi" class="sys link-5-30003412" target="_top">
+      <rect id="rect30003412" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Elgoi</text>
+      <text id="txt30003412" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003462">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eldjaerin" class="sys link-5-30003462" target="_top">
+      <rect id="rect30003462" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eldjaerin</text>
+      <text id="txt30003462" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003464">
+    <a xlink:href="http://evemaps.dotlan.net/system/Aldik" class="sys link-5-30003464" target="_top">
+      <rect id="rect30003464" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Aldik</text>
+      <text id="txt30003464" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003461">
+    <a xlink:href="http://evemaps.dotlan.net/system/Diromitur" class="sys link-5-30003461" target="_top">
+      <rect id="rect30003461" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Diromitur</text>
+      <text id="txt30003461" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003413">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eram" class="sys link-5-30003413" target="_top">
+      <rect id="rect30003413" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eram</text>
+      <text id="txt30003413" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003454">
+    <a xlink:href="http://evemaps.dotlan.net/system/Engosi" class="sys link-5-30003454" target="_top">
+      <rect id="rect30003454" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Engosi</text>
+      <text id="txt30003454" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003466">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eurgrana" class="sys link-5-30003466" target="_top">
+      <rect id="rect30003466" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Eurgrana</text>
+      <text id="txt30003466" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003414">
+    <a xlink:href="http://evemaps.dotlan.net/system/Yrmori" class="sys link-5-30003414" target="_top">
+      <rect id="rect30003414" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Yrmori</text>
+      <text id="txt30003414" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003455">
+    <a xlink:href="http://evemaps.dotlan.net/system/Atonder" class="sys link-5-30003455" target="_top">
+      <rect id="rect30003455" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Atonder</text>
+      <text id="txt30003455" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003459">
+    <a xlink:href="http://evemaps.dotlan.net/system/Lirerim" class="sys link-5-30003459" target="_top">
+      <rect id="rect30003459" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Lirerim</text>
+      <text id="txt30003459" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003463">
+    <a xlink:href="http://evemaps.dotlan.net/system/Erlendur" class="sys link-5-30003463" target="_top">
+      <rect id="rect30003463" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Erlendur</text>
+      <text id="txt30003463" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003453">
+    <a xlink:href="http://evemaps.dotlan.net/system/Orduin" class="sys link-5-30003453" target="_top">
+      <rect id="rect30003453" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Orduin</text>
+      <text id="txt30003453" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003460">
+    <a xlink:href="http://evemaps.dotlan.net/system/Offikatlin" class="sys link-5-30003460" target="_top">
+      <rect id="rect30003460" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Offikatlin</text>
+      <text id="txt30003460" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30003467">
+    <a xlink:href="http://evemaps.dotlan.net/system/Frulegur" class="sys link-5-30003467" target="_top">
+      <rect id="rect30003467" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Frulegur</text>
+      <text id="txt30003467" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003458">
+    <a xlink:href="http://evemaps.dotlan.net/system/Klaevik" class="sys link-5-30003458" target="_top">
+      <rect id="rect30003458" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Klaevik</text>
+      <text id="txt30003458" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003470">
+    <a xlink:href="http://evemaps.dotlan.net/system/Odebeinn" class="sys link-5-30003470" target="_top">
+      <rect id="rect30003470" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Odebeinn</text>
+      <text id="txt30003470" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003465">
+    <a xlink:href="http://evemaps.dotlan.net/system/Tabbetzur" class="sys link-5-30003465" target="_top">
+      <rect id="rect30003465" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Tabbetzur</text>
+      <text id="txt30003465" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003456">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hotrardik" class="sys link-5-30003456" target="_top">
+      <rect id="rect30003456" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hotrardik</text>
+      <text id="txt30003456" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003457">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ridoner" class="sys link-5-30003457" target="_top">
+      <rect id="rect30003457" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Ridoner</text>
+      <text id="txt30003457" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003468">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hroduko" class="sys link-5-30003468" target="_top">
+      <rect id="rect30003468" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hroduko</text>
+      <text id="txt30003468" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003469">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hodrold" class="sys link-5-30003469" target="_top">
+    <rect id="ice30003469" x="1" y="0.5" rx="12.35" ry="11.35" width="48.5" height="24.7" class="i" />
+      <rect id="rect30003469" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Hodrold</text>
+      <text id="txt30003469" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003471">
+    <a xlink:href="http://evemaps.dotlan.net/system/Konora" class="sys link-5-30003471" target="_top">
+      <rect id="rect30003471" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sl" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Konora</text>
+      <text id="txt30003471" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003472">
+    <a xlink:href="http://evemaps.dotlan.net/system/Erindur" class="sys link-5-30003472" target="_top">
+      <rect id="rect30003472" x="4" y="3.5" rx="9.35" ry="9.35" width="42.5" height="18.7"  class="sh" style="fill: #FFE8E8;" />
+      <text x="24.25" y="12.35" class="ss" text-anchor="middle">Erindur</text>
+      <text id="txt30003472" x="24.25" y="18.895" class="st" text-anchor="middle">Minmatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002539">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Siseide" class="sys link-5-30002539" target="_top">
+      <rect id="rect30002539" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Siseide</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002541">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Dal" class="sys link-5-30002541" target="_top">
+      <rect id="rect30002541" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Dal</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002723">
+    <a xlink:href="http://evemaps.dotlan.net/map/Sinq_Laison/Otou" class="sys link-5-30002723" target="_top">
+      <rect id="rect30002723" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Otou</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Sinq Laison</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002517">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Gulmorogod" class="sys link-5-30002517" target="_top">
+      <rect id="rect30002517" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Gulmorogod</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30003089">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Bleak_Lands/Kurniainen" class="sys link-5-30003089" target="_top">
+      <rect id="rect30003089" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Kurniainen</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">The Bleak Lands</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30000200">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Forge/Akkio" class="sys link-5-30000200" target="_top">
+      <rect id="rect30000200" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Akkio</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">The Forge</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002682">
+    <a xlink:href="http://evemaps.dotlan.net/map/Sinq_Laison/Colelie" class="sys link-5-30002682" target="_top">
+      <rect id="rect30002682" x="3.5" y="3.5" width="42.5" height="18.7" class="eh" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Colelie</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Sinq Laison</text>
+    </a>
+  </symbol>
+  <symbol id="def30002543">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Eystur" class="sys link-5-30002543" target="_top">
+      <rect id="rect30002543" x="3.5" y="3.5" width="42.5" height="18.7" class="eh" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Eystur</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002720">
+    <a xlink:href="http://evemaps.dotlan.net/map/Sinq_Laison/Thelan" class="sys link-5-30002720" target="_top">
+      <rect id="rect30002720" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Thelan</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Sinq Laison</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002684">
+    <a xlink:href="http://evemaps.dotlan.net/map/Sinq_Laison/Audaerne" class="sys link-5-30002684" target="_top">
+      <rect id="rect30002684" x="3.5" y="3.5" width="42.5" height="18.7" class="eh" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Audaerne</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Sinq Laison</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002560">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Gultratren" class="sys link-5-30002560" target="_top">
+      <rect id="rect30002560" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Gultratren</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002511">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Ameinaka" class="sys link-5-30002511" target="_top">
+      <rect id="rect30002511" x="3.5" y="3.5" width="42.5" height="18.7" class="eh" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Ameinaka</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002573">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Vullat" class="sys link-5-30002573" target="_top">
+      <rect id="rect30002573" x="3.5" y="3.5" width="42.5" height="18.7" class="eh" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Vullat</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="52.11,18.025 47.435,13.35 42.76,18.025 52.11,18.025" class="v3" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30000199">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Forge/Fuskunen" class="sys link-5-30000199" target="_top">
+      <rect id="rect30000199" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Fuskunen</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">The Forge</text>
+    </a>
+  </symbol>
+  <symbol id="def30002554">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Wiskeber" class="sys link-5-30002554" target="_top">
+      <rect id="rect30002554" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Wiskeber</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+  <symbol id="def30002525">
+    <a xlink:href="http://evemaps.dotlan.net/map/Heimatar/Meirakulf" class="sys link-5-30002525" target="_top">
+      <rect id="rect30002525" x="3.5" y="3.5" width="42.5" height="18.7" class="eh" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Meirakulf</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Heimatar</text>
+    </a>
+  </symbol>
+  <symbol id="def30002478">
+    <a xlink:href="http://evemaps.dotlan.net/map/Geminate/AD-5B8" class="sys link-5-30002478" target="_top">
+      <rect id="rect30002478" x="3.5" y="3.5" width="42.5" height="18.7" class="e" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">AD-5B8</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Geminate</text>
+    </a>
+  </symbol>
+  <symbol id="def30000999">
+    <a xlink:href="http://evemaps.dotlan.net/map/Great_Wildlands/N-RAEL" class="sys link-5-30000999" target="_top">
+      <rect id="rect30000999" x="3.5" y="3.5" width="42.5" height="18.7" class="e" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">N-RAEL</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Great Wildlands</text>
+    </a>
+  </symbol>
+  <symbol id="def30002412">
+    <a xlink:href="http://evemaps.dotlan.net/map/Molden_Heath/Ennur" class="sys link-5-30002412" target="_top">
+      <rect id="rect30002412" x="3.5" y="3.5" width="42.5" height="18.7" class="el" />
+      <text x="24.25" y="12.35" class="es" text-anchor="middle">Ennur</text>
+      <text x="24.25" y="18.895" class="er" text-anchor="middle">Molden Heath</text>
+    </a>
+    <rect x="42.76" y="8.675" height="9.35" width="9.35" class="o" />
+    <polygon points="42.76,8.675 52.11,8.675 47.435,13.35 42.76,8.675" class="v1" />
+    <polygon points="52.11,8.675 47.435,13.35 52.11,18.025 52.11,8.675" class="v2" />
+    <polygon points="42.76,18.025 47.435,13.35 42.76,8.675 42.76,18.025" class="v4" />
+    <rect x="42.76" y="8.675" height="9.35" width="9.35"  class="oo" />
+  </symbol>
+
+  <linearGradient id="fw500002-0"><stop offset="3%" stop-color="#FFF4CE"/><stop offset="4%" stop-color="#FFA0FF"/><stop offset="6%" stop-color="#FFA0FF"/><stop offset="7%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-5"><stop offset="7.5%" stop-color="#FFF4CE"/><stop offset="8.5%" stop-color="#FFA0FF"/><stop offset="10.5%" stop-color="#FFA0FF"/><stop offset="11.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-10"><stop offset="12%" stop-color="#FFF4CE"/><stop offset="13%" stop-color="#FFA0FF"/><stop offset="15%" stop-color="#FFA0FF"/><stop offset="16%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-15"><stop offset="16.5%" stop-color="#FFF4CE"/><stop offset="17.5%" stop-color="#FFA0FF"/><stop offset="19.5%" stop-color="#FFA0FF"/><stop offset="20.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-20"><stop offset="21%" stop-color="#FFF4CE"/><stop offset="22%" stop-color="#FFA0FF"/><stop offset="24%" stop-color="#FFA0FF"/><stop offset="25%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-25"><stop offset="25.5%" stop-color="#FFF4CE"/><stop offset="26.5%" stop-color="#FFA0FF"/><stop offset="28.5%" stop-color="#FFA0FF"/><stop offset="29.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-30"><stop offset="30%" stop-color="#FFF4CE"/><stop offset="31%" stop-color="#FFA0FF"/><stop offset="33%" stop-color="#FFA0FF"/><stop offset="34%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-35"><stop offset="34.5%" stop-color="#FFF4CE"/><stop offset="35.5%" stop-color="#FFA0FF"/><stop offset="37.5%" stop-color="#FFA0FF"/><stop offset="38.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-40"><stop offset="39%" stop-color="#FFF4CE"/><stop offset="40%" stop-color="#FFA0FF"/><stop offset="42%" stop-color="#FFA0FF"/><stop offset="43%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-45"><stop offset="43.5%" stop-color="#FFF4CE"/><stop offset="44.5%" stop-color="#FFA0FF"/><stop offset="46.5%" stop-color="#FFA0FF"/><stop offset="47.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-50"><stop offset="48%" stop-color="#FFF4CE"/><stop offset="49%" stop-color="#FFA0FF"/><stop offset="51%" stop-color="#FFA0FF"/><stop offset="52%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-55"><stop offset="52.5%" stop-color="#FFF4CE"/><stop offset="53.5%" stop-color="#FFA0FF"/><stop offset="55.5%" stop-color="#FFA0FF"/><stop offset="56.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-60"><stop offset="57%" stop-color="#FFF4CE"/><stop offset="58%" stop-color="#FFA0FF"/><stop offset="60%" stop-color="#FFA0FF"/><stop offset="61%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-65"><stop offset="61.5%" stop-color="#FFF4CE"/><stop offset="62.5%" stop-color="#FFA0FF"/><stop offset="64.5%" stop-color="#FFA0FF"/><stop offset="65.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-70"><stop offset="66%" stop-color="#FFF4CE"/><stop offset="67%" stop-color="#FFA0FF"/><stop offset="69%" stop-color="#FFA0FF"/><stop offset="70%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-75"><stop offset="70.5%" stop-color="#FFF4CE"/><stop offset="71.5%" stop-color="#FFA0FF"/><stop offset="73.5%" stop-color="#FFA0FF"/><stop offset="74.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-80"><stop offset="75%" stop-color="#FFF4CE"/><stop offset="76%" stop-color="#FFA0FF"/><stop offset="78%" stop-color="#FFA0FF"/><stop offset="79%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-85"><stop offset="79.5%" stop-color="#FFF4CE"/><stop offset="80.5%" stop-color="#FFA0FF"/><stop offset="82.5%" stop-color="#FFA0FF"/><stop offset="83.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-90"><stop offset="84%" stop-color="#FFF4CE"/><stop offset="85%" stop-color="#FFA0FF"/><stop offset="87%" stop-color="#FFA0FF"/><stop offset="88%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-95"><stop offset="88.5%" stop-color="#FFF4CE"/><stop offset="89.5%" stop-color="#FFA0FF"/><stop offset="91.5%" stop-color="#FFA0FF"/><stop offset="92.5%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500002-100"><stop offset="93%" stop-color="#FFF4CE"/><stop offset="94%" stop-color="#FFA0FF"/><stop offset="96%" stop-color="#FFA0FF"/><stop offset="97%" stop-color="#FFE8E8"/></linearGradient>
+  <linearGradient id="fw500003-0"><stop offset="3%" stop-color="#FFE8E8"/><stop offset="4%" stop-color="#FFA0FF"/><stop offset="6%" stop-color="#FFA0FF"/><stop offset="7%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-5"><stop offset="7.5%" stop-color="#FFE8E8"/><stop offset="8.5%" stop-color="#FFA0FF"/><stop offset="10.5%" stop-color="#FFA0FF"/><stop offset="11.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-10"><stop offset="12%" stop-color="#FFE8E8"/><stop offset="13%" stop-color="#FFA0FF"/><stop offset="15%" stop-color="#FFA0FF"/><stop offset="16%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-15"><stop offset="16.5%" stop-color="#FFE8E8"/><stop offset="17.5%" stop-color="#FFA0FF"/><stop offset="19.5%" stop-color="#FFA0FF"/><stop offset="20.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-20"><stop offset="21%" stop-color="#FFE8E8"/><stop offset="22%" stop-color="#FFA0FF"/><stop offset="24%" stop-color="#FFA0FF"/><stop offset="25%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-25"><stop offset="25.5%" stop-color="#FFE8E8"/><stop offset="26.5%" stop-color="#FFA0FF"/><stop offset="28.5%" stop-color="#FFA0FF"/><stop offset="29.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-30"><stop offset="30%" stop-color="#FFE8E8"/><stop offset="31%" stop-color="#FFA0FF"/><stop offset="33%" stop-color="#FFA0FF"/><stop offset="34%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-35"><stop offset="34.5%" stop-color="#FFE8E8"/><stop offset="35.5%" stop-color="#FFA0FF"/><stop offset="37.5%" stop-color="#FFA0FF"/><stop offset="38.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-40"><stop offset="39%" stop-color="#FFE8E8"/><stop offset="40%" stop-color="#FFA0FF"/><stop offset="42%" stop-color="#FFA0FF"/><stop offset="43%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-45"><stop offset="43.5%" stop-color="#FFE8E8"/><stop offset="44.5%" stop-color="#FFA0FF"/><stop offset="46.5%" stop-color="#FFA0FF"/><stop offset="47.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-50"><stop offset="48%" stop-color="#FFE8E8"/><stop offset="49%" stop-color="#FFA0FF"/><stop offset="51%" stop-color="#FFA0FF"/><stop offset="52%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-55"><stop offset="52.5%" stop-color="#FFE8E8"/><stop offset="53.5%" stop-color="#FFA0FF"/><stop offset="55.5%" stop-color="#FFA0FF"/><stop offset="56.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-60"><stop offset="57%" stop-color="#FFE8E8"/><stop offset="58%" stop-color="#FFA0FF"/><stop offset="60%" stop-color="#FFA0FF"/><stop offset="61%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-65"><stop offset="61.5%" stop-color="#FFE8E8"/><stop offset="62.5%" stop-color="#FFA0FF"/><stop offset="64.5%" stop-color="#FFA0FF"/><stop offset="65.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-70"><stop offset="66%" stop-color="#FFE8E8"/><stop offset="67%" stop-color="#FFA0FF"/><stop offset="69%" stop-color="#FFA0FF"/><stop offset="70%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-75"><stop offset="70.5%" stop-color="#FFE8E8"/><stop offset="71.5%" stop-color="#FFA0FF"/><stop offset="73.5%" stop-color="#FFA0FF"/><stop offset="74.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-80"><stop offset="75%" stop-color="#FFE8E8"/><stop offset="76%" stop-color="#FFA0FF"/><stop offset="78%" stop-color="#FFA0FF"/><stop offset="79%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-85"><stop offset="79.5%" stop-color="#FFE8E8"/><stop offset="80.5%" stop-color="#FFA0FF"/><stop offset="82.5%" stop-color="#FFA0FF"/><stop offset="83.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-90"><stop offset="84%" stop-color="#FFE8E8"/><stop offset="85%" stop-color="#FFA0FF"/><stop offset="87%" stop-color="#FFA0FF"/><stop offset="88%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-95"><stop offset="88.5%" stop-color="#FFE8E8"/><stop offset="89.5%" stop-color="#FFA0FF"/><stop offset="91.5%" stop-color="#FFA0FF"/><stop offset="92.5%" stop-color="#FFF4CE"/></linearGradient>
+  <linearGradient id="fw500003-100"><stop offset="93%" stop-color="#FFE8E8"/><stop offset="94%" stop-color="#FFA0FF"/><stop offset="96%" stop-color="#FFA0FF"/><stop offset="97%" stop-color="#FFF4CE"/></linearGradient>
+  <symbol id="defCampaign" width="85" height="46">
+    <rect x="0" y="0" width="85" height="46" class="cam" />
+  </symbol>
+  <symbol id="defCampaignActive" width="85" height="46">
+    <rect x="0" y="0" width="85" height="46" class="cam-active" />
+  </symbol>
+  <radialGradient id="conBg">
+    <stop offset="50%" stop-color="#FFA0FF"/>
+    <stop offset="95%" stop-color="#FFA0FF" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="camBg">
+    <stop offset="30%" stop-color="#FF8800" stop-opacity="1"/>
+    <stop offset="95%" stop-color="#FF8800" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="camActiveBg">
+    <stop offset="40%" stop-color="#FF0000" stop-opacity="1"/>
+    <stop offset="95%" stop-color="#FF0000" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="incBg">
+    <stop offset="50%" stop-color="#AFCE00"/>
+    <stop offset="100%" stop-color="#AFCE00" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="incStBg">
+    <stop offset="50%" stop-color="#808000"/>
+    <stop offset="100%" stop-color="#808000" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<text x="10" y="20" id="debug"  style="fill: #888888;"> </text>
+
+<g id="glow">
+
+  <rect id="inc30002091" x="18.5" y="615.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002093" x="33.5" y="660.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002097" x="48.5" y="445.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002058" x="53.5" y="540.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002096" x="68.5" y="735.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002090" x="73.5" y="580.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002095" x="73.5" y="695.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002098" x="83.5" y="410.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002094" x="108.5" y="660.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002092" x="123.5" y="615.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002099" x="138.5" y="390.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002088" x="183.5" y="650.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002065" x="188.5" y="345.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002082" x="208.5" y="565.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002066" x="213.5" y="380.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002084" x="213.5" y="605.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002061" x="228.5" y="320.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002087" x="233.5" y="680.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002060" x="273.5" y="355.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002062" x="278.5" y="410.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002086" x="283.5" y="605.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002089" x="298.5" y="695.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002083" x="308.5" y="570.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002085" x="323.5" y="650.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002539" x="3.5" y="695.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002541" x="3.5" y="735.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30002517" x="126.5" y="351.5" width="63.5" height="34.7" class="con" />
+  <rect id="inc30003089" x="212.5" y="725.5" width="63.5" height="34.7" class="con" />
+</g>
+
+<g id="campaigns"></g>
+
+<g id="jumps">
+<line id="j-30002049-30002048" x1="224.5" y1="117.5" x2="134.5" y2="87.5" class="j" />
+<line id="j-30002050-30002048" x1="224.5" y1="117.5" x2="274.5" y2="202.5" class="j" />
+<line id="j-30002682-30002048" x1="224.5" y1="117.5" x2="294.5" y2="122.5" class="jr" />
+<line id="j-30003386-30002048" x1="224.5" y1="117.5" x2="204.5" y2="82.5" class="jc" />
+<line id="j-30002053-30002049" x1="134.5" y1="87.5" x2="24.5" y2="12.5" class="j" />
+<line id="j-30002051-30002050" x1="274.5" y1="202.5" x2="309.5" y2="307.5" class="j" />
+<line id="j-30002052-30002050" x1="274.5" y1="202.5" x2="344.5" y2="182.5" class="j" />
+<line id="j-30002076-30002050" x1="274.5" y1="202.5" x2="224.5" y2="242.5" class="jc" />
+<line id="j-30002720-30002050" x1="274.5" y1="202.5" x2="324.5" y2="152.5" class="jr" />
+<line id="j-30002060-30002051" x1="309.5" y1="307.5" x2="304.5" y2="372.5" class="jc" />
+<line id="j-30002054-30002053" x1="24.5" y1="12.5" x2="24.5" y2="317.5" class="jc" />
+<line id="j-30002068-30002053" x1="24.5" y1="12.5" x2="104.5" y2="117.5" class="jc" />
+<line id="j-30002543-30002053" x1="24.5" y1="12.5" x2="319.5" y2="12.5" class="jr" />
+<line id="j-30002723-30002053" x1="24.5" y1="12.5" x2="99.5" y2="27.5" class="jr" />
+<line id="j-30002055-30002054" x1="24.5" y1="317.5" x2="69.5" y2="352.5" class="j" />
+<line id="j-30002056-30002054" x1="24.5" y1="317.5" x2="24.5" y2="442.5" class="j" />
+<line id="j-30002056-30002055" x1="69.5" y1="352.5" x2="24.5" y2="442.5" class="j" />
+<line id="j-30002059-30002055" x1="69.5" y1="352.5" x2="99.5" y2="392.5" class="j" />
+<line id="j-30002057-30002056" x1="24.5" y1="442.5" x2="39.5" y2="507.5" class="j" />
+<line id="j-30002059-30002056" x1="24.5" y1="442.5" x2="99.5" y2="392.5" class="j" />
+<line id="j-30002058-30002057" x1="39.5" y1="507.5" x2="84.5" y2="557.5" class="j" />
+<line id="j-30002097-30002057" x1="39.5" y1="507.5" x2="79.5" y2="462.5" class="jc" />
+<line id="j-30002082-30002058" x1="84.5" y1="557.5" x2="239.5" y2="582.5" class="jc" />
+<line id="j-30002090-30002058" x1="84.5" y1="557.5" x2="104.5" y2="597.5" class="jc" />
+<line id="j-30002061-30002060" x1="304.5" y1="372.5" x2="259.5" y2="337.5" class="j" />
+<line id="j-30002062-30002060" x1="304.5" y1="372.5" x2="309.5" y2="427.5" class="j" />
+<line id="j-30002065-30002060" x1="304.5" y1="372.5" x2="219.5" y2="362.5" class="j" />
+<line id="j-30002066-30002060" x1="304.5" y1="372.5" x2="244.5" y2="397.5" class="j" />
+<line id="j-30002065-30002061" x1="259.5" y1="337.5" x2="219.5" y2="362.5" class="j" />
+<line id="j-30002062-30000200" x1="309.5" y1="427.5" x2="254.5" y2="432.5" class="jr" />
+<line id="j-30002063-30002062" x1="309.5" y1="427.5" x2="279.5" y2="477.5" class="j" />
+<line id="j-30002064-30002062" x1="309.5" y1="427.5" x2="339.5" y2="477.5" class="j" />
+<line id="j-30002064-30002063" x1="279.5" y1="477.5" x2="339.5" y2="477.5" class="j" />
+<line id="j-30002067-30002063" x1="279.5" y1="477.5" x2="309.5" y2="517.5" class="j" />
+<line id="j-30002067-30002064" x1="339.5" y1="477.5" x2="309.5" y2="517.5" class="j" />
+<line id="j-30002560-30002064" x1="339.5" y1="477.5" x2="364.5" y2="527.5" class="jr" />
+<line id="j-30002066-30002065" x1="219.5" y1="362.5" x2="244.5" y2="397.5" class="j" />
+<line id="j-30002099-30002066" x1="244.5" y1="397.5" x2="169.5" y2="407.5" class="jc" />
+<line id="j-30002069-30002068" x1="104.5" y1="117.5" x2="104.5" y2="182.5" class="j" />
+<line id="j-30002070-30002068" x1="104.5" y1="117.5" x2="54.5" y2="212.5" class="j" />
+<line id="j-30002071-30002068" x1="104.5" y1="117.5" x2="164.5" y2="202.5" class="j" />
+<line id="j-30002072-30002068" x1="104.5" y1="117.5" x2="54.5" y2="152.5" class="j" />
+<line id="j-30002073-30002068" x1="104.5" y1="117.5" x2="159.5" y2="152.5" class="j" />
+<line id="j-30002074-30002068" x1="104.5" y1="117.5" x2="214.5" y2="152.5" class="j" />
+<line id="j-30002071-30002069" x1="104.5" y1="182.5" x2="164.5" y2="202.5" class="j" />
+<line id="j-30002072-30002070" x1="54.5" y1="212.5" x2="54.5" y2="152.5" class="j" />
+<line id="j-30002075-30002070" x1="54.5" y1="212.5" x2="109.5" y2="237.5" class="j" />
+<line id="j-30002073-30002071" x1="164.5" y1="202.5" x2="159.5" y2="152.5" class="j" />
+<line id="j-30002074-30002071" x1="164.5" y1="202.5" x2="214.5" y2="152.5" class="j" />
+<line id="j-30002075-30002071" x1="164.5" y1="202.5" x2="109.5" y2="237.5" class="j" />
+<line id="j-30002073-30002072" x1="54.5" y1="152.5" x2="159.5" y2="152.5" class="j" />
+<line id="j-30002074-30002073" x1="159.5" y1="152.5" x2="214.5" y2="152.5" class="j" />
+<line id="j-30002077-30002076" x1="224.5" y1="242.5" x2="254.5" y2="277.5" class="j" />
+<line id="j-30002079-30002076" x1="224.5" y1="242.5" x2="129.5" y2="272.5" class="j" />
+<line id="j-30002080-30002076" x1="224.5" y1="242.5" x2="194.5" y2="272.5" class="j" />
+<line id="j-30002078-30002077" x1="254.5" y1="277.5" x2="194.5" y2="312.5" class="j" />
+<line id="j-30002079-30002078" x1="194.5" y1="312.5" x2="129.5" y2="272.5" class="j" />
+<line id="j-30002080-30002078" x1="194.5" y1="312.5" x2="194.5" y2="272.5" class="j" />
+<line id="j-30002081-30002078" x1="194.5" y1="312.5" x2="129.5" y2="312.5" class="j" />
+<line id="j-30002080-30002079" x1="129.5" y1="272.5" x2="194.5" y2="272.5" class="j" />
+<line id="j-30002081-30002079" x1="129.5" y1="272.5" x2="129.5" y2="312.5" class="j" />
+<line id="j-30002081-30002080" x1="194.5" y1="272.5" x2="129.5" y2="312.5" class="j" />
+<line id="j-30002083-30002082" x1="239.5" y1="582.5" x2="339.5" y2="587.5" class="j" />
+<line id="j-30002084-30002082" x1="239.5" y1="582.5" x2="244.5" y2="622.5" class="j" />
+<line id="j-30002084-30002083" x1="339.5" y1="587.5" x2="244.5" y2="622.5" class="j" />
+<line id="j-30002085-30002083" x1="339.5" y1="587.5" x2="354.5" y2="667.5" class="j" />
+<line id="j-30002086-30002083" x1="339.5" y1="587.5" x2="314.5" y2="622.5" class="j" />
+<line id="j-30002085-30002084" x1="244.5" y1="622.5" x2="354.5" y2="667.5" class="j" />
+<line id="j-30002086-30002084" x1="244.5" y1="622.5" x2="314.5" y2="622.5" class="j" />
+<line id="j-30002087-30002084" x1="244.5" y1="622.5" x2="264.5" y2="697.5" class="j" />
+<line id="j-30002088-30002084" x1="244.5" y1="622.5" x2="214.5" y2="667.5" class="j" />
+<line id="j-30002089-30002084" x1="244.5" y1="622.5" x2="329.5" y2="712.5" class="j" />
+<line id="j-30002087-30002085" x1="354.5" y1="667.5" x2="264.5" y2="697.5" class="j" />
+<line id="j-30002089-30002085" x1="354.5" y1="667.5" x2="329.5" y2="712.5" class="j" />
+<line id="j-30002087-30002086" x1="314.5" y1="622.5" x2="264.5" y2="697.5" class="j" />
+<line id="j-30002088-30002087" x1="264.5" y1="697.5" x2="214.5" y2="667.5" class="j" />
+<line id="j-30003089-30002087" x1="264.5" y1="697.5" x2="243.5" y2="742.5" class="jr" />
+<line id="j-30002684-30002089" x1="329.5" y1="712.5" x2="329.5" y2="752.5" class="jr" />
+<line id="j-30002091-30002090" x1="104.5" y1="597.5" x2="49.5" y2="632.5" class="j" />
+<line id="j-30002092-30002090" x1="104.5" y1="597.5" x2="154.5" y2="632.5" class="j" />
+<line id="j-30002093-30002090" x1="104.5" y1="597.5" x2="64.5" y2="677.5" class="j" />
+<line id="j-30002094-30002090" x1="104.5" y1="597.5" x2="139.5" y2="677.5" class="j" />
+<line id="j-30002095-30002090" x1="104.5" y1="597.5" x2="104.5" y2="712.5" class="j" />
+<line id="j-30002092-30002091" x1="49.5" y1="632.5" x2="154.5" y2="632.5" class="j" />
+<line id="j-30002093-30002091" x1="49.5" y1="632.5" x2="64.5" y2="677.5" class="j" />
+<line id="j-30002094-30002091" x1="49.5" y1="632.5" x2="139.5" y2="677.5" class="j" />
+<line id="j-30002094-30002092" x1="154.5" y1="632.5" x2="139.5" y2="677.5" class="j" />
+<line id="j-30002094-30002093" x1="64.5" y1="677.5" x2="139.5" y2="677.5" class="j" />
+<line id="j-30002095-30002093" x1="64.5" y1="677.5" x2="104.5" y2="712.5" class="j" />
+<line id="j-30002095-30002094" x1="139.5" y1="677.5" x2="104.5" y2="712.5" class="j" />
+<line id="j-30002096-30002095" x1="104.5" y1="712.5" x2="99.5" y2="752.5" class="j" />
+<line id="j-30002539-30002095" x1="104.5" y1="712.5" x2="34.5" y2="712.5" class="jr" />
+<line id="j-30002541-30002096" x1="99.5" y1="752.5" x2="34.5" y2="752.5" class="jr" />
+<line id="j-30002098-30002097" x1="79.5" y1="462.5" x2="114.5" y2="427.5" class="j" />
+<line id="j-30002099-30002098" x1="114.5" y1="427.5" x2="169.5" y2="407.5" class="j" />
+<line id="j-30002100-30002099" x1="169.5" y1="407.5" x2="169.5" y2="452.5" class="j" />
+<line id="j-30002517-30002099" x1="169.5" y1="407.5" x2="157.5" y2="368.5" class="jr" />
+<line id="j-30002101-30002100" x1="169.5" y1="452.5" x2="129.5" y2="487.5" class="j" />
+<line id="j-30002102-30002100" x1="169.5" y1="452.5" x2="199.5" y2="487.5" class="j" />
+<line id="j-30002102-30002101" x1="129.5" y1="487.5" x2="199.5" y2="487.5" class="j" />
+<line id="j-30003374-30002511" x1="634.5" y1="662.5" x2="609.5" y2="707.5" class="jr" />
+<line id="j-30003375-30003374" x1="634.5" y1="662.5" x2="699.5" y2="697.5" class="j" />
+<line id="j-30003376-30003374" x1="634.5" y1="662.5" x2="644.5" y2="617.5" class="j" />
+<line id="j-30003380-30003374" x1="634.5" y1="662.5" x2="709.5" y2="647.5" class="j" />
+<line id="j-30022505-30003374" x1="634.5" y1="662.5" x2="569.5" y2="647.5" class="j" />
+<line id="j-30003378-30003375" x1="699.5" y1="697.5" x2="774.5" y2="697.5" class="j" />
+<line id="j-30003380-30003375" x1="699.5" y1="697.5" x2="709.5" y2="647.5" class="j" />
+<line id="j-30003377-30003376" x1="644.5" y1="617.5" x2="704.5" y2="607.5" class="j" />
+<line id="j-30003379-30003377" x1="704.5" y1="607.5" x2="784.5" y2="617.5" class="j" />
+<line id="j-30003380-30003377" x1="704.5" y1="607.5" x2="709.5" y2="647.5" class="j" />
+<line id="j-30003400-30003377" x1="704.5" y1="607.5" x2="614.5" y2="562.5" class="jc" />
+<line id="j-30003409-30003377" x1="704.5" y1="607.5" x2="729.5" y2="547.5" class="jc" />
+<line id="j-30013410-30003380" x1="709.5" y1="647.5" x2="784.5" y2="657.5" class="j" />
+<line id="j-30003382-30003381" x1="204.5" y1="47.5" x2="259.5" y2="47.5" class="j" />
+<line id="j-30003383-30003381" x1="204.5" y1="47.5" x2="149.5" y2="37.5" class="j" />
+<line id="j-30003386-30003381" x1="204.5" y1="47.5" x2="204.5" y2="82.5" class="j" />
+<line id="j-30003385-30003382" x1="259.5" y1="47.5" x2="259.5" y2="82.5" class="j" />
+<line id="j-30003387-30003382" x1="259.5" y1="47.5" x2="309.5" y2="47.5" class="jc" />
+<line id="j-30003385-30003384" x1="369.5" y1="97.5" x2="259.5" y2="82.5" class="j" />
+<line id="j-30003393-30003384" x1="369.5" y1="97.5" x2="399.5" y2="147.5" class="jc" />
+<line id="j-30003386-30003385" x1="259.5" y1="82.5" x2="204.5" y2="82.5" class="j" />
+<line id="j-30003388-30003387" x1="309.5" y1="47.5" x2="429.5" y2="42.5" class="j" />
+<line id="j-30003388-30002543" x1="429.5" y1="42.5" x2="319.5" y2="12.5" class="jr" />
+<line id="j-30003389-30003388" x1="429.5" y1="42.5" x2="524.5" y2="157.5" class="j" />
+<line id="j-30043410-30003388" x1="429.5" y1="42.5" x2="429.5" y2="12.5" class="j" />
+<line id="j-30003390-30003389" x1="524.5" y1="157.5" x2="524.5" y2="117.5" class="j" />
+<line id="j-30003391-30003389" x1="524.5" y1="157.5" x2="509.5" y2="212.5" class="j" />
+<line id="j-30003392-30003389" x1="524.5" y1="157.5" x2="589.5" y2="207.5" class="j" />
+<line id="j-30003434-30003390" x1="524.5" y1="117.5" x2="524.5" y2="82.5" class="jc" />
+<line id="j-30003392-30003391" x1="509.5" y1="212.5" x2="589.5" y2="207.5" class="j" />
+<line id="j-30003416-30003392" x1="589.5" y1="207.5" x2="544.5" y2="302.5" class="jc" />
+<line id="j-30003422-30003392" x1="589.5" y1="207.5" x2="589.5" y2="177.5" class="jc" />
+<line id="j-30003394-30003393" x1="399.5" y1="147.5" x2="449.5" y2="182.5" class="j" />
+<line id="j-30003395-30003393" x1="399.5" y1="147.5" x2="394.5" y2="207.5" class="j" />
+<line id="j-30003395-30003394" x1="449.5" y1="182.5" x2="394.5" y2="207.5" class="j" />
+<line id="j-30003397-30003394" x1="449.5" y1="182.5" x2="444.5" y2="247.5" class="j" />
+<line id="j-30003396-30003395" x1="394.5" y1="207.5" x2="399.5" y2="282.5" class="j" />
+<line id="j-30003397-30003396" x1="399.5" y1="282.5" x2="444.5" y2="247.5" class="j" />
+<line id="j-30003399-30003396" x1="399.5" y1="282.5" x2="429.5" y2="367.5" class="j" />
+<line id="j-30003428-30003396" x1="399.5" y1="282.5" x2="384.5" y2="432.5" class="jc" />
+<line id="j-30003398-30003397" x1="444.5" y1="247.5" x2="509.5" y2="257.5" class="j" />
+<line id="j-30003401-30003400" x1="614.5" y1="562.5" x2="579.5" y2="512.5" class="j" />
+<line id="j-30003402-30003400" x1="614.5" y1="562.5" x2="644.5" y2="497.5" class="j" />
+<line id="j-30003408-30003400" x1="614.5" y1="562.5" x2="544.5" y2="552.5" class="j" />
+<line id="j-30003407-30003401" x1="579.5" y1="512.5" x2="544.5" y2="477.5" class="j" />
+<line id="j-30003403-30003402" x1="644.5" y1="497.5" x2="669.5" y2="447.5" class="j" />
+<line id="j-30003404-30003402" x1="644.5" y1="497.5" x2="584.5" y2="442.5" class="j" />
+<line id="j-30003405-30003402" x1="644.5" y1="497.5" x2="614.5" y2="407.5" class="j" />
+<line id="j-30003405-30003403" x1="669.5" y1="447.5" x2="614.5" y2="407.5" class="j" />
+<line id="j-30003406-30003403" x1="669.5" y1="447.5" x2="669.5" y2="382.5" class="j" />
+<line id="j-30033410-30003403" x1="669.5" y1="447.5" x2="724.5" y2="412.5" class="j" />
+<line id="j-30003405-30003404" x1="584.5" y1="442.5" x2="614.5" y2="407.5" class="j" />
+<line id="j-30003407-30003404" x1="584.5" y1="442.5" x2="544.5" y2="477.5" class="j" />
+<line id="j-30003406-30003405" x1="614.5" y1="407.5" x2="669.5" y2="382.5" class="j" />
+<line id="j-30003431-30003408" x1="544.5" y1="552.5" x2="469.5" y2="537.5" class="jc" />
+<line id="j-30003410-30003409" x1="729.5" y1="547.5" x2="744.5" y2="507.5" class="j" />
+<line id="j-30023410-30003409" x1="729.5" y1="547.5" x2="764.5" y2="577.5" class="j" />
+<line id="j-30003410-30002525" x1="744.5" y1="507.5" x2="829.5" y2="532.5" class="jr" />
+<line id="j-30003411-30003410" x1="744.5" y1="507.5" x2="764.5" y2="447.5" class="j" />
+<line id="j-30003412-30003411" x1="764.5" y1="447.5" x2="799.5" y2="407.5" class="j" />
+<line id="j-30003413-30003412" x1="799.5" y1="407.5" x2="839.5" y2="357.5" class="j" />
+<line id="j-30003453-30003412" x1="799.5" y1="407.5" x2="884.5" y2="427.5" class="jc" />
+<line id="j-30003413-30002573" x1="839.5" y1="357.5" x2="644.5" y2="292.5" class="jr" />
+<line id="j-30003414-30003413" x1="839.5" y1="357.5" x2="854.5" y2="312.5" class="j" />
+<line id="j-30003415-30003413" x1="839.5" y1="357.5" x2="774.5" y2="297.5" class="j" />
+<line id="j-30003459-30003414" x1="854.5" y1="312.5" x2="864.5" y2="227.5" class="jc" />
+<line id="j-30003441-30003415" x1="774.5" y1="297.5" x2="714.5" y2="272.5" class="jc" />
+<line id="j-30003417-30003416" x1="544.5" y1="302.5" x2="554.5" y2="362.5" class="j" />
+<line id="j-30003418-30003416" x1="544.5" y1="302.5" x2="494.5" y2="357.5" class="j" />
+<line id="j-30003419-30003416" x1="544.5" y1="302.5" x2="614.5" y2="327.5" class="j" />
+<line id="j-30003420-30003416" x1="544.5" y1="302.5" x2="469.5" y2="297.5" class="j" />
+<line id="j-30003418-30003417" x1="554.5" y1="362.5" x2="494.5" y2="357.5" class="j" />
+<line id="j-30003419-30003417" x1="554.5" y1="362.5" x2="614.5" y2="327.5" class="j" />
+<line id="j-30003420-30003418" x1="494.5" y1="357.5" x2="469.5" y2="297.5" class="j" />
+<line id="j-30003421-30003419" x1="614.5" y1="327.5" x2="674.5" y2="337.5" class="j" />
+<line id="j-30003423-30003422" x1="589.5" y1="177.5" x2="589.5" y2="127.5" class="j" />
+<line id="j-30003424-30003422" x1="589.5" y1="177.5" x2="649.5" y2="152.5" class="j" />
+<line id="j-30003424-30003423" x1="589.5" y1="127.5" x2="649.5" y2="152.5" class="j" />
+<line id="j-30003425-30003423" x1="589.5" y1="127.5" x2="604.5" y2="92.5" class="j" />
+<line id="j-30003426-30003425" x1="604.5" y1="92.5" x2="669.5" y2="82.5" class="j" />
+<line id="j-30003427-30003426" x1="669.5" y1="82.5" x2="694.5" y2="127.5" class="j" />
+<line id="j-30003443-30003427" x1="694.5" y1="127.5" x2="709.5" y2="172.5" class="jc" />
+<line id="j-30003429-30003428" x1="384.5" y1="432.5" x2="459.5" y2="447.5" class="j" />
+<line id="j-30003430-30003428" x1="384.5" y1="432.5" x2="404.5" y2="492.5" class="j" />
+<line id="j-30003430-30003429" x1="459.5" y1="447.5" x2="404.5" y2="492.5" class="j" />
+<line id="j-30003431-30003430" x1="404.5" y1="492.5" x2="469.5" y2="537.5" class="j" />
+<line id="j-30003433-30003430" x1="404.5" y1="492.5" x2="434.5" y2="582.5" class="j" />
+<line id="j-30003432-30003431" x1="469.5" y1="537.5" x2="479.5" y2="497.5" class="j" />
+<line id="j-30003433-30003431" x1="469.5" y1="537.5" x2="434.5" y2="582.5" class="j" />
+<line id="j-30003447-30003433" x1="434.5" y1="582.5" x2="424.5" y2="622.5" class="jc" />
+<line id="j-30003435-30003434" x1="524.5" y1="82.5" x2="499.5" y2="42.5" class="j" />
+<line id="j-30003436-30003434" x1="524.5" y1="82.5" x2="559.5" y2="42.5" class="j" />
+<line id="j-30003440-30003435" x1="499.5" y1="42.5" x2="499.5" y2="12.5" class="j" />
+<line id="j-30003437-30003436" x1="559.5" y1="42.5" x2="629.5" y2="42.5" class="j" />
+<line id="j-30003438-30003436" x1="559.5" y1="42.5" x2="559.5" y2="12.5" class="j" />
+<line id="j-30003439-30003437" x1="629.5" y1="42.5" x2="669.5" y2="12.5" class="j" />
+<line id="j-30003442-30003441" x1="714.5" y1="272.5" x2="744.5" y2="232.5" class="j" />
+<line id="j-30003443-30003441" x1="714.5" y1="272.5" x2="709.5" y2="172.5" class="j" />
+<line id="j-30003445-30003441" x1="714.5" y1="272.5" x2="669.5" y2="217.5" class="j" />
+<line id="j-30003444-30003442" x1="744.5" y1="232.5" x2="769.5" y2="202.5" class="j" />
+<line id="j-30003445-30003443" x1="709.5" y1="172.5" x2="669.5" y2="217.5" class="j" />
+<line id="j-30003446-30003443" x1="709.5" y1="172.5" x2="764.5" y2="127.5" class="j" />
+<line id="j-30003444-30002554" x1="769.5" y1="202.5" x2="809.5" y2="257.5" class="jr" />
+<line id="j-30003446-30003444" x1="769.5" y1="202.5" x2="764.5" y2="127.5" class="j" />
+<line id="j-30003446-30000199" x1="764.5" y1="127.5" x2="779.5" y2="57.5" class="jr" />
+<line id="j-30003448-30003447" x1="424.5" y1="622.5" x2="439.5" y2="662.5" class="j" />
+<line id="j-30003451-30003447" x1="424.5" y1="622.5" x2="514.5" y2="612.5" class="j" />
+<line id="j-30003449-30003448" x1="439.5" y1="662.5" x2="449.5" y2="697.5" class="j" />
+<line id="j-30003450-30003449" x1="449.5" y1="697.5" x2="494.5" y2="737.5" class="j" />
+<line id="j-30003452-30003449" x1="449.5" y1="697.5" x2="424.5" y2="747.5" class="j" />
+<line id="j-30003452-30003450" x1="494.5" y1="737.5" x2="424.5" y2="747.5" class="j" />
+<line id="j-30003454-30003453" x1="884.5" y1="427.5" x2="839.5" y2="457.5" class="j" />
+<line id="j-30003456-30003453" x1="884.5" y1="427.5" x2="954.5" y2="432.5" class="j" />
+<line id="j-30003457-30003453" x1="884.5" y1="427.5" x2="979.5" y2="477.5" class="j" />
+<line id="j-30003455-30003454" x1="839.5" y1="457.5" x2="854.5" y2="492.5" class="j" />
+<line id="j-30003457-30003454" x1="839.5" y1="457.5" x2="979.5" y2="477.5" class="j" />
+<line id="j-30003456-30003455" x1="854.5" y1="492.5" x2="954.5" y2="432.5" class="j" />
+<line id="j-30003457-30003455" x1="854.5" y1="492.5" x2="979.5" y2="477.5" class="j" />
+<line id="j-30003458-30003455" x1="854.5" y1="492.5" x2="924.5" y2="512.5" class="j" />
+<line id="j-30003457-30003456" x1="954.5" y1="432.5" x2="979.5" y2="477.5" class="j" />
+<line id="j-30003458-30003456" x1="954.5" y1="432.5" x2="924.5" y2="512.5" class="j" />
+<line id="j-30003458-30003457" x1="979.5" y1="477.5" x2="924.5" y2="512.5" class="j" />
+<line id="j-30003460-30003459" x1="864.5" y1="227.5" x2="914.5" y2="277.5" class="j" />
+<line id="j-30003461-30003459" x1="864.5" y1="227.5" x2="839.5" y2="182.5" class="j" />
+<line id="j-30003460-30002554" x1="914.5" y1="277.5" x2="809.5" y2="257.5" class="jr" />
+<line id="j-30003465-30003460" x1="914.5" y1="277.5" x2="939.5" y2="302.5" class="j" />
+<line id="j-30003462-30003461" x1="839.5" y1="182.5" x2="824.5" y2="127.5" class="j" />
+<line id="j-30003463-30003461" x1="839.5" y1="182.5" x2="884.5" y2="152.5" class="j" />
+<line id="j-30003463-30003462" x1="824.5" y1="127.5" x2="884.5" y2="152.5" class="j" />
+<line id="j-30003464-30003462" x1="824.5" y1="127.5" x2="829.5" y2="87.5" class="j" />
+<line id="j-30003467-30003463" x1="884.5" y1="152.5" x2="924.5" y2="117.5" class="jc" />
+<line id="j-30003466-30003464" x1="829.5" y1="87.5" x2="849.5" y2="47.5" class="j" />
+<line id="j-30003465-30002412" x1="939.5" y1="302.5" x2="998.5" y2="332.5" class="jr" />
+<line id="j-30003466-30002478" x1="849.5" y1="47.5" x2="879.5" y2="17.5" class="jr" />
+<line id="j-30003468-30003467" x1="924.5" y1="117.5" x2="989.5" y2="117.5" class="j" />
+<line id="j-30003469-30003468" x1="989.5" y1="117.5" x2="989.5" y2="182.5" class="j" />
+<line id="j-30003472-30003468" x1="989.5" y1="117.5" x2="998.5" y2="62.5" class="j" />
+<line id="j-30003470-30003469" x1="989.5" y1="182.5" x2="934.5" y2="202.5" class="j" />
+<line id="j-30003471-30003469" x1="989.5" y1="182.5" x2="989.5" y2="227.5" class="j" />
+<line id="j-30003471-30003470" x1="934.5" y1="202.5" x2="989.5" y2="227.5" class="j" />
+<line id="j-30003471-30000999" x1="989.5" y1="227.5" x2="998.5" y2="267.5" class="jr" />
+<line id="j-30002541-30002539" x1="34.5" y1="712.5" x2="34.5" y2="752.5" class="j" />
+<line id="j-30002573-30002543" x1="319.5" y1="12.5" x2="644.5" y2="292.5" class="jc" />
+
+</g>
+
+<g id="sysuse">
+<use id="sys30002053" x="0" y="0" width="54.175" height="26.7" xlink:href="#def30002053" />
+<use id="sys30002054" x="0" y="305" width="54.175" height="26.7" xlink:href="#def30002054" />
+<use id="sys30002056" x="0" y="430" width="54.175" height="26.7" xlink:href="#def30002056" />
+<use id="sys30002057" x="15" y="495" width="54.175" height="26.7" xlink:href="#def30002057" />
+<use id="sys30002091" x="25" y="620" width="54.175" height="26.7" xlink:href="#def30002091" />
+<use id="sys30002072" x="30" y="140" width="54.175" height="26.7" xlink:href="#def30002072" />
+<use id="sys30002070" x="30" y="200" width="54.175" height="26.7" xlink:href="#def30002070" />
+<use id="sys30002093" x="40" y="665" width="54.175" height="26.7" xlink:href="#def30002093" />
+<use id="sys30002055" x="45" y="340" width="54.175" height="26.7" xlink:href="#def30002055" />
+<use id="sys30002097" x="55" y="450" width="54.175" height="26.7" xlink:href="#def30002097" />
+<use id="sys30002058" x="60" y="545" width="54.175" height="26.7" xlink:href="#def30002058" />
+<use id="sys30002059" x="75" y="380" width="54.175" height="26.7" xlink:href="#def30002059" />
+<use id="sys30002096" x="75" y="740" width="54.175" height="26.7" xlink:href="#def30002096" />
+<use id="sys30002068" x="80" y="105" width="54.175" height="26.7" xlink:href="#def30002068" />
+<use id="sys30002069" x="80" y="170" width="54.175" height="26.7" xlink:href="#def30002069" />
+<use id="sys30002090" x="80" y="585" width="54.175" height="26.7" xlink:href="#def30002090" />
+<use id="sys30002095" x="80" y="700" width="54.175" height="26.7" xlink:href="#def30002095" />
+<use id="sys30002075" x="85" y="225" width="54.175" height="26.7" xlink:href="#def30002075" />
+<use id="sys30002098" x="90" y="415" width="54.175" height="26.7" xlink:href="#def30002098" />
+<use id="sys30002079" x="105" y="260" width="54.175" height="26.7" xlink:href="#def30002079" />
+<use id="sys30002081" x="105" y="300" width="54.175" height="26.7" xlink:href="#def30002081" />
+<use id="sys30002101" x="105" y="475" width="54.175" height="26.7" xlink:href="#def30002101" />
+<use id="sys30002049" x="110" y="75" width="54.175" height="26.7" xlink:href="#def30002049" />
+<use id="sys30002094" x="115" y="665" width="54.175" height="26.7" xlink:href="#def30002094" />
+<use id="sys30003383" x="125" y="25" width="54.175" height="26.7" xlink:href="#def30003383" />
+<use id="sys30002092" x="130" y="620" width="54.175" height="26.7" xlink:href="#def30002092" />
+<use id="sys30002073" x="135" y="140" width="54.175" height="26.7" xlink:href="#def30002073" />
+<use id="sys30002071" x="140" y="190" width="54.175" height="26.7" xlink:href="#def30002071" />
+<use id="sys30002099" x="145" y="395" width="54.175" height="26.7" xlink:href="#def30002099" />
+<use id="sys30002100" x="145" y="440" width="54.175" height="26.7" xlink:href="#def30002100" />
+<use id="sys30002080" x="170" y="260" width="54.175" height="26.7" xlink:href="#def30002080" />
+<use id="sys30002078" x="170" y="300" width="54.175" height="26.7" xlink:href="#def30002078" />
+<use id="sys30002102" x="175" y="475" width="54.175" height="26.7" xlink:href="#def30002102" />
+<use id="sys30003381" x="180" y="35" width="54.175" height="26.7" xlink:href="#def30003381" />
+<use id="sys30003386" x="180" y="70" width="54.175" height="26.7" xlink:href="#def30003386" />
+<use id="sys30002074" x="190" y="140" width="54.175" height="26.7" xlink:href="#def30002074" />
+<use id="sys30002088" x="190" y="655" width="54.175" height="26.7" xlink:href="#def30002088" />
+<use id="sys30002065" x="195" y="350" width="54.175" height="26.7" xlink:href="#def30002065" />
+<use id="sys30002048" x="200" y="105" width="54.175" height="26.7" xlink:href="#def30002048" />
+<use id="sys30002076" x="200" y="230" width="54.175" height="26.7" xlink:href="#def30002076" />
+<use id="sys30002082" x="215" y="570" width="54.175" height="26.7" xlink:href="#def30002082" />
+<use id="sys30002066" x="220" y="385" width="54.175" height="26.7" xlink:href="#def30002066" />
+<use id="sys30002084" x="220" y="610" width="54.175" height="26.7" xlink:href="#def30002084" />
+<use id="sys30002077" x="230" y="265" width="54.175" height="26.7" xlink:href="#def30002077" />
+<use id="sys30003382" x="235" y="35" width="54.175" height="26.7" xlink:href="#def30003382" />
+<use id="sys30003385" x="235" y="70" width="54.175" height="26.7" xlink:href="#def30003385" />
+<use id="sys30002061" x="235" y="325" width="54.175" height="26.7" xlink:href="#def30002061" />
+<use id="sys30002087" x="240" y="685" width="54.175" height="26.7" xlink:href="#def30002087" />
+<use id="sys30002050" x="250" y="190" width="54.175" height="26.7" xlink:href="#def30002050" />
+<use id="sys30002063" x="255" y="465" width="54.175" height="26.7" xlink:href="#def30002063" />
+<use id="sys30002060" x="280" y="360" width="54.175" height="26.7" xlink:href="#def30002060" />
+<use id="sys30003387" x="285" y="35" width="54.175" height="26.7" xlink:href="#def30003387" />
+<use id="sys30002051" x="285" y="295" width="54.175" height="26.7" xlink:href="#def30002051" />
+<use id="sys30002062" x="285" y="415" width="54.175" height="26.7" xlink:href="#def30002062" />
+<use id="sys30002067" x="285" y="505" width="54.175" height="26.7" xlink:href="#def30002067" />
+<use id="sys30002086" x="290" y="610" width="54.175" height="26.7" xlink:href="#def30002086" />
+<use id="sys30002089" x="305" y="700" width="54.175" height="26.7" xlink:href="#def30002089" />
+<use id="sys30002064" x="315" y="465" width="54.175" height="26.7" xlink:href="#def30002064" />
+<use id="sys30002083" x="315" y="575" width="54.175" height="26.7" xlink:href="#def30002083" />
+<use id="sys30002052" x="320" y="170" width="54.175" height="26.7" xlink:href="#def30002052" />
+<use id="sys30002085" x="330" y="655" width="54.175" height="26.7" xlink:href="#def30002085" />
+<use id="sys30003384" x="345" y="85" width="54.175" height="26.7" xlink:href="#def30003384" />
+<use id="sys30003428" x="360" y="420" width="54.175" height="26.7" xlink:href="#def30003428" />
+<use id="sys30003395" x="370" y="195" width="54.175" height="26.7" xlink:href="#def30003395" />
+<use id="sys30003393" x="375" y="135" width="54.175" height="26.7" xlink:href="#def30003393" />
+<use id="sys30003396" x="375" y="270" width="54.175" height="26.7" xlink:href="#def30003396" />
+<use id="sys30003430" x="380" y="480" width="54.175" height="26.7" xlink:href="#def30003430" />
+<use id="sys30003447" x="400" y="610" width="54.175" height="26.7" xlink:href="#def30003447" />
+<use id="sys30003452" x="400" y="735" width="54.175" height="26.7" xlink:href="#def30003452" />
+<use id="sys30043410" x="405" y="0" width="54.175" height="26.7" xlink:href="#def30043410" />
+<use id="sys30003388" x="405" y="30" width="54.175" height="26.7" xlink:href="#def30003388" />
+<use id="sys30003399" x="405" y="355" width="54.175" height="26.7" xlink:href="#def30003399" />
+<use id="sys30003433" x="410" y="570" width="54.175" height="26.7" xlink:href="#def30003433" />
+<use id="sys30003448" x="415" y="650" width="54.175" height="26.7" xlink:href="#def30003448" />
+<use id="sys30003397" x="420" y="235" width="54.175" height="26.7" xlink:href="#def30003397" />
+<use id="sys30003394" x="425" y="170" width="54.175" height="26.7" xlink:href="#def30003394" />
+<use id="sys30003449" x="425" y="685" width="54.175" height="26.7" xlink:href="#def30003449" />
+<use id="sys30003429" x="435" y="435" width="54.175" height="26.7" xlink:href="#def30003429" />
+<use id="sys30003420" x="445" y="285" width="54.175" height="26.7" xlink:href="#def30003420" />
+<use id="sys30003431" x="445" y="525" width="54.175" height="26.7" xlink:href="#def30003431" />
+<use id="sys30003432" x="455" y="485" width="54.175" height="26.7" xlink:href="#def30003432" />
+<use id="sys30003418" x="470" y="345" width="54.175" height="26.7" xlink:href="#def30003418" />
+<use id="sys30003450" x="470" y="725" width="54.175" height="26.7" xlink:href="#def30003450" />
+<use id="sys30003440" x="475" y="0" width="54.175" height="26.7" xlink:href="#def30003440" />
+<use id="sys30003435" x="475" y="30" width="54.175" height="26.7" xlink:href="#def30003435" />
+<use id="sys30003391" x="485" y="200" width="54.175" height="26.7" xlink:href="#def30003391" />
+<use id="sys30003398" x="485" y="245" width="54.175" height="26.7" xlink:href="#def30003398" />
+<use id="sys30003451" x="490" y="600" width="54.175" height="26.7" xlink:href="#def30003451" />
+<use id="sys30003434" x="500" y="70" width="54.175" height="26.7" xlink:href="#def30003434" />
+<use id="sys30003390" x="500" y="105" width="54.175" height="26.7" xlink:href="#def30003390" />
+<use id="sys30003389" x="500" y="145" width="54.175" height="26.7" xlink:href="#def30003389" />
+<use id="sys30003416" x="520" y="290" width="54.175" height="26.7" xlink:href="#def30003416" />
+<use id="sys30003407" x="520" y="465" width="54.175" height="26.7" xlink:href="#def30003407" />
+<use id="sys30003408" x="520" y="540" width="54.175" height="26.7" xlink:href="#def30003408" />
+<use id="sys30003417" x="530" y="350" width="54.175" height="26.7" xlink:href="#def30003417" />
+<use id="sys30003438" x="535" y="0" width="54.175" height="26.7" xlink:href="#def30003438" />
+<use id="sys30003436" x="535" y="30" width="54.175" height="26.7" xlink:href="#def30003436" />
+<use id="sys30022505" x="545" y="635" width="54.175" height="26.7" xlink:href="#def30022505" />
+<use id="sys30003401" x="555" y="500" width="54.175" height="26.7" xlink:href="#def30003401" />
+<use id="sys30003404" x="560" y="430" width="54.175" height="26.7" xlink:href="#def30003404" />
+<use id="sys30003423" x="565" y="115" width="54.175" height="26.7" xlink:href="#def30003423" />
+<use id="sys30003422" x="565" y="165" width="54.175" height="26.7" xlink:href="#def30003422" />
+<use id="sys30003392" x="565" y="195" width="54.175" height="26.7" xlink:href="#def30003392" />
+<use id="sys30003425" x="580" y="80" width="54.175" height="26.7" xlink:href="#def30003425" />
+<use id="sys30003419" x="590" y="315" width="54.175" height="26.7" xlink:href="#def30003419" />
+<use id="sys30003405" x="590" y="395" width="54.175" height="26.7" xlink:href="#def30003405" />
+<use id="sys30003400" x="590" y="550" width="54.175" height="26.7" xlink:href="#def30003400" />
+<use id="sys30003437" x="605" y="30" width="54.175" height="26.7" xlink:href="#def30003437" />
+<use id="sys30003374" x="610" y="650" width="54.175" height="26.7" xlink:href="#def30003374" />
+<use id="sys30003402" x="620" y="485" width="54.175" height="26.7" xlink:href="#def30003402" />
+<use id="sys30003376" x="620" y="605" width="54.175" height="26.7" xlink:href="#def30003376" />
+<use id="sys30003424" x="625" y="140" width="54.175" height="26.7" xlink:href="#def30003424" />
+<use id="sys30003439" x="645" y="0" width="54.175" height="26.7" xlink:href="#def30003439" />
+<use id="sys30003426" x="645" y="70" width="54.175" height="26.7" xlink:href="#def30003426" />
+<use id="sys30003445" x="645" y="205" width="54.175" height="26.7" xlink:href="#def30003445" />
+<use id="sys30003406" x="645" y="370" width="54.175" height="26.7" xlink:href="#def30003406" />
+<use id="sys30003403" x="645" y="435" width="54.175" height="26.7" xlink:href="#def30003403" />
+<use id="sys30003421" x="650" y="325" width="54.175" height="26.7" xlink:href="#def30003421" />
+<use id="sys30003427" x="670" y="115" width="54.175" height="26.7" xlink:href="#def30003427" />
+<use id="sys30003375" x="675" y="685" width="54.175" height="26.7" xlink:href="#def30003375" />
+<use id="sys30003377" x="680" y="595" width="54.175" height="26.7" xlink:href="#def30003377" />
+<use id="sys30003443" x="685" y="160" width="54.175" height="26.7" xlink:href="#def30003443" />
+<use id="sys30003380" x="685" y="635" width="54.175" height="26.7" xlink:href="#def30003380" />
+<use id="sys30003441" x="690" y="260" width="54.175" height="26.7" xlink:href="#def30003441" />
+<use id="sys30033410" x="700" y="400" width="54.175" height="26.7" xlink:href="#def30033410" />
+<use id="sys30003409" x="705" y="535" width="54.175" height="26.7" xlink:href="#def30003409" />
+<use id="sys30003442" x="720" y="220" width="54.175" height="26.7" xlink:href="#def30003442" />
+<use id="sys30003410" x="720" y="495" width="54.175" height="26.7" xlink:href="#def30003410" />
+<use id="sys30003446" x="740" y="115" width="54.175" height="26.7" xlink:href="#def30003446" />
+<use id="sys30003411" x="740" y="435" width="54.175" height="26.7" xlink:href="#def30003411" />
+<use id="sys30023410" x="740" y="565" width="54.175" height="26.7" xlink:href="#def30023410" />
+<use id="sys30003444" x="745" y="190" width="54.175" height="26.7" xlink:href="#def30003444" />
+<use id="sys30003415" x="750" y="285" width="54.175" height="26.7" xlink:href="#def30003415" />
+<use id="sys30003378" x="750" y="685" width="54.175" height="26.7" xlink:href="#def30003378" />
+<use id="sys30003379" x="760" y="605" width="54.175" height="26.7" xlink:href="#def30003379" />
+<use id="sys30013410" x="760" y="645" width="54.175" height="26.7" xlink:href="#def30013410" />
+<use id="sys30003412" x="775" y="395" width="54.175" height="26.7" xlink:href="#def30003412" />
+<use id="sys30003462" x="800" y="115" width="54.175" height="26.7" xlink:href="#def30003462" />
+<use id="sys30003464" x="805" y="75" width="54.175" height="26.7" xlink:href="#def30003464" />
+<use id="sys30003461" x="815" y="170" width="54.175" height="26.7" xlink:href="#def30003461" />
+<use id="sys30003413" x="815" y="345" width="54.175" height="26.7" xlink:href="#def30003413" />
+<use id="sys30003454" x="815" y="445" width="54.175" height="26.7" xlink:href="#def30003454" />
+<use id="sys30003466" x="825" y="35" width="54.175" height="26.7" xlink:href="#def30003466" />
+<use id="sys30003414" x="830" y="300" width="54.175" height="26.7" xlink:href="#def30003414" />
+<use id="sys30003455" x="830" y="480" width="54.175" height="26.7" xlink:href="#def30003455" />
+<use id="sys30003459" x="840" y="215" width="54.175" height="26.7" xlink:href="#def30003459" />
+<use id="sys30003463" x="860" y="140" width="54.175" height="26.7" xlink:href="#def30003463" />
+<use id="sys30003453" x="860" y="415" width="54.175" height="26.7" xlink:href="#def30003453" />
+<use id="sys30003460" x="890" y="265" width="54.175" height="26.7" xlink:href="#def30003460" />
+<use id="sys30003467" x="900" y="105" width="54.175" height="26.7" xlink:href="#def30003467" />
+<use id="sys30003458" x="900" y="500" width="54.175" height="26.7" xlink:href="#def30003458" />
+<use id="sys30003470" x="910" y="190" width="54.175" height="26.7" xlink:href="#def30003470" />
+<use id="sys30003465" x="915" y="290" width="54.175" height="26.7" xlink:href="#def30003465" />
+<use id="sys30003456" x="930" y="420" width="54.175" height="26.7" xlink:href="#def30003456" />
+<use id="sys30003457" x="955" y="465" width="54.175" height="26.7" xlink:href="#def30003457" />
+<use id="sys30003468" x="965" y="105" width="54.175" height="26.7" xlink:href="#def30003468" />
+<use id="sys30003469" x="965" y="170" width="54.175" height="26.7" xlink:href="#def30003469" />
+<use id="sys30003471" x="965" y="215" width="54.175" height="26.7" xlink:href="#def30003471" />
+<use id="sys30003472" x="974" y="50" width="54.175" height="26.7" xlink:href="#def30003472" />
+<use id="sys30002539" x="10" y="700" width="54.175" height="26.7" xlink:href="#def30002539" />
+<use id="sys30002541" x="10" y="740" width="54.175" height="26.7" xlink:href="#def30002541" />
+<use id="sys30002723" x="75" y="15" width="54.175" height="26.7" xlink:href="#def30002723" />
+<use id="sys30002517" x="133" y="356" width="54.175" height="26.7" xlink:href="#def30002517" />
+<use id="sys30003089" x="219" y="730" width="54.175" height="26.7" xlink:href="#def30003089" />
+<use id="sys30000200" x="230" y="420" width="54.175" height="26.7" xlink:href="#def30000200" />
+<use id="sys30002682" x="270" y="110" width="54.175" height="26.7" xlink:href="#def30002682" />
+<use id="sys30002543" x="295" y="0" width="54.175" height="26.7" xlink:href="#def30002543" />
+<use id="sys30002720" x="300" y="140" width="54.175" height="26.7" xlink:href="#def30002720" />
+<use id="sys30002684" x="305" y="740" width="54.175" height="26.7" xlink:href="#def30002684" />
+<use id="sys30002560" x="340" y="515" width="54.175" height="26.7" xlink:href="#def30002560" />
+<use id="sys30002511" x="585" y="695" width="54.175" height="26.7" xlink:href="#def30002511" />
+<use id="sys30002573" x="620" y="280" width="54.175" height="26.7" xlink:href="#def30002573" />
+<use id="sys30000199" x="755" y="45" width="54.175" height="26.7" xlink:href="#def30000199" />
+<use id="sys30002554" x="785" y="245" width="54.175" height="26.7" xlink:href="#def30002554" />
+<use id="sys30002525" x="805" y="520" width="54.175" height="26.7" xlink:href="#def30002525" />
+<use id="sys30002478" x="855" y="5" width="54.175" height="26.7" xlink:href="#def30002478" />
+<use id="sys30000999" x="974" y="255" width="54.175" height="26.7" xlink:href="#def30000999" />
+<use id="sys30002412" x="974" y="320" width="54.175" height="26.7" xlink:href="#def30002412" />
+
+</g>
+
+<g id="highlights">
+
+</g>
+
+<g id="notes"></g>
+
+<g id="standings"></g>
+
+</g>
+<g id="controls" style="display: none;">
+  <a xlink:title="Zoom In"><image id="zoom_in" x="5" y="5" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/magnifier_zoom_in.png" style="cursor: pointer;"/></a>
+  <a xlink:title="Zoom Out"><image id="zoom_out" x="5" y="23" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/magnifier_zoom_out.png" style="cursor: pointer;"/></a>
+  <a xlink:title="Enable Mousewheel Support"><image id="wheel_on" x="5" y="42" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/mouse_add.png" style="cursor: pointer;"/> </a>
+  <a xlink:title="Disable Mousewheel Support"><image id="wheel_off" x="5" y="42" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/mouse_delete.png" style="cursor: pointer; display: none;"/></a>
+</g>
+
+
+<script type="text/javascript" xlink:href="https://s.dotlan.net/lib/dotSvg.js?1595967170"></script>
+<script type="text/javascript"><![CDATA[
+
+function init(E) {
+	SVGMap.init(E);
+}
+
+]]></script>
+
+
+</svg>

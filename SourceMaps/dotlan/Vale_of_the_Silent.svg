@@ -1,0 +1,1502 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg version="1.1"
+     id="svgdoc"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1024" height="768"
+     viewBox="0 0 1024 768"
+     style="background: #ffffff"
+     onload="init(evt)"
+>
+
+
+<style type="text/css">
+<![CDATA[
+/* jumps */
+.j	{ stroke: #000000; stroke-width: 1; }
+.jc	{ stroke: #FF0000; stroke-width: 1; }
+.jr	{ stroke: #800080; stroke-width: 1; }
+.jx	{ stroke: #000000; stroke-width: 3; }
+.jxc	{ stroke: #FF0000; stroke-width: 3; }
+.jxr	{ stroke: #800080; stroke-width: 3; }
+.jb	{ stroke: #0000FF; stroke-width: 3; fill: none; }
+
+/* external system */
+.eh	{ stroke: #00B000; stroke-width: 1; fill: #CCCCCC; }
+.el	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 4; fill: #CCCCCC; }
+.e	{ stroke: #000000; stroke-width: 1; fill: #CCCCCC; }
+.exh	{ stroke: #00B000; stroke-width: 2; fill: #CCCCCC; }
+.exl	{ stroke: #F00000; stroke-width: 2; stroke-dasharray: 8, 3; fill: #CCCCCC; }
+.ex	{ stroke: #000000; stroke-width: 2; fill: #CCCCCC; }
+
+/* external system text */
+.es	{ font-size: 9px; font-family: Arial, Helvetica, sans-serif; fill: #000000; }
+.er	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
+
+/* system */
+.sh	{ stroke: #00B000; stroke-width: 1; }
+.sl	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 3; }
+.s	{ stroke: #000000; stroke-width: 1; }
+.sc	{ stroke-width: 1.2; stroke-dasharray: 4, 3; }
+.sx	{ stroke-width: 2.5; }
+
+.scl	{ stroke: transparent; stroke-width: 2; fill: transparent; }
+
+/* system text */
+.ss	{ font-family: Arial, Helvetica, sans-serif; font-size: 9px; fill: #000000; }
+.st	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
+.so	{ fill: #ff0000; }
+.i	{ stroke: #0080FF; stroke-width: 1; fill: none; }
+
+/* station */
+.o	{ fill: #ffffff; }
+.oc	{ fill: #0000FF; }
+.oa	{ fill: #FFDC00; }
+.og	{ fill: #00FF00; }
+.om	{ fill: #FF0000; }
+.o1	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
+.o2	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
+.oo	{ fill: none; stroke: #000000; stroke-width: 1; }
+
+/* station services */
+.v1	{ fill: #FF0000; }
+.v2	{ fill: #00FF00; }
+.v3	{ fill: #FFDC00; }
+.v4	{ fill: #0000FF; }
+
+/* legend */
+.lb	{ stroke-width: 1; stroke: #000000; fill: #ffffff; }
+.lbt	{ stroke-width: 1; stroke: #000000; fill: #ffffff; }
+.lt	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 12px; }
+.lc	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 11px; }
+.l	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 10px; }
+
+/* highlight */
+.h	{ fill: none; stroke-width: 3; stroke: #000000; }
+.hw	{ fill: none; stroke-width: 2; stroke: #00AA00; }
+.hl	{ fill: none; stroke-width: 2; stroke: #F00000; }
+.hg	{ fill: none; stroke-width: 2; stroke: #00B000; }
+
+/* incursion */
+.inc	{ fill: url(#incBg); }
+.incs	{ fill: url(#incStBg); }
+
+/* contested */
+.con	{ fill: url(#conBg); }
+
+/* sov campaign triggered */
+.cam		{ fill: url(#camBg); }
+.cam-active	{ fill: url(#camActiveBg); }
+]]>
+</style>
+
+<g id="map">
+<g id="legend">
+<rect x="860.5" y="575.5" width="160" height="188" class="lb" />
+<rect x="860.5" y="860.5" width="160" height="20" class="lbt" />
+<text x="942.5" y="590.5" class="lt" text-anchor="middle">Vale of the Silent</text>
+<rect x="860.5" y="595.5" width="160" height="148" class="lb" />
+<rect x="860.5" y="743.5" width="160" height="20" class="lb" />
+<text x="942.5" y="757.5" class="lc" text-anchor="middle"> 	&#169; by Wollari &amp; CCP</text>
+
+<rect x="875" y="600" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFFFFF;" /><text x="900" y="611" class="ss" text-anchor="middle">XXXXX</text><text x="900" y="618.7" class="st so" text-anchor="middle">YYYYY (Z)</text>
+<rect x="920.6" y="605.5" height="11" width="11" class="o" /><polygon points="922.8,611 929.4,607.7 929.4,614.3 922.8,611"  class="o1" /><rect x="920.6" y="605.5" height="11" width="11"  class="oo" />
+<text x="877" y="639.4" class="l" text-anchor="start">X</text><text x="890" y="639.4" class="l" text-anchor="start">= System</text>
+<text x="877" y="654.8" class="l" text-anchor="start">Y</text><text x="890" y="654.8" class="l" text-anchor="start">= Alliance</text>
+<text x="877" y="670.2" class="l" text-anchor="start">Z</text><text x="890" y="670.2" class="l" text-anchor="start">= Sov. Lvl</text>
+<rect x="874" y="679.8" height="11" width="11" class="o" /><polygon points="876.2,685.3 882.8,682 882.8,688.6 876.2,685.3"  class="o1" /><rect x="874" y="679.8" height="11" width="11"  class="oo" /><text x="890" y="687.8" class="l" text-anchor="start">= Outpost</text>
+<rect x="874" y="695.2" height="11" width="11" class="o" /><rect x="877.3" y="698.5" height="4.4" width="4.4" class="o2" /><rect x="874" y="695.2" height="11" width="11"  class="oo" /><text x="890" y="703.2" class="l" text-anchor="start">= Cq Stat.</text>
+<rect x="874" y="710.6" height="11" width="11" class="o" /><rect x="874" y="710.6" height="11" width="11"  class="oo" /><text x="890" y="718.6" class="l" text-anchor="start">= NPC Stat.</text>
+<rect x="872" y="726" rx="5.5" ry="5.5" width="15.4" height="11" class="i" /><text x="890" y="734" class="l" text-anchor="start">= Icebelt</text>
+
+<rect x="947" y="603" height="11" width="11" class="om" /><polygon points="949.2,608.5 955.8,605.2 955.8,611.8 949.2,608.5"  class="o1" /><rect x="947" y="603" height="11" width="11"  class="oo" /><text x="963" y="611" class="l" text-anchor="start">= Refinery</text>
+<rect x="947" y="618.4" height="11" width="11" class="oa" /><polygon points="949.2,623.9 955.8,620.6 955.8,627.2 949.2,623.9"  class="o1" /><rect x="947" y="618.4" height="11" width="11"  class="oo" /><text x="963" y="626.4" class="l" text-anchor="start">= Factory</text>
+<rect x="947" y="633.8" height="11" width="11" class="oc" /><polygon points="949.2,639.3 955.8,636 955.8,642.6 949.2,639.3"  class="o1" /><rect x="947" y="633.8" height="11" width="11"  class="oo" /><text x="963" y="641.8" class="l" text-anchor="start">= Research</text>
+<rect x="947" y="649.2" height="11" width="11" class="og" /><polygon points="949.2,654.7 955.8,651.4 955.8,658 949.2,654.7"  class="o1" /><rect x="947" y="649.2" height="11" width="11"  class="oo" /><text x="963" y="657.2" class="l" text-anchor="start">= Offices</text>
+<rect x="947" y="664.6" height="11" width="11" class="o" /><polygon points="947,664.6 958,664.6 952.5,670.1 947,664.6" class="v1" /><rect x="947" y="664.6" height="11" width="11"  class="oo" /><text x="963" y="672.6" class="l" text-anchor="start">= Refining</text>
+<rect x="947" y="680" height="11" width="11" class="o" /><polygon points="958,691 952.5,685.5 947,691 958,691" class="v3" /><rect x="947" y="680" height="11" width="11"  class="oo" /><text x="963" y="688" class="l" text-anchor="start">= Industry</text>
+<rect x="947" y="695.4" height="11" width="11" class="o" /><polygon points="947,706.4 952.5,700.9 947,695.4 947,706.4" class="v4" /><rect x="947" y="695.4" height="11" width="11"  class="oo" /><text x="963" y="703.4" class="l" text-anchor="start">= Research</text>
+<rect x="947" y="710.8" height="11" width="11" class="o" /><polygon points="958,710.8 952.5,716.3 958,721.8 958,710.8" class="v2" /><rect x="947" y="710.8" height="11" width="11"  class="oo" /><text x="963" y="718.8" class="l" text-anchor="start">= Cloning</text>
+<rect x="945" y="726.2" rx="5.5" ry="5.5" width="15.4" height="11" class="sl" style="fill: #ffa0ff;" /><text x="963" y="734.2" class="l" text-anchor="start">= Contested</text>
+
+</g>
+
+<defs>
+  <symbol id="def30000237">
+    <a xlink:href="http://evemaps.dotlan.net/system/XV-8JQ" class="sys link-5-30000237" target="_top">
+      <rect id="rect30000237" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">XV-8JQ</text>
+      <text id="txt30000237" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000231">
+    <a xlink:href="http://evemaps.dotlan.net/system/YXIB-I" class="sys link-5-30000231" target="_top">
+    <rect id="ice30000231" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000231" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">YXIB-I</text>
+      <text id="txt30000231" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000249">
+    <a xlink:href="http://evemaps.dotlan.net/system/EIDI-N" class="sys link-5-30000249" target="_top">
+      <rect id="rect30000249" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #D5D1EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">EIDI-N</text>
+      <text id="txt30000249" x="28" y="21.7" class="st so" text-anchor="middle">SILNT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000252">
+    <a xlink:href="http://evemaps.dotlan.net/system/IPAY-2" class="sys link-5-30000252" target="_top">
+      <rect id="rect30000252" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FEFFBF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">IPAY-2</text>
+      <text id="txt30000252" x="28" y="21.7" class="st so" text-anchor="middle">--ASS (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000250">
+    <a xlink:href="http://evemaps.dotlan.net/system/P3EN-E" class="sys link-5-30000250" target="_top">
+      <rect id="rect30000250" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">P3EN-E</text>
+      <text id="txt30000250" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000245">
+    <a xlink:href="http://evemaps.dotlan.net/system/X445-5" class="sys link-5-30000245" target="_top">
+      <rect id="rect30000245" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">X445-5</text>
+      <text id="txt30000245" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000235">
+    <a xlink:href="http://evemaps.dotlan.net/system/Q-R3GP" class="sys link-5-30000235" target="_top">
+      <rect id="rect30000235" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Q-R3GP</text>
+      <text id="txt30000235" x="28" y="21.7" class="st so" text-anchor="middle">TP (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000232">
+    <a xlink:href="http://evemaps.dotlan.net/system/MY-T2P" class="sys link-5-30000232" target="_top">
+      <rect id="rect30000232" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">MY-T2P</text>
+      <text id="txt30000232" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000230">
+    <a xlink:href="http://evemaps.dotlan.net/system/NFM-0V" class="sys link-5-30000230" target="_top">
+      <rect id="rect30000230" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">NFM-0V</text>
+      <text id="txt30000230" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000229">
+    <a xlink:href="http://evemaps.dotlan.net/system/UH-9ZG" class="sys link-5-30000229" target="_top">
+      <rect id="rect30000229" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">UH-9ZG</text>
+      <text id="txt30000229" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000228">
+    <a xlink:href="http://evemaps.dotlan.net/system/3HX-DL" class="sys link-5-30000228" target="_top">
+      <rect id="rect30000228" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">3HX-DL</text>
+      <text id="txt30000228" x="28" y="21.7" class="st so" text-anchor="middle">TP (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000216">
+    <a xlink:href="http://evemaps.dotlan.net/system/05R-7A" class="sys link-5-30000216" target="_top">
+      <rect id="rect30000216" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">05R-7A</text>
+      <text id="txt30000216" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000221">
+    <a xlink:href="http://evemaps.dotlan.net/system/X97D-W" class="sys link-5-30000221" target="_top">
+      <rect id="rect30000221" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">X97D-W</text>
+      <text id="txt30000221" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000244">
+    <a xlink:href="http://evemaps.dotlan.net/system/K8X-6B" class="sys link-5-30000244" target="_top">
+      <rect id="rect30000244" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">K8X-6B</text>
+      <text id="txt30000244" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000247">
+    <a xlink:href="http://evemaps.dotlan.net/system/9OO-LH" class="sys link-5-30000247" target="_top">
+      <rect id="rect30000247" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">9OO-LH</text>
+      <text id="txt30000247" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000246">
+    <a xlink:href="http://evemaps.dotlan.net/system/KRUN-N" class="sys link-5-30000246" target="_top">
+    <rect id="ice30000246" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000246" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #D5D1EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">KRUN-N</text>
+      <text id="txt30000246" x="28" y="21.7" class="st so" text-anchor="middle">SILNT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000256">
+    <a xlink:href="http://evemaps.dotlan.net/system/Q-L07F" class="sys link-5-30000256" target="_top">
+      <rect id="rect30000256" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Q-L07F</text>
+      <text id="txt30000256" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000233">
+    <a xlink:href="http://evemaps.dotlan.net/system/FA-DMO" class="sys link-5-30000233" target="_top">
+      <rect id="rect30000233" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">FA-DMO</text>
+      <text id="txt30000233" x="28" y="21.7" class="st so" text-anchor="middle">TP (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000219">
+    <a xlink:href="http://evemaps.dotlan.net/system/FS-RFL" class="sys link-5-30000219" target="_top">
+      <rect id="rect30000219" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">FS-RFL</text>
+      <text id="txt30000219" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000253">
+    <a xlink:href="http://evemaps.dotlan.net/system/DAYP-G" class="sys link-5-30000253" target="_top">
+      <rect id="rect30000253" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">DAYP-G</text>
+      <text id="txt30000253" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000864">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/MSHD-4" class="sys link-5-30000864" target="_top">
+      <rect id="rect30000864" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">MSHD-4</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000248">
+    <a xlink:href="http://evemaps.dotlan.net/system/V-OJEN" class="sys link-5-30000248" target="_top">
+    <rect id="ice30000248" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000248" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">V-OJEN</text>
+      <text id="txt30000248" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000234">
+    <a xlink:href="http://evemaps.dotlan.net/system/GEKJ-9" class="sys link-5-30000234" target="_top">
+      <rect id="rect30000234" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E6F0D0;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">GEKJ-9</text>
+      <text id="txt30000234" x="28" y="21.7" class="st so" text-anchor="middle">Q (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000251">
+    <a xlink:href="http://evemaps.dotlan.net/system/49-0LI" class="sys link-5-30000251" target="_top">
+      <rect id="rect30000251" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">49-0LI</text>
+      <text id="txt30000251" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000254">
+    <a xlink:href="http://evemaps.dotlan.net/system/IFJ-EL" class="sys link-5-30000254" target="_top">
+      <rect id="rect30000254" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">IFJ-EL</text>
+      <text id="txt30000254" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000260">
+    <a xlink:href="http://evemaps.dotlan.net/system/S-NJBB" class="sys link-5-30000260" target="_top">
+    <rect id="ice30000260" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000260" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">S-NJBB</text>
+      <text id="txt30000260" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000215">
+    <a xlink:href="http://evemaps.dotlan.net/system/N-HSK0" class="sys link-5-30000215" target="_top">
+      <rect id="rect30000215" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #E677EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">N-HSK0</text>
+      <text id="txt30000215" x="28" y="21.7" class="st so" text-anchor="middle">FAM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000217">
+    <a xlink:href="http://evemaps.dotlan.net/system/7-UH4Z" class="sys link-5-30000217" target="_top">
+      <rect id="rect30000217" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">7-UH4Z</text>
+      <text id="txt30000217" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000220">
+    <a xlink:href="http://evemaps.dotlan.net/system/Y0-BVN" class="sys link-5-30000220" target="_top">
+    <rect id="ice30000220" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000220" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Y0-BVN</text>
+      <text id="txt30000220" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000236">
+    <a xlink:href="http://evemaps.dotlan.net/system/N-5QPW" class="sys link-5-30000236" target="_top">
+      <rect id="rect30000236" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">N-5QPW</text>
+      <text id="txt30000236" x="28" y="21.7" class="st so" text-anchor="middle">TP (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000865">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/H-W9TY" class="sys link-5-30000865" target="_top">
+      <rect id="rect30000865" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">H-W9TY</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000241">
+    <a xlink:href="http://evemaps.dotlan.net/system/YMJG-4" class="sys link-5-30000241" target="_top">
+      <rect id="rect30000241" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">YMJG-4</text>
+      <text id="txt30000241" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000257">
+    <a xlink:href="http://evemaps.dotlan.net/system/E-D0VZ" class="sys link-5-30000257" target="_top">
+      <rect id="rect30000257" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">E-D0VZ</text>
+      <text id="txt30000257" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000259">
+    <a xlink:href="http://evemaps.dotlan.net/system/A8A-JN" class="sys link-5-30000259" target="_top">
+      <rect id="rect30000259" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">A8A-JN</text>
+      <text id="txt30000259" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000218">
+    <a xlink:href="http://evemaps.dotlan.net/system/5ZO-NZ" class="sys link-5-30000218" target="_top">
+      <rect id="rect30000218" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">5ZO-NZ</text>
+      <text id="txt30000218" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000255">
+    <a xlink:href="http://evemaps.dotlan.net/system/47L-J4" class="sys link-5-30000255" target="_top">
+      <rect id="rect30000255" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">47L-J4</text>
+      <text id="txt30000255" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000867">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/D7-ZAC" class="sys link-5-30000867" target="_top">
+      <rect id="rect30000867" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">D7-ZAC</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000239">
+    <a xlink:href="http://evemaps.dotlan.net/system/4GYV-Q" class="sys link-5-30000239" target="_top">
+      <rect id="rect30000239" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">4GYV-Q</text>
+      <text id="txt30000239" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000240">
+    <a xlink:href="http://evemaps.dotlan.net/system/4-HWWF" class="sys link-5-30000240" target="_top">
+      <rect id="rect30000240" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">4-HWWF</text>
+      <text id="txt30000240" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000243">
+    <a xlink:href="http://evemaps.dotlan.net/system/PM-DWE" class="sys link-5-30000243" target="_top">
+      <rect id="rect30000243" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">PM-DWE</text>
+      <text id="txt30000243" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000258">
+    <a xlink:href="http://evemaps.dotlan.net/system/6WW-28" class="sys link-5-30000258" target="_top">
+      <rect id="rect30000258" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">6WW-28</text>
+      <text id="txt30000258" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000211">
+    <a xlink:href="http://evemaps.dotlan.net/system/B-588R" class="sys link-5-30000211" target="_top">
+      <rect id="rect30000211" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">B-588R</text>
+      <text id="txt30000211" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000871">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/WH-JCA" class="sys link-5-30000871" target="_top">
+      <rect id="rect30000871" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">WH-JCA</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000267">
+    <a xlink:href="http://evemaps.dotlan.net/system/0J3L-V" class="sys link-5-30000267" target="_top">
+      <rect id="rect30000267" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">0J3L-V</text>
+      <text id="txt30000267" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000266">
+    <a xlink:href="http://evemaps.dotlan.net/system/Z-8Q65" class="sys link-5-30000266" target="_top">
+      <rect id="rect30000266" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Z-8Q65</text>
+      <text id="txt30000266" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000265">
+    <a xlink:href="http://evemaps.dotlan.net/system/AZBR-2" class="sys link-5-30000265" target="_top">
+    <rect id="ice30000265" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000265" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">AZBR-2</text>
+      <text id="txt30000265" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000263">
+    <a xlink:href="http://evemaps.dotlan.net/system/TVN-FM" class="sys link-5-30000263" target="_top">
+      <rect id="rect30000263" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">TVN-FM</text>
+      <text id="txt30000263" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000238">
+    <a xlink:href="http://evemaps.dotlan.net/system/WBR5-R" class="sys link-5-30000238" target="_top">
+      <rect id="rect30000238" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">WBR5-R</text>
+      <text id="txt30000238" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000242">
+    <a xlink:href="http://evemaps.dotlan.net/system/8TPX-N" class="sys link-5-30000242" target="_top">
+      <rect id="rect30000242" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">8TPX-N</text>
+      <text id="txt30000242" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000208">
+    <a xlink:href="http://evemaps.dotlan.net/system/LZ-6SU" class="sys link-5-30000208" target="_top">
+    <rect id="ice30000208" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000208" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">LZ-6SU</text>
+      <text id="txt30000208" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000213">
+    <a xlink:href="http://evemaps.dotlan.net/system/G-LOIT" class="sys link-5-30000213" target="_top">
+      <rect id="rect30000213" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">G-LOIT</text>
+      <text id="txt30000213" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000268">
+    <a xlink:href="http://evemaps.dotlan.net/system/H-NOU5" class="sys link-5-30000268" target="_top">
+      <rect id="rect30000268" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">H-NOU5</text>
+      <text id="txt30000268" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000261">
+    <a xlink:href="http://evemaps.dotlan.net/system/T-GCGL" class="sys link-5-30000261" target="_top">
+      <rect id="rect30000261" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">T-GCGL</text>
+      <text id="txt30000261" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000209">
+    <a xlink:href="http://evemaps.dotlan.net/system/MC6O-F" class="sys link-5-30000209" target="_top">
+      <rect id="rect30000209" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">MC6O-F</text>
+      <text id="txt30000209" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000269">
+    <a xlink:href="http://evemaps.dotlan.net/system/KX-2UI" class="sys link-5-30000269" target="_top">
+      <rect id="rect30000269" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">KX-2UI</text>
+      <text id="txt30000269" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000262">
+    <a xlink:href="http://evemaps.dotlan.net/system/0MV-4W" class="sys link-5-30000262" target="_top">
+      <rect id="rect30000262" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">0MV-4W</text>
+      <text id="txt30000262" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000214">
+    <a xlink:href="http://evemaps.dotlan.net/system/HE-V4V" class="sys link-5-30000214" target="_top">
+      <rect id="rect30000214" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">HE-V4V</text>
+      <text id="txt30000214" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000270">
+    <a xlink:href="http://evemaps.dotlan.net/system/MO-FIF" class="sys link-5-30000270" target="_top">
+      <rect id="rect30000270" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">MO-FIF</text>
+      <text id="txt30000270" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000894">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/W6VP-Y" class="sys link-5-30000894" target="_top">
+      <rect id="rect30000894" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">W6VP-Y</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000272">
+    <a xlink:href="http://evemaps.dotlan.net/system/MA-XAP" class="sys link-5-30000272" target="_top">
+      <rect id="rect30000272" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">MA-XAP</text>
+      <text id="txt30000272" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000273">
+    <a xlink:href="http://evemaps.dotlan.net/system/C-J7CR" class="sys link-5-30000273" target="_top">
+      <rect id="rect30000273" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">C-J7CR</text>
+      <text id="txt30000273" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000271">
+    <a xlink:href="http://evemaps.dotlan.net/system/97-M96" class="sys link-5-30000271" target="_top">
+      <rect id="rect30000271" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EEE0EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">97-M96</text>
+      <text id="txt30000271" x="28" y="21.7" class="st so" text-anchor="middle">PR.BL (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000264">
+    <a xlink:href="http://evemaps.dotlan.net/system/V-NL3K" class="sys link-5-30000264" target="_top">
+    <rect id="ice30000264" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000264" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">V-NL3K</text>
+      <text id="txt30000264" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000212">
+    <a xlink:href="http://evemaps.dotlan.net/system/NCGR-Q" class="sys link-5-30000212" target="_top">
+      <rect id="rect30000212" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">NCGR-Q</text>
+      <text id="txt30000212" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000210">
+    <a xlink:href="http://evemaps.dotlan.net/system/U54-1L" class="sys link-5-30000210" target="_top">
+    <rect id="ice30000210" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000210" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">U54-1L</text>
+      <text id="txt30000210" x="28" y="21.7" class="st so" text-anchor="middle">SCUM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000222">
+    <a xlink:href="http://evemaps.dotlan.net/system/0-R5TS" class="sys link-5-30000222" target="_top">
+      <rect id="rect30000222" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #DFF1FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">0-R5TS</text>
+      <text id="txt30000222" x="28" y="21.7" class="st so" text-anchor="middle">BOOM (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000895">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/IMK-K1" class="sys link-5-30000895" target="_top">
+      <rect id="rect30000895" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">IMK-K1</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000223">
+    <a xlink:href="http://evemaps.dotlan.net/system/H-UCD1" class="sys link-5-30000223" target="_top">
+      <rect id="rect30000223" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EF95A3;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">H-UCD1</text>
+      <text id="txt30000223" x="28" y="21.7" class="st so" text-anchor="middle">.S0B. (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000301">
+    <a xlink:href="http://evemaps.dotlan.net/system/1-GBBP" class="sys link-5-30000301" target="_top">
+      <rect id="rect30000301" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">1-GBBP</text>
+      <text id="txt30000301" x="28" y="21.7" class="st so" text-anchor="middle">FRT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000304">
+    <a xlink:href="http://evemaps.dotlan.net/system/ZA0L-U" class="sys link-5-30000304" target="_top">
+      <rect id="rect30000304" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">ZA0L-U</text>
+      <text id="txt30000304" x="28" y="21.7" class="st so" text-anchor="middle">FRT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000305">
+    <a xlink:href="http://evemaps.dotlan.net/system/G96R-F" class="sys link-5-30000305" target="_top">
+      <rect id="rect30000305" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">G96R-F</text>
+      <text id="txt30000305" x="28" y="21.7" class="st so" text-anchor="middle">FRT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000306">
+    <a xlink:href="http://evemaps.dotlan.net/system/Y-ZXIO" class="sys link-5-30000306" target="_top">
+      <rect id="rect30000306" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Y-ZXIO</text>
+      <text id="txt30000306" x="28" y="21.7" class="st so" text-anchor="middle">FRT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000289">
+    <a xlink:href="http://evemaps.dotlan.net/system/669-IX" class="sys link-5-30000289" target="_top">
+      <rect id="rect30000289" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">669-IX</text>
+      <text id="txt30000289" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000291">
+    <a xlink:href="http://evemaps.dotlan.net/system/R-P7KL" class="sys link-5-30000291" target="_top">
+      <rect id="rect30000291" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">R-P7KL</text>
+      <text id="txt30000291" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000293">
+    <a xlink:href="http://evemaps.dotlan.net/system/XF-PWO" class="sys link-5-30000293" target="_top">
+      <rect id="rect30000293" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">XF-PWO</text>
+      <text id="txt30000293" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000224">
+    <a xlink:href="http://evemaps.dotlan.net/system/7-K5EL" class="sys link-5-30000224" target="_top">
+      <rect id="rect30000224" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">7-K5EL</text>
+      <text id="txt30000224" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000896">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/NJ4X-S" class="sys link-5-30000896" target="_top">
+      <rect id="rect30000896" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">NJ4X-S</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000303">
+    <a xlink:href="http://evemaps.dotlan.net/system/T-ZWA1" class="sys link-5-30000303" target="_top">
+    <rect id="ice30000303" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000303" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">T-ZWA1</text>
+      <text id="txt30000303" x="28" y="21.7" class="st so" text-anchor="middle">FRT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000302">
+    <a xlink:href="http://evemaps.dotlan.net/system/C-FP70" class="sys link-5-30000302" target="_top">
+    <rect id="ice30000302" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000302" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">C-FP70</text>
+      <text id="txt30000302" x="28" y="21.7" class="st so" text-anchor="middle">FRT (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000290">
+    <a xlink:href="http://evemaps.dotlan.net/system/0R-F2F" class="sys link-5-30000290" target="_top">
+      <rect id="rect30000290" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">0R-F2F</text>
+      <text id="txt30000290" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000292">
+    <a xlink:href="http://evemaps.dotlan.net/system/2DWM-2" class="sys link-5-30000292" target="_top">
+      <rect id="rect30000292" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">2DWM-2</text>
+      <text id="txt30000292" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000294">
+    <a xlink:href="http://evemaps.dotlan.net/system/1N-FJ8" class="sys link-5-30000294" target="_top">
+      <rect id="rect30000294" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">1N-FJ8</text>
+      <text id="txt30000294" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000274">
+    <a xlink:href="http://evemaps.dotlan.net/system/Q-EHMJ" class="sys link-5-30000274" target="_top">
+      <rect id="rect30000274" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #CFFFEC;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Q-EHMJ</text>
+      <text id="txt30000274" x="28" y="21.7" class="st so" text-anchor="middle">REKTD (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000275">
+    <a xlink:href="http://evemaps.dotlan.net/system/XSQ-TF" class="sys link-5-30000275" target="_top">
+      <rect id="rect30000275" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #CFFFEC;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">XSQ-TF</text>
+      <text id="txt30000275" x="28" y="21.7" class="st so" text-anchor="middle">REKTD (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000225">
+    <a xlink:href="http://evemaps.dotlan.net/system/H-5GUI" class="sys link-5-30000225" target="_top">
+      <rect id="rect30000225" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">H-5GUI</text>
+      <text id="txt30000225" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000276">
+    <a xlink:href="http://evemaps.dotlan.net/system/H-1EOH" class="sys link-5-30000276" target="_top">
+      <rect id="rect30000276" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #CFFFEC;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">H-1EOH</text>
+      <text id="txt30000276" x="28" y="21.7" class="st so" text-anchor="middle">REKTD (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000307">
+    <a xlink:href="http://evemaps.dotlan.net/system/B-E3KQ" class="sys link-5-30000307" target="_top">
+      <rect id="rect30000307" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFD39F;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">B-E3KQ</text>
+      <text id="txt30000307" x="28" y="21.7" class="st so" text-anchor="middle">CSE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000299">
+    <a xlink:href="http://evemaps.dotlan.net/system/5T-KM3" class="sys link-5-30000299" target="_top">
+    <rect id="ice30000299" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000299" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">5T-KM3</text>
+      <text id="txt30000299" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000297">
+    <a xlink:href="http://evemaps.dotlan.net/system/6Y-WRK" class="sys link-5-30000297" target="_top">
+      <rect id="rect30000297" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">6Y-WRK</text>
+      <text id="txt30000297" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000296">
+    <a xlink:href="http://evemaps.dotlan.net/system/ZLZ-1Z" class="sys link-5-30000296" target="_top">
+      <rect id="rect30000296" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">ZLZ-1Z</text>
+      <text id="txt30000296" x="28" y="21.7" class="st so" text-anchor="middle">-10.0 (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000295">
+    <a xlink:href="http://evemaps.dotlan.net/system/VI2K-J" class="sys link-5-30000295" target="_top">
+    <rect id="ice30000295" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000295" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">VI2K-J</text>
+      <text id="txt30000295" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000227">
+    <a xlink:href="http://evemaps.dotlan.net/system/FMBR-8" class="sys link-5-30000227" target="_top">
+      <rect id="rect30000227" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">FMBR-8</text>
+      <text id="txt30000227" x="28" y="21.7" class="st so" text-anchor="middle">LTRIG (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000226">
+    <a xlink:href="http://evemaps.dotlan.net/system/FH-TTC" class="sys link-5-30000226" target="_top">
+      <rect id="rect30000226" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">FH-TTC</text>
+      <text id="txt30000226" x="28" y="21.7" class="st so" text-anchor="middle">LTRIG (3)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000308">
+    <a xlink:href="http://evemaps.dotlan.net/system/Y5J-EU" class="sys link-5-30000308" target="_top">
+      <rect id="rect30000308" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFD39F;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Y5J-EU</text>
+      <text id="txt30000308" x="28" y="21.7" class="st so" text-anchor="middle">CSE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000277">
+    <a xlink:href="http://evemaps.dotlan.net/system/IR-DYY" class="sys link-5-30000277" target="_top">
+      <rect id="rect30000277" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #CFFFEC;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">IR-DYY</text>
+      <text id="txt30000277" x="28" y="21.7" class="st so" text-anchor="middle">REKTD (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000309">
+    <a xlink:href="http://evemaps.dotlan.net/system/O-LR1H" class="sys link-5-30000309" target="_top">
+      <rect id="rect30000309" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFD39F;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">O-LR1H</text>
+      <text id="txt30000309" x="28" y="21.7" class="st so" text-anchor="middle">CSE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000279">
+    <a xlink:href="http://evemaps.dotlan.net/system/F-D49D" class="sys link-5-30000279" target="_top">
+    <rect id="ice30000279" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000279" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #CCCCCC;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">F-D49D</text>
+      <text id="txt30000279" x="28" y="21.7" class="st so" text-anchor="middle">THE-V (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000280">
+    <a xlink:href="http://evemaps.dotlan.net/system/MQ-O27" class="sys link-5-30000280" target="_top">
+    <rect id="ice30000280" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000280" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">MQ-O27</text>
+      <text id="txt30000280" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000298">
+    <a xlink:href="http://evemaps.dotlan.net/system/RVCZ-C" class="sys link-5-30000298" target="_top">
+      <rect id="rect30000298" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">RVCZ-C</text>
+      <text id="txt30000298" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000278">
+    <a xlink:href="http://evemaps.dotlan.net/system/C-DHON" class="sys link-5-30000278" target="_top">
+      <rect id="rect30000278" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #CFFFEC;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">C-DHON</text>
+      <text id="txt30000278" x="28" y="21.7" class="st so" text-anchor="middle">REKTD (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000300">
+    <a xlink:href="http://evemaps.dotlan.net/system/LS9B-9" class="sys link-5-30000300" target="_top">
+      <rect id="rect30000300" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #EBB3EF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">LS9B-9</text>
+      <text id="txt30000300" x="28" y="21.7" class="st so" text-anchor="middle">LORDE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000312">
+    <a xlink:href="http://evemaps.dotlan.net/system/8-TFDX" class="sys link-5-30000312" target="_top">
+      <rect id="rect30000312" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FDFF00;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">8-TFDX</text>
+      <text id="txt30000312" x="28" y="21.7" class="st so" text-anchor="middle">NC (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000310">
+    <a xlink:href="http://evemaps.dotlan.net/system/G5ED-Y" class="sys link-5-30000310" target="_top">
+      <rect id="rect30000310" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFD39F;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">G5ED-Y</text>
+      <text id="txt30000310" x="28" y="21.7" class="st so" text-anchor="middle">CSE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000281">
+    <a xlink:href="http://evemaps.dotlan.net/system/H-EY0P" class="sys link-5-30000281" target="_top">
+      <rect id="rect30000281" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">H-EY0P</text>
+      <text id="txt30000281" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000282">
+    <a xlink:href="http://evemaps.dotlan.net/system/UNAG-6" class="sys link-5-30000282" target="_top">
+    <rect id="ice30000282" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000282" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">UNAG-6</text>
+      <text id="txt30000282" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000283">
+    <a xlink:href="http://evemaps.dotlan.net/system/E-SCTX" class="sys link-5-30000283" target="_top">
+      <rect id="rect30000283" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">E-SCTX</text>
+      <text id="txt30000283" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000313">
+    <a xlink:href="http://evemaps.dotlan.net/system/UL-4ZW" class="sys link-5-30000313" target="_top">
+      <rect id="rect30000313" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FDFF00;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">UL-4ZW</text>
+      <text id="txt30000313" x="28" y="21.7" class="st so" text-anchor="middle">NC (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000320">
+    <a xlink:href="http://evemaps.dotlan.net/system/R-RSZZ" class="sys link-5-30000320" target="_top">
+      <rect id="rect30000320" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">R-RSZZ</text>
+      <text id="txt30000320" x="28" y="21.7" class="st so" text-anchor="middle">NO (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000323">
+    <a xlink:href="http://evemaps.dotlan.net/system/7G-H7D" class="sys link-5-30000323" target="_top">
+    <rect id="ice30000323" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000323" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">7G-H7D</text>
+      <text id="txt30000323" x="28" y="21.7" class="st so" text-anchor="middle">NO (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000286">
+    <a xlink:href="http://evemaps.dotlan.net/system/1VK-6B" class="sys link-5-30000286" target="_top">
+      <rect id="rect30000286" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">1VK-6B</text>
+      <text id="txt30000286" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000318">
+    <a xlink:href="http://evemaps.dotlan.net/system/9-GBPD" class="sys link-5-30000318" target="_top">
+      <rect id="rect30000318" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">9-GBPD</text>
+      <text id="txt30000318" x="28" y="21.7" class="st so" text-anchor="middle">-10.0 (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000319">
+    <a xlink:href="http://evemaps.dotlan.net/system/LS-JEP" class="sys link-5-30000319" target="_top">
+      <rect id="rect30000319" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #CCCCCC;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">LS-JEP</text>
+      <text id="txt30000319" x="28" y="21.7" class="st so" text-anchor="middle">THE-V (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000311">
+    <a xlink:href="http://evemaps.dotlan.net/system/BR-6XP" class="sys link-5-30000311" target="_top">
+      <rect id="rect30000311" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFD39F;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">BR-6XP</text>
+      <text id="txt30000311" x="28" y="21.7" class="st so" text-anchor="middle">CSE (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000287">
+    <a xlink:href="http://evemaps.dotlan.net/system/7-PO3P" class="sys link-5-30000287" target="_top">
+      <rect id="rect30000287" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">7-PO3P</text>
+      <text id="txt30000287" x="28" y="21.7" class="st so" text-anchor="middle">LTRIG (4)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000322">
+    <a xlink:href="http://evemaps.dotlan.net/system/VORM-W" class="sys link-5-30000322" target="_top">
+      <rect id="rect30000322" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">VORM-W</text>
+      <text id="txt30000322" x="28" y="21.7" class="st so" text-anchor="middle">NO (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000321">
+    <a xlink:href="http://evemaps.dotlan.net/system/MGAM-4" class="sys link-5-30000321" target="_top">
+      <rect id="rect30000321" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">MGAM-4</text>
+      <text id="txt30000321" x="28" y="21.7" class="st so" text-anchor="middle">NO (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000284">
+    <a xlink:href="http://evemaps.dotlan.net/system/S6QX-N" class="sys link-5-30000284" target="_top">
+      <rect id="rect30000284" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">S6QX-N</text>
+      <text id="txt30000284" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000317">
+    <a xlink:href="http://evemaps.dotlan.net/system/A3-RQ3" class="sys link-5-30000317" target="_top">
+      <rect id="rect30000317" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">A3-RQ3</text>
+      <text id="txt30000317" x="28" y="21.7" class="st so" text-anchor="middle">-10.0 (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000316">
+    <a xlink:href="http://evemaps.dotlan.net/system/PX5-LR" class="sys link-5-30000316" target="_top">
+      <rect id="rect30000316" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">PX5-LR</text>
+      <text id="txt30000316" x="28" y="21.7" class="st so" text-anchor="middle">-10.0 (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000315">
+    <a xlink:href="http://evemaps.dotlan.net/system/WMBZ-U" class="sys link-5-30000315" target="_top">
+      <rect id="rect30000315" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">WMBZ-U</text>
+      <text id="txt30000315" x="28" y="21.7" class="st so" text-anchor="middle">-10.0 (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000314">
+    <a xlink:href="http://evemaps.dotlan.net/system/A-QRQT" class="sys link-5-30000314" target="_top">
+      <rect id="rect30000314" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">A-QRQT</text>
+      <text id="txt30000314" x="28" y="21.7" class="st so" text-anchor="middle">-10.0 (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000285">
+    <a xlink:href="http://evemaps.dotlan.net/system/IT-YAU" class="sys link-5-30000285" target="_top">
+      <rect id="rect30000285" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #8C8BDF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">IT-YAU</text>
+      <text id="txt30000285" x="28" y="21.7" class="st so" text-anchor="middle">FRT (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000325">
+    <a xlink:href="http://evemaps.dotlan.net/system/JZV-F4" class="sys link-5-30000325" target="_top">
+    <rect id="ice30000325" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000325" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #BFA26B;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">JZV-F4</text>
+      <text id="txt30000325" x="28" y="21.7" class="st so" text-anchor="middle">-10.0 (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000324">
+    <a xlink:href="http://evemaps.dotlan.net/system/Q3-BAY" class="sys link-5-30000324" target="_top">
+      <rect id="rect30000324" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFE2BF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Q3-BAY</text>
+      <text id="txt30000324" x="28" y="21.7" class="st so" text-anchor="middle">NO (5)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000288">
+    <a xlink:href="http://evemaps.dotlan.net/system/1W-0KS" class="sys link-5-30000288" target="_top">
+    <rect id="ice30000288" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000288" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #C7DFA7;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">1W-0KS</text>
+      <text id="txt30000288" x="28" y="21.7" class="st so" text-anchor="middle">TISHU (1)</text>
+    </a>
+  </symbol>
+  <symbol id="def30000205">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Forge/Obe" class="sys link-5-30000205" target="_top">
+      <rect id="rect30000205" x="3.5" y="3.5" width="50" height="22" class="el" />
+      <text x="28" y="14" class="es" text-anchor="middle">Obe</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">The Forge</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000863">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/C2X-M5" class="sys link-5-30000863" target="_top">
+      <rect id="rect30000863" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">C2X-M5</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000868">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/SH1-6P" class="sys link-5-30000868" target="_top">
+      <rect id="rect30000868" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">SH1-6P</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000870">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/O-0ERG" class="sys link-5-30000870" target="_top">
+      <rect id="rect30000870" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">O-0ERG</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000872">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/Q-CAB2" class="sys link-5-30000872" target="_top">
+      <rect id="rect30000872" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">Q-CAB2</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30001348">
+    <a xlink:href="http://evemaps.dotlan.net/map/Venal/G9D-XW" class="sys link-5-30001348" target="_top">
+      <rect id="rect30001348" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">G9D-XW</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Venal</text>
+    </a>
+  </symbol>
+  <symbol id="def30000899">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/QFF-O6" class="sys link-5-30000899" target="_top">
+      <rect id="rect30000899" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">QFF-O6</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30000897">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/F-G7BO" class="sys link-5-30000897" target="_top">
+      <rect id="rect30000897" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">F-G7BO</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30002421">
+    <a xlink:href="http://evemaps.dotlan.net/map/Geminate/MR4-MY" class="sys link-5-30002421" target="_top">
+      <rect id="rect30002421" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">MR4-MY</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Geminate</text>
+    </a>
+  </symbol>
+  <symbol id="def30000898">
+    <a xlink:href="http://evemaps.dotlan.net/map/Tribute/2CG-5V" class="sys link-5-30000898" target="_top">
+      <rect id="rect30000898" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">2CG-5V</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Tribute</text>
+    </a>
+  </symbol>
+  <symbol id="def30002470">
+    <a xlink:href="http://evemaps.dotlan.net/map/Geminate/L-TOFR" class="sys link-5-30002470" target="_top">
+      <rect id="rect30002470" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">L-TOFR</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Geminate</text>
+    </a>
+  </symbol>
+  <symbol id="def30002825">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Kalevala_Expanse/UDVW-O" class="sys link-5-30002825" target="_top">
+      <rect id="rect30002825" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">UDVW-O</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">The Kalevala Expanse</text>
+    </a>
+  </symbol>
+  <symbol id="def30002479">
+    <a xlink:href="http://evemaps.dotlan.net/map/Geminate/QP0K-B" class="sys link-5-30002479" target="_top">
+      <rect id="rect30002479" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">QP0K-B</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Geminate</text>
+    </a>
+  </symbol>
+
+
+  <symbol id="defCampaign" width="85" height="46">
+    <rect x="0" y="0" width="85" height="46" class="cam" />
+  </symbol>
+  <symbol id="defCampaignActive" width="85" height="46">
+    <rect x="0" y="0" width="85" height="46" class="cam-active" />
+  </symbol>
+  <radialGradient id="conBg">
+    <stop offset="50%" stop-color="#FFA0FF"/>
+    <stop offset="95%" stop-color="#FFA0FF" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="camBg">
+    <stop offset="30%" stop-color="#FF8800" stop-opacity="1"/>
+    <stop offset="95%" stop-color="#FF8800" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="camActiveBg">
+    <stop offset="40%" stop-color="#FF0000" stop-opacity="1"/>
+    <stop offset="95%" stop-color="#FF0000" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="incBg">
+    <stop offset="50%" stop-color="#AFCE00"/>
+    <stop offset="100%" stop-color="#AFCE00" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="incStBg">
+    <stop offset="50%" stop-color="#808000"/>
+    <stop offset="100%" stop-color="#808000" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<text x="10" y="20" id="debug"  style="fill: #888888;"> </text>
+
+<g id="glow">
+
+
+</g>
+
+<g id="campaigns"></g>
+
+<g id="jumps">
+<line id="j-30000211-30000208" x1="388.5" y1="499.5" x2="328.5" y2="524.5" class="j" />
+<line id="j-30000213-30000208" x1="388.5" y1="499.5" x2="388.5" y2="544.5" class="j" />
+<line id="j-30000214-30000208" x1="388.5" y1="499.5" x2="413.5" y2="454.5" class="j" />
+<line id="j-30000212-30000209" x1="408.5" y1="409.5" x2="488.5" y2="409.5" class="j" />
+<line id="j-30000214-30000209" x1="408.5" y1="409.5" x2="413.5" y2="454.5" class="j" />
+<line id="j-30000242-30000209" x1="408.5" y1="409.5" x2="373.5" y2="369.5" class="jc" />
+<line id="j-30000212-30000210" x1="488.5" y1="489.5" x2="488.5" y2="409.5" class="j" />
+<line id="j-30000222-30000210" x1="488.5" y1="489.5" x2="493.5" y2="524.5" class="jc" />
+<line id="j-30000213-30000211" x1="328.5" y1="524.5" x2="388.5" y2="544.5" class="j" />
+<line id="j-30000214-30000212" x1="488.5" y1="409.5" x2="413.5" y2="454.5" class="j" />
+<line id="j-30000289-30000212" x1="488.5" y1="409.5" x2="553.5" y2="394.5" class="jc" />
+<line id="j-30000268-30000213" x1="388.5" y1="544.5" x2="393.5" y2="584.5" class="jc" />
+<line id="j-30000216-30000215" x1="179.5" y1="535.5" x2="101.5" y2="536.5" class="j" />
+<line id="j-30000217-30000215" x1="179.5" y1="535.5" x2="179.5" y2="577.5" class="j" />
+<line id="j-30000219-30000215" x1="179.5" y1="535.5" x2="139.5" y2="500.5" class="j" />
+<line id="j-30000251-30000215" x1="179.5" y1="535.5" x2="178.5" y2="461.5" class="jc" />
+<line id="j-30000219-30000216" x1="101.5" y1="536.5" x2="139.5" y2="500.5" class="j" />
+<line id="j-30000221-30000216" x1="101.5" y1="536.5" x2="101.5" y2="578.5" class="j" />
+<line id="j-30000218-30000217" x1="179.5" y1="577.5" x2="247.5" y2="576.5" class="j" />
+<line id="j-30000220-30000217" x1="179.5" y1="577.5" x2="179.5" y2="617.5" class="j" />
+<line id="j-30000221-30000217" x1="179.5" y1="577.5" x2="101.5" y2="578.5" class="j" />
+<line id="j-30000223-30000222" x1="493.5" y1="524.5" x2="518.5" y2="564.5" class="j" />
+<line id="j-30000224-30000223" x1="518.5" y1="564.5" x2="583.5" y2="574.5" class="j" />
+<line id="j-30000225-30000224" x1="583.5" y1="574.5" x2="653.5" y2="559.5" class="j" />
+<line id="j-30000226-30000225" x1="653.5" y1="559.5" x2="693.5" y2="529.5" class="j" />
+<line id="j-30000274-30000225" x1="653.5" y1="559.5" x2="633.5" y2="619.5" class="jc" />
+<line id="j-30002421-30000225" x1="653.5" y1="559.5" x2="708.5" y2="594.5" class="jr" />
+<line id="j-30000227-30000226" x1="693.5" y1="529.5" x2="693.5" y2="494.5" class="j" />
+<line id="j-30000280-30000226" x1="693.5" y1="529.5" x2="753.5" y2="524.5" class="jc" />
+<line id="j-30000295-30000227" x1="693.5" y1="494.5" x2="693.5" y2="454.5" class="jc" />
+<line id="j-30000232-30000228" x1="97.5" y1="91.5" x2="96.5" y2="128.5" class="j" />
+<line id="j-30000233-30000228" x1="97.5" y1="91.5" x2="129.5" y2="55.5" class="j" />
+<line id="j-30000235-30000228" x1="97.5" y1="91.5" x2="58.5" y2="59.5" class="j" />
+<line id="j-30000230-30000229" x1="96.5" y1="206.5" x2="96.5" y2="166.5" class="j" />
+<line id="j-30000231-30000229" x1="96.5" y1="206.5" x2="28.5" y2="209.5" class="j" />
+<line id="j-30000247-30000229" x1="96.5" y1="206.5" x2="113.5" y2="264.5" class="jc" />
+<line id="j-30000232-30000230" x1="96.5" y1="166.5" x2="96.5" y2="128.5" class="j" />
+<line id="j-30000234-30000232" x1="96.5" y1="128.5" x2="170.5" y2="119.5" class="j" />
+<line id="j-30000237-30000232" x1="96.5" y1="128.5" x2="28.5" y2="129.5" class="j" />
+<line id="j-30000235-30000233" x1="129.5" y1="55.5" x2="58.5" y2="59.5" class="j" />
+<line id="j-30000236-30000233" x1="129.5" y1="55.5" x2="191.5" y2="40.5" class="j" />
+<line id="j-30000239-30000238" x1="348.5" y1="309.5" x2="273.5" y2="324.5" class="j" />
+<line id="j-30000242-30000238" x1="348.5" y1="309.5" x2="373.5" y2="369.5" class="j" />
+<line id="j-30000243-30000238" x1="348.5" y1="309.5" x2="318.5" y2="349.5" class="j" />
+<line id="j-30000263-30000238" x1="348.5" y1="309.5" x2="338.5" y2="269.5" class="jc" />
+<line id="j-30000240-30000239" x1="273.5" y1="324.5" x2="278.5" y2="384.5" class="j" />
+<line id="j-30000241-30000240" x1="278.5" y1="384.5" x2="213.5" y2="389.5" class="j" />
+<line id="j-30000242-30000240" x1="278.5" y1="384.5" x2="373.5" y2="369.5" class="j" />
+<line id="j-30000243-30000240" x1="278.5" y1="384.5" x2="318.5" y2="349.5" class="j" />
+<line id="j-30000253-30000241" x1="213.5" y1="389.5" x2="143.5" y2="389.5" class="jc" />
+<line id="j-30000245-30000244" x1="108.5" y1="309.5" x2="43.5" y2="279.5" class="j" />
+<line id="j-30000246-30000244" x1="108.5" y1="309.5" x2="113.5" y2="349.5" class="j" />
+<line id="j-30000247-30000244" x1="108.5" y1="309.5" x2="113.5" y2="264.5" class="j" />
+<line id="j-30000249-30000244" x1="108.5" y1="309.5" x2="28.5" y2="389.5" class="j" />
+<line id="j-30000247-30000245" x1="43.5" y1="279.5" x2="113.5" y2="264.5" class="j" />
+<line id="j-30000249-30000246" x1="113.5" y1="349.5" x2="28.5" y2="389.5" class="j" />
+<line id="j-30000253-30000246" x1="113.5" y1="349.5" x2="143.5" y2="389.5" class="j" />
+<line id="j-30000864-30000247" x1="113.5" y1="264.5" x2="158.5" y2="224.5" class="jr" />
+<line id="j-30000251-30000248" x1="163.5" y1="424.5" x2="178.5" y2="461.5" class="j" />
+<line id="j-30000253-30000248" x1="163.5" y1="424.5" x2="143.5" y2="389.5" class="j" />
+<line id="j-30000252-30000249" x1="28.5" y1="389.5" x2="28.5" y2="669.5" class="j" />
+<line id="j-30000253-30000249" x1="28.5" y1="389.5" x2="143.5" y2="389.5" class="j" />
+<line id="j-30000250-30000205" x1="28.5" y1="709.5" x2="28.5" y2="754.5" class="jr" />
+<line id="j-30000252-30000250" x1="28.5" y1="709.5" x2="28.5" y2="669.5" class="j" />
+<line id="j-30000256-30000252" x1="28.5" y1="669.5" x2="113.5" y2="669.5" class="jc" />
+<line id="j-30000255-30000254" x1="178.5" y1="684.5" x2="263.5" y2="699.5" class="j" />
+<line id="j-30000256-30000254" x1="178.5" y1="684.5" x2="113.5" y2="669.5" class="j" />
+<line id="j-30000257-30000254" x1="178.5" y1="684.5" x2="236.5" y2="656.5" class="j" />
+<line id="j-30000260-30000254" x1="178.5" y1="684.5" x2="178.5" y2="724.5" class="j" />
+<line id="j-30000257-30000255" x1="263.5" y1="699.5" x2="236.5" y2="656.5" class="j" />
+<line id="j-30000258-30000255" x1="263.5" y1="699.5" x2="323.5" y2="719.5" class="j" />
+<line id="j-30000259-30000255" x1="263.5" y1="699.5" x2="243.5" y2="739.5" class="j" />
+<line id="j-30000260-30000259" x1="243.5" y1="739.5" x2="178.5" y2="724.5" class="j" />
+<line id="j-30000262-30000261" x1="408.5" y1="244.5" x2="413.5" y2="289.5" class="j" />
+<line id="j-30000263-30000261" x1="408.5" y1="244.5" x2="338.5" y2="269.5" class="j" />
+<line id="j-30000264-30000261" x1="408.5" y1="244.5" x2="468.5" y2="219.5" class="j" />
+<line id="j-30000263-30000262" x1="413.5" y1="289.5" x2="338.5" y2="269.5" class="j" />
+<line id="j-30000265-30000263" x1="338.5" y1="269.5" x2="338.5" y2="229.5" class="j" />
+<line id="j-30000301-30000264" x1="468.5" y1="219.5" x2="528.5" y2="194.5" class="jc" />
+<line id="j-30000266-30000265" x1="338.5" y1="229.5" x2="338.5" y2="199.5" class="j" />
+<line id="j-30000267-30000266" x1="338.5" y1="199.5" x2="338.5" y2="164.5" class="j" />
+<line id="j-30000871-30000267" x1="338.5" y1="164.5" x2="338.5" y2="129.5" class="jr" />
+<line id="j-30000269-30000268" x1="393.5" y1="584.5" x2="408.5" y2="629.5" class="j" />
+<line id="j-30000270-30000269" x1="408.5" y1="629.5" x2="423.5" y2="669.5" class="j" />
+<line id="j-30000271-30000269" x1="408.5" y1="629.5" x2="463.5" y2="624.5" class="j" />
+<line id="j-30000272-30000270" x1="423.5" y1="669.5" x2="438.5" y2="709.5" class="j" />
+<line id="j-30000273-30000272" x1="438.5" y1="709.5" x2="453.5" y2="744.5" class="j" />
+<line id="j-30000275-30000274" x1="633.5" y1="619.5" x2="638.5" y2="664.5" class="j" />
+<line id="j-30000276-30000275" x1="638.5" y1="664.5" x2="658.5" y2="704.5" class="j" />
+<line id="j-30000277-30000276" x1="658.5" y1="704.5" x2="728.5" y2="704.5" class="j" />
+<line id="j-30000278-30000277" x1="728.5" y1="704.5" x2="763.5" y2="734.5" class="j" />
+<line id="j-30000279-30000277" x1="728.5" y1="704.5" x2="748.5" y2="669.5" class="j" />
+<line id="j-30000281-30000280" x1="753.5" y1="524.5" x2="808.5" y2="504.5" class="j" />
+<line id="j-30000282-30000281" x1="808.5" y1="504.5" x2="858.5" y2="464.5" class="j" />
+<line id="j-30000283-30000282" x1="858.5" y1="464.5" x2="863.5" y2="419.5" class="j" />
+<line id="j-30000287-30000282" x1="858.5" y1="464.5" x2="888.5" y2="509.5" class="j" />
+<line id="j-30000284-30000283" x1="863.5" y1="419.5" x2="928.5" y2="404.5" class="j" />
+<line id="j-30000286-30000283" x1="863.5" y1="419.5" x2="868.5" y2="379.5" class="j" />
+<line id="j-30000285-30000284" x1="928.5" y1="404.5" x2="958.5" y2="439.5" class="j" />
+<line id="j-30000286-30000284" x1="928.5" y1="404.5" x2="868.5" y2="379.5" class="j" />
+<line id="j-30000288-30000285" x1="958.5" y1="439.5" x2="983.5" y2="479.5" class="j" />
+<line id="j-30000323-30000286" x1="868.5" y1="379.5" x2="868.5" y2="334.5" class="jc" />
+<line id="j-30002479-30000288" x1="983.5" y1="479.5" x2="983.5" y2="514.5" class="jr" />
+<line id="j-30000290-30000289" x1="553.5" y1="394.5" x2="618.5" y2="369.5" class="j" />
+<line id="j-30000291-30000289" x1="553.5" y1="394.5" x2="558.5" y2="424.5" class="j" />
+<line id="j-30000292-30000290" x1="618.5" y1="369.5" x2="618.5" y2="404.5" class="j" />
+<line id="j-30000299-30000290" x1="618.5" y1="369.5" x2="693.5" y2="329.5" class="jc" />
+<line id="j-30000292-30000291" x1="558.5" y1="424.5" x2="618.5" y2="404.5" class="j" />
+<line id="j-30000293-30000291" x1="558.5" y1="424.5" x2="563.5" y2="459.5" class="j" />
+<line id="j-30000294-30000292" x1="618.5" y1="404.5" x2="623.5" y2="449.5" class="j" />
+<line id="j-30000296-30000295" x1="693.5" y1="454.5" x2="693.5" y2="419.5" class="j" />
+<line id="j-30000298-30000295" x1="693.5" y1="454.5" x2="763.5" y2="429.5" class="j" />
+<line id="j-30000297-30000296" x1="693.5" y1="419.5" x2="693.5" y2="374.5" class="j" />
+<line id="j-30000298-30000296" x1="693.5" y1="419.5" x2="763.5" y2="429.5" class="j" />
+<line id="j-30000299-30000297" x1="693.5" y1="374.5" x2="693.5" y2="329.5" class="j" />
+<line id="j-30000300-30000298" x1="763.5" y1="429.5" x2="778.5" y2="389.5" class="j" />
+<line id="j-30000307-30000299" x1="693.5" y1="329.5" x2="693.5" y2="249.5" class="jc" />
+<line id="j-30000302-30000301" x1="528.5" y1="194.5" x2="598.5" y2="214.5" class="j" />
+<line id="j-30000303-30000301" x1="528.5" y1="194.5" x2="588.5" y2="174.5" class="j" />
+<line id="j-30000304-30000301" x1="528.5" y1="194.5" x2="533.5" y2="239.5" class="j" />
+<line id="j-30000303-30000302" x1="598.5" y1="214.5" x2="588.5" y2="174.5" class="j" />
+<line id="j-30000304-30000302" x1="598.5" y1="214.5" x2="533.5" y2="239.5" class="j" />
+<line id="j-30000899-30000303" x1="588.5" y1="174.5" x2="653.5" y2="149.5" class="jr" />
+<line id="j-30000305-30000304" x1="533.5" y1="239.5" x2="533.5" y2="279.5" class="j" />
+<line id="j-30000306-30000305" x1="533.5" y1="279.5" x2="533.5" y2="319.5" class="j" />
+<line id="j-30000308-30000307" x1="693.5" y1="249.5" x2="723.5" y2="179.5" class="j" />
+<line id="j-30000309-30000307" x1="693.5" y1="249.5" x2="743.5" y2="224.5" class="j" />
+<line id="j-30000309-30000308" x1="723.5" y1="179.5" x2="743.5" y2="224.5" class="j" />
+<line id="j-30000310-30000308" x1="723.5" y1="179.5" x2="803.5" y2="209.5" class="j" />
+<line id="j-30000312-30000308" x1="723.5" y1="179.5" x2="803.5" y2="164.5" class="j" />
+<line id="j-30000898-30000308" x1="723.5" y1="179.5" x2="713.5" y2="124.5" class="jr" />
+<line id="j-30000310-30000309" x1="743.5" y1="224.5" x2="803.5" y2="209.5" class="j" />
+<line id="j-30000311-30000310" x1="803.5" y1="209.5" x2="883.5" y2="194.5" class="j" />
+<line id="j-30000312-30000310" x1="803.5" y1="209.5" x2="803.5" y2="164.5" class="j" />
+<line id="j-30000313-30000310" x1="803.5" y1="209.5" x2="868.5" y2="234.5" class="j" />
+<line id="j-30000312-30000311" x1="883.5" y1="194.5" x2="803.5" y2="164.5" class="j" />
+<line id="j-30000313-30000311" x1="883.5" y1="194.5" x2="868.5" y2="234.5" class="j" />
+<line id="j-30000314-30000311" x1="883.5" y1="194.5" x2="948.5" y2="169.5" class="jc" />
+<line id="j-30000313-30000312" x1="803.5" y1="164.5" x2="868.5" y2="234.5" class="j" />
+<line id="j-30000320-30000313" x1="868.5" y1="234.5" x2="868.5" y2="289.5" class="jc" />
+<line id="j-30000315-30000314" x1="948.5" y1="169.5" x2="948.5" y2="134.5" class="j" />
+<line id="j-30000316-30000315" x1="948.5" y1="134.5" x2="948.5" y2="99.5" class="j" />
+<line id="j-30000317-30000316" x1="948.5" y1="99.5" x2="948.5" y2="54.5" class="j" />
+<line id="j-30000318-30000317" x1="948.5" y1="54.5" x2="883.5" y2="29.5" class="j" />
+<line id="j-30000319-30000317" x1="948.5" y1="54.5" x2="883.5" y2="74.5" class="j" />
+<line id="j-30000319-30000318" x1="883.5" y1="29.5" x2="883.5" y2="74.5" class="j" />
+<line id="j-30002470-30000318" x1="883.5" y1="29.5" x2="808.5" y2="29.5" class="jr" />
+<line id="j-30002825-30000319" x1="883.5" y1="74.5" x2="813.5" y2="74.5" class="jr" />
+<line id="j-30000321-30000320" x1="868.5" y1="289.5" x2="928.5" y2="334.5" class="j" />
+<line id="j-30000322-30000320" x1="868.5" y1="289.5" x2="928.5" y2="289.5" class="j" />
+<line id="j-30000323-30000320" x1="868.5" y1="289.5" x2="868.5" y2="334.5" class="j" />
+<line id="j-30000322-30000321" x1="928.5" y1="334.5" x2="928.5" y2="289.5" class="j" />
+<line id="j-30000323-30000321" x1="928.5" y1="334.5" x2="868.5" y2="334.5" class="j" />
+<line id="j-30000324-30000321" x1="928.5" y1="334.5" x2="983.5" y2="314.5" class="j" />
+<line id="j-30000323-30000322" x1="928.5" y1="289.5" x2="868.5" y2="334.5" class="j" />
+<line id="j-30000324-30000322" x1="928.5" y1="289.5" x2="983.5" y2="314.5" class="j" />
+<line id="j-30000325-30000324" x1="983.5" y1="314.5" x2="983.5" y2="264.5" class="j" />
+<line id="j-30000864-30000863" x1="158.5" y1="224.5" x2="198.5" y2="269.5" class="j" />
+<line id="j-30000865-30000864" x1="158.5" y1="224.5" x2="213.5" y2="189.5" class="j" />
+<line id="j-30000867-30000865" x1="213.5" y1="189.5" x2="273.5" y2="159.5" class="jc" />
+<line id="j-30000868-30000867" x1="273.5" y1="159.5" x2="253.5" y2="119.5" class="j" />
+<line id="j-30000871-30000867" x1="273.5" y1="159.5" x2="338.5" y2="129.5" class="j" />
+<line id="j-30000871-30000870" x1="338.5" y1="129.5" x2="318.5" y2="89.5" class="j" />
+<line id="j-30000872-30000871" x1="338.5" y1="129.5" x2="418.5" y2="129.5" class="j" />
+<line id="j-30000894-30000871" x1="338.5" y1="129.5" x2="428.5" y2="84.5" class="jc" />
+<line id="j-30000895-30000894" x1="428.5" y1="84.5" x2="503.5" y2="64.5" class="j" />
+<line id="j-30000896-30000895" x1="503.5" y1="64.5" x2="588.5" y2="59.5" class="j" />
+<line id="j-30000897-30000896" x1="588.5" y1="59.5" x2="668.5" y2="84.5" class="j" />
+<line id="j-30001348-30000896" x1="588.5" y1="59.5" x2="603.5" y2="14.5" class="jr" />
+<line id="j-30000870-30000868" x1="253.5" y1="119.5" x2="318.5" y2="89.5" class="j" />
+<line id="j-30000898-30000897" x1="668.5" y1="84.5" x2="713.5" y2="124.5" class="j" />
+<line id="j-30000899-30000898" x1="713.5" y1="124.5" x2="653.5" y2="149.5" class="j" />
+
+</g>
+
+<g id="sysuse">
+<use id="sys30000237" x="0" y="115" width="62.5" height="30" xlink:href="#def30000237" />
+<use id="sys30000231" x="0" y="195" width="62.5" height="30" xlink:href="#def30000231" />
+<use id="sys30000249" x="0" y="375" width="62.5" height="30" xlink:href="#def30000249" />
+<use id="sys30000252" x="0" y="655" width="62.5" height="30" xlink:href="#def30000252" />
+<use id="sys30000250" x="0" y="695" width="62.5" height="30" xlink:href="#def30000250" />
+<use id="sys30000245" x="15" y="265" width="62.5" height="30" xlink:href="#def30000245" />
+<use id="sys30000235" x="30" y="45" width="62.5" height="30" xlink:href="#def30000235" />
+<use id="sys30000232" x="68" y="114" width="62.5" height="30" xlink:href="#def30000232" />
+<use id="sys30000230" x="68" y="152" width="62.5" height="30" xlink:href="#def30000230" />
+<use id="sys30000229" x="68" y="192" width="62.5" height="30" xlink:href="#def30000229" />
+<use id="sys30000228" x="69" y="77" width="62.5" height="30" xlink:href="#def30000228" />
+<use id="sys30000216" x="73" y="522" width="62.5" height="30" xlink:href="#def30000216" />
+<use id="sys30000221" x="73" y="564" width="62.5" height="30" xlink:href="#def30000221" />
+<use id="sys30000244" x="80" y="295" width="62.5" height="30" xlink:href="#def30000244" />
+<use id="sys30000247" x="85" y="250" width="62.5" height="30" xlink:href="#def30000247" />
+<use id="sys30000246" x="85" y="335" width="62.5" height="30" xlink:href="#def30000246" />
+<use id="sys30000256" x="85" y="655" width="62.5" height="30" xlink:href="#def30000256" />
+<use id="sys30000233" x="101" y="41" width="62.5" height="30" xlink:href="#def30000233" />
+<use id="sys30000219" x="111" y="486" width="62.5" height="30" xlink:href="#def30000219" />
+<use id="sys30000253" x="115" y="375" width="62.5" height="30" xlink:href="#def30000253" />
+<use id="sys30000864" x="130" y="210" width="62.5" height="30" xlink:href="#def30000864" />
+<use id="sys30000248" x="135" y="410" width="62.5" height="30" xlink:href="#def30000248" />
+<use id="sys30000234" x="142" y="105" width="62.5" height="30" xlink:href="#def30000234" />
+<use id="sys30000251" x="150" y="447" width="62.5" height="30" xlink:href="#def30000251" />
+<use id="sys30000254" x="150" y="670" width="62.5" height="30" xlink:href="#def30000254" />
+<use id="sys30000260" x="150" y="710" width="62.5" height="30" xlink:href="#def30000260" />
+<use id="sys30000215" x="151" y="521" width="62.5" height="30" xlink:href="#def30000215" />
+<use id="sys30000217" x="151" y="563" width="62.5" height="30" xlink:href="#def30000217" />
+<use id="sys30000220" x="151" y="603" width="62.5" height="30" xlink:href="#def30000220" />
+<use id="sys30000236" x="163" y="26" width="62.5" height="30" xlink:href="#def30000236" />
+<use id="sys30000865" x="185" y="175" width="62.5" height="30" xlink:href="#def30000865" />
+<use id="sys30000241" x="185" y="375" width="62.5" height="30" xlink:href="#def30000241" />
+<use id="sys30000257" x="208" y="642" width="62.5" height="30" xlink:href="#def30000257" />
+<use id="sys30000259" x="215" y="725" width="62.5" height="30" xlink:href="#def30000259" />
+<use id="sys30000218" x="219" y="562" width="62.5" height="30" xlink:href="#def30000218" />
+<use id="sys30000255" x="235" y="685" width="62.5" height="30" xlink:href="#def30000255" />
+<use id="sys30000867" x="245" y="145" width="62.5" height="30" xlink:href="#def30000867" />
+<use id="sys30000239" x="245" y="310" width="62.5" height="30" xlink:href="#def30000239" />
+<use id="sys30000240" x="250" y="370" width="62.5" height="30" xlink:href="#def30000240" />
+<use id="sys30000243" x="290" y="335" width="62.5" height="30" xlink:href="#def30000243" />
+<use id="sys30000258" x="295" y="705" width="62.5" height="30" xlink:href="#def30000258" />
+<use id="sys30000211" x="300" y="510" width="62.5" height="30" xlink:href="#def30000211" />
+<use id="sys30000871" x="310" y="115" width="62.5" height="30" xlink:href="#def30000871" />
+<use id="sys30000267" x="310" y="150" width="62.5" height="30" xlink:href="#def30000267" />
+<use id="sys30000266" x="310" y="185" width="62.5" height="30" xlink:href="#def30000266" />
+<use id="sys30000265" x="310" y="215" width="62.5" height="30" xlink:href="#def30000265" />
+<use id="sys30000263" x="310" y="255" width="62.5" height="30" xlink:href="#def30000263" />
+<use id="sys30000238" x="320" y="295" width="62.5" height="30" xlink:href="#def30000238" />
+<use id="sys30000242" x="345" y="355" width="62.5" height="30" xlink:href="#def30000242" />
+<use id="sys30000208" x="360" y="485" width="62.5" height="30" xlink:href="#def30000208" />
+<use id="sys30000213" x="360" y="530" width="62.5" height="30" xlink:href="#def30000213" />
+<use id="sys30000268" x="365" y="570" width="62.5" height="30" xlink:href="#def30000268" />
+<use id="sys30000261" x="380" y="230" width="62.5" height="30" xlink:href="#def30000261" />
+<use id="sys30000209" x="380" y="395" width="62.5" height="30" xlink:href="#def30000209" />
+<use id="sys30000269" x="380" y="615" width="62.5" height="30" xlink:href="#def30000269" />
+<use id="sys30000262" x="385" y="275" width="62.5" height="30" xlink:href="#def30000262" />
+<use id="sys30000214" x="385" y="440" width="62.5" height="30" xlink:href="#def30000214" />
+<use id="sys30000270" x="395" y="655" width="62.5" height="30" xlink:href="#def30000270" />
+<use id="sys30000894" x="400" y="70" width="62.5" height="30" xlink:href="#def30000894" />
+<use id="sys30000272" x="410" y="695" width="62.5" height="30" xlink:href="#def30000272" />
+<use id="sys30000273" x="425" y="730" width="62.5" height="30" xlink:href="#def30000273" />
+<use id="sys30000271" x="435" y="610" width="62.5" height="30" xlink:href="#def30000271" />
+<use id="sys30000264" x="440" y="205" width="62.5" height="30" xlink:href="#def30000264" />
+<use id="sys30000212" x="460" y="395" width="62.5" height="30" xlink:href="#def30000212" />
+<use id="sys30000210" x="460" y="475" width="62.5" height="30" xlink:href="#def30000210" />
+<use id="sys30000222" x="465" y="510" width="62.5" height="30" xlink:href="#def30000222" />
+<use id="sys30000895" x="475" y="50" width="62.5" height="30" xlink:href="#def30000895" />
+<use id="sys30000223" x="490" y="550" width="62.5" height="30" xlink:href="#def30000223" />
+<use id="sys30000301" x="500" y="180" width="62.5" height="30" xlink:href="#def30000301" />
+<use id="sys30000304" x="505" y="225" width="62.5" height="30" xlink:href="#def30000304" />
+<use id="sys30000305" x="505" y="265" width="62.5" height="30" xlink:href="#def30000305" />
+<use id="sys30000306" x="505" y="305" width="62.5" height="30" xlink:href="#def30000306" />
+<use id="sys30000289" x="525" y="380" width="62.5" height="30" xlink:href="#def30000289" />
+<use id="sys30000291" x="530" y="410" width="62.5" height="30" xlink:href="#def30000291" />
+<use id="sys30000293" x="535" y="445" width="62.5" height="30" xlink:href="#def30000293" />
+<use id="sys30000224" x="555" y="560" width="62.5" height="30" xlink:href="#def30000224" />
+<use id="sys30000896" x="560" y="45" width="62.5" height="30" xlink:href="#def30000896" />
+<use id="sys30000303" x="560" y="160" width="62.5" height="30" xlink:href="#def30000303" />
+<use id="sys30000302" x="570" y="200" width="62.5" height="30" xlink:href="#def30000302" />
+<use id="sys30000290" x="590" y="355" width="62.5" height="30" xlink:href="#def30000290" />
+<use id="sys30000292" x="590" y="390" width="62.5" height="30" xlink:href="#def30000292" />
+<use id="sys30000294" x="595" y="435" width="62.5" height="30" xlink:href="#def30000294" />
+<use id="sys30000274" x="605" y="605" width="62.5" height="30" xlink:href="#def30000274" />
+<use id="sys30000275" x="610" y="650" width="62.5" height="30" xlink:href="#def30000275" />
+<use id="sys30000225" x="625" y="545" width="62.5" height="30" xlink:href="#def30000225" />
+<use id="sys30000276" x="630" y="690" width="62.5" height="30" xlink:href="#def30000276" />
+<use id="sys30000307" x="665" y="235" width="62.5" height="30" xlink:href="#def30000307" />
+<use id="sys30000299" x="665" y="315" width="62.5" height="30" xlink:href="#def30000299" />
+<use id="sys30000297" x="665" y="360" width="62.5" height="30" xlink:href="#def30000297" />
+<use id="sys30000296" x="665" y="405" width="62.5" height="30" xlink:href="#def30000296" />
+<use id="sys30000295" x="665" y="440" width="62.5" height="30" xlink:href="#def30000295" />
+<use id="sys30000227" x="665" y="480" width="62.5" height="30" xlink:href="#def30000227" />
+<use id="sys30000226" x="665" y="515" width="62.5" height="30" xlink:href="#def30000226" />
+<use id="sys30000308" x="695" y="165" width="62.5" height="30" xlink:href="#def30000308" />
+<use id="sys30000277" x="700" y="690" width="62.5" height="30" xlink:href="#def30000277" />
+<use id="sys30000309" x="715" y="210" width="62.5" height="30" xlink:href="#def30000309" />
+<use id="sys30000279" x="720" y="655" width="62.5" height="30" xlink:href="#def30000279" />
+<use id="sys30000280" x="725" y="510" width="62.5" height="30" xlink:href="#def30000280" />
+<use id="sys30000298" x="735" y="415" width="62.5" height="30" xlink:href="#def30000298" />
+<use id="sys30000278" x="735" y="720" width="62.5" height="30" xlink:href="#def30000278" />
+<use id="sys30000300" x="750" y="375" width="62.5" height="30" xlink:href="#def30000300" />
+<use id="sys30000312" x="775" y="150" width="62.5" height="30" xlink:href="#def30000312" />
+<use id="sys30000310" x="775" y="195" width="62.5" height="30" xlink:href="#def30000310" />
+<use id="sys30000281" x="780" y="490" width="62.5" height="30" xlink:href="#def30000281" />
+<use id="sys30000282" x="830" y="450" width="62.5" height="30" xlink:href="#def30000282" />
+<use id="sys30000283" x="835" y="405" width="62.5" height="30" xlink:href="#def30000283" />
+<use id="sys30000313" x="840" y="220" width="62.5" height="30" xlink:href="#def30000313" />
+<use id="sys30000320" x="840" y="275" width="62.5" height="30" xlink:href="#def30000320" />
+<use id="sys30000323" x="840" y="320" width="62.5" height="30" xlink:href="#def30000323" />
+<use id="sys30000286" x="840" y="365" width="62.5" height="30" xlink:href="#def30000286" />
+<use id="sys30000318" x="855" y="15" width="62.5" height="30" xlink:href="#def30000318" />
+<use id="sys30000319" x="855" y="60" width="62.5" height="30" xlink:href="#def30000319" />
+<use id="sys30000311" x="855" y="180" width="62.5" height="30" xlink:href="#def30000311" />
+<use id="sys30000287" x="860" y="495" width="62.5" height="30" xlink:href="#def30000287" />
+<use id="sys30000322" x="900" y="275" width="62.5" height="30" xlink:href="#def30000322" />
+<use id="sys30000321" x="900" y="320" width="62.5" height="30" xlink:href="#def30000321" />
+<use id="sys30000284" x="900" y="390" width="62.5" height="30" xlink:href="#def30000284" />
+<use id="sys30000317" x="920" y="40" width="62.5" height="30" xlink:href="#def30000317" />
+<use id="sys30000316" x="920" y="85" width="62.5" height="30" xlink:href="#def30000316" />
+<use id="sys30000315" x="920" y="120" width="62.5" height="30" xlink:href="#def30000315" />
+<use id="sys30000314" x="920" y="155" width="62.5" height="30" xlink:href="#def30000314" />
+<use id="sys30000285" x="930" y="425" width="62.5" height="30" xlink:href="#def30000285" />
+<use id="sys30000325" x="955" y="250" width="62.5" height="30" xlink:href="#def30000325" />
+<use id="sys30000324" x="955" y="300" width="62.5" height="30" xlink:href="#def30000324" />
+<use id="sys30000288" x="955" y="465" width="62.5" height="30" xlink:href="#def30000288" />
+<use id="sys30000205" x="0" y="740" width="62.5" height="30" xlink:href="#def30000205" />
+<use id="sys30000863" x="170" y="255" width="62.5" height="30" xlink:href="#def30000863" />
+<use id="sys30000868" x="225" y="105" width="62.5" height="30" xlink:href="#def30000868" />
+<use id="sys30000870" x="290" y="75" width="62.5" height="30" xlink:href="#def30000870" />
+<use id="sys30000872" x="390" y="115" width="62.5" height="30" xlink:href="#def30000872" />
+<use id="sys30001348" x="575" y="0" width="62.5" height="30" xlink:href="#def30001348" />
+<use id="sys30000899" x="625" y="135" width="62.5" height="30" xlink:href="#def30000899" />
+<use id="sys30000897" x="640" y="70" width="62.5" height="30" xlink:href="#def30000897" />
+<use id="sys30002421" x="680" y="580" width="62.5" height="30" xlink:href="#def30002421" />
+<use id="sys30000898" x="685" y="110" width="62.5" height="30" xlink:href="#def30000898" />
+<use id="sys30002470" x="780" y="15" width="62.5" height="30" xlink:href="#def30002470" />
+<use id="sys30002825" x="785" y="60" width="62.5" height="30" xlink:href="#def30002825" />
+<use id="sys30002479" x="955" y="500" width="62.5" height="30" xlink:href="#def30002479" />
+
+</g>
+
+<g id="highlights">
+
+</g>
+
+<g id="notes"></g>
+
+<g id="standings"></g>
+
+</g>
+<g id="controls" style="display: none;">
+  <a xlink:title="Zoom In"><image id="zoom_in" x="5" y="5" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/magnifier_zoom_in.png" style="cursor: pointer;"/></a>
+  <a xlink:title="Zoom Out"><image id="zoom_out" x="5" y="23" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/magnifier_zoom_out.png" style="cursor: pointer;"/></a>
+  <a xlink:title="Enable Mousewheel Support"><image id="wheel_on" x="5" y="42" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/mouse_add.png" style="cursor: pointer;"/> </a>
+  <a xlink:title="Disable Mousewheel Support"><image id="wheel_off" x="5" y="42" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/mouse_delete.png" style="cursor: pointer; display: none;"/></a>
+</g>
+
+
+<script type="text/javascript" xlink:href="https://s.dotlan.net/lib/dotSvg.js?1595967170"></script>
+<script type="text/javascript"><![CDATA[
+
+function init(E) {
+	SVGMap.init(E);
+}
+
+]]></script>
+
+
+</svg>

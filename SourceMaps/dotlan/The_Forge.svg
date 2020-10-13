@@ -1,0 +1,1679 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg version="1.1"
+     id="svgdoc"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1024" height="768"
+     viewBox="0 0 1024 768"
+     style="background: #ffffff"
+     onload="init(evt)"
+>
+
+
+<style type="text/css">
+<![CDATA[
+/* jumps */
+.j	{ stroke: #000000; stroke-width: 1; }
+.jc	{ stroke: #FF0000; stroke-width: 1; }
+.jr	{ stroke: #800080; stroke-width: 1; }
+.jx	{ stroke: #000000; stroke-width: 3; }
+.jxc	{ stroke: #FF0000; stroke-width: 3; }
+.jxr	{ stroke: #800080; stroke-width: 3; }
+.jb	{ stroke: #0000FF; stroke-width: 3; fill: none; }
+
+/* external system */
+.eh	{ stroke: #00B000; stroke-width: 1; fill: #CCCCCC; }
+.el	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 4; fill: #CCCCCC; }
+.e	{ stroke: #000000; stroke-width: 1; fill: #CCCCCC; }
+.exh	{ stroke: #00B000; stroke-width: 2; fill: #CCCCCC; }
+.exl	{ stroke: #F00000; stroke-width: 2; stroke-dasharray: 8, 3; fill: #CCCCCC; }
+.ex	{ stroke: #000000; stroke-width: 2; fill: #CCCCCC; }
+
+/* external system text */
+.es	{ font-size: 9px; font-family: Arial, Helvetica, sans-serif; fill: #000000; }
+.er	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
+
+/* system */
+.sh	{ stroke: #00B000; stroke-width: 1; }
+.sl	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 3; }
+.s	{ stroke: #000000; stroke-width: 1; }
+.sc	{ stroke-width: 1.2; stroke-dasharray: 4, 3; }
+.sx	{ stroke-width: 2.5; }
+
+.scl	{ stroke: transparent; stroke-width: 2; fill: transparent; }
+
+/* system text */
+.ss	{ font-family: Arial, Helvetica, sans-serif; font-size: 9px; fill: #000000; }
+.st	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
+.so	{ fill: #ff0000; }
+.i	{ stroke: #0080FF; stroke-width: 1; fill: none; }
+
+/* station */
+.o	{ fill: #ffffff; }
+.oc	{ fill: #0000FF; }
+.oa	{ fill: #FFDC00; }
+.og	{ fill: #00FF00; }
+.om	{ fill: #FF0000; }
+.o1	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
+.o2	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
+.oo	{ fill: none; stroke: #000000; stroke-width: 1; }
+
+/* station services */
+.v1	{ fill: #FF0000; }
+.v2	{ fill: #00FF00; }
+.v3	{ fill: #FFDC00; }
+.v4	{ fill: #0000FF; }
+
+/* legend */
+.lb	{ stroke-width: 1; stroke: #000000; fill: #ffffff; }
+.lbt	{ stroke-width: 1; stroke: #000000; fill: #ffffff; }
+.lt	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 12px; }
+.lc	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 11px; }
+.l	{ fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 10px; }
+
+/* highlight */
+.h	{ fill: none; stroke-width: 3; stroke: #000000; }
+.hw	{ fill: none; stroke-width: 2; stroke: #00AA00; }
+.hl	{ fill: none; stroke-width: 2; stroke: #F00000; }
+.hg	{ fill: none; stroke-width: 2; stroke: #00B000; }
+
+/* incursion */
+.inc	{ fill: url(#incBg); }
+.incs	{ fill: url(#incStBg); }
+
+/* contested */
+.con	{ fill: url(#conBg); }
+
+/* sov campaign triggered */
+.cam		{ fill: url(#camBg); }
+.cam-active	{ fill: url(#camActiveBg); }
+]]>
+</style>
+
+<g id="map">
+<g id="legend">
+<rect x="860.5" y="575.5" width="160" height="188" class="lb" />
+<rect x="860.5" y="860.5" width="160" height="20" class="lbt" />
+<text x="942.5" y="590.5" class="lt" text-anchor="middle">The Forge</text>
+<rect x="860.5" y="595.5" width="160" height="148" class="lb" />
+<rect x="860.5" y="743.5" width="160" height="20" class="lb" />
+<text x="942.5" y="757.5" class="lc" text-anchor="middle"> 	&#169; by Wollari &amp; CCP</text>
+
+<rect x="875" y="600" rx="11" ry="11" width="50" height="22"  class="s" style="fill: #FFFFFF;" /><text x="900" y="611" class="ss" text-anchor="middle">XXXXX</text><text x="900" y="618.7" class="st so" text-anchor="middle">YYYYY (Z)</text>
+<rect x="920.6" y="605.5" height="11" width="11" class="o" /><polygon points="922.8,611 929.4,607.7 929.4,614.3 922.8,611"  class="o1" /><rect x="920.6" y="605.5" height="11" width="11"  class="oo" />
+<text x="877" y="639.4" class="l" text-anchor="start">X</text><text x="890" y="639.4" class="l" text-anchor="start">= System</text>
+<text x="877" y="654.8" class="l" text-anchor="start">Y</text><text x="890" y="654.8" class="l" text-anchor="start">= Alliance</text>
+<text x="877" y="670.2" class="l" text-anchor="start">Z</text><text x="890" y="670.2" class="l" text-anchor="start">= Sov. Lvl</text>
+<rect x="874" y="679.8" height="11" width="11" class="o" /><polygon points="876.2,685.3 882.8,682 882.8,688.6 876.2,685.3"  class="o1" /><rect x="874" y="679.8" height="11" width="11"  class="oo" /><text x="890" y="687.8" class="l" text-anchor="start">= Outpost</text>
+<rect x="874" y="695.2" height="11" width="11" class="o" /><rect x="877.3" y="698.5" height="4.4" width="4.4" class="o2" /><rect x="874" y="695.2" height="11" width="11"  class="oo" /><text x="890" y="703.2" class="l" text-anchor="start">= Cq Stat.</text>
+<rect x="874" y="710.6" height="11" width="11" class="o" /><rect x="874" y="710.6" height="11" width="11"  class="oo" /><text x="890" y="718.6" class="l" text-anchor="start">= NPC Stat.</text>
+<rect x="872" y="726" rx="5.5" ry="5.5" width="15.4" height="11" class="i" /><text x="890" y="734" class="l" text-anchor="start">= Icebelt</text>
+
+<rect x="947" y="603" height="11" width="11" class="om" /><polygon points="949.2,608.5 955.8,605.2 955.8,611.8 949.2,608.5"  class="o1" /><rect x="947" y="603" height="11" width="11"  class="oo" /><text x="963" y="611" class="l" text-anchor="start">= Refinery</text>
+<rect x="947" y="618.4" height="11" width="11" class="oa" /><polygon points="949.2,623.9 955.8,620.6 955.8,627.2 949.2,623.9"  class="o1" /><rect x="947" y="618.4" height="11" width="11"  class="oo" /><text x="963" y="626.4" class="l" text-anchor="start">= Factory</text>
+<rect x="947" y="633.8" height="11" width="11" class="oc" /><polygon points="949.2,639.3 955.8,636 955.8,642.6 949.2,639.3"  class="o1" /><rect x="947" y="633.8" height="11" width="11"  class="oo" /><text x="963" y="641.8" class="l" text-anchor="start">= Research</text>
+<rect x="947" y="649.2" height="11" width="11" class="og" /><polygon points="949.2,654.7 955.8,651.4 955.8,658 949.2,654.7"  class="o1" /><rect x="947" y="649.2" height="11" width="11"  class="oo" /><text x="963" y="657.2" class="l" text-anchor="start">= Offices</text>
+<rect x="947" y="664.6" height="11" width="11" class="o" /><polygon points="947,664.6 958,664.6 952.5,670.1 947,664.6" class="v1" /><rect x="947" y="664.6" height="11" width="11"  class="oo" /><text x="963" y="672.6" class="l" text-anchor="start">= Refining</text>
+<rect x="947" y="680" height="11" width="11" class="o" /><polygon points="958,691 952.5,685.5 947,691 958,691" class="v3" /><rect x="947" y="680" height="11" width="11"  class="oo" /><text x="963" y="688" class="l" text-anchor="start">= Industry</text>
+<rect x="947" y="695.4" height="11" width="11" class="o" /><polygon points="947,706.4 952.5,700.9 947,695.4 947,706.4" class="v4" /><rect x="947" y="695.4" height="11" width="11"  class="oo" /><text x="963" y="703.4" class="l" text-anchor="start">= Research</text>
+<rect x="947" y="710.8" height="11" width="11" class="o" /><polygon points="958,710.8 952.5,716.3 958,721.8 958,710.8" class="v2" /><rect x="947" y="710.8" height="11" width="11"  class="oo" /><text x="963" y="718.8" class="l" text-anchor="start">= Cloning</text>
+<rect x="945" y="726.2" rx="5.5" ry="5.5" width="15.4" height="11" class="sl" style="fill: #ffa0ff;" /><text x="963" y="734.2" class="l" text-anchor="start">= Contested</text>
+
+</g>
+
+<defs>
+  <symbol id="def30000135">
+    <a xlink:href="http://evemaps.dotlan.net/system/Outuni" class="sys link-5-30000135" target="_top">
+    <rect id="ice30000135" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000135" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Outuni</text>
+      <text id="txt30000135" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30010141">
+    <a xlink:href="http://evemaps.dotlan.net/system/Sakenta" class="sys link-5-30010141" target="_top">
+      <rect id="rect30010141" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Sakenta</text>
+      <text id="txt30010141" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000137">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eskunen" class="sys link-5-30000137" target="_top">
+      <rect id="rect30000137" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Eskunen</text>
+      <text id="txt30000137" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000134">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hykkota" class="sys link-5-30000134" target="_top">
+      <rect id="rect30000134" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Hykkota</text>
+      <text id="txt30000134" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000132">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ansila" class="sys link-5-30000132" target="_top">
+      <rect id="rect30000132" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ansila</text>
+      <text id="txt30000132" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000136">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ohmahailen" class="sys link-5-30000136" target="_top">
+      <rect id="rect30000136" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ohmahailen</text>
+      <text id="txt30000136" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000138">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ikuchi" class="sys link-5-30000138" target="_top">
+      <rect id="rect30000138" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ikuchi</text>
+      <text id="txt30000138" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000139">
+    <a xlink:href="http://evemaps.dotlan.net/system/Urlen" class="sys link-5-30000139" target="_top">
+      <rect id="rect30000139" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Urlen</text>
+      <text id="txt30000139" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000133">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hirtamon" class="sys link-5-30000133" target="_top">
+      <rect id="rect30000133" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Hirtamon</text>
+      <text id="txt30000133" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000129">
+    <a xlink:href="http://evemaps.dotlan.net/system/Unpas" class="sys link-5-30000129" target="_top">
+      <rect id="rect30000129" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Unpas</text>
+      <text id="txt30000129" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30021407">
+    <a xlink:href="http://evemaps.dotlan.net/system/Aokannitoh" class="sys link-5-30021407" target="_top">
+      <rect id="rect30021407" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Aokannitoh</text>
+      <text id="txt30021407" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000144">
+    <a xlink:href="http://evemaps.dotlan.net/system/Perimeter" class="sys link-5-30000144" target="_top">
+      <rect id="rect30000144" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Perimeter</text>
+      <text id="txt30000144" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000143">
+    <a xlink:href="http://evemaps.dotlan.net/system/Niyabainen" class="sys link-5-30000143" target="_top">
+      <rect id="rect30000143" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Niyabainen</text>
+      <text id="txt30000143" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000205">
+    <a xlink:href="http://evemaps.dotlan.net/system/Obe" class="sys link-5-30000205" target="_top">
+    <rect id="ice30000205" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000205" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Obe</text>
+      <text id="txt30000205" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000141">
+    <a xlink:href="http://evemaps.dotlan.net/system/Kisogo" class="sys link-5-30000141" target="_top">
+      <rect id="rect30000141" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Kisogo</text>
+      <text id="txt30000141" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30030141">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uitra" class="sys link-5-30030141" target="_top">
+      <rect id="rect30030141" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Uitra</text>
+      <text id="txt30030141" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000130">
+    <a xlink:href="http://evemaps.dotlan.net/system/Shihuken" class="sys link-5-30000130" target="_top">
+      <rect id="rect30000130" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Shihuken</text>
+      <text id="txt30000130" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000142">
+    <a xlink:href="http://evemaps.dotlan.net/system/Jita" class="sys link-5-30000142" target="_top">
+      <rect id="rect30000142" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Jita</text>
+      <text id="txt30000142" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000204">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ohkunen" class="sys link-5-30000204" target="_top">
+      <rect id="rect30000204" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ohkunen</text>
+      <text id="txt30000204" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000206">
+    <a xlink:href="http://evemaps.dotlan.net/system/Wirashoda" class="sys link-5-30000206" target="_top">
+      <rect id="rect30000206" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Wirashoda</text>
+      <text id="txt30000206" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000145">
+    <a xlink:href="http://evemaps.dotlan.net/system/New_Caldari" class="sys link-5-30000145" target="_top">
+      <rect id="rect30000145" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">New Caldari</text>
+      <text id="txt30000145" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000140">
+    <a xlink:href="http://evemaps.dotlan.net/system/Maurasi" class="sys link-5-30000140" target="_top">
+      <rect id="rect30000140" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Maurasi</text>
+      <text id="txt30000140" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000121">
+    <a xlink:href="http://evemaps.dotlan.net/system/Jatate" class="sys link-5-30000121" target="_top">
+      <rect id="rect30000121" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Jatate</text>
+      <text id="txt30000121" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000123">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vaankalen" class="sys link-5-30000123" target="_top">
+      <rect id="rect30000123" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Vaankalen</text>
+      <text id="txt30000123" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30020141">
+    <a xlink:href="http://evemaps.dotlan.net/system/Senda" class="sys link-5-30020141" target="_top">
+      <rect id="rect30020141" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Senda</text>
+      <text id="txt30020141" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000127">
+    <a xlink:href="http://evemaps.dotlan.net/system/Sirseshin" class="sys link-5-30000127" target="_top">
+    <rect id="ice30000127" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000127" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Sirseshin</text>
+      <text id="txt30000127" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000202">
+    <a xlink:href="http://evemaps.dotlan.net/system/Mastakomon" class="sys link-5-30000202" target="_top">
+      <rect id="rect30000202" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Mastakomon</text>
+      <text id="txt30000202" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000201">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uchoshi" class="sys link-5-30000201" target="_top">
+      <rect id="rect30000201" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Uchoshi</text>
+      <text id="txt30000201" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000119">
+    <a xlink:href="http://evemaps.dotlan.net/system/Itamo" class="sys link-5-30000119" target="_top">
+      <rect id="rect30000119" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Itamo</text>
+      <text id="txt30000119" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000128">
+    <a xlink:href="http://evemaps.dotlan.net/system/Tuuriainas" class="sys link-5-30000128" target="_top">
+      <rect id="rect30000128" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Tuuriainas</text>
+      <text id="txt30000128" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000177">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ukkalen" class="sys link-5-30000177" target="_top">
+      <rect id="rect30000177" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ukkalen</text>
+      <text id="txt30000177" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000120">
+    <a xlink:href="http://evemaps.dotlan.net/system/Mitsolen" class="sys link-5-30000120" target="_top">
+    <rect id="ice30000120" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000120" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Mitsolen</text>
+      <text id="txt30000120" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000203">
+    <a xlink:href="http://evemaps.dotlan.net/system/Eruka" class="sys link-5-30000203" target="_top">
+      <rect id="rect30000203" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Eruka</text>
+      <text id="txt30000203" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000124">
+    <a xlink:href="http://evemaps.dotlan.net/system/Kylmabe" class="sys link-5-30000124" target="_top">
+      <rect id="rect30000124" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Kylmabe</text>
+      <text id="txt30000124" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000122">
+    <a xlink:href="http://evemaps.dotlan.net/system/Mahtista" class="sys link-5-30000122" target="_top">
+      <rect id="rect30000122" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Mahtista</text>
+      <text id="txt30000122" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000125">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ahtulaima" class="sys link-5-30000125" target="_top">
+    <rect id="ice30000125" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000125" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ahtulaima</text>
+      <text id="txt30000125" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000207">
+    <a xlink:href="http://evemaps.dotlan.net/system/Osaa" class="sys link-5-30000207" target="_top">
+      <rect id="rect30000207" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Osaa</text>
+      <text id="txt30000207" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000176">
+    <a xlink:href="http://evemaps.dotlan.net/system/Keikaken" class="sys link-5-30000176" target="_top">
+      <rect id="rect30000176" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Keikaken</text>
+      <text id="txt30000176" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000193">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vouskiaho" class="sys link-5-30000193" target="_top">
+      <rect id="rect30000193" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Vouskiaho</text>
+      <text id="txt30000193" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000126">
+    <a xlink:href="http://evemaps.dotlan.net/system/Geras" class="sys link-5-30000126" target="_top">
+      <rect id="rect30000126" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Geras</text>
+      <text id="txt30000126" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000148">
+    <a xlink:href="http://evemaps.dotlan.net/system/Jakanerva" class="sys link-5-30000148" target="_top">
+      <rect id="rect30000148" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Jakanerva</text>
+      <text id="txt30000148" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000146">
+    <a xlink:href="http://evemaps.dotlan.net/system/Saisio" class="sys link-5-30000146" target="_top">
+      <rect id="rect30000146" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Saisio</text>
+      <text id="txt30000146" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000149">
+    <a xlink:href="http://evemaps.dotlan.net/system/Gekutami" class="sys link-5-30000149" target="_top">
+    <rect id="ice30000149" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000149" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Gekutami</text>
+      <text id="txt30000149" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000174">
+    <a xlink:href="http://evemaps.dotlan.net/system/Onuse" class="sys link-5-30000174" target="_top">
+      <rect id="rect30000174" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Onuse</text>
+      <text id="txt30000174" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000151">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uoyonen" class="sys link-5-30000151" target="_top">
+      <rect id="rect30000151" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Uoyonen</text>
+      <text id="txt30000151" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000190">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vasala" class="sys link-5-30000190" target="_top">
+      <rect id="rect30000190" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Vasala</text>
+      <text id="txt30000190" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000131">
+    <a xlink:href="http://evemaps.dotlan.net/system/Nomaa" class="sys link-5-30000131" target="_top">
+      <rect id="rect30000131" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Nomaa</text>
+      <text id="txt30000131" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000147">
+    <a xlink:href="http://evemaps.dotlan.net/system/Abagawa" class="sys link-5-30000147" target="_top">
+      <rect id="rect30000147" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Abagawa</text>
+      <text id="txt30000147" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000152">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hampinen" class="sys link-5-30000152" target="_top">
+      <rect id="rect30000152" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Hampinen</text>
+      <text id="txt30000152" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000173">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vattuolen" class="sys link-5-30000173" target="_top">
+    <rect id="ice30000173" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000173" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Vattuolen</text>
+      <text id="txt30000173" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000178">
+    <a xlink:href="http://evemaps.dotlan.net/system/Akkilen" class="sys link-5-30000178" target="_top">
+      <rect id="rect30000178" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Akkilen</text>
+      <text id="txt30000178" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000150">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hurtoken" class="sys link-5-30000150" target="_top">
+    <rect id="ice30000150" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000150" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Hurtoken</text>
+      <text id="txt30000150" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000192">
+    <a xlink:href="http://evemaps.dotlan.net/system/Otanuomi" class="sys link-5-30000192" target="_top">
+    <rect id="ice30000192" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000192" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Otanuomi</text>
+      <text id="txt30000192" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000191">
+    <a xlink:href="http://evemaps.dotlan.net/system/Walvalin" class="sys link-5-30000191" target="_top">
+      <rect id="rect30000191" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Walvalin</text>
+      <text id="txt30000191" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000189">
+    <a xlink:href="http://evemaps.dotlan.net/system/Kiainti" class="sys link-5-30000189" target="_top">
+      <rect id="rect30000189" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Kiainti</text>
+      <text id="txt30000189" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000188">
+    <a xlink:href="http://evemaps.dotlan.net/system/Hentogaira" class="sys link-5-30000188" target="_top">
+    <rect id="ice30000188" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000188" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Hentogaira</text>
+      <text id="txt30000188" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000156">
+    <a xlink:href="http://evemaps.dotlan.net/system/Josameto" class="sys link-5-30000156" target="_top">
+      <rect id="rect30000156" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Josameto</text>
+      <text id="txt30000156" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000157">
+    <a xlink:href="http://evemaps.dotlan.net/system/Otela" class="sys link-5-30000157" target="_top">
+    <rect id="ice30000157" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000157" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Otela</text>
+      <text id="txt30000157" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000200">
+    <a xlink:href="http://evemaps.dotlan.net/system/Akkio" class="sys link-5-30000200" target="_top">
+      <rect id="rect30000200" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Akkio</text>
+      <text id="txt30000200" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000175">
+    <a xlink:href="http://evemaps.dotlan.net/system/Soshin" class="sys link-5-30000175" target="_top">
+      <rect id="rect30000175" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Soshin</text>
+      <text id="txt30000175" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000194">
+    <a xlink:href="http://evemaps.dotlan.net/system/Otsela" class="sys link-5-30000194" target="_top">
+      <rect id="rect30000194" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Otsela</text>
+      <text id="txt30000194" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000154">
+    <a xlink:href="http://evemaps.dotlan.net/system/Liekuri" class="sys link-5-30000154" target="_top">
+      <rect id="rect30000154" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Liekuri</text>
+      <text id="txt30000154" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000198">
+    <a xlink:href="http://evemaps.dotlan.net/system/Paala" class="sys link-5-30000198" target="_top">
+      <rect id="rect30000198" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Paala</text>
+      <text id="txt30000198" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000161">
+    <a xlink:href="http://evemaps.dotlan.net/system/Purjola" class="sys link-5-30000161" target="_top">
+      <rect id="rect30000161" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Purjola</text>
+      <text id="txt30000161" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000153">
+    <a xlink:href="http://evemaps.dotlan.net/system/Poinen" class="sys link-5-30000153" target="_top">
+      <rect id="rect30000153" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Poinen</text>
+      <text id="txt30000153" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000159">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ikami" class="sys link-5-30000159" target="_top">
+      <rect id="rect30000159" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ikami</text>
+      <text id="txt30000159" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000196">
+    <a xlink:href="http://evemaps.dotlan.net/system/Otosela" class="sys link-5-30000196" target="_top">
+      <rect id="rect30000196" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Otosela</text>
+      <text id="txt30000196" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000179">
+    <a xlink:href="http://evemaps.dotlan.net/system/Silen" class="sys link-5-30000179" target="_top">
+    <rect id="ice30000179" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000179" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Silen</text>
+      <text id="txt30000179" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000162">
+    <a xlink:href="http://evemaps.dotlan.net/system/Maila" class="sys link-5-30000162" target="_top">
+      <rect id="rect30000162" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Maila</text>
+      <text id="txt30000162" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000155">
+    <a xlink:href="http://evemaps.dotlan.net/system/Obanen" class="sys link-5-30000155" target="_top">
+      <rect id="rect30000155" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Obanen</text>
+      <text id="txt30000155" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000197">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uemon" class="sys link-5-30000197" target="_top">
+      <rect id="rect30000197" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Uemon</text>
+      <text id="txt30000197" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000160">
+    <a xlink:href="http://evemaps.dotlan.net/system/Reisen" class="sys link-5-30000160" target="_top">
+      <rect id="rect30000160" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Reisen</text>
+      <text id="txt30000160" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000195">
+    <a xlink:href="http://evemaps.dotlan.net/system/Tasti" class="sys link-5-30000195" target="_top">
+      <rect id="rect30000195" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Tasti</text>
+      <text id="txt30000195" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000166">
+    <a xlink:href="http://evemaps.dotlan.net/system/Airmia" class="sys link-5-30000166" target="_top">
+      <rect id="rect30000166" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Airmia</text>
+      <text id="txt30000166" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000169">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ihakana" class="sys link-5-30000169" target="_top">
+      <rect id="rect30000169" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ihakana</text>
+      <text id="txt30000169" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000164">
+    <a xlink:href="http://evemaps.dotlan.net/system/Messoya" class="sys link-5-30000164" target="_top">
+      <rect id="rect30000164" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Messoya</text>
+      <text id="txt30000164" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000168">
+    <a xlink:href="http://evemaps.dotlan.net/system/Friggi" class="sys link-5-30000168" target="_top">
+      <rect id="rect30000168" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Friggi</text>
+      <text id="txt30000168" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000165">
+    <a xlink:href="http://evemaps.dotlan.net/system/Ishisomo" class="sys link-5-30000165" target="_top">
+      <rect id="rect30000165" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Ishisomo</text>
+      <text id="txt30000165" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000158">
+    <a xlink:href="http://evemaps.dotlan.net/system/Olo" class="sys link-5-30000158" target="_top">
+      <rect id="rect30000158" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Olo</text>
+      <text id="txt30000158" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000163">
+    <a xlink:href="http://evemaps.dotlan.net/system/Akora" class="sys link-5-30000163" target="_top">
+      <rect id="rect30000163" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Akora</text>
+      <text id="txt30000163" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000199">
+    <a xlink:href="http://evemaps.dotlan.net/system/Fuskunen" class="sys link-5-30000199" target="_top">
+    <rect id="ice30000199" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000199" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Fuskunen</text>
+      <text id="txt30000199" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000180">
+    <a xlink:href="http://evemaps.dotlan.net/system/Osmon" class="sys link-5-30000180" target="_top">
+    <rect id="ice30000180" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000180" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Osmon</text>
+      <text id="txt30000180" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000181">
+    <a xlink:href="http://evemaps.dotlan.net/system/Korsiki" class="sys link-5-30000181" target="_top">
+      <rect id="rect30000181" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Korsiki</text>
+      <text id="txt30000181" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000185">
+    <a xlink:href="http://evemaps.dotlan.net/system/Airaken" class="sys link-5-30000185" target="_top">
+      <rect id="rect30000185" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Airaken</text>
+      <text id="txt30000185" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000186">
+    <a xlink:href="http://evemaps.dotlan.net/system/Oijanen" class="sys link-5-30000186" target="_top">
+      <rect id="rect30000186" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sl" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Oijanen</text>
+      <text id="txt30000186" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000167">
+    <a xlink:href="http://evemaps.dotlan.net/system/Sakkikainen" class="sys link-5-30000167" target="_top">
+      <rect id="rect30000167" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Sakkikainen</text>
+      <text id="txt30000167" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000172">
+    <a xlink:href="http://evemaps.dotlan.net/system/Otomainen" class="sys link-5-30000172" target="_top">
+      <rect id="rect30000172" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Otomainen</text>
+      <text id="txt30000172" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+  </symbol>
+  <symbol id="def30000182">
+    <a xlink:href="http://evemaps.dotlan.net/system/Inaya" class="sys link-5-30000182" target="_top">
+      <rect id="rect30000182" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Inaya</text>
+      <text id="txt30000182" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000183">
+    <a xlink:href="http://evemaps.dotlan.net/system/Nuken" class="sys link-5-30000183" target="_top">
+      <rect id="rect30000183" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Nuken</text>
+      <text id="txt30000183" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000171">
+    <a xlink:href="http://evemaps.dotlan.net/system/Otitoh" class="sys link-5-30000171" target="_top">
+      <rect id="rect30000171" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Otitoh</text>
+      <text id="txt30000171" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000187">
+    <a xlink:href="http://evemaps.dotlan.net/system/Wuos" class="sys link-5-30000187" target="_top">
+    <rect id="ice30000187" x="1" y="0.5" rx="14" ry="13" width="56" height="28" class="i" />
+      <rect id="rect30000187" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Wuos</text>
+      <text id="txt30000187" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000170">
+    <a xlink:href="http://evemaps.dotlan.net/system/Vahunomi" class="sys link-5-30000170" target="_top">
+      <rect id="rect30000170" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Vahunomi</text>
+      <text id="txt30000170" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000184">
+    <a xlink:href="http://evemaps.dotlan.net/system/Uminas" class="sys link-5-30000184" target="_top">
+      <rect id="rect30000184" x="4" y="3.5" rx="11" ry="11" width="50" height="22"  class="sh" style="fill: #CEE7FF;" />
+      <text x="28" y="14" class="ss" text-anchor="middle">Uminas</text>
+      <text id="txt30000184" x="28" y="21.7" class="st" text-anchor="middle">Caldari</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002802">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Citadel/Kusomonmon" class="sys link-5-30002802" target="_top">
+      <rect id="rect30002802" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Kusomonmon</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">The Citadel</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002642">
+    <a xlink:href="http://evemaps.dotlan.net/map/Sinq_Laison/Iyen-Oursta" class="sys link-5-30002642" target="_top">
+      <rect id="rect30002642" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Iyen-Oursta</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Sinq Laison</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002791">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Citadel/Sirppala" class="sys link-5-30002791" target="_top">
+      <rect id="rect30002791" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Sirppala</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">The Citadel</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30001379">
+    <a xlink:href="http://evemaps.dotlan.net/map/Lonetrek/Tunttaras" class="sys link-5-30001379" target="_top">
+      <rect id="rect30001379" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Tunttaras</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Lonetrek</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30001448">
+    <a xlink:href="http://evemaps.dotlan.net/map/Lonetrek/Hakonen" class="sys link-5-30001448" target="_top">
+      <rect id="rect30001448" x="3.5" y="3.5" width="50" height="22" class="el" />
+      <text x="28" y="14" class="es" text-anchor="middle">Hakonen</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Lonetrek</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002788">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Citadel/Inaro" class="sys link-5-30002788" target="_top">
+      <rect id="rect30002788" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Inaro</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">The Citadel</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30000250">
+    <a xlink:href="http://evemaps.dotlan.net/map/Vale_of_the_Silent/P3EN-E" class="sys link-5-30000250" target="_top">
+      <rect id="rect30000250" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">P3EN-E</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Vale of the Silent</text>
+    </a>
+  </symbol>
+  <symbol id="def30001393">
+    <a xlink:href="http://evemaps.dotlan.net/map/Lonetrek/Malkalen" class="sys link-5-30001393" target="_top">
+      <rect id="rect30001393" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Malkalen</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Lonetrek</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002780">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Citadel/Muvolailen" class="sys link-5-30002780" target="_top">
+      <rect id="rect30002780" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Muvolailen</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">The Citadel</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002754">
+    <a xlink:href="http://evemaps.dotlan.net/map/The_Citadel/Alikara" class="sys link-5-30002754" target="_top">
+      <rect id="rect30002754" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Alikara</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">The Citadel</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30001363">
+    <a xlink:href="http://evemaps.dotlan.net/map/Lonetrek/Sobaseki" class="sys link-5-30001363" target="_top">
+      <rect id="rect30001363" x="3.5" y="3.5" width="50" height="22" class="eh" />
+      <text x="28" y="14" class="es" text-anchor="middle">Sobaseki</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Lonetrek</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <polygon points="49.6,20.5 55.1,15 49.6,9.5 49.6,20.5" class="v4" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002475">
+    <a xlink:href="http://evemaps.dotlan.net/map/Geminate/EOA-ZC" class="sys link-5-30002475" target="_top">
+      <rect id="rect30002475" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">EOA-ZC</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Geminate</text>
+    </a>
+  </symbol>
+  <symbol id="def30002062">
+    <a xlink:href="http://evemaps.dotlan.net/map/Metropolis/Todifrauan" class="sys link-5-30002062" target="_top">
+      <rect id="rect30002062" x="3.5" y="3.5" width="50" height="22" class="el" />
+      <text x="28" y="14" class="es" text-anchor="middle">Todifrauan</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Metropolis</text>
+    </a>
+    <rect x="49.6" y="9.5" height="11" width="11" class="o" />
+    <polygon points="49.6,9.5 60.6,9.5 55.1,15 49.6,9.5" class="v1" />
+    <polygon points="60.6,9.5 55.1,15 60.6,20.5 60.6,9.5" class="v2" />
+    <polygon points="60.6,20.5 55.1,15 49.6,20.5 60.6,20.5" class="v3" />
+    <rect x="49.6" y="9.5" height="11" width="11"  class="oo" />
+  </symbol>
+  <symbol id="def30002355">
+    <a xlink:href="http://evemaps.dotlan.net/map/Etherium_Reach/LXQ2-T" class="sys link-5-30002355" target="_top">
+      <rect id="rect30002355" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">LXQ2-T</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Etherium Reach</text>
+    </a>
+  </symbol>
+  <symbol id="def30003446">
+    <a xlink:href="http://evemaps.dotlan.net/map/Metropolis/Ofage" class="sys link-5-30003446" target="_top">
+      <rect id="rect30003446" x="3.5" y="3.5" width="50" height="22" class="el" />
+      <text x="28" y="14" class="es" text-anchor="middle">Ofage</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Metropolis</text>
+    </a>
+  </symbol>
+  <symbol id="def30002440">
+    <a xlink:href="http://evemaps.dotlan.net/map/Geminate/BWF-ZZ" class="sys link-5-30002440" target="_top">
+      <rect id="rect30002440" x="3.5" y="3.5" width="50" height="22" class="e" />
+      <text x="28" y="14" class="es" text-anchor="middle">BWF-ZZ</text>
+      <text x="28" y="21.7" class="er" text-anchor="middle">Geminate</text>
+    </a>
+  </symbol>
+
+
+  <symbol id="defCampaign" width="85" height="46">
+    <rect x="0" y="0" width="85" height="46" class="cam" />
+  </symbol>
+  <symbol id="defCampaignActive" width="85" height="46">
+    <rect x="0" y="0" width="85" height="46" class="cam-active" />
+  </symbol>
+  <radialGradient id="conBg">
+    <stop offset="50%" stop-color="#FFA0FF"/>
+    <stop offset="95%" stop-color="#FFA0FF" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="camBg">
+    <stop offset="30%" stop-color="#FF8800" stop-opacity="1"/>
+    <stop offset="95%" stop-color="#FF8800" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="camActiveBg">
+    <stop offset="40%" stop-color="#FF0000" stop-opacity="1"/>
+    <stop offset="95%" stop-color="#FF0000" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="incBg">
+    <stop offset="50%" stop-color="#AFCE00"/>
+    <stop offset="100%" stop-color="#AFCE00" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="incStBg">
+    <stop offset="50%" stop-color="#808000"/>
+    <stop offset="100%" stop-color="#808000" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<text x="10" y="20" id="debug"  style="fill: #888888;"> </text>
+
+<g id="glow">
+
+
+</g>
+
+<g id="campaigns"></g>
+
+<g id="jumps">
+<line id="j-30000120-30000119" x1="333.5" y1="459.5" x2="363.5" y2="499.5" class="j" />
+<line id="j-30000121-30000119" x1="333.5" y1="459.5" x2="268.5" y2="459.5" class="j" />
+<line id="j-30000123-30000119" x1="333.5" y1="459.5" x2="293.5" y2="494.5" class="j" />
+<line id="j-30000124-30000119" x1="333.5" y1="459.5" x2="383.5" y2="429.5" class="j" />
+<line id="j-30000125-30000119" x1="333.5" y1="459.5" x2="398.5" y2="469.5" class="j" />
+<line id="j-30000140-30000119" x1="333.5" y1="459.5" x2="254.5" y2="417.5" class="jc" />
+<line id="j-30000122-30000120" x1="363.5" y1="499.5" x2="388.5" y2="534.5" class="j" />
+<line id="j-30000128-30000126" x1="438.5" y1="659.5" x2="333.5" y2="654.5" class="j" />
+<line id="j-30000131-30000126" x1="438.5" y1="659.5" x2="513.5" y2="634.5" class="j" />
+<line id="j-30000128-30000127" x1="293.5" y1="689.5" x2="333.5" y2="654.5" class="j" />
+<line id="j-30002788-30000127" x1="293.5" y1="689.5" x2="128.5" y2="679.5" class="jr" />
+<line id="j-30000130-30000128" x1="333.5" y1="654.5" x2="228.5" y2="634.5" class="j" />
+<line id="j-30000130-30000129" x1="163.5" y1="589.5" x2="228.5" y2="634.5" class="j" />
+<line id="j-30000139-30000129" x1="163.5" y1="589.5" x2="123.5" y2="504.5" class="jc" />
+<line id="j-30030141-30000129" x1="163.5" y1="589.5" x2="228.5" y2="559.5" class="j" />
+<line id="j-30020141-30000130" x1="228.5" y1="634.5" x2="293.5" y2="594.5" class="j" />
+<line id="j-30000146-30000131" x1="513.5" y1="634.5" x2="473.5" y2="514.5" class="jc" />
+<line id="j-30000153-30000131" x1="513.5" y1="634.5" x2="703.5" y2="404.5" class="jc" />
+<line id="j-30000133-30000132" x1="94.5" y1="243.5" x2="162.5" y2="257.5" class="j" />
+<line id="j-30000134-30000132" x1="94.5" y1="243.5" x2="73.5" y2="204.5" class="j" />
+<line id="j-30000138-30000132" x1="94.5" y1="243.5" x2="122.5" y2="286.5" class="j" />
+<line id="j-30000138-30000133" x1="162.5" y1="257.5" x2="122.5" y2="286.5" class="j" />
+<line id="j-30000145-30000133" x1="162.5" y1="257.5" x2="253.5" y2="293.5" class="jc" />
+<line id="j-30021407-30000133" x1="162.5" y1="257.5" x2="173.5" y2="219.5" class="j" />
+<line id="j-30000135-30000134" x1="73.5" y1="204.5" x2="28.5" y2="159.5" class="j" />
+<line id="j-30000136-30000134" x1="73.5" y1="204.5" x2="108.5" y2="159.5" class="j" />
+<line id="j-30000136-30000135" x1="28.5" y1="159.5" x2="108.5" y2="159.5" class="j" />
+<line id="j-30000137-30000135" x1="28.5" y1="159.5" x2="63.5" y2="114.5" class="j" />
+<line id="j-30000137-30000136" x1="108.5" y1="159.5" x2="63.5" y2="114.5" class="j" />
+<line id="j-30000142-30000138" x1="122.5" y1="286.5" x2="252.5" y2="357.5" class="jc" />
+<line id="j-30001379-30000138" x1="122.5" y1="286.5" x2="88.5" y2="349.5" class="jr" />
+<line id="j-30010141-30000138" x1="122.5" y1="286.5" x2="28.5" y2="304.5" class="j" />
+<line id="j-30000141-30000139" x1="123.5" y1="504.5" x2="188.5" y2="494.5" class="j" />
+<line id="j-30000144-30000139" x1="123.5" y1="504.5" x2="174.5" y2="394.5" class="j" />
+<line id="j-30002791-30000139" x1="123.5" y1="504.5" x2="73.5" y2="604.5" class="jr" />
+<line id="j-30002802-30000139" x1="123.5" y1="504.5" x2="53.5" y2="479.5" class="jr" />
+<line id="j-30000142-30000140" x1="254.5" y1="417.5" x2="252.5" y2="357.5" class="j" />
+<line id="j-30000144-30000140" x1="254.5" y1="417.5" x2="174.5" y2="394.5" class="j" />
+<line id="j-30002780-30000140" x1="254.5" y1="417.5" x2="332.5" y2="389.5" class="jr" />
+<line id="j-30000143-30000142" x1="252.5" y1="357.5" x2="175.5" y2="341.5" class="j" />
+<line id="j-30000144-30000142" x1="252.5" y1="357.5" x2="174.5" y2="394.5" class="j" />
+<line id="j-30000145-30000142" x1="252.5" y1="357.5" x2="253.5" y2="293.5" class="j" />
+<line id="j-30001363-30000142" x1="252.5" y1="357.5" x2="334.5" y2="349.5" class="jr" />
+<line id="j-30002780-30000142" x1="252.5" y1="357.5" x2="332.5" y2="389.5" class="jr" />
+<line id="j-30000144-30000143" x1="175.5" y1="341.5" x2="174.5" y2="394.5" class="j" />
+<line id="j-30000145-30000143" x1="175.5" y1="341.5" x2="253.5" y2="293.5" class="j" />
+<line id="j-30001379-30000143" x1="175.5" y1="341.5" x2="88.5" y2="349.5" class="jr" />
+<line id="j-30002642-30000144" x1="174.5" y1="394.5" x2="63.5" y2="409.5" class="jr" />
+<line id="j-30000156-30000145" x1="253.5" y1="293.5" x2="602.5" y2="308.5" class="jc" />
+<line id="j-30001393-30000145" x1="253.5" y1="293.5" x2="330.5" y2="314.5" class="jr" />
+<line id="j-30002754-30000145" x1="253.5" y1="293.5" x2="333.5" y2="249.5" class="jr" />
+<line id="j-30000147-30000146" x1="473.5" y1="514.5" x2="533.5" y2="539.5" class="j" />
+<line id="j-30000148-30000146" x1="473.5" y1="514.5" x2="468.5" y2="464.5" class="j" />
+<line id="j-30000150-30000147" x1="533.5" y1="539.5" x2="578.5" y2="504.5" class="j" />
+<line id="j-30000149-30000148" x1="468.5" y1="464.5" x2="483.5" y2="424.5" class="j" />
+<line id="j-30000152-30000148" x1="468.5" y1="464.5" x2="553.5" y2="459.5" class="j" />
+<line id="j-30000151-30000149" x1="483.5" y1="424.5" x2="503.5" y2="374.5" class="j" />
+<line id="j-30000152-30000150" x1="578.5" y1="504.5" x2="553.5" y2="459.5" class="j" />
+<line id="j-30000173-30000151" x1="503.5" y1="374.5" x2="563.5" y2="274.5" class="jc" />
+<line id="j-30000159-30000152" x1="553.5" y1="459.5" x2="708.5" y2="509.5" class="jc" />
+<line id="j-30000154-30000153" x1="703.5" y1="404.5" x2="678.5" y2="329.5" class="j" />
+<line id="j-30000155-30000153" x1="703.5" y1="404.5" x2="748.5" y2="359.5" class="j" />
+<line id="j-30000156-30000153" x1="703.5" y1="404.5" x2="602.5" y2="308.5" class="j" />
+<line id="j-30000157-30000153" x1="703.5" y1="404.5" x2="623.5" y2="384.5" class="j" />
+<line id="j-30000155-30000154" x1="678.5" y1="329.5" x2="748.5" y2="359.5" class="j" />
+<line id="j-30000156-30000154" x1="678.5" y1="329.5" x2="602.5" y2="308.5" class="j" />
+<line id="j-30000158-30000155" x1="748.5" y1="359.5" x2="813.5" y2="349.5" class="j" />
+<line id="j-30000157-30000156" x1="602.5" y1="308.5" x2="623.5" y2="384.5" class="j" />
+<line id="j-30000165-30000158" x1="813.5" y1="349.5" x2="813.5" y2="294.5" class="jc" />
+<line id="j-30000180-30000158" x1="813.5" y1="349.5" x2="833.5" y2="404.5" class="jc" />
+<line id="j-30000160-30000159" x1="708.5" y1="509.5" x2="768.5" y2="529.5" class="j" />
+<line id="j-30000161-30000159" x1="708.5" y1="509.5" x2="698.5" y2="549.5" class="j" />
+<line id="j-30000161-30000160" x1="768.5" y1="529.5" x2="698.5" y2="549.5" class="j" />
+<line id="j-30000163-30000160" x1="768.5" y1="529.5" x2="823.5" y2="579.5" class="j" />
+<line id="j-30000162-30000161" x1="698.5" y1="549.5" x2="733.5" y2="589.5" class="j" />
+<line id="j-30000163-30000162" x1="733.5" y1="589.5" x2="823.5" y2="579.5" class="j" />
+<line id="j-30000164-30000163" x1="823.5" y1="579.5" x2="808.5" y2="614.5" class="j" />
+<line id="j-30000186-30000163" x1="823.5" y1="579.5" x2="838.5" y2="524.5" class="jc" />
+<line id="j-30000195-30000164" x1="808.5" y1="614.5" x2="773.5" y2="649.5" class="jc" />
+<line id="j-30000166-30000165" x1="813.5" y1="294.5" x2="783.5" y2="249.5" class="j" />
+<line id="j-30000167-30000165" x1="813.5" y1="294.5" x2="858.5" y2="244.5" class="j" />
+<line id="j-30000167-30000166" x1="783.5" y1="249.5" x2="858.5" y2="244.5" class="j" />
+<line id="j-30000168-30000166" x1="783.5" y1="249.5" x2="813.5" y2="199.5" class="j" />
+<line id="j-30000168-30000167" x1="858.5" y1="244.5" x2="813.5" y2="199.5" class="j" />
+<line id="j-30000170-30000167" x1="858.5" y1="244.5" x2="928.5" y2="234.5" class="j" />
+<line id="j-30000169-30000168" x1="813.5" y1="199.5" x2="798.5" y2="149.5" class="j" />
+<line id="j-30000171-30000168" x1="813.5" y1="199.5" x2="903.5" y2="149.5" class="j" />
+<line id="j-30000171-30000169" x1="798.5" y1="149.5" x2="903.5" y2="149.5" class="j" />
+<line id="j-30000172-30000169" x1="798.5" y1="149.5" x2="863.5" y2="109.5" class="j" />
+<line id="j-30000194-30000169" x1="798.5" y1="149.5" x2="678.5" y2="114.5" class="jc" />
+<line id="j-30000174-30000173" x1="563.5" y1="274.5" x2="498.5" y2="234.5" class="j" />
+<line id="j-30000175-30000173" x1="563.5" y1="274.5" x2="643.5" y2="264.5" class="j" />
+<line id="j-30000178-30000173" x1="563.5" y1="274.5" x2="578.5" y2="234.5" class="j" />
+<line id="j-30000176-30000174" x1="498.5" y1="234.5" x2="428.5" y2="214.5" class="j" />
+<line id="j-30000178-30000174" x1="498.5" y1="234.5" x2="578.5" y2="234.5" class="j" />
+<line id="j-30000178-30000175" x1="643.5" y1="264.5" x2="578.5" y2="234.5" class="j" />
+<line id="j-30000179-30000175" x1="643.5" y1="264.5" x2="713.5" y2="279.5" class="j" />
+<line id="j-30000177-30000176" x1="428.5" y1="214.5" x2="358.5" y2="194.5" class="j" />
+<line id="j-30000188-30000178" x1="578.5" y1="234.5" x2="593.5" y2="184.5" class="jc" />
+<line id="j-30000181-30000180" x1="833.5" y1="404.5" x2="838.5" y2="449.5" class="j" />
+<line id="j-30000182-30000180" x1="833.5" y1="404.5" x2="883.5" y2="364.5" class="j" />
+<line id="j-30000183-30000181" x1="838.5" y1="449.5" x2="898.5" y2="444.5" class="j" />
+<line id="j-30000185-30000181" x1="838.5" y1="449.5" x2="838.5" y2="484.5" class="j" />
+<line id="j-30000184-30000182" x1="883.5" y1="364.5" x2="948.5" y2="369.5" class="j" />
+<line id="j-30000187-30000182" x1="883.5" y1="364.5" x2="913.5" y2="329.5" class="j" />
+<line id="j-30000186-30000185" x1="838.5" y1="484.5" x2="838.5" y2="524.5" class="j" />
+<line id="j-30002440-30000186" x1="838.5" y1="524.5" x2="918.5" y2="529.5" class="jr" />
+<line id="j-30000189-30000188" x1="593.5" y1="184.5" x2="593.5" y2="144.5" class="j" />
+<line id="j-30000194-30000188" x1="593.5" y1="184.5" x2="678.5" y2="114.5" class="j" />
+<line id="j-30000190-30000189" x1="593.5" y1="144.5" x2="513.5" y2="114.5" class="j" />
+<line id="j-30000191-30000189" x1="593.5" y1="144.5" x2="593.5" y2="89.5" class="j" />
+<line id="j-30000194-30000189" x1="593.5" y1="144.5" x2="678.5" y2="114.5" class="j" />
+<line id="j-30000191-30000190" x1="513.5" y1="114.5" x2="593.5" y2="89.5" class="j" />
+<line id="j-30000192-30000190" x1="513.5" y1="114.5" x2="593.5" y2="54.5" class="j" />
+<line id="j-30000193-30000190" x1="513.5" y1="114.5" x2="438.5" y2="109.5" class="j" />
+<line id="j-30000194-30000190" x1="513.5" y1="114.5" x2="678.5" y2="114.5" class="j" />
+<line id="j-30000192-30000191" x1="593.5" y1="89.5" x2="593.5" y2="54.5" class="j" />
+<line id="j-30000194-30000191" x1="593.5" y1="89.5" x2="678.5" y2="114.5" class="j" />
+<line id="j-30000193-30000192" x1="593.5" y1="54.5" x2="438.5" y2="109.5" class="j" />
+<line id="j-30000194-30000192" x1="593.5" y1="54.5" x2="678.5" y2="114.5" class="j" />
+<line id="j-30000207-30000192" x1="593.5" y1="54.5" x2="428.5" y2="54.5" class="jc" />
+<line id="j-30000201-30000193" x1="438.5" y1="109.5" x2="328.5" y2="109.5" class="jc" />
+<line id="j-30000196-30000195" x1="773.5" y1="649.5" x2="708.5" y2="674.5" class="j" />
+<line id="j-30000197-30000196" x1="708.5" y1="674.5" x2="758.5" y2="704.5" class="j" />
+<line id="j-30000200-30000196" x1="708.5" y1="674.5" x2="623.5" y2="679.5" class="j" />
+<line id="j-30000198-30000197" x1="758.5" y1="704.5" x2="683.5" y2="719.5" class="j" />
+<line id="j-30000199-30000197" x1="758.5" y1="704.5" x2="828.5" y2="719.5" class="j" />
+<line id="j-30002355-30000198" x1="683.5" y1="719.5" x2="683.5" y2="754.5" class="jr" />
+<line id="j-30003446-30000199" x1="828.5" y1="719.5" x2="828.5" y2="754.5" class="jr" />
+<line id="j-30002062-30000200" x1="623.5" y1="679.5" x2="563.5" y2="709.5" class="jr" />
+<line id="j-30002475-30000200" x1="623.5" y1="679.5" x2="563.5" y2="664.5" class="jr" />
+<line id="j-30000202-30000201" x1="328.5" y1="109.5" x2="328.5" y2="54.5" class="j" />
+<line id="j-30000206-30000201" x1="328.5" y1="109.5" x2="253.5" y2="109.5" class="j" />
+<line id="j-30000203-30000202" x1="328.5" y1="54.5" x2="383.5" y2="19.5" class="j" />
+<line id="j-30000204-30000202" x1="328.5" y1="54.5" x2="253.5" y2="54.5" class="j" />
+<line id="j-30000207-30000202" x1="328.5" y1="54.5" x2="428.5" y2="54.5" class="j" />
+<line id="j-30000207-30000203" x1="383.5" y1="19.5" x2="428.5" y2="54.5" class="j" />
+<line id="j-30000205-30000204" x1="253.5" y1="54.5" x2="178.5" y2="54.5" class="j" />
+<line id="j-30000250-30000205" x1="178.5" y1="54.5" x2="179.5" y2="15.5" class="jr" />
+<line id="j-30001448-30000205" x1="178.5" y1="54.5" x2="110.5" y2="53.5" class="jr" />
+<line id="j-30001393-30001363" x1="334.5" y1="349.5" x2="330.5" y2="314.5" class="jc" />
+<line id="j-30002791-30002788" x1="128.5" y1="679.5" x2="73.5" y2="604.5" class="j" />
+
+</g>
+
+<g id="sysuse">
+<use id="sys30000135" x="0" y="145" width="62.5" height="30" xlink:href="#def30000135" />
+<use id="sys30010141" x="0" y="290" width="62.5" height="30" xlink:href="#def30010141" />
+<use id="sys30000137" x="35" y="100" width="62.5" height="30" xlink:href="#def30000137" />
+<use id="sys30000134" x="45" y="190" width="62.5" height="30" xlink:href="#def30000134" />
+<use id="sys30000132" x="66" y="229" width="62.5" height="30" xlink:href="#def30000132" />
+<use id="sys30000136" x="80" y="145" width="62.5" height="30" xlink:href="#def30000136" />
+<use id="sys30000138" x="94" y="272" width="62.5" height="30" xlink:href="#def30000138" />
+<use id="sys30000139" x="95" y="490" width="62.5" height="30" xlink:href="#def30000139" />
+<use id="sys30000133" x="134" y="243" width="62.5" height="30" xlink:href="#def30000133" />
+<use id="sys30000129" x="135" y="575" width="62.5" height="30" xlink:href="#def30000129" />
+<use id="sys30021407" x="145" y="205" width="62.5" height="30" xlink:href="#def30021407" />
+<use id="sys30000144" x="146" y="380" width="62.5" height="30" xlink:href="#def30000144" />
+<use id="sys30000143" x="147" y="327" width="62.5" height="30" xlink:href="#def30000143" />
+<use id="sys30000205" x="150" y="40" width="62.5" height="30" xlink:href="#def30000205" />
+<use id="sys30000141" x="160" y="480" width="62.5" height="30" xlink:href="#def30000141" />
+<use id="sys30030141" x="200" y="545" width="62.5" height="30" xlink:href="#def30030141" />
+<use id="sys30000130" x="200" y="620" width="62.5" height="30" xlink:href="#def30000130" />
+<use id="sys30000142" x="224" y="343" width="62.5" height="30" xlink:href="#def30000142" />
+<use id="sys30000204" x="225" y="40" width="62.5" height="30" xlink:href="#def30000204" />
+<use id="sys30000206" x="225" y="95" width="62.5" height="30" xlink:href="#def30000206" />
+<use id="sys30000145" x="225" y="279" width="62.5" height="30" xlink:href="#def30000145" />
+<use id="sys30000140" x="226" y="403" width="62.5" height="30" xlink:href="#def30000140" />
+<use id="sys30000121" x="240" y="445" width="62.5" height="30" xlink:href="#def30000121" />
+<use id="sys30000123" x="265" y="480" width="62.5" height="30" xlink:href="#def30000123" />
+<use id="sys30020141" x="265" y="580" width="62.5" height="30" xlink:href="#def30020141" />
+<use id="sys30000127" x="265" y="675" width="62.5" height="30" xlink:href="#def30000127" />
+<use id="sys30000202" x="300" y="40" width="62.5" height="30" xlink:href="#def30000202" />
+<use id="sys30000201" x="300" y="95" width="62.5" height="30" xlink:href="#def30000201" />
+<use id="sys30000119" x="305" y="445" width="62.5" height="30" xlink:href="#def30000119" />
+<use id="sys30000128" x="305" y="640" width="62.5" height="30" xlink:href="#def30000128" />
+<use id="sys30000177" x="330" y="180" width="62.5" height="30" xlink:href="#def30000177" />
+<use id="sys30000120" x="335" y="485" width="62.5" height="30" xlink:href="#def30000120" />
+<use id="sys30000203" x="355" y="5" width="62.5" height="30" xlink:href="#def30000203" />
+<use id="sys30000124" x="355" y="415" width="62.5" height="30" xlink:href="#def30000124" />
+<use id="sys30000122" x="360" y="520" width="62.5" height="30" xlink:href="#def30000122" />
+<use id="sys30000125" x="370" y="455" width="62.5" height="30" xlink:href="#def30000125" />
+<use id="sys30000207" x="400" y="40" width="62.5" height="30" xlink:href="#def30000207" />
+<use id="sys30000176" x="400" y="200" width="62.5" height="30" xlink:href="#def30000176" />
+<use id="sys30000193" x="410" y="95" width="62.5" height="30" xlink:href="#def30000193" />
+<use id="sys30000126" x="410" y="645" width="62.5" height="30" xlink:href="#def30000126" />
+<use id="sys30000148" x="440" y="450" width="62.5" height="30" xlink:href="#def30000148" />
+<use id="sys30000146" x="445" y="500" width="62.5" height="30" xlink:href="#def30000146" />
+<use id="sys30000149" x="455" y="410" width="62.5" height="30" xlink:href="#def30000149" />
+<use id="sys30000174" x="470" y="220" width="62.5" height="30" xlink:href="#def30000174" />
+<use id="sys30000151" x="475" y="360" width="62.5" height="30" xlink:href="#def30000151" />
+<use id="sys30000190" x="485" y="100" width="62.5" height="30" xlink:href="#def30000190" />
+<use id="sys30000131" x="485" y="620" width="62.5" height="30" xlink:href="#def30000131" />
+<use id="sys30000147" x="505" y="525" width="62.5" height="30" xlink:href="#def30000147" />
+<use id="sys30000152" x="525" y="445" width="62.5" height="30" xlink:href="#def30000152" />
+<use id="sys30000173" x="535" y="260" width="62.5" height="30" xlink:href="#def30000173" />
+<use id="sys30000178" x="550" y="220" width="62.5" height="30" xlink:href="#def30000178" />
+<use id="sys30000150" x="550" y="490" width="62.5" height="30" xlink:href="#def30000150" />
+<use id="sys30000192" x="565" y="40" width="62.5" height="30" xlink:href="#def30000192" />
+<use id="sys30000191" x="565" y="75" width="62.5" height="30" xlink:href="#def30000191" />
+<use id="sys30000189" x="565" y="130" width="62.5" height="30" xlink:href="#def30000189" />
+<use id="sys30000188" x="565" y="170" width="62.5" height="30" xlink:href="#def30000188" />
+<use id="sys30000156" x="574" y="294" width="62.5" height="30" xlink:href="#def30000156" />
+<use id="sys30000157" x="595" y="370" width="62.5" height="30" xlink:href="#def30000157" />
+<use id="sys30000200" x="595" y="665" width="62.5" height="30" xlink:href="#def30000200" />
+<use id="sys30000175" x="615" y="250" width="62.5" height="30" xlink:href="#def30000175" />
+<use id="sys30000194" x="650" y="100" width="62.5" height="30" xlink:href="#def30000194" />
+<use id="sys30000154" x="650" y="315" width="62.5" height="30" xlink:href="#def30000154" />
+<use id="sys30000198" x="655" y="705" width="62.5" height="30" xlink:href="#def30000198" />
+<use id="sys30000161" x="670" y="535" width="62.5" height="30" xlink:href="#def30000161" />
+<use id="sys30000153" x="675" y="390" width="62.5" height="30" xlink:href="#def30000153" />
+<use id="sys30000159" x="680" y="495" width="62.5" height="30" xlink:href="#def30000159" />
+<use id="sys30000196" x="680" y="660" width="62.5" height="30" xlink:href="#def30000196" />
+<use id="sys30000179" x="685" y="265" width="62.5" height="30" xlink:href="#def30000179" />
+<use id="sys30000162" x="705" y="575" width="62.5" height="30" xlink:href="#def30000162" />
+<use id="sys30000155" x="720" y="345" width="62.5" height="30" xlink:href="#def30000155" />
+<use id="sys30000197" x="730" y="690" width="62.5" height="30" xlink:href="#def30000197" />
+<use id="sys30000160" x="740" y="515" width="62.5" height="30" xlink:href="#def30000160" />
+<use id="sys30000195" x="745" y="635" width="62.5" height="30" xlink:href="#def30000195" />
+<use id="sys30000166" x="755" y="235" width="62.5" height="30" xlink:href="#def30000166" />
+<use id="sys30000169" x="770" y="135" width="62.5" height="30" xlink:href="#def30000169" />
+<use id="sys30000164" x="780" y="600" width="62.5" height="30" xlink:href="#def30000164" />
+<use id="sys30000168" x="785" y="185" width="62.5" height="30" xlink:href="#def30000168" />
+<use id="sys30000165" x="785" y="280" width="62.5" height="30" xlink:href="#def30000165" />
+<use id="sys30000158" x="785" y="335" width="62.5" height="30" xlink:href="#def30000158" />
+<use id="sys30000163" x="795" y="565" width="62.5" height="30" xlink:href="#def30000163" />
+<use id="sys30000199" x="800" y="705" width="62.5" height="30" xlink:href="#def30000199" />
+<use id="sys30000180" x="805" y="390" width="62.5" height="30" xlink:href="#def30000180" />
+<use id="sys30000181" x="810" y="435" width="62.5" height="30" xlink:href="#def30000181" />
+<use id="sys30000185" x="810" y="470" width="62.5" height="30" xlink:href="#def30000185" />
+<use id="sys30000186" x="810" y="510" width="62.5" height="30" xlink:href="#def30000186" />
+<use id="sys30000167" x="830" y="230" width="62.5" height="30" xlink:href="#def30000167" />
+<use id="sys30000172" x="835" y="95" width="62.5" height="30" xlink:href="#def30000172" />
+<use id="sys30000182" x="855" y="350" width="62.5" height="30" xlink:href="#def30000182" />
+<use id="sys30000183" x="870" y="430" width="62.5" height="30" xlink:href="#def30000183" />
+<use id="sys30000171" x="875" y="135" width="62.5" height="30" xlink:href="#def30000171" />
+<use id="sys30000187" x="885" y="315" width="62.5" height="30" xlink:href="#def30000187" />
+<use id="sys30000170" x="900" y="220" width="62.5" height="30" xlink:href="#def30000170" />
+<use id="sys30000184" x="920" y="355" width="62.5" height="30" xlink:href="#def30000184" />
+<use id="sys30002802" x="25" y="465" width="62.5" height="30" xlink:href="#def30002802" />
+<use id="sys30002642" x="35" y="395" width="62.5" height="30" xlink:href="#def30002642" />
+<use id="sys30002791" x="45" y="590" width="62.5" height="30" xlink:href="#def30002791" />
+<use id="sys30001379" x="60" y="335" width="62.5" height="30" xlink:href="#def30001379" />
+<use id="sys30001448" x="82" y="39" width="62.5" height="30" xlink:href="#def30001448" />
+<use id="sys30002788" x="100" y="665" width="62.5" height="30" xlink:href="#def30002788" />
+<use id="sys30000250" x="151" y="1" width="62.5" height="30" xlink:href="#def30000250" />
+<use id="sys30001393" x="302" y="300" width="62.5" height="30" xlink:href="#def30001393" />
+<use id="sys30002780" x="304" y="375" width="62.5" height="30" xlink:href="#def30002780" />
+<use id="sys30002754" x="305" y="235" width="62.5" height="30" xlink:href="#def30002754" />
+<use id="sys30001363" x="306" y="335" width="62.5" height="30" xlink:href="#def30001363" />
+<use id="sys30002475" x="535" y="650" width="62.5" height="30" xlink:href="#def30002475" />
+<use id="sys30002062" x="535" y="695" width="62.5" height="30" xlink:href="#def30002062" />
+<use id="sys30002355" x="655" y="740" width="62.5" height="30" xlink:href="#def30002355" />
+<use id="sys30003446" x="800" y="740" width="62.5" height="30" xlink:href="#def30003446" />
+<use id="sys30002440" x="890" y="515" width="62.5" height="30" xlink:href="#def30002440" />
+
+</g>
+
+<g id="highlights">
+
+</g>
+
+<g id="notes"></g>
+
+<g id="standings"></g>
+
+</g>
+<g id="controls" style="display: none;">
+  <a xlink:title="Zoom In"><image id="zoom_in" x="5" y="5" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/magnifier_zoom_in.png" style="cursor: pointer;"/></a>
+  <a xlink:title="Zoom Out"><image id="zoom_out" x="5" y="23" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/magnifier_zoom_out.png" style="cursor: pointer;"/></a>
+  <a xlink:title="Enable Mousewheel Support"><image id="wheel_on" x="5" y="42" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/mouse_add.png" style="cursor: pointer;"/> </a>
+  <a xlink:title="Disable Mousewheel Support"><image id="wheel_off" x="5" y="42" width="16" height="16" xlink:href="https://i.dotlan.net/images/icons/mouse_delete.png" style="cursor: pointer; display: none;"/></a>
+</g>
+
+
+<script type="text/javascript" xlink:href="https://s.dotlan.net/lib/dotSvg.js?1595967170"></script>
+<script type="text/javascript"><![CDATA[
+
+function init(E) {
+	SVGMap.init(E);
+}
+
+]]></script>
+
+
+</svg>
