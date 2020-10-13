@@ -387,6 +387,10 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Verge Vendor", "10000068", "Gallente", 245, 330));
             Regions.Add(new MapRegion("Wicked Creek", "10000006", string.Empty, 790, 615));
 
+      
+
+
+
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
@@ -518,6 +522,7 @@ namespace SMT.EVEData
                 {
                     string[] bits = line.Split(',');
 
+                    string regionID = bits[0];
                     string constID = bits[1];
                     string systemID = bits[2];
                     string systemName = bits[3]; // SystemIDToName[SystemID];
@@ -537,6 +542,12 @@ namespace SMT.EVEData
                         s.TrueSec = security;
                         s.ConstellationID = constID;
                         s.RadiusAU = radius / 149597870700;
+
+                        // manually patch pochven
+                        if(regionID == "10000070")
+                        {
+                            s.Region = "Pochven";
+                        }
                     }
                 }
             }
@@ -630,6 +641,172 @@ namespace SMT.EVEData
             {
                 // error
             }
+
+
+            // 13 Oct 2020 :  Temp rebuild of maps for Trig Invasions
+
+            // Krai Perun
+            // 20000787    30000157    Otela
+            // 20000787    30000192    Otanuomi
+            // 20000787    30001372    Kino
+            // 20000787    30001445    Nalvula
+            // 20000787    30002079    Krirald
+            // 20000787    30002737    Konola
+            // 20000787    30005005    Ignebaener
+            // 20000787    30010141    Sakenta
+            // 20000787    30031392    Komo
+
+
+            // Krai Svarog
+            // 20000788    30000021    Kuharah
+            // 20000788    30001413    Nani
+            // 20000788    30002225    Harva
+            // 20000788    30002411    Skarkon
+            // 20000788    30002770    Tunudan
+            // 20000788    30003495    Raravoss
+            // 20000788    30003504    Niarja
+            // 20000788    30040141    Urhinichi
+            // 20000788    30045328    Ahtila
+
+
+            // Krai Veles
+            // 20000789    30000206    Wirashoda
+            // 20000789    30001381    Arvasaras
+            // 20000789    30002652    Ala
+            // 20000789    30002702    Archee
+            // 20000789    30002797    Kaunokka
+            // 20000789    30003046    Angymonne
+            // 20000789    30005029    Vale
+            // 20000789    30020141    Senda
+            // 20000789    30045329    Ichoriya
+
+
+            EVEData.MapRegion blackRise = GetRegion("Black Rise");
+            blackRise.MapSystems.Remove("Ahtila");  // Pochven
+            blackRise.MapSystems.Remove("Ichoriya"); // Pochven
+
+
+
+            EVEData.MapRegion theBleakLands = GetRegion("The Bleak Lands");
+            theBleakLands.MapSystems.Remove("Raravoss"); // out of region link
+
+
+            EVEData.MapRegion theCitadel = GetRegion("The Citadel");
+            theCitadel.MapSystems.Remove("Konola"); // Pochven
+            theCitadel.MapSystems.Remove("Komo"); // Pochven
+            theCitadel.MapSystems.Remove("Kaunokka"); // Pochven
+            theCitadel.MapSystems.Remove("Tunudan"); // Pochven
+            theCitadel.MapSystems.Remove("Urhinichi"); // Pochven
+            theCitadel.MapSystems.Remove("Kino"); // out of region link
+            theCitadel.MapSystems.Remove("Niarja"); // out of region link
+
+
+            EVEData.MapRegion derelik = GetRegion("Derelik");
+            derelik.MapSystems.Remove("Kuharah"); // Pochven
+
+            EVEData.MapRegion domain = GetRegion("Domain");
+            domain.MapSystems.Remove("Niarja"); // Pochven
+            domain.MapSystems.Remove("Raravoss"); // Pochven
+            domain.MapSystems.Remove("Harva"); // Pochven
+            domain.MapSystems.Remove("Kaaputenen"); // No longer connected
+
+            EVEData.MapRegion essence = GetRegion("Essence");
+            essence.MapSystems.Remove("Vale"); // Pochven
+            essence.MapSystems.Remove("Ignebaener"); // Pochven
+
+            EVEData.MapRegion etheriumReach = GetRegion("Etherium Reach");
+            etheriumReach.MapSystems.Remove("Skarkon"); // out of region link
+
+            EVEData.MapRegion everyshore = GetRegion("Everyshore");
+            everyshore.MapSystems.Remove("Angymonne");  // Pochven
+
+            EVEData.MapRegion theForge = GetRegion("The Forge");
+            theForge.MapSystems.Remove("Otanuomi");  // Pochven
+            theForge.MapSystems.Remove("Wirashoda");  // Pochven
+            theForge.MapSystems.Remove("Sakenta");  // Pochven
+            theForge.MapSystems.Remove("Otela");  // Pochven
+            theForge.MapSystems.Remove("Senda");  // Pochven
+
+
+
+            EVEData.MapRegion lonetrek = GetRegion("Lonetrek");
+            lonetrek.MapSystems.Remove("Nalvula");  // Pochven
+            lonetrek.MapSystems.Remove("Kino");  // Pochven
+            lonetrek.MapSystems.Remove("Nani");  // Pochven
+            lonetrek.MapSystems.Remove("Arvasaras");  // Pochven
+            
+
+
+            EVEData.MapRegion metropolis = GetRegion("Metropolis");
+            metropolis.MapSystems.Remove("Krirald");  // Pochven
+
+
+            EVEData.MapRegion moldenHeath = GetRegion("Molden Heath");
+            moldenHeath.MapSystems.Remove("Skarkon");  // Pochven
+            moldenHeath.MapSystems.Remove("L4X-1V");  // no longer connected
+
+
+            EVEData.MapRegion sinqLaison = GetRegion("Sinq Laison");
+            sinqLaison.MapSystems.Remove("Archee");  // Pochven
+            sinqLaison.MapSystems.Remove("Ala");  // Pochven
+
+
+            EVEData.MapRegion tribute = GetRegion("Tribute");
+            tribute.MapSystems.Remove("Nalvula");  // out of region
+
+
+            EVEData.MapRegion vergeVendor = GetRegion("Verge Vendor");
+            vergeVendor.MapSystems.Remove("Ignebaener");  // out of region   
+            vergeVendor.MapSystems.Remove("Lisbaetanne");  // doesnt make sense to keep   
+
+
+            // now create Pochven from scratch
+            MapRegion pochven = new MapRegion("Pochven", "10000008", "Triglavian", 50, 50);
+            Regions.Add(pochven);
+
+             // Krai Perun
+            pochven.MapSystems.Add("Otela", new MapSystem() { Name = "Otela", LayoutX = 915, LayoutY = 360, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Otanuomi", new MapSystem() { Name = "Otanuomi", LayoutX = 600, LayoutY = 550, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Kino", new MapSystem() { Name = "Kino", LayoutX = 790, LayoutY = 390, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Nalvula", new MapSystem() { Name = "Nalvula", LayoutX = 870, LayoutY = 445, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Krirald", new MapSystem() { Name = "Krirald", LayoutX = 690, LayoutY = 520, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Konola", new MapSystem() { Name = "Konola", LayoutX = 780, LayoutY = 480, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Ignebaener", new MapSystem() { Name = "Ignebaener", LayoutX = 835, LayoutY = 320, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Sakenta", new MapSystem() { Name = "Sakenta", LayoutX = 680, LayoutY = 245, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Komo", new MapSystem() { Name = "Komo", LayoutX = 760, LayoutY = 285, Region = "Pochven", OutOfRegion = false });
+
+            // Krai Svarog
+            pochven.MapSystems.Add("Kuharah", new MapSystem() { Name = "Kuharah", LayoutX = 115, LayoutY = 500, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Nani", new MapSystem() { Name = "Nani", LayoutX = 350, LayoutY = 665, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Harva", new MapSystem() { Name = "Harva", LayoutX = 95, LayoutY = 670, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Skarkon", new MapSystem() { Name = "Skarkon", LayoutX = 255, LayoutY = 705, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Tunudan", new MapSystem() { Name = "Tunudan", LayoutX = 105, LayoutY = 585, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Raravoss", new MapSystem() { Name = "Raravoss", LayoutX = 160, LayoutY = 745, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Niarja", new MapSystem() { Name = "Niarja", LayoutX = 185, LayoutY = 645, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Urhinichi", new MapSystem() { Name = "Urhinichi", LayoutX = 440, LayoutY = 625, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Ahtila", new MapSystem() { Name = "Ahtila", LayoutX = 120, LayoutY = 435, Region = "Pochven", OutOfRegion = false });
+
+
+
+
+            // Krai Veles
+            pochven.MapSystems.Add("Wirashoda", new MapSystem() { Name = "Wirashoda", LayoutX = 145, LayoutY = 215, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Arvasaras", new MapSystem() { Name = "Arvasaras", LayoutX = 525, LayoutY = 170, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Ala", new MapSystem() { Name = "Ala", LayoutX = 155, LayoutY = 145, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Archee", new MapSystem() { Name = "Archee", LayoutX = 235, LayoutY = 130, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Kaunokka", new MapSystem() { Name = "Kaunokka", LayoutX = 445, LayoutY = 135, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Angymonne", new MapSystem() { Name = "Angymonne", LayoutX = 280, LayoutY = 50, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Vale", new MapSystem() { Name = "Vale", LayoutX = 170, LayoutY = 70, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Senda", new MapSystem() { Name = "Senda", LayoutX = 135, LayoutY = 295, Region = "Pochven", OutOfRegion = false });
+            pochven.MapSystems.Add("Ichoriya", new MapSystem() { Name = "Ichoriya", LayoutX = 365, LayoutY = 100, Region = "Pochven", OutOfRegion = false });
+
+
+
+
+
+
+
+
 
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
@@ -745,6 +922,16 @@ namespace SMT.EVEData
                     }
                 }
             }
+
+
+
+
+ 
+
+
+
+
+
 
             // collect the system points to generate them from
             List<Vector2f> regionpoints = new List<Vector2f>();
