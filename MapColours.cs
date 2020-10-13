@@ -29,6 +29,12 @@ namespace SMT
         [DisplayName("Constellation")]
         public Color ConstellationGateColour { get; set; }
 
+        [Category("Gates")]
+        [DisplayName("Region")]
+        public Color RegionGateColour { get; set; }
+
+
+
         [Category("SOV")]
         [DisplayName("Constellation Highlight")]
         public Color ConstellationHighlightColour { get; set; }

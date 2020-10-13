@@ -1828,6 +1828,7 @@ namespace SMT
 
             Brush NormalGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
             Brush ConstellationGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+            Brush RegionGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionGateColour);
 
             // cache all system links
             List<GateHelper> systemLinks = new List<GateHelper>();
@@ -2356,8 +2357,15 @@ namespace SMT
                     {
                         sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                     }
-                    sysSubText.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
-                    sysSubText.IsHitTestVisible = false;
+
+                    if (system.OutOfRegion)
+                    {
+                        sysSubText.Foreground = SysOutRegionTextBrush;
+                    }
+                    else
+                    {
+                        sysSubText.Foreground = SysInRegionTextBrush;
+                    }
 
                     Canvas.SetLeft(sysSubText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
                     Canvas.SetTop(sysSubText, system.LayoutY + regionMarkerOffset);
@@ -2378,13 +2386,16 @@ namespace SMT
                 sysLink.X2 = gh.to.LayoutX;
                 sysLink.Y2 = gh.to.LayoutY;
 
-                if (gh.from.ActualSystem.Region != gh.to.ActualSystem.Region || gh.from.ActualSystem.ConstellationID != gh.to.ActualSystem.ConstellationID)
+                sysLink.Stroke = NormalGateBrush;
+
+                if (gh.from.ActualSystem.ConstellationID != gh.to.ActualSystem.ConstellationID)
                 {
                     sysLink.Stroke = ConstellationGateBrush;
                 }
-                else
+
+                if (gh.from.ActualSystem.Region != gh.to.ActualSystem.Region)
                 {
-                    sysLink.Stroke = NormalGateBrush;
+                    sysLink.Stroke = RegionGateBrush;
                 }
 
                 sysLink.StrokeThickness = 1.2;
@@ -2469,20 +2480,20 @@ namespace SMT
                         jbLine.X2 = endPoint.X;
                         jbLine.Y2 = endPoint.Y;
 
-                        jbLine.StrokeThickness = 2;
+                        jbLine.StrokeThickness = 1;
 
                         DoubleCollection dashes = new DoubleCollection();
 
                         if (!jb.Disabled)
                         {
                             dashes.Add(1.0);
-                            dashes.Add(1.0);
+                            dashes.Add(3.0);
                             jbLine.Stroke = FriendlyJumpBridgeBrush;
                         }
                         else
                         {
                             dashes.Add(1.0);
-                            dashes.Add(3.0);
+                            dashes.Add(6.0);
                             jbLine.Stroke = DisabledJumpBridgeBrush;
                         }
 
