@@ -19,6 +19,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Services;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -1174,7 +1175,8 @@ namespace SMT.EVEData
         /// </summary>
         public string GetESILogonURL(string challengeCode)
         {
-            return ESIClient.SSO.CreateAuthenticationUrl(ESIScopes, VersionStr, challengeCode);
+            string URL = ESIClient.SSO.CreateAuthenticationUrl(ESIScopes, VersionStr, challengeCode);
+            return HttpUtility.UrlPathEncode(URL);
         }
 
         /// <summary>
