@@ -108,7 +108,7 @@ namespace SMT.EVEData
                             zs.SystemName = z.Package.Killmail.SolarSystemId.ToString();
                         }
 
-                        zs.KillTime = z.Package.Killmail.KillmailTime;
+                        zs.KillTime = z.Package.Killmail.KillmailTime.ToLocalTime();
                         string shipID = z.Package.Killmail.Victim.ShipTypeId.ToString();
                         if (EveManager.Instance.ShipTypes.Keys.Contains(shipID))
                         {
