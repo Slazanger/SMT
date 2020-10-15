@@ -601,15 +601,18 @@ namespace SMT
 
             MenuItem setDesto = cm.Items[2] as MenuItem;
             MenuItem addWaypoint = cm.Items[3] as MenuItem;
+            MenuItem clearRoute = cm.Items[4] as MenuItem;
+
 
             if (ActiveCharacter != null && ActiveCharacter.ESILinked)
             {
                 setDesto.IsEnabled = true;
                 addWaypoint.IsEnabled = true;
+                clearRoute.IsEnabled = true;
             }
 
             // update SOV
-            MenuItem SovHeader = cm.Items[6] as MenuItem;
+            MenuItem SovHeader = cm.Items[7] as MenuItem;
             SovHeader.Items.Clear();
             SovHeader.IsEnabled = false;
 
@@ -634,7 +637,7 @@ namespace SMT
             }
 
             // update stats
-            MenuItem StatsHeader = cm.Items[7] as MenuItem;
+            MenuItem StatsHeader = cm.Items[8] as MenuItem;
             StatsHeader.Items.Clear();
             StatsHeader.IsEnabled = false;
 
@@ -1416,5 +1419,15 @@ namespace SMT
                 ActiveCharacter.AddDestination(eveSys.ID, false);
             }
         }
+
+        private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
+        {
+            if (ActiveCharacter != null)
+            {
+                ActiveCharacter.ClearAllWaypoints();            }
+        }
+
+
+        
     }
 }

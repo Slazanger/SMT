@@ -31,6 +31,7 @@
 
             <MenuItem Header="Set Destination" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
             <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
+            <MenuItem Header="Clear Route" Click="SysContexMenuItemClearRoute_Click" IsEnabled="False" />
 
             <Separator />
 

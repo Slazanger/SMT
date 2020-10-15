@@ -2824,8 +2824,9 @@ namespace SMT
 
                 MenuItem setDesto = cm.Items[2] as MenuItem;
                 MenuItem addWaypoint = cm.Items[3] as MenuItem;
+                MenuItem clearRoute = cm.Items[4] as MenuItem;
 
-                MenuItem characters = cm.Items[4] as MenuItem;
+                MenuItem characters = cm.Items[5] as MenuItem;
                 characters.Items.Clear();
 
                 setDesto.IsEnabled = false;
@@ -2838,6 +2839,7 @@ namespace SMT
                 {
                     setDesto.IsEnabled = true;
                     addWaypoint.IsEnabled = true;
+                    clearRoute.IsEnabled = true;
                 }
 
                 // get a list of characters in this system
@@ -3174,6 +3176,22 @@ namespace SMT
                 ActiveCharacter.AddDestination(eveSys.ActualSystem.ID, false);
             }
         }
+
+
+        /// <summary>
+        /// Ckear Route  Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
+        {
+             if (ActiveCharacter != null)
+            {
+                ActiveCharacter.ClearAllWaypoints();
+            }
+        }
+
+
 
         /// <summary>
         /// Copy Clicked
