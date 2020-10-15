@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SMT"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Preferences" Height="455" Width="600">
+        Title="Preferences" Height="455" Width="600" WindowStartupLocation="CenterOwner">
     <Grid Background="{DynamicResource ButtonBorder}">
         <DockPanel>
             <TabControl x:Name="tabControl" DockPanel.Dock="Top">
