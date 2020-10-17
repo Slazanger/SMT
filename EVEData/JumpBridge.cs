@@ -12,6 +12,10 @@ namespace SMT.EVEData
     /// </summary>
     public class JumpBridge : INotifyPropertyChanged
     {
+
+        public static readonly string SaveVersion = "01";
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JumpBridge" /> class.
         /// </summary>
