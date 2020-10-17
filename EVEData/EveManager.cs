@@ -1170,7 +1170,7 @@ namespace SMT.EVEData
         /// </summary>
         public string GetESILogonURL(string challengeCode)
         {
-            string URL = ESIClient.SSO.CreateAuthenticationUrl(ESIScopes, VersionStr, challengeCode).Replace(" ", "+");
+            string URL = ESIClient.SSO.CreateAuthenticationUrl(ESIScopes, VersionStr, challengeCode);
             return URL;
         }
 
@@ -1425,7 +1425,7 @@ namespace SMT.EVEData
         {
             JumpBridges = new ObservableCollection<JumpBridge>();
 
-            string dataFilename = SaveDataVersionFolder + @"\JumpBridges.dat";
+            string dataFilename = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             if (!File.Exists(dataFilename))
             {
                 return;
@@ -1567,7 +1567,9 @@ namespace SMT.EVEData
             Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
             Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
 
-            Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, SaveDataVersionFolder + @"\JumpBridges.dat");
+
+            string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
+            Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
         }
 
         /// <summary>
