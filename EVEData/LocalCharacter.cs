@@ -48,6 +48,10 @@ namespace SMT.EVEData
         /// </summary>
         private bool routeNeedsUpdate = false;
 
+
+        private int ssoErrorCount = 0;
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
         /// </summary>
@@ -313,9 +317,10 @@ namespace SMT.EVEData
 
                         foreach (long stationID in esr.Data.Structures)
                         {
+                            esiClient.SetCharacterData(ESIAuthData);
                             ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
 
-                            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                             if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
                             {
                                 SystemJumpGateList[stationID] = esrs.Data;
 
@@ -501,10 +506,18 @@ namespace SMT.EVEData
                 sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
                 if (sst == null || sst.RefreshToken == null)
                 {
-                    // we have a valid refresh token BUT it failed to auth; we need to force
-                    // a reauth
-                    ESIRefreshToken = "";
-                    ESILinked = false;
+
+                    ssoErrorCount++;
+
+                    if(ssoErrorCount > 10 )
+                    {
+                        // we have a valid refresh token BUT it failed to auth; we need to force
+                        // a reauth
+                        ESIRefreshToken = "";
+                        ESILinked = false;
+                    }
+
+
 
                     return;
                 }
