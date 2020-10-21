@@ -267,7 +267,7 @@
                                                 <StackPanel Margin="4">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Label Content="Mode" />
-                                                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ActiveCharacter.NavigationMode, ElementName=RegionRC}" Margin="2" Width="150" />
+                                                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ActiveCharacter.NavigationMode, ElementName=RegionUC, Mode=TwoWay}" Margin="2" Width="150" />
                                                     </StackPanel>
 
                                                     <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionRC}" Margin="2" />
