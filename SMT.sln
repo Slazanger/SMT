@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMT", "SMT.csproj", "{D2916
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfHelpers", "External\WpfHelpers\WpfHelpers.csproj", "{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESI.NET", "..\ESI.Net\ESI.NET\ESI.NET.csproj", "{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,14 +34,6 @@ Global
 		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|x64.ActiveCfg = Release|x64
 		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|x64.Build.0 = Release|x64
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Debug|x64.Build.0 = Debug|Any CPU
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Release|x64.ActiveCfg = Release|Any CPU
-		{ED1C9A4D-5556-4F1F-BEB9-09E8611E2B4B}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

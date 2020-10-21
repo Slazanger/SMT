@@ -109,6 +109,9 @@
     <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=4.6.94.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>packages\DotNetProjects.Extended.Wpf.Toolkit.4.6.94\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
     </Reference>
+    <Reference Include="ESI.NET, Version=2020.10.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\ESI.NET.2020.10.20\lib\net471\ESI.NET.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Configuration.5.0.0-rc.2.20475.5\lib\net461\Microsoft.Extensions.Configuration.dll</HintPath>
     </Reference>
@@ -211,6 +214,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CharactersWindow.xaml.cs">
+      <DependentUpon>CharactersWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EVEData\Coalition.cs" />
     <Compile Include="EVEData\ESI\CharacterIDData.cs" />
     <Compile Include="EVEData\ESI\CoalitionInfo.cs" />
@@ -247,6 +253,10 @@
       <DependentUpon>UniverseControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Page Include="CharactersWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LogonWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -425,10 +435,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ESI.Net\ESI.NET\ESI.NET.csproj">
-      <Project>{ed1c9a4d-5556-4f1f-beb9-09e8611e2b4b}</Project>
-      <Name>ESI.NET</Name>
-    </ProjectReference>
     <ProjectReference Include="External\WpfHelpers\WpfHelpers.csproj">
       <Project>{2d1e6ac7-6fb8-42e6-a1d8-754951a99428}</Project>
       <Name>WpfHelpers</Name>
