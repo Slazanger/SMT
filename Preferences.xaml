@@ -111,14 +111,9 @@
                         <StackPanel Grid.Column="1">
                             <GroupBox Header="DangerZone" Margin="4" Height="355">
                                 <StackPanel>
-
                                     <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2">Limit Sound to Dangerzone</CheckBox>
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=WarningRange}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="50" Minimum="1" MaxLength="5" Background="Transparent"  Foreground="White" />
-                                        <Label Content="DangerZone Size" />
-                                    </StackPanel>
-                                </StackPanel>
+                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
                     </Grid>

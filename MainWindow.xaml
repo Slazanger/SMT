@@ -41,6 +41,7 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Background="{DynamicResource MenuBackground}" Height="27">
             <Menu Style="{DynamicResource ResourceKey={x:Type Menu}}">
                 <MenuItem Header="File">
+                    <MenuItem Header="Characters" Click="Characters_MenuItem_Click" />
                     <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
                     <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
                 </MenuItem>
@@ -185,15 +186,7 @@
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" IsReadOnly="True" />
                                                 <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" IsReadOnly="True" />
                                                 <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" IsReadOnly="True" />
-                                                <DataGridCheckBoxColumn Header="Dangerzone"  Binding="{Binding DangerzoneActive}"  CanUserReorder="False" Width="*" IsReadOnly="False">
-                                                    <DataGridCheckBoxColumn.CellStyle>
-                                                        <Style>
-                                                            <EventSetter Event="CheckBox.Checked" Handler="DangerzoneChanged" />
-                                                            <EventSetter Event="CheckBox.Unchecked" Handler="DangerzoneChanged" />
-                                                        </Style>
-                                                    </DataGridCheckBoxColumn.CellStyle>
-                                                </DataGridCheckBoxColumn>
-                                            </DataGrid.Columns>
+                                          </DataGrid.Columns>
                                         </DataGrid>
                                         <CheckBox Content="Show Characters On Map" IsChecked="{Binding MapConf.ShowCharacterNamesOnMap}" Margin="3" />
                                         <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />

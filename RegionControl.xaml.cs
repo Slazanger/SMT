@@ -965,7 +965,7 @@ namespace SMT
 
             foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
             {
-                if (MapConf.ShowDangerZone && c.WarningSystems != null && c.DangerzoneActive)
+                if (MapConf.ShowDangerZone && c.WarningSystems != null && c.DangerZoneActive)
                 {
                     foreach (string s in c.WarningSystems)
                     {

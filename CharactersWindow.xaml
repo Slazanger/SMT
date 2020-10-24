@@ -1,0 +1,99 @@
+﻿<Window x:Class="SMT.CharactersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:SMT"
+        mc:Ignorable="d"
+        Closed="Window_Closed"
+        Title="Characters" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20" />
+
+        </Grid.RowDefinitions>
+
+        <ListView x:Name="characterLV"  Grid.Row="0" BorderBrush="Black"   SelectionChanged="characterLV_Selected">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <WrapPanel>
+                            <Image Source="{Binding Portrait}" Width="32" Height="32" Margin="1" />
+                            <TextBlock Text="{Binding Name}" FontSize="16"/>
+                        </WrapPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        <Button DockPanel.Dock="Bottom" Content="Add Character" Grid.Row="1" Click="AddCharacter_Click"/>
+
+        <Grid x:Name="characterInfoGrid" Grid.Column="1" Grid.RowSpan="2"
+              Background="{DynamicResource ListBackground}" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="128" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+
+            <Image Source="{Binding Portrait}" Width="100" Height="100" Grid.Row="0" Grid.Column="0"/>
+            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="0,30" Grid.RowSpan="2">
+                <TextBlock Text="{Binding Name}" FontSize="20" Foreground="White" />
+
+                <TextBlock FontSize="14" Foreground="LightGray">
+                                    <Run Text="{Binding CorporationName, FallbackValue='????'}"/>
+                                    <Run Text=" ["/>
+                                    <Run Text="{Binding CorporationTicker, FallbackValue='????'}"/>
+                                    <Run Text="]"/>
+                </TextBlock>
+                <TextBlock FontSize="14" Foreground="LightGray">
+                                    <Run Text="{Binding AllianceName, FallbackValue='No Alliance'}"/>
+                                    <Run Text=" ["/>
+                                    <Run Text="{Binding AllianceTicker , FallbackValue=''}"/>
+                                    <Run Text="]"/>
+                </TextBlock>
+
+                <TextBlock FontSize="14" Foreground="LightGray">
+                                    <Run Text="{Binding Location, FallbackValue='Unknown Location'}"/>
+                </TextBlock>
+
+                
+                
+            </StackPanel>
+            <Label Content="ESI Authenticated" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"/>
+            <Label Content="{Binding ESILinked}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left"/>
+
+            <Label Content="Use Ansiblex" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"/>
+            <CheckBox IsChecked="{Binding UseAnsiblexGates}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+            <Label Content="Online" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"/>
+            <Label Content="{Binding IsOnline}" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left"/>
+
+
+            <Label Content="DangerZone Enabled" Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" />
+            <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked"/>
+
+            <Label Content="DangerZone Size" Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding DangerZoneRange}" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Width="45" Minimum="1" Maximum="6" Background="Transparent"  Foreground="White" ValueChanged="dangerzone_ValueChanged" />
+
+
+
+        </Grid>
+    </Grid>
+</Window>

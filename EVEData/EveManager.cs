@@ -82,6 +82,12 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(SaveDataVersionFolder);
             }
 
+            string characterSaveFolder = SaveDataRootFolder + "\\Portraits";
+            if (!Directory.Exists(characterSaveFolder))
+            {
+                Directory.CreateDirectory(characterSaveFolder);
+            }
+
             string webCacheFoilder = DataCacheFolder + "\\WebCache";
             if (!Directory.Exists(webCacheFoilder))
             {
@@ -234,7 +240,7 @@ namespace SMT.EVEData
 
         public ObservableCollection<Triangles.Invasion> TrigInvasions { get; set; }
         public bool UseESIForCharacterPositions { get; set; }
-        public int WarningSystemRange { get; set; }
+
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -2252,8 +2258,6 @@ namespace SMT.EVEData
                         for (int i = 0; i < LocalCharacters.Count; i++)
                         {
                             LocalCharacter c = LocalCharacters.ElementAt(i);
-                            if (c.WarningSystemRange != WarningSystemRange)
-                                c.WarningSystemRange = WarningSystemRange;
                             await c.Update();
                         }
                     }

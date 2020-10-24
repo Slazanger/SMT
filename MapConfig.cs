@@ -88,7 +88,6 @@ namespace SMT
 
         private int m_UpcomingSovMinutes;
 
-        private int m_WarningRange = 5;
 
         public MapConfig()
         {
@@ -744,38 +743,7 @@ namespace SMT
 
         public bool UseESIForCharacterPositions { get; set; }
 
-        [Category("Intel")]
-        [DisplayName("Warning Range")]
-        public int WarningRange
-        {
-            get
-            {
-                return m_WarningRange;
-            }
-            set
-            {
-                // clamp to 1 miniumum
-                if (value > 0)
-                {
-                    m_WarningRange = value;
-                }
-                else
-                {
-                    m_WarningRange = 1;
-                }
-
-                if (value < 10)
-                {
-                    m_WarningRange = value;
-                }
-                else
-                {
-                    m_WarningRange = 9;
-                }
-
-                OnPropertyChanged("WarningRange");
-            }
-        }
+ 
 
         public void SetDefaultColours()
         {
@@ -866,7 +834,6 @@ namespace SMT
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 
-            WarningRange = 5;
         }
 
         protected void OnPropertyChanged(string name)
