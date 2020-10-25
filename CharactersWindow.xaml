@@ -4,22 +4,31 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
         Closed="Window_Closed"
-        Title="Characters" Height="450" Width="800">
-    <Grid>
+        Title="Characters" Height="450" Width="750" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:RoutingMode" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
+    <Grid Background="{DynamicResource ListBackground}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="20" />
+            <RowDefinition Height="30" />
 
         </Grid.RowDefinitions>
 
-        <ListView x:Name="characterLV"  Grid.Row="0" BorderBrush="Black"   SelectionChanged="characterLV_Selected">
+        <ListView x:Name="characterLV"  Grid.Row="0" BorderBrush="Black"   SelectionChanged="characterLV_Selected" Margin="4">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <WrapPanel>
@@ -29,16 +38,16 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        <Button DockPanel.Dock="Bottom" Content="Add Character" Grid.Row="1" Click="AddCharacter_Click"/>
+        <Button DockPanel.Dock="Bottom" Content="Add Character" Grid.Row="1" Click="AddCharacter_Click" Margin="4"/>
 
-        <Grid x:Name="characterInfoGrid" Grid.Column="1" Grid.RowSpan="2"
+        <Grid x:Name="characterInfoGrid" Grid.Column="1" Grid.RowSpan="2" Visibility="Hidden"
               Background="{DynamicResource ListBackground}" >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="50*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="128" />
+                <RowDefinition Height="190" />
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
@@ -52,9 +61,9 @@
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
-            <Image Source="{Binding Portrait}" Width="100" Height="100" Grid.Row="0" Grid.Column="0"/>
-            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="0,30" Grid.RowSpan="2">
-                <TextBlock Text="{Binding Name}" FontSize="20" Foreground="White" />
+            <Image Source="{Binding Portrait}" Width="170" Height="170" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10"/>
+            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="-40,30" Grid.RowSpan="2">
+                <TextBlock Text="{Binding Name}" FontSize="24" Foreground="White" />
 
                 <TextBlock FontSize="14" Foreground="LightGray">
                                     <Run Text="{Binding CorporationName, FallbackValue='????'}"/>
@@ -73,24 +82,79 @@
                                     <Run Text="{Binding Location, FallbackValue='Unknown Location'}"/>
                 </TextBlock>
 
-                
-                
+                <TextBlock Text=" " />
+
+                <TextBlock Margin="0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ESILinked}" Value="True">
+                                    <Setter Property="Text" Value="Authenticated" />
+                                    <Setter Property="Foreground" Value="Green" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ESILinked}" Value="False">
+                                    <Setter Property="Text" Value="Unauthenticated" />
+                                    <Setter Property="Foreground" Value="Red" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+
+
+                <TextBlock>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                    <Setter Property="Text" Value="Online" />
+                                    <Setter Property="Foreground" Value="LightGray" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsOnline}" Value="False">
+                                    <Setter Property="Text" Value="Offline" />
+                                    <Setter Property="Foreground" Value="DarkGray" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+
             </StackPanel>
-            <Label Content="ESI Authenticated" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"/>
-            <Label Content="{Binding ESILinked}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left"/>
-
-            <Label Content="Use Ansiblex" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"/>
-            <CheckBox IsChecked="{Binding UseAnsiblexGates}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-
-            <Label Content="Online" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"/>
-            <Label Content="{Binding IsOnline}" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left"/>
 
 
-            <Label Content="DangerZone Enabled" Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" />
-            <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked"/>
 
-            <Label Content="DangerZone Size" Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" />
-            <xctk:IntegerUpDown Value="{Binding DangerZoneRange}" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Width="45" Minimum="1" Maximum="6" Background="Transparent"  Foreground="White" ValueChanged="dangerzone_ValueChanged" />
+
+            <GroupBox Header="Navigation Options" Grid.Row="1" Grid.RowSpan="7" BorderBrush="DarkGray" Margin="5">
+                <StackPanel Margin="4">
+                    <StackPanel Orientation="Horizontal" Margin="4">
+                        <Label Content="Autopilot" />
+                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding NavigationMode, Mode=TwoWay}" Margin="2" Width="140"  Background="Black"/>
+                    </StackPanel>
+                    <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="Use Ansiblex Gates" Margin="4"/>
+
+ 
+                 </StackPanel>
+            </GroupBox>
+
+
+            <GroupBox Header="DangerZone"  Grid.Column="1" Grid.Row="1" Grid.RowSpan="7" BorderBrush="DarkGray" Margin="5">
+                <StackPanel Margin="4" >
+                    <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked" Content="DangerZone Enabled" Margin="4"/>
+                    <StackPanel Orientation="Horizontal" Margin="4">
+                        <xctk:IntegerUpDown Value="{Binding DangerZoneRange}" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Width="45" Minimum="1" Maximum="6" Background="Transparent"  Foreground="White" ValueChanged="dangerzone_ValueChanged" />
+                        <Label Content="DangerZone Size" Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+
+            <Button Content="Delete" Grid.Column="1" Grid.Row="8" Width="100" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click"/>
+
+
+
+
 
 
 

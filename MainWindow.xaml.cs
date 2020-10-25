@@ -26,7 +26,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_094";
+        public const string SMT_VERSION = "SMT_095";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -50,7 +50,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Blue Falcon Patrol : " + SMT_VERSION + ")";
+            Title = "SMT (Dr dont touch it : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
@@ -456,7 +456,7 @@ namespace SMT
             }
         }
 
-        private void OnCharacterSelectionChanged()
+        public void OnCharacterSelectionChanged()
         {
             CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
         }

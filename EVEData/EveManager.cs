@@ -1342,6 +1342,7 @@ namespace SMT.EVEData
             esiChar.ESIAccessTokenExpiry = acd.ExpiresOn;
             esiChar.ID = acd.CharacterID;
             esiChar.ESIAuthData = acd;
+            esiChar.UpdateInfoFromESI();
 
             // now to find if a matching character
         }
