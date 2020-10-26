@@ -88,6 +88,8 @@ namespace SMT
 
         private int m_UpcomingSovMinutes;
 
+        private int m_ZkillExpireTimeMinutes;
+
 
         public MapConfig()
         {
@@ -741,6 +743,29 @@ namespace SMT
             }
         }
 
+
+
+        public int ZkillExpireTimeMinutes
+        {
+            get
+            {
+                return m_ZkillExpireTimeMinutes;
+            }
+
+            set
+            {
+                m_ZkillExpireTimeMinutes = value;
+                if (m_ZkillExpireTimeMinutes < 5)
+                {
+                    m_UpcomingSovMinutes = 5;
+                }
+
+                OnPropertyChanged("ZkillExpireTimeMinutes");
+            }
+        }
+
+        
+
         public bool UseESIForCharacterPositions { get; set; }
 
  
@@ -815,6 +840,7 @@ namespace SMT
             ShowSystemPopup = true;
             MaxIntelSeconds = 120;
             UpcomingSovMinutes = 30;
+            ZkillExpireTimeMinutes = 30;
             AlwaysOnTop = false;
             ShowToolBox = true;
             ShowZKillData = true;

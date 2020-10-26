@@ -122,6 +122,8 @@ namespace SMT
             EVEManager.SetupIntelWatcher();
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
 
+            EVEManager.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
+
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.UpdateESIUniverseData();

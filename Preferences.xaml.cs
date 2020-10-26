@@ -34,5 +34,12 @@ namespace SMT
         {
             EveManager.Instance.UseESIForCharacterPositions = (bool)syncESIPositionChk.IsChecked;
         }
+
+        private void zkilltime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+
+            EveManager.Instance.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
+
+        }
     }
 }

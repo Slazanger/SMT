@@ -104,6 +104,13 @@
                                         <xctk:IntegerUpDown Value="{Binding Path=MaxIntelSeconds}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="30" Maximum="1200" Background="Transparent"  Foreground="White" />
                                         <Label Content="Intel Max Time (s)" />
                                     </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=ZkillExpireTimeMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="120" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
+                                        <Label Content="Zkill Max Time (minutes)" />
+                                    </StackPanel>
+
+
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
