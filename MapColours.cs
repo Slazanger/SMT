@@ -13,9 +13,15 @@ namespace SMT
         [DisplayName("Highlight")]
         public Color CharacterHighlightColour { get; set; }
 
+
+
         [Category("Character")]
         [DisplayName("Text")]
         public Color CharacterTextColour { get; set; }
+
+        [Category("Character")]
+        [DisplayName("OfflineText")]
+        public Color CharacterOfflineTextColour { get; set; }
 
         [Category("Character")]
         [DisplayName("Fleet Member Text")]

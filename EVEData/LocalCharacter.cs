@@ -877,7 +877,7 @@ namespace SMT.EVEData
 
                         if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
                         {
-                            if (esr.Pages.HasValue) ;
+                            if (esr.Pages.HasValue)
                             {
                                 maxPageCount = (int)esr.Pages;
                             }

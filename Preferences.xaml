@@ -59,6 +59,9 @@
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSimpleSecurityView}" Content="Show Simple Security View (Just HS/LS/null)" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrigInvasions}" Content="Show Trig Invasions" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOnlyFinalLiminality}" Content="Limit Trig Invasions to Final Luminality" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
+
+                                    
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>

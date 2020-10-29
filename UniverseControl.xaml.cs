@@ -1028,6 +1028,7 @@ namespace SMT
                 float characterNametextXOffset = 3;
                 float characterNametextYOffset = -16;
                 Brush CharacterNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+                Brush CharacterOfflineNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour); 
                 Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -60,7 +61,7 @@ namespace SMT
         private bool m_ShowSystemADM;
         private bool m_ShowSystemSecurity;
         private bool m_ShowSystemTimers;
-        private Dictionary<string, List<KeyValuePair<bool, string>>> NameTrackingLocationMap = new Dictionary<string, List<KeyValuePair<bool, string>>>();
+        private Dictionary<string, List<KeyValuePair<int, string>>> NameTrackingLocationMap = new Dictionary<string, List<KeyValuePair<int, string>>>();
         private long SelectedAlliance;
         private bool showJumpDistance;
         private Brush StandingBadBrush = new SolidColorBrush(Color.FromArgb(110, 196, 72, 6));
@@ -789,7 +790,12 @@ namespace SMT
                 return;
             }
 
+            // 0 = online
+            // 1 = offline
+            // 2 = fleet
             NameTrackingLocationMap.Clear();
+
+           
 
             foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
             {
@@ -801,9 +807,10 @@ namespace SMT
 
                 if (!NameTrackingLocationMap.ContainsKey(c.Location))
                 {
-                    NameTrackingLocationMap[c.Location] = new List<KeyValuePair<bool, string>>();
+                    NameTrackingLocationMap[c.Location] = new List<KeyValuePair<int, string>>();
                 }
-                NameTrackingLocationMap[c.Location].Add(new KeyValuePair<bool, string>(true, c.Name));
+
+                NameTrackingLocationMap[c.Location].Add(new KeyValuePair<int, string>(c.IsOnline? 0:1, c.Name));
             }
 
             if (ActiveCharacter != null && MapConf.FleetShowOnMap)
@@ -836,7 +843,7 @@ namespace SMT
 
                         if (!NameTrackingLocationMap.ContainsKey(fm.Location))
                         {
-                            NameTrackingLocationMap[fm.Location] = new List<KeyValuePair<bool, string>>();
+                            NameTrackingLocationMap[fm.Location] = new List<KeyValuePair<int, string>>();
                         }
 
                         string displayName = fm.Name;
@@ -844,21 +851,21 @@ namespace SMT
                         {
                             displayName += " (" + fm.ShipType + ")";
                         }
-                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<bool, string>(false, displayName));
+                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<int, string>(2, displayName));
                     }
                 }
             }
 
             foreach (string lkvpk in NameTrackingLocationMap.Keys)
             {
-                List<KeyValuePair<bool, string>> lkvp = NameTrackingLocationMap[lkvpk];
+                List<KeyValuePair<int, string>> lkvp = NameTrackingLocationMap[lkvpk];
                 EVEData.MapSystem ms = Region.MapSystems[lkvpk];
 
                 bool addIndividualFleetMembers = true;
                 int fleetMemberCount = 0;
-                foreach (KeyValuePair<bool, string> kvp in lkvp)
+                foreach (KeyValuePair<int, string> kvp in lkvp)
                 {
-                    if (kvp.Key == false)
+                    if (kvp.Key == 2)
                     {
                         fleetMemberCount++;
                     }
@@ -874,15 +881,35 @@ namespace SMT
 
                 SolidColorBrush fleetMemberText = new SolidColorBrush(MapConf.ActiveColourScheme.FleetMemberTextColour);
                 SolidColorBrush localCharacterText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+                SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
 
-                foreach (KeyValuePair<bool, string> kvp in lkvp)
+                foreach (KeyValuePair<int, string> kvp in lkvp)
                 {
-                    if (kvp.Key || kvp.Key == false && addIndividualFleetMembers)
+                    if(kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
+                    {
+                        continue;
+                    }
+
+                    if (kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 2 && addIndividualFleetMembers)
                     {
                         Label charText = new Label();
                         charText.Content = kvp.Value;
-                        charText.Foreground = kvp.Key ? localCharacterText : fleetMemberText;
                         charText.IsHitTestVisible = false;
+
+                        switch(kvp.Key)
+                        {
+                            case 0:
+                                charText.Foreground = localCharacterText;
+                                break;
+                            case 1:
+                                charText.Foreground = localCharacterOfflineText;
+                                charText.Content += "(Offline)";
+                                break;
+                            case 2:
+                                charText.Foreground = fleetMemberText;
+                                break;
+                        }
+
 
                         if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
                         {

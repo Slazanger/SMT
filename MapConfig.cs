@@ -45,6 +45,7 @@ namespace SMT
 
         private int m_MaxIntelSeconds;
 
+        private bool m_showOfflineCharactersOnMap = true;
         private bool m_ShowCharacterNamesOnMap = true;
         private bool m_ShowCoalition;
 
@@ -55,7 +56,6 @@ namespace SMT
         private bool m_ShowJoveObservatories;
         private bool m_ShowNegativeRattingDelta;
 
-        private bool m_ShowOfflineCharactersOnMap;
         private bool m_ShowOnlyFinalLiminality;
         private bool m_ShowRattingDataAsDelta;
 
@@ -306,6 +306,22 @@ namespace SMT
             }
         }
 
+
+        public bool ShowOfflineCharactersOnMap
+        {
+            get
+            {
+                return m_showOfflineCharactersOnMap;
+            }
+            set
+            {
+                m_showOfflineCharactersOnMap = value;
+                OnPropertyChanged("ShowOfflineCharactersOnMap");
+            }
+        }
+
+
+
         [Category("SOV")]
         [DisplayName("Show Coalition")]
         public bool ShowCoalition
@@ -390,18 +406,7 @@ namespace SMT
             }
         }
 
-        public bool ShowOfflineCharactersOnMap
-        {
-            get
-            {
-                return m_ShowOfflineCharactersOnMap;
-            }
-            set
-            {
-                m_ShowOfflineCharactersOnMap = value;
-                OnPropertyChanged("ShowOfflineCharactersOnMap");
-            }
-        }
+
 
         public bool ShowOnlyFinalLiminality
         {
@@ -807,6 +812,7 @@ namespace SMT
                 RegionGateColour = Color.FromRgb(128, 64, 64),
                 SelectedSystemColour = Color.FromRgb(255, 255, 255),
                 CharacterHighlightColour = Color.FromRgb(170, 130, 180),
+                CharacterOfflineTextColour = Colors.DarkGray,
                 CharacterTextColour = Color.FromRgb(240, 190, 10),
                 CharacterTextSize = 11,
                 SystemTextSize = 12,
