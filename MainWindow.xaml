@@ -401,6 +401,7 @@
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
                                             <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
                                             <DataGridTextColumn Header="ShipType" Binding="{Binding ShipType}" CanUserReorder="False" Width="*" />
                                         </DataGrid.Columns>
                                     </DataGrid>

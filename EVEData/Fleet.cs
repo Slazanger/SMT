@@ -54,6 +54,8 @@ namespace SMT.EVEData
 
             public string Location { get; set; }
 
+            public string Region { get; set; }
+
             public long CharacterID { get; set; }
 
             public string Name { get; set; }
