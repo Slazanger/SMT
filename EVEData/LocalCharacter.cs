@@ -46,6 +46,8 @@ namespace SMT.EVEData
 
         private bool m_UseAnsiblexGates;
 
+        private bool m_isOnline;
+
         /// <summary>
         /// Does the route need updating
         /// </summary>
@@ -173,7 +175,19 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public Fleet FleetInfo { get; set; }
 
-        public bool IsOnline { get; set; }
+        public bool IsOnline 
+        { 
+            get
+            {
+                return m_isOnline;
+            }
+            set
+            {
+                m_isOnline = value;
+                OnPropertyChanged("IsOnline");
+            }
+        }
+
         public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
 
         [XmlIgnoreAttribute]

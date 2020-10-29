@@ -129,6 +129,8 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
             EVEManager.InitNavigation();
 
+            EVEManager.LocalCharacters.CollectionChanged += LocalCharacters_CollectionChanged;
+
             CharactersList.ItemsSource = EVEManager.LocalCharacters;
             CurrentActiveCharacterCombo.ItemsSource = EVEManager.LocalCharacters;
 
@@ -214,6 +216,7 @@ namespace SMT
             }
         }
 
+
         /// <summary>
         /// Anom Manager
         /// </summary>
@@ -236,6 +239,13 @@ namespace SMT
         private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+        }
+
+
+        private void LocalCharacters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(CharactersList.ItemsSource).Refresh();
+
         }
 
 

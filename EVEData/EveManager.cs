@@ -58,7 +58,7 @@ namespace SMT.EVEData
         /// </summary>
         public EveManager(string version)
         {
-            LocalCharacters = new BindingList<LocalCharacter>();
+            LocalCharacters = new ObservableCollection<LocalCharacter>();
             VersionStr = version;
 
             // ensure we have the cache folder setup
@@ -199,7 +199,7 @@ namespace SMT.EVEData
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
         [XmlIgnoreAttribute]
-        public BindingList<LocalCharacter> LocalCharacters { get; set; }
+        public ObservableCollection<LocalCharacter> LocalCharacters { get; set; }
 
         /// <summary>
         /// Gets or sets the master list of Regions
