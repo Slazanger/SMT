@@ -30,9 +30,9 @@
 
         <DataTemplate x:Key="intelDataDataTemplate">
             <DockPanel>
-                <TextBlock Text="{Binding IntelChannel, FallbackValue=''}" Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
-                <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
-                <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
+                <TextBlock Text="{Binding IntelChannel, FallbackValue=''}" Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Bottom" />
+                <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Bottom" />
+                <TextBox Background="Transparent" BorderThickness="0" Text="{Binding IntelString, FallbackValue=Intel Data, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" IsTabStop="False" FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
             </DockPanel>
         </DataTemplate>
     </Window.Resources>
