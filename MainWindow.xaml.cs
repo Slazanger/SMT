@@ -1445,4 +1445,66 @@ namespace SMT
             return null;
         }
     }
+
+
+    /// <summary>
+    /// ZKillboard Sec statuc colour converter
+    /// </summary>
+    public class ZKBForegroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            EVEData.ZKillRedisQ.ZKBDataSimple zs = value as EVEData.ZKillRedisQ.ZKBDataSimple;
+            Color rowCol = Colors.White;
+            if (zs != null)
+            {
+                float Standing = 0.0f;
+
+                EVEData.LocalCharacter c = MainWindow.AppWindow.RegionUC.ActiveCharacter;
+                if (c != null && c.ESILinked)
+                {
+                    if (c.AllianceID != 0 && c.AllianceID == zs.VictimAllianceID)
+                    {
+                        Standing = 10.0f;
+                    }
+
+                    if (c.Standings.Keys.Contains(zs.VictimAllianceID))
+                    {
+                        Standing = c.Standings[zs.VictimAllianceID];
+                    }
+
+                    if (Standing == -10.0)
+                    {
+                        rowCol = Colors.Black;
+                    }
+
+                    if (Standing == -5.0)
+                    {
+                        rowCol = Colors.Black;
+                    }
+
+                    if (Standing == 5.0)
+                    {
+                        rowCol = Colors.Black;
+                    }
+
+                    if (Standing == 10.0)
+                    {
+                        rowCol = Colors.White;
+                    }
+                }
+
+                // Do the conversion from bool to visibility
+            }
+
+            return new SolidColorBrush(rowCol);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    
 }
