@@ -25,7 +25,7 @@ namespace SMT.EVEData
             IntelTime = DateTime.Now;
             Systems = new List<string>();
             ClearNotification = false;
-            IntelChannel = $"({intelChannel})";
+            IntelChannel = intelChannel;
         }
 
         public bool ClearNotification { get; set; }
