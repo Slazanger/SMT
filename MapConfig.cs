@@ -34,6 +34,7 @@ namespace SMT
 
         private string m_DefaultRegion;
 
+        private bool m_LimitESIDataToRegion;
         private bool m_DisableJumpBridgesPathAnimation;
         private bool m_DisableRoutePathAnimation;
         private int m_FleetMaxMembersPerSystem = 5;
@@ -149,6 +150,22 @@ namespace SMT
                 OnPropertyChanged("DisableRoutePathAnimation");
             }
         }
+
+
+        public bool LimitESIDataToRegion
+        {
+            get
+            {
+                return m_LimitESIDataToRegion;
+            }
+            set
+            {
+                m_LimitESIDataToRegion = value;
+                OnPropertyChanged("LimitESIDataToRegion");
+            }
+        }
+
+
 
         [Category("Fleet")]
         [DisplayName("Max Fleet Per System")]
@@ -862,6 +879,8 @@ namespace SMT
             ShowIhubVunerabilities = true;
 
             ShowJoveObservatories = true;
+
+            LimitESIDataToRegion = false;
 
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;

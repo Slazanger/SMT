@@ -1094,6 +1094,15 @@ namespace SMT
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
+
+                if(MapConf.LimitESIDataToRegion && sys.OutOfRegion)
+                {
+                    continue;
+                }
+
+
+
+
                 infoColour = dataColor;
                 long SystemAlliance = 0;
 
