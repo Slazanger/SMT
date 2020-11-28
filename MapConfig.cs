@@ -91,7 +91,7 @@ namespace SMT
 
         private int m_ZkillExpireTimeMinutes;
 
-
+        private int m_MaxChatLines;
         public MapConfig()
         {
             SetDefaults();
@@ -99,6 +99,17 @@ namespace SMT
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        [Category("General")]
+        [DisplayName("Max Chat Lines")]
+        public int MaxChatLines
+        {
+            get => m_MaxChatLines;
+            set
+            {
+                m_MaxChatLines = value;
+                OnPropertyChanged("MaxChatLines");
+            }
+        }
         [Category("General")]
         [DisplayName("Always on top")]
         public bool AlwaysOnTop
@@ -885,6 +896,7 @@ namespace SMT
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 
+            MaxChatLines = 20;
         }
 
         protected void OnPropertyChanged(string name)

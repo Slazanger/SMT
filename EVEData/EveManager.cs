@@ -53,6 +53,7 @@ namespace SMT.EVEData
 
         private bool WatcherThreadShouldTerminate;
 
+        public int MaxChatLines;
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
@@ -188,7 +189,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Intel List
         /// </summary>
-        public BindingList<EVEData.IntelData> IntelDataList { get; set; }
+        public ObservableCollection<IntelData> IntelDataList { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of Jump Bridges
@@ -1330,6 +1331,7 @@ namespace SMT.EVEData
             {
                 esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
 
+
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     LocalCharacters.Add(esiChar);
@@ -1584,9 +1586,9 @@ namespace SMT.EVEData
         /// </summary>
         public void SetupIntelWatcher()
         {
-            IntelFilters = new List<string>();
-            IntelDataList = new BindingList<IntelData>();
+            IntelDataList = new ObservableCollection<IntelData>();
             string intelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
+            IntelDataList.CollectionChanged += IntelDataList_CollectionChanged;
 
             if (File.Exists(intelFileFilter))
             {
@@ -1648,6 +1650,27 @@ namespace SMT.EVEData
 
             // END SUPERHACK
             // -----------------------------------------------------------------
+        }
+
+        private void IntelDataList_CollectionChanged(object sender, global::System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action != global::System.Collections.Specialized.NotifyCollectionChangedAction.Add) return;
+            if (IntelDataList.Count > MaxChatLines)
+            {
+                _cleanIntel = true;
+            }
+        }
+
+        private bool _cleanIntel;
+
+        public void CheckChatLines()
+        {
+            if (IntelDataList.Count <= MaxChatLines) return;
+            for (int i = MaxChatLines - 1; i < IntelDataList.Count; i++)
+            {
+                IntelDataList.RemoveAt(i);
+            }
+            _cleanIntel = false;
         }
 
         public void ShuddownIntelWatcher()
@@ -2240,6 +2263,7 @@ namespace SMT.EVEData
             {
                 Thread.CurrentThread.IsBackground = false;
 
+                TimeSpan ChatCleanupUpdateRate = TimeSpan.FromSeconds(2);
                 TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
                 TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
                 TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
@@ -2247,6 +2271,7 @@ namespace SMT.EVEData
                 DateTime NextCharacterUpdate = DateTime.Now;
                 DateTime NextLowFreqUpdate = DateTime.Now;
                 DateTime NextSOVCampaignUpdate = DateTime.Now;
+                DateTime NextChatCleanup = DateTime.Now;
 
                 // loop forever
                 while (BackgroundThreadShouldTerminate == false)
@@ -2261,6 +2286,16 @@ namespace SMT.EVEData
                             LocalCharacter c = LocalCharacters.ElementAt(i);
                             await c.Update();
                         }
+                    }
+                    if ((NextChatCleanup - DateTime.Now).Ticks < 0)
+                    {
+                        NextChatCleanup = DateTime.Now + ChatCleanupUpdateRate;
+                        if (Application.Current != null)
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                if (_cleanIntel)
+                                    CheckChatLines();
+                            }), DispatcherPriority.Normal, null);
                     }
 
                     // sov update

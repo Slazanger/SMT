@@ -102,6 +102,7 @@ namespace SMT
             }
 
             // Create the main EVE manager
+            EVEManager.MaxChatLines = MapConf.MaxChatLines;
 
             EVEManager = new EVEData.EveManager(SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
@@ -434,6 +435,10 @@ namespace SMT
                 }
             }
 
+            if (e.PropertyName == "MaxChatLines")
+            {
+                EVEManager.MaxChatLines = MapConf.MaxChatLines;
+            }
 
             if (e.PropertyName == "ShowZKillData")
             {
