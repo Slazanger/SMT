@@ -102,9 +102,9 @@ namespace SMT
             }
 
             // Create the main EVE manager
-            EVEManager.MaxChatLines = MapConf.MaxChatLines;
 
             EVEManager = new EVEData.EveManager(SMT_VERSION);
+            EVEManager.MaxChatLines = MapConf.MaxChatLines;
             EVEData.EveManager.Instance = EVEManager;
 
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;

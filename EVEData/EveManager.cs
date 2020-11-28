@@ -1586,6 +1586,7 @@ namespace SMT.EVEData
         /// </summary>
         public void SetupIntelWatcher()
         {
+            IntelFilters = new List<string>();
             IntelDataList = new ObservableCollection<IntelData>();
             string intelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
             IntelDataList.CollectionChanged += IntelDataList_CollectionChanged;
@@ -1666,7 +1667,7 @@ namespace SMT.EVEData
         public void CheckChatLines()
         {
             if (IntelDataList.Count <= MaxChatLines) return;
-            for (int i = MaxChatLines - 1; i < IntelDataList.Count; i++)
+            for (int i = IntelDataList.Count - 1; i >= MaxChatLines; i--)
             {
                 IntelDataList.RemoveAt(i);
             }
