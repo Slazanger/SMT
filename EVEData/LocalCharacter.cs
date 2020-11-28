@@ -555,8 +555,6 @@ namespace SMT.EVEData
                         ESILinked = false;
                     }
 
-
-
                     return;
                 }
 
@@ -927,19 +925,30 @@ namespace SMT.EVEData
                     ESI.NET.EsiResponse<ESI.NET.Models.Images> esri = await esiClient.Character.Portrait((int)ID);
                     if(esri.Data != null)
                     {
-                        WebClient webClient = new WebClient();
-                        webClient.DownloadFile(esri.Data.x128, characterPortrait);
+                        try
+                        {
+                            WebClient webClient = new WebClient();
+                            webClient.DownloadFile(esri.Data.x128, characterPortrait);
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                if (File.Exists(characterPortrait))
                 {
-                    Uri imageLoc = new Uri(characterPortrait);
-                    Portrait = new BitmapImage(imageLoc);
-                }), DispatcherPriority.Normal, null);
-                
-                //get the corp info
-                if(CorporationID != -1)
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        Uri imageLoc = new Uri(characterPortrait);
+                        Portrait = new BitmapImage(imageLoc);
+                    }), DispatcherPriority.Normal, null);
+                }
+
+
+                    //get the corp info
+                    if (CorporationID != -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Corporation.Corporation> esrc = await esiClient.Corporation.Information((int)CorporationID);
                     if(esrc.Data != null)
