@@ -2717,7 +2717,7 @@ namespace SMT.EVEData
             {
                 ServerInfo.Name = "Tranquility";
                 ServerInfo.NumPlayers = esr.Data.Players;
-                ServerInfo.ServerVersion = esr.Data.ServerVersion;
+                ServerInfo.ServerVersion = esr.Data.ServerVersion.ToString();
             }
             else
             {

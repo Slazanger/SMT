@@ -1079,7 +1079,7 @@ namespace SMT
                                 }
                             }
 
-                            Thread.Sleep(2000);
+                            Thread.Sleep(100);
                         }
 
                         foreach (char cc in chars)
@@ -1105,7 +1105,7 @@ namespace SMT
                                 }
                             }
 
-                            Thread.Sleep(2000);
+                            Thread.Sleep(100);
                         }
                     }
                     else
