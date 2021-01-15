@@ -237,6 +237,7 @@
     <Compile Include="External\nAlpha\Shape.cs" />
     <Compile Include="External\nAlpha\VertexCounter.cs" />
     <Compile Include="GitHubRelease.cs" />
+    <Compile Include="InfoItem.cs" />
     <Compile Include="NewVersionWindow.xaml.cs">
       <DependentUpon>NewVersionWindow.xaml</DependentUpon>
     </Compile>

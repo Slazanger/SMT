@@ -370,6 +370,9 @@ namespace SMT
             }
         }
 
+
+        public List<InfoItem> InfoLayer { get; set; }
+
         public void AddSovConflictsToMap()
         {
             if (!ShowSystemTimers)
@@ -2612,6 +2615,19 @@ namespace SMT
             else
             {
                 AllianceNameList.Visibility = Visibility.Hidden;
+            }
+
+            // now add any info items
+            if(InfoLayer != null)
+            {
+                foreach (InfoItem ii in InfoLayer)
+                {
+                    if(ii.Region == Region.Name)
+                    {
+                        Shape s = ii.Draw();
+                        MainCanvas.Children.Add(s);
+                    }
+                }
             }
         }
 

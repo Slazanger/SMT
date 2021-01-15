@@ -36,6 +36,8 @@ namespace SMT
         private int uiRefreshCounter = 0;
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
+        private List<InfoItem> InfoLayer;
+
         /// <summary>
         /// Main Window
         /// </summary>
@@ -144,6 +146,8 @@ namespace SMT
 
             TrigInvasionsList.ItemsSource = EVEManager.TrigInvasions;
 
+            LoadInfoObjects();
+
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
@@ -214,6 +218,8 @@ namespace SMT
             {
                 lc.Location = "";
             }
+
+
         }
 
 
@@ -1347,6 +1353,134 @@ namespace SMT
 
             charactersWindow.ShowDialog();
 
+        }
+
+        private void LoadInfoObjects()
+        {
+
+            InfoLayer = new List<InfoItem>();
+
+            // now add the beacons
+            string infoObjectsFile = AppDomain.CurrentDomain.BaseDirectory + @"\InfoObjects.txt";
+            if (File.Exists(infoObjectsFile))
+            {
+                StreamReader file = new StreamReader(infoObjectsFile);
+
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    line = line.Trim();
+                    if (line.StartsWith("#"))
+                    {
+                            continue;
+                    }
+
+                    string[] parts = line.Split(' ');
+
+                    if(parts.Length == 0 )
+                    {
+                        continue;
+                    }
+
+                    string region = parts[0];
+
+                    EVEData.MapRegion mr = EVEManager.GetRegion(region);
+                    if(mr == null)
+                    {
+                        continue;
+                    }
+
+                    if(parts[1] == "SYSLINK")
+                    {
+                        if(parts.Length != 7)
+                        {
+                            continue;
+                        }
+                        // REGION SYSLINK FROM TO SOLID/DASHED size #FFFFFF 
+                        string from = parts[2];
+                        string to = parts[3];
+                        string lineStyle = parts[4];
+                        string size = parts[5];
+                        string colour = parts[6];
+
+                        if(!mr.MapSystems.ContainsKey(from))
+                        {
+                            continue;
+                        }
+
+                        if (!mr.MapSystems.ContainsKey(to))
+                        {
+                            continue;
+                        }
+
+                        EVEData.MapSystem fromMS = mr.MapSystems[from];
+                        EVEData.MapSystem toMS = mr.MapSystems[to];
+
+                        InfoItem.LineType lt = InfoItem.LineType.Solid;
+                        if(lineStyle == "DASHED")
+                        {
+                            lt = InfoItem.LineType.Dashed;
+                        }
+
+                        Color c = (Color)ColorConverter.ConvertFromString(colour);
+
+                        int lineThickness = int.Parse(size);
+
+
+                        InfoItem ii = new InfoItem();
+                        ii.DrawType = InfoItem.ShapeType.Line;
+                        ii.X1 = (int)fromMS.LayoutX;
+                        ii.Y1 = (int)fromMS.LayoutY;
+                        ii.X2 = (int)toMS.LayoutX;
+                        ii.Y2 = (int)toMS.LayoutY;
+                        ii.Size = lineThickness;
+                        ii.Region = region;
+                        ii.Fill = c;
+                        ii.LineStyle = lt;
+                        InfoLayer.Add(ii);
+                    }
+
+
+                    if (parts[1] == "SYSMARKER")
+                    {
+                        if (parts.Length != 5)
+                        {
+                            continue;
+                        }
+                        // REGION SYSMARKER FROM SIZE #FFFFFF 
+                        string from = parts[2];
+                        string size = parts[3];
+                        string colour = parts[4];
+
+                        if (!mr.MapSystems.ContainsKey(from))
+                        {
+                            continue;
+                        }
+
+                        EVEData.MapSystem fromMS = mr.MapSystems[from];
+
+
+                        Color c = (Color)ColorConverter.ConvertFromString(colour);
+
+                        int radius = int.Parse(size);
+
+
+                        InfoItem ii = new InfoItem();
+                        ii.DrawType = InfoItem.ShapeType.Circle;
+                        ii.X1 = (int)fromMS.LayoutX;
+                        ii.Y1 = (int)fromMS.LayoutY;
+                        ii.Size = radius;
+                        ii.Region = region;
+                        ii.Fill = c;
+                        InfoLayer.Add(ii);
+                    }
+
+
+
+                }
+            }
+
+            RegionUC.InfoLayer = InfoLayer;
         }
     }
 
