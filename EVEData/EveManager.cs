@@ -241,6 +241,8 @@ namespace SMT.EVEData
         public ObservableCollection<Triangles.Invasion> TrigInvasions { get; set; }
         public bool UseESIForCharacterPositions { get; set; }
 
+        public ObservableCollection<Storm> MetaliminalStorms { get; set; }
+
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -1733,6 +1735,28 @@ namespace SMT.EVEData
             request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
         }
 
+
+        public void UpdateMetaliminalStorms()
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                MetaliminalStorms.Clear();
+
+                List<Storm> ls = Storm.GetStorms();
+                foreach(Storm s in ls)
+                {
+                    System sys = GetEveSystem(s.System);
+                    if(sys != null)
+                    {
+                        MetaliminalStorms.Add(s);
+                    }
+                }
+
+            }), DispatcherPriority.Normal, null);
+
+
+        }
+
         /// <summary>
         /// Update the current Trig Invasions
         /// </summary>
@@ -1927,6 +1951,10 @@ namespace SMT.EVEData
 
             InitTheraConnections();
             InitTrigInvasions();
+            InitMetaliminalStorms();
+
+            UpdateMetaliminalStorms();
+
 
             ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
 
@@ -1949,6 +1977,11 @@ namespace SMT.EVEData
         {
             TrigInvasions = new ObservableCollection<Triangles.Invasion>();
             UpdateTrigInvasions();
+        }
+
+        private void InitMetaliminalStorms()
+        {
+            MetaliminalStorms = new ObservableCollection<Storm>();
         }
 
         /// <summary>

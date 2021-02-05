@@ -1661,8 +1661,8 @@ namespace SMT
                 highlightSystemCircle.RenderTransform = rt;
 
                 DoubleCollection dashes = new DoubleCollection();
-                dashes.Add(1.0);
-                dashes.Add(1.0);
+                dashes.Add(0.71);
+                dashes.Add(0.71);
 
                 highlightSystemCircle.StrokeDashArray = dashes;
 

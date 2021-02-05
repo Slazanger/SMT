@@ -363,6 +363,10 @@ namespace SMT.EVEData
                                 // found a jump gate
                                 if (esrs.Data.TypeId == 35841)
                                 {
+
+
+
+
                                     string[] parts = esrs.Data.Name.Split(' ');
                                     string from = parts[0];
                                     string to = parts[2];

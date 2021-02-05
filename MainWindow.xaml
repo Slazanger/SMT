@@ -343,6 +343,28 @@
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
+
+                            <xcadl:LayoutAnchorable Title="Storms" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="StormContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer>
+                                    <StackPanel>
+
+                                        <DataGrid  x:Name="MetaliminalStormList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="AliceBlue">
+
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
+                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
+
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+                            
+
                             <xcadl:LayoutAnchorable Title="SOV Campaigns" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>
                                     <StackPanel>

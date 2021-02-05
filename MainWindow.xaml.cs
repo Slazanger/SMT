@@ -26,7 +26,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_096";
+        public const string SMT_VERSION = "SMT_097";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -140,6 +140,7 @@ namespace SMT
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
+            MetaliminalStormList.ItemsSource = EVEManager.MetaliminalStorms;
 
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
             EVEManager.ActiveSovCampaigns.CollectionChanged += ActiveSovCampaigns_CollectionChanged;
