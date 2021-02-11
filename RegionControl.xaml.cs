@@ -45,6 +45,7 @@ namespace SMT
         private System.Windows.Media.Imaging.BitmapImage edencomLogoImage;
         private System.Windows.Media.Imaging.BitmapImage fightImage;
         private System.Windows.Media.Imaging.BitmapImage joveLogoImage;
+        private System.Windows.Media.Imaging.BitmapImage stormImage;
         private EVEData.EveManager.JumpShip jumpShipType;
         private LocalCharacter m_ActiveCharacter;
 
@@ -136,7 +137,7 @@ namespace SMT
             trigLogoImage = ResourceLoader.LoadBitmapFromResource("Images/TrigTile.png");
             edencomLogoImage = ResourceLoader.LoadBitmapFromResource("Images/edencom.png");
             fightImage = ResourceLoader.LoadBitmapFromResource("Images/fight.png");
-
+            stormImage = ResourceLoader.LoadBitmapFromResource("Images/cloud.png");
             helpIcon.MouseLeftButtonDown += HelpIcon_MouseLeftButtonDown;
         }
 
@@ -396,6 +397,8 @@ namespace SMT
                         Source = fightImage,
                         Stretch = Stretch.Uniform,
                         IsHitTestVisible = false,
+                      
+
                     };
                     SovFightLogo.IsHitTestVisible = false;
 
@@ -456,6 +459,44 @@ namespace SMT
                 }
             }
         }
+
+
+        public void AddStormsToMap()
+        {
+ 
+            foreach (Storm s in EM.MetaliminalStorms)
+            {
+                if (Region.IsSystemOnMap(s.System))
+                {
+                    MapSystem ms = Region.MapSystems[s.System];
+
+
+                    Image stormCloud = new Image
+                    {
+                        Width = 28,
+                        Height = 28,
+                        Name = "Storm",
+                        Source = stormImage,
+                        Stretch = Stretch.Uniform,
+                        IsHitTestVisible = false,
+                    };
+
+                    stormCloud.UseLayoutRounding = true;
+                    stormCloud.SnapsToDevicePixels = true;
+
+                    Canvas.SetLeft(stormCloud, ms.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
+                    Canvas.SetTop(stormCloud, ms.LayoutY - SYSTEM_SHAPE_OFFSET - 11);
+                    Canvas.SetZIndex(stormCloud, SYSTEM_Z_INDEX + 5);
+                    MainCanvas.Children.Add(stormCloud);
+                    DynamicMapElements.Add(stormCloud);
+
+
+
+      
+                }
+            }
+        }
+
 
         public void AddTrigInvasionSytemsToMap()
         {
@@ -645,6 +686,7 @@ namespace SMT
             AddHighlightToSystem(SelectedSystem);
             AddRouteToMap();
             AddTheraSystemsToMap();
+            AddStormsToMap();
             AddSovConflictsToMap();
             AddTrigInvasionSytemsToMap();
         }
@@ -3197,6 +3239,24 @@ namespace SMT
                         tl.Content = $"Thera\t: out {tc.OutSignatureID}";
                         tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
+                    }
+                }
+
+                // storms
+                foreach (EVEData.Storm s in EM.MetaliminalStorms)
+                {
+                    if (selectedSys.Name == s.System)
+                    {
+                        SystemInfoPopupSP.Children.Add(new Separator());
+
+                        Label tl = new Label();
+                        tl.Padding = one;
+                        tl.Margin = one;
+                        tl.Content = $"Storm\t: {s.Type}";
+                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        SystemInfoPopupSP.Children.Add(tl);
+
+
                     }
                 }
 
