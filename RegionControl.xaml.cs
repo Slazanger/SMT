@@ -45,7 +45,12 @@ namespace SMT
         private System.Windows.Media.Imaging.BitmapImage edencomLogoImage;
         private System.Windows.Media.Imaging.BitmapImage fightImage;
         private System.Windows.Media.Imaging.BitmapImage joveLogoImage;
-        private System.Windows.Media.Imaging.BitmapImage stormImage;
+        private System.Windows.Media.Imaging.BitmapImage stormImageBase;
+        private System.Windows.Media.Imaging.BitmapImage stormImageEM;
+        private System.Windows.Media.Imaging.BitmapImage stormImageExp;
+        private System.Windows.Media.Imaging.BitmapImage stormImageKin;
+        private System.Windows.Media.Imaging.BitmapImage stormImageTherm;
+
         private EVEData.EveManager.JumpShip jumpShipType;
         private LocalCharacter m_ActiveCharacter;
 
@@ -137,7 +142,12 @@ namespace SMT
             trigLogoImage = ResourceLoader.LoadBitmapFromResource("Images/TrigTile.png");
             edencomLogoImage = ResourceLoader.LoadBitmapFromResource("Images/edencom.png");
             fightImage = ResourceLoader.LoadBitmapFromResource("Images/fight.png");
-            stormImage = ResourceLoader.LoadBitmapFromResource("Images/cloud.png");
+            stormImageBase = ResourceLoader.LoadBitmapFromResource("Images/cloud_unknown.png");
+            stormImageEM = ResourceLoader.LoadBitmapFromResource("Images/cloud_em.png");
+            stormImageExp = ResourceLoader.LoadBitmapFromResource("Images/cloud_explosive.png");
+            stormImageKin = ResourceLoader.LoadBitmapFromResource("Images/cloud_kinetic.png");
+            stormImageTherm = ResourceLoader.LoadBitmapFromResource("Images/cloud_thermal.png");
+
             helpIcon.MouseLeftButtonDown += HelpIcon_MouseLeftButtonDown;
         }
 
@@ -476,13 +486,41 @@ namespace SMT
                         Width = 28,
                         Height = 28,
                         Name = "Storm",
-                        Source = stormImage,
+                        Source = stormImageBase,
                         Stretch = Stretch.Uniform,
                         IsHitTestVisible = false,
                     };
 
                     stormCloud.UseLayoutRounding = true;
                     stormCloud.SnapsToDevicePixels = true;
+
+                    switch (s.Type)
+                    {
+                        case "Plasma":
+                            {
+                                stormCloud.Source = stormImageTherm;
+                            }
+                            break;
+
+                        case "Gamma":
+                            {
+                                stormCloud.Source = stormImageExp;
+                            }
+                            break;
+
+                        case "Exotic":
+                            {
+                                stormCloud.Source = stormImageKin;
+                            }
+                            break;
+
+                        case "Electrical":
+                            {
+                                stormCloud.Source = stormImageEM;
+                            }
+                            break;
+                    }
+
 
                     Canvas.SetLeft(stormCloud, ms.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
                     Canvas.SetTop(stormCloud, ms.LayoutY - SYSTEM_SHAPE_OFFSET - 11);

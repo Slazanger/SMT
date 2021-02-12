@@ -464,6 +464,13 @@
   <ItemGroup>
     <Resource Include="Images\cloud.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\cloud_em.png" />
+    <Resource Include="Images\cloud_explosive.png" />
+    <Resource Include="Images\cloud_kinetic.png" />
+    <Resource Include="Images\cloud_thermal.png" />
+    <Resource Include="Images\cloud_unknown.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
