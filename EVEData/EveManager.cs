@@ -2203,7 +2203,7 @@ namespace SMT.EVEData
 
                                     IntelDataList.Insert(0, id);
 
-                                    if (IntelAddedEvent != null)
+                                    if (IntelAddedEvent != null && !id.ClearNotification)
                                     {
                                         IntelAddedEvent(id.Systems);
                                     }
