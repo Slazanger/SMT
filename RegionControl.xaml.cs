@@ -620,6 +620,19 @@ namespace SMT
             ActiveCharacter = null;
 
             RegionSelectCB.ItemsSource = EM.Regions;
+
+
+            ShowJumpBridges = MapConf.ToolBox_ShowJumpBridges;
+            ShowNPCKills = MapConf.ToolBox_ShowNPCKills;
+            ShowPodKills = MapConf.ToolBox_ShowPodKills;
+            ShowShipJumps = MapConf.ToolBox_ShowShipJumps;
+            ShowShipKills = MapConf.ToolBox_ShowShipKills;
+            ShowSovOwner = MapConf.ToolBox_ShowSovOwner;
+            ShowStandings = MapConf.ToolBox_ShowStandings;
+            ShowSystemADM = MapConf.ToolBox_ShowSystemADM;
+            ShowSystemSecurity = MapConf.ToolBox_ShowSystemSecurity;
+            ShowSystemTimers = MapConf.ToolBox_ShowSystemTimers;
+
             SelectRegion(MapConf.DefaultRegion);
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();

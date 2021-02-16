@@ -315,8 +315,25 @@ namespace SMT
                 // Save off any explicit items
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
+
+
+
+
                 // Save the Map Colours
                 string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
+
+
+                // save off the toolbar setup
+                MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges ;
+                MapConf.ToolBox_ShowNPCKills = RegionUC.ShowNPCKills;
+                MapConf.ToolBox_ShowPodKills = RegionUC.ShowPodKills;
+                MapConf.ToolBox_ShowShipJumps = RegionUC.ShowShipJumps;
+                MapConf.ToolBox_ShowShipKills = RegionUC.ShowShipKills;
+                MapConf.ToolBox_ShowSovOwner = RegionUC.ShowSovOwner;
+                MapConf.ToolBox_ShowStandings = RegionUC.ShowStandings;
+                MapConf.ToolBox_ShowSystemADM = RegionUC.ShowSystemADM;
+                MapConf.ToolBox_ShowSystemSecurity = RegionUC.ShowSystemSecurity;
+                MapConf.ToolBox_ShowSystemTimers = RegionUC.ShowSystemTimers;
 
                 // now serialise the class to disk
                 XmlSerializer xms = new XmlSerializer(typeof(MapConfig));

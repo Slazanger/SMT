@@ -131,6 +131,38 @@ namespace SMT
             }
         }
 
+        [Browsable(false)]
+        public bool ToolBox_ShowJumpBridges { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowNPCKills { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowPodKills { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowShipJumps { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowShipKills { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowSovOwner { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowStandings { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowSystemADM { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowSystemSecurity { get; set; }
+
+        [Browsable(false)]
+        public bool ToolBox_ShowSystemTimers { get; set; }
+
+
+
         public bool DisableJumpBridgesPathAnimation
         {
             get => m_DisableJumpBridgesPathAnimation;
