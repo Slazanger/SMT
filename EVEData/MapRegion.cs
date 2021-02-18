@@ -87,15 +87,11 @@ namespace SMT.EVEData
         /// </summary>
         public double RegionX { get; set; }
 
+
         /// <summary>
         /// Gets or sets the Regions Y coord on the universe map
         /// </summary>
         public double RegionY { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Regions Z coord on the universe map
-        /// </summary>
-        public double RegionZ { get; set; }
 
         /// <summary>
         /// Gets or sets the Regions X coord on the universe map

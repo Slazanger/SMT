@@ -78,6 +78,16 @@ namespace SMT.EVEData
         public double ActualZ { get; set; }
 
         /// <summary>
+        /// the 2d X coordinate used to render on the universe view
+        /// </summary>
+        public double UniverseX { get; set; }
+
+        /// <summary>
+        /// the 2d Y coordinate used to render on the universe view
+        /// </summary>
+        public double UniverseY { get; set; }
+
+        /// <summary>
         /// Gets or sets EVE's internal Constellation ID
         /// </summary>
         public string ConstellationID { get; set; }

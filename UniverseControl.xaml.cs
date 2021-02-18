@@ -112,6 +112,7 @@ namespace SMT
         }
 
         private double m_ESIOverlayScale = 1.0f;
+        private double universeScale = 5.22295244275827E-15; // note this is calculated based off 5000x5000 at the data compile time
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
@@ -281,15 +282,6 @@ namespace SMT
 
         private List<KeyValuePair<string, double>> activeJumpSpheres;
 
-        private double universeWidth;
-        private double universeDepth;
-        private double universeXMin;
-        private double universeXMax;
-        private double universeScale;
-
-        private double universeZMin;
-        private double universeZMax;
-
         private EVEData.EveManager EM;
 
         private VisualHost VHSystems;
@@ -316,12 +308,6 @@ namespace SMT
 
             universeSysLinksCache = new List<GateHelper>();
             activeJumpSpheres = new List<KeyValuePair<string, double>>();
-
-            universeXMin = 0.0;
-            universeXMax = 336522971264518000.0;
-
-            universeZMin = -484452845697854000;
-            universeZMax = 472860102256057000.0;
 
             VHSystems = new VisualHost();
             VHSystems.HitTestEnabled = true;
@@ -384,31 +370,7 @@ namespace SMT
                         universeSysLinksCache.Add(g);
                     }
                 }
-
-                if (sys.ActualX < universeXMin)
-                {
-                    universeXMin = sys.ActualX;
-                }
-
-                if (sys.ActualX > universeXMax)
-                {
-                    universeXMax = sys.ActualX;
-                }
-
-                if (sys.ActualZ < universeZMin)
-                {
-                    universeZMin = sys.ActualZ;
-                }
-
-                if (sys.ActualZ > universeZMax)
-                {
-                    universeZMax = sys.ActualZ;
-                }
             }
-
-            universeWidth = universeXMax - universeXMin;
-            universeDepth = universeZMax - universeZMin;
-
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
@@ -511,10 +473,10 @@ namespace SMT
             {
                 EVEData.System ssys = EM.GetEveSystem(kvp.Key);
 
-                double Radius = 9460730472580800.0 * kvp.Value * universeScale;
+                double Radius = 9460730472580800.0 * kvp.Value * universeScale;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ;
 
-                double X = (ssys.ActualX - universeXMin) * universeScale; ;
-                double Z = (universeDepth - (ssys.ActualZ - universeZMin)) * universeScale;
+                double X = ssys.UniverseX;
+                double Z = ssys.UniverseY;
 
                 // Create an instance of a DrawingVisual.
 
@@ -546,9 +508,8 @@ namespace SMT
 
                 if (inRange)
                 {
-                    double irX = (es.ActualX - universeXMin) * universeScale; ;
-                    double irZ = (universeDepth - (es.ActualZ - universeZMin)) * universeScale;
-
+                    double irX = es.UniverseX; 
+                    double irZ = es.UniverseY;
                     System.Windows.Media.DrawingVisual rangeSquareDV = new System.Windows.Media.DrawingVisual();
 
                     // Retrieve the DrawingContext from the DrawingVisual.
@@ -747,9 +708,7 @@ namespace SMT
             double SystemTextSize = 5;
             double CharacterTextSize = 6;
 
-            double XScale = (UniverseMainCanvas.Width) / universeWidth;
-            double ZScale = (UniverseMainCanvas.Height) / universeDepth;
-            universeScale = Math.Min(XScale, ZScale);
+
 
             // recreate the brushes on a full draw
             if (FullRedraw)
@@ -778,7 +737,7 @@ namespace SMT
                 RegionTextColourBrush.Freeze();
                 GateColourBrush.Freeze();
                 JumpBridgeColourBrush.Freeze();
-                DataColourBrush.Freeze();
+                DataColourBrush.Freeze();                                                                                                                                                                                                       
                 BackgroundColourBrush.Freeze();
                 RegionTextZoomedOutColourBrush.Freeze();
                 RegionShapeColourBrush.Freeze();
@@ -805,7 +764,7 @@ namespace SMT
                 VHRegionShapes.ClearAllChildren();
 
                 ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
-
+                                                                                                                                    
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
                 Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
@@ -815,11 +774,11 @@ namespace SMT
 
                 foreach (GateHelper gh in universeSysLinksCache)
                 {
-                    double X1 = (gh.from.ActualX - universeXMin) * universeScale;
-                    double Y1 = (universeDepth - (gh.from.ActualZ - universeZMin)) * universeScale;
+                    double X1 = gh.from.UniverseX;
+                    double Y1 = gh.from.UniverseY;
 
-                    double X2 = (gh.to.ActualX - universeXMin) * universeScale;
-                    double Y2 = (universeDepth - (gh.to.ActualZ - universeZMin)) * universeScale;
+                    double X2 = gh.to.UniverseX;
+                    double Y2 = gh.to.UniverseY;
                     Pen p = GatePen;
 
                     if (gh.from.ConstellationID != gh.to.ConstellationID)
@@ -852,12 +811,12 @@ namespace SMT
                         EVEData.System from = EM.GetEveSystem(jb.From);
                         EVEData.System to = EM.GetEveSystem(jb.To);
 
-                        double X1 = (from.ActualX - universeXMin) * universeScale; ;
-                        double Y1 = (universeDepth - (from.ActualZ - universeZMin)) * universeScale;
+                        double X1 = from.UniverseX;
+                        double Y1 = from.UniverseY;
 
-                        double X2 = (to.ActualX - universeXMin) * universeScale;
-                        double Y2 = (universeDepth - (to.ActualZ - universeZMin)) * universeScale;
-
+                        double X2 = to.UniverseX;
+                        double Y2 = to.UniverseY; 
+                        
                         // Create a rectangle and draw it in the DrawingContext.
                         drawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
                     }
@@ -875,11 +834,9 @@ namespace SMT
                     System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
                     DrawingContext systemTextDrawingContext = SystemTextVisual.RenderOpen();
 
-                    double X = (sys.ActualX - universeXMin) * universeScale;
-
-                    // need to invert Z
-                    double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
-
+                    double X = sys.UniverseX;
+                    double Z = sys.UniverseY;
+                        
                     System.Windows.Media.DrawingVisual systemShapeVisual = new System.Windows.Media.DrawingVisual();
 
                     // Retrieve the DrawingContext in order to create new drawing content.
@@ -917,10 +874,10 @@ namespace SMT
 
                     foreach (Point p in mr.RegionOutline)
                     {
-                        double X = (p.X - universeXMin) * universeScale;
+                        double X = p.X;
 
                         // need to invert Z
-                        double Z = (universeDepth - (p.Y - universeZMin)) * universeScale;
+                        double Z = p.Y;
 
                         scaledRegionPoints.Add(new Point(X, Z));
                     }
@@ -960,10 +917,10 @@ namespace SMT
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = dataDV.RenderOpen();
 
-                    double X = (sys.ActualX - universeXMin) * universeScale;
+                    double X = sys.UniverseX;
 
                     // need to invert Z
-                    double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+                    double Z = sys.UniverseY;
 
                     double DataScale = 0;
 
@@ -1058,9 +1015,8 @@ namespace SMT
                         {
                             continue;
                         }
-                        double X = (sys.ActualX - universeXMin) * universeScale;
-                        // need to invert Z
-                        double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+                        double X = sys.UniverseX;                        // need to invert Z
+                        double Z = sys.UniverseY;
 
                         double charTextOffset = 0;
 
@@ -1127,9 +1083,9 @@ namespace SMT
                             // probably a WH
                             continue;
                         }
-                        double X = (sys.ActualX - universeXMin) * universeScale;
+                        double X = sys.UniverseX;
                         // need to invert Z
-                        double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+                        double Z = sys.UniverseY;
 
                         // draw a circle around the system
                         dc.DrawEllipse(ZKBBrush, zkbPen, new Point(X, Z), zkbVal, zkbVal);
@@ -1164,11 +1120,11 @@ namespace SMT
 
                             if (sysA != null && sysB != null)
                             {
-                                double X1 = (sysA.ActualX - universeXMin) * universeScale; ;
-                                double Y1 = (universeDepth - (sysA.ActualZ - universeZMin)) * universeScale;
+                                double X1 = sysA.UniverseX;
+                                double Y1 = sysA.UniverseY;
 
-                                double X2 = (sysB.ActualX - universeXMin) * universeScale;
-                                double Y2 = (universeDepth - (sysB.ActualZ - universeZMin)) * universeScale;
+                                double X2 = sysB.UniverseX;
+                                double Y2 = sysB.UniverseY;
 
                                 System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
 
@@ -1191,8 +1147,8 @@ namespace SMT
 
                             if (sysA != null)
                             {
-                                double X1 = (sysA.ActualX - universeXMin) * universeScale; ;
-                                double Y1 = (universeDepth - (sysA.ActualZ - universeZMin)) * universeScale;
+                                double X1 = sysA.UniverseX;
+                                double Y1 = sysA.UniverseY;
 
                                 System.Windows.Media.DrawingVisual jumpRouteVisual = new System.Windows.Media.DrawingVisual();
 
@@ -1276,8 +1232,8 @@ namespace SMT
 
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
-                double X = (mr.RegionX - universeXMin) * universeScale; ;
-                double Z = (universeDepth - (mr.RegionZ - universeZMin)) * universeScale;
+                double X = mr.RegionX;
+                double Z = mr.RegionY;
 
                 System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext drawingContext = SystemTextVisual.RenderOpen();
@@ -1301,8 +1257,8 @@ namespace SMT
             if (sd != null)
             {
                 // actual
-                double X1 = (sd.ActualX - universeXMin) * universeScale;
-                double Y1 = (universeDepth - (sd.ActualZ - universeZMin)) * universeScale;
+                double X1 = sd.UniverseX;
+                double Y1 = sd.UniverseY;
 
                 MainZoomControl.Show(X1, Y1, 3.0);
             }
@@ -1383,8 +1339,8 @@ namespace SMT
             if (s != null)
             {
                 // actual
-                double X1 = (s.ActualX - universeXMin) * universeScale;
-                double Y1 = (universeDepth - (s.ActualZ - universeZMin)) * universeScale;
+                double X1 = s.UniverseX; 
+                double Y1 = s.UniverseY;
 
                 MainZoomControl.Show(X1, Y1, MainZoomControl.Zoom);
             }

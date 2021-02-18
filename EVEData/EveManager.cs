@@ -556,8 +556,7 @@ namespace SMT.EVEData
                     if (r != null)
                     {
                         r.RegionX = x;
-                        r.RegionY = y;
-                        r.RegionZ = z;
+                        r.RegionY = z;
                     }
                 }
             }
@@ -810,59 +809,7 @@ namespace SMT.EVEData
                 }
             }
 
-            // now create the region outlines
-            foreach (MapRegion mr in Regions)
-            {
-                List<nAlpha.Point> regionShapePL = new List<nAlpha.Point>();
-                foreach (System s in Systems)
-                {
-                    if (s.Region == mr.Name)
-                    {
-                        nAlpha.Point p = new nAlpha.Point(s.ActualX, s.ActualZ);
-                        regionShapePL.Add(p);
-                    }
-                }
-
-                nAlpha.AlphaShapeCalculator shapeCalc = new nAlpha.AlphaShapeCalculator();
-                shapeCalc.Alpha = 1 / (20 * 9460730472580800.0);
-                shapeCalc.CloseShape = true;
-
-                nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
-
-                mr.RegionOutline = new List<Point>();
-
-                List<Tuple<int, int>> processed = new List<Tuple<int, int>>();
-
-                int CurrentPoint = 0;
-                int count = 0;
-                int edgeCount = ns.Edges.Length;
-                while (count < edgeCount)
-                {
-                    foreach (Tuple<int, int> i in ns.Edges)
-                    {
-                        if (processed.Contains(i))
-                            continue;
-
-                        if (i.Item1 == CurrentPoint)
-                        {
-                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
-                            CurrentPoint = i.Item2;
-                            processed.Add(i);
-                            break;
-                        }
-
-                        if (i.Item2 == CurrentPoint)
-                        {
-                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
-                            CurrentPoint = i.Item1;
-                            processed.Add(i);
-                            break;
-                        }
-                    }
-
-                    count++;
-                }
-            }
+ 
 
             foreach (System s in Systems)
             {
@@ -895,13 +842,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
-
-
-
- 
-
-
 
 
 
@@ -1084,6 +1024,120 @@ namespace SMT.EVEData
                     }
                 }
             }
+
+
+            // now generate the 2d universe view coordinates 
+
+            double RenderSize = 5000;
+            double universeXMin = 0.0;
+            double universeXMax = 336522971264518000.0;
+
+            double universeZMin = -484452845697854000;
+            double universeZMax = 472860102256057000.0;
+
+            foreach (EVEData.System sys in Systems)
+            {
+ 
+
+                if (sys.ActualX < universeXMin)
+                {
+                    universeXMin = sys.ActualX;
+                }
+
+                if (sys.ActualX > universeXMax)
+                {
+                    universeXMax = sys.ActualX;
+                }
+
+                if (sys.ActualZ < universeZMin)
+                {
+                    universeZMin = sys.ActualZ;
+                }
+
+                if (sys.ActualZ > universeZMax)
+                {
+                    universeZMax = sys.ActualZ;
+                }
+            }
+            double universeWidth = universeXMax - universeXMin;
+            double universeDepth = universeZMax - universeZMin;
+            double XScale = (RenderSize) / universeWidth;
+            double ZScale = (RenderSize) / universeDepth;
+            double universeScale = Math.Min(XScale, ZScale);
+
+
+           
+            foreach (EVEData.System sys in Systems)
+            {
+                double X = (sys.ActualX - universeXMin) * universeScale;
+
+                // need to invert Z
+                double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+
+                sys.UniverseX = X;
+                sys.UniverseY = Z;
+            }
+
+
+            // now create the region outlines and recalc the centre
+            foreach (MapRegion mr in Regions)
+            {
+
+                mr.RegionX = (mr.RegionX - universeXMin) * universeScale;
+                mr.RegionY = (universeDepth - (mr.RegionY - universeZMin)) * universeScale;
+
+                List<nAlpha.Point> regionShapePL = new List<nAlpha.Point>();
+                foreach (System s in Systems)
+                {
+                    if (s.Region == mr.Name)
+                    {
+                        nAlpha.Point p = new nAlpha.Point(s.UniverseX, s.UniverseY);
+                        regionShapePL.Add(p);
+                    }
+                }
+
+                nAlpha.AlphaShapeCalculator shapeCalc = new nAlpha.AlphaShapeCalculator();
+                shapeCalc.Alpha = 1 / (20 * 9460730472580800.0 * 5.22295244275827E-15);
+                shapeCalc.CloseShape = true;
+
+                nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
+
+                mr.RegionOutline = new List<Point>();
+
+                List<Tuple<int, int>> processed = new List<Tuple<int, int>>();
+
+                int CurrentPoint = 0;
+                int count = 0;
+                int edgeCount = ns.Edges.Length;
+                while (count < edgeCount)
+                {
+                    foreach (Tuple<int, int> i in ns.Edges)
+                    {
+                        if (processed.Contains(i))
+                            continue;
+
+                        if (i.Item1 == CurrentPoint)
+                        {
+                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
+                            CurrentPoint = i.Item2;
+                            processed.Add(i);
+                            break;
+                        }
+
+                        if (i.Item2 == CurrentPoint)
+                        {
+                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
+                            CurrentPoint = i.Item1;
+                            processed.Add(i);
+                            break;
+                        }
+                    }
+
+                    count++;
+                }
+            }
+
+
 
             // now serialise the classes to disk
             Utils.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
