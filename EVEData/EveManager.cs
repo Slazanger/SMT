@@ -1137,9 +1137,25 @@ namespace SMT.EVEData
                 }
             }
 
+            // debug write out universe to CSV
+
+            using (var w = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + @"\universeDump.csv"))
+            {
+                string Header = "Region,Name, UniverseX, UniverseY";
+                w.WriteLine(Header);
+
+                foreach(System s in Systems)
+                {
+                    string CSVLine = $"{s.Region},{s.Name},{s.UniverseX},{s.UniverseY}";
+                    w.WriteLine(CSVLine);
+                }
+            }
+
+
 
 
             // now serialise the classes to disk
+
             Utils.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
             Utils.SerializeToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
             Utils.SerializeToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
