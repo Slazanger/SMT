@@ -61,13 +61,7 @@ namespace SMT.EVEData
             LocalCharacters = new ObservableCollection<LocalCharacter>();
             VersionStr = version;
 
-            // ensure we have the cache folder setup
-            DataCacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SMTCache";
-            if (!Directory.Exists(DataCacheFolder))
-            {
-                Directory.CreateDirectory(DataCacheFolder);
-            }
-
+  
             string SaveDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT";
             if (!Directory.Exists(SaveDataRoot))
             {
@@ -88,23 +82,6 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(characterSaveFolder);
             }
 
-            string webCacheFoilder = DataCacheFolder + "\\WebCache";
-            if (!Directory.Exists(webCacheFoilder))
-            {
-                Directory.CreateDirectory(webCacheFoilder);
-            }
-
-            string portraitCacheFoilder = DataCacheFolder + "\\Portraits";
-            if (!Directory.Exists(portraitCacheFoilder))
-            {
-                Directory.CreateDirectory(portraitCacheFoilder);
-            }
-
-            string logosFoilder = DataCacheFolder + "\\Logos";
-            if (!Directory.Exists(logosFoilder))
-            {
-                Directory.CreateDirectory(logosFoilder);
-            }
 
             CharacterIDToName = new SerializableDictionary<long, string>();
             AllianceIDToName = new SerializableDictionary<long, string>();
@@ -177,10 +154,6 @@ namespace SMT.EVEData
 
         public List<Coalition> Coalitions { get; set; }
 
-        /// <summary>
-        /// Gets or sets the folder to cache dotland svg's etc to
-        /// </summary>
-        public string DataCacheFolder { get; set; }
 
         public ESI.NET.EsiClient ESIClient { get; set; }
         public List<string> ESIScopes { get; set; }
@@ -409,23 +382,19 @@ namespace SMT.EVEData
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
-                string localSVG = DataCacheFolder + @"\" + rd.DotLanRef + ".svg";
+                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
                 string remoteSVG = @"http://evemaps.dotlan.net/svg/" + rd.DotLanRef + ".svg";
 
-                bool needsDownload = true;
 
-                if (File.Exists(localSVG))
+
+                if (!File.Exists(localSVG))
                 {
-                    needsDownload = false;
+                    // error
+                    throw new NullReferenceException();
+
                 }
 
-                if (needsDownload)
-                {
-                    webClient.DownloadFile(remoteSVG, localSVG);
 
-                    // throttle so we dont hammer the server
-                    Thread.Sleep(100);
-                }
 
                 // parse the svg as xml
                 XmlDocument xmldoc = new XmlDocument
