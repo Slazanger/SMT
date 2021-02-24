@@ -87,6 +87,9 @@ namespace SMT.EVEData
         /// </summary>
         public double UniverseY { get; set; }
 
+        [XmlIgnoreAttribute]
+        public bool  CustomUniverseLayout { get; set; }
+
         /// <summary>
         /// Gets or sets EVE's internal Constellation ID
         /// </summary>

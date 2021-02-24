@@ -82,7 +82,7 @@
         </StackPanel>
 
         <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2" ContentDragFinished="MainZoomControl_ContentDragFinished">
-            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" />
+            <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" MouseDown="UniverseMainCanvas_MouseDown" />
         </zoombox1:ZoomControl>
 
         <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="145" Height="70" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1">

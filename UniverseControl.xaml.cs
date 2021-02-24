@@ -553,7 +553,18 @@ namespace SMT
 
         private void VHSystems_MouseClicked(object sender, RoutedEventArgs e)
         {
+
             EVEData.System sys = (EVEData.System)e.OriginalSource;
+
+
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                currentDebugSystem = sys;
+            }
+            else
+            {
+                currentDebugSystem = null;
+            }
 
             ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
 
@@ -759,6 +770,7 @@ namespace SMT
 
             if (FullRedraw)
             {
+                VHSystems.ClearAllChildren();
                 VHLinks.ClearAllChildren();
                 VHNames.ClearAllChildren();
                 VHRegionShapes.ClearAllChildren();
@@ -1384,7 +1396,24 @@ namespace SMT
                 ActiveCharacter.ClearAllWaypoints();            }
         }
 
+        EVEData.System currentDebugSystem;
 
-        
+        private void UniverseMainCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.ChangedButton == MouseButton.Left)
+            {
+                Point p = Mouse.GetPosition(UniverseMainCanvas);
+
+                if(currentDebugSystem != null)
+                {
+                    currentDebugSystem.UniverseX = p.X;
+                    currentDebugSystem.UniverseY = p.Y;
+                    currentDebugSystem.CustomUniverseLayout = true;
+                    currentDebugSystem = null;
+                    ReDrawMap(true, true, false);
+                }
+                
+            }
+        }
     }
 }

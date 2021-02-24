@@ -111,7 +111,7 @@ namespace SMT
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -148,6 +148,43 @@ namespace SMT
             TrigInvasionsList.ItemsSource = EVEManager.TrigInvasions;
 
             LoadInfoObjects();
+
+            // load any custom universe view layout
+            // Save any custom map Layout
+            string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+            if (File.Exists(customLayoutFile))
+            {
+                try
+                {
+                    using (TextReader tr = new StreamReader(customLayoutFile))
+                    {
+
+                        string line = tr.ReadLine();
+
+                        while (line != null)
+                        {
+                            string[] bits = line.Split(',');
+                            string region = bits[0];
+                            string system = bits[1];
+                            double x = double.Parse(bits[2]);
+                            double y = double.Parse(bits[3]);
+
+                            EVEData.System sys = EVEManager.GetEveSystem(system);
+                            if (sys != null)
+                            {
+                                sys.UniverseX = x;
+                                sys.UniverseY = y;
+                                sys.CustomUniverseLayout = true;
+                            }
+
+                            line = tr.ReadLine();
+                        }
+                    }
+                }
+                catch { }
+            }
+
+
 
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
@@ -189,6 +226,8 @@ namespace SMT
             {
                 ANOMManager = new EVEData.AnomManager();
             }
+
+
 
             RegionUC.ANOMManager = ANOMManager;
 
@@ -340,6 +379,19 @@ namespace SMT
                 using (TextWriter tw = new StreamWriter(mapConfigFileName))
                 {
                     xms.Serialize(tw, MapConf);
+                }
+
+                // Save any custom map Layout
+                string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+                using (TextWriter tw = new StreamWriter(customLayoutFile))
+                {
+                    foreach(EVEData.System s in EVEManager.Systems)
+                    {
+                        if(s.CustomUniverseLayout)
+                        {
+                            tw.WriteLine($"{s.Region},{s.Name},{s.UniverseX},{s.UniverseY}");
+                        }
+                    }
                 }
             }
             catch
