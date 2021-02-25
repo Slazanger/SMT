@@ -577,6 +577,12 @@ namespace SMT.EVEData
             }
             catch (Exception ex)
             {
+                // expired token
+                if(ex.HResult == -2147024809)
+                {
+                    ESIRefreshToken = "";
+                    ESILinked = false;
+                }
             }
         }
 
