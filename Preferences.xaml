@@ -30,8 +30,12 @@
                         <StackPanel Grid.Column="1">
                             <GroupBox Header="Performance" Margin="4" Height="355">
                                 <StackPanel>
-                                    <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3">Disable jump bridges path animation</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=DisableRoutePathAnimation}" Margin="0,3">Disable route path animation</CheckBox>
+                                    <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3" Content="Disable jump bridges path animation" ToolTip="Turn off jump bridge animations."/>
+                                    <CheckBox IsChecked="{Binding Path=DisableRoutePathAnimation}" Margin="0,3" Content="Disable route path animation" ToolTip="Turn off route path animations."/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=MaxChatLines}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Minimum="20" MaxLength="9999" Background="Transparent"  Foreground="White" ToolTip="Truncates chat after a set number of lines, helps prevent lag over longer periods."/>
+                                        <Label Content="Max Intel Lines" ToolTip="Truncates chat after a set number of lines, helps prevent lag over longer periods."/>
+                                    </StackPanel>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
