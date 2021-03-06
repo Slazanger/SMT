@@ -197,6 +197,23 @@
 
 
                 </TabItem>
+                <TabItem Header="Debug">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <GroupBox Header="General" Margin="4" Height="355">
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding Path=Debug_EnableMapEdit}" Margin="0,2">Enable Universe Map Edits</CheckBox>
+    
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
             </TabControl>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,2">
                 <Button Content="Default" Margin="3,0" Width="55" Click="Prefs_Default_Click" />

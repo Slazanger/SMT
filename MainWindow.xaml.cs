@@ -26,7 +26,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_097";
+        public const string SMT_VERSION = "SMT_098";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -52,7 +52,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (HotDrop : " + SMT_VERSION + ")";
+            Title = "SMT (Getting Closer.. : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
@@ -235,8 +235,7 @@ namespace SMT
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             RouteSystemDropDownAC.ItemsSource = globalSystemList;
 
-            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
-            ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
+
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
             Closed += MainWindow_Closed;
@@ -590,11 +589,7 @@ namespace SMT
 
         #region Preferences & Options
 
-        private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
-        {
-            RegionUC.ReDrawMap(true);
-            UniverseUC.ReDrawMap(true, true, true);
-        }
+
 
         private void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -636,13 +631,6 @@ namespace SMT
             UniverseUC.ReDrawMap(true, true, false);
         }
 
-        private void ResetColourData_Click(object sender, RoutedEventArgs e)
-        {
-            MapConf.SetDefaultColours();
-            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
-            RegionUC.ReDrawMap(true);
-            UniverseUC.ReDrawMap(true, true, true);
-        }
 
         #endregion Preferences & Options
 

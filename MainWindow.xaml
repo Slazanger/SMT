@@ -143,22 +143,6 @@
                                 </Grid>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Map Colours" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="MapColoursContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer Background="{DynamicResource ButtonBackground}">
-                                    <StackPanel>
-                                        <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False">
-                                            <xctk:PropertyGrid.CategoryGroupHeaderTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock Text="{Binding}" Foreground="Black" />
-                                                </DataTemplate>
-                                            </xctk:PropertyGrid.CategoryGroupHeaderTemplate>
-                                        </xctk:PropertyGrid>
-                                        <Separator />
-                                        <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </xcadl:LayoutAnchorable>
-
                             <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                     <StackPanel>
@@ -420,18 +404,7 @@
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer Background="{DynamicResource ButtonBackground}">
-                                    <DataGrid  x:Name="FleetMembersList"  Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
-                                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" />
-                                            <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
-                                            <DataGridTextColumn Header="ShipType" Binding="{Binding ShipType}" CanUserReorder="False" Width="*" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </ScrollViewer>
-                            </xcadl:LayoutAnchorable>
+ 
                         </xcadl:LayoutAnchorGroup>
                     </xcadl:LayoutAnchorSide>
                 </xcadl:LayoutRoot.RightSide>
@@ -479,6 +452,18 @@
                                     <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource intelDataDataTemplate}" />
                                     <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
                                 </Grid>
+                            </xcadl:LayoutAnchorable>
+                            <xcadl:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer Background="{DynamicResource ButtonBackground}">
+                                    <DataGrid  x:Name="FleetMembersList"  Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="ShipType" Binding="{Binding ShipType}" CanUserReorder="False" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </ScrollViewer>
                             </xcadl:LayoutAnchorable>
 
                         </xcadl:LayoutAnchorablePane>

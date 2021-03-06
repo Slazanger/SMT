@@ -1400,6 +1400,11 @@ namespace SMT
 
         private void UniverseMainCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if(MapConf.Debug_EnableMapEdit == false)
+            {
+                return;
+            }
+
             if(e.ChangedButton == MouseButton.Left)
             {
                 Point p = Mouse.GetPosition(UniverseMainCanvas);
