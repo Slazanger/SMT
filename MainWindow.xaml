@@ -102,7 +102,7 @@
                     <xcadl:LayoutAnchorSide>
                         <xcadl:LayoutAnchorGroup>
 
-                            <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" x:Name="avlpAnoms">
                                 <Grid x:Name="MainAnomGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="60" />
@@ -467,6 +467,9 @@
                                     </ScrollViewer>
                                 </Grid>
                             </xcadl:LayoutAnchorable>
+                        </xcadl:LayoutAnchorablePane>
+
+                        <xcadl:LayoutAnchorablePane>
                             <xcadl:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -477,6 +480,7 @@
                                     <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
                                 </Grid>
                             </xcadl:LayoutAnchorable>
+
                         </xcadl:LayoutAnchorablePane>
                     </xcadl:LayoutAnchorablePaneGroup>
 
