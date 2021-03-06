@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SMT"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Preferences" Height="455" Width="600" WindowStartupLocation="CenterOwner">
+        Title="Preferences" Height="455" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid Background="{DynamicResource ButtonBorder}">
         <DockPanel>
             <TabControl x:Name="tabControl" DockPanel.Dock="Top">
@@ -176,6 +176,26 @@
                             </GroupBox>
                         </StackPanel>
                     </Grid>
+                </TabItem>
+                <TabItem Header="Colours">
+                    <Grid Height="362">
+                        <ScrollViewer>
+                            <StackPanel>
+                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" >
+                                    <xctk:PropertyGrid.CategoryGroupHeaderTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Foreground="Black" />
+                                        </DataTemplate>
+                                    </xctk:PropertyGrid.CategoryGroupHeaderTemplate>
+
+                                </xctk:PropertyGrid>
+                                <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
+                            </StackPanel>
+
+                        </ScrollViewer>
+                    </Grid>
+
+
                 </TabItem>
             </TabControl>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,2">

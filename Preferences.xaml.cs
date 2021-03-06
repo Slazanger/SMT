@@ -41,5 +41,28 @@ namespace SMT
             EveManager.Instance.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
 
         }
+
+        private void ResetColourData_Click(object sender, RoutedEventArgs e)
+        {
+            MapConf.SetDefaultColours();
+            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
+            MainWindow.AppWindow.RegionUC.ReDrawMap(true);
+            MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
+            ColoursPropertyGrid.CollapseAllProperties();
+            ColoursPropertyGrid.Update();
+            ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
+
+        }
+
+        private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
+        {
+            MainWindow.AppWindow.RegionUC.ReDrawMap(true);
+            MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
+        }
     }
 }
