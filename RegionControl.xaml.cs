@@ -473,9 +473,10 @@ namespace SMT
 
         public void AddStormsToMap()
         {
- 
+
             foreach (Storm s in EM.MetaliminalStorms)
             {
+
                 if (Region.IsSystemOnMap(s.System))
                 {
                     MapSystem ms = Region.MapSystems[s.System];
@@ -529,8 +530,61 @@ namespace SMT
                     DynamicMapElements.Add(stormCloud);
 
 
+                    // now the strong area..
+                    foreach (string strongSys in s.StrongArea)
+                    {
+                        if (Region.IsSystemOnMap(strongSys))
+                        {
+                            MapSystem mss = Region.MapSystems[strongSys];
 
-      
+                            Image strongStormCloud = new Image
+                            {
+                                Width = 28,
+                                Height = 28,
+                                Name = "Storm",
+                                Source = stormCloud.Source,
+                                Stretch = Stretch.Uniform,
+                                IsHitTestVisible = false,
+                                Opacity = 0.75,
+                            };
+
+                            Canvas.SetLeft(strongStormCloud, mss.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
+                            Canvas.SetTop(strongStormCloud, mss.LayoutY - SYSTEM_SHAPE_OFFSET - 11);
+                            Canvas.SetZIndex(strongStormCloud, SYSTEM_Z_INDEX + 5);
+                            MainCanvas.Children.Add(strongStormCloud);
+                            DynamicMapElements.Add(strongStormCloud);
+
+                        }
+
+                    }
+
+                    // now the strong area..
+                    foreach (string weakSys in s.WeakArea)
+                    {
+                        if (Region.IsSystemOnMap(weakSys))
+                        {
+                            MapSystem msw = Region.MapSystems[weakSys];
+
+                            Image weakStormCloud = new Image
+                            {
+                                Width = 28,
+                                Height = 28,
+                                Name = "Storm",
+                                Source = stormCloud.Source,
+                                Stretch = Stretch.Uniform,
+                                IsHitTestVisible = false,
+                                Opacity = 0.25,
+                            };
+
+                            Canvas.SetLeft(weakStormCloud, msw.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
+                            Canvas.SetTop(weakStormCloud, msw.LayoutY - SYSTEM_SHAPE_OFFSET - 11);
+                            Canvas.SetZIndex(weakStormCloud, SYSTEM_Z_INDEX + 5);
+                            MainCanvas.Children.Add(weakStormCloud);
+                            DynamicMapElements.Add(weakStormCloud);
+
+                        }
+
+                    }
                 }
             }
         }

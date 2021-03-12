@@ -338,7 +338,6 @@
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
                                                 <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
-                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
                                                 <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
 
                                             </DataGrid.Columns>

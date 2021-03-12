@@ -225,12 +225,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current list of clear markers for the intel (eg "Clear" "Clr" etc)
         /// </summary>
-        private List<string> IntelClearFilters { get; set; }
+         public List<string> IntelClearFilters { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of intel filters used to monitor the local log files
         /// </summary>
-        private List<string> IntelFilters { get; set; }
+        public List<string> IntelFilters { get; set; }
 
         /// <summary>
         /// Gets or sets the Name to System dictionary
@@ -1618,6 +1618,11 @@ namespace SMT.EVEData
 
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
+
+            // save the intel channels / intel filters
+            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelChannels.txt", IntelFilters);
+            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelClearFilters.txt", IntelClearFilters);
+
         }
 
         /// <summary>
@@ -1627,7 +1632,8 @@ namespace SMT.EVEData
         {
             IntelFilters = new List<string>();
             IntelDataList = new BindingList<IntelData>();
-            string intelFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelChannels.txt";
+            string intelFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelChannels.txt";
+
 
             if (File.Exists(intelFileFilter))
             {
@@ -1642,9 +1648,13 @@ namespace SMT.EVEData
                     }
                 }
             }
+            else
+            {
+                IntelFilters.Add("Int");
+            }
 
             IntelClearFilters = new List<string>();
-            string intelClearFileFilter = AppDomain.CurrentDomain.BaseDirectory + @"\IntelClearFilters.txt";
+            string intelClearFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelClearFilters.txt";
 
             if (File.Exists(intelClearFileFilter))
             {
@@ -1658,6 +1668,13 @@ namespace SMT.EVEData
                         IntelClearFilters.Add(line);
                     }
                 }
+            }
+            else
+            {
+                // default
+                IntelClearFilters.Add("Clr");
+                IntelClearFilters.Add("Clear");
+
             }
 
             intelFileReadPos = new Dictionary<string, int>();
@@ -1794,6 +1811,25 @@ namespace SMT.EVEData
             }), DispatcherPriority.Normal, null);
 
 
+            // now update the Strong and weak areas around the storm 
+            foreach(Storm s in MetaliminalStorms)
+            {
+
+                // The Strong area is 1 jump out from the centre
+                List<string> strongArea = Navigation.GetSystemsXJumpsFrom(new List<string>(), s.System, 1);
+
+                // The weak area is 3 jumps out from the centre
+                List<string> weakArea = Navigation.GetSystemsXJumpsFrom(new List<string>(), s.System, 3);
+
+                // strip the strong area out of the weak so we dont have overlapping icons
+                s.WeakArea = weakArea.Except(strongArea).ToList();
+
+                // strip the centre out of the strong area
+                strongArea.Remove(s.Name);
+
+                s.StrongArea = strongArea;
+
+            }
         }
 
         /// <summary>
@@ -1992,7 +2028,6 @@ namespace SMT.EVEData
             InitTrigInvasions();
             InitMetaliminalStorms();
 
-            UpdateMetaliminalStorms();
 
 
             ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();

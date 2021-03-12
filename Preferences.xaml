@@ -5,8 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SMT"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         mc:Ignorable="d"
+        Name="PrefsWindow"
         Title="Preferences" Height="455" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
+    <Window.Resources>
+        <local:JoinStringConverter  x:Key="stringJoiner" />
+    </Window.Resources>
+
     <Grid Background="{DynamicResource ButtonBorder}">
         <DockPanel>
             <TabControl x:Name="tabControl" DockPanel.Dock="Top">
@@ -62,7 +68,7 @@
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
 
-                                    
+
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -79,6 +85,7 @@
                                         <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
                                         <Label Content="Text Max Zoom" />
                                     </StackPanel>
+
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -93,7 +100,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <GroupBox Header="General" Margin="4" Height="355">
+                            <GroupBox Header="General" Margin="4" >
                                 <StackPanel>
 
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
@@ -117,14 +124,25 @@
 
                                 </StackPanel>
                             </GroupBox>
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="1">
-                            <GroupBox Header="DangerZone" Margin="4" Height="355">
+                            <GroupBox Header="DangerZone" Margin="4" >
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2">Limit Sound to Dangerzone</CheckBox>
-                                 </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <GroupBox Margin="4" Height="355">
+
+                                <StackPanel Orientation="Vertical">
+                                    <Label>Channel Filters</Label>
+                                    <TextBox Width="271" Height="200" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
+                                    <Label>Clear Filters</Label>
+                                    <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelClearFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
+
+                                </StackPanel>
+
                             </GroupBox>
                         </StackPanel>
                     </Grid>
@@ -208,7 +226,7 @@
                             <GroupBox Header="General" Margin="4" Height="355">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=Debug_EnableMapEdit}" Margin="0,2">Enable Universe Map Edits</CheckBox>
-    
+
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>

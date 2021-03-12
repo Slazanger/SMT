@@ -16,7 +16,9 @@ namespace SMT.EVEData
         public string Name { get; set; }
         public string Type { get; set; }
 
+        public List<string> StrongArea { get; set; }
 
+        public List<string> WeakArea { get; set; }
         static public List<Storm> GetStorms()
         {
             List<Storm> storms = new List<Storm>();

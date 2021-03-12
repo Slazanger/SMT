@@ -131,6 +131,8 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
             EVEManager.InitNavigation();
 
+            EVEManager.UpdateMetaliminalStorms();
+
             EVEManager.LocalCharacters.CollectionChanged += LocalCharacters_CollectionChanged;
 
             CharactersList.ItemsSource = EVEManager.LocalCharacters;
@@ -621,6 +623,7 @@ namespace SMT
             preferencesWindow.Owner = this;
             preferencesWindow.DataContext = MapConf;
             preferencesWindow.MapConf = MapConf;
+            preferencesWindow.EM = EVEManager;
             preferencesWindow.ShowDialog();
             preferencesWindow.Closed += PreferencesWindow_Closed;
         }
