@@ -545,7 +545,7 @@ namespace SMT
                                 Source = stormCloud.Source,
                                 Stretch = Stretch.Uniform,
                                 IsHitTestVisible = false,
-                                Opacity = 0.75,
+                                Opacity = 1.0,
                             };
 
                             Canvas.SetLeft(strongStormCloud, mss.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
@@ -558,7 +558,7 @@ namespace SMT
 
                     }
 
-                    // now the strong area..
+                    // now the wiki area..
                     foreach (string weakSys in s.WeakArea)
                     {
                         if (Region.IsSystemOnMap(weakSys))
@@ -567,17 +567,17 @@ namespace SMT
 
                             Image weakStormCloud = new Image
                             {
-                                Width = 28,
-                                Height = 28,
+                                Width = 18,
+                                Height = 18,
                                 Name = "Storm",
                                 Source = stormCloud.Source,
                                 Stretch = Stretch.Uniform,
                                 IsHitTestVisible = false,
-                                Opacity = 0.25,
+                               // Opacity = 0.5,
                             };
 
-                            Canvas.SetLeft(weakStormCloud, msw.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
-                            Canvas.SetTop(weakStormCloud, msw.LayoutY - SYSTEM_SHAPE_OFFSET - 11);
+                            Canvas.SetLeft(weakStormCloud, msw.LayoutX - SYSTEM_SHAPE_OFFSET - 10);
+                            Canvas.SetTop(weakStormCloud, msw.LayoutY - SYSTEM_SHAPE_OFFSET - 6);
                             Canvas.SetZIndex(weakStormCloud, SYSTEM_Z_INDEX + 5);
                             MainCanvas.Children.Add(weakStormCloud);
                             DynamicMapElements.Add(weakStormCloud);
