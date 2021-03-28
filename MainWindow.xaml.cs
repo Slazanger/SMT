@@ -150,6 +150,7 @@ namespace SMT
             TrigInvasionsList.ItemsSource = EVEManager.TrigInvasions;
 
             LoadInfoObjects();
+            UpdateJumpBridgeSummary();
 
             // load any custom universe view layout
             // Save any custom map Layout
@@ -1043,6 +1044,7 @@ namespace SMT
             {
                 c.RecalcRoute();
             }
+            UpdateJumpBridgeSummary();
         }
 
         private void EnableDisableJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1065,6 +1067,8 @@ namespace SMT
             {
                 c.RecalcRoute();
             }
+
+            UpdateJumpBridgeSummary();
         }
 
         private void ExportJumpGatesBtn_Click(object sender, RoutedEventArgs e)
@@ -1202,6 +1206,7 @@ namespace SMT
 
             EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            UpdateJumpBridgeSummary();
             RegionUC.ReDrawMap(true);
 
             ImportJumpGatesBtn.IsEnabled = true;
@@ -1250,12 +1255,41 @@ namespace SMT
 
             EVEData.Navigation.ClearJumpBridges();
             EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            UpdateJumpBridgeSummary();
             RegionUC.ReDrawMap(true);
         }
 
+
+        private void UpdateJumpBridgeSummary()
+        {
+            int JBCount = 0;
+            int MissingInfo = 0;
+            int Disabled = 0;
+
+
+            foreach (EVEData.JumpBridge jb in EVEManager.JumpBridges)
+            {
+                JBCount++;
+
+                if (jb.FromID == 0 || jb.ToID == 0)
+                {
+                    MissingInfo++;
+                }
+                if (jb.Disabled)
+                {
+                    Disabled++;
+                }
+            }
+
+            string Label = $"{JBCount} Ansiblex, {MissingInfo} Incomplete, {Disabled} Disabled ";
+
+            AnsiblexSummaryLbl.Content = Label; 
+        }
+
+
         #endregion JumpBridges
 
-        #region ZKillBoard
+            #region ZKillBoard
 
         private bool zkbFilterByRegion = true;
 
