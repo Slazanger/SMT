@@ -31,11 +31,11 @@
 
         <DataTemplate x:Key="intelDataDataTemplate">
             <DockPanel>
-                <TextBlock Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Bottom">
+                <TextBlock Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top">
                     <Run Text="["/><Run Text="{Binding IntelChannel, FallbackValue=''}" /><Run Text="]"/>
                 </TextBlock>
-                <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Bottom" />
-                <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Bottom" />
+                <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
+                <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
              </DockPanel>
         </DataTemplate>
     </Window.Resources>
