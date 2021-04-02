@@ -1281,7 +1281,7 @@ namespace SMT
                 }
             }
 
-            string Label = $"{JBCount} Ansiblex, {MissingInfo} Incomplete, {Disabled} Disabled ";
+            string Label = $"{JBCount} gates, {MissingInfo} Incomplete, {Disabled} Disabled ";
 
             AnsiblexSummaryLbl.Content = Label; 
         }
