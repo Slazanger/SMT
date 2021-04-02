@@ -106,14 +106,14 @@
     <Reference Include="DotNetKit.Wpf.AutoCompleteComboBox, Version=1.3.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DotNetKit.Wpf.AutoCompleteComboBox.1.3.3\lib\net45\DotNetKit.Wpf.AutoCompleteComboBox.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=4.6.96.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>packages\DotNetProjects.Extended.Wpf.Toolkit.4.6.96\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
+    <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=4.6.97.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\DotNetProjects.Extended.Wpf.Toolkit.4.6.97\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="ESI.NET, Version=2020.12.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ESI.NET.2020.12.8\lib\net471\ESI.NET.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.11.31.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>packages\HtmlAgilityPack.1.11.31\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.11.32.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>packages\HtmlAgilityPack.1.11.32\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Configuration.5.0.0\lib\net461\Microsoft.Extensions.Configuration.dll</HintPath>
@@ -136,8 +136,8 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Primitives.5.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
