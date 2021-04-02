@@ -916,7 +916,7 @@ namespace SMT
             ShowIhubVunerabilities = true;
 
             ShowJoveObservatories = true;
-
+            ShowCynoBeacons = true;
             LimitESIDataToRegion = false;
 
             UniverseMaxZoomDisplaySystems = 1.3f;

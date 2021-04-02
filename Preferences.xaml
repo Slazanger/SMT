@@ -54,7 +54,6 @@
                             <GroupBox Header="Region" Margin="4" Height="355">
                                 <StackPanel>
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowActiveIncursions}" Content="Show Active Incursions" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowJoveObservatories}" Content="Show Jove Observatories" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowToolBox}" Content="Show Toolbox" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrueSec}" Content="Show TrueSec" />
@@ -67,8 +66,6 @@
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOnlyFinalLiminality}" Content="Limit Trig Invasions to Final Luminality" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
-
-
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -168,6 +165,15 @@
                                         <xctk:IntegerUpDown Value="{Binding Path=UpcomingSovMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="360" Background="Transparent"  Foreground="White" />
                                         <Label Content="Upcoming Period (Mins)" />
                                     </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <GroupBox Header="Beacons" Margin="4" Height="355">
+                                <StackPanel>
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons" />
+                                    <TextBox Width="271" Height="300" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=CynoBeaconSystems, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>

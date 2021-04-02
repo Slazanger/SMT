@@ -17,15 +17,44 @@ namespace SMT
         public SMT.MapConfig MapConf;
         public SMT.EVEData.EveManager EM { get; set; }
 
+        public List<string> CynoBeaconSystems { get; set; }
         public PreferencesWindow()
         {
             InitializeComponent();
 
             syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
+
+        }
+
+        public void Init()
+        {
+            CynoBeaconSystems = new List<string>();
+            foreach (EVEData.System s in EM.Systems)
+            {
+                if (s.HasJumpBeacon)
+                {
+                    CynoBeaconSystems.Add(s.Name);
+                }
+            }
         }
 
         private void Prefs_OK_Click(object sender, RoutedEventArgs e)
         {
+            foreach (EVEData.System s in EM.Systems)
+            {
+                s.HasJumpBeacon = false;
+            }
+
+            foreach (string sys in CynoBeaconSystems)
+            {
+                EVEData.System es = EM.GetEveSystem(sys);
+                if(es != null)
+                {
+                    es.HasJumpBeacon = true;
+                }
+            }
+
+
             Close();
         }
 

@@ -1444,8 +1444,10 @@ namespace SMT.EVEData
                 NameToSystem[s.Name] = s;
             }
 
+
+            
             // now add the beacons
-            string cynoBeaconsFile = AppDomain.CurrentDomain.BaseDirectory + @"\CynoBeacons.txt";
+            string cynoBeaconsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\CynoBeacons.txt";
             if (File.Exists(cynoBeaconsFile))
             {
                 StreamReader file = new StreamReader(cynoBeaconsFile);
@@ -1619,9 +1621,21 @@ namespace SMT.EVEData
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
 
+            List<string> beaconsToSave = new List<string>();
+            foreach(System s in Systems)
+            {
+                if(s.HasJumpBeacon)
+                {
+                    beaconsToSave.Add(s.Name);
+                }
+            }
+
             // save the intel channels / intel filters
             File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelChannels.txt", IntelFilters);
             File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelClearFilters.txt", IntelClearFilters);
+            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\CynoBeacons.txt", beaconsToSave);
+
+
 
         }
 

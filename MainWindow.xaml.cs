@@ -625,6 +625,7 @@ namespace SMT
             preferencesWindow.DataContext = MapConf;
             preferencesWindow.MapConf = MapConf;
             preferencesWindow.EM = EVEManager;
+            preferencesWindow.Init();
             preferencesWindow.ShowDialog();
             preferencesWindow.Closed += PreferencesWindow_Closed;
         }
