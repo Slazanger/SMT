@@ -325,7 +325,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Everyshore", "10000037", "Gallente", 330, 365));
             Regions.Add(new MapRegion("Fade", "10000046", string.Empty, 360, 130));
             Regions.Add(new MapRegion("Feythabolis", "10000056", string.Empty, 535, 755));
-            Regions.Add(new MapRegion("The Forge", "10000002", "Caldari", 600, 300));
+            Regions.Add(new MapRegion("The Forge", "10000002", "Caldari", 600, 310));
             Regions.Add(new MapRegion("Fountain", "10000058", string.Empty, 60, 250));
             Regions.Add(new MapRegion("Geminate", "10000029", "The Society", 665, 245));
             Regions.Add(new MapRegion("Genesis", "10000067", "Amarr", 240, 430));
@@ -354,7 +354,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Pure Blind", "10000023", string.Empty, 435, 190));
             Regions.Add(new MapRegion("Querious", "10000050", string.Empty, 340, 640));
             Regions.Add(new MapRegion("Scalding Pass", "10000008", string.Empty, 800, 540));
-            Regions.Add(new MapRegion("Sinq Laison", "10000032", "Gallente", 420, 375));
+            Regions.Add(new MapRegion("Sinq Laison", "10000032", "Gallente", 475, 385));
             Regions.Add(new MapRegion("Solitude", "10000044", "Gallente", 155, 335));
             Regions.Add(new MapRegion("The Spire", "10000018", string.Empty, 860, 350));
             Regions.Add(new MapRegion("Stain", "10000022", "Sansha", 450, 675));
@@ -619,6 +619,13 @@ namespace SMT.EVEData
             }
 
 
+            foreach (System s in Systems)
+            {
+                NameToSystem[s.Name] = s;
+            }
+
+
+
             // 13 Oct 2020 :  Temp rebuild of maps for Trig Invasions
 
             // Krai Perun
@@ -779,6 +786,49 @@ namespace SMT.EVEData
 
 
 
+            // now add the additional systems added with trailblazers release
+
+            // Caldari Hykkota to Ahbazon
+            EVEData.MapRegion genesis = GetRegion("Genesis");
+
+            theForge.MapSystems.Add("Ahbazon", new MapSystem() { Name = "Ahbazon", LayoutX = 25, LayoutY = 225, Region = "Genesis", OutOfRegion = true });
+            genesis.MapSystems.Add("Hykkota", new MapSystem() { Name = "Hykkota", LayoutX = 755, LayoutY = 195, Region = "The Forge", OutOfRegion = true });
+
+            NameToSystem["Ahbazon"].Jumps.Add("Hykkota");
+            NameToSystem["Hykkota"].Jumps.Add("Ahbazon");
+
+            // Amarr Saminer to F7-ICZ
+            EVEData.MapRegion tashMurkon = GetRegion("Tash-Murkon");
+            EVEData.MapRegion stain = GetRegion("Stain");
+
+            tashMurkon.MapSystems.Add("F7-ICZ", new MapSystem() { Name = "F7-ICZ", LayoutX = 30, LayoutY = 95, Region = "Stain", OutOfRegion = true });
+            stain.MapSystems.Add("Saminer", new MapSystem() { Name = "Saminer", LayoutX = 150, LayoutY = 40, Region = "Tash-Murkon", OutOfRegion = true });
+
+            NameToSystem["Saminer"].Jumps.Add("F7-ICZ");
+            NameToSystem["F7-ICZ"].Jumps.Add("Saminer");
+
+            // Minmatar - Irgrus to Pakhshi – IRGRUS TO PAKHSHI
+            metropolis.MapSystems["Irgrus"].LayoutX -= 20; // move up slightly
+            metropolis.MapSystems["Irgrus"].LayoutY -= 40; // move up slightly
+
+
+            genesis.MapSystems.Add("Irgrus", new MapSystem() { Name = "Irgrus", LayoutX = 525, LayoutY = 105, Region = "Metropolis", OutOfRegion = true });
+            metropolis.MapSystems.Add("Pakhshi", new MapSystem() { Name = "Pakhshi", LayoutX = 425, LayoutY = 750, Region = "Genesis", OutOfRegion = true });
+
+            NameToSystem["Irgrus"].Jumps.Add("Pakhshi");
+            NameToSystem["Pakhshi"].Jumps.Add("Irgrus");
+
+            //GALLENTE – Kenninck TO Eggheron
+
+            EVEData.MapRegion placid = GetRegion("Placid");
+            EVEData.MapRegion solitude = GetRegion("Solitude");
+
+            solitude.MapSystems.Add("Kenninck", new MapSystem() { Name = "Kenninck", LayoutX = 285, LayoutY = 30, Region = "Placid", OutOfRegion = true });
+            placid.MapSystems.Add("Eggheron", new MapSystem() { Name = "Eggheron", LayoutX = 40, LayoutY = 605, Region = "Solitude", OutOfRegion = true });
+
+            NameToSystem["Kenninck"].Jumps.Add("Eggheron");
+            NameToSystem["Eggheron"].Jumps.Add("Kenninck");
+
 
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
@@ -810,11 +860,6 @@ namespace SMT.EVEData
             }
 
  
-
-            foreach (System s in Systems)
-            {
-                NameToSystem[s.Name] = s;
-            }
 
             foreach (MapRegion rr in Regions)
             {
