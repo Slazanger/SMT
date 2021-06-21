@@ -1106,7 +1106,7 @@ namespace SMT
                     }
                 }
 
-                if (ActiveCharacter?.ActiveRoute != null)
+                if (MapConf.DrawRoute && ActiveCharacter?.ActiveRoute != null)
                 {
                     if (ActiveCharacter.ActiveRoute.Count > 1)
                     {

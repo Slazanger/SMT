@@ -91,6 +91,8 @@ namespace SMT
 
         private int m_ZkillExpireTimeMinutes;
 
+        private bool m_drawRoute;
+
 
         public MapConfig()
         {
@@ -187,6 +189,22 @@ namespace SMT
                 OnPropertyChanged("DisableRoutePathAnimation");
             }
         }
+
+
+
+        public bool DrawRoute
+        {
+            get
+            {
+                return m_drawRoute;
+            }
+            set
+            {
+                m_drawRoute = value;
+                OnPropertyChanged("DrawRoute");
+            }
+        }
+
 
 
         public bool LimitESIDataToRegion

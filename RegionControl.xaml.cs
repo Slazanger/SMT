@@ -789,7 +789,12 @@ namespace SMT
             AddDataToMap();
             AddSystemIntelOverlay();
             AddHighlightToSystem(SelectedSystem);
-            AddRouteToMap();
+
+            if(MapConf.DrawRoute)
+            {
+                AddRouteToMap();
+            }
+
             AddTheraSystemsToMap();
             AddStormsToMap();
             AddSovConflictsToMap();

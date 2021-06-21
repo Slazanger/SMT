@@ -356,23 +356,23 @@ namespace SMT.EVEData
                             esiClient.SetCharacterData(ESIAuthData);
                             ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
 
-                             if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
                             {
                                 SystemJumpGateList[stationID] = esrs.Data;
 
                                 // found a jump gate
                                 if (esrs.Data.TypeId == 35841)
                                 {
-
-
-
-
                                     string[] parts = esrs.Data.Name.Split(' ');
                                     string from = parts[0];
                                     string to = parts[2];
 
                                     EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
                                 }
+                            }
+                            else
+                            {
+
                             }
 
                             Thread.Sleep(100);
