@@ -26,7 +26,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_100";
+        public const string SMT_VERSION = "SMT_101";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -52,7 +52,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Light the Beacon! : " + SMT_VERSION + ")";
+            Title = "SMT (Heroes & Kings : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
@@ -111,7 +111,7 @@ namespace SMT
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();

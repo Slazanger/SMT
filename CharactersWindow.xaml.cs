@@ -87,6 +87,7 @@ namespace SMT
 
                     mw.EVEManager.LocalCharacters.Remove(lc);
 
+                    characterLV.Items.Refresh();
 
                     characterInfoGrid.Visibility = Visibility.Hidden;
                 }
