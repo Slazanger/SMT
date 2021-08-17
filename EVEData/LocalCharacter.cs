@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using System.Windows.Media.Imaging;
+using WpfHelpers.ResourceUsage;
 
 namespace SMT.EVEData
 {
@@ -55,6 +56,9 @@ namespace SMT.EVEData
 
 
         private int ssoErrorCount = 0;
+
+        private static BitmapImage unknownChar = null;
+
 
 
         /// <summary>
@@ -106,6 +110,13 @@ namespace SMT.EVEData
             KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
 
             IsOnline = true;
+
+            if(unknownChar == null)
+            {
+                unknownChar = ResourceLoader.LoadBitmapFromResource("Images/unknownChar.png");
+            }
+
+            Portrait = unknownChar;
         }
 
         /// <summary>
@@ -942,7 +953,7 @@ namespace SMT.EVEData
                         }
                         catch
                         {
-
+                            // todo : some older images are still in the .jpg format
                         }
                     }
                 }
@@ -951,14 +962,27 @@ namespace SMT.EVEData
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
-                        Uri imageLoc = new Uri(characterPortrait);
-                        Portrait = new BitmapImage(imageLoc);
+                        try
+                        {
+                            Uri imageLoc = new Uri(characterPortrait);
+                            Portrait = new BitmapImage(imageLoc);
+                        }
+                        catch
+                        {
+                            // something wrong with the portrait
+                        }
                     }), DispatcherPriority.Normal, null);
+                }
+                else
+                {
+                    Uri imageLoc = new Uri(characterPortrait);
+                    Portrait = new BitmapImage(imageLoc);
+
                 }
 
 
-                    //get the corp info
-                    if (CorporationID != -1)
+                //get the corp info
+                if (CorporationID != -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Corporation.Corporation> esrc = await esiClient.Corporation.Information((int)CorporationID);
                     if(esrc.Data != null)
