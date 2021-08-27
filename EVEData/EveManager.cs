@@ -24,6 +24,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Globalization;
 
 namespace SMT.EVEData
 {
@@ -300,6 +301,9 @@ namespace SMT.EVEData
         /// </summary>
         public void CreateFromScratch()
         {
+            // allow parsing to work for all locales (comma/dot in csv float)
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
             Regions = new List<MapRegion>();
 
             // manually add the regions we care about
