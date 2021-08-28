@@ -233,6 +233,11 @@ namespace SMT.EVEData
         public List<string> IntelFilters { get; set; }
 
         /// <summary>
+        /// Gets or sets the current list of ignore markers for the intel (eg "status")
+        /// </summary>
+        public List<string> IntelIgnoreFilters { get; set; }
+
+        /// <summary>
         /// Gets or sets the Name to System dictionary
         /// </summary>
         private Dictionary<string, System> NameToSystem { get; }
@@ -1676,9 +1681,10 @@ namespace SMT.EVEData
             }
 
             // save the intel channels / intel filters
-            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelChannels.txt", IntelFilters);
-            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelClearFilters.txt", IntelClearFilters);
-            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\CynoBeacons.txt", beaconsToSave);
+            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelChannels.txt", IntelFilters);
+            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelClearFilters.txt", IntelClearFilters);
+            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelIgnoreFilters.txt", IntelIgnoreFilters);
+            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\CynoBeacons.txt", beaconsToSave);
 
 
 
@@ -1691,8 +1697,7 @@ namespace SMT.EVEData
         {
             IntelFilters = new List<string>();
             IntelDataList = new BindingList<IntelData>();
-            string intelFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelChannels.txt";
-
+            string intelFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\ntelChannels.txt";
 
             if (File.Exists(intelFileFilter))
             {
@@ -1713,7 +1718,7 @@ namespace SMT.EVEData
             }
 
             IntelClearFilters = new List<string>();
-            string intelClearFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\IntelClearFilters.txt";
+            string intelClearFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelClearFilters.txt";
 
             if (File.Exists(intelClearFileFilter))
             {
@@ -1734,6 +1739,28 @@ namespace SMT.EVEData
                 IntelClearFilters.Add("Clr");
                 IntelClearFilters.Add("Clear");
 
+            }
+
+            IntelIgnoreFilters = new List<string>();
+            string intelIgnoreFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelIgnoreFilters.txt";
+
+            if (File.Exists(intelIgnoreFileFilter))
+            {
+                StreamReader file = new StreamReader(intelIgnoreFileFilter);
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    line = line.Trim();
+                    if (!string.IsNullOrEmpty(line))
+                    {
+                        IntelIgnoreFilters.Add(line);
+                    }
+                }
+            }
+            else
+            {
+                // default
+                IntelIgnoreFilters.Add("Status");
             }
 
             intelFileReadPos = new Dictionary<string, int>();
@@ -2138,6 +2165,7 @@ namespace SMT.EVEData
             bool processFile = false;
             bool localChat = false;
 
+            // check if the changed file path contains the name of a channel we're looking for
             foreach (string intelFilterStr in IntelFilters)
             {
                 if (changedFile.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
@@ -2315,6 +2343,16 @@ namespace SMT.EVEData
                                         if (s == "" || s.Length < 3)
                                         {
                                             continue;
+                                        }
+
+                                        // check if we should ignore this message (maybe we could put this before every other checks ?)
+                                        foreach (String ignoreMarker in IntelIgnoreFilters)
+                                        {
+                                            if (ignoreMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                            {
+                                                // do not even add to the intel list
+                                                return;
+                                            }
                                         }
 
                                         foreach (String clearMarker in IntelClearFilters)
