@@ -358,6 +358,10 @@ namespace SMT
         public bool PlayIntelSoundOnUnknown { get; set; }
 
         [Category("Intel")]
+        [DisplayName("Warning Sound Volume")]
+        public float IntelSoundVolume { get; set; }
+
+        [Category("Intel")]
         [DisplayName("Limit Sound to Dangerzone")]
         public bool PlaySoundOnlyInDangerZone { get; set; }
 
@@ -940,6 +944,7 @@ namespace SMT
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 
+            IntelSoundVolume = 0.5f;
         }
 
         protected void OnPropertyChanged(string name)

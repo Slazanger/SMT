@@ -105,6 +105,10 @@
 
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2">Warning on Unknown</CheckBox>
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Warning Sound Volume" />
+                                        <Slider Value="{Binding Path=IntelSoundVolume}" Minimum="0" Maximum="1" TickFrequency="0.1" TickPlacement="BottomRight" />
+                                    </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <xctk:IntegerUpDown Value="{Binding Path=IntelTextSize}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="8" Maximum="20" Background="Transparent"  Foreground="White" />
