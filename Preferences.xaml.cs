@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace SMT
 {
@@ -18,11 +19,21 @@ namespace SMT
         public SMT.EVEData.EveManager EM { get; set; }
 
         public List<string> CynoBeaconSystems { get; set; }
+
+
+        private MediaPlayer mediaPlayer;
+
+
         public PreferencesWindow()
         {
             InitializeComponent();
 
             syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
+
+
+            mediaPlayer = new MediaPlayer();
+            Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+            mediaPlayer.Open(woopUri);
 
         }
 
@@ -36,7 +47,10 @@ namespace SMT
                     CynoBeaconSystems.Add(s.Name);
                 }
             }
+
         }
+
+
 
         private void Prefs_OK_Click(object sender, RoutedEventArgs e)
         {
@@ -48,7 +62,7 @@ namespace SMT
             foreach (string sys in CynoBeaconSystems)
             {
                 EVEData.System es = EM.GetEveSystem(sys);
-                if(es != null)
+                if (es != null)
                 {
                     es.HasJumpBeacon = true;
                 }
@@ -93,12 +107,23 @@ namespace SMT
             ColoursPropertyGrid.Update();
             ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
 
+
+            intelVolumeSlider.ValueChanged += IntelVolumeChanged_ValueChanged;
+
         }
 
         private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
         {
             MainWindow.AppWindow.RegionUC.ReDrawMap(true);
             MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
+        }
+
+        private void IntelVolumeChanged_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            mediaPlayer.Stop();
+            mediaPlayer.Volume = MapConf.IntelSoundVolume;
+            mediaPlayer.Position = new TimeSpan(0, 0, 0);
+            mediaPlayer.Play();
         }
     }
 
