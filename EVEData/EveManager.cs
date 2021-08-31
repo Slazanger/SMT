@@ -1701,7 +1701,7 @@ namespace SMT.EVEData
         {
             IntelFilters = new List<string>();
             IntelDataList = new BindingList<IntelData>();
-            string intelFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\ntelChannels.txt";
+            string intelFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelChannels.txt";
 
             if (File.Exists(intelFileFilter))
             {
