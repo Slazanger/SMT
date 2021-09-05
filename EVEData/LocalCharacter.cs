@@ -940,7 +940,7 @@ namespace SMT.EVEData
                 }
 
                 // get the character portrait
-                string characterPortrait = EveManager.Instance.SaveDataRootFolder + "\\Portraits\\" + ID + ".png";
+                string characterPortrait = EveManager.Instance.SaveDataRootFolder + "\\Portraits\\" + ID;
                 if(!File.Exists(characterPortrait))
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Images> esri = await esiClient.Character.Portrait((int)ID);
@@ -953,7 +953,6 @@ namespace SMT.EVEData
                         }
                         catch
                         {
-                            // todo : some older images are still in the .jpg format
                         }
                     }
                 }
@@ -973,13 +972,7 @@ namespace SMT.EVEData
                         }
                     }), DispatcherPriority.Normal, null);
                 }
-                else
-                {
-                    Uri imageLoc = new Uri(characterPortrait);
-                    Portrait = new BitmapImage(imageLoc);
-
-                }
-
+                
 
                 //get the corp info
                 if (CorporationID != -1)
