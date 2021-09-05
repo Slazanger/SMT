@@ -417,7 +417,7 @@
                                     <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                         <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
                                             <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" Margin="4" />
-                                            <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" MouseUp="ZKBContexMenu_ShowSystem_Click" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None"  MinHeight="200">
+                                            <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" Cursor="Hand" AutoGenerateColumns="False" CanUserAddRows="False" MouseUp="ZKBContexMenu_ShowSystem_Click" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None"  MinHeight="200">
                                                 <DataGrid.Columns>
                                                     <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
                                                     <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
