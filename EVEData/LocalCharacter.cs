@@ -113,10 +113,18 @@ namespace SMT.EVEData
 
             if(unknownChar == null)
             {
-                unknownChar = ResourceLoader.LoadBitmapFromResource("Images/unknownChar.png");
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    unknownChar = ResourceLoader.LoadBitmapFromResource("Images/unknownChar.png");
+                }), DispatcherPriority.Normal, null);
+
             }
 
-            Portrait = unknownChar;
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                Portrait = unknownChar;
+            }), DispatcherPriority.Normal, null);
+
         }
 
         /// <summary>

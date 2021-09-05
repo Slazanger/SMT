@@ -1431,14 +1431,14 @@ namespace SMT.EVEData
                 }), DispatcherPriority.Normal, null);
             }
 
+
             esiChar.ESIRefreshToken = acd.RefreshToken;
             esiChar.ESILinked = true;
             esiChar.ESIAccessToken = acd.Token;
             esiChar.ESIAccessTokenExpiry = acd.ExpiresOn;
             esiChar.ID = acd.CharacterID;
             esiChar.ESIAuthData = acd;
-            esiChar.UpdateInfoFromESI();
-
+ 
             // now to find if a matching character
         }
 
