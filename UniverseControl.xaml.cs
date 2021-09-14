@@ -516,11 +516,11 @@ namespace SMT
                     DrawingContext dcR = rangeSquareDV.RenderOpen();
                     if (overlap)
                     {
-                        dcR.DrawRectangle(sysRangeCol, new Pen(rangeOverlapCol, 1), new Rect(irX - 5, irZ - 5, 10, 10));
+                        dcR.DrawRectangle(sysRangeCol, new Pen(rangeOverlapCol, 1), new Rect(irX - 3, irZ - 3, 6, 6));
                     }
                     else
                     {
-                        dcR.DrawRectangle(sysRangeCol, new Pen(sysRangeCol, 1), new Rect(irX - 5, irZ - 5, 10, 10));
+                        dcR.DrawRectangle(sysRangeCol, new Pen(sysRangeCol, 1), new Rect(irX - 3, irZ - 3, 6, 6));
                     }
 
                     dcR.Close();
@@ -713,8 +713,8 @@ namespace SMT
         /// <param name="FullRedraw">Clear all the static items or not</param>
         public void ReDrawMap(bool FullRedraw = false, bool DataRedraw = false, bool FastUpdate = false)
         {
-            double textXOffset = 3;
-            double textYOffset = 0;
+            double textXOffset = 0;
+            double textYOffset = 3;
 
             double SystemTextSize = 5;
             double CharacterTextSize = 6;
@@ -863,13 +863,17 @@ namespace SMT
                     VHSystems.AddChild(systemShapeVisual, sys);
 
 #pragma warning disable CS0618
-                    // Draw a formatted text string into the DrawingContext.
-                    systemTextDrawingContext.DrawText(
-                        new FormattedText(sys.Name,
+
+                    FormattedText ft = new FormattedText(sys.Name,
                             ci,
                             FlowDirection.LeftToRight,
                             tf,
-                            SystemTextSize, SystemTextColourBrush),
+                            SystemTextSize, SystemTextColourBrush);
+                    ft.TextAlignment = TextAlignment.Center;
+                    // Draw a formatted text string into the DrawingContext.
+                    systemTextDrawingContext.DrawText(
+
+                        ft,
                         new Point(X + textXOffset, Z + textYOffset));
 #pragma warning restore CS0618
 
