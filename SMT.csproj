@@ -109,9 +109,6 @@
     <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=4.6.97.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>packages\DotNetProjects.Extended.Wpf.Toolkit.4.6.97\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
     </Reference>
-    <Reference Include="ESI.NET, Version=2020.12.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\ESI.NET.2020.12.8\lib\net471\ESI.NET.dll</HintPath>
-    </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.11.32.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>packages\HtmlAgilityPack.1.11.32\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -440,6 +437,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ESI.Net\ESI.NET\ESI.NET.csproj">
+      <Project>{9606a303-4b16-45be-9103-d16a152f009c}</Project>
+      <Name>ESI.NET</Name>
+    </ProjectReference>
     <ProjectReference Include="External\WpfHelpers\WpfHelpers.csproj">
       <Project>{2d1e6ac7-6fb8-42e6-a1d8-754951a99428}</Project>
       <Name>WpfHelpers</Name>

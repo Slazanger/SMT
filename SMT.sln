@@ -5,10 +5,13 @@ VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMT", "SMT.csproj", "{D2916D4D-8A38-4195-97D8-25676ADA0AE3}"
 	ProjectSection(ProjectDependencies) = postProject
+		{9606A303-4B16-45BE-9103-D16A152F009C} = {9606A303-4B16-45BE-9103-D16A152F009C}
 		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428} = {2D1E6AC7-6FB8-42E6-A1D8-754951A99428}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfHelpers", "External\WpfHelpers\WpfHelpers.csproj", "{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESI.NET", "..\ESI.Net\ESI.NET\ESI.NET.csproj", "{9606A303-4B16-45BE-9103-D16A152F009C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +37,14 @@ Global
 		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|x64.ActiveCfg = Release|x64
 		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|x64.Build.0 = Release|x64
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Debug|x64.Build.0 = Debug|Any CPU
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Release|x64.ActiveCfg = Release|Any CPU
+		{9606A303-4B16-45BE-9103-D16A152F009C}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
