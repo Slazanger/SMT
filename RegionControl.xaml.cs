@@ -3145,6 +3145,15 @@ namespace SMT
 
                 SystemInfoPopupSP.Children.Add(new Separator());
 
+                Label secstatus = new Label();
+                secstatus.Padding = one;
+                secstatus.Margin = one;
+                secstatus.Content = "Security\t:  " + string.Format("{0:0.00}", selectedSys.ActualSystem.TrueSec) + " (" + selectedSys.ActualSystem.SecType + ")";
+                secstatus.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                SystemInfoPopupSP.Children.Add(secstatus);
+
+                SystemInfoPopupSP.Children.Add(new Separator());
+
                 if (selectedSys.ActualSystem.ShipKillsLastHour != 0)
                 {
                     Label data = new Label();

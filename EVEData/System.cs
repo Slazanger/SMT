@@ -212,6 +212,26 @@ namespace SMT.EVEData
         /// </summary>
         public double TrueSec { get; set; }
 
+        public string SecType
+        {
+            get
+            {
+                if (TrueSec >= 0.45)
+                {
+                    return "High Sec";
+                }
+
+                if (TrueSec > 0.0 && TrueSec < 0.45)
+                {
+                    return "Low Sec";
+                }
+
+                return "Null Sec";
+            }
+                
+        }
+
+
         public override string ToString()
         {
             return $"{Name} ({Region})";
