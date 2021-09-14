@@ -1206,6 +1206,63 @@ namespace SMT.EVEData
             }
 
 
+            bool done = false;
+            int iteration = 0;
+            double minSpread = 19.0;
+
+            while (!done)
+            {
+                iteration++;
+                bool movedThisTime = false;
+
+
+                foreach (EVEData.System sysA in Systems)
+                {
+                    foreach (EVEData.System sysB in Systems)
+                    {
+                        if (sysA == sysB )
+                        {
+                            continue;
+                        }
+
+                        double dx = sysA.UniverseX - sysB.UniverseX;
+                        double dy = sysA.UniverseY - sysB.UniverseY;
+                        double l = Math.Sqrt(dx * dx + dy * dy);
+
+                        double s = minSpread - l;
+
+                        if(s > 0)
+                        {
+                            movedThisTime = true;
+
+                            // move apart
+                            dx = dx / l;
+                            dy = dy / l;
+
+                            sysB.UniverseX -= dx * s / 2;
+                            sysB.UniverseY -= dy * s / 2;
+
+                            sysA.UniverseX += dx * s / 2;
+                            sysA.UniverseY += dy * s / 2;
+
+                        }
+
+                    }
+                }
+
+                if(movedThisTime == false)
+                {
+                    done = true;
+                }
+
+                if (iteration > 20)
+                {
+                    done = true;
+                }
+
+            }
+
+
 
 
             // now serialise the classes to disk
