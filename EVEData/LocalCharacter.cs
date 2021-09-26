@@ -21,7 +21,7 @@ namespace SMT.EVEData
 
     public class LocalCharacter : Character, INotifyPropertyChanged
     {
-        public static readonly string SaveVersion = "02";
+        public static readonly string SaveVersion = "03";
 
         [XmlIgnoreAttribute]
         public object ActiveRouteLock;
