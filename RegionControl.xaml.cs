@@ -1,4 +1,4 @@
-using SMT.EVEData;
+﻿using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -470,6 +470,39 @@ namespace SMT
             }
         }
 
+        public void AddPOIsToMap()
+        {
+            Brush POIBrush = new SolidColorBrush(Colors.White);
+
+            foreach (POI p in EM.PointsOfInterest)
+            {
+                if (Region.IsSystemOnMap(p.System))
+                {
+                    MapSystem ms = Region.MapSystems[p.System];
+                    string POISymbol = "ℹ";
+
+
+                    Label poiLbl = new Label();
+                    poiLbl.FontSize = 9;
+                    poiLbl.IsHitTestVisible = false;
+                    poiLbl.Content = POISymbol;
+                    poiLbl.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    poiLbl.VerticalContentAlignment = VerticalAlignment.Center;
+                    poiLbl.Width = SYSTEM_SHAPE_SIZE + 6;
+                    poiLbl.Height = SYSTEM_SHAPE_SIZE + 6;
+                    poiLbl.Foreground = POIBrush;
+                    poiLbl.FontWeight = FontWeights.Bold;
+
+                    Canvas.SetLeft(poiLbl, ms.LayoutX - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(poiLbl, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetZIndex(poiLbl, SYSTEM_Z_INDEX + 13);
+                    MainCanvas.Children.Add(poiLbl);
+                    DynamicMapElements.Add(poiLbl);
+
+                }
+            }
+        }
+
 
         public void AddStormsToMap()
         {
@@ -640,7 +673,7 @@ namespace SMT
                     if (ti.DerivedSecurityStatus != null)
                     {
                         Label TrigSecChangeHighlight = new Label();
-                        TrigSecChangeHighlight.Content = "�";
+                        TrigSecChangeHighlight.Content = "»";
                         TrigSecChangeHighlight.Foreground = trigSecStatusChangeBrush;
                         TrigSecChangeHighlight.IsHitTestVisible = false;
                         TrigSecChangeHighlight.RenderTransform = new RotateTransform(90);
@@ -799,6 +832,7 @@ namespace SMT
             AddStormsToMap();
             AddSovConflictsToMap();
             AddTrigInvasionSytemsToMap();
+            AddPOIsToMap();
         }
 
         /// <summary>
@@ -3375,6 +3409,23 @@ namespace SMT
                         tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
 
+
+                    }
+                }
+
+                SystemInfoPopupSP.Children.Add(new Separator());
+
+                // Points of interest
+                foreach (POI p in EM.PointsOfInterest)
+                {
+                    if(selectedSys.Name == p.System)
+                    {
+                        Label tl = new Label();
+                        tl.Padding = one;
+                        tl.Margin = one;
+                        tl.Content = $"{p.Type} : {p.ShortDesc}";
+                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        SystemInfoPopupSP.Children.Add(tl);
 
                     }
                 }

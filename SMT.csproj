@@ -228,6 +228,7 @@
     <Compile Include="EVEData\ESI\StructureSearch.cs" />
     <Compile Include="EVEData\LocalCharacter.cs" />
     <Compile Include="EVEData\Navigation.cs" />
+    <Compile Include="EVEData\POI.cs" />
     <Compile Include="EVEData\Server.cs" />
     <Compile Include="EVEData\SOVCampaign.cs" />
     <Compile Include="EVEData\Storm.cs" />

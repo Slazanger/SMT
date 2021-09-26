@@ -218,6 +218,9 @@ namespace SMT.EVEData
         public ObservableCollection<Storm> MetaliminalStorms { get; set; }
 
 
+        public ObservableCollection<POI> PointsOfInterest { get; set; }
+
+
         /// <summary>
         /// Gets or sets the current list of ZKillData
         /// </summary>
@@ -1271,6 +1274,8 @@ namespace SMT.EVEData
             Utils.SerializeToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
             Utils.SerializeToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
 
+            File.Copy(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\POI.csv", AppDomain.CurrentDomain.BaseDirectory + @"\POI.csv", true);
+
             Init();
         }
 
@@ -2174,7 +2179,7 @@ namespace SMT.EVEData
             InitTheraConnections();
             InitTrigInvasions();
             InitMetaliminalStorms();
-
+            InitPOI();
 
 
             ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
@@ -2183,6 +2188,60 @@ namespace SMT.EVEData
             StartUpdateCoalitionInfo();
 
             StartBackgroundThread();
+        }
+
+        private void InitPOI()
+        {
+            PointsOfInterest = new ObservableCollection<POI>();
+
+            try
+            {
+                string POIcsv = AppDomain.CurrentDomain.BaseDirectory + @"\POI.csv";
+                if (File.Exists(POIcsv))
+                {
+                    StreamReader file = new StreamReader(POIcsv);
+
+                    string line;
+                    line = file.ReadLine();
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (string.IsNullOrEmpty(line))
+                        {
+                            continue;
+                        }
+                        string[] bits = line.Split(',');
+
+                        if (bits.Length < 4)
+                        {
+                            continue;
+                        }
+
+                        string system = bits[0];
+                        string type = bits[1];
+                        string desc = bits[2];
+                        string longdesc = bits[3];
+
+                        if (GetEveSystem(system) == null)
+                        {
+                            continue;
+                        }
+
+                        POI p = new POI() { System = system, Type = type, ShortDesc = desc, LongDesc = longdesc };
+
+                        PointsOfInterest.Add(p);
+
+                    }
+                }
+
+            }
+            catch
+            {
+
+            }
+
+
+
+
         }
 
         /// <summary>
