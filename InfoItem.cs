@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SMT.EVEData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,8 +15,8 @@ namespace SMT
         {
             Line,
             Circle,
-            Text,
-            Rect,
+            //Text,
+            //Rect,
         };
 
         public enum LineType
@@ -23,6 +24,11 @@ namespace SMT
             Solid,
             Dashed
         };
+
+        public enum Type
+        {
+            SystemTag
+        }
 
         public ShapeType DrawType;
 
@@ -36,12 +42,14 @@ namespace SMT
         public Color Fill;
 
         public string Region;
+        public MapSystem AssociatedMapSystem;
+
         public string Content;
 
         private Brush FillBrush;
 
         public LineType LineStyle;
-
+        public Type ItemType;
 
         public Shape Draw()
         {
@@ -89,11 +97,6 @@ namespace SMT
                         infoCircle.Height = Size;
                         infoCircle.Width = Size;
 
-
-
-                       
-
-
                         System.Windows.Controls.Canvas.SetZIndex(infoCircle, 19);
 
                         infoCircle.Stroke = FillBrush;
@@ -108,16 +111,10 @@ namespace SMT
 
                         infoObject = infoCircle;
                     }
-
                     break;
-
-
-
-
             }
 
             return infoObject;
         }
-
     }
 }

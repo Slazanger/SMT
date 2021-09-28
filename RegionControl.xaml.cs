@@ -1289,9 +1289,6 @@ namespace SMT
                     continue;
                 }
 
-
-
-
                 infoColour = dataColor;
                 long SystemAlliance = 0;
 
@@ -3010,6 +3007,51 @@ namespace SMT
                 }
 
                 ReDrawMap(true);
+            }
+        }
+
+        private void SetTag_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+            MenuItem mi = sender as MenuItem;
+            if (mi != null)
+            {
+                string tagColor = mi.DataContext as string;
+                int deleted;
+                switch(tagColor)
+                {
+                    case "clear":
+                        deleted = InfoLayer.RemoveAll(infoitem => infoitem.AssociatedMapSystem == eveSys);
+                        if (deleted > 0)
+                        {
+                            ReDrawMap(true);
+                        }
+                        break;
+
+                    case "clear_region":
+                        deleted = InfoLayer.RemoveAll(infoitem => infoitem.ItemType == InfoItem.Type.SystemTag && infoitem.Region == eveSys.Region);
+                        if (deleted > 0)
+                        {
+                            ReDrawMap(true);
+                        }
+                        break;
+
+                    default:
+                        InfoItem ii = new InfoItem();
+                        ii.ItemType = InfoItem.Type.SystemTag;
+                        ii.AssociatedMapSystem = eveSys;
+                        ii.DrawType = InfoItem.ShapeType.Circle;
+                        ii.X1 = (int)eveSys.LayoutX;
+                        ii.Y1 = (int)eveSys.LayoutY;
+                        ii.Size = 30;
+                        ii.Region = eveSys.Region;
+                        ii.Fill = (Color)ColorConverter.ConvertFromString(tagColor);
+                        InfoLayer.Add(ii);
+
+                        ReDrawMap(true);
+                        break;
+                }
             }
         }
 

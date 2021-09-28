@@ -1458,7 +1458,7 @@ namespace SMT
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
-            string infoObjectsFile = AppDomain.CurrentDomain.BaseDirectory + @"\InfoObjects.txt";
+            string infoObjectsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\InfoObjects.txt";
             if (File.Exists(infoObjectsFile))
             {
                 StreamReader file = new StreamReader(infoObjectsFile);
@@ -1487,6 +1487,7 @@ namespace SMT
                         continue;
                     }
 
+                    // Line format : <region> SYSLINK <from_system> <to_system> <line_style:DASHED/SOLID> <size> <colour>
                     if(parts[1] == "SYSLINK")
                     {
                         if(parts.Length != 7)
@@ -1537,7 +1538,7 @@ namespace SMT
                         InfoLayer.Add(ii);
                     }
 
-
+                    // Line format : <region> SYSMARKER <from_system> <size> <colour>
                     if (parts[1] == "SYSMARKER")
                     {
                         if (parts.Length != 5)
