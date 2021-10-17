@@ -822,10 +822,22 @@ namespace SMT.EVEData
 
                             EVEData.System es = EveManager.Instance.GetEveSystemFromID(esifm.SolarSystemId);
 
+
                             fm.Name = EveManager.Instance.GetCharacterName(esifm.CharacterId);
-                            fm.Location = es.Name;
-                            fm.Region = es.Region;
+
                             fm.CharacterID = esifm.CharacterId;
+
+                            if (es == null)
+                            {
+                                fm.Location = "";
+                                fm.Region= "";
+                            }
+                            else
+                            {
+                                fm.Location = es.Name;
+                                fm.Region = es.Region;
+
+                            }
                             if (EveManager.Instance.ShipTypes.ContainsKey(esifm.ShipTypeId.ToString()))
                             {
                                 fm.ShipType = EveManager.Instance.ShipTypes[esifm.ShipTypeId.ToString()];
