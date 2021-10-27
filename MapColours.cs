@@ -153,12 +153,12 @@ namespace SMT
         public bool ShowSystemPopup { get; set; }
 
         [Category("SOV")]
-        [DisplayName("Structure Vunerable")]
-        public Color SOVStructureVunerableColour { get; set; }
+        [DisplayName("Structure Vulnerable")]
+        public Color SOVStructureVulnerableColour { get; set; }
 
         [Category("SOV")]
-        [DisplayName("Structure Vunerable Soon")]
-        public Color SOVStructureVunerableSoonColour { get; set; }
+        [DisplayName("Structure Vulnerable Soon")]
+        public Color SOVStructureVulnerableSoonColour { get; set; }
 
         [Category("Systems")]
         [DisplayName("Outline")]

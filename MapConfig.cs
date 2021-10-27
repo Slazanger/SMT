@@ -902,8 +902,8 @@ namespace SMT
 
                 ActiveIncursionColour = Color.FromRgb(110, 82, 77),
 
-                SOVStructureVunerableColour = Color.FromRgb(64, 64, 64),
-                SOVStructureVunerableSoonColour = Color.FromRgb(178, 178, 178),
+                SOVStructureVulnerableColour = Color.FromRgb(64, 64, 64),
+                SOVStructureVulnerableSoonColour = Color.FromRgb(178, 178, 178),
 
                 ConstellationHighlightColour = Color.FromRgb(147, 131, 131),
 
