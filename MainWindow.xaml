@@ -252,7 +252,9 @@
                                                         <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ActiveCharacter.NavigationMode, ElementName=RegionUC, Mode=TwoWay}" Margin="2" Width="150" />
                                                     </StackPanel>
 
-                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionRC}" Margin="2" />
+                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="Use Thera" IsChecked="{Binding ActiveCharacter.UseTheraRouting, ElementName=RegionUC}" Margin="2" />
+
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">

@@ -47,6 +47,8 @@ namespace SMT.EVEData
 
         private bool m_UseAnsiblexGates;
 
+        private bool m_UseTheraRouting;
+
         private bool m_isOnline;
 
         /// <summary>
@@ -289,6 +291,28 @@ namespace SMT.EVEData
                 OnPropertyChanged("UseAnsiblexGates");
             }
         }
+
+
+        public bool UseTheraRouting
+        {
+            get
+            {
+                return m_UseTheraRouting;
+            }
+            set
+            {
+                if (m_UseTheraRouting == value)
+                {
+                    return;
+                }
+
+                m_UseTheraRouting = value;
+                routeNeedsUpdate = true;
+                esiRouteNeedsUpdate = true;
+                OnPropertyChanged("UseTheraRouting");
+            }
+        }
+
 
         public int DangerZoneRange { get; set; } 
 
@@ -631,6 +655,7 @@ namespace SMT.EVEData
                 return;
             }
 
+           
 
 
             if (Waypoints.Count == 0)
@@ -642,6 +667,16 @@ namespace SMT.EVEData
                 // new routing
                 string start = string.Empty;
                 string end = Location;
+
+                // grab the simple list of thera connections
+                List<string> currentActiveTheraConnections = new List<string>();
+                foreach(TheraConnection tc in EveManager.Instance.TheraConnections)
+                {
+                    currentActiveTheraConnections.Add(tc.System);
+                }
+                Navigation.UpdateTheraConnections(currentActiveTheraConnections);
+
+
 
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
@@ -662,7 +697,7 @@ namespace SMT.EVEData
                     start = end;
                     end = Waypoints[i];
 
-                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, false, NavigationMode);
+                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, UseTheraRouting, NavigationMode);
 
                     if (sysList != null)
                     {
@@ -692,7 +727,7 @@ namespace SMT.EVEData
                     foreach (Navigation.RoutePoint rp in ActiveRoute)
                     {
                         // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                        if (rp.GateToTake == Navigation.GateType.Ansibex || Waypoints.Contains(rp.SystemName))
+                        if (rp.GateToTake == Navigation.GateType.Ansibex || rp.GateToTake == Navigation.GateType.Thera  || Waypoints.Contains(rp.SystemName))
                         {
                             long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
 
@@ -720,6 +755,8 @@ namespace SMT.EVEData
                                 }
                             }
                             WayPointsToAdd.Add(wayPointSysID);
+
+
                         }
                     }
                 }

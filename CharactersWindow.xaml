@@ -133,9 +133,11 @@
                         <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding NavigationMode, Mode=TwoWay}" Margin="2" Width="140"  Background="Black"/>
                     </StackPanel>
                     <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="Use Ansiblex Gates" Margin="4"/>
+                    <CheckBox IsChecked="{Binding UseTheraRouting}"  HorizontalAlignment="Left" Content="Use Thera" Margin="4"/>
 
- 
-                 </StackPanel>
+                    
+
+                </StackPanel>
             </GroupBox>
 
 

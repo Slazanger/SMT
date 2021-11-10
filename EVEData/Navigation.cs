@@ -33,6 +33,25 @@ namespace SMT.EVEData
             {
                 mn.JBConnection = null;
             }
+            MapNodes["Thera"].Connections.Clear();
+        }
+
+        public static void ClearTheraConnections()
+        {
+            foreach (MapNode mn in MapNodes.Values)
+            {
+                mn.TheraConnections = null;
+            }
+        }
+
+        public static void UpdateTheraConnections(List<string> theraSystems)
+        {
+            ClearTheraConnections();
+
+            foreach (string ts in theraSystems)
+            {
+                MapNodes[ts].TheraConnections = theraSystems;
+            }
         }
 
         public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
@@ -127,6 +146,9 @@ namespace SMT.EVEData
                     }
                 }
             }
+
+
+
         }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)
@@ -222,6 +244,28 @@ namespace SMT.EVEData
                     }
                 }
 
+
+                if(UseThera && CurrentNode.TheraConnections != null)
+                {
+                    foreach (string theraConnection in CurrentNode.TheraConnections)
+                    {
+                        MapNode CMN = MapNodes[theraConnection];
+
+                        if (CMN.Visited)
+                            continue;
+
+                        if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
+                        {
+                            CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
+                            CMN.NearestToStart = CurrentNode;
+                            if (!OpenList.Contains(CMN))
+                            {
+                                OpenList.Add(CMN);
+                            }
+                        }
+                    }
+                }
+
                 /* Todo :  Additional error checking
                 if (UseThera && !string.IsNullOrEmptyCurrent(Node.TheraInSig))
                 {
@@ -262,6 +306,11 @@ namespace SMT.EVEData
                     if (mn.JBConnection != null && mn.JBConnection == Route[i + 1])
                     {
                         RP.GateToTake = GateType.Ansibex;
+                    }
+
+                    if(UseThera && mn.TheraConnections != null && mn.TheraConnections.Contains(Route[i + 1]) )
+                    {
+                        RP.GateToTake = GateType.Thera;
                     }
                 }
                 ActualRoute.Add(RP);
@@ -425,6 +474,11 @@ namespace SMT.EVEData
                     s += " (Ansiblex)";
                 }
 
+                if (GateToTake == GateType.Thera)
+                {
+                    s += " (Thera)";
+                }
+
                 if (GateToTake == GateType.JumpTo && LY > 0.0)
                 {
                     s += " (Jump To, Range " + LY.ToString("0.##") + " )";
@@ -439,6 +493,7 @@ namespace SMT.EVEData
             public double Cost;
             public double F;
             public string JBConnection;
+            public List<string> TheraConnections;
             public double MinCostToStart;
             public MapNode NearestToStart;
             public string TheraInSig;
