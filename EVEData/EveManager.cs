@@ -130,6 +130,9 @@ namespace SMT.EVEData
             }
         }
 
+
+        public string EVELogFolder { get; set; }
+
         public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
 
         /// <summary>
@@ -1831,10 +1834,15 @@ namespace SMT.EVEData
 
             intelFileReadPos = new Dictionary<string, int>();
 
-            string eveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
-            if (Directory.Exists(eveLogFolder))
+
+            if(string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
-                intelFileWatcher = new FileSystemWatcher(eveLogFolder)
+                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
+            }
+
+            if (Directory.Exists(EVELogFolder))
+            {
+                intelFileWatcher = new FileSystemWatcher(EVELogFolder)
                 {
                     Filter = "*.txt",
                     EnableRaisingEvents = true,
@@ -1853,7 +1861,7 @@ namespace SMT.EVEData
 
             new Thread(() =>
             {
-                FileWatcher(eveLogFolder);
+                FileWatcher(EVELogFolder);
             }).Start();
 
             // END SUPERHACK
@@ -1862,7 +1870,6 @@ namespace SMT.EVEData
 
         public void ShuddownIntelWatcher()
         {
-            string eveLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
             if (intelFileWatcher != null)
             {
                 intelFileWatcher.Changed -= IntelFileWatcher_Changed;
@@ -2146,7 +2153,6 @@ namespace SMT.EVEData
                 SecretKey = EveAppConfig.SecretKey,
                 CallbackUrl = EveAppConfig.CallbackURL,
                 UserAgent = "SMT-map-app",
-                AuthVersion = AuthVersion.v2
             });
 
             ESIClient = new ESI.NET.EsiClient(config);

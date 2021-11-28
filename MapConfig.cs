@@ -93,6 +93,8 @@ namespace SMT
 
         private bool m_drawRoute;
 
+        private string m_CustomEveLogFolderLocation;
+
 
         public MapConfig()
         {
@@ -190,7 +192,22 @@ namespace SMT
             }
         }
 
+        [XmlIgnoreAttribute]
+        public string CurrentEveLogFolderLocation
+        {
+            get; set;
+        }
 
+
+        public string CustomEveLogFolderLocation
+        {
+            get => m_CustomEveLogFolderLocation;
+            set
+            {
+                m_CustomEveLogFolderLocation = value;
+                OnPropertyChanged("CustomEveLogFolderLocation");
+            }
+        }
 
         public bool DrawRoute
         {

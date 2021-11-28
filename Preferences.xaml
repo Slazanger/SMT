@@ -22,28 +22,48 @@
                             <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0">
-                            <GroupBox Header="General" Margin="4" Height="355">
-                                <StackPanel>
-                                    <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="Always on top" />
-                                    <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
-                                    <CheckBox x:Name="syncESIPositionChk" Margin="0,3" Checked="syncESIPositionChk_Checked" Unchecked="syncESIPositionChk_Checked">Use ESI for character positions</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=DrawRoute}" Margin="0,3" Content="Draw Route" />
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="2">
+                            <StackPanel>
+                                <GroupBox Margin="4" Height="115">
+                                    <GroupBox.Header>
+                                        <TextBlock FontWeight="Bold">General</TextBlock>
+                                    </GroupBox.Header>
+                                    <StackPanel>
+                                        <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="Always on top" />
+                                        <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
+                                        <CheckBox x:Name="syncESIPositionChk" Margin="0,3" Checked="syncESIPositionChk_Checked" Unchecked="syncESIPositionChk_Checked">Use ESI for character positions</CheckBox>
+                                        <CheckBox IsChecked="{Binding Path=DrawRoute}" Margin="0,3" Content="Draw Route" />
+                                    </StackPanel>
+                                </GroupBox>
 
 
-                                    
-                                </StackPanel>
-                            </GroupBox>
+                                <GroupBox Header="Logs (changing these requires a restart)" Margin="4" Height="125">
+                                    <StackPanel>
+                                        <Label Content="Current Log Folder : "/>
+                                        <Label Content="{Binding Path=CurrentEveLogFolderLocation}"/>
+
+                                        <Button Name="SetLogLocation" Content="Set Custom Log Folder" Click="SetLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left"/>
+                                        <Button Name="DefaultLogLocation" Content="Set Default Log Folder" Click="DefaultLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left"/>
+
+                                    </StackPanel>
+                                </GroupBox>
+
+
+                            </StackPanel>
+
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <GroupBox Header="Performance" Margin="4" Height="355">
+                            <GroupBox Header="Performance" Margin="4" Height="325">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3">Disable jump bridges path animation</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=DisableRoutePathAnimation}" Margin="0,3">Disable route path animation</CheckBox>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
+
+
+
                     </Grid>
                 </TabItem>
                 <TabItem Header="Region/Universe" HorizontalAlignment="Left">

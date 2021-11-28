@@ -33,7 +33,6 @@ namespace SMT.EVEData
             {
                 mn.JBConnection = null;
             }
-            MapNodes["Thera"].Connections.Clear();
         }
 
         public static void ClearTheraConnections()

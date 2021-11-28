@@ -6,7 +6,9 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Media;
+using MessageBox = System.Windows.MessageBox;
 
 namespace SMT
 {
@@ -124,6 +126,22 @@ namespace SMT
             mediaPlayer.Volume = MapConf.IntelSoundVolume;
             mediaPlayer.Position = new TimeSpan(0, 0, 0);
             mediaPlayer.Play();
+        }
+
+        private void SetLogLocation_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new FolderBrowserDialog();
+            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+            {
+                MapConf.CustomEveLogFolderLocation = dialog.SelectedPath;
+            }
+            MessageBoxResult result = MessageBox.Show("Restart SMT for the log folder location to take effect", "Please Restart SMT", MessageBoxButton.OK);
+        }
+
+        private void DefaultLogLocation_Click(object sender, RoutedEventArgs e)
+        {
+            MapConf.CustomEveLogFolderLocation = string.Empty;
+            MessageBoxResult result = MessageBox.Show("Restart SMT for the log folder location to take effect",  "Please Restart SMT",  MessageBoxButton.OK);
         }
     }
 

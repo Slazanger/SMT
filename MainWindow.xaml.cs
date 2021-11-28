@@ -107,6 +107,7 @@ namespace SMT
 
             EVEManager = new EVEData.EveManager(SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
+            EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
 
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
 
@@ -123,6 +124,8 @@ namespace SMT
 
             EVEManager.SetupIntelWatcher();
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
+
+            MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
             EVEManager.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
 
