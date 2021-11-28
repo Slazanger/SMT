@@ -634,6 +634,40 @@ namespace SMT.EVEData
             }
 
 
+            // now open up the eve static data export and extract some info from it
+            string eveStaticDataConstellationFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapConstellations.csv";
+            if (File.Exists(eveStaticDataConstellationFile))
+            {
+                StreamReader file = new StreamReader(eveStaticDataConstellationFile);
+
+                Dictionary<string, string> constMap = new Dictionary<string, string>();
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] bits = line.Split(',');
+
+                    string constID = bits[1];
+                    string constName = bits[2];
+
+                    constMap[constID] = constName;
+                }
+
+                foreach (System s in Systems)
+                {
+                    s.ConstellationName = constMap[s.ConstellationID];
+                }
+
+            }
+            else
+            {
+                // Error
+            }
+
+            
+
             foreach (System s in Systems)
             {
                 NameToSystem[s.Name] = s;

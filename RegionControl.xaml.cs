@@ -3179,6 +3179,14 @@ namespace SMT
 
                 SystemInfoPopupSP.Children.Add(new Separator());
 
+                Label constellation = new Label();
+                constellation.Padding = one;
+                constellation.Margin = one;
+                constellation.Content = "Const\t:  " + selectedSys.ActualSystem.ConstellationName;
+                constellation.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                SystemInfoPopupSP.Children.Add(constellation);
+
+
                 Label secstatus = new Label();
                 secstatus.Padding = one;
                 secstatus.Margin = one;

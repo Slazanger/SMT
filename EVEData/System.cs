@@ -95,6 +95,8 @@ namespace SMT.EVEData
         /// </summary>
         public string ConstellationID { get; set; }
 
+        public string ConstellationName { get; set; }
+
         public bool HasIceBelt { get; set; }
 
         public bool HasJoveObservatory { get; set; }
