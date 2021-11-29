@@ -17,7 +17,7 @@ namespace SMT.EVEData
         public Anom()
         {
             Name = string.Empty;
-            Type = SignatureType.Unknown;
+            Type = string.Empty;
             TimeFound = DateTime.Now;
         }
 
@@ -80,44 +80,9 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the type of signature
         /// </summary>
-        public SignatureType Type { get; set; }
+        public string Type { get; set; }
 
-        /// <summary>
-        /// Converts the signature text to appropriate Enum
-        /// </summary>
-        /// <param name="text">the signature type text</param>
-        /// <returns>Enum of the found signature or Unknown if no match</returns>
-        public static SignatureType GetTypeFromString(string text)
-        {
-            if (text == "Combat Site")
-            {
-                return SignatureType.Combat;
-            }
-            else if (text == "Ore Site")
-            {
-                return SignatureType.Ore;
-            }
-            else if (text == "Gas Site")
-            {
-                return SignatureType.Gas;
-            }
-            else if (text == "Relic Site")
-            {
-                return SignatureType.Relic;
-            }
-            else if (text == "Data Site")
-            {
-                return SignatureType.Data;
-            }
-            else if (text == "Wormhole")
-            {
-                return SignatureType.WormHole;
-            }
-            else
-            {
-                return SignatureType.Unknown;
-            }
-        }
+
 
         /// <summary>
         /// To String

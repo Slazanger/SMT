@@ -12,12 +12,22 @@ namespace SMT.EVEData
     /// </summary>
     public class AnomData
     {
+
+        private List<string> CosmicSignatureTags;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AnomData" /> class
         /// </summary>
         public AnomData()
         {
             Anoms = new SerializableDictionary<string, Anom>();
+            CosmicSignatureTags = new List<string>();
+
+            CosmicSignatureTags.Add("Cosmic Signature");
+            CosmicSignatureTags.Add("Kosmische Signatur");
+            CosmicSignatureTags.Add("Signature cosmique");
+            
+
         }
 
         /// <summary>
@@ -46,13 +56,18 @@ namespace SMT.EVEData
                 if (words.Length == 6)
                 {
                     // only care about "Cosmic Signature"
-                    if (words[1] == "Cosmic Signature")
+                    if (CosmicSignatureTags.Contains(words[1]) )
                     {
                         validPaste = true;
 
                         string sigID = words[0];
                         string sigType = words[2];
                         string sigName = words[3];
+
+                        if(string.IsNullOrEmpty(sigType))
+                        {
+                            sigType = "Unknown";
+                        }
 
                         itemsToKeep.Add(sigID);
 
@@ -61,9 +76,9 @@ namespace SMT.EVEData
                         {
                             // updating an existing one
                             Anom an = Anoms[sigID];
-                            if (an.Type == Anom.SignatureType.Unknown)
+                            if (an.Type == "Unknown")
                             {
-                                an.Type = Anom.GetTypeFromString(sigType);
+                                an.Type = sigType;
                             }
 
                             if (!string.IsNullOrEmpty(sigName))
@@ -75,11 +90,7 @@ namespace SMT.EVEData
                         {
                             Anom an = new Anom();
                             an.Signature = sigID;
-
-                            if (!string.IsNullOrEmpty(sigType))
-                            {
-                                an.Type = Anom.GetTypeFromString(sigType);
-                            }
+                            an.Type = sigType;
 
                             if (!string.IsNullOrEmpty(sigName))
                             {
