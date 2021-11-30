@@ -586,7 +586,7 @@ namespace SMT.EVEData
                 SsoToken sst;
                 AuthorizedCharacterData acd;
 
-                sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken);
+                sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken, "");
                 if (sst == null || sst.RefreshToken == null)
                 {
 
