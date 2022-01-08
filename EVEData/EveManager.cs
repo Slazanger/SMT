@@ -25,6 +25,7 @@ using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace SMT.EVEData
 {
@@ -46,9 +47,27 @@ namespace SMT.EVEData
         private Dictionary<string, int> intelFileReadPos;
 
         /// <summary>
+        /// Read position map for the intel files
+        /// </summary>
+        private Dictionary<string, int> gameFileReadPos;
+
+        /// <summary>
+        /// Read position map for the intel files
+        /// </summary>
+        private Dictionary<string, string> gamelogFileCharacterMap;
+
+
+        /// <summary>
         /// File system watcher
         /// </summary>
         private FileSystemWatcher intelFileWatcher;
+
+
+        /// <summary>
+        /// File system watcher
+        /// </summary>
+        private FileSystemWatcher gameLogFileWatcher;
+
 
         private string VersionStr;
 
@@ -62,7 +81,7 @@ namespace SMT.EVEData
             LocalCharacters = new ObservableCollection<LocalCharacter>();
             VersionStr = version;
 
-  
+
             string SaveDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT";
             if (!Directory.Exists(SaveDataRoot))
             {
@@ -168,6 +187,11 @@ namespace SMT.EVEData
         public BindingList<EVEData.IntelData> IntelDataList { get; set; }
 
         /// <summary>
+        /// Gets or sets the Gamelog List
+        /// </summary>
+        public BindingList<EVEData.GameLogData> GameLogList { get; set; }
+
+        /// <summary>
         /// Gets or sets the current list of Jump Bridges
         /// </summary>
         public ObservableCollection<JumpBridge> JumpBridges { get; set; }
@@ -232,7 +256,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current list of clear markers for the intel (eg "Clear" "Clr" etc)
         /// </summary>
-         public List<string> IntelClearFilters { get; set; }
+        public List<string> IntelClearFilters { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of intel filters used to monitor the local log files
@@ -383,7 +407,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Verge Vendor", "10000068", "Gallente", 245, 330));
             Regions.Add(new MapRegion("Wicked Creek", "10000006", string.Empty, 790, 615));
 
-      
+
 
 
 
@@ -536,7 +560,7 @@ namespace SMT.EVEData
                         s.RadiusAU = radius / 149597870700;
 
                         // manually patch pochven
-                        if(regionID == "10000070")
+                        if (regionID == "10000070")
                         {
                             s.Region = "Pochven";
                         }
@@ -666,7 +690,7 @@ namespace SMT.EVEData
                 // Error
             }
 
-            
+
 
             foreach (System s in Systems)
             {
@@ -766,7 +790,7 @@ namespace SMT.EVEData
             lonetrek.MapSystems.Remove("Kino");  // Pochven
             lonetrek.MapSystems.Remove("Nani");  // Pochven
             lonetrek.MapSystems.Remove("Arvasaras");  // Pochven
-            
+
 
 
             EVEData.MapRegion metropolis = GetRegion("Metropolis");
@@ -796,7 +820,7 @@ namespace SMT.EVEData
             MapRegion pochven = new MapRegion("Pochven", "10000008", "Triglavian", 50, 50);
             Regions.Add(pochven);
 
-             // Krai Perun
+            // Krai Perun
             pochven.MapSystems.Add("Otela", new MapSystem() { Name = "Otela", LayoutX = 915, LayoutY = 360, Region = "Pochven", OutOfRegion = false });
             pochven.MapSystems.Add("Otanuomi", new MapSystem() { Name = "Otanuomi", LayoutX = 600, LayoutY = 550, Region = "Pochven", OutOfRegion = false });
             pochven.MapSystems.Add("Kino", new MapSystem() { Name = "Kino", LayoutX = 790, LayoutY = 390, Region = "Pochven", OutOfRegion = false });
@@ -908,7 +932,7 @@ namespace SMT.EVEData
                 }
             }
 
- 
+
 
             foreach (MapRegion rr in Regions)
             {
@@ -1131,7 +1155,7 @@ namespace SMT.EVEData
 
             foreach (EVEData.System sys in Systems)
             {
- 
+
 
                 if (sys.ActualX < universeXMin)
                 {
@@ -1160,7 +1184,7 @@ namespace SMT.EVEData
             double universeScale = Math.Min(XScale, ZScale);
 
 
-           
+
             foreach (EVEData.System sys in Systems)
             {
                 double X = (sys.ActualX - universeXMin) * universeScale;
@@ -1238,7 +1262,7 @@ namespace SMT.EVEData
                 string Header = "Region,Name, UniverseX, UniverseY";
                 w.WriteLine(Header);
 
-                foreach(System s in Systems)
+                foreach (System s in Systems)
                 {
                     string CSVLine = $"{s.Region},{s.Name},{s.UniverseX},{s.UniverseY}";
                     w.WriteLine(CSVLine);
@@ -1260,7 +1284,7 @@ namespace SMT.EVEData
                 {
                     foreach (EVEData.System sysB in Systems)
                     {
-                        if (sysA == sysB )
+                        if (sysA == sysB)
                         {
                             continue;
                         }
@@ -1271,7 +1295,7 @@ namespace SMT.EVEData
 
                         double s = minSpread - l;
 
-                        if(s > 0)
+                        if (s > 0)
                         {
                             movedThisTime = true;
 
@@ -1290,7 +1314,7 @@ namespace SMT.EVEData
                     }
                 }
 
-                if(movedThisTime == false)
+                if (movedThisTime == false)
                 {
                     done = true;
                 }
@@ -1537,7 +1561,7 @@ namespace SMT.EVEData
             esiChar.ESIAccessTokenExpiry = acd.ExpiresOn;
             esiChar.ID = acd.CharacterID;
             esiChar.ESIAuthData = acd;
- 
+
             // now to find if a matching character
         }
 
@@ -1598,7 +1622,7 @@ namespace SMT.EVEData
             }
 
 
-            
+
             // now add the beacons
             string cynoBeaconsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\CynoBeacons.txt";
             if (File.Exists(cynoBeaconsFile))
@@ -1775,9 +1799,9 @@ namespace SMT.EVEData
             Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
 
             List<string> beaconsToSave = new List<string>();
-            foreach(System s in Systems)
+            foreach (System s in Systems)
             {
-                if(s.HasJumpBeacon)
+                if (s.HasJumpBeacon)
                 {
                     beaconsToSave.Add(s.Name);
                 }
@@ -1869,14 +1893,16 @@ namespace SMT.EVEData
             intelFileReadPos = new Dictionary<string, int>();
 
 
-            if(string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
+            if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
-                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs\";
+                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\";
             }
 
-            if (Directory.Exists(EVELogFolder))
+            string chatlogFolder = EVELogFolder + "Chatlogs\\";
+
+            if (Directory.Exists(chatlogFolder))
             {
-                intelFileWatcher = new FileSystemWatcher(EVELogFolder)
+                intelFileWatcher = new FileSystemWatcher(chatlogFolder)
                 {
                     Filter = "*.txt",
                     EnableRaisingEvents = true,
@@ -1884,6 +1910,42 @@ namespace SMT.EVEData
                 };
                 intelFileWatcher.Changed += IntelFileWatcher_Changed;
             }
+
+        }
+
+        /// <summary>
+        /// Setup the game log0 watcher
+        /// </summary>
+        public void SetupGameLogWatcher()
+        {
+            gameFileReadPos = new Dictionary<string, int>();
+            gamelogFileCharacterMap = new Dictionary<string, string>();
+
+            GameLogList = new BindingList<GameLogData>();
+
+            if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
+            {
+                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\";
+            }
+
+            string gameLogFolder = EVELogFolder + "Gamelogs\\";
+
+            if (Directory.Exists(gameLogFolder))
+            {
+                gameLogFileWatcher = new FileSystemWatcher(gameLogFolder)
+                {
+                    Filter = "*.txt",
+                    EnableRaisingEvents = true,
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
+                };
+                gameLogFileWatcher.Changed += GameLogFileWatcher_Changed;
+            }
+
+        }
+
+
+        public void SetupLogFileTriggers()
+        {
 
             // -----------------------------------------------------------------
             // SUPER HACK WARNING....
@@ -1893,13 +1955,81 @@ namespace SMT.EVEData
             // causes the file watcher to operate correctly otherwise this data
             // doesnt get updated until something other than the eve client reads these files
 
+            List<string> logFolders = new List<string>();
+            string chatLogFolder = EVELogFolder + "Chatlogs\\";
+            string gameLogFolder = EVELogFolder + "Gamelogs\\";
+
+            logFolders.Add(chatLogFolder);
+            logFolders.Add(gameLogFolder);
+
             new Thread(() =>
             {
-                FileWatcher(EVELogFolder);
+                LogFileCacheTrigger(logFolders);
             }).Start();
 
             // END SUPERHACK
             // -----------------------------------------------------------------
+        }
+
+        private void LogFileCacheTrigger(List<string> eveLogFolders)
+        {
+            Thread.CurrentThread.IsBackground = false;
+
+            foreach (string dir in eveLogFolders)
+            {
+                if (!Directory.Exists(dir))
+                {
+                    return;
+                }
+            }
+
+            // loop forever
+            while (WatcherThreadShouldTerminate == false)
+            {
+                foreach (string folder in eveLogFolders)
+                {
+                    DirectoryInfo di = new DirectoryInfo(folder);
+                    FileInfo[] files = di.GetFiles("*.txt");
+                    foreach (FileInfo file in files)
+                    {
+                        bool readFile = false;
+                        foreach (string intelFilterStr in IntelFilters)
+                        {
+                            if (file.Name.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                readFile = true;
+                                break;
+                            }
+                        }
+
+                        // local files
+                        if (file.Name.Contains("Local_"))
+                        {
+                            readFile = true;
+                        }
+
+                        // gamelogs
+                        if (folder.Contains("GameLogs"))
+                        {
+                            readFile = true;
+                        }
+
+                        // only read files from the last day
+                        if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
+                        {
+                            FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                            ifs.Seek(0, SeekOrigin.End);
+                            Thread.Sleep(100);
+                            ifs.Close();
+                            Thread.Sleep(100);
+                        }
+                    }
+
+                    Thread.Sleep(1000);
+                }
+
+
+            }
         }
 
         public void ShuddownIntelWatcher()
@@ -1911,9 +2041,20 @@ namespace SMT.EVEData
             WatcherThreadShouldTerminate = true;
         }
 
+        public void ShuddownGameLogWatcher()
+        {
+            if (gameLogFileWatcher != null)
+            {
+                gameLogFileWatcher.Changed -= GameLogFileWatcher_Changed;
+            }
+            WatcherThreadShouldTerminate = true;
+        }
+
+
         public void ShutDown()
         {
             ShuddownIntelWatcher();
+            ShuddownGameLogWatcher();
             BackgroundThreadShouldTerminate = true;
 
             ZKillFeed.ShutDown();
@@ -1992,10 +2133,10 @@ namespace SMT.EVEData
                 MetaliminalStorms.Clear();
 
                 List<Storm> ls = Storm.GetStorms();
-                foreach(Storm s in ls)
+                foreach (Storm s in ls)
                 {
                     System sys = GetEveSystem(s.System);
-                    if(sys != null)
+                    if (sys != null)
                     {
                         MetaliminalStorms.Add(s);
                     }
@@ -2005,7 +2146,7 @@ namespace SMT.EVEData
 
 
             // now update the Strong and weak areas around the storm 
-            foreach(Storm s in MetaliminalStorms)
+            foreach (Storm s in MetaliminalStorms)
             {
 
                 // The Strong area is 1 jump out from the centre
@@ -2127,52 +2268,7 @@ namespace SMT.EVEData
             }
         }
 
-        private void FileWatcher(string eveLogFolder)
-        {
-            Thread.CurrentThread.IsBackground = false;
 
-            if (!Directory.Exists(eveLogFolder))
-            {
-                return;
-            }
-
-            // loop forever
-            while (WatcherThreadShouldTerminate == false)
-            {
-                DirectoryInfo di = new DirectoryInfo(eveLogFolder);
-                FileInfo[] files = di.GetFiles("*.txt");
-                foreach (FileInfo file in files)
-                {
-                    bool readFile = false;
-                    foreach (string intelFilterStr in IntelFilters)
-                    {
-                        if (file.Name.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            readFile = true;
-                            break;
-                        }
-                    }
-
-                    // local files
-                    if (file.Name.Contains("Local_"))
-                    {
-                        readFile = true;
-                    }
-
-                    // only read files from the last day
-                    if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
-                    {
-                        FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        ifs.Seek(0, SeekOrigin.End);
-                        Thread.Sleep(100);
-                        ifs.Close();
-                        Thread.Sleep(100);
-                    }
-                }
-
-                Thread.Sleep(2000);
-            }
-        }
 
         /// <summary>
         /// Initialise the eve manager
@@ -2559,6 +2655,132 @@ namespace SMT.EVEData
         }
 
         /// <summary>
+        /// GameLog File watcher changed handler
+        /// </summary>
+        private void GameLogFileWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            string changedFile = e.FullPath;
+            string characterName = string.Empty;
+
+
+            try
+            {
+                Encoding fe = Utils.GetEncoding(changedFile);
+                FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                StreamReader file = new StreamReader(ifs, fe);
+
+                int fileReadFrom = 0;
+
+                // have we seen this file before
+                if (gameFileReadPos.Keys.Contains<string>(changedFile))
+                {
+                    fileReadFrom = gameFileReadPos[changedFile];
+                }
+                else
+                {
+
+                    // read the iniital block
+                    while (!file.EndOfStream)
+                    {
+                        string l = file.ReadLine();
+                        fileReadFrom++;
+
+                        // explicitly skip just "local"
+                        if (l.Contains("Gamelog"))
+                        {
+                            // now can read the next line
+                            l = file.ReadLine(); // should be the "Listener : <CharName>"
+                            fileReadFrom++;
+
+                            gamelogFileCharacterMap[changedFile] = l.Split(':')[1].Trim(); 
+
+                            // session started
+                            l = file.ReadLine();
+                            fileReadFrom++;
+
+                            // header end
+                            l = file.ReadLine();
+                            fileReadFrom++;
+
+                            break;
+                        }
+                    }
+
+
+
+                    file.BaseStream.Seek(0, SeekOrigin.Begin);
+                }
+
+                
+                characterName = gamelogFileCharacterMap[changedFile];
+
+                for (int i = 0; i < fileReadFrom; i++)
+                {
+                    file.ReadLine();
+                }
+
+                string line = file.ReadLine();
+
+                while (line != null)
+                {                    // trim any items off the front
+
+                    if (line == "")
+                    {
+                        line = file.ReadLine();
+                        continue;
+                    }
+
+                    fileReadFrom++;
+
+                    int typeStartPos = line.IndexOf("(") + 1;
+                    int typeEndPos = line.IndexOf(")");
+
+                    // file corrupt
+                    if(typeStartPos < 1 || typeEndPos < 1)
+                    {
+                        return;
+                    }
+
+
+
+                    string type = line.Substring(typeStartPos, typeEndPos - typeStartPos);
+
+                    line = line.Substring(typeEndPos + 1);
+
+                    // strip the formatting from the log
+                    line = Regex.Replace(line, "<.*?>", String.Empty);
+
+
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        GameLogData gd = new GameLogData()
+                        {
+                            Character = characterName,
+                            Text = line,
+                            Severity = type,
+                            Time = DateTime.Now,
+                        };
+
+                        GameLogList.Insert(0, gd);
+
+                    }), DispatcherPriority.Normal, null);
+
+                    line = file.ReadLine();
+                    gameFileReadPos[changedFile] = fileReadFrom;
+                }
+
+                ifs.Close();
+
+                gameFileReadPos[changedFile] = fileReadFrom;
+            }
+            catch
+            {
+            }
+        }
+
+
+        /// <summary>
         /// Load the character data from disk
         /// </summary>
         private void LoadCharacters()
@@ -2739,7 +2961,7 @@ namespace SMT.EVEData
             catch
             {
             }
-       }
+        }
 
         /// <summary>
         /// Start the ESI download for the kill info

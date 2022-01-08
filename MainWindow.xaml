@@ -38,6 +38,16 @@
                 <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
              </DockPanel>
         </DataTemplate>
+
+        <DataTemplate x:Key="gameLogDataDataTemplate">
+            <DockPanel>
+                <TextBlock Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top">
+                    <Run Text="["/><Run Text="{Binding Character, FallbackValue=''}" /><Run Text="]"/>
+                </TextBlock>
+                <TextBlock Text="{Binding Time, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
+                <TextBlock Text="{Binding Text, FallbackValue=GameLog Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
+            </DockPanel>
+        </DataTemplate>
     </Window.Resources>
 
     <DockPanel>
@@ -454,6 +464,18 @@
                                     </Grid.RowDefinitions>
                                     <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource intelDataDataTemplate}" />
                                     <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+                            <xcadl:LayoutAnchorable x:Name="GamelogLayoutAnchorable"  Title="Gamelog" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="GameLogContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="25" />
+                                    </Grid.RowDefinitions>
+
+                                    <ListView x:Name="RawGameDataBox" Margin="0,2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource gameLogDataDataTemplate}" />
+                                    <Button Content="Clear GameLog" Grid.Row="1" x:Name="ClearGameLogBtn" Click="ClearGameLogBtn_Click" />
+
                                 </Grid>
                             </xcadl:LayoutAnchorable>
                             <xcadl:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">

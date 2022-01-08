@@ -242,6 +242,7 @@
     <Compile Include="EVEData\ESI\StructureHunter.cs" />
     <Compile Include="EVEData\ESI\StructureIDData.cs" />
     <Compile Include="EVEData\ESI\StructureSearch.cs" />
+    <Compile Include="EVEData\GameLogData.cs" />
     <Compile Include="EVEData\LocalCharacter.cs" />
     <Compile Include="EVEData\Navigation.cs" />
     <Compile Include="EVEData\POI.cs" />

@@ -123,7 +123,11 @@ namespace SMT
             }
 
             EVEManager.SetupIntelWatcher();
+            EVEManager.SetupGameLogWatcher();
+            EVEManager.SetupLogFileTriggers();
+
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
+            RawGameDataBox.ItemsSource = EVEManager.GameLogList;
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -834,6 +838,15 @@ namespace SMT
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 EVEManager.IntelDataList.Clear();
+            }), DispatcherPriority.ApplicationIdle);
+        }
+
+
+        private void ClearGameLogBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                EVEManager.GameLogList.Clear();
             }), DispatcherPriority.ApplicationIdle);
         }
 

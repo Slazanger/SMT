@@ -113,7 +113,7 @@ namespace SMT.EVEData
 
             IsOnline = true;
 
-            if(unknownChar == null)
+            if (unknownChar == null)
             {
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
@@ -196,8 +196,8 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public Fleet FleetInfo { get; set; }
 
-        public bool IsOnline 
-        { 
+        public bool IsOnline
+        {
             get
             {
                 return m_isOnline;
@@ -314,7 +314,7 @@ namespace SMT.EVEData
         }
 
 
-        public int DangerZoneRange { get; set; } 
+        public int DangerZoneRange { get; set; }
 
         [XmlIgnoreAttribute]
         public List<string> WarningSystems { get; set; }
@@ -324,6 +324,10 @@ namespace SMT.EVEData
 
         [XmlIgnoreAttribute]
         public BitmapImage Portrait { get; set; }
+
+
+        [XmlIgnoreAttribute]
+        public String AlertText {get; set;} 
 
 
 
