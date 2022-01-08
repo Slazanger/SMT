@@ -26,6 +26,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace SMT.EVEData
 {
@@ -2764,7 +2765,40 @@ namespace SMT.EVEData
 
                         GameLogList.Insert(0, gd);
 
+
+
                     }), DispatcherPriority.Normal, null);
+
+                    foreach (LocalCharacter lc in LocalCharacters)
+                    {
+                        if (lc.Name == characterName)
+                        {
+                            bool sendWindowsNotification = false;
+                            if (lc.CombatWarningEnabled && type == "combat")
+                            {
+                                lc.GameLogWarningText = line;
+                                sendWindowsNotification = true;
+                            }
+
+                            if (lc.ObservatoryDecloakWarningEnabled && line.Contains("cloak deactivates due to a pulse from a Mobile Observatory"))
+                            {
+                                lc.GameLogWarningText = line;
+                                sendWindowsNotification = true;
+                            }
+
+                            if(sendWindowsNotification)
+                            {
+                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                new ToastContentBuilder()
+                                    .AddText("SMT Alert")
+                                    .AddText("Character : " + characterName + "(" + lc.Location + ")")
+                                    .AddText(line)
+                                    .Show(); 
+                            }
+                        }
+                    }
+
+
 
                     line = file.ReadLine();
                     gameFileReadPos[changedFile] = fileReadFrom;

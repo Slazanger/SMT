@@ -51,6 +51,10 @@ namespace SMT.EVEData
 
         private bool m_isOnline;
 
+        private bool m_ObservatoryDecloakWarningEnabled;
+        private bool m_CombatWarningEnabled;
+
+
         /// <summary>
         /// Does the route need updating
         /// </summary>
@@ -112,6 +116,8 @@ namespace SMT.EVEData
             KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
 
             IsOnline = true;
+            CombatWarningEnabled = true;
+            ObservatoryDecloakWarningEnabled = true;
 
             if (unknownChar == null)
             {
@@ -142,6 +148,9 @@ namespace SMT.EVEData
             LocalChatFile = lcf;
             Location = location;
             IsOnline = true;
+
+            CombatWarningEnabled = false;
+            ObservatoryDecloakWarningEnabled = true;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -208,6 +217,38 @@ namespace SMT.EVEData
                 OnPropertyChanged("IsOnline");
             }
         }
+
+        public bool ObservatoryDecloakWarningEnabled
+        {
+            get
+            {
+                return m_ObservatoryDecloakWarningEnabled;
+            }
+            set
+            {
+                m_ObservatoryDecloakWarningEnabled = value;
+                OnPropertyChanged("ObservatoryDecloakWarningEnabled");
+            }
+        }
+
+        public bool CombatWarningEnabled
+        {
+            get
+            {
+                return m_CombatWarningEnabled;
+            }
+            set
+            {
+                m_CombatWarningEnabled = value;
+                OnPropertyChanged("CombatWarningEnabled");
+            }
+        }
+
+        public string GameLogWarningText { get; set; }
+
+
+
+
 
         public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
 
