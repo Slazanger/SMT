@@ -2793,7 +2793,11 @@ namespace SMT.EVEData
                                     .AddText("SMT Alert")
                                     .AddText("Character : " + characterName + "(" + lc.Location + ")")
                                     .AddText(line)
-                                    .Show(); 
+                                    .AddInlineImage(lc.Portrait.UriSource)
+                                    .AddArgument("character", characterName)
+                                    .SetToastScenario(ToastScenario.Alarm)
+                                    .SetToastDuration(ToastDuration.Long)
+                                    .Show();
                             }
                         }
                     }

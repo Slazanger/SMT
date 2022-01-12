@@ -982,6 +982,7 @@ namespace SMT
             // 0 = online
             // 1 = offline
             // 2 = fleet
+            // 3 = warning
             NameTrackingLocationMap.Clear();
 
            
@@ -999,7 +1000,18 @@ namespace SMT
                     NameTrackingLocationMap[c.Location] = new List<KeyValuePair<int, string>>();
                 }
 
-                NameTrackingLocationMap[c.Location].Add(new KeyValuePair<int, string>(c.IsOnline? 0:1, c.Name));
+                int type = 0;
+                if(!c.IsOnline)
+                {
+                    type = 1;
+                }
+
+                if(!string.IsNullOrEmpty(c.GameLogWarningText))
+                {
+                    type = 3;
+                }
+
+                NameTrackingLocationMap[c.Location].Add(new KeyValuePair<int, string>(type, c.Name));
             }
 
             if (ActiveCharacter != null && MapConf.FleetShowOnMap)
@@ -1072,6 +1084,7 @@ namespace SMT
                 SolidColorBrush localCharacterText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
                 SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
 
+
                 foreach (KeyValuePair<int, string> kvp in lkvp)
                 {
                     if(kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
@@ -1079,7 +1092,7 @@ namespace SMT
                         continue;
                     }
 
-                    if (kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 2 && addIndividualFleetMembers)
+                    if (kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 3 || kvp.Key == 2 && addIndividualFleetMembers)
                     {
                         Label charText = new Label();
                         charText.Content = kvp.Value;
@@ -1097,6 +1110,12 @@ namespace SMT
                             case 2:
                                 charText.Foreground = fleetMemberText;
                                 break;
+
+                            case 3:
+                                charText.Foreground = localCharacterText;
+                                charText.Content = "⚠" + kvp.Value + " ⚠";
+                                break;
+
                         }
 
 
