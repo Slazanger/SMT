@@ -13,6 +13,7 @@ namespace SMT
         public enum ShapeType
         {
             Line,
+            ArcLine,
             Circle,
             Text,
             Rect,
@@ -21,7 +22,8 @@ namespace SMT
         public enum LineType
         {
             Solid,
-            Dashed
+            LightDashed,
+            Dashed,
         };
 
         public ShapeType DrawType;
@@ -73,6 +75,53 @@ namespace SMT
                             DoubleCollection dashes = new DoubleCollection();
                             dashes.Add(1.0);
                             dashes.Add(1.0);
+
+                            infoLine.StrokeDashArray = dashes;
+                        }
+
+                        if (LineStyle == LineType.LightDashed)
+                        {
+                            DoubleCollection dashes = new DoubleCollection();
+                            dashes.Add(1.0);
+                            dashes.Add(3.0);
+
+                            infoLine.StrokeDashArray = dashes;
+                        }
+
+                        System.Windows.Controls.Canvas.SetZIndex(infoLine, 19);
+
+                        infoObject = infoLine;
+                    }
+                    break;
+
+                case ShapeType.ArcLine:
+                    {
+                        Line infoLine = new Line();
+
+                        infoLine.X1 = X1;
+                        infoLine.Y1 = Y1;
+
+                        infoLine.X2 = X2;
+                        infoLine.Y2 = Y2;
+
+                        infoLine.StrokeThickness = Size;
+                        infoLine.Visibility = System.Windows.Visibility.Visible;
+                        infoLine.Stroke = FillBrush;
+
+                        if (LineStyle == LineType.Dashed)
+                        {
+                            DoubleCollection dashes = new DoubleCollection();
+                            dashes.Add(1.0);
+                            dashes.Add(1.0);
+
+                            infoLine.StrokeDashArray = dashes;
+                        }
+
+                        if (LineStyle == LineType.LightDashed)
+                        {
+                            DoubleCollection dashes = new DoubleCollection();
+                            dashes.Add(1.0);
+                            dashes.Add(3.0);
 
                             infoLine.StrokeDashArray = dashes;
                         }
