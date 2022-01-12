@@ -1,3 +1,4 @@
+using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using SMT.EVEData;
 using System;
@@ -18,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using Windows.Foundation.Collections;
 
 namespace SMT
 {
@@ -268,6 +270,49 @@ namespace SMT
                 lc.Location = "";
             }
 
+
+
+            // Listen to notification activation and select the character if clicked on
+            ToastNotificationManagerCompat.OnActivated += toastArgs =>
+            {
+                // Obtain the arguments from the notification
+                ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
+
+                if(args.Contains("character"))
+                {
+                    string charName = args["character"];
+
+                    foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                    {
+                        if(lc.Name == charName)
+                        {
+
+                            // Need to dispatch to UI thread if performing UI operations
+                            Application.Current.Dispatcher.Invoke(delegate
+                            {
+
+                                ActiveCharacter = lc;
+                                CurrentActiveCharacterCombo.SelectedItem = lc;
+
+                                FleetMembersList.ItemsSource = lc.FleetInfo.Members;
+                                CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+
+                                RegionUC.FollowCharacter = true;
+                                RegionUC.SelectSystem(lc.Location, true);
+
+                                UniverseUC.FollowCharacter = true;
+                                UniverseUC.UpdateActiveCharacter(lc);
+
+                            });
+
+                            break;
+
+                        }
+
+                    }
+
+                }
+            };
 
         }
 
@@ -1488,7 +1533,7 @@ namespace SMT
                             continue;
                     }
 
-                    string[] parts = line.Split(' ');
+                    string[] parts = line.Split(',');
 
                     if(parts.Length == 0 )
                     {
@@ -1503,7 +1548,7 @@ namespace SMT
                         continue;
                     }
 
-                    if(parts[1] == "SYSLINK")
+                    if(parts[1] == "SYSLINK" || parts[1] == "SYSLINKARC")
                     {
                         if(parts.Length != 7)
                         {
@@ -1535,6 +1580,12 @@ namespace SMT
                             lt = InfoItem.LineType.Dashed;
                         }
 
+                        if (lineStyle == "LIGHTDASHED")
+                        {
+                            lt = InfoItem.LineType.LightDashed;
+                        }
+                        
+
                         Color c = (Color)ColorConverter.ConvertFromString(colour);
 
                         int lineThickness = int.Parse(size);
@@ -1542,6 +1593,12 @@ namespace SMT
 
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Line;
+
+                        if(parts[1] == "SYSLINKARC")
+                        {
+                            ii.DrawType = InfoItem.ShapeType.ArcLine;
+                        }
+
                         ii.X1 = (int)fromMS.LayoutX;
                         ii.Y1 = (int)fromMS.LayoutY;
                         ii.X2 = (int)toMS.LayoutX;
@@ -1596,6 +1653,28 @@ namespace SMT
             RegionUC.InfoLayer = InfoLayer;
         }
 
+        private void TestMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            string characterName = ActiveCharacter.Name;
+
+            LocalCharacter lc = ActiveCharacter;
+
+
+
+            string line = "Your cloak deactivates due to a pulse from a Mobile Observatory deployed by Slazanger.";
+
+            lc.GameLogWarningText = line;
+
+            new ToastContentBuilder()
+                .AddText("SMT Alert")
+                .AddText("Character : " + characterName + "(" + lc.Location + ")")
+                .AddText(line)
+                .AddInlineImage(lc.Portrait.UriSource)
+                .AddArgument("character", characterName)
+                .SetToastScenario(ToastScenario.Alarm)
+                .SetToastDuration(ToastDuration.Long)
+                .Show();
+        }
     }
 
     /// <summary>
