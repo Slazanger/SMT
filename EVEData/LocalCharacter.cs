@@ -67,6 +67,7 @@ namespace SMT.EVEData
 
 
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
         /// </summary>
@@ -1177,9 +1178,20 @@ namespace SMT.EVEData
 
         private void UpdateWarningSystems()
         {
-            if (!string.IsNullOrEmpty(Location) && DangerZoneRange > 0 && DangerZoneActive)
+            // only track warning systems if the character is logged in
+            if(IsOnline)
             {
-                WarningSystems = Navigation.GetSystemsXJumpsFrom(new List<string>(), Location, DangerZoneRange);
+                if (!string.IsNullOrEmpty(Location) && DangerZoneRange > 0 && DangerZoneActive)
+                {
+                    WarningSystems = Navigation.GetSystemsXJumpsFrom(new List<string>(), Location, DangerZoneRange);
+                }
+            }
+            else
+            {
+                if(WarningSystems != null)
+                {
+                    WarningSystems.Clear();
+                }
             }
         }
     }
