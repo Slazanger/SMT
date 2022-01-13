@@ -2726,7 +2726,7 @@ namespace SMT.EVEData
                 while (line != null)
                 {                    // trim any items off the front
 
-                    if (line == "")
+                    if (line == "" || !line.StartsWith("[") ) 
                     {
                         line = file.ReadLine();
                         continue;
@@ -2740,7 +2740,7 @@ namespace SMT.EVEData
                     // file corrupt
                     if(typeStartPos < 1 || typeEndPos < 1)
                     {
-                        return;
+                        continue;
                     }
 
 
@@ -2789,15 +2789,16 @@ namespace SMT.EVEData
                             if(sendWindowsNotification)
                             {
                                 // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                                new ToastContentBuilder()
-                                    .AddText("SMT Alert")
-                                    .AddText("Character : " + characterName + "(" + lc.Location + ")")
-                                    .AddText(line)
-                                    .AddInlineImage(lc.Portrait.UriSource)
-                                    .AddArgument("character", characterName)
-                                    .SetToastScenario(ToastScenario.Alarm)
-                                    .SetToastDuration(ToastDuration.Long)
-                                    .Show();
+                                ToastContentBuilder tb = new ToastContentBuilder();
+                                tb.AddText("SMT Alert");
+                                tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
+                                tb.AddText(line);
+                                tb.AddArgument("character", characterName);
+                                tb.SetToastScenario(ToastScenario.Alarm);
+                                tb.SetToastDuration(ToastDuration.Long);
+                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                tb.AddAudio(woopUri);
+                                tb.Show();
                             }
                         }
                     }
