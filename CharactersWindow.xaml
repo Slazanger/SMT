@@ -47,7 +47,7 @@
                 <ColumnDefinition Width="50*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="190" />
+                <RowDefinition Height="180" />
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
@@ -126,7 +126,7 @@
 
 
 
-            <GroupBox Header="Navigation Options" Grid.Row="1" Grid.RowSpan="7" BorderBrush="DarkGray" Margin="5">
+            <GroupBox Header="Navigation Options" Grid.Row="1" Grid.RowSpan="8" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4">
                     <StackPanel Orientation="Horizontal" Margin="4">
                         <Label Content="Autopilot" />
@@ -140,8 +140,7 @@
                 </StackPanel>
             </GroupBox>
 
-
-            <GroupBox Header="DangerZone"  Grid.Column="1" Grid.Row="1" Grid.RowSpan="7" BorderBrush="DarkGray" Margin="5">
+            <GroupBox Header="DangerZone"  Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4" >
                     <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked" Content="DangerZone Enabled" Margin="4"/>
                     <StackPanel Orientation="Horizontal" Margin="4">
@@ -151,8 +150,17 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="Notifications"  Grid.Column="1" Grid.Row="5" Grid.RowSpan="4" BorderBrush="DarkGray" Margin="5">
+                <StackPanel Margin="4" >
+                    <CheckBox IsChecked="{Binding ObservatoryDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Mobile Observatory Decloak" Margin="4"/>
+                    <CheckBox IsChecked="{Binding CombatWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Combat" Margin="4"/>
 
-            <Button Content="Delete" Grid.Column="1" Grid.Row="8" Width="100" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click"/>
+                </StackPanel>
+            </GroupBox>
+
+
+
+            <Button Content="Delete" Grid.Column="1" Grid.Row="9" Width="100" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click"/>
 
 
 

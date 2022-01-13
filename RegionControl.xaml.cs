@@ -1113,7 +1113,7 @@ namespace SMT
 
                             case 3:
                                 charText.Foreground = localCharacterText;
-                                charText.Content = "⚠" + kvp.Value + " ⚠";
+                                charText.Content = "⚠ " + kvp.Value + " ⚠";
                                 break;
 
                         }
@@ -3100,7 +3100,7 @@ namespace SMT
                 }
 
                 // get a list of characters in this system
-                List<Character> charactersInSystem = new List<Character>();
+                List<LocalCharacter> charactersInSystem = new List<LocalCharacter>();
                 foreach (LocalCharacter lc in EM.LocalCharacters)
                 {
                     if (lc.Location == selectedSys.Name)
@@ -3114,7 +3114,7 @@ namespace SMT
                     characters.IsEnabled = true;
                     characters.Visibility = Visibility.Visible;
 
-                    foreach (Character lc in charactersInSystem)
+                    foreach (LocalCharacter lc in charactersInSystem)
                     {
                         MenuItem miChar = new MenuItem();
                         miChar.Header = lc.Name;
@@ -3155,10 +3155,32 @@ namespace SMT
                         miARJFR.DataContext = "10";
                         miARJFR.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARJFR);
+
+                        if(!string.IsNullOrEmpty(lc.GameLogWarningText))
+                        {
+                            MenuItem miRemoveWarning = new MenuItem();
+                            miRemoveWarning.Header = "Clear Warning";
+                            miRemoveWarning.DataContext = lc;
+                            miRemoveWarning.Click += characterRightClickClearWarning;
+                            miChar.Items.Add(miRemoveWarning);
+
+
+                        }
                     }
                 }
 
                 cm.IsOpen = true;
+            }
+        }
+
+        private void characterRightClickClearWarning(object sender, RoutedEventArgs e)
+        {
+            MenuItem mi = sender as MenuItem;
+
+            LocalCharacter lc = mi.DataContext as LocalCharacter;
+            if(lc != null)
+            {
+                lc.GameLogWarningText = "";
             }
         }
 

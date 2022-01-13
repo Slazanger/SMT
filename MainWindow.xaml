@@ -156,7 +156,7 @@
                             <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                     <StackPanel>
-                                        <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="False" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False">
+                                        <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="False" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False" ItemsSource="{Binding Path=., Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}">
 
                                             <DataGrid.CellStyle>
                                                 <Style TargetType="{x:Type DataGridCell}">
@@ -164,11 +164,25 @@
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsOnline}" Value="False">
                                                             <Setter Property="Background" Value="DarkGray" />
+                                                            <Setter Property="Foreground" Value="Black" />
                                                         </DataTrigger>
 
                                                         <DataTrigger Binding="{Binding IsOnline}" Value="True">
                                                             <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
                                                         </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding WarningState}" Value="Warning">
+                                                            <Setter Property="Background" Value="Yellow" />
+                                                            <Setter Property="Foreground" Value="Black" />
+                                                        </DataTrigger>
+
+                                                        
+
+
                                                     </Style.Triggers>
                                                 </Style>
                                             </DataGrid.CellStyle>

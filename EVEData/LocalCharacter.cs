@@ -245,10 +245,33 @@ namespace SMT.EVEData
             }
         }
 
-        public string GameLogWarningText { get; set; }
+        private string m_gameLogWarningText;
 
+        [XmlIgnoreAttribute]
+        public string GameLogWarningText
+        {
+            get
+            {
+                return m_gameLogWarningText;
+            }
+            set
+            {
+                m_gameLogWarningText = value;
+                if (string.IsNullOrEmpty(value))
+                {
+                    WarningState = "";
+                }
+                else
+                {
+                    WarningState = "Warning";
+                }
 
+                OnPropertyChanged("GameLogWarningText");
+                OnPropertyChanged("WarningState");
 
+            }
+        }
+        public string WarningState { get; set; }
 
 
         public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
@@ -284,6 +307,9 @@ namespace SMT.EVEData
                 location = value;
                 routeNeedsUpdate = true;
                 warningSystemsNeedsUpdate = true;
+
+                // clear the warning everytime the location updates
+                GameLogWarningText = "";
             }
         }
 
