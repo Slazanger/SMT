@@ -19,6 +19,6 @@ namespace SMT.EVEData
         /// <summary>
         /// Callback URL for eve
         /// </summary>
-        public const string CallbackURL = @"eveauth-smt://callback";
+        public const string CallbackURL = @"http://localhost:8762/callback/";
     }
 }
