@@ -2788,17 +2788,25 @@ namespace SMT.EVEData
 
                             if(sendWindowsNotification)
                             {
-                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                                ToastContentBuilder tb = new ToastContentBuilder();
-                                tb.AddText("SMT Alert");
-                                tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
-                                tb.AddText(line);
-                                tb.AddArgument("character", characterName);
-                                tb.SetToastScenario(ToastScenario.Alarm);
-                                tb.SetToastDuration(ToastDuration.Long);
-                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                                tb.AddAudio(woopUri);
-                                tb.Show();
+
+                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                {
+                                    // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                    ToastContentBuilder tb = new ToastContentBuilder();
+                                    tb.AddText("SMT Alert");
+                                    tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
+                                    tb.AddInlineImage(lc.Portrait.UriSource);
+                                    tb.AddText(line);
+                                    tb.AddArgument("character", characterName);
+                                    tb.SetToastScenario(ToastScenario.Alarm);
+                                    tb.SetToastDuration(ToastDuration.Long);
+                                    Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                    tb.AddAudio(woopUri);
+                                    tb.Show();
+
+
+                                }), DispatcherPriority.Normal, null);
+
                             }
                         }
                     }

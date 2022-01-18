@@ -1665,15 +1665,18 @@ namespace SMT
 
             lc.GameLogWarningText = line;
 
-            new ToastContentBuilder()
-                .AddText("SMT Alert")
-                .AddText("Character : " + characterName + "(" + lc.Location + ")")
-                .AddText(line)
-                .AddInlineImage(lc.Portrait.UriSource)
-                .AddArgument("character", characterName)
-                .SetToastScenario(ToastScenario.Alarm)
-                .SetToastDuration(ToastDuration.Long)
-                .Show();
+            ToastContentBuilder tb = new ToastContentBuilder();
+            tb.AddText("SMT Alert");
+            tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
+            tb.AddInlineImage(lc.Portrait.UriSource);
+            tb.AddText(line);
+            tb.AddArgument("character", characterName);
+            tb.SetToastScenario(ToastScenario.Alarm);
+            tb.SetToastDuration(ToastDuration.Long);
+            Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+            tb.AddAudio(woopUri);
+            tb.Show();
+
         }
     }
 
