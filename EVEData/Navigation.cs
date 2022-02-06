@@ -19,7 +19,7 @@ namespace SMT.EVEData
         public enum GateType
         {
             StarGate,
-            Ansibex,
+            Ansiblex,
             JumpTo,
             Thera,
         }
@@ -109,7 +109,8 @@ namespace SMT.EVEData
                     X = sys.ActualX,
                     Y = sys.ActualY,
                     Z = sys.ActualZ,
-                    F = 0
+                    F = 0,
+                    ActualSystem = sys
                 };
 
                 foreach (string s in sys.Jumps)
@@ -296,6 +297,7 @@ namespace SMT.EVEData
             {
                 RoutePoint RP = new RoutePoint();
                 RP.SystemName = Route[i];
+                RP.ActualSystem = EveManager.Instance.GetEveSystem(Route[i]);
                 RP.GateToTake = GateType.StarGate;
                 RP.LY = 0.0;
 
@@ -304,7 +306,7 @@ namespace SMT.EVEData
                     MapNode mn = MapNodes[RP.SystemName];
                     if (mn.JBConnection != null && mn.JBConnection == Route[i + 1])
                     {
-                        RP.GateToTake = GateType.Ansibex;
+                        RP.GateToTake = GateType.Ansiblex;
                     }
 
                     if(UseThera && mn.TheraConnections != null && mn.TheraConnections.Contains(Route[i + 1]) )
@@ -465,10 +467,12 @@ namespace SMT.EVEData
             public double LY { get; set; }
             public string SystemName { get; set; }
 
+            public System ActualSystem { get; set; }
+
             public override string ToString()
             {
                 string s = SystemName;
-                if (GateToTake == GateType.Ansibex)
+                if (GateToTake == GateType.Ansiblex)
                 {
                     s += " (Ansiblex)";
                 }
@@ -505,6 +509,7 @@ namespace SMT.EVEData
             public bool HighSec { get; set; }
             public List<JumpLink> JumpableSystems { get; set; }
             public string Name { get; set; }
+            public System ActualSystem { get; set; }
         }
     }
 }

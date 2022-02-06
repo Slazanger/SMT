@@ -42,11 +42,11 @@ namespace SMT.EVEData
             HasIceBelt = iceBelt;
 
             // default the ESI stats
-            NPCKillsLastHour = -1;
+            NPCKillsLastHour = 0;
             NPCKillsDeltaLastHour = 0;
-            PodKillsLastHour = -1;
-            ShipKillsLastHour = -1;
-            JumpsLastHour = -1;
+            PodKillsLastHour = 0;
+            ShipKillsLastHour = 0;
+            JumpsLastHour = 0;
             ActiveIncursion = false;
 
             SOVAllianceTCU = 0;

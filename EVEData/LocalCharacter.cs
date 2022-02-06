@@ -398,6 +398,11 @@ namespace SMT.EVEData
         public String AlertText {get; set;} 
 
 
+        [XmlIgnoreAttribute]
+        public bool EdenCommStandingsGood { get; set; }
+
+        [XmlIgnoreAttribute]
+        public bool TrigStandingsGood { get; set; }
 
 
 
@@ -515,11 +520,11 @@ namespace SMT.EVEData
                     string WayPointText = string.Empty;
                     long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
                     // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                    if (rp.GateToTake == Navigation.GateType.Ansibex)
+                    if (rp.GateToTake == Navigation.GateType.Ansiblex)
                     {
                         bool isSystemLink = true;
 
-                        if (rp.GateToTake == Navigation.GateType.Ansibex)
+                        if (rp.GateToTake == Navigation.GateType.Ansiblex)
                         {
                             string GateDesto = string.Empty;
 
@@ -799,11 +804,11 @@ namespace SMT.EVEData
                     foreach (Navigation.RoutePoint rp in ActiveRoute)
                     {
                         // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                        if (rp.GateToTake == Navigation.GateType.Ansibex || rp.GateToTake == Navigation.GateType.Thera  || Waypoints.Contains(rp.SystemName))
+                        if (rp.GateToTake == Navigation.GateType.Ansiblex || rp.GateToTake == Navigation.GateType.Thera  || Waypoints.Contains(rp.SystemName))
                         {
                             long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
 
-                            if (rp.GateToTake == Navigation.GateType.Ansibex)
+                            if (rp.GateToTake == Navigation.GateType.Ansiblex)
                             {
                                 foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
                                 {
@@ -1128,6 +1133,31 @@ namespace SMT.EVEData
                 {
                     AllianceName = null;
                     AllianceTicker = null;
+                }
+
+                // get the edencom and trig standings
+                {
+                    EdenCommStandingsGood = false;
+                    TrigStandingsGood = false;
+
+                    ESI.NET.EsiResponse<List<ESI.NET.Models.Standing>> essl = await esiClient.Character.Standings();
+                    if(essl.Data != null)
+                    {
+                        foreach(ESI.NET.Models.Standing standing in essl.Data)
+                        {
+                            if(standing.FromId == 500027 && standing.Value > 0)
+                            {
+                                EdenCommStandingsGood = true;
+                            }
+
+                            if (standing.FromId == 500026 && standing.Value > 0)
+                            {
+                                TrigStandingsGood = true;
+                            }
+
+                        }
+
+                    }
                 }
 
 

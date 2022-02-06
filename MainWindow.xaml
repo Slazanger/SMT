@@ -296,8 +296,81 @@
 
                                             <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding ActiveCharacter.ActiveRoute, ElementName=RegionUC}" MinHeight="50" />
+                                                    <DataGrid ItemsSource="{Binding ActiveCharacter.ActiveRoute, ElementName=RegionUC}" MinHeight="50" AutoGenerateColumns="false">
+                                                        <DataGrid.CellStyle>
+                                                            <Style TargetType="{x:Type DataGridCell}">
 
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Thera">
+                                                                        <Setter Property="Background" Value="#292" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Ansiblex">
+                                                                        <Setter Property="Background" Value="blue" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False"/>
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False"/>
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False"/>
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+
+                                                                    <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
+                                                                            <Setter Property="Background" Value="blue" />
+                                                                    </DataTrigger>
+
+                                                                    
+
+                                                                </Style.Triggers>
+
+                                                            </Style>
+
+                                                        </DataGrid.CellStyle>
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" />
+                                                            <DataGridTextColumn Header="Con" Binding="{Binding GateToTake}" Width="8*" />
+                                                            <DataGridTextColumn Header="Jumps" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" />
+                                                            <DataGridTextColumn Header="SK" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" />
+                                                            <DataGridTextColumn Header="PK" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" />
+                                                            <DataGridTextColumn Header="Trig" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" />
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                    
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <Label Content="Total number of jumps : " />
                                                         <Label Content="{Binding ActiveCharacter.ActiveRoute.Count, ElementName=RegionUC}" />

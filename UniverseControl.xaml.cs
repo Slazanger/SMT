@@ -1126,7 +1126,7 @@ namespace SMT
                         for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
                         {
                             Pen linePen = dashedRoutePen;
-                            if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == EVEData.Navigation.GateType.Ansibex)
+                            if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == EVEData.Navigation.GateType.Ansiblex)
                             {
                                 linePen = dashedRouteAnsiblexPen;
                             }

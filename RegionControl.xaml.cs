@@ -1910,7 +1910,7 @@ namespace SMT
 
                     routeLine.StrokeThickness = 5;
                     routeLine.Visibility = Visibility.Visible;
-                    if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == Navigation.GateType.Ansibex)
+                    if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == Navigation.GateType.Ansiblex)
                     {
                         routeLine.Stroke = RouteAnsiblexBrush;
                     }
