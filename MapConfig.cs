@@ -57,7 +57,6 @@ namespace SMT
         private bool m_ShowJoveObservatories;
         private bool m_ShowNegativeRattingDelta;
 
-        private bool m_ShowOnlyFinalLiminality;
         private bool m_ShowRattingDataAsDelta;
 
         private bool m_ShowRegionStandings;
@@ -499,20 +498,6 @@ namespace SMT
             }
         }
 
-
-
-        public bool ShowOnlyFinalLiminality
-        {
-            get
-            {
-                return m_ShowOnlyFinalLiminality;
-            }
-            set
-            {
-                m_ShowOnlyFinalLiminality = value;
-                OnPropertyChanged("ShowOnlyFinalLiminality");
-            }
-        }
 
         [Category("Misc")]
         [DisplayName("Show Ratting Data as Delta")]

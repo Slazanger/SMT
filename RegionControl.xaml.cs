@@ -639,53 +639,26 @@ namespace SMT
             ib.Stretch = Stretch.None;
             ib.ImageSource = trigLogoImage;
 
-            foreach (Triangles.Invasion ti in EM.TrigInvasions)
+            foreach (KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
             {
-                if (Region.IsSystemOnMap(ti.SystemName))
+                EVEData.MapSystem ms = kvp.Value;
+                if(ms.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None)
                 {
-                    MapSystem ms = Region.MapSystems[ti.SystemName];
+                    Polygon TrigShape;
+                    TrigShape = new Polygon();
+                    TrigShape.Points.Add(new Point(ms.LayoutX - 13, ms.LayoutY + 6));
+                    TrigShape.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 14));
+                    TrigShape.Points.Add(new Point(ms.LayoutX + 13, ms.LayoutY + 6));
 
-                    bool addTriangle = true;
-                    if (MapConf.ShowOnlyFinalLiminality && ti.Status != Triangles.Status.FinalLiminality)
-                    {
-                        addTriangle = false;
-                    }
+                    TrigShape.Stroke = trigOutlineBrush;
+                    TrigShape.StrokeThickness = 1;
+                    TrigShape.StrokeLineJoin = PenLineJoin.Round;
+                    TrigShape.Fill = trigBrush;
 
-                    if (addTriangle)
-                    {
-                        Polygon TrigShape;
-                        TrigShape = new Polygon();
-                        TrigShape.Points.Add(new Point(ms.LayoutX - 13, ms.LayoutY + 6));
-                        TrigShape.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 14));
-                        TrigShape.Points.Add(new Point(ms.LayoutX + 13, ms.LayoutY + 6));
+                    Canvas.SetZIndex(TrigShape, SYSTEM_Z_INDEX - 3);
 
-                        TrigShape.Stroke = trigOutlineBrush;
-                        TrigShape.StrokeThickness = 1;
-                        TrigShape.StrokeLineJoin = PenLineJoin.Round;
-                        TrigShape.Fill = trigBrush;
-
-                        Canvas.SetZIndex(TrigShape, SYSTEM_Z_INDEX - 3);
-
-                        MainCanvas.Children.Add(TrigShape);
-                        DynamicMapElements.Add(TrigShape);
-                    }
-
-                    if (ti.DerivedSecurityStatus != null)
-                    {
-                        Label TrigSecChangeHighlight = new Label();
-                        TrigSecChangeHighlight.Content = "»";
-                        TrigSecChangeHighlight.Foreground = trigSecStatusChangeBrush;
-                        TrigSecChangeHighlight.IsHitTestVisible = false;
-                        TrigSecChangeHighlight.RenderTransform = new RotateTransform(90);
-                        TrigSecChangeHighlight.FontSize = 15;
-                        TrigSecChangeHighlight.FontWeight = FontWeights.Bold;
-
-                        Canvas.SetLeft(TrigSecChangeHighlight, ms.LayoutX + 28);
-                        Canvas.SetTop(TrigSecChangeHighlight, ms.LayoutY - 18);
-                        Canvas.SetZIndex(TrigSecChangeHighlight, SYSTEM_Z_INDEX - 3);
-                        MainCanvas.Children.Add(TrigSecChangeHighlight);
-                        DynamicMapElements.Add(TrigSecChangeHighlight);
-                    }
+                    MainCanvas.Children.Add(TrigShape);
+                    DynamicMapElements.Add(TrigShape);
                 }
             }
         }
@@ -3477,6 +3450,17 @@ namespace SMT
                         SystemInfoPopupSP.Children.Add(tl);
 
                     }
+                }
+
+                if(MapConf.ShowTrigInvasions && selectedSys.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None)
+                {
+                    Label trigInfo = new Label();
+                    trigInfo.Padding = one;
+                    trigInfo.Margin = one;
+                    trigInfo.Content = $"Invasion : {selectedSys.ActualSystem.TrigInvasionStatus}";
+                    trigInfo.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    SystemInfoPopupSP.Children.Add(trigInfo);
+
                 }
 
                 SystemInfoPopup.IsOpen = true;

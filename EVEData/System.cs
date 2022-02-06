@@ -56,6 +56,19 @@ namespace SMT.EVEData
             SHStructures = new List<StructureHunter.Structures>();
         }
 
+
+
+        public enum EdenComTrigStatus 
+        { 
+            None,
+            EdencomMinorVictory, 
+            Fortress, 
+            TriglavianMinorVictory 
+        };
+
+        public EdenComTrigStatus TrigInvasionStatus { get; set; }
+
+
         /// <summary>
         /// Gets or sets the an incursion is active in this system
         /// </summary>

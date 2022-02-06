@@ -240,7 +240,6 @@ namespace SMT.EVEData
         /// </summary>
         public ObservableCollection<TheraConnection> TheraConnections { get; set; }
 
-        public ObservableCollection<Triangles.Invasion> TrigInvasions { get; set; }
         public bool UseESIForCharacterPositions { get; set; }
 
         public ObservableCollection<Storm> MetaliminalStorms { get; set; }
@@ -696,6 +695,9 @@ namespace SMT.EVEData
             foreach (System s in Systems)
             {
                 NameToSystem[s.Name] = s;
+
+                // default to no invasion
+                s.TrigInvasionStatus = System.EdenComTrigStatus.None;
             }
 
 
@@ -903,8 +905,52 @@ namespace SMT.EVEData
             NameToSystem["Kenninck"].Jumps.Add("Eggheron");
             NameToSystem["Eggheron"].Jumps.Add("Kenninck");
 
+            // now read the trig/edencom systems
 
-            // now create the voronoi regions
+            string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\trigInvasionSystems.csv";
+            if (File.Exists(trigSystemsFile))
+            {
+                StreamReader file = new StreamReader(trigSystemsFile);
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] bits = line.Split(',');
+
+                    string systemid = bits[0];
+                    string status = bits[1];
+
+                    System.EdenComTrigStatus invasionStatus = System.EdenComTrigStatus.None;
+                    switch (status)
+                    {
+                        case "edencom_minor_victory":
+                            invasionStatus = System.EdenComTrigStatus.EdencomMinorVictory;
+                            break;
+                        case "fortress":
+                            invasionStatus = System.EdenComTrigStatus.Fortress;
+                            break;
+                        case "triglavian_minor_victory":
+                            invasionStatus = System.EdenComTrigStatus.TriglavianMinorVictory;
+                            break;
+                    }
+
+                    if(invasionStatus != System.EdenComTrigStatus.None)
+                    {
+                        System s = GetEveSystemFromID(long.Parse(systemid));
+                        if (s != null)
+                        {
+                            s.TrigInvasionStatus = invasionStatus;
+                        }
+                    }
+                }
+
+            }
+
+
+
+                // now create the voronoi regions
             foreach (MapRegion mr in Regions)
             {
                 // collect the system points to generate them from
@@ -2167,29 +2213,7 @@ namespace SMT.EVEData
             }
         }
 
-        /// <summary>
-        /// Update the current Trig Invasions
-        /// </summary>
-        public void UpdateTrigInvasions()
-        {
-            try
-            {
-                string trigApiURL = "https://kybernaut.space/invasions.json";
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(trigApiURL);
-                request.Method = WebRequestMethods.Http.Get;
-                request.Timeout = 20000;
-                request.Proxy = null;
-
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    TrigInvasions.Clear();
-                }), DispatcherPriority.Normal, null);
-
-                request.BeginGetResponse(new AsyncCallback(UpdateTrigInvasionsCallback), request);
-            }
-            catch { }
-        }
+ 
 
         internal void AddUpdateJumpBridge(string from, string to, long stationID)
         {
@@ -2314,7 +2338,6 @@ namespace SMT.EVEData
             LoadCharacters();
 
             InitTheraConnections();
-            InitTrigInvasions();
             InitMetaliminalStorms();
             InitPOI();
 
@@ -2390,11 +2413,6 @@ namespace SMT.EVEData
             UpdateTheraConnections();
         }
 
-        private void InitTrigInvasions()
-        {
-            TrigInvasions = new ObservableCollection<Triangles.Invasion>();
-            UpdateTrigInvasions();
-        }
 
         private void InitMetaliminalStorms()
         {
@@ -3411,36 +3429,5 @@ namespace SMT.EVEData
             }
         }
 
-        /// <summary>
-        ///  Update Trig Invasions Connections Callback
-        /// </summary>
-        private void UpdateTrigInvasionsCallback(IAsyncResult asyncResult)
-        {
-            HttpWebRequest request = (HttpWebRequest)asyncResult.AsyncState;
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult))
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    using (StreamReader sr = new StreamReader(responseStream))
-                    {
-                        // Need to return this response
-                        string strContent = sr.ReadToEnd();
-
-                        var invasions = Triangles.Invasion.FromJson(strContent);
-                        foreach (Triangles.Invasion ti in invasions)
-                        {
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                TrigInvasions.Add(ti);
-                            }), DispatcherPriority.Normal, null);
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
     }
 }

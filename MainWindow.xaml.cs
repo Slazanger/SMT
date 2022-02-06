@@ -114,7 +114,7 @@ namespace SMT
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = false;
+            bool initFromScratch = true;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -155,8 +155,6 @@ namespace SMT
 
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
             EVEManager.ActiveSovCampaigns.CollectionChanged += ActiveSovCampaigns_CollectionChanged;
-
-            TrigInvasionsList.ItemsSource = EVEManager.TrigInvasions;
 
             LoadInfoObjects();
             UpdateJumpBridgeSummary();
@@ -497,23 +495,7 @@ namespace SMT
             }
         }
 
-        private void TrigInvasionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (sender != null)
-            {
-                DataGrid grid = sender as DataGrid;
-                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
-                {
-                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
-                    Triangles.Invasion tc = dgr.Item as Triangles.Invasion;
 
-                    if (tc != null)
-                    {
-                        RegionUC.SelectSystem(tc.SystemName, true);
-                    }
-                }
-            }
-        }
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
