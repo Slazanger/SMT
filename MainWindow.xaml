@@ -365,12 +365,12 @@
 
                                                         </DataGrid.CellStyle>
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" />
-                                                            <DataGridTextColumn Header="Con" Binding="{Binding GateToTake}" Width="8*" />
-                                                            <DataGridTextColumn Header="Jumps" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" />
-                                                            <DataGridTextColumn Header="SK" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" />
-                                                            <DataGridTextColumn Header="PK" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" />
-                                                            <DataGridTextColumn Header="Trig" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" />
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Con" Binding="{Binding GateToTake}" Width="8*" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="Jumps" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="SK" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="PK" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="Trig" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" CanUserSort="False"/>
                                                         </DataGrid.Columns>
                                                     </DataGrid>
                                                     
