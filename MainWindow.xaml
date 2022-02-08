@@ -65,7 +65,10 @@
 
                 <MenuItem Header="View">
                     <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
+                    <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
                 </MenuItem>
+
+
             </Menu>
 
             <Label Margin="30,0,0,0" Padding="7">Active Character :</Label>

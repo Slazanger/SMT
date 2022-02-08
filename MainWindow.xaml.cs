@@ -28,7 +28,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_108";
+        public const string SMT_VERSION = "SMT_109";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -54,7 +54,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (A new dawn approaches : " + SMT_VERSION + ")";
+            Title = "SMT (Powered by Plastic Support : " + SMT_VERSION + ")";
 
             CheckGitHubVersion();
 
@@ -114,10 +114,11 @@ namespace SMT
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = true;
+            bool initFromScratch = false;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
+                SaveDefaultLayout();
             }
             else
             {
@@ -314,6 +315,31 @@ namespace SMT
 
         }
 
+        private void SaveDefaultLayout()
+        {
+            // first delete the existing
+            string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";
+
+            if(File.Exists(defaultLayoutFile))
+            {
+                File.Delete(defaultLayoutFile);
+            }
+
+            try
+            {
+                AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                using (var sw = new StreamWriter(defaultLayoutFile))
+                {
+                    ls.Serialize(sw);
+                }
+            }
+            catch
+            {
+            }
+
+
+        }
+
 
         /// <summary>
         /// Anom Manager
@@ -330,9 +356,9 @@ namespace SMT
         /// </summary>
         public MapConfig MapConf { get; }
 
-        private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; }
+        private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; set; }
 
-        private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; }
+        private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; set; }
 
         private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -1658,6 +1684,33 @@ namespace SMT
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
             tb.AddAudio(woopUri);
             tb.Show();
+
+        }
+
+        private void miResetLayout_Click(object sender, RoutedEventArgs e)
+        {
+            
+            string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";
+            if (File.Exists(defaultLayoutFile))
+            {
+                try
+                {
+                    AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+                    using (var sr = new StreamReader(defaultLayoutFile))
+                    {
+                        ls.Deserialize(sr);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            // Due to bugs in the Dock manager patch up the content id's for the 2 main views
+            RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
+            UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
+
+            dockManager.UpdateLayout();
 
         }
     }
