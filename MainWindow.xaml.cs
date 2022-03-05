@@ -1295,33 +1295,37 @@ namespace SMT
             }
             String jbText = Clipboard.GetText(TextDataFormat.Text);
 
-            using (StringReader reader = new StringReader(jbText))
+            Regex rx = new Regex(
+                @"<url=showinfo:35841//([0-9]+)>(.*?) » (.*?) - .*?</url>|^[\t ]*([0-9]+) (.*) --> (.*)",
+                RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled
+            );
+            MatchCollection matches = rx.Matches(jbText);
+
+            foreach (Match match in matches)
             {
-                string line = string.Empty;
-                do
+                // from eve chat
+                // 1 = id
+                // 2 = from
+                // 3 = to
+
+                // from export
+                // 4 = id
+                // 5 = from
+                // 6 = to
+                GroupCollection groups = match.Groups;
+                long IDFrom = 0;
+                if ( groups[1].Value != "" && groups[2].Value != "" && groups[3].Value != "")
                 {
-                    line = reader.ReadLine();
-                    if (line != null)
-                    {
-                        // ignore comments
-                        if (line.StartsWith("#"))
-                        {
-                            continue;
-                        }
-
-                        string[] bits = line.Split(' ');
-                        if (bits.Length > 3)
-                        {
-                            long IDFrom = 0;
-                            long.TryParse(bits[0], out IDFrom);
-
-                            string from = bits[1];
-                            string to = bits[3];
-
-                            EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
-                        }
-                    }
-                } while (line != null);
+                    long.TryParse(groups[1].Value, out IDFrom);
+                    string from = groups[2].Value;
+                    string to = groups[3].Value;
+                    EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
+                } else if ( groups[4].Value != "" && groups[5].Value != "" && groups[6].Value != "") {
+                    long.TryParse(groups[4].Value, out IDFrom);
+                    string from = groups[5].Value;
+                    string to = groups[6].Value;
+                    EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
+                }
             }
 
             EVEData.Navigation.ClearJumpBridges();
