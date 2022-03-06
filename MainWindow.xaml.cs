@@ -132,6 +132,19 @@ namespace SMT
             RawIntelBox.ItemsSource = EVEManager.IntelDataList;
             RawGameDataBox.ItemsSource = EVEManager.GameLogList;
 
+            // add test intel with debug info
+            IntelData id = new IntelData("[00:00] blah.... > blah", "System");
+            id.IntelString = "Intel Watcher monitoring : " + EVEManager.EVELogFolder + @"\Chatlogs\";
+
+            IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
+            idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
+
+
+            EVEManager.IntelDataList.Add(id);
+            EVEManager.IntelDataList.Add(idtwo);
+
+
+
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
             EVEManager.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
