@@ -1942,10 +1942,10 @@ namespace SMT.EVEData
 
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
-                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\";
+                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs";
             }
 
-            string chatlogFolder = EVELogFolder + "Chatlogs\\";
+            string chatlogFolder = EVELogFolder + @"\Chatlogs\\";
 
             if (Directory.Exists(chatlogFolder))
             {
@@ -1975,7 +1975,7 @@ namespace SMT.EVEData
                 EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\";
             }
 
-            string gameLogFolder = EVELogFolder + "Gamelogs\\";
+            string gameLogFolder = EVELogFolder + @"\Gamelogs\\";
 
             if (Directory.Exists(gameLogFolder))
             {
@@ -2003,8 +2003,8 @@ namespace SMT.EVEData
             // doesnt get updated until something other than the eve client reads these files
 
             List<string> logFolders = new List<string>();
-            string chatLogFolder = EVELogFolder + "Chatlogs\\";
-            string gameLogFolder = EVELogFolder + "Gamelogs\\";
+            string chatLogFolder = EVELogFolder + @"\Chatlogs\";
+            string gameLogFolder = EVELogFolder + @"\Gamelogs\";
 
             logFolders.Add(chatLogFolder);
             logFolders.Add(gameLogFolder);
