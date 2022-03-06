@@ -1736,13 +1736,16 @@ namespace SMT
                         {
                             Shape InRangeMarker;
 
+                            double ShapeSize = SYSTEM_SHAPE_SIZE + 10;
+                            double halfShapeSize = ShapeSize / 2;
+
                             if (sys.ActualSystem.HasNPCStation)
                             {
-                                InRangeMarker = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                                InRangeMarker = new Rectangle() { Height = ShapeSize, Width = ShapeSize };
                             }
                             else
                             {
-                                InRangeMarker = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                                InRangeMarker = new Ellipse() { Height = ShapeSize, Width = ShapeSize };
                             }
 
                             InRangeMarker.Stroke = HighlightBrush;
@@ -1750,9 +1753,9 @@ namespace SMT
                             InRangeMarker.StrokeLineJoin = PenLineJoin.Round;
                             InRangeMarker.Fill = HighlightBrush;
 
-                            Canvas.SetLeft(InRangeMarker, sys.LayoutX - (SYSTEM_SHAPE_SIZE + 6) / 2);
-                            Canvas.SetTop(InRangeMarker, sys.LayoutY - (SYSTEM_SHAPE_SIZE + 6) / 2);
-                            Canvas.SetZIndex(InRangeMarker, 19);
+                            Canvas.SetLeft(InRangeMarker, sys.LayoutX - halfShapeSize);
+                            Canvas.SetTop(InRangeMarker, sys.LayoutY - halfShapeSize);
+                            Canvas.SetZIndex(InRangeMarker, SYSTEM_Z_INDEX - 4);
 
                             MainCanvas.Children.Add(InRangeMarker);
                             DynamicMapElements.Add(InRangeMarker);
