@@ -82,8 +82,6 @@ namespace SMT.EVEData
         /// </summary>
         public string Type { get; set; }
 
-
-
         /// <summary>
         /// To String
         /// </summary>

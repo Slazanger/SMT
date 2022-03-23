@@ -18,8 +18,10 @@ namespace csDelaunay
             }
         }
 
-        public List<LR> EdgeOrientations { get { return edgeOrientations; } }
-        public List<Edge> Edges { get { return edges; } }
+        public List<LR> EdgeOrientations
+        { get { return edgeOrientations; } }
+        public List<Edge> Edges
+        { get { return edges; } }
 
         public void Dispose()
         {

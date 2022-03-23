@@ -14,7 +14,8 @@ namespace csDelaunay
             sites.Add(c);
         }
 
-        public List<Site> Sites { get { return sites; } }
+        public List<Site> Sites
+        { get { return sites; } }
 
         public void Dispose()
         {

@@ -121,12 +121,18 @@ namespace csDelaunay
             Init();
         }
 
-        public Dictionary<LR, Vector2f> ClippedEnds { get { return clippedVertices; } }
-        public int EdgeIndex { get { return edgeIndex; } }
-        public Site LeftSite { get { return sites[LR.LEFT]; } set { sites[LR.LEFT] = value; } }
-        public Vertex LeftVertex { get { return leftVertex; } }
-        public Site RightSite { get { return sites[LR.RIGHT]; } set { sites[LR.RIGHT] = value; } }
-        public Vertex RightVertex { get { return rightVertex; } }
+        public Dictionary<LR, Vector2f> ClippedEnds
+        { get { return clippedVertices; } }
+        public int EdgeIndex
+        { get { return edgeIndex; } }
+        public Site LeftSite
+        { get { return sites[LR.LEFT]; } set { sites[LR.LEFT] = value; } }
+        public Vertex LeftVertex
+        { get { return leftVertex; } }
+        public Site RightSite
+        { get { return sites[LR.RIGHT]; } set { sites[LR.RIGHT] = value; } }
+        public Vertex RightVertex
+        { get { return rightVertex; } }
 
         public static int CompareSitesDistances(Edge edge0, Edge edge1)
         {

@@ -56,8 +56,6 @@ namespace SMT.EVEData
             SHStructures = new List<StructureHunter.Structures>();
         }
 
-
-
         public enum EdenComTrigStatus
         {
             None,
@@ -67,7 +65,6 @@ namespace SMT.EVEData
         };
 
         public EdenComTrigStatus TrigInvasionStatus { get; set; }
-
 
         /// <summary>
         /// Gets or sets the an incursion is active in this system
@@ -243,9 +240,7 @@ namespace SMT.EVEData
 
                 return "Null Sec";
             }
-
         }
-
 
         public override string ToString()
         {

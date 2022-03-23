@@ -64,17 +64,23 @@ namespace csDelaunay
             Init(p, index, weigth);
         }
 
-        public Vector2f Coord { get { return coord; } set { coord = value; } }
+        public Vector2f Coord
+        { get { return coord; } set { coord = value; } }
 
-        public List<Edge> Edges { get { return edges; } }
+        public List<Edge> Edges
+        { get { return edges; } }
 
-        public int SiteIndex { get { return siteIndex; } set { siteIndex = value; } }
+        public int SiteIndex
+        { get { return siteIndex; } set { siteIndex = value; } }
 
-        public float Weigth { get { return weigth; } }
+        public float Weigth
+        { get { return weigth; } }
 
-        public float x { get { return coord.x; } }
+        public float x
+        { get { return coord.x; } }
 
-        public float y { get { return coord.y; } }
+        public float y
+        { get { return coord.y; } }
 
         public static Site Create(Vector2f p, int index, float weigth)
         {

@@ -3,8 +3,6 @@ using System.Linq;
 
 namespace SMT.EVEData
 {
-
-
     public class Storm
     {
         public string Region { get; set; }
@@ -15,7 +13,8 @@ namespace SMT.EVEData
         public List<string> StrongArea { get; set; }
 
         public List<string> WeakArea { get; set; }
-        static public List<Storm> GetStorms()
+
+        public static List<Storm> GetStorms()
         {
             List<Storm> storms = new List<Storm>();
 
@@ -42,17 +41,12 @@ namespace SMT.EVEData
 
                     storms.Add(s);
                 }
-
-
             }
             catch
             {
-
             }
 
             return storms;
-
         }
-
     }
 }

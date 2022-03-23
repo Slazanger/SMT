@@ -57,18 +57,15 @@ namespace SMT.EVEData
         /// </summary>
         private Dictionary<string, string> gamelogFileCharacterMap;
 
-
         /// <summary>
         /// File system watcher
         /// </summary>
         private FileSystemWatcher intelFileWatcher;
 
-
         /// <summary>
         /// File system watcher
         /// </summary>
         private FileSystemWatcher gameLogFileWatcher;
-
 
         private string VersionStr;
 
@@ -81,7 +78,6 @@ namespace SMT.EVEData
         {
             LocalCharacters = new ObservableCollection<LocalCharacter>();
             VersionStr = version;
-
 
             string SaveDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT";
             if (!Directory.Exists(SaveDataRoot))
@@ -102,7 +98,6 @@ namespace SMT.EVEData
             {
                 Directory.CreateDirectory(characterSaveFolder);
             }
-
 
             CharacterIDToName = new SerializableDictionary<long, string>();
             AllianceIDToName = new SerializableDictionary<long, string>();
@@ -150,7 +145,6 @@ namespace SMT.EVEData
             }
         }
 
-
         public string EVELogFolder { get; set; }
 
         public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
@@ -177,7 +171,6 @@ namespace SMT.EVEData
         public SerializableDictionary<long, string> CharacterIDToName { get; set; }
 
         public List<Coalition> Coalitions { get; set; }
-
 
         public ESI.NET.EsiClient ESIClient { get; set; }
         public List<string> ESIScopes { get; set; }
@@ -244,9 +237,7 @@ namespace SMT.EVEData
 
         public ObservableCollection<Storm> MetaliminalStorms { get; set; }
 
-
         public ObservableCollection<POI> PointsOfInterest { get; set; }
-
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -407,10 +398,6 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Verge Vendor", "10000068", "Gallente", 245, 330));
             Regions.Add(new MapRegion("Wicked Creek", "10000006", string.Empty, 790, 615));
 
-
-
-
-
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
@@ -424,16 +411,11 @@ namespace SMT.EVEData
                 string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
                 string remoteSVG = @"http://evemaps.dotlan.net/svg/" + rd.DotLanRef + ".svg";
 
-
-
                 if (!File.Exists(localSVG))
                 {
                     // error
                     throw new NullReferenceException();
-
                 }
-
-
 
                 // parse the svg as xml
                 XmlDocument xmldoc = new XmlDocument
@@ -657,7 +639,6 @@ namespace SMT.EVEData
                 // error
             }
 
-
             // now open up the eve static data export and extract some info from it
             string eveStaticDataConstellationFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapConstellations.csv";
             if (File.Exists(eveStaticDataConstellationFile))
@@ -683,14 +664,11 @@ namespace SMT.EVEData
                 {
                     s.ConstellationName = constMap[s.ConstellationID];
                 }
-
             }
             else
             {
                 // Error
             }
-
-
 
             foreach (System s in Systems)
             {
@@ -699,8 +677,6 @@ namespace SMT.EVEData
                 // default to no invasion
                 s.TrigInvasionStatus = System.EdenComTrigStatus.None;
             }
-
-
 
             // 13 Oct 2020 :  Temp rebuild of maps for Trig Invasions
 
@@ -715,7 +691,6 @@ namespace SMT.EVEData
             // 20000787    30010141    Sakenta
             // 20000787    30031392    Komo
 
-
             // Krai Svarog
             // 20000788    30000021    Kuharah
             // 20000788    30001413    Nani
@@ -726,7 +701,6 @@ namespace SMT.EVEData
             // 20000788    30003504    Niarja
             // 20000788    30040141    Urhinichi
             // 20000788    30045328    Ahtila
-
 
             // Krai Veles
             // 20000789    30000206    Wirashoda
@@ -739,16 +713,12 @@ namespace SMT.EVEData
             // 20000789    30020141    Senda
             // 20000789    30045329    Ichoriya
 
-
             EVEData.MapRegion blackRise = GetRegion("Black Rise");
             blackRise.MapSystems.Remove("Ahtila");  // Pochven
             blackRise.MapSystems.Remove("Ichoriya"); // Pochven
 
-
-
             EVEData.MapRegion theBleakLands = GetRegion("The Bleak Lands");
             theBleakLands.MapSystems.Remove("Raravoss"); // out of region link
-
 
             EVEData.MapRegion theCitadel = GetRegion("The Citadel");
             theCitadel.MapSystems.Remove("Konola"); // Pochven
@@ -758,7 +728,6 @@ namespace SMT.EVEData
             theCitadel.MapSystems.Remove("Urhinichi"); // Pochven
             theCitadel.MapSystems.Remove("Kino"); // out of region link
             theCitadel.MapSystems.Remove("Niarja"); // out of region link
-
 
             EVEData.MapRegion derelik = GetRegion("Derelik");
             derelik.MapSystems.Remove("Kuharah"); // Pochven
@@ -786,38 +755,29 @@ namespace SMT.EVEData
             theForge.MapSystems.Remove("Otela");  // Pochven
             theForge.MapSystems.Remove("Senda");  // Pochven
 
-
-
             EVEData.MapRegion lonetrek = GetRegion("Lonetrek");
             lonetrek.MapSystems.Remove("Nalvula");  // Pochven
             lonetrek.MapSystems.Remove("Kino");  // Pochven
             lonetrek.MapSystems.Remove("Nani");  // Pochven
             lonetrek.MapSystems.Remove("Arvasaras");  // Pochven
 
-
-
             EVEData.MapRegion metropolis = GetRegion("Metropolis");
             metropolis.MapSystems.Remove("Krirald");  // Pochven
-
 
             EVEData.MapRegion moldenHeath = GetRegion("Molden Heath");
             moldenHeath.MapSystems.Remove("Skarkon");  // Pochven
             moldenHeath.MapSystems.Remove("L4X-1V");  // no longer connected
 
-
             EVEData.MapRegion sinqLaison = GetRegion("Sinq Laison");
             sinqLaison.MapSystems.Remove("Archee");  // Pochven
             sinqLaison.MapSystems.Remove("Ala");  // Pochven
 
-
             EVEData.MapRegion tribute = GetRegion("Tribute");
             tribute.MapSystems.Remove("Nalvula");  // out of region
 
-
             EVEData.MapRegion vergeVendor = GetRegion("Verge Vendor");
-            vergeVendor.MapSystems.Remove("Ignebaener");  // out of region   
-            vergeVendor.MapSystems.Remove("Lisbaetanne");  // doesnt make sense to keep   
-
+            vergeVendor.MapSystems.Remove("Ignebaener");  // out of region
+            vergeVendor.MapSystems.Remove("Lisbaetanne");  // doesnt make sense to keep
 
             // now create Pochven from scratch
             MapRegion pochven = new MapRegion("Pochven", "10000008", "Triglavian", 50, 50);
@@ -845,9 +805,6 @@ namespace SMT.EVEData
             pochven.MapSystems.Add("Urhinichi", new MapSystem() { Name = "Urhinichi", LayoutX = 440, LayoutY = 625, Region = "Pochven", OutOfRegion = false });
             pochven.MapSystems.Add("Ahtila", new MapSystem() { Name = "Ahtila", LayoutX = 120, LayoutY = 435, Region = "Pochven", OutOfRegion = false });
 
-
-
-
             // Krai Veles
             pochven.MapSystems.Add("Wirashoda", new MapSystem() { Name = "Wirashoda", LayoutX = 145, LayoutY = 215, Region = "Pochven", OutOfRegion = false });
             pochven.MapSystems.Add("Arvasaras", new MapSystem() { Name = "Arvasaras", LayoutX = 525, LayoutY = 170, Region = "Pochven", OutOfRegion = false });
@@ -858,9 +815,6 @@ namespace SMT.EVEData
             pochven.MapSystems.Add("Vale", new MapSystem() { Name = "Vale", LayoutX = 170, LayoutY = 70, Region = "Pochven", OutOfRegion = false });
             pochven.MapSystems.Add("Senda", new MapSystem() { Name = "Senda", LayoutX = 135, LayoutY = 295, Region = "Pochven", OutOfRegion = false });
             pochven.MapSystems.Add("Ichoriya", new MapSystem() { Name = "Ichoriya", LayoutX = 365, LayoutY = 100, Region = "Pochven", OutOfRegion = false });
-
-
-
 
             // now add the additional systems added with trailblazers release
 
@@ -886,7 +840,6 @@ namespace SMT.EVEData
             // Minmatar - Irgrus to Pakhshi – IRGRUS TO PAKHSHI
             metropolis.MapSystems["Irgrus"].LayoutX -= 20; // move up slightly
             metropolis.MapSystems["Irgrus"].LayoutY -= 40; // move up slightly
-
 
             genesis.MapSystems.Add("Irgrus", new MapSystem() { Name = "Irgrus", LayoutX = 525, LayoutY = 105, Region = "Metropolis", OutOfRegion = true });
             metropolis.MapSystems.Add("Pakhshi", new MapSystem() { Name = "Pakhshi", LayoutX = 425, LayoutY = 750, Region = "Genesis", OutOfRegion = true });
@@ -928,9 +881,11 @@ namespace SMT.EVEData
                         case "edencom_minor_victory":
                             invasionStatus = System.EdenComTrigStatus.EdencomMinorVictory;
                             break;
+
                         case "fortress":
                             invasionStatus = System.EdenComTrigStatus.Fortress;
                             break;
+
                         case "triglavian_minor_victory":
                             invasionStatus = System.EdenComTrigStatus.TriglavianMinorVictory;
                             break;
@@ -945,10 +900,7 @@ namespace SMT.EVEData
                         }
                     }
                 }
-
             }
-
-
 
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
@@ -979,8 +931,6 @@ namespace SMT.EVEData
                 }
             }
 
-
-
             foreach (MapRegion rr in Regions)
             {
                 // link to the real systems
@@ -1007,9 +957,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
-
-
 
             // collect the system points to generate them from
             List<Vector2f> regionpoints = new List<Vector2f>();
@@ -1190,8 +1137,7 @@ namespace SMT.EVEData
                 }
             }
 
-
-            // now generate the 2d universe view coordinates 
+            // now generate the 2d universe view coordinates
 
             double RenderSize = 5000;
             double universeXMin = 0.0;
@@ -1202,8 +1148,6 @@ namespace SMT.EVEData
 
             foreach (EVEData.System sys in Systems)
             {
-
-
                 if (sys.ActualX < universeXMin)
                 {
                     universeXMin = sys.ActualX;
@@ -1230,8 +1174,6 @@ namespace SMT.EVEData
             double ZScale = (RenderSize) / universeDepth;
             double universeScale = Math.Min(XScale, ZScale);
 
-
-
             foreach (EVEData.System sys in Systems)
             {
                 double X = (sys.ActualX - universeXMin) * universeScale;
@@ -1243,11 +1185,9 @@ namespace SMT.EVEData
                 sys.UniverseY = Z;
             }
 
-
             // now create the region outlines and recalc the centre
             foreach (MapRegion mr in Regions)
             {
-
                 mr.RegionX = (mr.RegionX - universeXMin) * universeScale;
                 mr.RegionY = (universeDepth - (mr.RegionY - universeZMin)) * universeScale;
 
@@ -1316,7 +1256,6 @@ namespace SMT.EVEData
                 }
             }
 
-
             bool done = false;
             int iteration = 0;
             double minSpread = 19.0;
@@ -1325,7 +1264,6 @@ namespace SMT.EVEData
             {
                 iteration++;
                 bool movedThisTime = false;
-
 
                 foreach (EVEData.System sysA in Systems)
                 {
@@ -1355,9 +1293,7 @@ namespace SMT.EVEData
 
                             sysA.UniverseX += dx * s / 2;
                             sysA.UniverseY += dy * s / 2;
-
                         }
-
                     }
                 }
 
@@ -1370,11 +1306,7 @@ namespace SMT.EVEData
                 {
                     done = true;
                 }
-
             }
-
-
-
 
             // now serialise the classes to disk
 
@@ -1601,7 +1533,6 @@ namespace SMT.EVEData
                 }), DispatcherPriority.Normal, null);
             }
 
-
             esiChar.ESIRefreshToken = acd.RefreshToken;
             esiChar.ESILinked = true;
             esiChar.ESIAccessToken = acd.Token;
@@ -1667,8 +1598,6 @@ namespace SMT.EVEData
             {
                 NameToSystem[s.Name] = s;
             }
-
-
 
             // now add the beacons
             string cynoBeaconsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\CynoBeacons.txt";
@@ -1841,7 +1770,6 @@ namespace SMT.EVEData
             Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
             Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
 
-
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
 
@@ -1859,9 +1787,6 @@ namespace SMT.EVEData
             File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelClearFilters.txt", IntelClearFilters);
             File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelIgnoreFilters.txt", IntelIgnoreFilters);
             File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\CynoBeacons.txt", beaconsToSave);
-
-
-
         }
 
         /// <summary>
@@ -1912,7 +1837,6 @@ namespace SMT.EVEData
                 // default
                 IntelClearFilters.Add("Clr");
                 IntelClearFilters.Add("Clear");
-
             }
 
             IntelIgnoreFilters = new List<string>();
@@ -1939,7 +1863,6 @@ namespace SMT.EVEData
 
             intelFileReadPos = new Dictionary<string, int>();
 
-
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
                 EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs";
@@ -1957,7 +1880,6 @@ namespace SMT.EVEData
                 };
                 intelFileWatcher.Changed += IntelFileWatcher_Changed;
             }
-
         }
 
         /// <summary>
@@ -1987,13 +1909,10 @@ namespace SMT.EVEData
                 };
                 gameLogFileWatcher.Changed += GameLogFileWatcher_Changed;
             }
-
         }
-
 
         public void SetupLogFileTriggers()
         {
-
             // -----------------------------------------------------------------
             // SUPER HACK WARNING....
             //
@@ -2074,8 +1993,6 @@ namespace SMT.EVEData
 
                     Thread.Sleep(1000);
                 }
-
-
             }
         }
 
@@ -2096,7 +2013,6 @@ namespace SMT.EVEData
             }
             WatcherThreadShouldTerminate = true;
         }
-
 
         public void ShutDown()
         {
@@ -2172,7 +2088,6 @@ namespace SMT.EVEData
             request.BeginGetResponse(new AsyncCallback(UpdateTheraConnectionsCallback), request);
         }
 
-
         public void UpdateMetaliminalStorms()
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>
@@ -2188,14 +2103,11 @@ namespace SMT.EVEData
                         MetaliminalStorms.Add(s);
                     }
                 }
-
             }), DispatcherPriority.Normal, null);
 
-
-            // now update the Strong and weak areas around the storm 
+            // now update the Strong and weak areas around the storm
             foreach (Storm s in MetaliminalStorms)
             {
-
                 // The Strong area is 1 jump out from the centre
                 List<string> strongArea = Navigation.GetSystemsXJumpsFrom(new List<string>(), s.System, 1);
 
@@ -2209,11 +2121,8 @@ namespace SMT.EVEData
                 strongArea.Remove(s.Name);
 
                 s.StrongArea = strongArea;
-
             }
         }
-
-
 
         internal void AddUpdateJumpBridge(string from, string to, long stationID)
         {
@@ -2293,8 +2202,6 @@ namespace SMT.EVEData
             }
         }
 
-
-
         /// <summary>
         /// Initialise the eve manager
         /// </summary>
@@ -2340,7 +2247,6 @@ namespace SMT.EVEData
             InitTheraConnections();
             InitMetaliminalStorms();
             InitPOI();
-
 
             ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
 
@@ -2389,19 +2295,12 @@ namespace SMT.EVEData
                         POI p = new POI() { System = system, Type = type, ShortDesc = desc, LongDesc = longdesc };
 
                         PointsOfInterest.Add(p);
-
                     }
                 }
-
             }
             catch
             {
-
             }
-
-
-
-
         }
 
         /// <summary>
@@ -2412,7 +2311,6 @@ namespace SMT.EVEData
             TheraConnections = new ObservableCollection<TheraConnection>();
             UpdateTheraConnections();
         }
-
 
         private void InitMetaliminalStorms()
         {
@@ -2681,7 +2579,6 @@ namespace SMT.EVEData
             string changedFile = e.FullPath;
             string characterName = string.Empty;
 
-
             try
             {
                 Encoding fe = Utils.GetEncoding(changedFile);
@@ -2698,7 +2595,6 @@ namespace SMT.EVEData
                 }
                 else
                 {
-
                     // read the iniital block
                     while (!file.EndOfStream)
                     {
@@ -2726,11 +2622,8 @@ namespace SMT.EVEData
                         }
                     }
 
-
-
                     file.BaseStream.Seek(0, SeekOrigin.Begin);
                 }
-
 
                 characterName = gamelogFileCharacterMap[changedFile];
 
@@ -2743,7 +2636,6 @@ namespace SMT.EVEData
 
                 while (line != null)
                 {                    // trim any items off the front
-
                     if (line == "" || !line.StartsWith("["))
                     {
                         line = file.ReadLine();
@@ -2761,15 +2653,12 @@ namespace SMT.EVEData
                         continue;
                     }
 
-
-
                     string type = line.Substring(typeStartPos, typeEndPos - typeStartPos);
 
                     line = line.Substring(typeEndPos + 1);
 
                     // strip the formatting from the log
                     line = Regex.Replace(line, "<.*?>", String.Empty);
-
 
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
@@ -2782,9 +2671,6 @@ namespace SMT.EVEData
                         };
 
                         GameLogList.Insert(0, gd);
-
-
-
                     }), DispatcherPriority.Normal, null);
 
                     foreach (LocalCharacter lc in LocalCharacters)
@@ -2806,7 +2692,6 @@ namespace SMT.EVEData
 
                             if (sendWindowsNotification)
                             {
-
                                 Application.Current.Dispatcher.Invoke((Action)(() =>
                                 {
                                     // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
@@ -2821,15 +2706,10 @@ namespace SMT.EVEData
                                     Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
                                     tb.AddAudio(woopUri);
                                     tb.Show();
-
-
                                 }), DispatcherPriority.Normal, null);
-
                             }
                         }
                     }
-
-
 
                     line = file.ReadLine();
                     gameFileReadPos[changedFile] = fileReadFrom;
@@ -2843,7 +2723,6 @@ namespace SMT.EVEData
             {
             }
         }
-
 
         /// <summary>
         /// Load the character data from disk
@@ -3021,7 +2900,6 @@ namespace SMT.EVEData
                         }
                     }
                 }
-
             }
             catch
             {
@@ -3428,6 +3306,5 @@ namespace SMT.EVEData
             {
             }
         }
-
     }
 }

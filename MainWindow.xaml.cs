@@ -138,11 +138,8 @@ namespace SMT
             IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
             idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
 
-
             EVEManager.IntelDataList.Add(id);
             EVEManager.IntelDataList.Add(idtwo);
-
-
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -181,7 +178,6 @@ namespace SMT
                 {
                     using (TextReader tr = new StreamReader(customLayoutFile))
                     {
-
                         string line = tr.ReadLine();
 
                         while (line != null)
@@ -206,8 +202,6 @@ namespace SMT
                 }
                 catch { }
             }
-
-
 
             RegionUC.MapConf = MapConf;
             RegionUC.Init();
@@ -250,14 +244,11 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
-
-
             RegionUC.ANOMManager = ANOMManager;
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             RouteSystemDropDownAC.ItemsSource = globalSystemList;
-
 
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
@@ -281,8 +272,6 @@ namespace SMT
                 lc.Location = "";
             }
 
-
-
             // Listen to notification activation and select the character if clicked on
             ToastNotificationManagerCompat.OnActivated += toastArgs =>
             {
@@ -297,11 +286,9 @@ namespace SMT
                     {
                         if (lc.Name == charName)
                         {
-
                             // Need to dispatch to UI thread if performing UI operations
                             Application.Current.Dispatcher.Invoke(delegate
                             {
-
                                 ActiveCharacter = lc;
                                 CurrentActiveCharacterCombo.SelectedItem = lc;
 
@@ -313,18 +300,13 @@ namespace SMT
 
                                 UniverseUC.FollowCharacter = true;
                                 UniverseUC.UpdateActiveCharacter(lc);
-
                             });
 
                             break;
-
                         }
-
                     }
-
                 }
             };
-
         }
 
         private void SaveDefaultLayout()
@@ -348,10 +330,7 @@ namespace SMT
             catch
             {
             }
-
-
         }
-
 
         /// <summary>
         /// Anom Manager
@@ -377,14 +356,10 @@ namespace SMT
             CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
         }
 
-
         private void LocalCharacters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(CharactersList.ItemsSource).Refresh();
-
         }
-
-
 
         private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -444,13 +419,8 @@ namespace SMT
                 // Save off any explicit items
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
-
-
-
-
                 // Save the Map Colours
                 string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
-
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -533,8 +503,6 @@ namespace SMT
             }
         }
 
-
-
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
             uiRefreshCounter++;
@@ -583,7 +551,6 @@ namespace SMT
                     this.Topmost = false;
                 }
             }
-
 
             if (e.PropertyName == "ShowZKillData")
             {
@@ -664,8 +631,6 @@ namespace SMT
 
         #region Preferences & Options
 
-
-
         private void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             EVEManager.UpdateESIUniverseData();
@@ -707,7 +672,6 @@ namespace SMT
             RegionUC.ReDrawMap(true);
             UniverseUC.ReDrawMap(true, true, false);
         }
-
 
         #endregion Preferences & Options
 
@@ -779,7 +743,6 @@ namespace SMT
             AddCharacter();
         }
 
-
         public void AddCharacter()
         {
             if (logonBrowserWindow != null)
@@ -791,8 +754,6 @@ namespace SMT
             logonBrowserWindow.Owner = this;
             logonBrowserWindow.ShowDialog();
         }
-
-
 
         private void CharactersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -905,7 +866,6 @@ namespace SMT
                 EVEManager.IntelDataList.Clear();
             }), DispatcherPriority.ApplicationIdle);
         }
-
 
         private void ClearGameLogBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1348,13 +1308,11 @@ namespace SMT
             RegionUC.ReDrawMap(true);
         }
 
-
         private void UpdateJumpBridgeSummary()
         {
             int JBCount = 0;
             int MissingInfo = 0;
             int Disabled = 0;
-
 
             foreach (EVEData.JumpBridge jb in EVEManager.JumpBridges)
             {
@@ -1374,7 +1332,6 @@ namespace SMT
 
             AnsiblexSummaryLbl.Content = Label;
         }
-
 
         #endregion JumpBridges
 
@@ -1536,12 +1493,10 @@ namespace SMT
             charactersWindow.Owner = this;
 
             charactersWindow.ShowDialog();
-
         }
 
         private void LoadInfoObjects()
         {
-
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
@@ -1580,7 +1535,7 @@ namespace SMT
                         {
                             continue;
                         }
-                        // REGION SYSLINK FROM TO SOLID/DASHED size #FFFFFF 
+                        // REGION SYSLINK FROM TO SOLID/DASHED size #FFFFFF
                         string from = parts[2];
                         string to = parts[3];
                         string lineStyle = parts[4];
@@ -1611,11 +1566,9 @@ namespace SMT
                             lt = InfoItem.LineType.LightDashed;
                         }
 
-
                         Color c = (Color)ColorConverter.ConvertFromString(colour);
 
                         int lineThickness = int.Parse(size);
-
 
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Line;
@@ -1636,14 +1589,13 @@ namespace SMT
                         InfoLayer.Add(ii);
                     }
 
-
                     if (parts[1] == "SYSMARKER")
                     {
                         if (parts.Length != 5)
                         {
                             continue;
                         }
-                        // REGION SYSMARKER FROM SIZE #FFFFFF 
+                        // REGION SYSMARKER FROM SIZE #FFFFFF
                         string from = parts[2];
                         string size = parts[3];
                         string colour = parts[4];
@@ -1655,11 +1607,9 @@ namespace SMT
 
                         EVEData.MapSystem fromMS = mr.MapSystems[from];
 
-
                         Color c = (Color)ColorConverter.ConvertFromString(colour);
 
                         int radius = int.Parse(size);
-
 
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Circle;
@@ -1670,9 +1620,6 @@ namespace SMT
                         ii.Fill = c;
                         InfoLayer.Add(ii);
                     }
-
-
-
                 }
             }
 
@@ -1684,8 +1631,6 @@ namespace SMT
             string characterName = ActiveCharacter.Name;
 
             LocalCharacter lc = ActiveCharacter;
-
-
 
             string line = "Your cloak deactivates due to a pulse from a Mobile Observatory deployed by Slazanger.";
 
@@ -1702,12 +1647,10 @@ namespace SMT
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
             tb.AddAudio(woopUri);
             tb.Show();
-
         }
 
         private void miResetLayout_Click(object sender, RoutedEventArgs e)
         {
-
             string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";
             if (File.Exists(defaultLayoutFile))
             {
@@ -1729,7 +1672,6 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             dockManager.UpdateLayout();
-
         }
     }
 
@@ -1829,7 +1771,6 @@ namespace SMT
         }
     }
 
-
     /// <summary>
     /// ZKillboard Sec statuc colour converter
     /// </summary>
@@ -1888,6 +1829,4 @@ namespace SMT
             return null;
         }
     }
-
-
 }

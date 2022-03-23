@@ -36,21 +36,16 @@
                                     </StackPanel>
                                 </GroupBox>
 
-
                                 <GroupBox Header="Logs (changing these requires a restart)" Margin="4" Height="125">
                                     <StackPanel>
-                                        <Label Content="Current Log Folder : "/>
-                                        <Label Content="{Binding Path=CurrentEveLogFolderLocation}"/>
+                                        <Label Content="Current Log Folder : " />
+                                        <Label Content="{Binding Path=CurrentEveLogFolderLocation}" />
 
-                                        <Button Name="SetLogLocation" Content="Set Custom Log Folder" Click="SetLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left"/>
-                                        <Button Name="DefaultLogLocation" Content="Set Default Log Folder" Click="DefaultLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left"/>
-
+                                        <Button Name="SetLogLocation" Content="Set Custom Log Folder" Click="SetLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left" />
+                                        <Button Name="DefaultLogLocation" Content="Set Default Log Folder" Click="DefaultLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left" />
                                     </StackPanel>
                                 </GroupBox>
-
-
                             </StackPanel>
-
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
@@ -61,9 +56,6 @@
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
-
-
-
                     </Grid>
                 </TabItem>
                 <TabItem Header="Region/Universe" HorizontalAlignment="Left">
@@ -104,7 +96,6 @@
                                         <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
                                         <Label Content="Text Max Zoom" />
                                     </StackPanel>
-
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -119,7 +110,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <GroupBox Header="General" Margin="4" >
+                            <GroupBox Header="General" Margin="4">
                                 <StackPanel>
 
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
@@ -143,11 +134,9 @@
                                         <xctk:IntegerUpDown Value="{Binding Path=ZkillExpireTimeMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="120" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
                                         <Label Content="Zkill Max Time (minutes)" />
                                     </StackPanel>
-
-
                                 </StackPanel>
                             </GroupBox>
-                            <GroupBox Header="DangerZone" Margin="4" >
+                            <GroupBox Header="DangerZone" Margin="4">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2">Limit Sound to Dangerzone</CheckBox>
@@ -166,7 +155,6 @@
                                     <Label>Ignore Filters</Label>
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelIgnoreFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                 </StackPanel>
-
                             </GroupBox>
                         </StackPanel>
                     </Grid>
@@ -232,21 +220,17 @@
                     <Grid Height="362">
                         <ScrollViewer>
                             <StackPanel>
-                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False" >
+                                <xctk:PropertyGrid x:Name="ColoursPropertyGrid" AutoGenerateProperties="True" ShowSearchBox="False" ShowSortOptions="False">
                                     <xctk:PropertyGrid.CategoryGroupHeaderTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding}" Foreground="Black" />
                                         </DataTemplate>
                                     </xctk:PropertyGrid.CategoryGroupHeaderTemplate>
-
                                 </xctk:PropertyGrid>
                                 <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
                             </StackPanel>
-
                         </ScrollViewer>
                     </Grid>
-
-
                 </TabItem>
                 <TabItem Header="Debug">
                     <Grid>
@@ -259,7 +243,6 @@
                             <GroupBox Header="General" Margin="4" Height="355">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=Debug_EnableMapEdit}" Margin="0,2">Enable Universe Map Edits</CheckBox>
-
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>

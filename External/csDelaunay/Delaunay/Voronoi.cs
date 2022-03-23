@@ -29,9 +29,12 @@ namespace csDelaunay
             LloydRelaxation(lloydIterations);
         }
 
-        public List<Edge> Edges { get { return edges; } }
-        public Rectf PlotBounds { get { return plotBounds; } }
-        public Dictionary<Vector2f, Site> SitesIndexedByLocation { get { return sitesIndexedByLocation; } }
+        public List<Edge> Edges
+        { get { return edges; } }
+        public Rectf PlotBounds
+        { get { return plotBounds; } }
+        public Dictionary<Vector2f, Site> SitesIndexedByLocation
+        { get { return sitesIndexedByLocation; } }
 
         public static int CompareByYThenX(Site s1, Site s2)
         {

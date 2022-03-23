@@ -13,8 +13,6 @@ namespace SMT
         [DisplayName("Highlight")]
         public Color CharacterHighlightColour { get; set; }
 
-
-
         [Category("Character")]
         [DisplayName("Text")]
         public Color CharacterTextColour { get; set; }
@@ -38,8 +36,6 @@ namespace SMT
         [Category("Gates")]
         [DisplayName("Region")]
         public Color RegionGateColour { get; set; }
-
-
 
         [Category("SOV")]
         [DisplayName("Constellation Highlight")]

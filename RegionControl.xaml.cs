@@ -1,4 +1,5 @@
 ﻿using SMT.EVEData;
+using SMT.ResourceUsage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using SMT.ResourceUsage;
+
 namespace SMT
 {
     /// <summary>
@@ -379,7 +380,6 @@ namespace SMT
             }
         }
 
-
         public List<InfoItem> InfoLayer { get; set; }
 
         public void AddSovConflictsToMap()
@@ -405,8 +405,6 @@ namespace SMT
                         Source = fightImage,
                         Stretch = Stretch.Uniform,
                         IsHitTestVisible = false,
-
-
                     };
                     SovFightLogo.IsHitTestVisible = false;
 
@@ -479,7 +477,6 @@ namespace SMT
                     MapSystem ms = Region.MapSystems[p.System];
                     string POISymbol = "ℹ";
 
-
                     Label poiLbl = new Label();
                     poiLbl.FontSize = 9;
                     poiLbl.IsHitTestVisible = false;
@@ -496,22 +493,17 @@ namespace SMT
                     Canvas.SetZIndex(poiLbl, SYSTEM_Z_INDEX + 13);
                     MainCanvas.Children.Add(poiLbl);
                     DynamicMapElements.Add(poiLbl);
-
                 }
             }
         }
 
-
         public void AddStormsToMap()
         {
-
             foreach (Storm s in EM.MetaliminalStorms)
             {
-
                 if (Region.IsSystemOnMap(s.System))
                 {
                     MapSystem ms = Region.MapSystems[s.System];
-
 
                     Image stormCloud = new Image
                     {
@@ -553,13 +545,11 @@ namespace SMT
                             break;
                     }
 
-
                     Canvas.SetLeft(stormCloud, ms.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
                     Canvas.SetTop(stormCloud, ms.LayoutY - SYSTEM_SHAPE_OFFSET - 11);
                     Canvas.SetZIndex(stormCloud, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(stormCloud);
                     DynamicMapElements.Add(stormCloud);
-
 
                     // now the strong area..
                     foreach (string strongSys in s.StrongArea)
@@ -584,9 +574,7 @@ namespace SMT
                             Canvas.SetZIndex(strongStormCloud, SYSTEM_Z_INDEX + 5);
                             MainCanvas.Children.Add(strongStormCloud);
                             DynamicMapElements.Add(strongStormCloud);
-
                         }
-
                     }
 
                     // now the wiki area..
@@ -612,14 +600,11 @@ namespace SMT
                             Canvas.SetZIndex(weakStormCloud, SYSTEM_Z_INDEX + 5);
                             MainCanvas.Children.Add(weakStormCloud);
                             DynamicMapElements.Add(weakStormCloud);
-
                         }
-
                     }
                 }
             }
         }
-
 
         public void AddTrigInvasionSytemsToMap()
         {
@@ -678,7 +663,6 @@ namespace SMT
             ActiveCharacter = null;
 
             RegionSelectCB.ItemsSource = EM.Regions;
-
 
             ShowJumpBridges = MapConf.ToolBox_ShowJumpBridges;
             ShowNPCKills = MapConf.ToolBox_ShowNPCKills;
@@ -956,8 +940,6 @@ namespace SMT
             // 3 = warning
             NameTrackingLocationMap.Clear();
 
-
-
             foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
             {
                 // ignore characters out of this Map..
@@ -1055,7 +1037,6 @@ namespace SMT
                 SolidColorBrush localCharacterText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
                 SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
 
-
                 foreach (KeyValuePair<int, string> kvp in lkvp)
                 {
                     if (kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
@@ -1074,10 +1055,12 @@ namespace SMT
                             case 0:
                                 charText.Foreground = localCharacterText;
                                 break;
+
                             case 1:
                                 charText.Foreground = localCharacterOfflineText;
                                 charText.Content += "(Offline)";
                                 break;
+
                             case 2:
                                 charText.Foreground = fleetMemberText;
                                 break;
@@ -1086,9 +1069,7 @@ namespace SMT
                                 charText.Foreground = localCharacterText;
                                 charText.Content = "⚠ " + kvp.Value + " ⚠";
                                 break;
-
                         }
-
 
                         if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
                         {
@@ -1273,14 +1254,10 @@ namespace SMT
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
-
                 if (MapConf.LimitESIDataToRegion && sys.OutOfRegion)
                 {
                     continue;
                 }
-
-
-
 
                 infoColour = dataColor;
                 long SystemAlliance = 0;
@@ -3137,8 +3114,6 @@ namespace SMT
                             miRemoveWarning.DataContext = lc;
                             miRemoveWarning.Click += characterRightClickClearWarning;
                             miChar.Items.Add(miRemoveWarning);
-
-
                         }
                     }
                 }
@@ -3200,7 +3175,6 @@ namespace SMT
                 constellation.Content = "Const\t:  " + selectedSys.ActualSystem.ConstellationName;
                 constellation.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                 SystemInfoPopupSP.Children.Add(constellation);
-
 
                 Label secstatus = new Label();
                 secstatus.Padding = one;
@@ -3431,8 +3405,6 @@ namespace SMT
                         tl.Content = $"Storm\t: {s.Type}";
                         tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
-
-
                     }
                 }
 
@@ -3449,7 +3421,6 @@ namespace SMT
                         tl.Content = $"{p.Type} : {p.ShortDesc}";
                         tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
-
                     }
                 }
 
@@ -3461,7 +3432,6 @@ namespace SMT
                     trigInfo.Content = $"Invasion : {selectedSys.ActualSystem.TrigInvasionStatus}";
                     trigInfo.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(trigInfo);
-
                 }
 
                 SystemInfoPopup.IsOpen = true;
@@ -3493,7 +3463,6 @@ namespace SMT
             }
         }
 
-
         /// <summary>
         /// Ckear Route  Clicked
         /// </summary>
@@ -3506,8 +3475,6 @@ namespace SMT
                 ActiveCharacter.ClearAllWaypoints();
             }
         }
-
-
 
         /// <summary>
         /// Copy Clicked

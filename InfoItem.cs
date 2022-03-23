@@ -39,7 +39,6 @@ namespace SMT
 
         public LineType LineStyle;
 
-
         public Shape Draw()
         {
             if (FillBrush == null)
@@ -133,11 +132,6 @@ namespace SMT
                         infoCircle.Height = Size;
                         infoCircle.Width = Size;
 
-
-
-
-
-
                         System.Windows.Controls.Canvas.SetZIndex(infoCircle, 19);
 
                         infoCircle.Stroke = FillBrush;
@@ -154,14 +148,9 @@ namespace SMT
                     }
 
                     break;
-
-
-
-
             }
 
             return infoObject;
         }
-
     }
 }

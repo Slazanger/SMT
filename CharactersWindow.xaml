@@ -19,13 +19,12 @@
     </Window.Resources>
     <Grid Background="{DynamicResource ListBackground}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
             <RowDefinition Height="30" />
-
         </Grid.RowDefinitions>
 
         <ListView x:Name="characterLV"  Grid.Row="0" BorderBrush="Black"   SelectionChanged="characterLV_Selected" Margin="4">
@@ -33,18 +32,18 @@
                     <DataTemplate>
                         <WrapPanel>
                             <Image Source="{Binding Portrait}" Width="32" Height="32" Margin="1" />
-                            <TextBlock Text="{Binding Name}" FontSize="16"/>
+                            <TextBlock Text="{Binding Name}" FontSize="16" />
                         </WrapPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        <Button DockPanel.Dock="Bottom" Content="Add Character" Grid.Row="1" Click="AddCharacter_Click" Margin="4"/>
+        <Button DockPanel.Dock="Bottom" Content="Add Character" Grid.Row="1" Click="AddCharacter_Click" Margin="4" />
 
         <Grid x:Name="characterInfoGrid" Grid.Column="1" Grid.RowSpan="2" Visibility="Hidden"
-              Background="{DynamicResource ListBackground}" >
+              Background="{DynamicResource ListBackground}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*"/>
-                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="180" />
@@ -61,25 +60,25 @@
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
-            <Image Source="{Binding Portrait}" Width="170" Height="170" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10"/>
+            <Image Source="{Binding Portrait}" Width="170" Height="170" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10" />
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="-40,30" Grid.RowSpan="2">
                 <TextBlock Text="{Binding Name}" FontSize="24" Foreground="White" />
 
                 <TextBlock FontSize="14" Foreground="LightGray">
-                                    <Run Text="{Binding CorporationName, FallbackValue='????'}"/>
-                                    <Run Text=" ["/>
-                                    <Run Text="{Binding CorporationTicker, FallbackValue='????'}"/>
-                                    <Run Text="]"/>
+                                    <Run Text="{Binding CorporationName, FallbackValue='????'}" />
+                                    <Run Text=" [" />
+                                    <Run Text="{Binding CorporationTicker, FallbackValue='????'}" />
+                                    <Run Text="]" />
                 </TextBlock>
                 <TextBlock FontSize="14" Foreground="LightGray">
-                                    <Run Text="{Binding AllianceName, FallbackValue='No Alliance'}"/>
-                                    <Run Text=" ["/>
-                                    <Run Text="{Binding AllianceTicker , FallbackValue=''}"/>
-                                    <Run Text="]"/>
+                                    <Run Text="{Binding AllianceName, FallbackValue='No Alliance'}" />
+                                    <Run Text=" [" />
+                                    <Run Text="{Binding AllianceTicker , FallbackValue=''}" />
+                                    <Run Text="]" />
                 </TextBlock>
 
                 <TextBlock FontSize="14" Foreground="LightGray">
-                                    <Run Text="{Binding Location, FallbackValue='Unknown Location'}"/>
+                                    <Run Text="{Binding Location, FallbackValue='Unknown Location'}" />
                 </TextBlock>
 
                 <TextBlock Text=" " />
@@ -101,8 +100,6 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-
-
                 <TextBlock>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -119,30 +116,22 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
-
-
             </StackPanel>
-
-
-
 
             <GroupBox Header="Navigation Options" Grid.Row="1" Grid.RowSpan="8" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4">
                     <StackPanel Orientation="Horizontal" Margin="4">
                         <Label Content="Autopilot" />
-                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding NavigationMode, Mode=TwoWay}" Margin="2" Width="140"  Background="Black"/>
+                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding NavigationMode, Mode=TwoWay}" Margin="2" Width="140"  Background="Black" />
                     </StackPanel>
-                    <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="Use Ansiblex Gates" Margin="4"/>
-                    <CheckBox IsChecked="{Binding UseTheraRouting}"  HorizontalAlignment="Left" Content="Use Thera" Margin="4"/>
-
-                    
-
+                    <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="Use Ansiblex Gates" Margin="4" />
+                    <CheckBox IsChecked="{Binding UseTheraRouting}"  HorizontalAlignment="Left" Content="Use Thera" Margin="4" />
                 </StackPanel>
             </GroupBox>
 
             <GroupBox Header="DangerZone"  Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" BorderBrush="DarkGray" Margin="5">
-                <StackPanel Margin="4" >
-                    <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked" Content="DangerZone Enabled" Margin="4"/>
+                <StackPanel Margin="4">
+                    <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked" Content="DangerZone Enabled" Margin="4" />
                     <StackPanel Orientation="Horizontal" Margin="4">
                         <xctk:IntegerUpDown Value="{Binding DangerZoneRange}" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Width="45" Minimum="1" Maximum="6" Background="Transparent"  Foreground="White" ValueChanged="dangerzone_ValueChanged" />
                         <Label Content="DangerZone Size" Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" />
@@ -151,23 +140,13 @@
             </GroupBox>
 
             <GroupBox Header="Notifications"  Grid.Column="1" Grid.Row="5" Grid.RowSpan="4" BorderBrush="DarkGray" Margin="5">
-                <StackPanel Margin="4" >
-                    <CheckBox IsChecked="{Binding ObservatoryDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Mobile Observatory Decloak" Margin="4"/>
-                    <CheckBox IsChecked="{Binding CombatWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Combat" Margin="4"/>
-
+                <StackPanel Margin="4">
+                    <CheckBox IsChecked="{Binding ObservatoryDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Mobile Observatory Decloak" Margin="4" />
+                    <CheckBox IsChecked="{Binding CombatWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Combat" Margin="4" />
                 </StackPanel>
             </GroupBox>
 
-
-
-            <Button Content="Delete" Grid.Column="1" Grid.Row="9" Width="100" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click"/>
-
-
-
-
-
-
-
+            <Button Content="Delete" Grid.Column="1" Grid.Row="9" Width="100" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click" />
         </Grid>
     </Grid>
 </Window>

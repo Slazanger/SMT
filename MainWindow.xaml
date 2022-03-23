@@ -29,7 +29,7 @@
         <DataTemplate x:Key="intelDataDataTemplate">
             <DockPanel>
                 <TextBlock Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top">
-                    <Run Text="["/><Run Text="{Binding IntelChannel, FallbackValue=''}" /><Run Text="]"/>
+                    <Run Text="[" /><Run Text="{Binding IntelChannel, FallbackValue=''}" /><Run Text="]" />
                 </TextBlock>
                 <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
                 <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
@@ -39,7 +39,7 @@
         <DataTemplate x:Key="gameLogDataDataTemplate">
             <DockPanel>
                 <TextBlock Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top">
-                    <Run Text="["/><Run Text="{Binding Character, FallbackValue=''}" /><Run Text="]"/>
+                    <Run Text="[" /><Run Text="{Binding Character, FallbackValue=''}" /><Run Text="]" />
                 </TextBlock>
                 <TextBlock Text="{Binding Time, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
                 <TextBlock Text="{Binding Text, FallbackValue=GameLog Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
@@ -64,8 +64,6 @@
                     <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
                     <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
                 </MenuItem>
-
-
             </Menu>
 
             <Label Margin="30,0,0,0" Padding="7">Active Character :</Label>
@@ -179,10 +177,6 @@
                                                             <Setter Property="Background" Value="Yellow" />
                                                             <Setter Property="Foreground" Value="Black" />
                                                         </DataTrigger>
-
-                                                        
-
-
                                                     </Style.Triggers>
                                                 </Style>
                                             </DataGrid.CellStyle>
@@ -225,7 +219,7 @@
                                     <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2" />
                                     <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3" />
                                     <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" Grid.Row="4" />
-                                    <Label Content="Ansiblex Gates" Margin="0" Grid.Row="5" FontWeight="Bold" FontSize="18"/>
+                                    <Label Content="Ansiblex Gates" Margin="0" Grid.Row="5" FontWeight="Bold" FontSize="18" />
                                     <Label x:Name="AnsiblexSummaryLbl" Grid.Row="6" Content="" FontStyle="Italic" FontSize="12" />
 
                                     <DataGrid x:Name="JumpBridgeList" Margin="2" Grid.Row="7" AutoGenerateColumns="False" AreRowDetailsFrozen="True" IsReadOnly="True" SelectionUnit="FullRow" SelectedItem="{Binding SelectedItemProperty, Mode=TwoWay}">
@@ -278,7 +272,6 @@
 
                                                     <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionUC}" Margin="2" />
                                                     <CheckBox Content="Use Thera" IsChecked="{Binding ActiveCharacter.UseTheraRouting, ElementName=RegionUC}" Margin="2" />
-
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">
@@ -324,53 +317,46 @@
                                                                         <Setter Property="Foreground" Value="black" />
                                                                     </DataTrigger>
 
-
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
-                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False"/>
-                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory"/>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory" />
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
 
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
-                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False"/>
-                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress"/>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress" />
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
 
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
-                                                                            <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False"/>
-                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory"/>
+                                                                            <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory" />
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
-
 
                                                                     <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
                                                                             <Setter Property="Background" Value="blue" />
                                                                     </DataTrigger>
-
-                                                                    
-
                                                                 </Style.Triggers>
-
                                                             </Style>
-
                                                         </DataGrid.CellStyle>
                                                         <DataGrid.Columns>
                                                             <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="Con" Binding="{Binding GateToTake}" Width="8*" CanUserSort="False"/>
-                                                            <DataGridTextColumn Header="Jumps" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" CanUserSort="False"/>
-                                                            <DataGridTextColumn Header="SK" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" CanUserSort="False"/>
-                                                            <DataGridTextColumn Header="PK" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" CanUserSort="False"/>
-                                                            <DataGridTextColumn Header="Trig" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="Con" Binding="{Binding GateToTake}" Width="8*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Jumps" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="SK" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="PK" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Trig" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                     </DataGrid>
-                                                    
+
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <Label Content="Total number of jumps : " />
                                                         <Label Content="{Binding ActiveCharacter.ActiveRoute.Count, ElementName=RegionUC}" />
@@ -435,19 +421,15 @@
 
                                         <DataGrid  x:Name="MetaliminalStormList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="AliceBlue">
 
-
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
                                                 <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
                                                 <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
-
                                             </DataGrid.Columns>
                                         </DataGrid>
-
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
-                            
 
                             <xcadl:LayoutAnchorable Title="SOV Campaigns" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>
@@ -487,8 +469,6 @@
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
-
- 
                         </xcadl:LayoutAnchorGroup>
                     </xcadl:LayoutAnchorSide>
                 </xcadl:LayoutRoot.RightSide>
@@ -509,7 +489,7 @@
                                                 <DataGrid.RowStyle>
                                                     <Style TargetType="{x:Type DataGridRow}">
                                                         <Setter Property="Background" Value="{Binding Converter={StaticResource zkbBGConverter}}" />
-                                                        <Setter Property="Foreground" Value="{Binding Converter={StaticResource zkbBGFConverter}}"/>
+                                                        <Setter Property="Foreground" Value="{Binding Converter={StaticResource zkbBGFConverter}}" />
                                                     </Style>
                                                 </DataGrid.RowStyle>
 
@@ -546,7 +526,6 @@
 
                                     <ListView x:Name="RawGameDataBox" Margin="0,2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource gameLogDataDataTemplate}" />
                                     <Button Content="Clear GameLog" Grid.Row="1" x:Name="ClearGameLogBtn" Click="ClearGameLogBtn_Click" />
-
                                 </Grid>
                             </xcadl:LayoutAnchorable>
                             <xcadl:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
@@ -561,7 +540,6 @@
                                     </DataGrid>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
-
                         </xcadl:LayoutAnchorablePane>
                     </xcadl:LayoutAnchorablePaneGroup>
 

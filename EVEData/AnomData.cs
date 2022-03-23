@@ -12,7 +12,6 @@ namespace SMT.EVEData
     /// </summary>
     public class AnomData
     {
-
         private List<string> CosmicSignatureTags;
 
         /// <summary>
@@ -26,8 +25,6 @@ namespace SMT.EVEData
             CosmicSignatureTags.Add("Cosmic Signature");
             CosmicSignatureTags.Add("Kosmische Signatur");
             CosmicSignatureTags.Add("Signature cosmique");
-
-
         }
 
         /// <summary>

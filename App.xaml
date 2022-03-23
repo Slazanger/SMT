@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Application xmlns:local="clr-namespace:SMT" StartupUri="MainWindow.xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+<Application  StartupUri="MainWindow.xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
     <Application.Resources>
 
         <ResourceDictionary>

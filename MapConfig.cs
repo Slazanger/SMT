@@ -94,7 +94,6 @@ namespace SMT
 
         private string m_CustomEveLogFolderLocation;
 
-
         public MapConfig()
         {
             SetDefaults();
@@ -164,12 +163,8 @@ namespace SMT
         [Browsable(false)]
         public bool ToolBox_ShowSystemTimers { get; set; }
 
-
         [Browsable(false)]
         public bool Debug_EnableMapEdit { get; set; }
-
-
-
 
         public bool DisableJumpBridgesPathAnimation
         {
@@ -197,7 +192,6 @@ namespace SMT
             get; set;
         }
 
-
         public string CustomEveLogFolderLocation
         {
             get => m_CustomEveLogFolderLocation;
@@ -221,8 +215,6 @@ namespace SMT
             }
         }
 
-
-
         public bool LimitESIDataToRegion
         {
             get
@@ -235,8 +227,6 @@ namespace SMT
                 OnPropertyChanged("LimitESIDataToRegion");
             }
         }
-
-
 
         [Category("Fleet")]
         [DisplayName("Max Fleet Per System")]
@@ -398,7 +388,6 @@ namespace SMT
             }
         }
 
-
         public bool ShowOfflineCharactersOnMap
         {
             get
@@ -411,8 +400,6 @@ namespace SMT
                 OnPropertyChanged("ShowOfflineCharactersOnMap");
             }
         }
-
-
 
         [Category("SOV")]
         [DisplayName("Show Coalition")]
@@ -497,7 +484,6 @@ namespace SMT
                 OnPropertyChanged("ShowNegativeRattingDelta");
             }
         }
-
 
         [Category("Misc")]
         [DisplayName("Show Ratting Data as Delta")]
@@ -826,8 +812,6 @@ namespace SMT
             }
         }
 
-
-
         public int ZkillExpireTimeMinutes
         {
             get
@@ -847,11 +831,7 @@ namespace SMT
             }
         }
 
-
-
         public bool UseESIForCharacterPositions { get; set; }
-
-
 
         public void SetDefaultColours()
         {
@@ -866,7 +846,6 @@ namespace SMT
                 InRegionSystemTextColour = Colors.BlanchedAlmond,
                 OutRegionSystemColour = Color.FromRgb(128, 64, 64),
                 OutRegionSystemTextColour = (Color)ColorConverter.ConvertFromString("#FF726340"),
-
 
                 UniverseSystemColour = Colors.SlateGray,
                 UniverseConstellationGateColour = Colors.SlateGray,

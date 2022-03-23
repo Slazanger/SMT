@@ -146,9 +146,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
-
-
         }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)
@@ -243,7 +240,6 @@ namespace SMT.EVEData
                         }
                     }
                 }
-
 
                 if (UseThera && CurrentNode.TheraConnections != null)
                 {

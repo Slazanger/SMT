@@ -20,9 +20,7 @@ namespace SMT
 
         public List<string> CynoBeaconSystems { get; set; }
 
-
         private MediaPlayer mediaPlayer;
-
 
         public PreferencesWindow()
         {
@@ -30,11 +28,9 @@ namespace SMT
 
             syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
 
-
             mediaPlayer = new MediaPlayer();
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
             mediaPlayer.Open(woopUri);
-
         }
 
         public void Init()
@@ -47,10 +43,7 @@ namespace SMT
                     CynoBeaconSystems.Add(s.Name);
                 }
             }
-
         }
-
-
 
         private void Prefs_OK_Click(object sender, RoutedEventArgs e)
         {
@@ -67,7 +60,6 @@ namespace SMT
                     es.HasJumpBeacon = true;
                 }
             }
-
 
             Close();
         }
@@ -87,9 +79,7 @@ namespace SMT
 
         private void zkilltime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-
             EveManager.Instance.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
-
         }
 
         private void ResetColourData_Click(object sender, RoutedEventArgs e)
@@ -107,9 +97,7 @@ namespace SMT
             ColoursPropertyGrid.Update();
             ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
 
-
             intelVolumeSlider.ValueChanged += IntelVolumeChanged_ValueChanged;
-
         }
 
         private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
@@ -142,7 +130,6 @@ namespace SMT
             MessageBoxResult result = MessageBox.Show("Restart SMT for the log folder location to take effect", "Please Restart SMT", MessageBoxButton.OK);
         }
     }
-
 
     public class JoinStringConverter : IValueConverter
     {

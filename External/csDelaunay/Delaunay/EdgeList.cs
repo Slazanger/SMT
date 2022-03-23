@@ -28,8 +28,10 @@
             hash[hashSize - 1] = rightEnd;
         }
 
-        public Halfedge LeftEnd { get { return leftEnd; } }
-        public Halfedge RightEnd { get { return rightEnd; } }
+        public Halfedge LeftEnd
+        { get { return leftEnd; } }
+        public Halfedge RightEnd
+        { get { return rightEnd; } }
 
         public void Dispose()
         {

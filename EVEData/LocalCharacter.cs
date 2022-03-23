@@ -14,7 +14,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 
-
 namespace SMT.EVEData
 {
     //jumpclones
@@ -54,19 +53,14 @@ namespace SMT.EVEData
         private bool m_ObservatoryDecloakWarningEnabled;
         private bool m_CombatWarningEnabled;
 
-
         /// <summary>
         /// Does the route need updating
         /// </summary>
         private bool routeNeedsUpdate = false;
 
-
         private int ssoErrorCount = 0;
 
         private static BitmapImage unknownChar = null;
-
-
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
@@ -126,14 +120,12 @@ namespace SMT.EVEData
                 {
                     unknownChar = SMT.ResourceUsage.ResourceLoader.LoadBitmapFromResource("Images/unknownChar.png");
                 }), DispatcherPriority.Normal, null);
-
             }
 
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 Portrait = unknownChar;
             }), DispatcherPriority.Normal, null);
-
         }
 
         /// <summary>
@@ -268,11 +260,10 @@ namespace SMT.EVEData
 
                 OnPropertyChanged("GameLogWarningText");
                 OnPropertyChanged("WarningState");
-
             }
         }
-        public string WarningState { get; set; }
 
+        public string WarningState { get; set; }
 
         public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
 
@@ -360,7 +351,6 @@ namespace SMT.EVEData
             }
         }
 
-
         public bool UseTheraRouting
         {
             get
@@ -381,30 +371,22 @@ namespace SMT.EVEData
             }
         }
 
-
         public int DangerZoneRange { get; set; }
 
         [XmlIgnoreAttribute]
         public List<string> WarningSystems { get; set; }
 
-
-
-
         [XmlIgnoreAttribute]
         public BitmapImage Portrait { get; set; }
 
-
         [XmlIgnoreAttribute]
         public String AlertText { get; set; }
-
 
         [XmlIgnoreAttribute]
         public bool EdenCommStandingsGood { get; set; }
 
         [XmlIgnoreAttribute]
         public bool TrigStandingsGood { get; set; }
-
-
 
         /// <summary>
         /// Gets or sets the current list of Waypoints
@@ -492,7 +474,6 @@ namespace SMT.EVEData
                             }
                             else
                             {
-
                             }
 
                             Thread.Sleep(100);
@@ -666,7 +647,6 @@ namespace SMT.EVEData
                 sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken, "");
                 if (sst == null || sst.RefreshToken == null)
                 {
-
                     ssoErrorCount++;
 
                     Thread.Sleep(10000);
@@ -732,9 +712,6 @@ namespace SMT.EVEData
                 return;
             }
 
-
-
-
             if (Waypoints.Count == 0)
             {
                 return;
@@ -752,8 +729,6 @@ namespace SMT.EVEData
                     currentActiveTheraConnections.Add(tc.System);
                 }
                 Navigation.UpdateTheraConnections(currentActiveTheraConnections);
-
-
 
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
@@ -832,8 +807,6 @@ namespace SMT.EVEData
                                 }
                             }
                             WayPointsToAdd.Add(wayPointSysID);
-
-
                         }
                     }
                 }
@@ -936,7 +909,6 @@ namespace SMT.EVEData
 
                             EVEData.System es = EveManager.Instance.GetEveSystemFromID(esifm.SolarSystemId);
 
-
                             fm.Name = EveManager.Instance.GetCharacterName(esifm.CharacterId);
 
                             fm.CharacterID = esifm.CharacterId;
@@ -950,7 +922,6 @@ namespace SMT.EVEData
                             {
                                 fm.Location = es.Name;
                                 fm.Region = es.Region;
-
                             }
                             if (EveManager.Instance.ShipTypes.ContainsKey(esifm.ShipTypeId.ToString()))
                             {
@@ -1107,7 +1078,6 @@ namespace SMT.EVEData
                     }), DispatcherPriority.Normal, null);
                 }
 
-
                 //get the corp info
                 if (CorporationID != -1)
                 {
@@ -1154,13 +1124,9 @@ namespace SMT.EVEData
                             {
                                 TrigStandingsGood = true;
                             }
-
                         }
-
                     }
                 }
-
-
             }
             catch (Exception)
             {

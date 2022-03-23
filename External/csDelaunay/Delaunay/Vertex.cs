@@ -40,11 +40,15 @@ namespace csDelaunay
             Init(x, y);
         }
 
-        public Vector2f Coord { get { return coord; } set { coord = value; } }
+        public Vector2f Coord
+        { get { return coord; } set { coord = value; } }
 
-        public int VertexIndex { get { return vertexIndex; } }
-        public float x { get { return coord.x; } }
-        public float y { get { return coord.y; } }
+        public int VertexIndex
+        { get { return vertexIndex; } }
+        public float x
+        { get { return coord.x; } }
+        public float y
+        { get { return coord.y; } }
 
         public static Vertex Intersect(Halfedge halfedge0, Halfedge halfedge1)
         {

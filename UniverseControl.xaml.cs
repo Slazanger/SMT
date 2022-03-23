@@ -553,9 +553,7 @@ namespace SMT
 
         private void VHSystems_MouseClicked(object sender, RoutedEventArgs e)
         {
-
             EVEData.System sys = (EVEData.System)e.OriginalSource;
-
 
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
@@ -574,7 +572,6 @@ namespace SMT
             MenuItem setDesto = cm.Items[2] as MenuItem;
             MenuItem addWaypoint = cm.Items[3] as MenuItem;
             MenuItem clearRoute = cm.Items[4] as MenuItem;
-
 
             if (ActiveCharacter != null && ActiveCharacter.ESILinked)
             {
@@ -718,8 +715,6 @@ namespace SMT
 
             double SystemTextSize = 5;
             double CharacterTextSize = 6;
-
-
 
             // recreate the brushes on a full draw
             if (FullRedraw)
@@ -1401,7 +1396,7 @@ namespace SMT
             }
         }
 
-        EVEData.System currentDebugSystem;
+        private EVEData.System currentDebugSystem;
 
         private void UniverseMainCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -1422,7 +1417,6 @@ namespace SMT
                     currentDebugSystem = null;
                     ReDrawMap(true, true, false);
                 }
-
             }
         }
     }

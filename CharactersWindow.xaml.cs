@@ -53,7 +53,6 @@ namespace SMT
 
         private void deleteBtn_Click(object sender, RoutedEventArgs e)
         {
-
             EVEData.LocalCharacter lc = characterInfoGrid.DataContext as EVEData.LocalCharacter;
             if (lc != null)
             {
@@ -62,7 +61,6 @@ namespace SMT
                 if (result == MessageBoxResult.Yes)
                 {
                     MainWindow mw = Owner as MainWindow;
-
 
                     mw.ActiveCharacter = null;
                     mw.FleetMembersList.ItemsSource = null;
@@ -80,7 +78,6 @@ namespace SMT
 
                     characterInfoGrid.Visibility = Visibility.Hidden;
                 }
-
             }
         }
     }

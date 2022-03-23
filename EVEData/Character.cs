@@ -29,7 +29,6 @@ namespace SMT.EVEData
         /// </summary>
         public string AllianceName { get; set; }
 
-
         /// <summary>
         /// Gets or sets the ticker of the alliance this character is in
         /// </summary>
@@ -40,8 +39,6 @@ namespace SMT.EVEData
         /// </summary>
         public long CorporationID { get; set; }
 
-
-
         /// <summary>
         /// Gets or sets the Name of the corporation this character is in
         /// </summary>
@@ -51,6 +48,7 @@ namespace SMT.EVEData
         /// Gets or sets the ticker of the corporation this character is in
         /// </summary>
         public string CorporationTicker { get; set; }
+
         /// <summary>
         /// Gets or sets the ID used by ESI for this character
         /// </summary>
