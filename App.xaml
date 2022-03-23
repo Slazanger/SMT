@@ -4,7 +4,7 @@
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/WpfHelpers;component/WpfControls/Zoombox/Themes/Generic.xaml" />
+                <ResourceDictionary Source="External/ZoomControl/Themes/Generic.xaml" />
                 <ResourceDictionary Source="Themes/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

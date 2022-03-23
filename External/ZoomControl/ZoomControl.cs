@@ -10,7 +10,7 @@ using System.Windows.Media.Animation;
 
 #endregion
 
-namespace WpfHelpers.WpfControls.Zoombox
+namespace SMT.ZoomControl
 {
     [TemplatePart(Name = PART_Presenter, Type = typeof(ZoomContentPresenter))]
     public class ZoomControl : ContentControl

@@ -1,14 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29519.181
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMT", "SMT.csproj", "{D2916D4D-8A38-4195-97D8-25676ADA0AE3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428} = {2D1E6AC7-6FB8-42E6-A1D8-754951A99428}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfHelpers", "External\WpfHelpers\WpfHelpers.csproj", "{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,14 +21,6 @@ Global
 		{D2916D4D-8A38-4195-97D8-25676ADA0AE3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2916D4D-8A38-4195-97D8-25676ADA0AE3}.Release|x64.ActiveCfg = Release|x64
 		{D2916D4D-8A38-4195-97D8-25676ADA0AE3}.Release|x64.Build.0 = Release|x64
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Debug|x64.ActiveCfg = Debug|x64
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Debug|x64.Build.0 = Debug|x64
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|x64.ActiveCfg = Release|x64
-		{2D1E6AC7-6FB8-42E6-A1D8-754951A99428}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

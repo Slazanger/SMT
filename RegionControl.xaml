@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
-             xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
              xmlns:local="clr-namespace:SMT"
+             xmlns:zc="clr-namespace:SMT.ZoomControl"
              xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="800">
@@ -82,9 +82,9 @@
                 <ColumnDefinition Width="7*" />
                 <ColumnDefinition Width="193*" />
             </Grid.ColumnDefinitions>
-            <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" Grid.ColumnSpan="3">
+            <zc:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" Grid.ColumnSpan="3">
                 <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
-            </zoombox1:ZoomControl>
+            </zc:ZoomControl>
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,0,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" Grid.Column="2" />
 
             <StackPanel x:Name="BridgeInfoStackPanel" HorizontalAlignment="Left" Margin="20,0,0,20" VerticalAlignment="Bottom"  Panel.ZIndex="50" />

@@ -4,9 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:SMT"
+             xmlns:zc="clr-namespace:SMT.ZoomControl"
              mc:Ignorable="d"
-             xmlns:zoombox1="clr-namespace:WpfHelpers.WpfControls.Zoombox;assembly=WpfHelpers"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -81,9 +80,9 @@
             <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Auto Follow Active Character" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
         </StackPanel>
 
-        <zoombox1:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2" ContentDragFinished="MainZoomControl_ContentDragFinished">
+        <zc:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2" ContentDragFinished="MainZoomControl_ContentDragFinished">
             <Canvas x:Name="UniverseMainCanvas" Margin="5" Width="5000" Height="5000" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" MouseDown="UniverseMainCanvas_MouseDown" />
-        </zoombox1:ZoomControl>
+        </zc:ZoomControl>
 
         <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="145" Height="70" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1">
             <Canvas x:Name="ToolBoxCanvas">

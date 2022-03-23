@@ -150,6 +150,13 @@
     <Compile Include="External\nAlpha\Point.cs" />
     <Compile Include="External\nAlpha\Shape.cs" />
     <Compile Include="External\nAlpha\VertexCounter.cs" />
+    <Compile Include="External\ResourceLoader.cs" />
+    <Compile Include="External\ZoomControl\DoubleToLog10Converter.cs" />
+    <Compile Include="External\ZoomControl\EqualityToBooleanConverter.cs" />
+    <Compile Include="External\ZoomControl\ZoomContentPresenter.cs" />
+    <Compile Include="External\ZoomControl\ZoomControl.cs" />
+    <Compile Include="External\ZoomControl\ZoomControlModes.cs" />
+    <Compile Include="External\ZoomControl\ZoomViewModifierMode.cs" />
     <Compile Include="GitHubRelease.cs" />
     <Compile Include="InfoItem.cs" />
     <Compile Include="NewVersionWindow.xaml.cs">
@@ -171,6 +178,10 @@
     <Page Include="CharactersWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="External\ZoomControl\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="LogonWindow.xaml">
       <SubType>Designer</SubType>
@@ -347,12 +358,6 @@
     <None Include="Sounds\woop.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="External\WpfHelpers\WpfHelpers.csproj">
-      <Project>{2d1e6ac7-6fb8-42e6-a1d8-754951a99428}</Project>
-      <Name>WpfHelpers</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\recentre.png" />

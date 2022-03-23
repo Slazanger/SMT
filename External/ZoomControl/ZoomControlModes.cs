@@ -1,4 +1,4 @@
-﻿namespace WpfHelpers.WpfControls.Zoombox
+﻿namespace SMT.ZoomControl
 {
     public enum ZoomControlModes
     {

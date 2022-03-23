@@ -6,7 +6,7 @@ using System.Windows.Data;
 
 #endregion
 
-namespace WpfHelpers.WpfDataManipulation.XamlConverters
+namespace SMT.ZoomControl
 {
     public class EqualityToBooleanConverter : IValueConverter
     {

@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 #endregion
 
-namespace WpfHelpers.WpfControls.Zoombox
+namespace SMT.ZoomControl
 {
     public delegate void ContentSizeChangedHandler(object sender, Size newSize);
 

@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Serialization;
-using WpfHelpers.ResourceUsage;
+
 
 namespace SMT.EVEData
 {
@@ -124,7 +124,7 @@ namespace SMT.EVEData
             {
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
-                    unknownChar = ResourceLoader.LoadBitmapFromResource("Images/unknownChar.png");
+                    unknownChar = SMT.ResourceUsage.ResourceLoader.LoadBitmapFromResource("Images/unknownChar.png");
                 }), DispatcherPriority.Normal, null);
 
             }

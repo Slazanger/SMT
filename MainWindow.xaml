@@ -5,14 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:SMT"
-        xmlns:localEveData="clr-namespace:SMT.EVEData"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
         xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
         xmlns:xcadl="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
         xmlns:xcadt="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Expression"
-        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
-        xmlns:Themes="clr-namespace:Xceed.Wpf.Toolkit.Themes;assembly=DotNetProjects.Wpf.Extended.Toolkit" 
+
         x:Class="SMT.MainWindow"
         mc:Ignorable="d"
         Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip">

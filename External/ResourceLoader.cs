@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Windows.Media.Imaging;
 
-namespace WpfHelpers.ResourceUsage
+namespace SMT.ResourceUsage
 {
     public class ResourceLoader
     {
