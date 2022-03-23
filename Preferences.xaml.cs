@@ -1,9 +1,7 @@
 ﻿using SMT.EVEData;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
@@ -131,7 +129,7 @@ namespace SMT
         private void SetLogLocation_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new FolderBrowserDialog();
-            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 MapConf.CustomEveLogFolderLocation = dialog.SelectedPath;
             }
@@ -141,7 +139,7 @@ namespace SMT
         private void DefaultLogLocation_Click(object sender, RoutedEventArgs e)
         {
             MapConf.CustomEveLogFolderLocation = string.Empty;
-            MessageBoxResult result = MessageBox.Show("Restart SMT for the log folder location to take effect",  "Please Restart SMT",  MessageBoxButton.OK);
+            MessageBoxResult result = MessageBox.Show("Restart SMT for the log folder location to take effect", "Please Restart SMT", MessageBoxButton.OK);
         }
     }
 

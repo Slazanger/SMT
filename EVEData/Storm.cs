@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMT.EVEData
 {
@@ -23,7 +19,7 @@ namespace SMT.EVEData
         {
             List<Storm> storms = new List<Storm>();
 
-            try 
+            try
             {
                 string sourceHTML = "https://evescoutrescue.com/home/stormtrack.php";
                 string tableXPath = "/html/body/div/div[4]/div/div/div[2]/table/tbody";
@@ -36,7 +32,7 @@ namespace SMT.EVEData
                     .Select(tr => tr.Elements("td").Select(td => td.InnerText.Trim()).ToList())
                     .ToList();
 
-                foreach( List<string> ls in table)
+                foreach (List<string> ls in table)
                 {
                     Storm s = new Storm();
                     s.Region = ls[0];

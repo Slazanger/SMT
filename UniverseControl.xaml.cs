@@ -473,7 +473,7 @@ namespace SMT
             {
                 EVEData.System ssys = EM.GetEveSystem(kvp.Key);
 
-                double Radius = 9460730472580800.0 * kvp.Value * universeScale;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ;
+                double Radius = 9460730472580800.0 * kvp.Value * universeScale; ;
 
                 double X = ssys.UniverseX;
                 double Z = ssys.UniverseY;
@@ -508,7 +508,7 @@ namespace SMT
 
                 if (inRange)
                 {
-                    double irX = es.UniverseX; 
+                    double irX = es.UniverseX;
                     double irZ = es.UniverseY;
                     System.Windows.Media.DrawingVisual rangeSquareDV = new System.Windows.Media.DrawingVisual();
 
@@ -748,7 +748,7 @@ namespace SMT
                 RegionTextColourBrush.Freeze();
                 GateColourBrush.Freeze();
                 JumpBridgeColourBrush.Freeze();
-                DataColourBrush.Freeze();                                                                                                                                                                                                       
+                DataColourBrush.Freeze();
                 BackgroundColourBrush.Freeze();
                 RegionTextZoomedOutColourBrush.Freeze();
                 RegionShapeColourBrush.Freeze();
@@ -776,7 +776,7 @@ namespace SMT
                 VHRegionShapes.ClearAllChildren();
 
                 ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
-                                                                                                                                    
+
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
                 Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
@@ -827,8 +827,8 @@ namespace SMT
                         double Y1 = from.UniverseY;
 
                         double X2 = to.UniverseX;
-                        double Y2 = to.UniverseY; 
-                        
+                        double Y2 = to.UniverseY;
+
                         // Create a rectangle and draw it in the DrawingContext.
                         drawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
                     }
@@ -848,7 +848,7 @@ namespace SMT
 
                     double X = sys.UniverseX;
                     double Z = sys.UniverseY;
-                        
+
                     System.Windows.Media.DrawingVisual systemShapeVisual = new System.Windows.Media.DrawingVisual();
 
                     // Retrieve the DrawingContext in order to create new drawing content.
@@ -1001,7 +1001,7 @@ namespace SMT
                 float characterNametextXOffset = 3;
                 float characterNametextYOffset = -16;
                 Brush CharacterNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
-                Brush CharacterOfflineNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour); 
+                Brush CharacterOfflineNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
                 Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 
@@ -1355,7 +1355,7 @@ namespace SMT
             if (s != null)
             {
                 // actual
-                double X1 = s.UniverseX; 
+                double X1 = s.UniverseX;
                 double Y1 = s.UniverseY;
 
                 MainZoomControl.Show(X1, Y1, MainZoomControl.Zoom);
@@ -1397,23 +1397,24 @@ namespace SMT
         {
             if (ActiveCharacter != null)
             {
-                ActiveCharacter.ClearAllWaypoints();            }
+                ActiveCharacter.ClearAllWaypoints();
+            }
         }
 
         EVEData.System currentDebugSystem;
 
         private void UniverseMainCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(MapConf.Debug_EnableMapEdit == false)
+            if (MapConf.Debug_EnableMapEdit == false)
             {
                 return;
             }
 
-            if(e.ChangedButton == MouseButton.Left)
+            if (e.ChangedButton == MouseButton.Left)
             {
                 Point p = Mouse.GetPosition(UniverseMainCanvas);
 
-                if(currentDebugSystem != null)
+                if (currentDebugSystem != null)
                 {
                     currentDebugSystem.UniverseX = p.X;
                     currentDebugSystem.UniverseY = p.Y;
@@ -1421,7 +1422,7 @@ namespace SMT
                     currentDebugSystem = null;
                     ReDrawMap(true, true, false);
                 }
-                
+
             }
         }
     }

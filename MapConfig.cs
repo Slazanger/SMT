@@ -847,11 +847,11 @@ namespace SMT
             }
         }
 
-        
+
 
         public bool UseESIForCharacterPositions { get; set; }
 
- 
+
 
         public void SetDefaultColours()
         {

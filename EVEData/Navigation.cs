@@ -245,7 +245,7 @@ namespace SMT.EVEData
                 }
 
 
-                if(UseThera && CurrentNode.TheraConnections != null)
+                if (UseThera && CurrentNode.TheraConnections != null)
                 {
                     foreach (string theraConnection in CurrentNode.TheraConnections)
                     {
@@ -309,7 +309,7 @@ namespace SMT.EVEData
                         RP.GateToTake = GateType.Ansiblex;
                     }
 
-                    if(UseThera && mn.TheraConnections != null && mn.TheraConnections.Contains(Route[i + 1]) )
+                    if (UseThera && mn.TheraConnections != null && mn.TheraConnections.Contains(Route[i + 1]))
                     {
                         RP.GateToTake = GateType.Thera;
                     }

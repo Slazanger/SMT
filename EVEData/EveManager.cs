@@ -6,16 +6,19 @@ using ESI.NET;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
 using Microsoft.Extensions.Options;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -24,9 +27,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace SMT.EVEData
 {
@@ -936,7 +936,7 @@ namespace SMT.EVEData
                             break;
                     }
 
-                    if(invasionStatus != System.EdenComTrigStatus.None)
+                    if (invasionStatus != System.EdenComTrigStatus.None)
                     {
                         System s = GetEveSystemFromID(long.Parse(systemid));
                         if (s != null)
@@ -950,7 +950,7 @@ namespace SMT.EVEData
 
 
 
-                // now create the voronoi regions
+            // now create the voronoi regions
             foreach (MapRegion mr in Regions)
             {
                 // collect the system points to generate them from
@@ -2213,7 +2213,7 @@ namespace SMT.EVEData
             }
         }
 
- 
+
 
         internal void AddUpdateJumpBridge(string from, string to, long stationID)
         {
@@ -2712,7 +2712,7 @@ namespace SMT.EVEData
                             l = file.ReadLine(); // should be the "Listener : <CharName>"
                             fileReadFrom++;
 
-                            gamelogFileCharacterMap[changedFile] = l.Split(':')[1].Trim(); 
+                            gamelogFileCharacterMap[changedFile] = l.Split(':')[1].Trim();
 
                             // session started
                             l = file.ReadLine();
@@ -2731,7 +2731,7 @@ namespace SMT.EVEData
                     file.BaseStream.Seek(0, SeekOrigin.Begin);
                 }
 
-                
+
                 characterName = gamelogFileCharacterMap[changedFile];
 
                 for (int i = 0; i < fileReadFrom; i++)
@@ -2744,7 +2744,7 @@ namespace SMT.EVEData
                 while (line != null)
                 {                    // trim any items off the front
 
-                    if (line == "" || !line.StartsWith("[") ) 
+                    if (line == "" || !line.StartsWith("["))
                     {
                         line = file.ReadLine();
                         continue;
@@ -2756,7 +2756,7 @@ namespace SMT.EVEData
                     int typeEndPos = line.IndexOf(")");
 
                     // file corrupt
-                    if(typeStartPos < 1 || typeEndPos < 1)
+                    if (typeStartPos < 1 || typeEndPos < 1)
                     {
                         continue;
                     }
@@ -2804,7 +2804,7 @@ namespace SMT.EVEData
                                 sendWindowsNotification = true;
                             }
 
-                            if(sendWindowsNotification)
+                            if (sendWindowsNotification)
                             {
 
                                 Application.Current.Dispatcher.Invoke((Action)(() =>

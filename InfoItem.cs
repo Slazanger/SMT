@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace SMT
@@ -47,7 +42,7 @@ namespace SMT
 
         public Shape Draw()
         {
-            if(FillBrush == null)
+            if (FillBrush == null)
             {
                 FillBrush = new SolidColorBrush(Fill);
             }
@@ -70,7 +65,7 @@ namespace SMT
                         infoLine.Visibility = System.Windows.Visibility.Visible;
                         infoLine.Stroke = FillBrush;
 
-                        if (LineStyle == LineType.Dashed )
+                        if (LineStyle == LineType.Dashed)
                         {
                             DoubleCollection dashes = new DoubleCollection();
                             dashes.Add(1.0);
@@ -140,7 +135,7 @@ namespace SMT
 
 
 
-                       
+
 
 
                         System.Windows.Controls.Canvas.SetZIndex(infoCircle, 19);

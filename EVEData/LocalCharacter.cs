@@ -10,9 +10,9 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Serialization;
-using System.Windows.Media.Imaging;
 using WpfHelpers.ResourceUsage;
 
 namespace SMT.EVEData
@@ -395,7 +395,7 @@ namespace SMT.EVEData
 
 
         [XmlIgnoreAttribute]
-        public String AlertText {get; set;} 
+        public String AlertText { get; set; }
 
 
         [XmlIgnoreAttribute]
@@ -671,7 +671,7 @@ namespace SMT.EVEData
 
                     Thread.Sleep(10000);
 
-                    if(ssoErrorCount > 50 )
+                    if (ssoErrorCount > 50)
                     {
                         // we have a valid refresh token BUT it failed to auth; we need to force
                         // a reauth
@@ -698,7 +698,7 @@ namespace SMT.EVEData
             catch (Exception ex)
             {
                 // expired token
-                if(ex.HResult == -2147024809)
+                if (ex.HResult == -2147024809)
                 {
                     ESIRefreshToken = "";
                     ESILinked = false;
@@ -732,7 +732,7 @@ namespace SMT.EVEData
                 return;
             }
 
-           
+
 
 
             if (Waypoints.Count == 0)
@@ -747,7 +747,7 @@ namespace SMT.EVEData
 
                 // grab the simple list of thera connections
                 List<string> currentActiveTheraConnections = new List<string>();
-                foreach(TheraConnection tc in EveManager.Instance.TheraConnections)
+                foreach (TheraConnection tc in EveManager.Instance.TheraConnections)
                 {
                     currentActiveTheraConnections.Add(tc.System);
                 }
@@ -804,7 +804,7 @@ namespace SMT.EVEData
                     foreach (Navigation.RoutePoint rp in ActiveRoute)
                     {
                         // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                        if (rp.GateToTake == Navigation.GateType.Ansiblex || rp.GateToTake == Navigation.GateType.Thera  || Waypoints.Contains(rp.SystemName))
+                        if (rp.GateToTake == Navigation.GateType.Ansiblex || rp.GateToTake == Navigation.GateType.Thera || Waypoints.Contains(rp.SystemName))
                         {
                             long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
 
@@ -944,7 +944,7 @@ namespace SMT.EVEData
                             if (es == null)
                             {
                                 fm.Location = "";
-                                fm.Region= "";
+                                fm.Region = "";
                             }
                             else
                             {
@@ -1075,10 +1075,10 @@ namespace SMT.EVEData
 
                 // get the character portrait
                 string characterPortrait = EveManager.Instance.SaveDataRootFolder + "\\Portraits\\" + ID;
-                if(!File.Exists(characterPortrait))
+                if (!File.Exists(characterPortrait))
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Images> esri = await esiClient.Character.Portrait((int)ID);
-                    if(esri.Data != null)
+                    if (esri.Data != null)
                     {
                         try
                         {
@@ -1106,13 +1106,13 @@ namespace SMT.EVEData
                         }
                     }), DispatcherPriority.Normal, null);
                 }
-                
+
 
                 //get the corp info
                 if (CorporationID != -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Corporation.Corporation> esrc = await esiClient.Corporation.Information((int)CorporationID);
-                    if(esrc.Data != null)
+                    if (esrc.Data != null)
                     {
                         CorporationName = esrc.Data.Name;
                         CorporationTicker = esrc.Data.Ticker;
@@ -1141,11 +1141,11 @@ namespace SMT.EVEData
                     TrigStandingsGood = false;
 
                     ESI.NET.EsiResponse<List<ESI.NET.Models.Standing>> essl = await esiClient.Character.Standings();
-                    if(essl.Data != null)
+                    if (essl.Data != null)
                     {
-                        foreach(ESI.NET.Models.Standing standing in essl.Data)
+                        foreach (ESI.NET.Models.Standing standing in essl.Data)
                         {
-                            if(standing.FromId == 500027 && standing.Value > 0)
+                            if (standing.FromId == 500027 && standing.Value > 0)
                             {
                                 EdenCommStandingsGood = true;
                             }
@@ -1235,7 +1235,7 @@ namespace SMT.EVEData
         private void UpdateWarningSystems()
         {
             // only track warning systems if the character is logged in
-            if(IsOnline)
+            if (IsOnline)
             {
                 if (!string.IsNullOrEmpty(Location) && DangerZoneRange > 0 && DangerZoneActive)
                 {
@@ -1244,7 +1244,7 @@ namespace SMT.EVEData
             }
             else
             {
-                if(WarningSystems != null)
+                if (WarningSystems != null)
                 {
                     WarningSystems.Clear();
                 }

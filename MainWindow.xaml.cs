@@ -19,7 +19,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using Windows.Foundation.Collections;
 
 namespace SMT
 {
@@ -290,13 +289,13 @@ namespace SMT
                 // Obtain the arguments from the notification
                 ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
 
-                if(args.Contains("character"))
+                if (args.Contains("character"))
                 {
                     string charName = args["character"];
 
                     foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                     {
-                        if(lc.Name == charName)
+                        if (lc.Name == charName)
                         {
 
                             // Need to dispatch to UI thread if performing UI operations
@@ -333,7 +332,7 @@ namespace SMT
             // first delete the existing
             string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";
 
-            if(File.Exists(defaultLayoutFile))
+            if (File.Exists(defaultLayoutFile))
             {
                 File.Delete(defaultLayoutFile);
             }
@@ -454,7 +453,7 @@ namespace SMT
 
 
                 // save off the toolbar setup
-                MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges ;
+                MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
                 MapConf.ToolBox_ShowNPCKills = RegionUC.ShowNPCKills;
                 MapConf.ToolBox_ShowPodKills = RegionUC.ShowPodKills;
                 MapConf.ToolBox_ShowShipJumps = RegionUC.ShowShipJumps;
@@ -476,9 +475,9 @@ namespace SMT
                 string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
                 using (TextWriter tw = new StreamWriter(customLayoutFile))
                 {
-                    foreach(EVEData.System s in EVEManager.Systems)
+                    foreach (EVEData.System s in EVEManager.Systems)
                     {
-                        if(s.CustomUniverseLayout)
+                        if (s.CustomUniverseLayout)
                         {
                             tw.WriteLine($"{s.Region},{s.Name},{s.UniverseX},{s.UniverseY}");
                         }
@@ -782,7 +781,7 @@ namespace SMT
 
 
         public void AddCharacter()
-        { 
+        {
             if (logonBrowserWindow != null)
             {
                 logonBrowserWindow.Close();
@@ -1327,13 +1326,15 @@ namespace SMT
                 // 6 = to
                 GroupCollection groups = match.Groups;
                 long IDFrom = 0;
-                if ( groups[1].Value != "" && groups[2].Value != "" && groups[3].Value != "")
+                if (groups[1].Value != "" && groups[2].Value != "" && groups[3].Value != "")
                 {
                     long.TryParse(groups[1].Value, out IDFrom);
                     string from = groups[2].Value;
                     string to = groups[3].Value;
                     EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
-                } else if ( groups[4].Value != "" && groups[5].Value != "" && groups[6].Value != "") {
+                }
+                else if (groups[4].Value != "" && groups[5].Value != "" && groups[6].Value != "")
+                {
                     long.TryParse(groups[4].Value, out IDFrom);
                     string from = groups[5].Value;
                     string to = groups[6].Value;
@@ -1371,13 +1372,13 @@ namespace SMT
 
             string Label = $"{JBCount} gates, {MissingInfo} Incomplete, {Disabled} Disabled ";
 
-            AnsiblexSummaryLbl.Content = Label; 
+            AnsiblexSummaryLbl.Content = Label;
         }
 
 
         #endregion JumpBridges
 
-            #region ZKillBoard
+        #region ZKillBoard
 
         private bool zkbFilterByRegion = true;
 
@@ -1555,12 +1556,12 @@ namespace SMT
                     line = line.Trim();
                     if (line.StartsWith("#"))
                     {
-                            continue;
+                        continue;
                     }
 
                     string[] parts = line.Split(',');
 
-                    if(parts.Length == 0 )
+                    if (parts.Length == 0)
                     {
                         continue;
                     }
@@ -1568,14 +1569,14 @@ namespace SMT
                     string region = parts[0];
 
                     EVEData.MapRegion mr = EVEManager.GetRegion(region);
-                    if(mr == null)
+                    if (mr == null)
                     {
                         continue;
                     }
 
-                    if(parts[1] == "SYSLINK" || parts[1] == "SYSLINKARC")
+                    if (parts[1] == "SYSLINK" || parts[1] == "SYSLINKARC")
                     {
-                        if(parts.Length != 7)
+                        if (parts.Length != 7)
                         {
                             continue;
                         }
@@ -1586,7 +1587,7 @@ namespace SMT
                         string size = parts[5];
                         string colour = parts[6];
 
-                        if(!mr.MapSystems.ContainsKey(from))
+                        if (!mr.MapSystems.ContainsKey(from))
                         {
                             continue;
                         }
@@ -1600,7 +1601,7 @@ namespace SMT
                         EVEData.MapSystem toMS = mr.MapSystems[to];
 
                         InfoItem.LineType lt = InfoItem.LineType.Solid;
-                        if(lineStyle == "DASHED")
+                        if (lineStyle == "DASHED")
                         {
                             lt = InfoItem.LineType.Dashed;
                         }
@@ -1609,7 +1610,7 @@ namespace SMT
                         {
                             lt = InfoItem.LineType.LightDashed;
                         }
-                        
+
 
                         Color c = (Color)ColorConverter.ConvertFromString(colour);
 
@@ -1619,7 +1620,7 @@ namespace SMT
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Line;
 
-                        if(parts[1] == "SYSLINKARC")
+                        if (parts[1] == "SYSLINKARC")
                         {
                             ii.DrawType = InfoItem.ShapeType.ArcLine;
                         }
@@ -1706,7 +1707,7 @@ namespace SMT
 
         private void miResetLayout_Click(object sender, RoutedEventArgs e)
         {
-            
+
             string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";
             if (File.Exists(defaultLayoutFile))
             {
@@ -1888,5 +1889,5 @@ namespace SMT
         }
     }
 
-    
+
 }

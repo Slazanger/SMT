@@ -58,12 +58,12 @@ namespace SMT.EVEData
 
 
 
-        public enum EdenComTrigStatus 
-        { 
+        public enum EdenComTrigStatus
+        {
             None,
-            EdencomMinorVictory, 
-            Fortress, 
-            TriglavianMinorVictory 
+            EdencomMinorVictory,
+            Fortress,
+            TriglavianMinorVictory
         };
 
         public EdenComTrigStatus TrigInvasionStatus { get; set; }
@@ -101,7 +101,7 @@ namespace SMT.EVEData
         public double UniverseY { get; set; }
 
         [XmlIgnoreAttribute]
-        public bool  CustomUniverseLayout { get; set; }
+        public bool CustomUniverseLayout { get; set; }
 
         /// <summary>
         /// Gets or sets EVE's internal Constellation ID
@@ -243,7 +243,7 @@ namespace SMT.EVEData
 
                 return "Null Sec";
             }
-                
+
         }
 
 

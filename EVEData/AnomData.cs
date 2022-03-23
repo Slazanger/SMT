@@ -26,7 +26,7 @@ namespace SMT.EVEData
             CosmicSignatureTags.Add("Cosmic Signature");
             CosmicSignatureTags.Add("Kosmische Signatur");
             CosmicSignatureTags.Add("Signature cosmique");
-            
+
 
         }
 
@@ -64,7 +64,7 @@ namespace SMT.EVEData
                         string sigType = words[2];
                         string sigName = words[3];
 
-                        if(string.IsNullOrEmpty(sigType))
+                        if (string.IsNullOrEmpty(sigType))
                         {
                             sigType = "Unknown";
                         }

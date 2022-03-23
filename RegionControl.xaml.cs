@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.ServiceModel.Channels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -407,7 +406,7 @@ namespace SMT
                         Source = fightImage,
                         Stretch = Stretch.Uniform,
                         IsHitTestVisible = false,
-                      
+
 
                     };
                     SovFightLogo.IsHitTestVisible = false;
@@ -606,7 +605,7 @@ namespace SMT
                                 Source = stormCloud.Source,
                                 Stretch = Stretch.Uniform,
                                 IsHitTestVisible = false,
-                               // Opacity = 0.5,
+                                // Opacity = 0.5,
                             };
 
                             Canvas.SetLeft(weakStormCloud, msw.LayoutX - SYSTEM_SHAPE_OFFSET - 10);
@@ -642,7 +641,7 @@ namespace SMT
             foreach (KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
             {
                 EVEData.MapSystem ms = kvp.Value;
-                if(ms.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None)
+                if (ms.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None)
                 {
                     Polygon TrigShape;
                     TrigShape = new Polygon();
@@ -796,7 +795,7 @@ namespace SMT
             AddSystemIntelOverlay();
             AddHighlightToSystem(SelectedSystem);
 
-            if(MapConf.DrawRoute)
+            if (MapConf.DrawRoute)
             {
                 AddRouteToMap();
             }
@@ -958,7 +957,7 @@ namespace SMT
             // 3 = warning
             NameTrackingLocationMap.Clear();
 
-           
+
 
             foreach (EVEData.LocalCharacter c in EM.LocalCharacters)
             {
@@ -974,12 +973,12 @@ namespace SMT
                 }
 
                 int type = 0;
-                if(!c.IsOnline)
+                if (!c.IsOnline)
                 {
                     type = 1;
                 }
 
-                if(!string.IsNullOrEmpty(c.GameLogWarningText))
+                if (!string.IsNullOrEmpty(c.GameLogWarningText))
                 {
                     type = 3;
                 }
@@ -1060,7 +1059,7 @@ namespace SMT
 
                 foreach (KeyValuePair<int, string> kvp in lkvp)
                 {
-                    if(kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
+                    if (kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
                     {
                         continue;
                     }
@@ -1071,7 +1070,7 @@ namespace SMT
                         charText.Content = kvp.Value;
                         charText.IsHitTestVisible = false;
 
-                        switch(kvp.Key)
+                        switch (kvp.Key)
                         {
                             case 0:
                                 charText.Foreground = localCharacterText;
@@ -1276,7 +1275,7 @@ namespace SMT
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
 
-                if(MapConf.LimitESIDataToRegion && sys.OutOfRegion)
+                if (MapConf.LimitESIDataToRegion && sys.OutOfRegion)
                 {
                     continue;
                 }
@@ -2799,11 +2798,11 @@ namespace SMT
             }
 
             // now add any info items
-            if(InfoLayer != null)
+            if (InfoLayer != null)
             {
                 foreach (InfoItem ii in InfoLayer)
                 {
-                    if(ii.Region == Region.Name)
+                    if (ii.Region == Region.Name)
                     {
                         Shape s = ii.Draw();
                         MainCanvas.Children.Add(s);
@@ -3132,7 +3131,7 @@ namespace SMT
                         miARJFR.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARJFR);
 
-                        if(!string.IsNullOrEmpty(lc.GameLogWarningText))
+                        if (!string.IsNullOrEmpty(lc.GameLogWarningText))
                         {
                             MenuItem miRemoveWarning = new MenuItem();
                             miRemoveWarning.Header = "Clear Warning";
@@ -3154,7 +3153,7 @@ namespace SMT
             MenuItem mi = sender as MenuItem;
 
             LocalCharacter lc = mi.DataContext as LocalCharacter;
-            if(lc != null)
+            if (lc != null)
             {
                 lc.GameLogWarningText = "";
             }
@@ -3443,7 +3442,7 @@ namespace SMT
                 // Points of interest
                 foreach (POI p in EM.PointsOfInterest)
                 {
-                    if(selectedSys.Name == p.System)
+                    if (selectedSys.Name == p.System)
                     {
                         Label tl = new Label();
                         tl.Padding = one;
@@ -3455,7 +3454,7 @@ namespace SMT
                     }
                 }
 
-                if(MapConf.ShowTrigInvasions && selectedSys.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None)
+                if (MapConf.ShowTrigInvasions && selectedSys.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None)
                 {
                     Label trigInfo = new Label();
                     trigInfo.Padding = one;
@@ -3503,7 +3502,7 @@ namespace SMT
         /// <param name="e"></param>
         private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
         {
-             if (ActiveCharacter != null)
+            if (ActiveCharacter != null)
             {
                 ActiveCharacter.ClearAllWaypoints();
             }
