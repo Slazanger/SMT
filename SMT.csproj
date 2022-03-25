@@ -1,23 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D2916D4D-8A38-4195-97D8-25676ADA0AE3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SMT</RootNamespace>
-    <AssemblyName>SMT</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -33,27 +19,14 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>
     </DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>smt_bomb_icon.ico</ApplicationIcon>
@@ -74,226 +47,23 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationFramework.Aero" />
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="CharactersWindow.xaml.cs">
-      <DependentUpon>CharactersWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="EVEData\Coalition.cs" />
-    <Compile Include="EVEData\ESI\CharacterIDData.cs" />
-    <Compile Include="EVEData\ESI\CoalitionInfo.cs" />
-    <Compile Include="EVEData\ESI\DotlanData.cs" />
-    <Compile Include="EVEData\ESI\ESIHelper.cs" />
-    <Compile Include="EVEData\ESI\IncursionData.cs" />
-    <Compile Include="EVEData\ESI\StructureHunter.cs" />
-    <Compile Include="EVEData\ESI\StructureIDData.cs" />
-    <Compile Include="EVEData\ESI\StructureSearch.cs" />
-    <Compile Include="EVEData\GameLogData.cs" />
-    <Compile Include="EVEData\LocalCharacter.cs" />
-    <Compile Include="EVEData\Navigation.cs" />
-    <Compile Include="EVEData\POI.cs" />
-    <Compile Include="EVEData\Server.cs" />
-    <Compile Include="EVEData\SOVCampaign.cs" />
-    <Compile Include="EVEData\Storm.cs" />
-    <Compile Include="EVEData\Structure.cs" />
-    <Compile Include="External\nAlpha\AlphaShapeCalculator.cs" />
-    <Compile Include="External\nAlpha\Point.cs" />
-    <Compile Include="External\nAlpha\Shape.cs" />
-    <Compile Include="External\nAlpha\VertexCounter.cs" />
-    <Compile Include="External\ResourceLoader.cs" />
-    <Compile Include="External\ZoomControl\DoubleToLog10Converter.cs" />
-    <Compile Include="External\ZoomControl\EqualityToBooleanConverter.cs" />
-    <Compile Include="External\ZoomControl\ZoomContentPresenter.cs" />
-    <Compile Include="External\ZoomControl\ZoomControl.cs" />
-    <Compile Include="External\ZoomControl\ZoomControlModes.cs" />
-    <Compile Include="External\ZoomControl\ZoomViewModifierMode.cs" />
-    <Compile Include="GitHubRelease.cs" />
-    <Compile Include="InfoItem.cs" />
-    <Compile Include="NewVersionWindow.xaml.cs">
-      <DependentUpon>NewVersionWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Preferences.xaml.cs">
-      <DependentUpon>Preferences.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="RegionsViewControl.xaml.cs">
-      <DependentUpon>RegionsViewControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="StaticJumpOverlay.cs" />
-    <Compile Include="Themes\LeftMarginMultiplierConverter.cs" />
-    <Compile Include="Themes\TreeViewItemExtensions.cs" />
-    <Compile Include="UniverseControl.xaml.cs">
-      <DependentUpon>UniverseControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Utils.cs" />
-    <Page Include="CharactersWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="External\ZoomControl\Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="LogonWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="EVEData\Alliance.cs" />
-    <Compile Include="EVEData\Anom.cs" />
-    <Compile Include="EVEData\AnomData.cs" />
-    <Compile Include="EVEData\AnomManager.cs" />
-    <Compile Include="EVEData\Character.cs" />
-    <Compile Include="EVEData\EveAppConfig.cs" />
-    <Compile Include="EVEData\Fleet.cs" />
-    <Compile Include="EVEData\IntelData.cs" />
-    <Compile Include="EVEData\JumpBridge.cs" />
-    <Compile Include="EVEData\MapSystem.cs" />
-    <Compile Include="EVEData\MapRegion.cs" />
-    <Compile Include="EVEData\EveManager.cs">
+    <Compile Update="EVEData\EveManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
-    <Compile Include="EVEData\TheraConnection.cs" />
-    <Compile Include="EVEData\ESI\ZKBData.cs" />
-    <Compile Include="EVEData\ZKillRedisQ.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\Edge.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\EdgeList.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\EdgeReorderer.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\Halfedge.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\HalfedgePriorityQueue.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\ICoord.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\LR.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\Site.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\SiteList.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\Triangle.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\Vertex.cs" />
-    <Compile Include="External\csDelaunay\Delaunay\Voronoi.cs" />
-    <Compile Include="External\csDelaunay\Geom\Circle.cs" />
-    <Compile Include="External\csDelaunay\Geom\LineSegment.cs" />
-    <Compile Include="External\csDelaunay\Geom\Polygon.cs" />
-    <Compile Include="External\csDelaunay\Geom\Rectf.cs" />
-    <Compile Include="External\csDelaunay\Geom\Vector2f.cs" />
-    <Compile Include="External\csDelaunay\Geom\Winding.cs" />
-    <Compile Include="LogonWindow.xaml.cs">
-      <DependentUpon>LogonWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MapColours.cs" />
-    <Compile Include="MapConfig.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="RegionControl.xaml.cs">
-      <DependentUpon>RegionControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SerializableDictionary.cs" />
-    <Compile Include="EVEData\System.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="NewVersionWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Preferences.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="RegionControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="RegionsViewControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Styles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UniverseControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Resource Include="smt_bomb_icon.ico" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <None Include="app.manifest">
+    <None Update="app.manifest">
       <SubType>Designer</SubType>
     </None>
-    <None Include="External\csDelaunay\LICENSE" />
-    <None Include="External\csDelaunay\README.md" />
     <Resource Include="Images\dotlan.png" />
     <Resource Include="Images\Gate Inactive.png" />
     <Resource Include="Images\Gate.png" />
@@ -318,23 +88,7 @@
     <Resource Include="Images\ADM.png" />
     <Resource Include="Images\Timer Inactive.png" />
     <Resource Include="Images\Timer.png" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\dotlan.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\dotlanbmp.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zkb.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\help.png" />
@@ -355,7 +109,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Sounds\woop.mp3">
+    <None Update="Sounds\woop.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -407,6 +161,7 @@
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.7.0</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration">
       <Version>6.0.1</Version>
     </PackageReference>
@@ -422,6 +177,8 @@
     <PackageReference Include="System.ComponentModel.Annotations">
       <Version>5.0.0</Version>
     </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Runtime">
       <Version>4.3.1</Version>
     </PackageReference>
@@ -434,13 +191,20 @@
     <PackageReference Include="WPFThemes.DarkBlend">
       <Version>1.0.8</Version>
     </PackageReference>
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.310801">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <Compile Remove="packages\WPFThemes.DarkBlend.1.0.8\content\Themes\LeftMarginMultiplierConverter.cs" />
+    <Compile Remove="packages\WPFThemes.DarkBlend.1.0.8\content\Themes\TreeViewItemExtensions.cs" />
+    <Compile Remove="Universe3dControl.xaml.cs" />
+    <Page Remove="packages\WPFThemes.DarkBlend.1.0.8\content\Themes\Styles.xaml" />
+    <Page Remove="Universe3dControl.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 </Project>
