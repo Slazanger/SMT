@@ -7,20 +7,6 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SMT
 {
-    public class JumpCharacterItemsSource : IItemsSource
-    {
-        public ItemCollection GetValues()
-        {
-            ItemCollection sizes = new ItemCollection();
-            sizes.Add("");
-
-            foreach (EVEData.LocalCharacter c in EVEData.EveManager.Instance.LocalCharacters)
-            {
-                sizes.Add(c.Name);
-            }
-            return sizes;
-        }
-    }
 
     public class MapConfig : INotifyPropertyChanged
     {
