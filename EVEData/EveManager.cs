@@ -17,6 +17,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -264,64 +265,7 @@ namespace SMT.EVEData
         /// </summary>
         private Dictionary<string, System> NameToSystem { get; }
 
-        public CharacterIDs.Character[] BulkUpdateCharacterCache(List<string> charList)
-        {
-            CharacterIDs.CharacterIdData cd = new CharacterIDs.CharacterIdData();
-
-            string esiCharString = "[";
-            foreach (string s in charList)
-            {
-                esiCharString += "\"";
-                esiCharString += s;
-                esiCharString += "\",";
-            }
-            esiCharString += "\"0\"]";
-
-            string url = @"https://esi.evetech.net/v1/universe/ids/?";
-
-            var httpData = HttpUtility.ParseQueryString(string.Empty);
-
-            httpData["datasource"] = "tranquility";
-
-            string httpDataStr = httpData.ToString();
-            byte[] data = UTF8Encoding.UTF8.GetBytes(esiCharString);
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url + httpDataStr);
-            request.Method = WebRequestMethods.Http.Post;
-            request.Timeout = 20000;
-            request.Proxy = null;
-            request.ContentType = "application/json";
-            request.ContentLength = data.Length;
-
-            var stream = request.GetRequestStream();
-            stream.Write(data, 0, data.Length);
-
-            HttpWebResponse esiResult = (HttpWebResponse)request.GetResponse();
-
-            if (esiResult.StatusCode != HttpStatusCode.OK)
-            {
-                return null;
-            }
-
-            Stream responseStream = esiResult.GetResponseStream();
-            using (StreamReader sr = new StreamReader(responseStream))
-            {
-                // Need to return this response
-                string strContent = sr.ReadToEnd();
-
-                try
-                {
-                    cd = CharacterIDs.CharacterIdData.FromJson(strContent);
-                    if (cd.Characters != null)
-                    {
-                    }
-                }
-                catch { }
-            }
-
-            return cd.Characters;
-        }
-
+      
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
@@ -402,14 +346,11 @@ namespace SMT.EVEData
 
             Systems = new List<System>();
 
-            // create folder cache
-            WebClient webClient = new WebClient();
 
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
                 string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
-                string remoteSVG = @"http://evemaps.dotlan.net/svg/" + rd.DotLanRef + ".svg";
 
                 if (!File.Exists(localSVG))
                 {
