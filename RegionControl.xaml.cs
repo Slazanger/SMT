@@ -876,7 +876,6 @@ namespace SMT
 
             EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
             ANOMManager.ActiveSystem = system;
-            ///AnomSigList.ItemsSource = system.Anoms.Values;
         }
 
         public void UpdateActiveCharacter(EVEData.LocalCharacter c = null)
