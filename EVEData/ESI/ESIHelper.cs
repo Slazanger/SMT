@@ -1,6 +1,6 @@
-﻿using ESI.NET;
-using System;
+﻿using System;
 using System.Net;
+using ESI.NET;
 
 namespace SMT.EVEData
 {

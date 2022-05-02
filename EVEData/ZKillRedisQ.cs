@@ -5,12 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
-using System.Net.Http;
 
 namespace SMT.EVEData
 {
@@ -74,7 +72,7 @@ namespace SMT.EVEData
             {
                 HttpClient hc = new HttpClient();
                 var response = hc.GetAsync(redistURL).Result;
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     strContent = response.Content.ReadAsStringAsync().Result;
                 }

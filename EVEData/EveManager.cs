@@ -2,13 +2,6 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
-using ESI.NET;
-using ESI.NET.Enumerations;
-using ESI.NET.Models.SSO;
-using Microsoft.Extensions.Options;
-using Microsoft.Toolkit.Uwp.Notifications;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +9,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -28,6 +20,13 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using ESI.NET;
+using ESI.NET.Enumerations;
+using ESI.NET.Models.SSO;
+using Microsoft.Extensions.Options;
+using Microsoft.Toolkit.Uwp.Notifications;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SMT.EVEData
 {
@@ -265,7 +264,7 @@ namespace SMT.EVEData
         /// </summary>
         private Dictionary<string, System> NameToSystem { get; }
 
-      
+
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
@@ -3120,7 +3119,7 @@ namespace SMT.EVEData
             catch { }
         }
 
-  
+
         /// <summary>
         /// Start the download for the Server Info
         /// </summary>

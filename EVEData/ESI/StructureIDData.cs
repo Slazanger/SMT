@@ -6,9 +6,9 @@
 
 namespace StructureIDs
 {
+    using System.Globalization;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
-    using System.Globalization;
 
     public static class Serialize
     {

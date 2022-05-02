@@ -6,11 +6,11 @@
 
 namespace StructureHunter
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     public enum RegionName
     { AR00001, AR00002, AR00003, Aridia, BR00004, BR00005, BR00006, BR00007, BR00008, BlackRise, Branch, CR00009, CR00010, CR00011, CR00012, CR00013, CR00014, CR00015, Cache, Catch, CloudRing, CobaltEdge, Curse, DR00016, DR00017, DR00018, DR00019, DR00020, DR00021, DR00022, DR00023, Deklein, Delve, Derelik, Detorid, Devoid, Domain, ER00024, ER00025, ER00026, ER00027, ER00028, ER00029, Esoteria, Essence, EtheriumReach, Everyshore, FR00030, Fade, Feythabolis, Fountain, Geminate, Genesis, GreatWildlands, Heimatar, Immensea, Impass, Insmother, Kador, Khanid, KorAzor, Lonetrek, Malpais, Metropolis, MoldenHeath, Oasa, Omist, OuterPassage, OuterRing, ParagonSoul, PeriodBasis, PerrigenFalls, Placid, Providence, PureBlind, Querious, ScaldingPass, SinqLaison, Solitude, Stain, Syndicate, TashMurkon, Tenal, Tenerifis, TheBleakLands, TheCitadel, TheForge, TheKalevalaExpanse, TheSpire, Tribute, ValeOfTheSilent, Venal, VergeVendor, WickedCreek };

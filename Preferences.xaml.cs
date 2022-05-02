@@ -1,11 +1,11 @@
-﻿using SMT.EVEData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Media;
+using SMT.EVEData;
 using MessageBox = System.Windows.MessageBox;
 
 namespace SMT

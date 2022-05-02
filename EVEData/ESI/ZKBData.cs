@@ -6,10 +6,10 @@
 
 namespace ZKBData
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
     using System.Collections.Generic;
     using System.Globalization;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     public static class Serialize
     {

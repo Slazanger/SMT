@@ -1,6 +1,3 @@
-using Microsoft.Toolkit.Uwp.Notifications;
-using Microsoft.Win32;
-using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
@@ -19,8 +16,9 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-
-using System.Net.Http;
+using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.Win32;
+using SMT.EVEData;
 
 namespace SMT
 {
@@ -61,7 +59,7 @@ namespace SMT
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
-            if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows() )
+            if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
                 {
@@ -323,7 +321,7 @@ namespace SMT
 
             try
             {
-                if(OperatingSystem.IsWindows())
+                if (OperatingSystem.IsWindows())
                 {
                     AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
                     using (var sw = new StreamWriter(defaultLayoutFile))
@@ -1630,7 +1628,7 @@ namespace SMT
             lc.GameLogWarningText = line;
 
 
-            if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10,0,17763,0)) 
+            if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
             {
                 ToastContentBuilder tb = new ToastContentBuilder();
                 tb.AddText("SMT Alert");
