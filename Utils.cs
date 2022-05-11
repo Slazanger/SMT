@@ -81,7 +81,7 @@ namespace SMT
         /// <summary>
         /// Create a colour from any string
         /// </summary>
-        public static Color stringToColour(string str)
+        public static Color StringToColour(string str)
         {
             int hash = 0;
 

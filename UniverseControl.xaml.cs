@@ -857,20 +857,17 @@ namespace SMT
                     drawingContext.Close();
                     VHSystems.AddChild(systemShapeVisual, sys);
 
-#pragma warning disable CS0618
-
-                    FormattedText ft = new FormattedText(sys.Name,
+                   FormattedText ft = new FormattedText(sys.Name,
                             ci,
                             FlowDirection.LeftToRight,
                             tf,
-                            SystemTextSize, SystemTextColourBrush);
+                            SystemTextSize, SystemTextColourBrush, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                     ft.TextAlignment = TextAlignment.Center;
                     // Draw a formatted text string into the DrawingContext.
                     systemTextDrawingContext.DrawText(
 
                         ft,
                         new Point(X + textXOffset, Z + textYOffset));
-#pragma warning restore CS0618
 
                     // Close the DrawingContext to persist changes to the DrawingVisual.
 
@@ -1042,16 +1039,14 @@ namespace SMT
 
                         foreach (string name in kvp.Value)
                         {
-#pragma warning disable CS0618
                             // Draw a formatted text string into the DrawingContext.
                             dc.DrawText(
                                 new FormattedText(name,
                                     CultureInfo.GetCultureInfo("en-us"),
                                     FlowDirection.LeftToRight,
                                     tf,
-                                    CharacterTextSize, CharacterNameBrush),
+                                    CharacterTextSize, CharacterNameBrush, VisualTreeHelper.GetDpi(this).PixelsPerDip),
                                 new Point(X + characterNametextXOffset, Z + characterNametextYOffset + charTextOffset));
-#pragma warning restore CS0618
 
                             charTextOffset -= (CharacterTextSize + 2);
                         }
@@ -1249,11 +1244,9 @@ namespace SMT
                 System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
-#pragma warning disable CS0618
-                FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, tf, RegionTextSize, rtb);
+                FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, tf, RegionTextSize, rtb, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                 ft.TextAlignment = TextAlignment.Center;
                 drawingContext.DrawText(ft, new Point(X, Z));
-#pragma warning restore CS0618
 
                 drawingContext.Close();
 
