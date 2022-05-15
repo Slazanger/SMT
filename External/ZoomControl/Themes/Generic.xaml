@@ -23,8 +23,8 @@
                             <Border Padding="5"
                                     CornerRadius="5"
                                     Background="#664B4B4B"
-                                    Canvas.Left="20"
-                                    Canvas.Top="20"
+                                    Canvas.Left="10"
+                                    Canvas.Top="10"
                                     ToolTipService.InitialShowDelay="0">
                                 <Border.ToolTip>
                                     <StackPanel Orientation="Vertical">
@@ -43,10 +43,10 @@
                                                                 BorderBrush="Black"
                                                                 Background="#FF747474"
                                                                 BorderThickness="1"
-                                                                CornerRadius="5"
-                                                                Width="40"
-                                                                Height="40"
-                                                                Margin="2"
+                                                                CornerRadius="2"
+                                                                Width="25"
+                                                                Height="25"
+                                                                Margin="0"
                                                                 HorizontalAlignment="Center"
                                                                 VerticalAlignment="Center">
                                                             <ContentPresenter HorizontalAlignment="Center"
@@ -75,7 +75,7 @@
                                             </Setter>
                                         </Style>
                                     </StackPanel.Resources>
-                                    <Slider Height="150"
+                                    <Slider Height="130"
                                             Minimum="{TemplateBinding MinZoom,Converter={StaticResource log10Converter}}"
                                             Maximum="{TemplateBinding MaxZoom,Converter={StaticResource log10Converter}}"
                                             Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,Mode=TwoWay,Converter={StaticResource log10Converter}}"
@@ -99,7 +99,7 @@
                                                  IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},
                                         Path=Mode,Converter={StaticResource equalityConverter},ConverterParameter={x:Static zc:ZoomControlModes.Fill}}">
                                         <RadioButton.Content>
-                                            <Viewbox Margin="10">
+                                            <Viewbox Margin="5">
                                                 <Path Data="M11.585977,18.999021L12.999977,20.41302 3.4147511,30.000045 9.999999,30.000045 9.999999,32.000045 0,32.000045 0,22.000045 2,22.000045 2,28.586798z M20.414059,18.998996L29.999999,28.586804 29.999999,22.000045 31.999999,22.000045 31.999999,32.000045 21.999999,32.000045 21.999999,30.000045 28.585288,30.000045 18.999996,20.412996z M21.999999,0L31.999999,0 31.999999,9.999999 29.999999,9.999999 29.999999,3.4131746 20.413977,13.001045 18.999977,11.587039 28.585168,2 21.999999,2z M0,0L9.999999,0 9.999999,2 3.4148293,2 13.000021,11.587039 11.586021,13.001045 2,3.4131756 2,9.999999 0,9.999999z"
                                                       Stretch="Uniform" Fill="Black"  Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" />
                                             </Viewbox>
