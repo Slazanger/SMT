@@ -27,7 +27,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_109";
+        public const string SMT_VERSION = "SMT_110";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -55,7 +55,7 @@ namespace SMT
 
             Title = "SMT (Powered by Plastic Support : " + SMT_VERSION + ")";
 
-            CheckGitHubVersion();
+
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
@@ -113,7 +113,7 @@ namespace SMT
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
-            bool initFromScratch = true;
+            bool initFromScratch = false;
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -307,6 +307,9 @@ namespace SMT
                     }
                 }
             };
+
+
+            CheckGitHubVersion();
         }
 
         private void SaveDefaultLayout()
@@ -689,6 +692,7 @@ namespace SMT
             try
             {
                 HttpClient hc = new HttpClient();
+                hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", SMT_VERSION));
                 var response = await hc.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 strContent = await response.Content.ReadAsStringAsync();
