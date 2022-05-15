@@ -864,7 +864,7 @@ namespace SMT
             {
                 if (kvp.Value.Name == name)
                 {
-                    if( MainZoomControl.Mode == ZoomControl.ZoomControlModes.Custom )
+                    if (MainZoomControl.Mode == ZoomControl.ZoomControlModes.Custom)
                     {
                         MainZoomControl.Show(kvp.Value.LayoutX, kvp.Value.LayoutY, MainZoomControl.Zoom);
                     }
