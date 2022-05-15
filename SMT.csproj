@@ -45,8 +45,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
-    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
-    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <PlatformTarget>x64</PlatformTarget>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
