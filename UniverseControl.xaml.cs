@@ -857,11 +857,11 @@ namespace SMT
                     drawingContext.Close();
                     VHSystems.AddChild(systemShapeVisual, sys);
 
-                   FormattedText ft = new FormattedText(sys.Name,
-                            ci,
-                            FlowDirection.LeftToRight,
-                            tf,
-                            SystemTextSize, SystemTextColourBrush, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                    FormattedText ft = new FormattedText(sys.Name,
+                             ci,
+                             FlowDirection.LeftToRight,
+                             tf,
+                             SystemTextSize, SystemTextColourBrush, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                     ft.TextAlignment = TextAlignment.Center;
                     // Draw a formatted text string into the DrawingContext.
                     systemTextDrawingContext.DrawText(

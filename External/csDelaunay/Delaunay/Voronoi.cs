@@ -31,8 +31,10 @@ namespace csDelaunay
 
         public List<Edge> Edges
         { get { return edges; } }
+
         public Rectf PlotBounds
         { get { return plotBounds; } }
+
         public Dictionary<Vector2f, Site> SitesIndexedByLocation
         { get { return sitesIndexedByLocation; } }
 

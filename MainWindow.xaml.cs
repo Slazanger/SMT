@@ -55,8 +55,6 @@ namespace SMT
 
             Title = "SMT (Powered by Plastic Support : " + SMT_VERSION + ")";
 
-
-
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
             if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
@@ -308,7 +306,6 @@ namespace SMT
                 }
             };
 
-
             CheckGitHubVersion();
         }
 
@@ -331,7 +328,6 @@ namespace SMT
                     {
                         ls.Serialize(sw);
                     }
-
                 }
             }
             catch
@@ -696,13 +692,11 @@ namespace SMT
                 var response = await hc.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 strContent = await response.Content.ReadAsStringAsync();
-
             }
             catch
             {
                 return;
             }
-
 
             GitHubRelease.Release releaseInfo = GitHubRelease.Release.FromJson(strContent);
 
@@ -1631,7 +1625,6 @@ namespace SMT
 
             lc.GameLogWarningText = line;
 
-
             if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
             {
                 ToastContentBuilder tb = new ToastContentBuilder();
@@ -1645,7 +1638,6 @@ namespace SMT
                 Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
                 tb.AddAudio(woopUri);
                 tb.Show();
-
             }
         }
 

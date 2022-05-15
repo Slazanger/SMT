@@ -6,7 +6,6 @@ using System.Xml.Serialization;
 
 namespace SMT
 {
-
     public class MapConfig : INotifyPropertyChanged
     {
         [Browsable(false)]

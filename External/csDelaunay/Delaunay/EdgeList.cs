@@ -30,6 +30,7 @@
 
         public Halfedge LeftEnd
         { get { return leftEnd; } }
+
         public Halfedge RightEnd
         { get { return rightEnd; } }
 

@@ -45,8 +45,10 @@ namespace csDelaunay
 
         public int VertexIndex
         { get { return vertexIndex; } }
+
         public float x
         { get { return coord.x; } }
+
         public float y
         { get { return coord.y; } }
 

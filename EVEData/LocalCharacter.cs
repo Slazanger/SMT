@@ -1059,7 +1059,6 @@ namespace SMT.EVEData
                             {
                                 await response.Content.CopyToAsync(fs);
                             }
-
                         }
                         catch
                         {

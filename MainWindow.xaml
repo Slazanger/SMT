@@ -12,7 +12,7 @@
 
         x:Class="SMT.MainWindow"
         mc:Ignorable="d"
-        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip" >
+        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
 

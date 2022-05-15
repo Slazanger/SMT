@@ -264,7 +264,6 @@ namespace SMT.EVEData
         /// </summary>
         private Dictionary<string, System> NameToSystem { get; }
 
-
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
@@ -344,7 +343,6 @@ namespace SMT.EVEData
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
-
 
             // update the region cache
             foreach (MapRegion rd in Regions)
@@ -2021,7 +2019,6 @@ namespace SMT.EVEData
                 response.EnsureSuccessStatusCode();
                 strContent = await response.Content.ReadAsStringAsync();
 
-
                 JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
 
                 // JSON feed is now in the format : {"id":38199,"signatureId":"QRQ","type":"wormhole","status":"scanned","wormholeMass":"stable","wormholeEol":"critical","wormholeEstimatedEol":"2018-02-25T20:41:21.000Z","wormholeDestinationSignatureId":"VHT","createdAt":"2018-02-25T04:41:21.000Z","updatedAt":"2018-02-25T16:41:46.000Z","deletedAt":null,"statusUpdatedAt":"2018-02-25T04:41:44.000Z","createdBy":"Erik Holden","createdById":"95598233","deletedBy":null,"deletedById":null,"wormholeSourceWormholeTypeId":91,"wormholeDestinationWormholeTypeId":140,"solarSystemId":31000005,"wormholeDestinationSolarSystemId":30001175,"sourceWormholeType":
@@ -2049,15 +2046,11 @@ namespace SMT.EVEData
                         }
                     }
                 }
-
-
             }
             catch
             {
                 return;
             }
-
-
         }
 
         public void UpdateMetaliminalStorms()
@@ -2127,8 +2120,6 @@ namespace SMT.EVEData
                 JumpBridges.Add(njb);
             }
         }
-
-
 
         /// <summary>
         /// Initialise the eve manager
@@ -2781,7 +2772,6 @@ namespace SMT.EVEData
             }
             catch
             {
-
             }
         }
 
@@ -2825,7 +2815,6 @@ namespace SMT.EVEData
                 }
                 catch
                 {
-
                 }
             }
         }
@@ -3080,9 +3069,7 @@ namespace SMT.EVEData
             }
             catch
             {
-
             }
-
         }
 
         private async void UpdateSovStructureUpdate()
@@ -3119,7 +3106,6 @@ namespace SMT.EVEData
             catch { }
         }
 
-
         /// <summary>
         /// Start the download for the Server Info
         /// </summary>
@@ -3140,6 +3126,5 @@ namespace SMT.EVEData
                 ServerInfo.ServerVersion = "";
             }
         }
-
     }
 }
