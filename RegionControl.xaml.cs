@@ -952,6 +952,12 @@ namespace SMT
                     continue;
                 }
 
+                // skip offline characters if enabled..
+                if (!MapConf.ShowOfflineCharactersOnMap && !c.IsOnline)
+                {
+                    continue;
+                }
+
                 if (!NameTrackingLocationMap.ContainsKey(c.Location))
                 {
                     NameTrackingLocationMap[c.Location] = new List<KeyValuePair<int, string>>();
