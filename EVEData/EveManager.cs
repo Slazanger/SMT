@@ -1194,20 +1194,7 @@ namespace SMT.EVEData
                 }
             }
 
-            // debug write out universe to CSV
-
-            using (var w = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + @"\universeDump.csv"))
-            {
-                string Header = "Region,Name, UniverseX, UniverseY";
-                w.WriteLine(Header);
-
-                foreach (System s in Systems)
-                {
-                    string CSVLine = $"{s.Region},{s.Name},{s.UniverseX},{s.UniverseY}";
-                    w.WriteLine(CSVLine);
-                }
-            }
-
+ 
             bool done = false;
             int iteration = 0;
             double minSpread = 19.0;

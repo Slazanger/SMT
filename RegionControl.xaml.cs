@@ -2806,7 +2806,8 @@ namespace SMT
             if (e.ClickCount == 2)
             {
                 string AURL = $"https://zkillboard.com/region/{Region.ID}/alliance/{AllianceID}/";
-                System.Diagnostics.Process.Start(AURL);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(AURL) { UseShellExecute = true });
+
             }
             else
             {
@@ -3524,7 +3525,7 @@ namespace SMT
             EVEData.MapRegion rd = EM.GetRegion(eveSys.Region);
 
             string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
-            System.Diagnostics.Process.Start(uRL);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
         }
 
         /// <summary>
@@ -3560,7 +3561,7 @@ namespace SMT
             EVEData.MapRegion rd = EM.GetRegion(eveSys.Region);
 
             string uRL = string.Format("https://zkillboard.com/system/{0}/", eveSys.ActualSystem.ID);
-            System.Diagnostics.Process.Start(uRL);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
         }
 
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)

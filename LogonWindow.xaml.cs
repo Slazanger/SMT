@@ -26,7 +26,9 @@ namespace SMT
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             string challengeCode = Utils.RandomString(32);
             string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
-            System.Diagnostics.Process.Start(esiLogonURL);
+
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(esiLogonURL) { UseShellExecute = true });
+
 
             try
             {

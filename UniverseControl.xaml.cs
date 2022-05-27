@@ -683,7 +683,8 @@ namespace SMT
             if (ID != 0)
             {
                 string uRL = string.Format("https://evewho.com/alliance/{0}", ID);
-                System.Diagnostics.Process.Start(uRL);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
+
             }
         }
 
@@ -1301,7 +1302,8 @@ namespace SMT
             EVEData.MapRegion rd = EM.GetRegion(eveSys.Region);
 
             string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
-            System.Diagnostics.Process.Start(uRL);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
+
         }
 
         /// <summary>
@@ -1315,7 +1317,8 @@ namespace SMT
             EVEData.MapRegion rd = EM.GetRegion(eveSys.Region);
 
             string uRL = string.Format("https://zkillboard.com/system/{0}/", eveSys.ID);
-            System.Diagnostics.Process.Start(uRL);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
+
         }
 
         private void SysContexMenuShowInRegion_Click(object sender, RoutedEventArgs e)

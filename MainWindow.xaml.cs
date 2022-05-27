@@ -938,7 +938,7 @@ namespace SMT
                     }
                     if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
                     {
-                        Process.Start(url);
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
                     }
                 }
                 // only select the first system
@@ -1361,7 +1361,7 @@ namespace SMT
             if (zkbs != null)
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
-                System.Diagnostics.Process.Start(KillURL);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
             }
         }
 
@@ -1377,7 +1377,8 @@ namespace SMT
             if (zkbs != null)
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
-                System.Diagnostics.Process.Start(KillURL);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
+
             }
         }
 
@@ -1393,7 +1394,8 @@ namespace SMT
             if (zkbs != null)
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
-                System.Diagnostics.Process.Start(KillURL);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
+
             }
         }
 
