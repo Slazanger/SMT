@@ -347,7 +347,7 @@ namespace SMT.EVEData
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
-                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
+                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
 
                 if (!File.Exists(localSVG))
                 {
@@ -446,7 +446,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapSolarSystems.csv";
+            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\mapSolarSystems.csv";
             if (File.Exists(eveStaticDataSolarSystemFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
@@ -489,11 +489,11 @@ namespace SMT.EVEData
             }
             else
             {
-                // Error
+                throw new Exception("Data Creation Error");
             }
 
             // now open up the eve static data export for the regions and extract some info from it
-            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapRegions.csv";
+            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\mapRegions.csv";
             if (File.Exists(eveStaticDataRegionFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataRegionFile);
@@ -521,10 +521,10 @@ namespace SMT.EVEData
             }
             else
             {
-                // Error
+                throw new Exception("Data Creation Error");
             }
 
-            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapSolarSystemJumps.csv";
+            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\mapSolarSystemJumps.csv";
             if (File.Exists(eveStaticDataJumpsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsFile);
@@ -551,7 +551,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\staStations.csv";
+            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\staStations.csv";
             if (File.Exists(eveStaticDataStationsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataStationsFile);
@@ -574,11 +574,12 @@ namespace SMT.EVEData
             }
             else
             {
-                // error
+                throw new Exception("Data Creation Error");
+
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataConstellationFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\mapConstellations.csv";
+            string eveStaticDataConstellationFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\mapConstellations.csv";
             if (File.Exists(eveStaticDataConstellationFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataConstellationFile);
@@ -605,7 +606,8 @@ namespace SMT.EVEData
             }
             else
             {
-                // Error
+                throw new Exception("Data Creation Error");
+
             }
 
             foreach (System s in Systems)
@@ -798,7 +800,7 @@ namespace SMT.EVEData
 
             // now read the trig/edencom systems
 
-            string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\trigInvasionSystems.csv";
+            string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\trigInvasionSystems.csv";
             if (File.Exists(trigSystemsFile))
             {
                 StreamReader file = new StreamReader(trigSystemsFile);
@@ -838,6 +840,10 @@ namespace SMT.EVEData
                         }
                     }
                 }
+            }
+            else
+            {
+                throw new Exception("Data Creation Error");
             }
 
             // now create the voronoi regions
@@ -929,7 +935,7 @@ namespace SMT.EVEData
             }
 
             // now get the ships
-            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\invTypes.csv";
+            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\invTypes.csv";
             if (File.Exists(eveStaticDataItemTypesFile))
             {
                 ShipTypes = new SerializableDictionary<string, string>();
@@ -1042,9 +1048,13 @@ namespace SMT.EVEData
                     }
                 }
             }
+            else
+            {
+                throw new Exception("Data Creation Error");
+            }
 
             // now add the jove systems
-            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\JoveSystems.csv";
+            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\data\JoveSystems.csv";
             if (File.Exists(eveStaticDataJoveObservatories))
             {
                 StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
@@ -1073,6 +1083,10 @@ namespace SMT.EVEData
                         s.HasJoveObservatory = true;
                     }
                 }
+            }
+            else
+            {
+                throw new Exception("Data Creation Error");
             }
 
             // now generate the 2d universe view coordinates
@@ -1248,13 +1262,17 @@ namespace SMT.EVEData
 
             // now serialise the classes to disk
 
-            Utils.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
-            Utils.SerializeToDisk<List<MapRegion>>(Regions, AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            Utils.SerializeToDisk<List<System>>(Systems, AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
+            string saveDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\data\"; 
 
-            File.Copy(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\POI.csv", AppDomain.CurrentDomain.BaseDirectory + @"\POI.csv", true);
+            Utils.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
+            Utils.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
+            Utils.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
 
-            Init();
+            // to fix.. File.Copy(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\POI.csv", AppDomain.CurrentDomain.BaseDirectory + @"\POI.csv", true);
+
+            // now close 
+
+            Application.Current.Shutdown();
         }
 
         /// <summary>
@@ -1493,9 +1511,9 @@ namespace SMT.EVEData
         {
             SystemIDToName = new SerializableDictionary<long, string>();
 
-            Regions = Utils.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\MapLayout.dat");
-            Systems = Utils.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\Systems.dat");
-            ShipTypes = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\ShipTypes.dat");
+            Regions = Utils.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
+            Systems = Utils.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
+            ShipTypes = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
 
             foreach (System s in Systems)
             {
@@ -2181,7 +2199,7 @@ namespace SMT.EVEData
 
             try
             {
-                string POIcsv = AppDomain.CurrentDomain.BaseDirectory + @"\POI.csv";
+                string POIcsv = AppDomain.CurrentDomain.BaseDirectory + @"\data\POI.csv";
                 if (File.Exists(POIcsv))
                 {
                     StreamReader file = new StreamReader(POIcsv);

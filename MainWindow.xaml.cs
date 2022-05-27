@@ -116,6 +116,7 @@ namespace SMT
             {
                 EVEManager.CreateFromScratch();
                 SaveDefaultLayout();
+                return;
             }
             else
             {
@@ -1489,7 +1490,7 @@ namespace SMT
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
-            string infoObjectsFile = AppDomain.CurrentDomain.BaseDirectory + @"\InfoObjects.txt";
+            string infoObjectsFile = AppDomain.CurrentDomain.BaseDirectory + @"\data\InfoObjects.txt";
             if (File.Exists(infoObjectsFile))
             {
                 StreamReader file = new StreamReader(infoObjectsFile);
@@ -1643,7 +1644,7 @@ namespace SMT
 
         private void miResetLayout_Click(object sender, RoutedEventArgs e)
         {
-            string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";
+            string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\data\DefaultWindowLayout.dat";
             if (File.Exists(defaultLayoutFile))
             {
                 try
