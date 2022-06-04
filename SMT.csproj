@@ -192,9 +192,6 @@
     <PackageReference Include="WPFThemes.DarkBlend">
       <Version>1.0.8</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.326103">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="packages\WPFThemes.DarkBlend.1.0.8\content\Themes\LeftMarginMultiplierConverter.cs" />
