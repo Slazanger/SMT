@@ -2749,7 +2749,7 @@ namespace SMT
 
                 List<Label> AllianceNameListLabels = new List<Label>();
 
-                Thickness p = new Thickness(3);
+                Thickness p = new Thickness(1);
 
                 foreach (long allianceID in AlliancesKeyList)
                 {
@@ -2762,6 +2762,7 @@ namespace SMT
                     akl.Content = $"{allianceTicker}\t{allianceName}";
                     akl.Foreground = fontColour;
                     akl.Margin = p;
+                    akl.Padding = p;
 
                     if (allianceID == SelectedAlliance)
                     {
