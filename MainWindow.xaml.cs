@@ -53,7 +53,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Powered by Plastic Support : " + SMT_VERSION + ")";
+            Title = "SMT (a new step : " + SMT_VERSION + ")";
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
