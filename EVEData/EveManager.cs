@@ -117,6 +117,35 @@ namespace SMT.EVEData
         /// </summary>
         public event IntelAddedEventHandler IntelAddedEvent;
 
+
+
+
+        /// <summary>
+        /// Ship Decloak Event Handler
+        /// </summary>
+        public delegate void ShipDecloakedEventHandler(string pilot, string text);
+
+
+        /// <summary>
+        /// Ship Decloaked
+        /// </summary>
+        public event ShipDecloakedEventHandler ShipDecloakedEvent;
+
+
+        /// <summary>
+        /// Combat Event Handler
+        /// </summary>
+        public delegate void CombatEventHandler(string pilot, string text);
+
+
+        /// <summary>
+        /// Combat Events
+        /// </summary>
+        public event CombatEventHandler CombatEvent;
+
+
+
+
         public enum JumpShip
         {
             Dread,
@@ -2601,36 +2630,22 @@ namespace SMT.EVEData
                     {
                         if (lc.Name == characterName)
                         {
-                            bool sendWindowsNotification = false;
-                            if (lc.CombatWarningEnabled && type == "combat")
+                            if (type == "combat")
                             {
-                                lc.GameLogWarningText = line;
-                                sendWindowsNotification = true;
-                            }
-
-                            if (lc.ObservatoryDecloakWarningEnabled && line.Contains("cloak deactivates due to a pulse from a Mobile Observatory"))
-                            {
-                                lc.GameLogWarningText = line;
-                                sendWindowsNotification = true;
-                            }
-
-                            if (sendWindowsNotification && OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
-                            {
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                if (CombatEvent != null)
                                 {
-                                    // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                                    ToastContentBuilder tb = new ToastContentBuilder();
-                                    tb.AddText("SMT Alert");
-                                    tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
-                                    tb.AddInlineImage(lc.Portrait.UriSource);
-                                    tb.AddText(line);
-                                    tb.AddArgument("character", characterName);
-                                    tb.SetToastScenario(ToastScenario.Alarm);
-                                    tb.SetToastDuration(ToastDuration.Long);
-                                    Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                                    tb.AddAudio(woopUri);
-                                    tb.Show();
-                                }), DispatcherPriority.Normal, null);
+                                    lc.GameLogWarningText = line;
+                                    CombatEvent(characterName, line);
+                                }
+                            }
+
+                            if (line.Contains("cloak deactivates due to a pulse from a Mobile Observatory"))
+                            {
+                                if (ShipDecloakedEvent != null)
+                                {
+                                    ShipDecloakedEvent(characterName, line);
+                                    lc.GameLogWarningText = line;
+                                }
                             }
                         }
                     }

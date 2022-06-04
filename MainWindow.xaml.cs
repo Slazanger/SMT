@@ -254,6 +254,8 @@ namespace SMT
             Closed += MainWindow_Closed;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
+            EVEManager.ShipDecloakedEvent += OnShipDecloaked;
+            EVEManager.CombatEvent += OnCombatEvent;
 
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
@@ -910,6 +912,76 @@ namespace SMT
                 mediaPlayer.Play();
             }
         }
+
+        private void OnShipDecloaked(string character, string text)
+        {
+            foreach (LocalCharacter lc in EVEManager.LocalCharacters)
+            {
+                if (lc.Name == character)
+                {
+                    if (lc.ObservatoryDecloakWarningEnabled)
+                    {
+                        if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
+                        {
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                ToastContentBuilder tb = new ToastContentBuilder();
+                                tb.AddText("SMT Alert");
+                                tb.AddText("Character : " + character + "(" + lc.Location + ")");
+                                tb.AddInlineImage(lc.Portrait.UriSource);
+                                tb.AddText(text);
+                                tb.AddArgument("character", character);
+                                tb.SetToastScenario(ToastScenario.Alarm);
+                                tb.SetToastDuration(ToastDuration.Long);
+                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                tb.AddAudio(woopUri);
+                                tb.Show();
+                            }), DispatcherPriority.Normal, null);
+                        }
+                    }
+
+
+                    break;
+                }
+            }
+        }
+
+        private void OnCombatEvent(string character, string text)
+        {
+            foreach (LocalCharacter lc in EVEManager.LocalCharacters)
+            {
+                if (lc.Name == character)
+                {
+                    if (lc.CombatWarningEnabled)
+                    {
+                        if(OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
+                        {
+                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                ToastContentBuilder tb = new ToastContentBuilder();
+                                tb.AddText("SMT Alert");
+                                tb.AddText("Character : " + character + "(" + lc.Location + ")");
+                                tb.AddInlineImage(lc.Portrait.UriSource);
+                                tb.AddText(text);
+                                tb.AddArgument("character", character);
+                                tb.SetToastScenario(ToastScenario.Alarm);
+                                tb.SetToastDuration(ToastDuration.Long);
+                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                tb.AddAudio(woopUri);
+                                tb.Show();
+                            }), DispatcherPriority.Normal, null);
+                        }
+                    }
+
+
+                    break;
+                }
+            }
+        }
+
+
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
