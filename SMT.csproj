@@ -203,7 +203,4 @@
     <Page Remove="packages\WPFThemes.DarkBlend.1.0.8\content\Themes\Styles.xaml" />
     <Page Remove="Universe3dControl.xaml" />
   </ItemGroup>
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 </Project>
