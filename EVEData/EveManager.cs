@@ -2055,6 +2055,13 @@ namespace SMT.EVEData
 
                 JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
 
+
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    TheraConnections.Clear();
+                }), DispatcherPriority.Normal, null);
+
+
                 // JSON feed is now in the format : {"id":38199,"signatureId":"QRQ","type":"wormhole","status":"scanned","wormholeMass":"stable","wormholeEol":"critical","wormholeEstimatedEol":"2018-02-25T20:41:21.000Z","wormholeDestinationSignatureId":"VHT","createdAt":"2018-02-25T04:41:21.000Z","updatedAt":"2018-02-25T16:41:46.000Z","deletedAt":null,"statusUpdatedAt":"2018-02-25T04:41:44.000Z","createdBy":"Erik Holden","createdById":"95598233","deletedBy":null,"deletedById":null,"wormholeSourceWormholeTypeId":91,"wormholeDestinationWormholeTypeId":140,"solarSystemId":31000005,"wormholeDestinationSolarSystemId":30001175,"sourceWormholeType":
                 while (jsr.Read())
                 {
