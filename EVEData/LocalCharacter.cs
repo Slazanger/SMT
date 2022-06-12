@@ -28,6 +28,8 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public SemaphoreSlim UpdateLock;
 
+
+
         [XmlIgnoreAttribute]
         public bool warningSystemsNeedsUpdate;
 
@@ -53,9 +55,6 @@ namespace SMT.EVEData
         private bool m_ObservatoryDecloakWarningEnabled;
         private bool m_CombatWarningEnabled;
 
-        /// <summary>
-        /// Does the route need updating
-        /// </summary>
         private bool routeNeedsUpdate = false;
 
         private int ssoErrorCount = 0;
@@ -153,6 +152,7 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public ObservableCollection<Navigation.RoutePoint> ActiveRoute { get; set; }
+
 
         public bool DangerZoneActive { get; set; }
         public bool DeepSearchEnabled { get; set; }
@@ -388,11 +388,12 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public bool TrigStandingsGood { get; set; }
 
-        /// <summary>
-        /// Gets or sets the current list of Waypoints
-        /// </summary>
         [XmlIgnoreAttribute]
         public ObservableCollection<string> Waypoints { get; set; }
+
+        [XmlIgnoreAttribute]
+        public ObservableCollection<string> JumpWaypoints { get; set; }
+
 
         /// <summary>
         /// Add Destination to the route
@@ -416,6 +417,7 @@ namespace SMT.EVEData
             esiRouteNeedsUpdate = true;
         }
 
+
         public void ClearAllWaypoints()
         {
             lock (ActiveRouteLock)
@@ -426,6 +428,7 @@ namespace SMT.EVEData
             routeNeedsUpdate = true;
             esiSendRouteClear = true;
         }
+
 
         public async Task<List<JumpBridge>> FindJumpGates(string JumpBridgeFilterString = " » ")
         {
@@ -562,6 +565,7 @@ namespace SMT.EVEData
             return ClipboardText;
         }
 
+
         public void RecalcRoute()
         {
             routeNeedsUpdate = true;
@@ -610,6 +614,7 @@ namespace SMT.EVEData
                     routeNeedsUpdate = false;
                     UpdateActiveRoute();
                 }
+
 
                 if (warningSystemsNeedsUpdate)
                 {
@@ -832,6 +837,7 @@ namespace SMT.EVEData
                 esiRouteUpdating = false;
             }
         }
+
 
         /// <summary>
         /// Update the characters FleetInfo

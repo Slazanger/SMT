@@ -2733,19 +2733,6 @@ namespace SMT
                 Brush fontColour = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF767576"));
                 Brush SelectedFont = new SolidColorBrush(Colors.White);
 
-                /*
-                List<string> allianceKeyItems = new List<string>
-
-                foreach (long allianceID in AlliancesKeyList)
-                {
-                    string allianceName = EM.GetAllianceName(allianceID);
-                    string allianceTicker = EM.GetAllianceTicker(allianceID);
-                    allianceKeyItems.Add($"{allianceTicker}\t{allianceName}")
-                }
-
-                allianceKeyItems.Sort();
-
-                */
 
                 List<Label> AllianceNameListLabels = new List<Label>();
 

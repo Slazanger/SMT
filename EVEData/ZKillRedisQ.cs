@@ -84,7 +84,7 @@ namespace SMT.EVEData
             }
 
             ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
-            if (z.Package != null)
+            if (z != null && z.Package != null)
             {
                 ZKBDataSimple zs = new ZKBDataSimple();
                 zs.KillID = long.Parse(z.Package.KillId.ToString());

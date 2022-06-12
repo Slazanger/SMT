@@ -121,7 +121,6 @@ namespace SMT
 
         public MapConfig MapConf { get; set; }
 
-        public List<EVEData.Navigation.RoutePoint> ActiveRoute { get; set; }
 
         public bool FollowCharacter
         {
@@ -269,6 +268,8 @@ namespace SMT
                 CentreMapOnActiveCharacter();
             }
         }
+
+        public EVEData.JumpRoute CapitalRoute { get; set; }
 
         public static readonly RoutedEvent RequestRegionSystemSelectEvent = EventManager.RegisterRoutedEvent("RequestRegionSystem", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
 
@@ -753,6 +754,7 @@ namespace SMT
             SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
             SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
 
+            SolidColorBrush jumpRouteColour = new SolidColorBrush(Colors.Orange);
             SolidColorBrush activeRouteColour = new SolidColorBrush(Colors.Yellow);
             SolidColorBrush activeRouteAniblexColour = new SolidColorBrush(Colors.DarkMagenta);
 
@@ -997,6 +999,8 @@ namespace SMT
                 Brush CharacterOfflineNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
                 Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
+                Brush RouteBrush = new SolidColorBrush(Colors.Orange);
+
 
                 if (MapConf.ShowCharacterNamesOnMap)
                 {
@@ -1101,7 +1105,118 @@ namespace SMT
                     }
                 }
 
-                if (MapConf.DrawRoute && ActiveCharacter?.ActiveRoute != null)
+
+                if (CapitalRoute != null && CapitalRoute.CurrentRoute.Count > 1)
+                {
+                    Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
+                    dashedRoutePen.DashStyle = DashStyles.Dot;
+                    Pen outlinePen = new Pen(activeRouteColour, 2);
+
+                    System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
+
+                    //Retrieve the DrawingContext in order to create new drawing content.
+                    DrawingContext drawingContext = routeVisual.RenderOpen();
+
+
+                    // add the lines
+                    for (int i = 1; i < CapitalRoute.CurrentRoute.Count; i++)
+                    {
+                        Pen linePen = dashedRoutePen;
+
+                        EVEData.System sysA = EM.GetEveSystem(CapitalRoute.CurrentRoute[i - 1].SystemName);
+                        EVEData.System sysB = EM.GetEveSystem(CapitalRoute.CurrentRoute[i].SystemName);
+
+
+
+
+                        if (sysA != null && sysB != null)
+                        {
+                            double X1 = sysA.UniverseX;
+                            double Y1 = sysA.UniverseY;
+
+                            double X2 = sysB.UniverseX;
+                            double Y2 = sysB.UniverseY;
+
+                            if (i == 1)
+                            {
+                                drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X1, Y1), 10, 10);
+                            }
+                            drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 10, 10);
+
+
+                            //Create a rectangle and draw it in the DrawingContext.
+                            drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
+
+
+                        }
+                    }
+
+                    drawingContext.Close();
+
+                    VHRoute.AddChild(routeVisual, "ActiveRoute");
+                }
+
+                /*
+
+                if (ActiveCharacter?.JumpRoute.Count > 1)
+                {
+                    if (ActiveCharacter.JumpRoute.Count > 1)
+                    {
+
+
+                        Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
+                        dashedRoutePen.DashStyle = DashStyles.Dot;
+                        Pen outlinePen = new Pen(activeRouteColour, 2);
+
+                        System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
+
+                        //Retrieve the DrawingContext in order to create new drawing content.
+                        DrawingContext drawingContext = routeVisual.RenderOpen();
+
+
+                        // add the lines
+                        for (int i = 1; i < ActiveCharacter.JumpRoute.Count; i++)
+                        {
+                            Pen linePen = dashedRoutePen;
+
+
+                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.JumpRoute[i - 1].SystemName);
+                            EVEData.System sysB = EM.GetEveSystem(ActiveCharacter.JumpRoute[i].SystemName);
+
+
+
+
+                            if (sysA != null && sysB != null)
+                            {
+                                double X1 = sysA.UniverseX;
+                                double Y1 = sysA.UniverseY;
+
+                                double X2 = sysB.UniverseX;
+                                double Y2 = sysB.UniverseY;
+
+                                if (i == 1)
+                                {
+                                    drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X1, Y1),10,10);
+                                }
+                                drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 10, 10);
+
+
+                                //Create a rectangle and draw it in the DrawingContext.
+                                drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
+
+
+                            }
+                        }
+
+                        drawingContext.Close();
+
+                        VHRoute.AddChild(routeVisual, "ActiveRoute");
+
+                    }
+
+
+
+                    if (MapConf.DrawRoute && ActiveCharacter?.ActiveRoute != null)
                 {
                     if (ActiveCharacter.ActiveRoute.Count > 1)
                     {
@@ -1176,8 +1291,48 @@ namespace SMT
                                 VHRoute.AddChild(jumpRouteVisual, "ActiveRoute");
                             }
                         }
+
+                        // add system highlights
+                        for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
+                        {
+                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
+
+                            if (sysA != null)
+                            {
+                                double X1 = sysA.UniverseX;
+                                double Y1 = sysA.UniverseY;
+
+                                System.Windows.Media.DrawingVisual jumpRouteVisual = new System.Windows.Media.DrawingVisual();
+
+                                //Retrieve the DrawingContext in order to create new drawing content.
+                                DrawingContext drawingContext = jumpRouteVisual.RenderOpen();
+
+                                double rectSize = 7;
+                                double rectHalfSize = rectSize / 2;
+
+                                //Pen p = new Pen(CapRouteColor, 1);
+                                Rect r = new Rect(X1 - rectHalfSize, Y1 - rectHalfSize, rectSize, rectSize);
+
+                                //Create a rectangle and draw it in the DrawingContext.
+                                drawingContext.DrawRectangle(activeRouteColour, outlinePen, r);
+
+                                drawingContext.Close();
+
+                                VHRoute.AddChild(jumpRouteVisual, "ActiveRoute");
+                            }
+                        }
+                        }
+
+ 
+
+
+
+
                     }
+
                 }
+
+                */
             }
         }
 

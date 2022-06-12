@@ -39,7 +39,9 @@ namespace SMT
 
         private List<InfoItem> InfoLayer;
 
-        /// <summary>
+        public JumpRoute CapitalRoute { get; set; }
+
+    /// <summary>
         /// Main Window
         /// </summary>
         public MainWindow()
@@ -103,6 +105,8 @@ namespace SMT
             }
 
             // Create the main EVE manager
+
+            CapitalRoute = new JumpRoute();
 
             EVEManager = new EVEData.EveManager(SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
@@ -210,6 +214,7 @@ namespace SMT
             RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
 
             UniverseUC.MapConf = MapConf;
+            UniverseUC.CapitalRoute = CapitalRoute;
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
 
@@ -248,6 +253,8 @@ namespace SMT
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             RouteSystemDropDownAC.ItemsSource = globalSystemList;
+            JumpRouteSystemDropDownAC.ItemsSource = globalSystemList;
+
 
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
@@ -1085,6 +1092,22 @@ namespace SMT
                 RegionUC.ActiveCharacter.AddDestination(s.ID, false);
             }
         }
+        private void AddJumpWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (JumpRouteSystemDropDownAC.SelectedItem == null)
+            {
+                return;
+            }
+            EVEData.System s = JumpRouteSystemDropDownAC.SelectedItem as EVEData.System;
+
+            if (s != null)
+            {
+                CapitalRoute.WayPoints.Add(s.Name);
+                CapitalRoute.Recalculate();
+            }
+        }
+
+        
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1093,6 +1116,15 @@ namespace SMT
             {
                 c.ClearAllWaypoints();
             }
+        }
+
+        private void ClearJumpWaypointsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // Need to dispatch to UI thread if performing UI operations
+            Application.Current.Dispatcher.Invoke(delegate
+            {
+                CapitalRoute.WayPoints.Clear();
+            });
         }
 
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
@@ -1109,6 +1141,7 @@ namespace SMT
                 catch { }
             }
         }
+
 
         private void ReCalculateRouteBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1739,6 +1772,28 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             dockManager.UpdateLayout();
+        }
+
+        private void JumpPlannerShipType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CapitalRoute != null)
+            {
+               ComboBox cb = sender as ComboBox;
+               ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
+               CapitalRoute.MaxLY = double.Parse(cbi.DataContext as string);
+               CapitalRoute.Recalculate();
+            }
+        }
+
+        private void JumpPlannerJDC_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CapitalRoute != null)
+            {
+                ComboBox cb = sender as ComboBox;
+                ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
+                CapitalRoute.JDC = int.Parse(cbi.DataContext as string);
+                CapitalRoute.Recalculate();
+            }
         }
     }
 

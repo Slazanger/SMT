@@ -369,21 +369,110 @@
                                 </Grid>
                             </xcadl:LayoutAnchorable>
 
-                            <!--   Temp Disabled   <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpPlannerContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                    <Grid x:Name="JumpPlannerGrid">
-                                        <ScrollViewer Background="#FFE5E5E5">
-                                            <StackPanel>
-                                                <Label Content="Jump Planner Options" />
-                                                <ComboBox x:Name="JPShipType" />
-                                                <CheckBox x:Name="JPUseGates" Content="Use Gates" />
+                            <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpRouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid x:Name="MainJumpRouteGrid">
+                                    <ScrollViewer Background="{DynamicResource ButtonBackground}">
+                                        <StackPanel>
 
-                                                <Button x:Name="JPSuggestRoute" Click="JPSuggestRoute_Click" Content="Suggest Route" />
-                                                <ListBox x:Name="JPSuggestedRoute" />
-                                            </StackPanel>
-                                        </ScrollViewer>
-                                    </Grid>
-                                </xcadl:LayoutAnchorable>
--->
+                                            <GroupBox Header="Navigation Options">
+                                                <StackPanel Margin="4">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Width="70">Ship Type</Label>
+                                                        <ComboBox x:Name="jumpPlannerShipType" SelectionChanged="JumpPlannerShipType_OnSelectionChanged">
+                                                            <ComboBoxItem DataContext="6.0">Ansiblex</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="6.0">Super/Titan</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="7.0" IsSelected="True">Regular Caps</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="8.0">Blops</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="10.0">JF/Rorqs</ComboBoxItem>
+                                                        </ComboBox>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Width="70">Skills</Label>
+                                                        <ComboBox x:Name="jumpPlannerJDC" SelectionChanged="JumpPlannerJDC_OnSelectionChanged">
+                                                            <ComboBoxItem DataContext="4">JDC 4 SubHuman</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="5" IsSelected="True">JDC 5</ComboBoxItem>
+                                                        </ComboBox>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="WayPoints">
+                                                <StackPanel Margin="4">
+                                                    <ListBox ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" />
+                                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
+                                                        <Button x:Name="AddJumpWaypointsBtn" Click="AddJumpWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
+                                                    </StackPanel>
+
+                                                    <Button x:Name="ClearJumpWaypointsBtn" Click="ClearJumpWaypointsBtn_Click" Content="Clear All" Margin="2" />
+                                                </StackPanel>
+                                            </GroupBox>
+
+                                            <GroupBox Header="Route">
+                                                <StackPanel Margin="4">
+                                                    <DataGrid ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false">
+                                                        <DataGrid.CellStyle>
+                                                            <Style TargetType="{x:Type DataGridCell}">
+
+                                                                <Style.Triggers>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
+                                                                        <Setter Property="Background" Value="blue" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </DataGrid.CellStyle>
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Distance (LY)" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+
+                                                </StackPanel>
+                                            </GroupBox>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+
 
                             <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>

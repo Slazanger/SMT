@@ -316,7 +316,7 @@ namespace SMT.EVEData
             return ActualRoute;
         }
 
-        public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY)
+        public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY, LocalCharacter lc)
         {
             if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
             {
