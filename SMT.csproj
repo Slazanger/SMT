@@ -133,6 +133,24 @@
     <None Update="data\Systems.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="DefaultWindowLayout.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EVEData\data\InfoObjects.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EVEData\data\MapLayout.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EVEData\data\POI.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EVEData\data\ShipTypes.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EVEData\data\Systems.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
