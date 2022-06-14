@@ -1139,9 +1139,9 @@ namespace SMT
 
                             if (i == 1)
                             {
-                                drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X1, Y1), 10, 10);
+                                drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X1, Y1), 6, 6);
                             }
-                            drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 10, 10);
+                            drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 6, 6);
 
 
                             //Create a rectangle and draw it in the DrawingContext.

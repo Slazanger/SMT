@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Threading;
@@ -56,13 +57,18 @@ namespace SMT.EVEData
             string start = string.Empty;
             string end = WayPoints[0];
 
+            List<string> avoidSystems = AvoidSystems.ToList();
+
+
             // loop through all the waypoints
             for (int i = 1; i < WayPoints.Count; i++)
             {
                 start = end;
                 end = WayPoints[i];
 
-                List<Navigation.RoutePoint> sysList = Navigation.NavigateCapitals(start, end, actualMaxLY, null);
+
+
+                List<Navigation.RoutePoint> sysList = Navigation.NavigateCapitals(start, end, actualMaxLY, null, avoidSystems);
                 
                 if (sysList != null)
                 {

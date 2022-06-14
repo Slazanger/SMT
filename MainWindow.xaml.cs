@@ -254,7 +254,7 @@ namespace SMT
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             RouteSystemDropDownAC.ItemsSource = globalSystemList;
             JumpRouteSystemDropDownAC.ItemsSource = globalSystemList;
-
+            JumpRouteAvoidSystemDropDownAC.ItemsSource = globalSystemList;
 
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
@@ -1107,7 +1107,23 @@ namespace SMT
             }
         }
 
+        private void AddJumpAvoidSystemsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (JumpRouteAvoidSystemDropDownAC.SelectedItem == null)
+            {
+                return;
+            }
+            EVEData.System s = JumpRouteAvoidSystemDropDownAC.SelectedItem as EVEData.System;
+
+            if (s != null)
+            {
+                CapitalRoute.AvoidSystems.Add(s.Name);
+                CapitalRoute.Recalculate();
+            }
+        }
+
         
+
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1124,8 +1140,19 @@ namespace SMT
             Application.Current.Dispatcher.Invoke(delegate
             {
                 CapitalRoute.WayPoints.Clear();
+                CapitalRoute.CurrentRoute.Clear();
             });
         }
+
+        private void ClearJumpAvoidSystemsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // Need to dispatch to UI thread if performing UI operations
+            Application.Current.Dispatcher.Invoke(delegate
+            {
+                CapitalRoute.AvoidSystems.Clear();
+            });
+        }
+
 
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
         {

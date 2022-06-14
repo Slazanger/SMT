@@ -276,47 +276,58 @@ namespace SMT.EVEData
 
             List<string> Route = new List<string>();
 
+
+            bool rootError = false;
+
             CurrentNode = End;
             if (End.NearestToStart != null)
             {
-                while (CurrentNode != null)
+                while (CurrentNode != null) 
                 {
                     Route.Add(CurrentNode.Name);
                     CurrentNode = CurrentNode.NearestToStart;
+                    if (Route.Count > 2000)
+                    {
+                        rootError = true;
+                        break;
+                    }
                 }
                 Route.Reverse();
             }
 
             List<RoutePoint> ActualRoute = new List<RoutePoint>();
 
-            for (int i = 0; i < Route.Count; i++)
+            if (!rootError)
             {
-                RoutePoint RP = new RoutePoint();
-                RP.SystemName = Route[i];
-                RP.ActualSystem = EveManager.Instance.GetEveSystem(Route[i]);
-                RP.GateToTake = GateType.StarGate;
-                RP.LY = 0.0;
-
-                if (i < Route.Count - 1)
+                for (int i = 0; i < Route.Count; i++)
                 {
-                    MapNode mn = MapNodes[RP.SystemName];
-                    if (mn.JBConnection != null && mn.JBConnection == Route[i + 1])
-                    {
-                        RP.GateToTake = GateType.Ansiblex;
-                    }
+                    RoutePoint RP = new RoutePoint();
+                    RP.SystemName = Route[i];
+                    RP.ActualSystem = EveManager.Instance.GetEveSystem(Route[i]);
+                    RP.GateToTake = GateType.StarGate;
+                    RP.LY = 0.0;
 
-                    if (UseThera && mn.TheraConnections != null && mn.TheraConnections.Contains(Route[i + 1]))
+                    if (i < Route.Count - 1)
                     {
-                        RP.GateToTake = GateType.Thera;
+                        MapNode mn = MapNodes[RP.SystemName];
+                        if (mn.JBConnection != null && mn.JBConnection == Route[i + 1])
+                        {
+                            RP.GateToTake = GateType.Ansiblex;
+                        }
+
+                        if (UseThera && mn.TheraConnections != null && mn.TheraConnections.Contains(Route[i + 1]))
+                        {
+                            RP.GateToTake = GateType.Thera;
+                        }
                     }
+                    ActualRoute.Add(RP);
                 }
-                ActualRoute.Add(RP);
             }
 
             return ActualRoute;
         }
 
-        public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY, LocalCharacter lc)
+        public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY, LocalCharacter lc, List<string> systemsToAvoid )
         {
             if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
             {
@@ -324,6 +335,7 @@ namespace SMT.EVEData
             }
 
             double ExtraJumpFactor = 5.0;
+            double AvoidFactor = 0.0;
 
             // clear the scores, values and parents from the list
             foreach (MapNode mapNode in MapNodes.Values)
@@ -370,9 +382,18 @@ namespace SMT.EVEData
                     if (CMN.Visited)
                         continue;
 
-                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor < CMN.MinCostToStart)
+                    if (systemsToAvoid.Contains(connection.System))
                     {
-                        CMN.MinCostToStart = CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor;
+                        AvoidFactor = 10000;
+                    }
+                    else
+                    {
+                        AvoidFactor = 0.0;
+                    }
+
+                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor + AvoidFactor < CMN.MinCostToStart)
+                    {
+                        CMN.MinCostToStart = CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor + AvoidFactor;
                         CMN.NearestToStart = CurrentNode;
                         if (!OpenList.Contains(CMN))
                         {
