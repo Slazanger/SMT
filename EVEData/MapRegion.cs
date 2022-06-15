@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Windows;
+using Utils;
 
 namespace SMT.EVEData
 {

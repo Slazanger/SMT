@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SMT
+namespace SMT.EVEData
 {
     public enum RoutingMode
     {
@@ -10,10 +10,8 @@ namespace SMT
         Safest,
         PreferLow,
     }
-}
 
-namespace SMT.EVEData
-{
+
     public class Navigation
     {
         public enum GateType

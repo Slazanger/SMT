@@ -1,0 +1,667 @@
+<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:SMT"
+        xmlns:eveData="clr-namespace:SMT.EVEData;assembly=EVEData"
+        xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+        xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
+        xmlns:xcadl="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
+        xmlns:xcadt="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Expression"
+
+        x:Class="SMT.MainWindow"
+        mc:Ignorable="d"
+        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip">
+
+    <Window.Resources>
+
+        <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
+        <local:ZKBForegroundConverter x:Key="zkbBGFConverter" />
+        <local:TimeSpanConverter x:Key="timeSpanConverter" />
+
+        <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="eveData:RoutingMode" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <DataTemplate x:Key="intelDataDataTemplate">
+            <DockPanel>
+                <TextBlock Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top">
+                    <Run Text="[" /><Run Text="{Binding IntelChannel, FallbackValue=''}" /><Run Text="]" />
+                </TextBlock>
+                <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
+                <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
+             </DockPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="gameLogDataDataTemplate">
+            <DockPanel>
+                <TextBlock Foreground="Cyan" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top">
+                    <Run Text="[" /><Run Text="{Binding Character, FallbackValue=''}" /><Run Text="]" />
+                </TextBlock>
+                <TextBlock Text="{Binding Time, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
+                <TextBlock Text="{Binding Text, FallbackValue=GameLog Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
+            </DockPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Background="{DynamicResource MenuBackground}" Height="27">
+            <Menu Style="{DynamicResource ResourceKey={x:Type Menu}}">
+                <MenuItem Header="File">
+                    <MenuItem Header="Characters" Click="Characters_MenuItem_Click" />
+                    <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
+                    <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
+                </MenuItem>
+
+                <MenuItem Header="Data">
+                    <MenuItem Header="Force ESI Update" Click="ForceESIUpdate_MenuItem_Click" />
+                </MenuItem>
+
+                <MenuItem Header="View">
+                    <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
+                    <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
+                </MenuItem>
+            </Menu>
+
+            <Label Margin="30,0,0,0" Padding="7">Active Character :</Label>
+            <ComboBox x:Name="CurrentActiveCharacterCombo" Width="180"  IsReadOnly="True" SelectionChanged="CurrentActiveCharacterCombo_Selected"  Height="18" />
+        </StackPanel>
+
+        <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock><Run Text="EVE Time :" /></TextBlock>
+            </StatusBarItem>
+
+            <StatusBarItem>
+                <TextBlock Text="{Binding ServerTime, StringFormat=HH:mm}" Foreground="White" />
+            </StatusBarItem>
+
+            <Separator />
+
+            <StatusBarItem>
+                <TextBlock><Run Text="Tranquility Version:" /></TextBlock>
+            </StatusBarItem>
+
+            <StatusBarItem>
+                <TextBlock Text="{Binding ServerVersion}" Foreground="White" />
+            </StatusBarItem>
+
+            <Separator />
+
+            <StatusBarItem>
+                <TextBlock Text="{Binding NumPlayers}" Foreground="White" />
+            </StatusBarItem>
+
+            <StatusBarItem>
+                <TextBlock Text="Players" />
+            </StatusBarItem>
+        </StatusBar>
+        <xcad:DockingManager x:Name="dockManager">
+            <xcad:DockingManager.Theme>
+                <xcadt:ExpressionDarkTheme />
+            </xcad:DockingManager.Theme>
+
+            <xcadl:LayoutRoot>
+
+                <xcadl:LayoutRoot.RightSide>
+                    <xcadl:LayoutAnchorSide>
+                        <xcadl:LayoutAnchorGroup>
+
+                            <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" x:Name="avlpAnoms">
+                                <Grid x:Name="MainAnomGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="60" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="26" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0">
+                                        <Button x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" />
+                                        <Label Content="{Binding ANOMManager.ActiveSystem.SystemName}" FontSize="18" FontWeight="Bold" />
+                                    </StackPanel>
+
+                                    <DataGrid x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding ANOMManager.ActiveSystem.Anoms.Values}" HeadersVisibility="Column">
+
+                                        <DataGrid.CellStyle>
+                                            <Style TargetType="{x:Type DataGridCell}">
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Unknown">
+                                                        <Setter Property="Background" Value="Red" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding State}" Value="State2">
+                                                        <Setter Property="Background" Value="Green" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGrid.CellStyle>
+
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" Width="*" />
+
+                                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
+                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="2">
+                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" />
+                                    </StackPanel>
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+
+                            <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer Background="{DynamicResource ButtonBackground}">
+                                    <StackPanel>
+                                        <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="False" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False" ItemsSource="{Binding Path=., Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}">
+
+                                            <DataGrid.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}">
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsOnline}" Value="False">
+                                                            <Setter Property="Background" Value="DarkGray" />
+                                                            <Setter Property="Foreground" Value="Black" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding WarningState}" Value="Warning">
+                                                            <Setter Property="Background" Value="Yellow" />
+                                                            <Setter Property="Foreground" Value="Black" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGrid.CellStyle>
+
+                                            <DataGrid.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Delete" Click="CharactersListMenuItemDelete_Click" />
+                                                </ContextMenu>
+                                            </DataGrid.ContextMenu>
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" IsReadOnly="True" />
+                                          </DataGrid.Columns>
+                                        </DataGrid>
+                                        <CheckBox Content="Show Characters On Map" IsChecked="{Binding MapConf.ShowCharacterNamesOnMap}" Margin="3" />
+                                        <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+
+                            <xcadl:LayoutAnchorable Title="Jump Bridges" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpBridgesContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid x:Name="JumpBridgeGrid">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2">
+                                        <Label Content="Gate SearchFilter : " />
+                                        <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
+                                    </StackPanel>
+                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" Grid.Row="1" />
+                                    <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2" />
+                                    <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3" />
+                                    <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" Grid.Row="4" />
+                                    <Label Content="Ansiblex Gates" Margin="0" Grid.Row="5" FontWeight="Bold" FontSize="18" />
+                                    <Label x:Name="AnsiblexSummaryLbl" Grid.Row="6" Content="" FontStyle="Italic" FontSize="12" />
+
+                                    <DataGrid x:Name="JumpBridgeList" Margin="2" Grid.Row="7" AutoGenerateColumns="False" AreRowDetailsFrozen="True" IsReadOnly="True" SelectionUnit="FullRow" SelectedItem="{Binding SelectedItemProperty, Mode=TwoWay}">
+
+                                        <DataGrid.CellStyle>
+                                            <Style TargetType="{x:Type DataGridCell}">
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding FromID}" Value="0">
+                                                        <Setter Property="Background" Value="#222" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ToID}" Value="0">
+                                                        <Setter Property="Background" Value="#222" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding Disabled}" Value="True">
+                                                        <Setter Property="Background" Value="Red" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGrid.CellStyle>
+
+                                        <DataGrid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Delete" Click="DeleteJumpGateMenuItem_Click" />
+                                                <MenuItem Header="Enable/Disable" Click="EnableDisableJumpGateMenuItem_Click" />
+                                            </ContextMenu>
+                                        </DataGrid.ContextMenu>
+
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="From" Binding="{Binding From}" Width="*" />
+                                            <DataGridTextColumn Header="To" Binding="{Binding To}" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+
+                            <xcadl:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid x:Name="MainRouteGrid">
+                                    <ScrollViewer Background="{DynamicResource ButtonBackground}">
+                                        <StackPanel>
+
+                                            <GroupBox Header="Navigation Options">
+                                                <StackPanel Margin="4">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Content="Mode" />
+                                                        <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ActiveCharacter.NavigationMode, ElementName=RegionUC, Mode=TwoWay}" Margin="2" Width="150" />
+                                                    </StackPanel>
+
+                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="Use Thera" IsChecked="{Binding ActiveCharacter.UseTheraRouting, ElementName=RegionUC}" Margin="2" />
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="WayPoints">
+                                                <StackPanel Margin="4">
+                                                    <ListBox ItemsSource="{Binding ActiveCharacter.Waypoints, ElementName=RegionUC}" MinHeight="50" Margin="2" />
+                                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
+                                                        <Button x:Name="AddWaypointsBtn" Click="AddWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
+                                                    </StackPanel>
+
+                                                    <Button x:Name="ReCalculateRouteBtn" Click="ReCalculateRouteBtn_Click"  Content="Recalculate" Margin="2" />
+                                                    <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear All" Margin="2" />
+                                                </StackPanel>
+                                            </GroupBox>
+
+                                            <GroupBox Header="Route">
+                                                <StackPanel Margin="4">
+                                                    <DataGrid ItemsSource="{Binding ActiveCharacter.ActiveRoute, ElementName=RegionUC}" MinHeight="50" AutoGenerateColumns="false">
+                                                        <DataGrid.CellStyle>
+                                                            <Style TargetType="{x:Type DataGridCell}">
+
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Thera">
+                                                                        <Setter Property="Background" Value="#292" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Ansiblex">
+                                                                        <Setter Property="Background" Value="blue" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
+                                                                            <Setter Property="Background" Value="blue" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </DataGrid.CellStyle>
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Con" Binding="{Binding GateToTake}" Width="8*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Jumps" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="SK" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="PK" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Trig" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" CanUserSort="False" />
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+
+                                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                                        <Label Content="Total number of jumps : " />
+                                                        <Label Content="{Binding ActiveCharacter.ActiveRoute.Count, ElementName=RegionUC}" />
+                                                    </StackPanel>
+                                                    <Button x:Name="CopyRouteBtn" Click="CopyRouteBtn_Click" Content="Copy Route" Margin="2" />
+                                                </StackPanel>
+                                            </GroupBox>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+
+                            <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpRouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid x:Name="MainJumpRouteGrid">
+                                    <ScrollViewer Background="{DynamicResource ButtonBackground}">
+                                        <StackPanel>
+
+                                            <GroupBox Header="Navigation Options">
+                                                <StackPanel Margin="4">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Width="70">Ship Type</Label>
+                                                        <ComboBox x:Name="jumpPlannerShipType" SelectionChanged="JumpPlannerShipType_OnSelectionChanged">
+                                                            <ComboBoxItem DataContext="6.0">Ansiblex</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="6.0">Super/Titan</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="7.0" IsSelected="True">Regular Caps</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="8.0">Blops</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="10.0">JF/Rorqs</ComboBoxItem>
+                                                        </ComboBox>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Width="70">Skills</Label>
+                                                        <ComboBox x:Name="jumpPlannerJDC" SelectionChanged="JumpPlannerJDC_OnSelectionChanged">
+                                                            <ComboBoxItem DataContext="4">JDC 4 SubHuman</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="5" IsSelected="True">JDC 5</ComboBoxItem>
+                                                        </ComboBox>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="WayPoints">
+                                                <StackPanel Margin="4">
+                                                    <ListBox ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" />
+                                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
+                                                        <Button x:Name="AddJumpWaypointsBtn" Click="AddJumpWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
+                                                    </StackPanel>
+
+                                                    <Button x:Name="ClearJumpWaypointsBtn" Click="ClearJumpWaypointsBtn_Click" Content="Clear All" Margin="2" />
+                                                </StackPanel>
+                                            </GroupBox>
+
+                                            <GroupBox Header="Avoidance">
+                                                <StackPanel Margin="4">
+                                                    <ListBox ItemsSource="{Binding CapitalRoute.AvoidSystems}" MinHeight="50" Margin="2" />
+                                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteAvoidSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
+                                                        <Button x:Name="AddJumpAvoidSystemsBtn" Click="AddJumpAvoidSystemsBtn_Click"  Content="Add Avoidance" Margin="2" />
+                                                    </StackPanel>
+
+                                                    <Button x:Name="ClearJumpAvoidSystemsBtn" Click="ClearJumpAvoidSystemsBtn_Click" Content="Clear All" Margin="2" />
+                                                </StackPanel>
+                                            </GroupBox>
+
+                                            <GroupBox Header="Route">
+                                                <StackPanel Margin="4">
+                                                    <DataGrid ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false">
+                                                        <DataGrid.CellStyle>
+                                                            <Style TargetType="{x:Type DataGridCell}">
+
+                                                                <Style.Triggers>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress">
+                                                                        <Setter Property="Background" Value="yellow" />
+                                                                        <Setter Property="Foreground" Value="black" />
+                                                                    </DataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False" />
+                                                                            <Condition Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Background" Value="Red" />
+                                                                    </MultiDataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
+                                                                        <Setter Property="Background" Value="blue" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </DataGrid.CellStyle>
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="Distance (LY)" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+
+                                                </StackPanel>
+                                            </GroupBox>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+
+
+                            <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer>
+                                    <StackPanel>
+
+                                        <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
+                                            <DataGrid.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}">
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
+                                                            <Setter Property="Background" Value="Red" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGrid.CellStyle>
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
+                                                <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*" />
+                                                <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
+                                                <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+
+                                        <Button x:Name="btn_UpdateThera" Click="btn_UpdateThera_Click"  Content="Update Connections" />
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+
+                            <xcadl:LayoutAnchorable Title="Storms" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="StormContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer>
+                                    <StackPanel>
+
+                                        <DataGrid  x:Name="MetaliminalStormList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="AliceBlue">
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+
+                            <xcadl:LayoutAnchorable Title="SOV Campaigns" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer>
+                                    <StackPanel>
+
+                                        <DataGrid x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column">
+
+                                            <DataGrid.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}">
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=IsActive, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged}" Value="true">
+                                                            <Setter Property="Background" Value="DarkRed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGrid.CellStyle>
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="System" Binding="{Binding Path=System, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Region" Binding="{Binding Path=Region, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="Type" Binding="{Binding Path=Type, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTemplateColumn  Header="Defenders Score"  Width="*">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Grid>
+                                                                <ProgressBar Value="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100" />
+                                                                <TextBlock Text="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Path=TimeToStart, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource timeSpanConverter}}" Width="*" />
+                                                <DataGridTextColumn Header="Defenders" Binding="{Binding Path=DefendingAllianceName, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+                        </xcadl:LayoutAnchorGroup>
+                    </xcadl:LayoutAnchorSide>
+                </xcadl:LayoutRoot.RightSide>
+                <xcadl:LayoutPanel>
+                    <xcadl:LayoutAnchorablePaneGroup DockWidth="250" DockMinWidth="250" Orientation="Vertical">
+                        <xcadl:LayoutAnchorablePane>
+                            <xcadl:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid>
+                                    <ScrollViewer Background="{DynamicResource ButtonBackground}">
+                                        <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
+                                            <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" Margin="4" />
+                                            <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" Cursor="Hand" AutoGenerateColumns="False" CanUserAddRows="False" MouseUp="ZKBContexMenu_ShowSystem_Click" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None"  MinHeight="200">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                </DataGrid.Columns>
+                                                <DataGrid.RowStyle>
+                                                    <Style TargetType="{x:Type DataGridRow}">
+                                                        <Setter Property="Background" Value="{Binding Converter={StaticResource zkbBGConverter}}" />
+                                                        <Setter Property="Foreground" Value="{Binding Converter={StaticResource zkbBGFConverter}}" />
+                                                    </Style>
+                                                </DataGrid.RowStyle>
+
+                                                <DataGrid.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
+                                                        <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
+                                                    </ContextMenu>
+                                                </DataGrid.ContextMenu>
+                                            </DataGrid>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+                        </xcadl:LayoutAnchorablePane>
+
+                        <xcadl:LayoutAnchorablePane>
+                            <xcadl:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="25" />
+                                    </Grid.RowDefinitions>
+                                    <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource intelDataDataTemplate}" />
+                                    <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+                            <xcadl:LayoutAnchorable x:Name="GamelogLayoutAnchorable"  Title="Gamelog" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="GameLogContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="25" />
+                                    </Grid.RowDefinitions>
+
+                                    <ListView x:Name="RawGameDataBox" Margin="0,2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource gameLogDataDataTemplate}" />
+                                    <Button Content="Clear GameLog" Grid.Row="1" x:Name="ClearGameLogBtn" Click="ClearGameLogBtn_Click" />
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+                            <xcadl:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <ScrollViewer Background="{DynamicResource ButtonBackground}">
+                                    <DataGrid  x:Name="FleetMembersList"  Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="ShipType" Binding="{Binding ShipType}" CanUserReorder="False" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </ScrollViewer>
+                            </xcadl:LayoutAnchorable>
+                        </xcadl:LayoutAnchorablePane>
+                    </xcadl:LayoutAnchorablePaneGroup>
+
+                    <xcadl:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False">
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Regions">
+                            <Grid>
+                                <local:RegionsViewControl x:Name="RegionsViewUC" />
+                            </Grid>
+                        </xcadl:LayoutDocument>
+
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
+                            <local:RegionControl x:Name="RegionUC" />
+                        </xcadl:LayoutDocument>
+
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverseViewID" Title="Universe">
+                            <local:UniverseControl x:Name="UniverseUC" />
+                        </xcadl:LayoutDocument>
+                    </xcadl:LayoutDocumentPane>
+                </xcadl:LayoutPanel>
+            </xcadl:LayoutRoot>
+        </xcad:DockingManager>
+    </DockPanel>
+</Window>

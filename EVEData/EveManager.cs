@@ -24,9 +24,10 @@ using ESI.NET;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
 using Microsoft.Extensions.Options;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Utils;
+
 
 namespace SMT.EVEData
 {
@@ -376,7 +377,7 @@ namespace SMT.EVEData
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
-                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
+                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\EVEData\data\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
 
                 if (!File.Exists(localSVG))
                 {
@@ -1278,11 +1279,11 @@ namespace SMT.EVEData
 
             // now serialise the classes to disk
 
-            string saveDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\EVEData\data\"; 
+            string saveDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\EVEData\data\";
 
-            Utils.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
-            Utils.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
-            Utils.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
+            Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
+            Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
+            Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
 
 
             // debug
@@ -1533,9 +1534,17 @@ namespace SMT.EVEData
         {
             SystemIDToName = new SerializableDictionary<long, string>();
 
-            Regions = Utils.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\EVEData\data\MapLayout.dat");
-            Systems = Utils.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\EVEData\data\Systems.dat");
-            ShipTypes = Utils.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\EVEData\data\ShipTypes.dat");
+            
+            
+
+            Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
+
+
+
+
+
+            Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
+            ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
 
             foreach (System s in Systems)
             {
@@ -1544,7 +1553,7 @@ namespace SMT.EVEData
 
             if (File.Exists(SaveDataVersionFolder + @"\CharacterNames.dat"))
             {
-                CharacterIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\CharacterNames.dat");
+                CharacterIDToName = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\CharacterNames.dat");
             }
             if (CharacterIDToName == null)
             {
@@ -1553,7 +1562,7 @@ namespace SMT.EVEData
 
             if (File.Exists(SaveDataVersionFolder + @"\AllianceNames.dat"))
             {
-                AllianceIDToName = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceNames.dat");
+                AllianceIDToName = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceNames.dat");
             }
 
             if (AllianceIDToName == null)
@@ -1563,7 +1572,7 @@ namespace SMT.EVEData
 
             if (File.Exists(SaveDataVersionFolder + @"\AllianceTickers.dat"))
             {
-                AllianceIDToTicker = Utils.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceTickers.dat");
+                AllianceIDToTicker = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceTickers.dat");
             }
 
             if (AllianceIDToTicker == null)
@@ -1744,12 +1753,12 @@ namespace SMT.EVEData
             }
 
             // now serialise the caches to disk
-            Utils.SerializeToDisk<SerializableDictionary<long, string>>(CharacterIDToName, SaveDataVersionFolder + @"\CharacterNames.dat");
-            Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
-            Utils.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
+            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(CharacterIDToName, SaveDataVersionFolder + @"\CharacterNames.dat");
+            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
+            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
 
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
-            Utils.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
+            Serialization.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
 
             List<string> beaconsToSave = new List<string>();
             foreach (System s in Systems)
@@ -2136,7 +2145,7 @@ namespace SMT.EVEData
             }
         }
 
-        internal void AddUpdateJumpBridge(string from, string to, long stationID)
+        public void AddUpdateJumpBridge(string from, string to, long stationID)
         {
             // validate
             if (GetEveSystem(from) == null || GetEveSystem(to) == null)
@@ -2228,7 +2237,7 @@ namespace SMT.EVEData
 
             try
             {
-                string POIcsv = AppDomain.CurrentDomain.BaseDirectory + @"\EVEData\data\POI.csv";
+                string POIcsv = AppDomain.CurrentDomain.BaseDirectory + @"\data\POI.csv";
                 if (File.Exists(POIcsv))
                 {
                     StreamReader file = new StreamReader(POIcsv);
@@ -2324,7 +2333,7 @@ namespace SMT.EVEData
             {
                 try
                 {
-                    Encoding fe = Utils.GetEncoding(changedFile);
+                    Encoding fe = Misc.GetEncoding(changedFile);
                     FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                     StreamReader file = new StreamReader(ifs, fe);
@@ -2547,7 +2556,7 @@ namespace SMT.EVEData
 
             try
             {
-                Encoding fe = Utils.GetEncoding(changedFile);
+                Encoding fe = Misc.GetEncoding(changedFile);
                 FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 StreamReader file = new StreamReader(ifs, fe);
