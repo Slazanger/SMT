@@ -4,12 +4,12 @@
 //
 //    var structureIdData = StructureIdData.FromJson(jsonString);
 
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace StructureIDs
 {
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-
     public static class Serialize
     {
         public static string ToJson(this StructureIdData self) => JsonConvert.SerializeObject(self, StructureIDs.Converter.Settings);

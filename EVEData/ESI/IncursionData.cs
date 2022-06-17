@@ -4,12 +4,12 @@
 //
 //    var incursionInfo = IncursionInfo.FromJson(jsonString);
 
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace IncursionData
 {
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-
     public static class Serialize
     {
         public static string ToJson(this IncursionInfo[] self) => JsonConvert.SerializeObject(self, IncursionData.Converter.Settings);

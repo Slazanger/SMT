@@ -4,12 +4,12 @@
 //
 //    var characterIdData = CharacterIdData.FromJson(jsonString);
 
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace CharacterIDs
 {
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-
     public static class Serialize
     {
         public static string ToJson(this CharacterIdData self) => JsonConvert.SerializeObject(self, CharacterIDs.Converter.Settings);

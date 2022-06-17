@@ -4,12 +4,12 @@
 //
 //    var structureSearch = StructureSearch.FromJson(jsonString);
 
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace StructureSearches
 {
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-
     public static class Serialize
     {
         public static string ToJson(this StructureSearch self) => JsonConvert.SerializeObject(self, StructureSearches.Converter.Settings);

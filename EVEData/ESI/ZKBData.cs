@@ -4,13 +4,13 @@
 //
 //    var zkbData = ZkbData.FromJson(jsonString);
 
+using System.Collections.Generic;
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace ZKBData
 {
-    using System.Collections.Generic;
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-
     public static class Serialize
     {
         public static string ToJson(this ZkbData self) => JsonConvert.SerializeObject(self, ZKBData.Converter.Settings);
