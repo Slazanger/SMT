@@ -280,7 +280,7 @@ namespace SMT.EVEData
             CurrentNode = End;
             if (End.NearestToStart != null)
             {
-                while (CurrentNode != null) 
+                while (CurrentNode != null)
                 {
                     Route.Add(CurrentNode.Name);
                     CurrentNode = CurrentNode.NearestToStart;
@@ -325,7 +325,7 @@ namespace SMT.EVEData
             return ActualRoute;
         }
 
-        public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY, LocalCharacter lc, List<string> systemsToAvoid )
+        public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY, LocalCharacter lc, List<string> systemsToAvoid)
         {
             if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
             {

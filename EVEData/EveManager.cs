@@ -1224,7 +1224,7 @@ namespace SMT.EVEData
                 }
             }
 
- 
+
             bool done = false;
             int iteration = 0;
             double minSpread = 19.0;
@@ -1534,8 +1534,8 @@ namespace SMT.EVEData
         {
             SystemIDToName = new SerializableDictionary<long, string>();
 
-            
-            
+
+
 
             Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
 

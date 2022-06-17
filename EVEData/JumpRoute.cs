@@ -69,7 +69,7 @@ namespace SMT.EVEData
 
 
                 List<Navigation.RoutePoint> sysList = Navigation.NavigateCapitals(start, end, actualMaxLY, null, avoidSystems);
-                
+
                 if (sysList != null)
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>

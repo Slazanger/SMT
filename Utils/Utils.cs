@@ -52,7 +52,7 @@ namespace Utils
             return Encoding.Default;
         }
 
-   
+
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetForegroundWindow();
@@ -86,6 +86,6 @@ namespace Utils
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
- 
+
     }
 }

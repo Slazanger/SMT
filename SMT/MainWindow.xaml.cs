@@ -41,7 +41,7 @@ namespace SMT
 
         public JumpRoute CapitalRoute { get; set; }
 
-    /// <summary>
+        /// <summary>
         /// Main Window
         /// </summary>
         public MainWindow()
@@ -962,7 +962,7 @@ namespace SMT
                 {
                     if (lc.CombatWarningEnabled)
                     {
-                        if(OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
+                        if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
@@ -1122,7 +1122,7 @@ namespace SMT
             }
         }
 
-        
+
 
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
@@ -1805,10 +1805,10 @@ namespace SMT
         {
             if (CapitalRoute != null)
             {
-               ComboBox cb = sender as ComboBox;
-               ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
-               CapitalRoute.MaxLY = double.Parse(cbi.DataContext as string);
-               CapitalRoute.Recalculate();
+                ComboBox cb = sender as ComboBox;
+                ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
+                CapitalRoute.MaxLY = double.Parse(cbi.DataContext as string);
+                CapitalRoute.Recalculate();
             }
         }
 
