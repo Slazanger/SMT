@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Threading;
 
 namespace SMT.EVEData

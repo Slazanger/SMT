@@ -2,8 +2,6 @@
 // EVE Anoms
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace SMT.EVEData
 {
     /// <summary>

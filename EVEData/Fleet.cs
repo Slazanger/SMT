@@ -2,7 +2,6 @@
 // Fleet
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.ObjectModel;
 
 namespace SMT.EVEData

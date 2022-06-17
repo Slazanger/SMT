@@ -2,7 +2,6 @@
 // Map System
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Xml.Serialization;
 

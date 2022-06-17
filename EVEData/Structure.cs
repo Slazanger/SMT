@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SMT.EVEData
+﻿namespace SMT.EVEData
 {
     public class Structure
     {

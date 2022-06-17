@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace csDelaunay
+﻿namespace csDelaunay
 {
     /*
 	 * The line segment connecting the two Sites is part of the Delaunay triangulation

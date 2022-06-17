@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace csDelaunay
+﻿namespace csDelaunay
 {
     public class SiteList
     {

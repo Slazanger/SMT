@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace nAlpha
+﻿namespace nAlpha
 {
     public struct Point : IEquatable<Point>
     {

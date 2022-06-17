@@ -2,9 +2,6 @@
 // Intel Data
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-
 namespace SMT.EVEData
 {
     /// <summary>

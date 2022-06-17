@@ -1,6 +1,4 @@
-﻿using System;
-
-// Recreation of the UnityEngine.Vector2, so it can be used in other thread
+﻿// Recreation of the UnityEngine.Vector2, so it can be used in other thread
 public struct Vector2f
 {
     public static readonly Vector2f down = new Vector2f(0, -1);
