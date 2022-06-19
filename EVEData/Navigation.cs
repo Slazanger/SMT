@@ -47,6 +47,45 @@
             }
         }
 
+
+        public static List<string> GetSystemsWithinXLYFrom(string start, double LY)
+        {
+            List<string> inRange = new List<string>();
+
+            MapNode startSys = null;
+
+            foreach (MapNode sys in MapNodes.Values)
+            {
+                if (sys.Name == start)
+                {
+                    startSys = sys;
+                    break;
+                }
+            }
+
+            foreach (MapNode sys in MapNodes.Values)
+            {
+                if (sys == startSys)
+                {
+                    continue;
+
+                }
+
+                double x = startSys.X - sys.X;
+                double y = startSys.Y - sys.Y;
+                double z = startSys.Z - sys.Z;
+
+                double length = Math.Sqrt((x * x) + (y * y) + (z * z)) / 9460730472580800.0;
+
+                if (length < LY)
+                {
+                    inRange.Add(sys.Name);
+                }
+            }
+
+            return inRange;
+        }
+
         public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
         {
             if (MapNodes == null || !MapNodes.ContainsKey(start))

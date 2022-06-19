@@ -14,6 +14,8 @@ namespace SMT.EVEData
         public ObservableCollection<string> AvoidSystems { get; set; }
         public ObservableCollection<string> AvoidRegions { get; set; }
 
+        public Dictionary<string, ObservableCollection<string>> AlternateMids { get; set; }
+
 
         public JumpRoute()
         {
@@ -26,6 +28,7 @@ namespace SMT.EVEData
                 WayPoints = new ObservableCollection<string>();
                 AvoidRegions = new ObservableCollection<string>();
                 AvoidSystems = new ObservableCollection<string>();
+                AlternateMids = new Dictionary<string, ObservableCollection<string>>();
 
             }), DispatcherPriority.Normal, null);
         }
@@ -56,6 +59,7 @@ namespace SMT.EVEData
             List<string> avoidSystems = AvoidSystems.ToList();
 
 
+
             // loop through all the waypoints
             for (int i = 1; i < WayPoints.Count; i++)
             {
@@ -70,16 +74,36 @@ namespace SMT.EVEData
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
+                        AlternateMids.Clear();
+
                         foreach (Navigation.RoutePoint s in sysList)
                         {
                             CurrentRoute.Add(s);
                         }
+
+                        if(sysList.Count > 2 )
+                        {
+                            for (int i = 2; i < sysList.Count; i++)
+                            {
+                                List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[i - 2].SystemName, MaxLY);
+                                List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[i].SystemName, MaxLY);
+
+                                IEnumerable<string> alternatives = a.AsQueryable().Intersect(b);
+
+                                AlternateMids[CurrentRoute[i - 2].SystemName] = new ObservableCollection<string>();
+                                foreach (string mid in alternatives)
+                                {
+                                    if (mid != CurrentRoute[i - 2].SystemName)
+                                    {
+                                        AlternateMids[CurrentRoute[i - 2].SystemName].Add(mid);
+                                    }
+                                }
+                            }
+
+                        }
                     }), DispatcherPriority.Normal, null);
                 }
             }
-
-
         }
-
     }
 }

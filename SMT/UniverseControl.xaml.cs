@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -772,6 +773,7 @@ namespace SMT
                 VHLinks.ClearAllChildren();
                 VHNames.ClearAllChildren();
                 VHRegionShapes.ClearAllChildren();
+                VHRoute.ClearAllChildren();
 
                 ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
 
@@ -1000,6 +1002,8 @@ namespace SMT
                 Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
                 Brush RouteBrush = new SolidColorBrush(Colors.Orange);
+                Brush RouteAltBrush = new SolidColorBrush(Colors.DarkRed);
+
 
 
                 if (MapConf.ShowCharacterNamesOnMap)
@@ -1111,6 +1115,9 @@ namespace SMT
                     Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
                     dashedRoutePen.DashStyle = DashStyles.Dot;
                     Pen outlinePen = new Pen(activeRouteColour, 2);
+                    Pen outlineAltPen = new Pen(RouteAltBrush,2);
+
+
 
                     System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
 
@@ -1151,188 +1158,38 @@ namespace SMT
                         }
                     }
 
+                    // add the alternates
+                    List<string> alts = new List<string>();
+                    foreach(ObservableCollection<string> sss in CapitalRoute.AlternateMids.Values)
+                    {
+                        foreach(string s in sss)
+                        {
+                            if (!alts.Contains(s))
+                            {
+                                alts.Add(s);
+                            }
+                        }
+                    }
+                    foreach(string s in alts)
+                    {
+                        EVEData.System sys = EM.GetEveSystem(s);
+                        if(s!=null)
+                        {
+                            double X = sys.UniverseX;
+                            double Y = sys.UniverseY;
+
+                            drawingContext.DrawEllipse(RouteAltBrush, outlineAltPen, new Point( X, Y), 3 , 3);
+
+                        }
+
+                    }
+
                     drawingContext.Close();
 
                     VHRoute.AddChild(routeVisual, "ActiveRoute");
                 }
 
-                /*
 
-                if (ActiveCharacter?.JumpRoute.Count > 1)
-                {
-                    if (ActiveCharacter.JumpRoute.Count > 1)
-                    {
-
-
-                        Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
-                        dashedRoutePen.DashStyle = DashStyles.Dot;
-                        Pen outlinePen = new Pen(activeRouteColour, 2);
-
-                        System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
-
-                        //Retrieve the DrawingContext in order to create new drawing content.
-                        DrawingContext drawingContext = routeVisual.RenderOpen();
-
-
-                        // add the lines
-                        for (int i = 1; i < ActiveCharacter.JumpRoute.Count; i++)
-                        {
-                            Pen linePen = dashedRoutePen;
-
-
-                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.JumpRoute[i - 1].SystemName);
-                            EVEData.System sysB = EM.GetEveSystem(ActiveCharacter.JumpRoute[i].SystemName);
-
-
-
-
-                            if (sysA != null && sysB != null)
-                            {
-                                double X1 = sysA.UniverseX;
-                                double Y1 = sysA.UniverseY;
-
-                                double X2 = sysB.UniverseX;
-                                double Y2 = sysB.UniverseY;
-
-                                if (i == 1)
-                                {
-                                    drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X1, Y1),10,10);
-                                }
-                                drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 10, 10);
-
-
-                                //Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
-
-
-                            }
-                        }
-
-                        drawingContext.Close();
-
-                        VHRoute.AddChild(routeVisual, "ActiveRoute");
-
-                    }
-
-
-
-                    if (MapConf.DrawRoute && ActiveCharacter?.ActiveRoute != null)
-                {
-                    if (ActiveCharacter.ActiveRoute.Count > 1)
-                    {
-                        Pen dashedRoutePen = new Pen(activeRouteColour, 2);
-                        dashedRoutePen.DashStyle = DashStyles.Dot;
-
-                        Pen dashedRouteAnsiblexPen = new Pen(activeRouteAniblexColour, 2);
-                        dashedRouteAnsiblexPen.DashStyle = DashStyles.Dot;
-
-                        Pen outlinePen = new Pen(activeRouteColour, 2);
-
-                        // add the lines
-                        for (int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
-                        {
-                            Pen linePen = dashedRoutePen;
-                            if (ActiveCharacter.ActiveRoute[i - 1].GateToTake == EVEData.Navigation.GateType.Ansiblex)
-                            {
-                                linePen = dashedRouteAnsiblexPen;
-                            }
-
-                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i - 1].SystemName);
-                            EVEData.System sysB = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
-
-                            if (sysA != null && sysB != null)
-                            {
-                                double X1 = sysA.UniverseX;
-                                double Y1 = sysA.UniverseY;
-
-                                double X2 = sysB.UniverseX;
-                                double Y2 = sysB.UniverseY;
-
-                                System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
-
-                                //Retrieve the DrawingContext in order to create new drawing content.
-                                DrawingContext drawingContext = routeVisual.RenderOpen();
-
-                                //Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
-
-                                drawingContext.Close();
-
-                                VHRoute.AddChild(routeVisual, "ActiveRoute");
-                            }
-                        }
-
-                        // add system highlights
-                        for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
-                        {
-                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
-
-                            if (sysA != null)
-                            {
-                                double X1 = sysA.UniverseX;
-                                double Y1 = sysA.UniverseY;
-
-                                System.Windows.Media.DrawingVisual jumpRouteVisual = new System.Windows.Media.DrawingVisual();
-
-                                //Retrieve the DrawingContext in order to create new drawing content.
-                                DrawingContext drawingContext = jumpRouteVisual.RenderOpen();
-
-                                double rectSize = 7;
-                                double rectHalfSize = rectSize / 2;
-
-                                //Pen p = new Pen(CapRouteColor, 1);
-                                Rect r = new Rect(X1 - rectHalfSize, Y1 - rectHalfSize, rectSize, rectSize);
-
-                                //Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawRectangle(activeRouteColour, outlinePen, r);
-
-                                drawingContext.Close();
-
-                                VHRoute.AddChild(jumpRouteVisual, "ActiveRoute");
-                            }
-                        }
-
-                        // add system highlights
-                        for (int i = 0; i < ActiveCharacter.ActiveRoute.Count; i++)
-                        {
-                            EVEData.System sysA = EM.GetEveSystem(ActiveCharacter.ActiveRoute[i].SystemName);
-
-                            if (sysA != null)
-                            {
-                                double X1 = sysA.UniverseX;
-                                double Y1 = sysA.UniverseY;
-
-                                System.Windows.Media.DrawingVisual jumpRouteVisual = new System.Windows.Media.DrawingVisual();
-
-                                //Retrieve the DrawingContext in order to create new drawing content.
-                                DrawingContext drawingContext = jumpRouteVisual.RenderOpen();
-
-                                double rectSize = 7;
-                                double rectHalfSize = rectSize / 2;
-
-                                //Pen p = new Pen(CapRouteColor, 1);
-                                Rect r = new Rect(X1 - rectHalfSize, Y1 - rectHalfSize, rectSize, rectSize);
-
-                                //Create a rectangle and draw it in the DrawingContext.
-                                drawingContext.DrawRectangle(activeRouteColour, outlinePen, r);
-
-                                drawingContext.Close();
-
-                                VHRoute.AddChild(jumpRouteVisual, "ActiveRoute");
-                            }
-                        }
-                        }
-
- 
-
-
-
-
-                    }
-
-                }
-
-                */
             }
         }
 

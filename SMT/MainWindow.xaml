@@ -422,7 +422,7 @@
 
                                             <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
-                                                    <DataGrid ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false">
+                                                    <DataGrid x:Name="dgCapitalRouteCurrentRoute" ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false"  SelectionChanged="CurrentCapitalRouteItem_Selected">
                                                         <DataGrid.CellStyle>
                                                             <Style TargetType="{x:Type DataGridCell}">
 
@@ -479,6 +479,15 @@
                                                         </DataGrid.Columns>
                                                     </DataGrid>
 
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="Alternate Mids">
+                                                <StackPanel Orientation="Vertical" >
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Content="Alternats for : "/>
+                                                        <Label x:Name="lblAlternateMids"/>
+                                                    </StackPanel>
+                                                    <ListBox x:Name="lbAlternateMids"/>
                                                 </StackPanel>
                                             </GroupBox>
                                         </StackPanel>

@@ -1821,6 +1821,27 @@ namespace SMT
                 CapitalRoute.Recalculate();
             }
         }
+
+        private void CurrentCapitalRouteItem_Selected(object sender, RoutedEventArgs e)
+        {
+            if(dgCapitalRouteCurrentRoute.SelectedItem != null)
+            {
+                Navigation.RoutePoint rp = dgCapitalRouteCurrentRoute.SelectedItem as Navigation.RoutePoint;
+                string sel = rp.SystemName;
+                lblAlternateMids.Content = sel;
+                if(CapitalRoute.AlternateMids.ContainsKey(sel))
+                {
+                    lbAlternateMids.ItemsSource = CapitalRoute.AlternateMids[sel];
+                }
+                else
+                {
+                    lbAlternateMids.ItemsSource = null;
+                }
+                
+            }
+
+        }
+
     }
 
     /// <summary>
