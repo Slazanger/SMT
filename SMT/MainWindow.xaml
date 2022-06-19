@@ -398,7 +398,7 @@
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" />
+                                                    <ListBox ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2"/>
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
                                                         <Button x:Name="AddJumpWaypointsBtn" Click="AddJumpWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
@@ -422,7 +422,8 @@
 
                                             <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
-                                                    <DataGrid x:Name="dgCapitalRouteCurrentRoute" ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false"  SelectionChanged="CurrentCapitalRouteItem_Selected">
+                                                    <Label x:Name="lblCapitalRouteSummary" Content=""/>
+                                                    <DataGrid x:Name="dgCapitalRouteCurrentRoute" ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false"  SelectionChanged="CurrentCapitalRouteItem_Selected" IsReadOnly="True">
                                                         <DataGrid.CellStyle>
                                                             <Style TargetType="{x:Type DataGridCell}">
 
@@ -474,7 +475,7 @@
                                                             </Style>
                                                         </DataGrid.CellStyle>
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False"/>
                                                             <DataGridTextColumn Header="Distance (LY)" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                     </DataGrid>
@@ -484,7 +485,7 @@
                                             <GroupBox Header="Alternate Mids">
                                                 <StackPanel Orientation="Vertical" >
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Label Content="Alternats for : "/>
+                                                        <Label Content="Alternates for : "/>
                                                         <Label x:Name="lblAlternateMids"/>
                                                     </StackPanel>
                                                     <ListBox x:Name="lbAlternateMids"/>

@@ -378,9 +378,8 @@
                 mapNode.Visited = false;
             }
 
-            // reverse as we want the short jump at the start
-            MapNode Start = MapNodes[To];
-            MapNode End = MapNodes[From];
+            MapNode Start = MapNodes[From];
+            MapNode End = MapNodes[To];
 
             List<MapNode> OpenList = new List<MapNode>();
             List<MapNode> ClosedList = new List<MapNode>();
@@ -457,17 +456,18 @@
             for (int i = 0; i < Route.Count; i++)
             {
                 RoutePoint RP = new RoutePoint();
-                RP.SystemName = Route[i];
-                RP.GateToTake = GateType.StarGate;
+                RP.GateToTake = GateType.JumpTo;
                 RP.LY = 0.0;
+                RP.SystemName = Route[i];
 
                 if (i > 0)
                 {
-                    RP.GateToTake = GateType.JumpTo;
                     RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]) / 9460730472580800.0;
                 }
                 ActualRoute.Add(RP);
             }
+
+            ActualRoute.Reverse();
 
             return ActualRoute;
         }

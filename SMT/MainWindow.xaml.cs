@@ -1103,6 +1103,16 @@ namespace SMT
             {
                 CapitalRoute.WayPoints.Add(s.Name);
                 CapitalRoute.Recalculate();
+
+                if (CapitalRoute.CurrentRoute.Count == 0)
+                {
+                    lblCapitalRouteSummary.Content = "No Valid Route Found";
+                }
+                else
+                {
+                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
+                }
+
             }
         }
 
@@ -1118,6 +1128,16 @@ namespace SMT
             {
                 CapitalRoute.AvoidSystems.Add(s.Name);
                 CapitalRoute.Recalculate();
+
+                if (CapitalRoute.CurrentRoute.Count == 0)
+                {
+                    lblCapitalRouteSummary.Content = "No Valid Route Found";
+                }
+                else
+                {
+                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
+                }
+
             }
         }
 
@@ -1808,6 +1828,16 @@ namespace SMT
                 ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
                 CapitalRoute.MaxLY = double.Parse(cbi.DataContext as string);
                 CapitalRoute.Recalculate();
+
+                if (CapitalRoute.CurrentRoute.Count == 0)
+                {
+                    lblCapitalRouteSummary.Content = "No Valid Route Found";
+                }
+                else
+                {
+                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
+                }
+
             }
         }
 
@@ -1819,6 +1849,16 @@ namespace SMT
                 ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
                 CapitalRoute.JDC = int.Parse(cbi.DataContext as string);
                 CapitalRoute.Recalculate();
+
+                if (CapitalRoute.CurrentRoute.Count == 0)
+                {
+                    lblCapitalRouteSummary.Content = "No Valid Route Found";
+                }
+                else
+                {
+                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
+                }
+
             }
         }
 
@@ -1828,6 +1868,9 @@ namespace SMT
             {
                 Navigation.RoutePoint rp = dgCapitalRouteCurrentRoute.SelectedItem as Navigation.RoutePoint;
                 string sel = rp.SystemName;
+
+                UniverseUC.ShowSystem(sel);
+
                 lblAlternateMids.Content = sel;
                 if(CapitalRoute.AlternateMids.ContainsKey(sel))
                 {
