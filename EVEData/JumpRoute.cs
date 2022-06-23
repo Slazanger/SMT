@@ -59,6 +59,8 @@ namespace SMT.EVEData
             List<string> avoidSystems = AvoidSystems.ToList();
 
 
+            AlternateMids.Clear();
+
 
             // loop through all the waypoints
             for (int i = 1; i < WayPoints.Count; i++)
@@ -74,28 +76,35 @@ namespace SMT.EVEData
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
-                        AlternateMids.Clear();
 
                         foreach (Navigation.RoutePoint s in sysList)
                         {
-                            CurrentRoute.Add(s);
+                            // for multiple waypoint routes, the first in the new and last item in the list will be the same system, so remove
+                            if(CurrentRoute.Count > 0 && CurrentRoute.Last().SystemName == s.SystemName)
+                            {
+                                CurrentRoute.Last().LY = s.LY;
+                            }
+                            else
+                            {
+                                CurrentRoute.Add(s);
+                            }
                         }
 
                         if(sysList.Count > 2 )
                         {
-                            for (int i = 2; i < sysList.Count; i++)
+                            for (int j = 2; j < sysList.Count; j++)
                             {
-                                List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[i - 2].SystemName, MaxLY);
-                                List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[i].SystemName, MaxLY);
+                                List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j - 2].SystemName, MaxLY);
+                                List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j].SystemName, MaxLY);
 
                                 IEnumerable<string> alternatives = a.AsQueryable().Intersect(b);
 
-                                AlternateMids[CurrentRoute[i - 2].SystemName] = new ObservableCollection<string>();
+                                AlternateMids[CurrentRoute[j - 1].SystemName] = new ObservableCollection<string>();
                                 foreach (string mid in alternatives)
                                 {
-                                    if (mid != CurrentRoute[i - 2].SystemName)
+                                    if (mid != CurrentRoute[j - 1].SystemName)
                                     {
-                                        AlternateMids[CurrentRoute[i - 2].SystemName].Add(mid);
+                                        AlternateMids[CurrentRoute[j - 1].SystemName].Add(mid);
                                     }
                                 }
                             }

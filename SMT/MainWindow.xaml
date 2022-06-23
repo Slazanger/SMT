@@ -398,7 +398,15 @@
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2"/>
+                                                    <ListBox x:Name="capitalRouteWaypointsLB" ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" AllowDrop="True">
+                                                        <ListBox.ContextMenu>
+                                                            <ContextMenu>
+                                                                <MenuItem Header="Move Up" Click="CapitalWaypointsContextMenuMoveUp_Click"/>
+                                                                <MenuItem Header="Move Down" Click="CapitalWaypointsContextMenuMoveDown_Click"/>
+                                                                <MenuItem Header="Delete" Click="CapitalWaypointsContextMenuDelete_Click"/>
+                                                            </ContextMenu>
+                                                        </ListBox.ContextMenu>
+                                                    </ListBox>
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
                                                         <Button x:Name="AddJumpWaypointsBtn" Click="AddJumpWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
@@ -488,7 +496,13 @@
                                                         <Label Content="Alternates for : "/>
                                                         <Label x:Name="lblAlternateMids"/>
                                                     </StackPanel>
-                                                    <ListBox x:Name="lbAlternateMids"/>
+                                                    <ListBox x:Name="lbAlternateMids">
+                                                        <ListBox.ContextMenu>
+                                                            <ContextMenu>
+                                                                <MenuItem Header="Use Alt" Click="CapitalRouteContextMenuUseAlt_Click"/>
+                                                            </ContextMenu>
+                                                        </ListBox.ContextMenu>
+                                                    </ListBox>
                                                 </StackPanel>
                                             </GroupBox>
                                         </StackPanel>

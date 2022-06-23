@@ -1885,6 +1885,66 @@ namespace SMT
 
         }
 
+        private void CapitalWaypointsContextMenuMoveUp_Click(object sender, RoutedEventArgs e)
+        {
+            if(capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != 0)
+            {
+                CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex - 1);
+                CapitalRoute.Recalculate();
+            }
+            
+        }
+
+        private void CapitalWaypointsContextMenuMoveDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != CapitalRoute.WayPoints.Count -1 )
+            {
+                CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex + 1);
+                CapitalRoute.Recalculate();
+            }
+            
+        }
+
+        private void CapitalWaypointsContextMenuDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (capitalRouteWaypointsLB.SelectedItem != null)
+            {
+                CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
+                CapitalRoute.Recalculate();
+            }
+        }
+
+        private void CapitalRouteContextMenuUseAlt_Click(object sender, RoutedEventArgs e)
+        {
+            if (lbAlternateMids.SelectedItem != null)
+            {
+                string selectedAlt = lbAlternateMids.SelectedItem as string;
+
+                // need to find where to insert the new waypoint
+                int waypointIndex = -1;
+                foreach(Navigation.RoutePoint rp in CapitalRoute.CurrentRoute)
+                {
+                    if(rp.SystemName == CapitalRoute.WayPoints[waypointIndex +1])
+                    {
+                        waypointIndex++;
+                    }
+                    if(CapitalRoute.AlternateMids.ContainsKey(rp.SystemName))
+                    {
+                        foreach (string alt in CapitalRoute.AlternateMids[rp.SystemName])
+                        {
+                            if (alt == selectedAlt)
+                            {
+                                CapitalRoute.WayPoints.Insert(waypointIndex + 1, selectedAlt);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                CapitalRoute.Recalculate();
+            }
+        }
+        
     }
 
     /// <summary>
