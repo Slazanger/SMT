@@ -169,6 +169,13 @@
                         continue;
                     }
 
+                    // cant jump into Pochven systems
+                    if(sys.Region == "Pochven")
+                    {
+                        continue;
+                    }
+
+
                     double Distance = EveManager.Instance.GetRangeBetweenSystems(sys.Name, mn.Name);
                     if (Distance < MaxRange && Distance > 0)
                     {
