@@ -1437,8 +1437,8 @@ namespace SMT
                 else if (groups[4].Value != "" && groups[5].Value != "" && groups[6].Value != "")
                 {
                     long.TryParse(groups[4].Value, out IDFrom);
-                    string from = groups[5].Value;
-                    string to = groups[6].Value;
+                    string from = groups[5].Value.Trim();
+                    string to = groups[6].Value.Trim();
                     EVEManager.AddUpdateJumpBridge(from, to, IDFrom);
                 }
             }
