@@ -94,8 +94,8 @@ namespace SMT.EVEData
                         {
                             for (int j = 2; j < sysList.Count; j++)
                             {
-                                List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j - 2].SystemName, MaxLY);
-                                List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j].SystemName, MaxLY);
+                                List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j - 2].SystemName, MaxLY, false, false);
+                                List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j].SystemName, MaxLY, false, false);
 
                                 IEnumerable<string> alternatives = a.AsQueryable().Intersect(b);
 
@@ -104,6 +104,8 @@ namespace SMT.EVEData
                                 {
                                     if (mid != CurrentRoute[j - 1].SystemName)
                                     {
+
+
                                         AlternateMids[CurrentRoute[j - 1].SystemName].Add(mid);
                                     }
                                 }

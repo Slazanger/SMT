@@ -48,7 +48,7 @@
         }
 
 
-        public static List<string> GetSystemsWithinXLYFrom(string start, double LY)
+        public static List<string> GetSystemsWithinXLYFrom(string start, double LY, bool includeHighSecSystems, bool includePochvenSystems)
         {
             List<string> inRange = new List<string>();
 
@@ -77,7 +77,25 @@
 
                 double length = Math.Sqrt((x * x) + (y * y) + (z * z)) / 9460730472580800.0;
 
+
+                bool shouldAdd = false;
+
                 if (length < LY)
+                {
+                    shouldAdd = true;
+                }
+                
+                if (sys.HighSec & !includeHighSecSystems)
+                {
+                    shouldAdd = false;
+                }
+
+                if(sys.Pochven &! includePochvenSystems)
+                {
+                    shouldAdd = false;
+                }
+
+                if (shouldAdd)
                 {
                     inRange.Add(sys.Name);
                 }
@@ -135,6 +153,7 @@
                 {
                     Name = sys.Name,
                     HighSec = sys.TrueSec > 0.45,
+                    Pochven = sys.Region == "Pochven",
                     Connections = new List<string>(),
                     JumpableSystems = new List<JumpLink>(),
                     Cost = 1,
@@ -564,6 +583,7 @@
             public double Z;
             public List<string> Connections { get; set; }
             public bool HighSec { get; set; }
+            public bool Pochven { get; set; }
             public List<JumpLink> JumpableSystems { get; set; }
             public string Name { get; set; }
             public System ActualSystem { get; set; }

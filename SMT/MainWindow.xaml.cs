@@ -1160,6 +1160,8 @@ namespace SMT
             {
                 CapitalRoute.WayPoints.Clear();
                 CapitalRoute.CurrentRoute.Clear();
+                lbAlternateMids.ItemsSource = null;
+                lblAlternateMids.Content = "";
             });
         }
 
