@@ -3,6 +3,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using SMTx.ViewModels;
 using SMTx.Views;
+using Dock.Model.Core;
+using SMTx.Models;
 
 namespace SMTx
 {
@@ -15,15 +17,59 @@ namespace SMTx
 
         public override void OnFrameworkInitializationCompleted()
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            var factory = new MainDockFactory(new Eve());
+            var layout = factory.CreateLayout();
+            factory.InitLayout(layout);
+
+            var mainWindowViewModel = new MainWindowViewModel()
             {
-                desktop.MainWindow = new MainWindow
+                Factory = factory,
+                Layout = layout
+            };
+
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            {
+
+                var mainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(),
+                    DataContext = mainWindowViewModel
+                };
+
+                mainWindow.Closing += (_, _) =>
+                {
+                    if (layout is IDock dock)
+                    {
+                        if (dock.Close.CanExecute(null))
+                        {
+                            dock.Close.Execute(null);
+                        }
+                    }
+                };
+
+                desktopLifetime.MainWindow = mainWindow;
+
+                desktopLifetime.Exit += (_, _) =>
+                {
+                    if (layout is IDock dock)
+                    {
+                        if (dock.Close.CanExecute(null))
+                        {
+                            dock.Close.Execute(null);
+                        }
+                    }
                 };
             }
+            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewLifetime)
+            {
+                var mainView = new MainView()
+                {
+                    DataContext = mainWindowViewModel
+                };
 
+                singleViewLifetime.MainView = mainView;
+            }
             base.OnFrameworkInitializationCompleted();
         }
     }
+    
 }

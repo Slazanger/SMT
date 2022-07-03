@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using SMTx.ViewModels;
+using Dock.Model.Core;
 
 namespace SMTx
 {
@@ -22,7 +23,7 @@ namespace SMTx
 
         public bool Match(object data)
         {
-            return data is ViewModelBase;
+            return data is ViewModelBase || data is IDockable;
         }
     }
 }

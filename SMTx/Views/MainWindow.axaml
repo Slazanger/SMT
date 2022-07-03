@@ -3,6 +3,7 @@
         xmlns:vm="using:SMTx.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="SMTx.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
@@ -12,6 +13,6 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	<idc:DockControl Layout="{Binding Layout}"/>
 
 </Window>
