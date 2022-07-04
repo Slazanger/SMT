@@ -117,7 +117,7 @@ namespace SMTx
             {
                 Id = "DocumentsPane",
                 Title = "DocumentsPane",
-                Proportion = double.NaN,
+                Proportion = 0.7,
                 ActiveDockable = document1,
                 VisibleDockables = CreateList<IDockable>
                 (
@@ -142,7 +142,7 @@ namespace SMTx
                    {
                        Id = "LeftPane",
                        Title = "LeftPane",
-                       Proportion = double.NaN,
+                       Proportion = 0.15,
                        Orientation = Orientation.Vertical,
                        ActiveDockable = null,
                        VisibleDockables = CreateList<IDockable>
@@ -196,31 +196,48 @@ namespace SMTx
                    {
                        Id = "RightPane",
                        Title = "RightPane",
-                       Proportion = double.NaN,
+                       Proportion = 0.15,
                        Orientation = Orientation.Vertical,
                        ActiveDockable = null,
                        VisibleDockables = CreateList<IDockable>
                        (
+
                            new ToolDock
                            {
                                Id = "RightPaneTop",
                                Title = "RightPaneTop",
                                Proportion = double.NaN,
-                               ActiveDockable = anomsTool,
+                               ActiveDockable = charactersTool,
+                               AutoHide = true,
                                VisibleDockables = CreateList<IDockable>
                                (
                                    anomsTool,
                                    charactersTool,
+                                   sovCampaignsTool,
+                                   stormsTool
+                               ),
+                               Alignment = Alignment.Right,
+                               GripMode = GripMode.Visible
+                           },
+
+                           new ToolDock
+                           {
+                               Id = "RightPaneBottom",
+                               Title = "RightPaneBottom",
+                               Proportion = double.NaN,
+                               ActiveDockable = theraTool,
+                               AutoHide = true,
+                               VisibleDockables = CreateList<IDockable>
+                               (
                                    jumpGateNetworkTool,
                                    jumpRoutePlannerTool,
                                    routeTool,
-                                   sovCampaignsTool,
-                                   stormsTool,
                                    theraTool
                                ),
                                Alignment = Alignment.Right,
                                GripMode = GripMode.Visible
                            }
+
                        )
                    }
                )
