@@ -29,7 +29,7 @@ namespace SMT.ResourceUsage
                 return
                     new BitmapImage(
                         new Uri(
-                            @"pack://application:,,,/" + assembly.GetName().Name + ";component/" + pathInApplication,
+                            @"pack://application:,,,/SMT;component/" + pathInApplication,
                             UriKind.Absolute));
             }
             catch

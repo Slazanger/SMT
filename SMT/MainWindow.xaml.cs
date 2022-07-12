@@ -140,8 +140,8 @@ namespace SMT
             IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
             idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
 
-            EVEManager.IntelDataList.Add(id);
-            EVEManager.IntelDataList.Add(idtwo);
+            EVEManager.IntelDataList.Enqueue(id);
+            EVEManager.IntelDataList.Enqueue(idtwo);
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -861,7 +861,7 @@ namespace SMT
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                EVEManager.IntelDataList.Clear();
+                EVEManager.IntelDataList.ClearAll();
             }), DispatcherPriority.ApplicationIdle);
         }
 
@@ -869,7 +869,7 @@ namespace SMT
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                EVEManager.GameLogList.Clear();
+                EVEManager.GameLogList.ClearAll();
             }), DispatcherPriority.ApplicationIdle);
         }
 

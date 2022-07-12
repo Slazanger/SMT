@@ -201,12 +201,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Intel List
         /// </summary>
-        public BindingList<EVEData.IntelData> IntelDataList { get; set; }
+        public BindingQueue<EVEData.IntelData> IntelDataList { get; set; }
 
         /// <summary>
         /// Gets or sets the Gamelog List
         /// </summary>
-        public BindingList<EVEData.GameLogData> GameLogList { get; set; }
+        public BindingQueue<EVEData.GameLogData> GameLogList { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of Jump Bridges
@@ -1775,7 +1775,9 @@ namespace SMT.EVEData
         public void SetupIntelWatcher()
         {
             IntelFilters = new List<string>();
-            IntelDataList = new BindingList<IntelData>();
+            IntelDataList = new BindingQueue<IntelData>();
+            IntelDataList.SetSizeLimit(50);
+
             string intelFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelChannels.txt";
 
             if (File.Exists(intelFileFilter))
@@ -1870,7 +1872,8 @@ namespace SMT.EVEData
             gameFileReadPos = new Dictionary<string, int>();
             gamelogFileCharacterMap = new Dictionary<string, string>();
 
-            GameLogList = new BindingList<GameLogData>();
+            GameLogList = new BindingQueue<GameLogData>();
+            GameLogList.SetSizeLimit(50);
 
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
@@ -2513,7 +2516,7 @@ namespace SMT.EVEData
                                         }
                                     }
 
-                                    IntelDataList.Insert(0, id);
+                                    IntelDataList.Enqueue(id);
 
                                     if (IntelAddedEvent != null && !id.ClearNotification)
                                     {
@@ -2639,7 +2642,7 @@ namespace SMT.EVEData
                             Time = DateTime.Now,
                         };
 
-                        GameLogList.Insert(0, gd);
+                        GameLogList.Enqueue(gd);
                     }), DispatcherPriority.Normal, null);
 
                     foreach (LocalCharacter lc in LocalCharacters)
