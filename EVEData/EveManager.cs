@@ -2607,6 +2607,7 @@ namespace SMT.EVEData
                     if (line == "" || !line.StartsWith("["))
                     {
                         line = file.ReadLine();
+                        fileReadFrom++;
                         continue;
                     }
 
