@@ -180,9 +180,6 @@
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit">
       <Version>5.0.103</Version>
     </PackageReference>
-    <PackageReference Include="ESI.NET">
-      <Version>2021.12.12</Version>
-    </PackageReference>
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.43</Version>
     </PackageReference>
@@ -195,8 +192,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\..\ESI.net\ESI.NET\ESI.NET.csproj" />
     <ProjectReference Include="..\EVEData\EVEData.csproj" />
   </ItemGroup>
 </Project>
