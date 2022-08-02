@@ -1958,7 +1958,7 @@ namespace SMT.EVEData
                         }
 
                         // gamelogs
-                        if (folder.Contains("GameLogs"))
+                        if (folder.Contains("Gamelogs"))
                         {
                             readFile = true;
                         }
@@ -1968,13 +1968,11 @@ namespace SMT.EVEData
                         {
                             FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                             ifs.Seek(0, SeekOrigin.End);
-                            Thread.Sleep(100);
                             ifs.Close();
-                            Thread.Sleep(100);
                         }
                     }
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1500);
                 }
             }
         }
@@ -2304,7 +2302,11 @@ namespace SMT.EVEData
         private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             string changedFile = e.FullPath;
-            string channelName = e.Name.Substring(0, e.Name.IndexOf("_"));
+            
+            string[] channelParts = e.Name.Split("_");
+            string channelName = string.Join("_", channelParts, 0, channelParts.Length - 3);
+            
+
 
             bool processFile = false;
             bool localChat = false;
