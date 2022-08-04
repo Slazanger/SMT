@@ -17,6 +17,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using SMT.EVEData;
 
 namespace SMT
@@ -26,7 +27,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_112";
+        public const string SMT_VERSION = "SMT_113";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -1946,7 +1947,167 @@ namespace SMT
                 CapitalRoute.Recalculate();
             }
         }
-        
+
+        private void btnUnseenFits_Click(object sender, RoutedEventArgs e)
+        {
+            string KillURL = "https://zkillboard.com/character/93280351/losses/";
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
+
+        }
+
+        struct LocalScanCharacterInfo
+        {
+            public long ID;
+            public long AllianceID;
+            public long CorpID;
+            public string dangerRating;
+            public string Name;
+
+
+            public override string ToString() => Name + " (" + dangerRating + ")";
+        }
+
+        private async void localScanInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // look up every character
+            string[] characterNameArray = localScanInput.Text.Split("\n", StringSplitOptions.RemoveEmptyEntries); ;
+           //list<string> results = new List<string>();
+
+            int count = -1;
+            bool done = false;
+            int textCount = 0;
+
+            List<string> currentBatch = new List<string>();
+            List<ESI.NET.Models.Universe.ResolvedInfo> parseResults = new List<ESI.NET.Models.Universe.ResolvedInfo>();
+
+            while (!done)
+            {
+                if(count+1 < characterNameArray.Length)
+                {
+                    if(textCount + characterNameArray[count+1].Length < 100)
+                    {
+                        textCount += characterNameArray[count + 1].Length;
+                        currentBatch.Add(characterNameArray[count + 1]);
+                        count++;
+                    }
+                    else
+                    {
+                        if(currentBatch.Count == 0)
+                        {
+                            // error
+                            return;
+                        }
+                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.IDLookup> esra = await EVEManager.ESIClient.Universe.IDs(currentBatch);
+                        foreach (ESI.NET.Models.Universe.ResolvedInfo i in esra.Data.Characters)
+                        {
+                            parseResults.Add(i);
+                        }
+                        currentBatch.Clear();
+                        textCount = 0;
+                    }
+                }
+                else
+                {
+                    if(currentBatch.Count > 0)
+                    {
+                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.IDLookup> esra = await EVEManager.ESIClient.Universe.IDs(currentBatch);
+                        foreach (ESI.NET.Models.Universe.ResolvedInfo i in esra.Data.Characters)
+                        {
+                            parseResults.Add(i);
+                        }
+                    }
+                    done = true;
+                }
+            
+            }
+
+
+            foreach (ESI.NET.Models.Universe.ResolvedInfo i in parseResults)
+            {
+                LocalScanCharacterInfo lcsi = new LocalScanCharacterInfo();
+                lcsi.Name = i.Name;
+                lcsi.ID = i.Id;
+                lcsi.AllianceID = 0;
+
+                // now get the public character info
+                ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esra = await EVEManager.ESIClient.Character.Information(i.Id);
+
+                if(esra.Data != null)
+                {
+                    lcsi.AllianceID = esra.Data.AllianceId;
+                }
+
+                string url = @"https://zkillboard.com/api/stats/characterID/" + i.Id.ToString() + "/";
+                string strContent = string.Empty;
+                string dangerRating = "???";
+                try
+                {
+                    HttpClient hc = new HttpClient();
+                    hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", SMT_VERSION));
+                    var response = await hc.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    strContent = await response.Content.ReadAsStringAsync();
+                }
+                catch
+                {
+                    ;
+                }
+
+                if(!string.IsNullOrEmpty(strContent))
+                {
+                    try
+                    {
+                        JObject zkillInfo = JObject.Parse(strContent);
+                        if(zkillInfo != null)
+                        {
+                            if(zkillInfo["dangerRatio"] != null)
+                            {
+                                dangerRating = zkillInfo["dangerRatio"].ToString();
+                            }
+                        }
+                        
+                    }
+                    catch 
+                    {
+                        
+                    }
+                    
+                }
+                lcsi.dangerRating = dangerRating;
+                if(ActiveCharacter != null && ActiveCharacter.ESILinked)
+                {
+                    if(ActiveCharacter.Standings.ContainsKey(lcsi.AllianceID))
+                    {
+                        if (ActiveCharacter.Standings[lcsi.AllianceID] <= 0)
+                        {
+                            localScanResults.Items.Add(lcsi);
+                        }
+                    }
+                }
+                else
+                {
+                    localScanResults.Items.Add(lcsi);
+                }
+
+            }
+
+        }
+
+        private void btnClearLocal_Click(object sender, RoutedEventArgs e)
+        {
+            localScanResults.Items.Clear();
+            localScanInput.Text = "";
+        }
+
+        private void localScanResults_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (localScanResults.SelectedItem is LocalScanCharacterInfo lcsi)
+            {
+                string KillURL = "https://zkillboard.com/character/" + lcsi.ID + "/";
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
+
+            }
+        }
     }
 
     /// <summary>

@@ -111,6 +111,29 @@
                     <xcadl:LayoutAnchorSide>
                         <xcadl:LayoutAnchorGroup>
 
+                            <xcadl:LayoutAnchorable Title="Local" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="LocalContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" >
+                                <Grid  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50" />
+                                        <RowDefinition Height="10*" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30*" />
+                                        <RowDefinition Height="26" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0">
+                                        <Button x:Name="btnUnseenFits" Content="Browse Unseen's fits" Click="btnUnseenFits_Click"/>
+                                        <Button x:Name="btnClearLocal" Content="Clear" Click="btnClearLocal_Click"/>
+                                    </StackPanel>
+
+                                    <TextBox x:Name="localScanInput" Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" TextChanged="localScanInput_TextChanged" />
+                                    <Label Content="Results" Grid.Row="2"/>
+                                    <ListBox x:Name="localScanResults" Grid.Row="3" MouseDoubleClick="localScanResults_MouseDoubleClick"/>
+
+
+                                </Grid>
+                            </xcadl:LayoutAnchorable>
+
+
                             <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" x:Name="avlpAnoms">
                                 <Grid x:Name="MainAnomGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Grid.RowDefinitions>
