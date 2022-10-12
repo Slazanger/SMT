@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -39,6 +40,10 @@ namespace SMT
 
         private List<InfoItem> InfoLayer;
 
+        private Dictionary<string, long> CharacterNameIDCache;
+        private Dictionary<long, string> CharacterIDNameCache;
+
+
         public JumpRoute CapitalRoute { get; set; }
 
         /// <summary>
@@ -52,6 +57,9 @@ namespace SMT
             mediaPlayer = new MediaPlayer();
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
             mediaPlayer.Open(woopUri);
+
+            CharacterNameIDCache = new Dictionary<string, long>();
+            CharacterIDNameCache = new Dictionary<long, string>();
 
             InitializeComponent();
 
@@ -1867,7 +1875,7 @@ namespace SMT
 
         private void CurrentCapitalRouteItem_Selected(object sender, RoutedEventArgs e)
         {
-            if(dgCapitalRouteCurrentRoute.SelectedItem != null)
+            if (dgCapitalRouteCurrentRoute.SelectedItem != null)
             {
                 Navigation.RoutePoint rp = dgCapitalRouteCurrentRoute.SelectedItem as Navigation.RoutePoint;
                 string sel = rp.SystemName;
@@ -1875,7 +1883,7 @@ namespace SMT
                 UniverseUC.ShowSystem(sel);
 
                 lblAlternateMids.Content = sel;
-                if(CapitalRoute.AlternateMids.ContainsKey(sel))
+                if (CapitalRoute.AlternateMids.ContainsKey(sel))
                 {
                     lbAlternateMids.ItemsSource = CapitalRoute.AlternateMids[sel];
                 }
@@ -1883,29 +1891,29 @@ namespace SMT
                 {
                     lbAlternateMids.ItemsSource = null;
                 }
-                
+
             }
 
         }
 
         private void CapitalWaypointsContextMenuMoveUp_Click(object sender, RoutedEventArgs e)
         {
-            if(capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != 0)
+            if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != 0)
             {
                 CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex - 1);
                 CapitalRoute.Recalculate();
             }
-            
+
         }
 
         private void CapitalWaypointsContextMenuMoveDown_Click(object sender, RoutedEventArgs e)
         {
-            if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != CapitalRoute.WayPoints.Count -1 )
+            if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != CapitalRoute.WayPoints.Count - 1)
             {
                 CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex + 1);
                 CapitalRoute.Recalculate();
             }
-            
+
         }
 
         private void CapitalWaypointsContextMenuDelete_Click(object sender, RoutedEventArgs e)
@@ -1925,13 +1933,13 @@ namespace SMT
 
                 // need to find where to insert the new waypoint
                 int waypointIndex = -1;
-                foreach(Navigation.RoutePoint rp in CapitalRoute.CurrentRoute)
+                foreach (Navigation.RoutePoint rp in CapitalRoute.CurrentRoute)
                 {
-                    if(rp.SystemName == CapitalRoute.WayPoints[waypointIndex +1])
+                    if (rp.SystemName == CapitalRoute.WayPoints[waypointIndex + 1])
                     {
                         waypointIndex++;
                     }
-                    if(CapitalRoute.AlternateMids.ContainsKey(rp.SystemName))
+                    if (CapitalRoute.AlternateMids.ContainsKey(rp.SystemName))
                     {
                         foreach (string alt in CapitalRoute.AlternateMids[rp.SystemName])
                         {
@@ -1971,112 +1979,172 @@ namespace SMT
         {
             // look up every character
             string[] characterNameArray = localScanInput.Text.Split("\n", StringSplitOptions.RemoveEmptyEntries); ;
-           //list<string> results = new List<string>();
 
-            int count = -1;
-            bool done = false;
-            int textCount = 0;
-
-            List<string> currentBatch = new List<string>();
             List<ESI.NET.Models.Universe.ResolvedInfo> parseResults = new List<ESI.NET.Models.Universe.ResolvedInfo>();
 
-            while (!done)
+            //list<string> results = new List<string>();
+            await Task.Run(async () =>
             {
-                if(count+1 < characterNameArray.Length)
                 {
-                    if(textCount + characterNameArray[count+1].Length < 100)
+                    int count = -1;
+                    bool done = false;
+                    int textCount = 0;
+
+                    List<string> currentBatch = new List<string>();
+
+                    List<Task<ESI.NET.EsiResponse<ESI.NET.Models.Universe.IDLookup>>> OpenRequests = new List<Task<ESI.NET.EsiResponse<ESI.NET.Models.Universe.IDLookup>>>();
+
+
+                    while (!done)
                     {
-                        textCount += characterNameArray[count + 1].Length;
-                        currentBatch.Add(characterNameArray[count + 1]);
-                        count++;
+//                        if(CharacterNameIDCache.ContainsKey(characterNameArray[count + 1]))
+//                        {
+//                            count++;
+//                            continue;
+//                        }
+
+                        if (count + 1 < characterNameArray.Length)
+                        {
+                            if (textCount + characterNameArray[count + 1].Length < 100)
+                            {
+                                textCount += characterNameArray[count + 1].Length;
+                                currentBatch.Add(characterNameArray[count + 1]);
+                                count++;
+                            }
+                            else
+                            {
+                                if (currentBatch.Count == 0)
+                                {
+                                    // error
+                                    return;
+                                }
+
+                                OpenRequests.Add(EVEManager.ESIClient.Universe.IDs(currentBatch));
+                                currentBatch.Clear();
+                                textCount = 0;
+                            }
+                        }
+                        else
+                        {
+                            if (currentBatch.Count > 0)
+                            {
+                                OpenRequests.Add(EVEManager.ESIClient.Universe.IDs(currentBatch));
+                            }
+                            done = true;
+                        }
+
                     }
-                    else
+
+                    Task.WaitAll(OpenRequests.ToArray());
+
+                    foreach (Task<ESI.NET.EsiResponse<ESI.NET.Models.Universe.IDLookup>> t in OpenRequests)
                     {
-                        if(currentBatch.Count == 0)
+                        if (t.Result.Data != null)
                         {
-                            // error
-                            return;
+                            if (t.Result.Data.Characters != null)
+                            {
+                                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in t.Result.Data.Characters)
+                                {
+                                    CharacterIDNameCache[ri.Id] = ri.Name;
+                                    CharacterNameIDCache[ri.Name] = ri.Id;
+                                    parseResults.Add(ri);
+                                }
+                            }
                         }
-                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.IDLookup> esra = await EVEManager.ESIClient.Universe.IDs(currentBatch);
-                        foreach (ESI.NET.Models.Universe.ResolvedInfo i in esra.Data.Characters)
-                        {
-                            parseResults.Add(i);
-                        }
-                        currentBatch.Clear();
-                        textCount = 0;
                     }
+
+
+
+
                 }
-                else
-                {
-                    if(currentBatch.Count > 0)
-                    {
-                        ESI.NET.EsiResponse<ESI.NET.Models.Universe.IDLookup> esra = await EVEManager.ESIClient.Universe.IDs(currentBatch);
-                        foreach (ESI.NET.Models.Universe.ResolvedInfo i in esra.Data.Characters)
-                        {
-                            parseResults.Add(i);
-                        }
-                    }
-                    done = true;
-                }
-            
             }
+            );
 
 
-            foreach (ESI.NET.Models.Universe.ResolvedInfo i in parseResults)
+            // now get the esi info for every characcter
+
+            List<Task<ESI.NET.EsiResponse<ESI.NET.Models.Character.Information>>> charRequests = new List<Task<ESI.NET.EsiResponse<ESI.NET.Models.Character.Information>>>();
+            List<Task<string>> zkillRequests = new List<Task<string>>();
+
+            List<KeyValuePair<Task<string>, Task<ESI.NET.EsiResponse<ESI.NET.Models.Character.Information>>>> requestPairs = new List<KeyValuePair<Task<string>, Task<ESI.NET.EsiResponse<ESI.NET.Models.Character.Information>>>>();
+
+            await Task.Run(async () =>
+            {
+                foreach (ESI.NET.Models.Universe.ResolvedInfo i in parseResults)
+                {
+                    Task<string> zkr = null;
+                    Task<ESI.NET.EsiResponse<ESI.NET.Models.Character.Information>> esr;
+
+
+                    // now get the public character info
+                    esr = EVEManager.ESIClient.Character.Information(i.Id);
+                    charRequests.Add(esr);
+
+                    string url = @"https://zkillboard.com/api/stats/characterID/" + i.Id.ToString() + "/";
+                    try
+                    {
+                        HttpClient hc = new HttpClient();
+                        hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", SMT_VERSION));
+                        var response = await hc.GetAsync(url);
+                        response.EnsureSuccessStatusCode();
+                        zkr = response.Content.ReadAsStringAsync();
+                        zkillRequests.Add(zkr);
+
+                        Thread.Sleep(50);
+                    }
+                    catch
+                    {
+
+                    }
+                    requestPairs.Add(new KeyValuePair<Task<string>, Task<ESI.NET.EsiResponse<ESI.NET.Models.Character.Information>>>(zkr, esr));
+                }
+
+
+            }
+            );
+
+            Task.WaitAll(charRequests.ToArray());
+            Task.WaitAll(zkillRequests.ToArray());
+
+            foreach(KeyValuePair<Task<string>, Task<ESI.NET.EsiResponse<ESI.NET.Models.Character.Information>>> kvp in requestPairs)
             {
                 LocalScanCharacterInfo lcsi = new LocalScanCharacterInfo();
-                lcsi.Name = i.Name;
-                lcsi.ID = i.Id;
+                if(kvp.Value.Result == null || kvp.Value.Result.Data == null)
+                {
+                    continue;
+                }
+
+                lcsi.Name = kvp.Value.Result.Data.Name;
+                lcsi.ID = CharacterNameIDCache[kvp.Value.Result.Data.Name];
                 lcsi.AllianceID = 0;
 
-                // now get the public character info
-                ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esra = await EVEManager.ESIClient.Character.Information(i.Id);
-
-                if(esra.Data != null)
-                {
-                    lcsi.AllianceID = esra.Data.AllianceId;
-                }
-
-                string url = @"https://zkillboard.com/api/stats/characterID/" + i.Id.ToString() + "/";
-                string strContent = string.Empty;
+                string strContent = kvp.Key.Result;
                 string dangerRating = "???";
-                try
-                {
-                    HttpClient hc = new HttpClient();
-                    hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", SMT_VERSION));
-                    var response = await hc.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
-                    strContent = await response.Content.ReadAsStringAsync();
-                }
-                catch
-                {
-                    ;
-                }
 
-                if(!string.IsNullOrEmpty(strContent))
+                if (!string.IsNullOrEmpty(strContent))
                 {
                     try
                     {
                         JObject zkillInfo = JObject.Parse(strContent);
-                        if(zkillInfo != null)
+                        if (zkillInfo != null)
                         {
-                            if(zkillInfo["dangerRatio"] != null)
+                            if (zkillInfo["dangerRatio"] != null)
                             {
                                 dangerRating = zkillInfo["dangerRatio"].ToString();
                             }
                         }
-                        
                     }
-                    catch 
+                    catch
                     {
-                        
+
                     }
-                    
+
                 }
                 lcsi.dangerRating = dangerRating;
-                if(ActiveCharacter != null && ActiveCharacter.ESILinked)
+
+                if (ActiveCharacter != null && ActiveCharacter.ESILinked)
                 {
-                    if(ActiveCharacter.Standings.ContainsKey(lcsi.AllianceID))
+                    if (ActiveCharacter.Standings.ContainsKey(lcsi.AllianceID) && lcsi.AllianceID != ActiveCharacter.AllianceID)
                     {
                         if (ActiveCharacter.Standings[lcsi.AllianceID] <= 0)
                         {
@@ -2090,8 +2158,10 @@ namespace SMT
                 }
 
             }
-
         }
+
+
+
 
         private void btnClearLocal_Click(object sender, RoutedEventArgs e)
         {
