@@ -1978,7 +1978,7 @@ namespace SMT
         private async void localScanInput_TextChanged(object sender, TextChangedEventArgs e)
         {
             // look up every character
-            string[] characterNameArray = localScanInput.Text.Split("\n", StringSplitOptions.RemoveEmptyEntries); ;
+/*            string[] characterNameArray = localScanInput.Text.Split("\n", StringSplitOptions.RemoveEmptyEntries); ;
 
             List<ESI.NET.Models.Universe.ResolvedInfo> parseResults = new List<ESI.NET.Models.Universe.ResolvedInfo>();
 
@@ -2158,6 +2158,8 @@ namespace SMT
                 }
 
             }
+
+            */
         }
 
 
@@ -2165,18 +2167,20 @@ namespace SMT
 
         private void btnClearLocal_Click(object sender, RoutedEventArgs e)
         {
-            localScanResults.Items.Clear();
+/*            localScanResults.Items.Clear();
             localScanInput.Text = "";
+*/
         }
 
         private void localScanResults_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (localScanResults.SelectedItem is LocalScanCharacterInfo lcsi)
+/*            if (localScanResults.SelectedItem is LocalScanCharacterInfo lcsi)
             {
                 string KillURL = "https://zkillboard.com/character/" + lcsi.ID + "/";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
 
             }
+*/
         }
     }
 

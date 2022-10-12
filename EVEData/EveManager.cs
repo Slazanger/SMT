@@ -99,6 +99,8 @@ namespace SMT.EVEData
             NameToSystem = new Dictionary<string, System>();
 
             ServerInfo = new EVEData.Server();
+            Coalitions = new List<Coalition>();
+
         }
 
         /// <summary>

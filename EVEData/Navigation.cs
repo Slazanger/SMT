@@ -90,7 +90,7 @@
                     shouldAdd = false;
                 }
 
-                if(sys.Pochven &! includePochvenSystems)
+                if(sys.Pochven & !includePochvenSystems)
                 {
                     shouldAdd = false;
                 }

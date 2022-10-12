@@ -13,7 +13,7 @@
 
         x:Class="SMT.MainWindow"
         mc:Ignorable="d"
-        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip">
+        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip" TextOptions.TextFormattingMode="Display" RenderOptions.ClearTypeHint="Enabled">
 
     <Window.Resources>
 
@@ -111,7 +111,7 @@
                     <xcadl:LayoutAnchorSide>
                         <xcadl:LayoutAnchorGroup>
 
-                            <xcadl:LayoutAnchorable Title="Local" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="LocalContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" >
+                          <!--  <xcadl:LayoutAnchorable Title="Local" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="LocalContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" >
                                 <Grid  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="50" />
@@ -131,8 +131,8 @@
 
 
                                 </Grid>
-                            </xcadl:LayoutAnchorable>
-
+                            </xcadl:LayoutAnchorable> 
+                            -->
 
                             <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" x:Name="avlpAnoms">
                                 <Grid x:Name="MainAnomGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

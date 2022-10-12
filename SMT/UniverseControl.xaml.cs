@@ -498,7 +498,7 @@ namespace SMT
                     double Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
                     Distance = Distance / 9460730472580800.0;
 
-                    if (Distance < kvp.Value && Distance > 0.0 && es.TrueSec <= 0.45)
+                    if (Distance < kvp.Value && Distance > 0.0 && es.TrueSec <= 0.45 && es.Region != "Pochven")
                     {
                         if (inRange == true)
                         {
@@ -696,12 +696,18 @@ namespace SMT
         }
 
         private Brush SystemColourBrush;
+        private Brush SystemColourHiSecBrush;
+        private Brush SystemColourLowSecBrush;
+        private Brush SystemColourNullSecBrush;
+        private Brush SystemColourOutlineBrush;
+
         private Brush ConstellationColourBrush;
         private Brush SystemTextColourBrush;
         private Brush RegionTextColourBrush;
         private Brush RegionTextZoomedOutColourBrush;
         private Brush GateColourBrush;
         private Brush RegionGateColourBrush;
+        private Brush PochvenGateColourBrush;
         private Brush JumpBridgeColourBrush;
         private Brush DataColourBrush;
         private Brush BackgroundColourBrush;
@@ -723,6 +729,11 @@ namespace SMT
             if (FullRedraw)
             {
                 SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemColour);
+                SystemColourHiSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(1.0, false));
+                SystemColourLowSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(0.4, false));
+                SystemColourNullSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(-0.5, true));
+                SystemColourOutlineBrush = new SolidColorBrush(Colors.Black);
+
                 ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseConstellationGateColour);
                 SystemTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemTextColour);
                 RegionTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
@@ -732,6 +743,7 @@ namespace SMT
                 DataColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
                 BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseMapBackgroundColour);
                 RegionGateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseRegionGateColour);
+                PochvenGateColourBrush = new SolidColorBrush(Colors.DimGray);
 
                 Color RegionShapeFillCol = MapConf.ActiveColourScheme.UniverseMapBackgroundColour;
                 RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.9);
@@ -741,7 +753,13 @@ namespace SMT
                 RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
 
                 SystemColourBrush.Freeze();
+                SystemColourHiSecBrush.Freeze();
+                SystemColourLowSecBrush.Freeze();
+                SystemColourNullSecBrush.Freeze();
+                SystemColourOutlineBrush.Freeze();
+
                 ConstellationColourBrush.Freeze();
+                
                 SystemTextColourBrush.Freeze();
                 RegionTextColourBrush.Freeze();
                 GateColourBrush.Freeze();
@@ -780,6 +798,8 @@ namespace SMT
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
                 Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
+                Pen SysOutlinePen = new Pen(SystemColourOutlineBrush, 0.3);
+                Pen PochvenGatePen = new Pen(PochvenGateColourBrush, 0.3);
 
                 System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
@@ -801,6 +821,11 @@ namespace SMT
                     if (gh.from.Region != gh.to.Region)
                     {
                         p = RegionGatePen;
+                    }
+
+                    if(gh.from.Region == "Pochven")
+                    {
+                        p = PochvenGatePen;
                     }
 
                     gatesDrawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
@@ -856,7 +881,19 @@ namespace SMT
 
                     // Create a rectangle and draw it in the DrawingContext.
                     Rect rect = new Rect(X - 2, Z - 2, 4, 4);
-                    drawingContext.DrawRectangle(SystemColourBrush, null, rect);
+
+
+                    Brush sysbrush = SystemColourNullSecBrush;
+                    if (sys.TrueSec >= 0.45)
+                    {
+                        sysbrush = SystemColourHiSecBrush;
+                    }
+                    else if (sys.TrueSec > 0.0)
+                    {
+                        sysbrush = SystemColourLowSecBrush;
+                    }
+
+                    drawingContext.DrawRectangle(sysbrush, SysOutlinePen, rect);
 
                     // Persist the drawing content.
                     drawingContext.Close();

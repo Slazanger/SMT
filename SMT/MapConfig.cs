@@ -862,7 +862,7 @@ namespace SMT
                 FleetMemberTextColour = Colors.White,
 
                 JumpRangeInColour = Color.FromRgb(255, 165, 0),
-                JumpRangeInColourHighlight = Color.FromArgb(20, 82, 135, 155),
+                JumpRangeInColourHighlight = Color.FromArgb(20, 82, 135, 125),
                 JumpRangeOverlapHighlight = Colors.DarkBlue,
 
                 ActiveIncursionColour = Color.FromRgb(110, 82, 77),

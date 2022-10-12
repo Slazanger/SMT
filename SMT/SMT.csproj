@@ -42,7 +42,7 @@
   <PropertyGroup>
     <SignManifests>false</SignManifests>
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
-    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <PlatformTarget>x64</PlatformTarget>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
