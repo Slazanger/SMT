@@ -2220,7 +2220,9 @@ namespace SMT.EVEData
             ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
 
             InitZKillFeed();
-            UpdateCoalitionInfo();
+
+            // Removed as the api site is down
+            //UpdateCoalitionInfo();
 
             StartBackgroundThread();
         }
