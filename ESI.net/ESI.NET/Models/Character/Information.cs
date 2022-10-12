@@ -5,6 +5,8 @@ namespace ESI.NET.Models.Character
 {
     public class Information
     {
+        public long CharacterId { get; set; }
+
         [JsonProperty("alliance_id")]
         public long AllianceId { get; set; }
 
