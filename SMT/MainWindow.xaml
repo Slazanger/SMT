@@ -235,11 +235,11 @@
                                         <RowDefinition Height="25" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2">
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2" IsEnabled="false">
                                         <Label Content="Gate SearchFilter : " />
                                         <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
                                     </StackPanel>
-                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" Grid.Row="1" />
+                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" Grid.Row="1" IsEnabled="false" />
                                     <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2" />
                                     <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3" />
                                     <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" Grid.Row="4" />
