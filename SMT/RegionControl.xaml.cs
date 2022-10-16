@@ -1046,6 +1046,7 @@ namespace SMT
                 SolidColorBrush fleetMemberText = new SolidColorBrush(MapConf.ActiveColourScheme.FleetMemberTextColour);
                 SolidColorBrush localCharacterText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
                 SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
+                SolidColorBrush characterTextOutline = new SolidColorBrush(Colors.Black);
 
                 foreach (KeyValuePair<int, string> kvp in lkvp)
                 {
@@ -1056,28 +1057,33 @@ namespace SMT
 
                     if (kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 3 || kvp.Key == 2 && addIndividualFleetMembers)
                     {
-                        Label charText = new Label();
-                        charText.Content = kvp.Value;
+
+                        OutlinedTextBlock charText = new OutlinedTextBlock();
+                        charText.Text = kvp.Value;
                         charText.IsHitTestVisible = false;
+                        charText.Stroke = characterTextOutline;
+                        charText.Fill = localCharacterText;
+                        charText.StrokeThickness = 2;
 
                         switch (kvp.Key)
                         {
                             case 0:
-                                charText.Foreground = localCharacterText;
+                                charText.Fill = localCharacterText;
+
                                 break;
 
                             case 1:
-                                charText.Foreground = localCharacterOfflineText;
-                                charText.Content += "(Offline)";
+                                charText.Fill = localCharacterOfflineText;
+                                charText.Text += "(Offline)";
                                 break;
 
                             case 2:
-                                charText.Foreground = fleetMemberText;
+                                charText.Fill = fleetMemberText;
                                 break;
 
                             case 3:
-                                charText.Foreground = localCharacterText;
-                                charText.Content = "⚠ " + kvp.Value + " ⚠";
+                                charText.Fill = localCharacterText;
+                                charText.Text = "⚠ " + kvp.Value + " ⚠";
                                 break;
                         }
 
@@ -1088,7 +1094,7 @@ namespace SMT
 
                         Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
                         Canvas.SetTop(charText, ms.LayoutY + textYOffset);
-                        Canvas.SetZIndex(charText, 20);
+                        Canvas.SetZIndex(charText, 40);
                         MainCanvas.Children.Add(charText);
                         DynamicMapElements.Add(charText);
 
@@ -1110,7 +1116,7 @@ namespace SMT
 
                     Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
                     Canvas.SetTop(charText, ms.LayoutY + textYOffset);
-                    Canvas.SetZIndex(charText, 20);
+                    Canvas.SetZIndex(charText, 40);
                     MainCanvas.Children.Add(charText);
                     DynamicMapElements.Add(charText);
 
