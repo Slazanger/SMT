@@ -598,6 +598,32 @@ namespace SMT.EVEData
 
             }
 
+
+
+            // now open up the ice systems
+            string iceSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\iceSystems.csv";
+            if (File.Exists(iceSystemsFile))
+            {
+                StreamReader file = new StreamReader(iceSystemsFile);
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    System s = GetEveSystem(line);
+                    if(s != null)
+                    {
+                        s.HasIceBelt = true;
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Data Creation Error");
+
+            }
+
+
             foreach (System s in Systems)
             {
                 NameToSystem[s.Name] = s;
