@@ -366,6 +366,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Venal", "10000015", "Guristas", 1140, 210));
             Regions.Add(new MapRegion("Verge Vendor", "10000068", "Gallente", 490, 660));
             Regions.Add(new MapRegion("Wicked Creek", "10000006", string.Empty, 1580, 1230));
+            Regions.Add(new MapRegion("Pochven", "10000008", "Triglavian", 50, 50));
 
             SystemIDToName = new SerializableDictionary<long, string>();
 
@@ -374,7 +375,7 @@ namespace SMT.EVEData
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
-                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\data\SourceMaps\dotlan\" + rd.DotLanRef + ".svg";
+                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\data\SourceMaps\raw\" + rd.DotLanRef + "_layout.svg";
 
                 if (!File.Exists(localSVG))
                 {
@@ -391,85 +392,38 @@ namespace SMT.EVEData
                 xmldoc.Load(fs);
 
                 // get the svg/g/g sys use child nodes
-                string systemsXpath = @"//*[@id='sysuse']";
-                XmlNodeList xn = xmldoc.SelectNodes(systemsXpath);
+                string systemsXpath = @"//*[@Type='system']";
+                XmlNodeList xnl = xmldoc.SelectNodes(systemsXpath);
 
-                XmlNode sysUseNode = xn[0];
-                foreach (XmlNode system in sysUseNode.ChildNodes)
+                foreach(XmlNode xn in xnl)
                 {
-                    // extact the base from info from the g
-                    long systemID = long.Parse(system.Attributes["id"].Value.Substring(3));
-                    float x = float.Parse(system.Attributes["x"].Value) + (float.Parse(system.Attributes["width"].Value) / 2.0f);
-                    float y = float.Parse(system.Attributes["y"].Value) + (float.Parse(system.Attributes["height"].Value) / 2.0f);
-
-                    float RoundVal = 5.0f;
-                    x = (float)Math.Round(x / RoundVal, 0) * RoundVal;
-                    y = (float)Math.Round(y / RoundVal, 0) * RoundVal;
-
-                    string systemnodepath = @"//*[@id='def" + systemID + "']";
-                    XmlNodeList snl = xmldoc.SelectNodes(systemnodepath);
-                    XmlNode sysdefNode = snl[0];
-
-                    XmlNode aNode = sysdefNode.ChildNodes[0];
-
-                    string name;
+                    long systemID = long.Parse(xn.Attributes["ID"].Value);
+                    float x = float.Parse(xn.Attributes["x"].Value);
+                    float y = float.Parse(xn.Attributes["y"].Value);
+                    string name = xn.Attributes["Name"].Value;
+                    string region = xn.Attributes["Region"].Value;
                     bool hasStation = false;
                     bool hasIceBelt = false;
-                    XmlNodeList iceNodes = aNode.SelectNodes(@".//*[@class='i']");
-                    if (iceNodes[0] != null)
-                    {
-                        hasIceBelt = true;
-                    }
 
-                    // SS Nodes for system nodes
-                    XmlNodeList ssNodes = aNode.SelectNodes(@".//*[@class='ss']");
-                    if (ssNodes[0] != null)
+                    // create and add the system
+                    if(region == rd.Name)
                     {
-                        name = ssNodes[0].InnerText;
-
-                        // create and add the system
                         System s = new System(name, systemID, rd.Name, hasStation, hasIceBelt);
                         Systems.Add(s);
-
                         NameToSystem[name] = s;
-
-                        // create and add the map version
-                        rd.MapSystems[name] = new MapSystem
-                        {
-                            Name = name,
-                            LayoutX = x,
-                            LayoutY = y,
-                            Region = rd.Name,
-                            OutOfRegion = false,
-                        };
-
-                        SystemIDToName[systemID] = name;
                     }
-                    else
+
+
+                    // create and add the map version
+                    rd.MapSystems[name] = new MapSystem
                     {
-                        // er / es nodes are region and constellation links
-                        XmlNodeList esNodes = aNode.SelectNodes(@".//*[@class='es']");
-                        XmlNodeList erNodes = aNode.SelectNodes(@".//*[@class='er']");
-
-                        if (esNodes[0] != null && erNodes[0] != null)
-                        {
-                            name = esNodes[0].InnerText;
-                            string regionLinkName = erNodes[0].InnerText;
-
-                            SystemIDToName[systemID] = name;
-
-                            rd.MapSystems[name] = new MapSystem
-                            {
-                                Name = name,
-                                LayoutX = x,
-                                LayoutY = y,
-                                Region = regionLinkName,
-                                OutOfRegion = true,
-                            };
-                        }
-                    }
+                        Name = name,
+                        LayoutX = x,
+                        LayoutY = y,
+                        Region = rd.Name,
+                        OutOfRegion = rd.Name != region,
+                    };
                 }
-                // extract Ice Systems
             }
 
             // now open up the eve static data export and extract some info from it
@@ -571,8 +525,15 @@ namespace SMT.EVEData
 
                     if (from != null && to != null)
                     {
-                        from.Jumps.Add(to.Name);
-                        to.Jumps.Add(from.Name);
+                        if(!from.Jumps.Contains(to.Name))
+                        {
+                            from.Jumps.Add(to.Name);
+                        }
+                        if (!to.Jumps.Contains(from.Name))
+                        {
+                            to.Jumps.Add(from.Name);
+                        }
+                            
                     }
                 }
             }
@@ -645,188 +606,7 @@ namespace SMT.EVEData
                 s.TrigInvasionStatus = System.EdenComTrigStatus.None;
             }
 
-            // 13 Oct 2020 :  Temp rebuild of maps for Trig Invasions
-
-            // Krai Perun
-            // 20000787    30000157    Otela
-            // 20000787    30000192    Otanuomi
-            // 20000787    30001372    Kino
-            // 20000787    30001445    Nalvula
-            // 20000787    30002079    Krirald
-            // 20000787    30002737    Konola
-            // 20000787    30005005    Ignebaener
-            // 20000787    30010141    Sakenta
-            // 20000787    30031392    Komo
-
-            // Krai Svarog
-            // 20000788    30000021    Kuharah
-            // 20000788    30001413    Nani
-            // 20000788    30002225    Harva
-            // 20000788    30002411    Skarkon
-            // 20000788    30002770    Tunudan
-            // 20000788    30003495    Raravoss
-            // 20000788    30003504    Niarja
-            // 20000788    30040141    Urhinichi
-            // 20000788    30045328    Ahtila
-
-            // Krai Veles
-            // 20000789    30000206    Wirashoda
-            // 20000789    30001381    Arvasaras
-            // 20000789    30002652    Ala
-            // 20000789    30002702    Archee
-            // 20000789    30002797    Kaunokka
-            // 20000789    30003046    Angymonne
-            // 20000789    30005029    Vale
-            // 20000789    30020141    Senda
-            // 20000789    30045329    Ichoriya
-
-            EVEData.MapRegion blackRise = GetRegion("Black Rise");
-            blackRise.MapSystems.Remove("Ahtila");  // Pochven
-            blackRise.MapSystems.Remove("Ichoriya"); // Pochven
-
-            EVEData.MapRegion theBleakLands = GetRegion("The Bleak Lands");
-            theBleakLands.MapSystems.Remove("Raravoss"); // out of region link
-
-            EVEData.MapRegion theCitadel = GetRegion("The Citadel");
-            theCitadel.MapSystems.Remove("Konola"); // Pochven
-            theCitadel.MapSystems.Remove("Komo"); // Pochven
-            theCitadel.MapSystems.Remove("Kaunokka"); // Pochven
-            theCitadel.MapSystems.Remove("Tunudan"); // Pochven
-            theCitadel.MapSystems.Remove("Urhinichi"); // Pochven
-            theCitadel.MapSystems.Remove("Kino"); // out of region link
-            theCitadel.MapSystems.Remove("Niarja"); // out of region link
-
-            EVEData.MapRegion derelik = GetRegion("Derelik");
-            derelik.MapSystems.Remove("Kuharah"); // Pochven
-
-            EVEData.MapRegion domain = GetRegion("Domain");
-            domain.MapSystems.Remove("Niarja"); // Pochven
-            domain.MapSystems.Remove("Raravoss"); // Pochven
-            domain.MapSystems.Remove("Harva"); // Pochven
-            domain.MapSystems.Remove("Kaaputenen"); // No longer connected
-
-            EVEData.MapRegion essence = GetRegion("Essence");
-            essence.MapSystems.Remove("Vale"); // Pochven
-            essence.MapSystems.Remove("Ignebaener"); // Pochven
-
-            EVEData.MapRegion etheriumReach = GetRegion("Etherium Reach");
-            etheriumReach.MapSystems.Remove("Skarkon"); // out of region link
-
-            EVEData.MapRegion everyshore = GetRegion("Everyshore");
-            everyshore.MapSystems.Remove("Angymonne");  // Pochven
-
-            EVEData.MapRegion theForge = GetRegion("The Forge");
-            theForge.MapSystems.Remove("Otanuomi");  // Pochven
-            theForge.MapSystems.Remove("Wirashoda");  // Pochven
-            theForge.MapSystems.Remove("Sakenta");  // Pochven
-            theForge.MapSystems.Remove("Otela");  // Pochven
-            theForge.MapSystems.Remove("Senda");  // Pochven
-
-            EVEData.MapRegion lonetrek = GetRegion("Lonetrek");
-            lonetrek.MapSystems.Remove("Nalvula");  // Pochven
-            lonetrek.MapSystems.Remove("Kino");  // Pochven
-            lonetrek.MapSystems.Remove("Nani");  // Pochven
-            lonetrek.MapSystems.Remove("Arvasaras");  // Pochven
-
-            EVEData.MapRegion metropolis = GetRegion("Metropolis");
-            metropolis.MapSystems.Remove("Krirald");  // Pochven
-
-            EVEData.MapRegion moldenHeath = GetRegion("Molden Heath");
-            moldenHeath.MapSystems.Remove("Skarkon");  // Pochven
-            moldenHeath.MapSystems.Remove("L4X-1V");  // no longer connected
-
-            EVEData.MapRegion sinqLaison = GetRegion("Sinq Laison");
-            sinqLaison.MapSystems.Remove("Archee");  // Pochven
-            sinqLaison.MapSystems.Remove("Ala");  // Pochven
-
-            EVEData.MapRegion tribute = GetRegion("Tribute");
-            tribute.MapSystems.Remove("Nalvula");  // out of region
-
-            EVEData.MapRegion vergeVendor = GetRegion("Verge Vendor");
-            vergeVendor.MapSystems.Remove("Ignebaener");  // out of region
-            vergeVendor.MapSystems.Remove("Lisbaetanne");  // doesnt make sense to keep
-
-            // now create Pochven from scratch
-            MapRegion pochven = new MapRegion("Pochven", "10000008", "Triglavian", 50, 50);
-            Regions.Add(pochven);
-
-            // Krai Perun
-            pochven.MapSystems.Add("Otela", new MapSystem() { Name = "Otela", LayoutX = 915, LayoutY = 360, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Otanuomi", new MapSystem() { Name = "Otanuomi", LayoutX = 600, LayoutY = 550, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Kino", new MapSystem() { Name = "Kino", LayoutX = 790, LayoutY = 390, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Nalvula", new MapSystem() { Name = "Nalvula", LayoutX = 870, LayoutY = 445, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Krirald", new MapSystem() { Name = "Krirald", LayoutX = 690, LayoutY = 520, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Konola", new MapSystem() { Name = "Konola", LayoutX = 780, LayoutY = 480, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Ignebaener", new MapSystem() { Name = "Ignebaener", LayoutX = 835, LayoutY = 320, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Sakenta", new MapSystem() { Name = "Sakenta", LayoutX = 680, LayoutY = 245, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Komo", new MapSystem() { Name = "Komo", LayoutX = 760, LayoutY = 285, Region = "Pochven", OutOfRegion = false });
-
-            // Krai Svarog
-            pochven.MapSystems.Add("Kuharah", new MapSystem() { Name = "Kuharah", LayoutX = 115, LayoutY = 500, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Nani", new MapSystem() { Name = "Nani", LayoutX = 350, LayoutY = 665, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Harva", new MapSystem() { Name = "Harva", LayoutX = 95, LayoutY = 670, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Skarkon", new MapSystem() { Name = "Skarkon", LayoutX = 255, LayoutY = 705, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Tunudan", new MapSystem() { Name = "Tunudan", LayoutX = 105, LayoutY = 585, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Raravoss", new MapSystem() { Name = "Raravoss", LayoutX = 160, LayoutY = 745, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Niarja", new MapSystem() { Name = "Niarja", LayoutX = 185, LayoutY = 645, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Urhinichi", new MapSystem() { Name = "Urhinichi", LayoutX = 440, LayoutY = 625, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Ahtila", new MapSystem() { Name = "Ahtila", LayoutX = 120, LayoutY = 435, Region = "Pochven", OutOfRegion = false });
-
-            // Krai Veles
-            pochven.MapSystems.Add("Wirashoda", new MapSystem() { Name = "Wirashoda", LayoutX = 145, LayoutY = 215, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Arvasaras", new MapSystem() { Name = "Arvasaras", LayoutX = 525, LayoutY = 170, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Ala", new MapSystem() { Name = "Ala", LayoutX = 155, LayoutY = 145, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Archee", new MapSystem() { Name = "Archee", LayoutX = 235, LayoutY = 130, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Kaunokka", new MapSystem() { Name = "Kaunokka", LayoutX = 445, LayoutY = 135, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Angymonne", new MapSystem() { Name = "Angymonne", LayoutX = 280, LayoutY = 50, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Vale", new MapSystem() { Name = "Vale", LayoutX = 170, LayoutY = 70, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Senda", new MapSystem() { Name = "Senda", LayoutX = 135, LayoutY = 295, Region = "Pochven", OutOfRegion = false });
-            pochven.MapSystems.Add("Ichoriya", new MapSystem() { Name = "Ichoriya", LayoutX = 365, LayoutY = 100, Region = "Pochven", OutOfRegion = false });
-
-            // now add the additional systems added with trailblazers release
-
-            // Caldari Hykkota to Ahbazon
-            EVEData.MapRegion genesis = GetRegion("Genesis");
-
-            theForge.MapSystems.Add("Ahbazon", new MapSystem() { Name = "Ahbazon", LayoutX = 25, LayoutY = 225, Region = "Genesis", OutOfRegion = true });
-            genesis.MapSystems.Add("Hykkota", new MapSystem() { Name = "Hykkota", LayoutX = 755, LayoutY = 195, Region = "The Forge", OutOfRegion = true });
-
-            NameToSystem["Ahbazon"].Jumps.Add("Hykkota");
-            NameToSystem["Hykkota"].Jumps.Add("Ahbazon");
-
-            // Amarr Saminer to F7-ICZ
-            EVEData.MapRegion tashMurkon = GetRegion("Tash-Murkon");
-            EVEData.MapRegion stain = GetRegion("Stain");
-
-            tashMurkon.MapSystems.Add("F7-ICZ", new MapSystem() { Name = "F7-ICZ", LayoutX = 30, LayoutY = 95, Region = "Stain", OutOfRegion = true });
-            stain.MapSystems.Add("Saminer", new MapSystem() { Name = "Saminer", LayoutX = 150, LayoutY = 40, Region = "Tash-Murkon", OutOfRegion = true });
-
-            NameToSystem["Saminer"].Jumps.Add("F7-ICZ");
-            NameToSystem["F7-ICZ"].Jumps.Add("Saminer");
-
-            // Minmatar - Irgrus to Pakhshi – IRGRUS TO PAKHSHI
-            metropolis.MapSystems["Irgrus"].LayoutX -= 20; // move up slightly
-            metropolis.MapSystems["Irgrus"].LayoutY -= 40; // move up slightly
-
-            genesis.MapSystems.Add("Irgrus", new MapSystem() { Name = "Irgrus", LayoutX = 525, LayoutY = 105, Region = "Metropolis", OutOfRegion = true });
-            metropolis.MapSystems.Add("Pakhshi", new MapSystem() { Name = "Pakhshi", LayoutX = 425, LayoutY = 750, Region = "Genesis", OutOfRegion = true });
-
-            NameToSystem["Irgrus"].Jumps.Add("Pakhshi");
-            NameToSystem["Pakhshi"].Jumps.Add("Irgrus");
-
-            //GALLENTE – Kenninck TO Eggheron
-
-            EVEData.MapRegion placid = GetRegion("Placid");
-            EVEData.MapRegion solitude = GetRegion("Solitude");
-
-            solitude.MapSystems.Add("Kenninck", new MapSystem() { Name = "Kenninck", LayoutX = 285, LayoutY = 30, Region = "Placid", OutOfRegion = true });
-            placid.MapSystems.Add("Eggheron", new MapSystem() { Name = "Eggheron", LayoutX = 40, LayoutY = 605, Region = "Solitude", OutOfRegion = true });
-
-            NameToSystem["Kenninck"].Jumps.Add("Eggheron");
-            NameToSystem["Eggheron"].Jumps.Add("Kenninck");
-
-            // now read the trig/edencom systems
-
+ 
             string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\trigInvasionSystems.csv";
             if (File.Exists(trigSystemsFile))
             {
@@ -1283,15 +1063,71 @@ namespace SMT.EVEData
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
 
 
-            // debug
+            foreach (MapRegion mr in Regions)
+            {
+                SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(1050, 800);
+
+                Dictionary<string, SvgNet.Elements.SvgRectElement> systemElementMap = new Dictionary<string, SvgNet.Elements.SvgRectElement>();
+
+
+                foreach(MapSystem s in mr.MapSystems.Values)
+                {
+                    SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.LayoutX, (float)s.LayoutY, 5, 5);
+                    sre["Type"] = "system";
+                    sre["Name"] = s.Name;
+                    sre["ID"] = s.ActualSystem.ID;
+                    sre["Region"] = s.Region;
 
 
 
+                    systemElementMap[s.Name] = sre;
+
+                    SvgNet.Elements.SvgTextElement srtText = new SvgNet.Elements.SvgTextElement(s.Name, (float) s.LayoutX, (float) s.LayoutY);
+                    
+                    
+  
+                    svgRootElement.AddChild(sre);
+                    svgRootElement.AddChild(srtText);
+                }
 
 
+                // add all the lines
+
+                foreach (MapSystem s in mr.MapSystems.Values)
+                {
+
+                    SvgNet.Elements.SvgRectElement from = systemElementMap[s.Name];
+                    foreach (string jumpSys in s.ActualSystem.Jumps)
+                    {
+                        if(!mr.MapSystems.ContainsKey(jumpSys))
+                        {
+                            continue;
+                        }
+
+                        SvgNet.Elements.SvgRectElement to = systemElementMap[jumpSys];
+
+                        SvgNet.Elements.SvgLineElement le = new SvgNet.Elements.SvgLineElement(from.X, from.Y, to.X, to.Y);
+                        SvgNet.Types.SvgStyle lineStyle = new SvgNet.Types.SvgStyle();
+                        SvgNet.Types.SvgColor sc = new SvgNet.Types.SvgColor("black");
+
+                        lineStyle.Set("stroke", sc);
+                        lineStyle.Set("fill", sc);
+                        le.Style = lineStyle;
+
+                        svgRootElement.AddChild(le);
+                    }
+                }
+
+
+                string svgStr = svgRootElement.WriteSVGString(false);
+                string filePath = $"{saveDataFolder}/SourceMaps/exported/{mr.DotLanRef}_layout.svg"; 
+                using (StreamWriter outputFile = new StreamWriter(filePath))
+                {
+                    outputFile.WriteLine(svgStr);
+                }
+            }
 
             // now close 
-
             Application.Current.Shutdown();
         }
 
