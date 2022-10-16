@@ -20,14 +20,19 @@ namespace SMT
     {
         public static readonly RoutedEvent UniverseSystemSelectEvent = EventManager.RegisterRoutedEvent("UniverseSystemSelect", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UniverseControl));
         private const int SYSTEM_LINK_INDEX = 19;
-        private const double SYSTEM_REGION_TEXT_X_OFFSET = 6;
+        private const double SYSTEM_REGION_TEXT_WIDTH = 100;
+        private const double SYSTEM_REGION_TEXT_X_OFFSET = -SYSTEM_REGION_TEXT_WIDTH / 2;
         private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 2;
         private const double SYSTEM_SHAPE_OFFSET = SYSTEM_SHAPE_SIZE / 2;
         private const double SYSTEM_SHAPE_SIZE = 20;
-        private const double SYSTEM_TEXT_TEXT_SIZE = 7;
-        private const double SYSTEM_TEXT_X_OFFSET = 10;
-        private const double SYSTEM_TEXT_Y_OFFSET = 2;
+        private const double SYSTEM_TEXT_TEXT_SIZE = 6;
+
+        private const int SYSTEM_TEXT_WIDTH = 100;
+        private const double SYSTEM_TEXT_X_OFFSET = - SYSTEM_TEXT_WIDTH / 2;
+        private const double SYSTEM_TEXT_Y_OFFSET = 8;
+
         private const int SYSTEM_Z_INDEX = 22;
+
 
         private readonly Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
         private Dictionary<string, EVEData.EveManager.JumpShip> activeJumpSpheres;
@@ -2366,6 +2371,10 @@ namespace SMT
                 sysText.Padding = border;
                 sysText.Margin = border;
                 sysText.IsHitTestVisible = false;
+                sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                sysText.Width = SYSTEM_TEXT_WIDTH;
+
 
                 Canvas.SetLeft(sysText, system.LayoutX + SYSTEM_TEXT_X_OFFSET);
                 Canvas.SetTop(sysText, system.LayoutY + SYSTEM_TEXT_Y_OFFSET);
@@ -2564,6 +2573,9 @@ namespace SMT
                 {
                     Label sysSubText = new Label();
                     sysSubText.Content = SystemSubText;
+                    sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
+                    sysSubText.HorizontalContentAlignment = HorizontalAlignment.Center;
+
                     if (MapConf.ActiveColourScheme.SystemSubTextSize > 0)
                     {
                         sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
