@@ -13,7 +13,7 @@
 
         x:Class="SMT.MainWindow"
         mc:Ignorable="d"
-        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip" TextOptions.TextFormattingMode="Display" RenderOptions.ClearTypeHint="Enabled">
+        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip" RenderOptions.ClearTypeHint="Enabled" TextOptions.TextFormattingMode="Ideal">
 
     <Window.Resources>
 
