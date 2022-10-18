@@ -1,1 +1,848 @@
-<?xml version="1.0" standalone="yes"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"[]><svg width="1050.00" height="800.00" id="33089" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect ID="30000157" x="915.00" Type="system" Region="Pochven" width="5.00" height="5.00" y="360.00" Name="Otela" id="33090" /><text id="33091" x="915.00" y="360.00">Otela</text><rect ID="30000192" x="608.67" Type="system" Region="Pochven" width="5.00" height="5.00" y="559.06" Name="Otanuomi" id="33093" /><text id="33094" x="608.67" y="559.06">Otanuomi</text><rect ID="30001372" x="790.00" Type="system" Region="Pochven" width="5.00" height="5.00" y="390.00" Name="Kino" id="33096" /><text id="33097" x="790.00" y="390.00">Kino</text><rect ID="30001445" x="871.66" Type="system" Region="Pochven" width="5.00" height="5.00" y="447.92" Name="Nalvula" id="33099" /><text id="33100" x="871.66" y="447.92">Nalvula</text><rect ID="30002079" x="692.53" Type="system" Region="Pochven" width="5.00" height="5.00" y="523.60" Name="Krirald" id="33102" /><text id="33103" x="692.53" y="523.60">Krirald</text><rect ID="30002737" x="784.09" Type="system" Region="Pochven" width="5.00" height="5.00" y="484.87" Name="Konola" id="33105" /><text id="33106" x="784.09" y="484.87">Konola</text><rect ID="30005005" x="820.18" Type="system" Region="Pochven" width="5.00" height="5.00" y="313.18" Name="Ignebaener" id="33108" /><text id="33109" x="820.18" y="313.18">Ignebaener</text><rect ID="30010141" x="645.11" Type="system" Region="Pochven" width="5.00" height="5.00" y="228.10" Name="Sakenta" id="33111" /><text id="33112" x="645.11" y="228.10">Sakenta</text><rect ID="30031392" x="736.42" Type="system" Region="Pochven" width="5.00" height="5.00" y="272.12" Name="Komo" id="33114" /><text id="33115" x="736.42" y="272.12">Komo</text><rect ID="30000021" x="119.82" Type="system" Region="Pochven" width="5.00" height="5.00" y="499.86" Name="Kuharah" id="33117" /><text id="33118" x="119.82" y="499.86">Kuharah</text><rect ID="30001413" x="352.34" Type="system" Region="Pochven" width="5.00" height="5.00" y="668.21" Name="Nani" id="33120" /><text id="33121" x="352.34" y="668.21">Nani</text><rect ID="30002225" x="95.00" Type="system" Region="Pochven" width="5.00" height="5.00" y="670.00" Name="Harva" id="33123" /><text id="33124" x="95.00" y="670.00">Harva</text><rect ID="30002411" x="257.34" Type="system" Region="Pochven" width="5.00" height="5.00" y="707.82" Name="Skarkon" id="33126" /><text id="33127" x="257.34" y="707.82">Skarkon</text><rect ID="30002770" x="109.83" Type="system" Region="Pochven" width="5.00" height="5.00" y="585.29" Name="Tunudan" id="33129" /><text id="33130" x="109.83" y="585.29">Tunudan</text><rect ID="30003495" x="161.66" Type="system" Region="Pochven" width="5.00" height="5.00" y="747.82" Name="Raravoss" id="33132" /><text id="33133" x="161.66" y="747.82">Raravoss</text><rect ID="30003504" x="185.00" Type="system" Region="Pochven" width="5.00" height="5.00" y="645.00" Name="Niarja" id="33135" /><text id="33136" x="185.00" y="645.00">Niarja</text><rect ID="30040141" x="443.21" Type="system" Region="Pochven" width="5.00" height="5.00" y="629.28" Name="Urhinichi" id="33138" /><text id="33139" x="443.21" y="629.28">Urhinichi</text><rect ID="30045328" x="127.57" Type="system" Region="Pochven" width="5.00" height="5.00" y="433.49" Name="Ahtila" id="33141" /><text id="33142" x="127.57" y="433.49">Ahtila</text><rect ID="30000206" x="152.57" Type="system" Region="Pochven" width="5.00" height="5.00" y="218.03" Name="Wirashoda" id="33144" /><text id="33145" x="152.57" y="218.03">Wirashoda</text><rect ID="30001381" x="562.80" Type="system" Region="Pochven" width="5.00" height="5.00" y="188.33" Name="Arvasaras" id="33147" /><text id="33148" x="562.80" y="188.33">Arvasaras</text><rect ID="30002652" x="160.65" Type="system" Region="Pochven" width="5.00" height="5.00" y="147.34" Name="Ala" id="33150" /><text id="33151" x="160.65" y="147.34">Ala</text><rect ID="30002702" x="235.00" Type="system" Region="Pochven" width="5.00" height="5.00" y="130.00" Name="Archee" id="33153" /><text id="33154" x="235.00" y="130.00">Archee</text><rect ID="30002797" x="476.47" Type="system" Region="Pochven" width="5.00" height="5.00" y="145.59" Name="Kaunokka" id="33156" /><text id="33157" x="476.47" y="145.59">Kaunokka</text><rect ID="30003046" x="280.00" Type="system" Region="Pochven" width="5.00" height="5.00" y="50.00" Name="Angymonne" id="33159" /><text id="33160" x="280.00" y="50.00">Angymonne</text><rect ID="30005029" x="170.00" Type="system" Region="Pochven" width="5.00" height="5.00" y="70.00" Name="Vale" id="33162" /><text id="33163" x="170.00" y="70.00">Vale</text><rect ID="30020141" x="142.57" Type="system" Region="Pochven" width="5.00" height="5.00" y="302.99" Name="Senda" id="33165" /><text id="33166" x="142.57" y="302.99">Senda</text><rect ID="30045329" x="384.86" Type="system" Region="Pochven" width="5.00" height="5.00" y="101.35" Name="Ichoriya" id="33168" /><text id="33169" x="384.86" y="101.35">Ichoriya</text><line x1="915.00" x2="790.00" y2="390.00" style="fill:black;stroke:black;" y1="360.00" id="33171" /><line x1="915.00" x2="871.66" y2="447.92" style="fill:black;stroke:black;" y1="360.00" id="33172" /><line x1="915.00" x2="820.18" y2="313.18" style="fill:black;stroke:black;" y1="360.00" id="33173" /><line x1="608.67" x2="692.53" y2="523.60" style="fill:black;stroke:black;" y1="559.06" id="33174" /><line x1="608.67" x2="443.21" y2="629.28" style="fill:black;stroke:black;" y1="559.06" id="33175" /><line x1="790.00" x2="915.00" y2="360.00" style="fill:black;stroke:black;" y1="390.00" id="33176" /><line x1="790.00" x2="871.66" y2="447.92" style="fill:black;stroke:black;" y1="390.00" id="33177" /><line x1="871.66" x2="915.00" y2="360.00" style="fill:black;stroke:black;" y1="447.92" id="33178" /><line x1="871.66" x2="790.00" y2="390.00" style="fill:black;stroke:black;" y1="447.92" id="33179" /><line x1="871.66" x2="784.09" y2="484.87" style="fill:black;stroke:black;" y1="447.92" id="33180" /><line x1="692.53" x2="608.67" y2="559.06" style="fill:black;stroke:black;" y1="523.60" id="33181" /><line x1="692.53" x2="784.09" y2="484.87" style="fill:black;stroke:black;" y1="523.60" id="33182" /><line x1="784.09" x2="871.66" y2="447.92" style="fill:black;stroke:black;" y1="484.87" id="33183" /><line x1="784.09" x2="692.53" y2="523.60" style="fill:black;stroke:black;" y1="484.87" id="33184" /><line x1="820.18" x2="915.00" y2="360.00" style="fill:black;stroke:black;" y1="313.18" id="33185" /><line x1="820.18" x2="736.42" y2="272.12" style="fill:black;stroke:black;" y1="313.18" id="33186" /><line x1="645.11" x2="562.80" y2="188.33" style="fill:black;stroke:black;" y1="228.10" id="33187" /><line x1="645.11" x2="736.42" y2="272.12" style="fill:black;stroke:black;" y1="228.10" id="33188" /><line x1="736.42" x2="820.18" y2="313.18" style="fill:black;stroke:black;" y1="272.12" id="33189" /><line x1="736.42" x2="645.11" y2="228.10" style="fill:black;stroke:black;" y1="272.12" id="33190" /><line x1="119.82" x2="109.83" y2="585.29" style="fill:black;stroke:black;" y1="499.86" id="33191" /><line x1="119.82" x2="127.57" y2="433.49" style="fill:black;stroke:black;" y1="499.86" id="33192" /><line x1="352.34" x2="257.34" y2="707.82" style="fill:black;stroke:black;" y1="668.21" id="33193" /><line x1="352.34" x2="443.21" y2="629.28" style="fill:black;stroke:black;" y1="668.21" id="33194" /><line x1="95.00" x2="109.83" y2="585.29" style="fill:black;stroke:black;" y1="670.00" id="33195" /><line x1="95.00" x2="161.66" y2="747.82" style="fill:black;stroke:black;" y1="670.00" id="33196" /><line x1="95.00" x2="185.00" y2="645.00" style="fill:black;stroke:black;" y1="670.00" id="33197" /><line x1="257.34" x2="352.34" y2="668.21" style="fill:black;stroke:black;" y1="707.82" id="33198" /><line x1="257.34" x2="161.66" y2="747.82" style="fill:black;stroke:black;" y1="707.82" id="33199" /><line x1="109.83" x2="119.82" y2="499.86" style="fill:black;stroke:black;" y1="585.29" id="33200" /><line x1="109.83" x2="95.00" y2="670.00" style="fill:black;stroke:black;" y1="585.29" id="33201" /><line x1="161.66" x2="95.00" y2="670.00" style="fill:black;stroke:black;" y1="747.82" id="33202" /><line x1="161.66" x2="257.34" y2="707.82" style="fill:black;stroke:black;" y1="747.82" id="33203" /><line x1="161.66" x2="185.00" y2="645.00" style="fill:black;stroke:black;" y1="747.82" id="33204" /><line x1="185.00" x2="95.00" y2="670.00" style="fill:black;stroke:black;" y1="645.00" id="33205" /><line x1="185.00" x2="161.66" y2="747.82" style="fill:black;stroke:black;" y1="645.00" id="33206" /><line x1="443.21" x2="608.67" y2="559.06" style="fill:black;stroke:black;" y1="629.28" id="33207" /><line x1="443.21" x2="352.34" y2="668.21" style="fill:black;stroke:black;" y1="629.28" id="33208" /><line x1="127.57" x2="119.82" y2="499.86" style="fill:black;stroke:black;" y1="433.49" id="33209" /><line x1="127.57" x2="142.57" y2="302.99" style="fill:black;stroke:black;" y1="433.49" id="33210" /><line x1="152.57" x2="160.65" y2="147.34" style="fill:black;stroke:black;" y1="218.03" id="33211" /><line x1="152.57" x2="142.57" y2="302.99" style="fill:black;stroke:black;" y1="218.03" id="33212" /><line x1="562.80" x2="476.47" y2="145.59" style="fill:black;stroke:black;" y1="188.33" id="33213" /><line x1="562.80" x2="645.11" y2="228.10" style="fill:black;stroke:black;" y1="188.33" id="33214" /><line x1="160.65" x2="152.57" y2="218.03" style="fill:black;stroke:black;" y1="147.34" id="33215" /><line x1="160.65" x2="170.00" y2="70.00" style="fill:black;stroke:black;" y1="147.34" id="33216" /><line x1="235.00" x2="280.00" y2="50.00" style="fill:black;stroke:black;" y1="130.00" id="33217" /><line x1="235.00" x2="170.00" y2="70.00" style="fill:black;stroke:black;" y1="130.00" id="33218" /><line x1="476.47" x2="562.80" y2="188.33" style="fill:black;stroke:black;" y1="145.59" id="33219" /><line x1="476.47" x2="384.86" y2="101.35" style="fill:black;stroke:black;" y1="145.59" id="33220" /><line x1="280.00" x2="235.00" y2="130.00" style="fill:black;stroke:black;" y1="50.00" id="33221" /><line x1="280.00" x2="170.00" y2="70.00" style="fill:black;stroke:black;" y1="50.00" id="33222" /><line x1="280.00" x2="384.86" y2="101.35" style="fill:black;stroke:black;" y1="50.00" id="33223" /><line x1="170.00" x2="160.65" y2="147.34" style="fill:black;stroke:black;" y1="70.00" id="33224" /><line x1="170.00" x2="235.00" y2="130.00" style="fill:black;stroke:black;" y1="70.00" id="33225" /><line x1="170.00" x2="280.00" y2="50.00" style="fill:black;stroke:black;" y1="70.00" id="33226" /><line x1="142.57" x2="152.57" y2="218.03" style="fill:black;stroke:black;" y1="302.99" id="33227" /><line x1="142.57" x2="127.57" y2="433.49" style="fill:black;stroke:black;" y1="302.99" id="33228" /><line x1="384.86" x2="476.47" y2="145.59" style="fill:black;stroke:black;" y1="101.35" id="33229" /><line x1="384.86" x2="280.00" y2="50.00" style="fill:black;stroke:black;" y1="101.35" id="33230" /></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="33089"
+   height="800.00"
+   width="1050.00"
+   version="1.1"
+   sodipodi:docname="Pochven_layout.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs119" />
+  <sodipodi:namedview
+     id="namedview117"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="58.095893"
+     inkscape:cx="119.06177"
+     inkscape:cy="612.86604"
+     inkscape:window-width="3840"
+     inkscape:window-height="2066"
+     inkscape:window-x="3061"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="33089" />
+  <rect
+     id="33090"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="915.00"
+     Name="Otela"
+     width="5.00"
+     y="360.00"
+     ID="30000157" />
+  <text
+     id="33091"
+     y="360.00"
+     x="915.00">Otela</text>
+  <rect
+     id="33093"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="608.67"
+     Name="Otanuomi"
+     width="5.00"
+     y="559.06"
+     ID="30000192" />
+  <text
+     id="33094"
+     y="559.06"
+     x="608.67">Otanuomi</text>
+  <rect
+     id="33096"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="790.00"
+     Name="Kino"
+     width="5.00"
+     y="390.00"
+     ID="30001372" />
+  <text
+     id="33097"
+     y="390.00"
+     x="790.00">Kino</text>
+  <rect
+     id="33099"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="871.66"
+     Name="Nalvula"
+     width="5.00"
+     y="447.92"
+     ID="30001445" />
+  <text
+     id="33100"
+     y="447.92"
+     x="871.66">Nalvula</text>
+  <rect
+     id="33102"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="692.53"
+     Name="Krirald"
+     width="5.00"
+     y="523.60"
+     ID="30002079" />
+  <text
+     id="33103"
+     y="523.60"
+     x="692.53">Krirald</text>
+  <rect
+     id="33105"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="784.09"
+     Name="Konola"
+     width="5.00"
+     y="484.87"
+     ID="30002737" />
+  <text
+     id="33106"
+     y="484.87"
+     x="784.09">Konola</text>
+  <rect
+     id="33108"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="820.17529"
+     Name="Ignebaener"
+     width="5"
+     y="313.18069"
+     ID="30005005" />
+  <text
+     id="33109"
+     y="320.00"
+     x="835.00">Ignebaener</text>
+  <rect
+     id="33111"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="645.10974"
+     Name="Sakenta"
+     width="5"
+     y="228.10471"
+     ID="30010141" />
+  <text
+     id="33112"
+     y="245.00"
+     x="680.00">Sakenta</text>
+  <rect
+     id="33114"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="736.41528"
+     Name="Komo"
+     width="5"
+     y="272.12173"
+     ID="30031392" />
+  <text
+     id="33115"
+     y="285.00"
+     x="760.00">Komo</text>
+  <rect
+     id="33117"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="119.81962"
+     Name="Kuharah"
+     width="5"
+     y="499.86227"
+     ID="30000021" />
+  <text
+     id="33118"
+     y="500.00"
+     x="115.00">Kuharah</text>
+  <rect
+     id="33120"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="352.34"
+     Name="Nani"
+     width="5.00"
+     y="668.21"
+     ID="30001413" />
+  <text
+     id="33121"
+     y="668.21"
+     x="352.34">Nani</text>
+  <rect
+     id="33123"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="95.00"
+     Name="Harva"
+     width="5.00"
+     y="670.00"
+     ID="30002225" />
+  <text
+     id="33124"
+     y="670.00"
+     x="95.00">Harva</text>
+  <rect
+     id="33126"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="257.34"
+     Name="Skarkon"
+     width="5.00"
+     y="707.82"
+     ID="30002411" />
+  <text
+     id="33127"
+     y="707.82"
+     x="257.34">Skarkon</text>
+  <rect
+     id="33129"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="109.82622"
+     Name="Tunudan"
+     width="5"
+     y="585.2926"
+     ID="30002770" />
+  <text
+     id="33130"
+     y="585.00"
+     x="105.00">Tunudan</text>
+  <rect
+     id="33132"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="161.66"
+     Name="Raravoss"
+     width="5.00"
+     y="747.82"
+     ID="30003495" />
+  <text
+     id="33133"
+     y="747.82"
+     x="161.66">Raravoss</text>
+  <rect
+     id="33135"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="185.00"
+     Name="Niarja"
+     width="5.00"
+     y="645.00"
+     ID="30003504" />
+  <text
+     id="33136"
+     y="645.00"
+     x="185.00">Niarja</text>
+  <rect
+     id="33138"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="443.21"
+     Name="Urhinichi"
+     width="5.00"
+     y="629.28"
+     ID="30040141" />
+  <text
+     id="33139"
+     y="629.28"
+     x="443.21">Urhinichi</text>
+  <rect
+     id="33141"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="127.57368"
+     Name="Ahtila"
+     width="5"
+     y="433.48526"
+     ID="30045328" />
+  <text
+     id="33142"
+     y="435.00"
+     x="120.00">Ahtila</text>
+  <rect
+     id="33144"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="152.57368"
+     Name="Wirashoda"
+     width="5"
+     y="218.02948"
+     ID="30000206" />
+  <text
+     id="33145"
+     y="215.00"
+     x="145.00">Wirashoda</text>
+  <rect
+     id="33147"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="562.8009"
+     Name="Arvasaras"
+     width="5"
+     y="188.32573"
+     ID="30001381" />
+  <text
+     id="33148"
+     y="170.00"
+     x="525.00">Arvasaras</text>
+  <rect
+     id="33150"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="160.64583"
+     Name="Ala"
+     width="5"
+     y="147.34096"
+     ID="30002652" />
+  <text
+     id="33151"
+     y="145.00"
+     x="155.00">Ala</text>
+  <rect
+     id="33153"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="235.00"
+     Name="Archee"
+     width="5.00"
+     y="130.00"
+     ID="30002702" />
+  <text
+     id="33154"
+     y="130.00"
+     x="235.00">Archee</text>
+  <rect
+     id="33156"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="476.46655"
+     Name="Kaunokka"
+     width="5"
+     y="145.58665"
+     ID="30002797" />
+  <text
+     id="33157"
+     y="135.00"
+     x="445.00">Kaunokka</text>
+  <rect
+     id="33159"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="280.00"
+     Name="Angymonne"
+     width="5.00"
+     y="50.00"
+     ID="30003046" />
+  <text
+     id="33160"
+     y="50.00"
+     x="280.00">Angymonne</text>
+  <rect
+     id="33162"
+     height="5.00"
+     Type="system"
+     Region="Pochven"
+     x="170.00"
+     Name="Vale"
+     width="5.00"
+     y="70.00"
+     ID="30005029" />
+  <text
+     id="33163"
+     y="70.00"
+     x="170.00">Vale</text>
+  <rect
+     id="33165"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="142.57368"
+     Name="Senda"
+     width="5"
+     y="302.98682"
+     ID="30020141" />
+  <text
+     id="33166"
+     y="295.00"
+     x="135.00">Senda</text>
+  <rect
+     id="33168"
+     height="5"
+     Type="system"
+     Region="Pochven"
+     x="384.86032"
+     Name="Ichoriya"
+     width="5"
+     y="101.34837"
+     ID="30045329" />
+  <text
+     id="33169"
+     y="100.00"
+     x="365.00">Ichoriya</text>
+  <line
+     id="33171"
+     y1="360.00"
+     x2="790.00"
+     x1="915.00"
+     style="fill:black;stroke:black;"
+     y2="390.00" />
+  <line
+     id="33172"
+     y1="360.00"
+     x2="871.66"
+     x1="915.00"
+     style="fill:black;stroke:black;"
+     y2="447.92" />
+  <line
+     id="33173"
+     y1="360.00"
+     x2="835.00"
+     x1="915.00"
+     style="fill:black;stroke:black;"
+     y2="320.00" />
+  <line
+     id="33174"
+     y1="559.06"
+     x2="692.53"
+     x1="608.67"
+     style="fill:black;stroke:black;"
+     y2="523.60" />
+  <line
+     id="33175"
+     y1="559.06"
+     x2="443.21"
+     x1="608.67"
+     style="fill:black;stroke:black;"
+     y2="629.28" />
+  <line
+     id="33176"
+     y1="390.00"
+     x2="915.00"
+     x1="790.00"
+     style="fill:black;stroke:black;"
+     y2="360.00" />
+  <line
+     id="33177"
+     y1="390.00"
+     x2="871.66"
+     x1="790.00"
+     style="fill:black;stroke:black;"
+     y2="447.92" />
+  <line
+     id="33178"
+     y1="447.92"
+     x2="915.00"
+     x1="871.66"
+     style="fill:black;stroke:black;"
+     y2="360.00" />
+  <line
+     id="33179"
+     y1="447.92"
+     x2="790.00"
+     x1="871.66"
+     style="fill:black;stroke:black;"
+     y2="390.00" />
+  <line
+     id="33180"
+     y1="447.92"
+     x2="784.09"
+     x1="871.66"
+     style="fill:black;stroke:black;"
+     y2="484.87" />
+  <line
+     id="33181"
+     y1="523.60"
+     x2="608.67"
+     x1="692.53"
+     style="fill:black;stroke:black;"
+     y2="559.06" />
+  <line
+     id="33182"
+     y1="523.60"
+     x2="784.09"
+     x1="692.53"
+     style="fill:black;stroke:black;"
+     y2="484.87" />
+  <line
+     id="33183"
+     y1="484.87"
+     x2="871.66"
+     x1="784.09"
+     style="fill:black;stroke:black;"
+     y2="447.92" />
+  <line
+     id="33184"
+     y1="484.87"
+     x2="692.53"
+     x1="784.09"
+     style="fill:black;stroke:black;"
+     y2="523.60" />
+  <line
+     id="33185"
+     y1="320.00"
+     x2="915.00"
+     x1="835.00"
+     style="fill:black;stroke:black;"
+     y2="360.00" />
+  <line
+     id="33186"
+     y1="320.00"
+     x2="760.00"
+     x1="835.00"
+     style="fill:black;stroke:black;"
+     y2="285.00" />
+  <line
+     id="33187"
+     y1="245.00"
+     x2="525.00"
+     x1="680.00"
+     style="fill:black;stroke:black;"
+     y2="170.00" />
+  <line
+     id="33188"
+     y1="245.00"
+     x2="760.00"
+     x1="680.00"
+     style="fill:black;stroke:black;"
+     y2="285.00" />
+  <line
+     id="33189"
+     y1="285.00"
+     x2="835.00"
+     x1="760.00"
+     style="fill:black;stroke:black;"
+     y2="320.00" />
+  <line
+     id="33190"
+     y1="285.00"
+     x2="680.00"
+     x1="760.00"
+     style="fill:black;stroke:black;"
+     y2="245.00" />
+  <line
+     id="33191"
+     y1="500.00"
+     x2="105.00"
+     x1="115.00"
+     style="fill:black;stroke:black;"
+     y2="585.00" />
+  <line
+     id="33192"
+     y1="500.00"
+     x2="120.00"
+     x1="115.00"
+     style="fill:black;stroke:black;"
+     y2="435.00" />
+  <line
+     id="33193"
+     y1="668.21"
+     x2="257.34"
+     x1="352.34"
+     style="fill:black;stroke:black;"
+     y2="707.82" />
+  <line
+     id="33194"
+     y1="668.21"
+     x2="443.21"
+     x1="352.34"
+     style="fill:black;stroke:black;"
+     y2="629.28" />
+  <line
+     id="33195"
+     y1="670.00"
+     x2="105.00"
+     x1="95.00"
+     style="fill:black;stroke:black;"
+     y2="585.00" />
+  <line
+     id="33196"
+     y1="670.00"
+     x2="161.66"
+     x1="95.00"
+     style="fill:black;stroke:black;"
+     y2="747.82" />
+  <line
+     id="33197"
+     y1="670.00"
+     x2="185.00"
+     x1="95.00"
+     style="fill:black;stroke:black;"
+     y2="645.00" />
+  <line
+     id="33198"
+     y1="707.82"
+     x2="352.34"
+     x1="257.34"
+     style="fill:black;stroke:black;"
+     y2="668.21" />
+  <line
+     id="33199"
+     y1="707.82"
+     x2="161.66"
+     x1="257.34"
+     style="fill:black;stroke:black;"
+     y2="747.82" />
+  <line
+     id="33200"
+     y1="585.00"
+     x2="115.00"
+     x1="105.00"
+     style="fill:black;stroke:black;"
+     y2="500.00" />
+  <line
+     id="33201"
+     y1="585.00"
+     x2="95.00"
+     x1="105.00"
+     style="fill:black;stroke:black;"
+     y2="670.00" />
+  <line
+     id="33202"
+     y1="747.82"
+     x2="95.00"
+     x1="161.66"
+     style="fill:black;stroke:black;"
+     y2="670.00" />
+  <line
+     id="33203"
+     y1="747.82"
+     x2="257.34"
+     x1="161.66"
+     style="fill:black;stroke:black;"
+     y2="707.82" />
+  <line
+     id="33204"
+     y1="747.82"
+     x2="185.00"
+     x1="161.66"
+     style="fill:black;stroke:black;"
+     y2="645.00" />
+  <line
+     id="33205"
+     y1="645.00"
+     x2="95.00"
+     x1="185.00"
+     style="fill:black;stroke:black;"
+     y2="670.00" />
+  <line
+     id="33206"
+     y1="645.00"
+     x2="161.66"
+     x1="185.00"
+     style="fill:black;stroke:black;"
+     y2="747.82" />
+  <line
+     id="33207"
+     y1="629.28"
+     x2="608.67"
+     x1="443.21"
+     style="fill:black;stroke:black;"
+     y2="559.06" />
+  <line
+     id="33208"
+     y1="629.28"
+     x2="352.34"
+     x1="443.21"
+     style="fill:black;stroke:black;"
+     y2="668.21" />
+  <line
+     id="33209"
+     y1="435.00"
+     x2="115.00"
+     x1="120.00"
+     style="fill:black;stroke:black;"
+     y2="500.00" />
+  <line
+     id="33210"
+     y1="435.00"
+     x2="135.00"
+     x1="120.00"
+     style="fill:black;stroke:black;"
+     y2="295.00" />
+  <line
+     id="33211"
+     y1="215.00"
+     x2="155.00"
+     x1="145.00"
+     style="fill:black;stroke:black;"
+     y2="145.00" />
+  <line
+     id="33212"
+     y1="215.00"
+     x2="135.00"
+     x1="145.00"
+     style="fill:black;stroke:black;"
+     y2="295.00" />
+  <line
+     id="33213"
+     y1="170.00"
+     x2="445.00"
+     x1="525.00"
+     style="fill:black;stroke:black;"
+     y2="135.00" />
+  <line
+     id="33214"
+     y1="170.00"
+     x2="680.00"
+     x1="525.00"
+     style="fill:black;stroke:black;"
+     y2="245.00" />
+  <line
+     id="33214-2"
+     y1="56.669502"
+     x2="914.63641"
+     x1="278.54761"
+     style="fill:#000000;stroke:#000000;stroke-width:4.11744"
+     y2="366.50479" />
+  <line
+     id="33215"
+     y1="145.00"
+     x2="145.00"
+     x1="155.00"
+     style="fill:black;stroke:black;"
+     y2="215.00" />
+  <line
+     id="33216"
+     y1="145.00"
+     x2="170.00"
+     x1="155.00"
+     style="fill:black;stroke:black;"
+     y2="70.00" />
+  <line
+     id="33217"
+     y1="130.00"
+     x2="280.00"
+     x1="235.00"
+     style="fill:black;stroke:black;"
+     y2="50.00" />
+  <line
+     id="33218"
+     y1="130.00"
+     x2="170.00"
+     x1="235.00"
+     style="fill:black;stroke:black;"
+     y2="70.00" />
+  <line
+     id="33219"
+     y1="135.00"
+     x2="525.00"
+     x1="445.00"
+     style="fill:black;stroke:black;"
+     y2="170.00" />
+  <line
+     id="33220"
+     y1="135.00"
+     x2="365.00"
+     x1="445.00"
+     style="fill:black;stroke:black;"
+     y2="100.00" />
+  <line
+     id="33221"
+     y1="50.00"
+     x2="235.00"
+     x1="280.00"
+     style="fill:black;stroke:black;"
+     y2="130.00" />
+  <line
+     id="33222"
+     y1="50.00"
+     x2="170.00"
+     x1="280.00"
+     style="fill:black;stroke:black;"
+     y2="70.00" />
+  <line
+     id="33223"
+     y1="50.00"
+     x2="365.00"
+     x1="280.00"
+     style="fill:black;stroke:black;"
+     y2="100.00" />
+  <line
+     id="33224"
+     y1="70.00"
+     x2="155.00"
+     x1="170.00"
+     style="fill:black;stroke:black;"
+     y2="145.00" />
+  <line
+     id="33225"
+     y1="70.00"
+     x2="235.00"
+     x1="170.00"
+     style="fill:black;stroke:black;"
+     y2="130.00" />
+  <line
+     id="33226"
+     y1="70.00"
+     x2="280.00"
+     x1="170.00"
+     style="fill:black;stroke:black;"
+     y2="50.00" />
+  <line
+     id="33227"
+     y1="295.00"
+     x2="145.00"
+     x1="135.00"
+     style="fill:black;stroke:black;"
+     y2="215.00" />
+  <line
+     id="33228"
+     y1="69.079224"
+     x2="97.727951"
+     x1="168.15063"
+     style="fill:#000000;stroke:#000000;stroke-width:4.50757"
+     y2="674.96643" />
+  <line
+     id="33229"
+     y1="100.00"
+     x2="445.00"
+     x1="365.00"
+     style="fill:black;stroke:black;"
+     y2="135.00" />
+  <line
+     id="33230"
+     y1="100.00"
+     x2="280.00"
+     x1="365.00"
+     style="fill:black;stroke:black;"
+     y2="50.00" />
+  <path
+     style="fill:#000000"
+     d="m 885.15723,196.64041 29.74393,-31.39637"
+     id="path395" />
+  <path
+     style="fill:#000000"
+     d="M 290.58514,34.767089 925.67306,343.77344"
+     id="path453"
+     inkscape:highlight-color="#aa00aa" />
+</svg>
