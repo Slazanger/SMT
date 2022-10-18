@@ -400,15 +400,30 @@ namespace SMT.EVEData
                     long systemID = long.Parse(xn.Attributes["ID"].Value);
                     float x = float.Parse(xn.Attributes["x"].Value);
                     float y = float.Parse(xn.Attributes["y"].Value);
+
+                    float RoundVal = 5.0f;
+                    x = (float)Math.Round(x / RoundVal, 0) * RoundVal;
+                    y = (float)Math.Round(y / RoundVal, 0) * RoundVal;
+
                     string name = xn.Attributes["Name"].Value;
                     string region = xn.Attributes["Region"].Value;
                     bool hasStation = false;
                     bool hasIceBelt = false;
 
+                    if(name == "Tama")
+                    {
+                        int test2 = 2;
+                        test2++;
+                    }
                     // create and add the system
                     if(region == rd.Name)
                     {
                         System s = new System(name, systemID, rd.Name, hasStation, hasIceBelt);
+                        if(GetEveSystem(name) != null)
+                        {
+                            int test = 0;
+                            test++;
+                        }
                         Systems.Add(s);
                         NameToSystem[name] = s;
                     }
@@ -420,7 +435,7 @@ namespace SMT.EVEData
                         Name = name,
                         LayoutX = x,
                         LayoutY = y,
-                        Region = rd.Name,
+                        Region = region,
                         OutOfRegion = rd.Name != region,
                     };
                 }
