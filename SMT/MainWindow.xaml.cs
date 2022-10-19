@@ -28,7 +28,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_113";
+        public const string SMT_VERSION = "SMT_114";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
