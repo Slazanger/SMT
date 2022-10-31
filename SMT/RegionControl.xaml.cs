@@ -2575,6 +2575,7 @@ namespace SMT
                     sysSubText.Content = SystemSubText;
                     sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
                     sysSubText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    sysSubText.IsHitTestVisible = false;
 
                     if (MapConf.ActiveColourScheme.SystemSubTextSize > 0)
                     {
