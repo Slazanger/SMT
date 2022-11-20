@@ -893,7 +893,15 @@ namespace SMT
                         sysbrush = SystemColourLowSecBrush;
                     }
 
-                    drawingContext.DrawRectangle(sysbrush, SysOutlinePen, rect);
+                    if(sys.HasNPCStation)
+                    {
+                        drawingContext.DrawRectangle(sysbrush, SysOutlinePen, rect);
+                    }
+                    else
+                    {
+                        drawingContext.DrawEllipse(sysbrush, SysOutlinePen, new Point(X, Z), 2, 2 );
+                    }
+
 
                     // Persist the drawing content.
                     drawingContext.Close();
