@@ -221,6 +221,14 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public ObservableCollection<LocalCharacter> LocalCharacters { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the list of Faction warfare systems
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public List<FactionWarfareSystemInfo> FactionWarfareSystems { get; set; }
+
+
         /// <summary>
         /// Gets or sets the master list of Regions
         /// </summary>
@@ -2020,6 +2028,102 @@ namespace SMT.EVEData
             }
         }
 
+        public async void UpdateFactionWarfareInfo()
+        {
+            FactionWarfareSystems.Clear();
+
+            ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
+
+
+
+            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
+            {
+                foreach (ESI.NET.Models.FactionWarfare.FactionWarfareSystem i in esr.Data)
+                {
+                    FactionWarfareSystemInfo fwsi = new FactionWarfareSystemInfo();
+                    fwsi.SystemState = FactionWarfareSystemInfo.State.None;
+
+                    fwsi.OccupierID = i.OccupierFactionId;
+                    fwsi.OccupierName = FactionWarfareSystemInfo.OwnerIDToName(i.OccupierFactionId);
+
+                    fwsi.OwnerID = i.OwnerFactionId;
+                    fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName(i.OwnerFactionId);
+
+
+                    fwsi.SystemID = i.SolarSystemId;
+                    fwsi.SystemName = GetEveSystemNameFromID(i.SolarSystemId);
+                    fwsi.LinkSystemID = 0;
+                    fwsi.VictoryPoints = i.VictoryPoints;
+                    fwsi.VictoryPointsThreshold = i.VictoryPointsThreshold;
+
+                    FactionWarfareSystems.Add(fwsi);
+                }
+            }
+
+            // step 1, identify all the Frontline systems, these will be systems with connections to other systems with a different occupier
+            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
+            {
+                System s = GetEveSystemFromID(fws.SystemID);
+                foreach (string js in s.Jumps)
+                {
+                    foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                    {
+                        if (fwss.SystemName == js && fwss.OccupierID != fws.OccupierID)
+                        {
+                            fwss.SystemState = FactionWarfareSystemInfo.State.Frontline;
+                            fws.SystemState = FactionWarfareSystemInfo.State.Frontline;
+                        }
+                    }
+
+                }
+            }
+
+            // step 2, itendify all commandline operations by flooding out one from the frontlines
+            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
+            {
+                if(fws.SystemState == FactionWarfareSystemInfo.State.Frontline)
+                {
+                    System s = GetEveSystemFromID(fws.SystemID);
+
+                    foreach (string js in s.Jumps)
+                    {
+                        foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                        {
+                            if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                            {
+                                fwss.SystemState = FactionWarfareSystemInfo.State.CommandLineOperation;
+                                fwss.LinkSystemID = fws.SystemID;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // step 3, itendify all Rearguard operations by flooding out one from the command lines
+            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
+            {
+                if (fws.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
+                {
+                    System s = GetEveSystemFromID(fws.SystemID);
+
+                    foreach (string js in s.Jumps)
+                    {
+                        foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                        {
+                            if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                            {
+                                fwss.SystemState = FactionWarfareSystemInfo.State.Rearguard;
+                                fwss.LinkSystemID = fws.SystemID;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // for ease remove all "none" systems
+            FactionWarfareSystems.RemoveAll(sys => sys.SystemState == FactionWarfareSystemInfo.State.None);
+        }
+
         public void AddUpdateJumpBridge(string from, string to, long stationID)
         {
             // validate
@@ -2096,6 +2200,7 @@ namespace SMT.EVEData
 
             InitTheraConnections();
             InitMetaliminalStorms();
+            InitFactionWarfareInfo();
             InitPOI();
 
             ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
@@ -2167,6 +2272,12 @@ namespace SMT.EVEData
         private void InitMetaliminalStorms()
         {
             MetaliminalStorms = new ObservableCollection<Storm>();
+        }
+
+        private void InitFactionWarfareInfo()
+        {
+            FactionWarfareSystems = new List<FactionWarfareSystemInfo>();
+            UpdateFactionWarfareInfo();
         }
 
         /// <summary>

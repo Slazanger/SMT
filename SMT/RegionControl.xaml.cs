@@ -778,6 +778,8 @@ namespace SMT
                 */
             }
 
+            AddFWDataToMap();
+
             AddCharactersToMap();
             AddDataToMap();
             AddSystemIntelOverlay();
@@ -1810,6 +1812,140 @@ namespace SMT
                         DynamicMapElements.Add(infoCircle);
                     }
                 }
+            }
+        }
+
+
+
+        Brush Gallente_FL = new SolidColorBrush(Color.FromArgb(100, 73, 171, 104));
+        Brush Gallente_CLO = new SolidColorBrush(Color.FromArgb(100, 36, 90, 52));
+        Brush Gallente_RG = new SolidColorBrush(Color.FromArgb(100, 13, 35, 19));
+        
+        Brush Caldari_FL = new SolidColorBrush(Color.FromArgb(100, 14, 186, 207));
+        Brush Caldari_CLO = new SolidColorBrush(Color.FromArgb(100, 0, 110, 129));
+        Brush Caldari_RG = new SolidColorBrush(Color.FromArgb(100, 0, 36, 43));
+        
+        Brush Amarr_FL = new SolidColorBrush(Color.FromArgb(100, 216, 191, 25));
+        Brush Amarr_CLO = new SolidColorBrush(Color.FromArgb(100, 138, 114, 14));
+        Brush Amarr_RG = new SolidColorBrush(Color.FromArgb(100, 46, 36, 5));
+        
+        Brush Minmatar_FL = new SolidColorBrush(Color.FromArgb(100, 221, 74, 79));
+        Brush Minmatar_CLO = new SolidColorBrush(Color.FromArgb(100, 140, 34, 41));
+        Brush Minmatar_RG = new SolidColorBrush(Color.FromArgb(100, 54, 11, 14));
+        
+        Brush FW_Outline = new SolidColorBrush(Color.FromArgb(150, 240, 240, 240));
+
+
+
+        private Brush GetBrushForFWState(FactionWarfareSystemInfo.State state, int Owner)
+        {
+            //500001: "Caldari State";
+            //500002: "Minmatar Republic";
+            //500003: "Amarr Empire";
+            //500004: "Gallente Federation";
+
+
+            switch (state)
+            {
+                case FactionWarfareSystemInfo.State.Frontline: 
+                    {
+                        switch(Owner)
+                        {
+                            case 500001: return Caldari_FL;
+                            case 500002: return Minmatar_FL;
+                            case 500003: return Amarr_FL;
+                            case 500004: return Gallente_FL;
+                        }
+                    }
+                    break;
+
+                case FactionWarfareSystemInfo.State.CommandLineOperation:
+                    {
+                        switch (Owner)
+                        {
+                            case 500001: return Caldari_CLO;
+                            case 500002: return Minmatar_CLO;
+                            case 500003: return Amarr_CLO;
+                            case 500004: return Gallente_CLO;
+                        }
+                    }
+                    break;
+
+                case FactionWarfareSystemInfo.State.Rearguard:
+                    {
+                        switch (Owner)
+                        {
+                            case 500001: return Caldari_RG;
+                            case 500002: return Minmatar_RG;
+                            case 500003: return Amarr_RG;
+                            case 500004: return Gallente_RG;
+                        }
+                    }
+                    break;
+
+            }
+
+            return null;
+        }
+
+        private void AddFWDataToMap()
+        {
+            if(!ShowSovOwner)
+            {
+                return;
+            }
+
+            foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
+            {
+                FactionWarfareSystemInfo fsw = null;
+                foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                {
+                    if(i.SystemID == sys.ActualSystem.ID)
+                    {
+                        fsw = i;
+                        break;
+                    }
+                }
+
+
+                if (fsw == null)
+                {
+                    continue;
+                }
+
+                
+                                Polygon poly = new Polygon();
+
+                                foreach (Point p in sys.CellPoints)
+                                {
+                                    poly.Points.Add(p);
+                                }
+
+                                //poly.Fill
+                                poly.Fill = GetBrushForFWState(fsw.SystemState, fsw.OccupierID);
+                                poly.SnapsToDevicePixels = true;
+                                poly.Stroke = null;
+                                poly.StrokeThickness = 3;
+                                poly.StrokeDashCap = PenLineCap.Round;
+                                poly.StrokeLineJoin = PenLineJoin.Round;
+                                MainCanvas.Children.Add(poly);
+                                DynamicMapElements.Add(poly);
+
+
+
+                /*
+                double fwIconSize = 50; 
+
+                Shape fwOwnerShape = new Ellipse() { Height = fwIconSize, Width = fwIconSize };
+                fwOwnerShape.Fill = GetBrushForFWState(fsw.SystemState, fsw.OccupierID); 
+
+                Canvas.SetZIndex(fwOwnerShape, 10);
+                Canvas.SetLeft(fwOwnerShape, sys.LayoutX - (fwIconSize / 2));
+                Canvas.SetTop(fwOwnerShape, sys.LayoutY - (fwIconSize / 2));
+                MainCanvas.Children.Add(fwOwnerShape);
+                DynamicMapElements.Add(fwOwnerShape);
+                */
+
             }
         }
 
