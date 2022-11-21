@@ -705,6 +705,61 @@ namespace SMT.EVEData
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
             {
+                // enforce a minimum spread
+                bool mrDone = false;
+                int mrIteration = 0;
+                double mrMinSpread = 49.0;
+
+                while (!mrDone)
+                {
+                    mrIteration++;
+                    bool movedThisTime = false;
+
+                    foreach (MapSystem sysA in mr.MapSystems.Values)
+                    {
+                        foreach (MapSystem sysB in mr.MapSystems.Values)
+                        {
+                            if (sysA == sysB)
+                            {
+                                continue;
+                            }
+
+                            double dx = sysA.LayoutX - sysB.LayoutX;
+                            double dy = sysA.LayoutY - sysB.LayoutY;
+                            double l = Math.Sqrt(dx * dx + dy * dy);
+
+                            double s = mrMinSpread - l;
+
+                            if (s > 0)
+                            {
+                                movedThisTime = true;
+
+                                // move apart
+                                dx = dx / l;
+                                dy = dy / l;
+
+                                sysB.LayoutX -= dx * s / 2;
+                                sysB.LayoutY -= dy * s / 2;
+
+                                sysA.LayoutX += dx * s / 2;
+                                sysA.LayoutY += dy * s / 2;
+                            }
+                        }
+                    }
+
+                    if (movedThisTime == false)
+                    {
+                        mrDone = true;
+                    }
+
+                    if (mrIteration > 20)
+                    {
+                        mrDone = true;
+                    }
+                }
+
+
+
                 // collect the system points to generate them from
                 List<Vector2f> points = new List<Vector2f>();
 
@@ -713,19 +768,70 @@ namespace SMT.EVEData
                     points.Add(new Vector2f(ms.LayoutX, ms.LayoutY));
                 }
 
-                // create the voronoi
-                csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, new Rectf(0, 0, 1050, 800));
 
+                // generate filler points to help the voronoi to get better partitioning of open areas
+                int division = 5;
+                int minDistance = 120;
+                int margin = 180;
+
+                List<Vector2f> fillerPoints = new List<Vector2f>();
+
+                for (int ix = -margin ; ix < 1050 + margin; ix += division)
+                {
+                    for (int iy = -margin; iy < 800 + margin; iy += division)
+                    {
+                        bool add = true;
+                        foreach(Vector2f vf in points)
+                        {
+                            double dx = vf.x - ix;
+                            double dy = vf.y - iy;
+                            double l = Math.Sqrt(dx * dx + dy * dy);
+
+                            if (l < (minDistance))
+                            {
+                                add = false;
+                                break;
+                            }
+                        }
+
+                        if(add)
+                        {
+                            fillerPoints.Add(new Vector2f(ix, iy));
+                        }
+                    }
+                }
+                points.AddRange(fillerPoints);
+
+
+
+                Rectf clipRect = new Rectf(-margin, -margin, 1050+ 2*margin, 800 + 2*margin);
+
+
+                // create the voronoi
+                csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, clipRect, 0);
+
+                int i = 0;
                 // extract the points from the graph for each cell
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                 {
-                    List<Vector2f> cellList = v.Region(new Vector2f(ms.LayoutX, ms.LayoutY));
+                    csDelaunay.Site s = v.SitesIndexedByLocation[points[i]];
+                    i++;
+
+                    List<Vector2f> cellList = s.Region(clipRect);
+                    ms.LayoutX = s.x;
+                    ms.LayoutY = s.y;
+
                     ms.CellPoints = new List<Point>();
 
                     foreach (Vector2f vc in cellList)
                     {
                         float RoundVal = 2.5f;
-                        ms.CellPoints.Add(new Point(Math.Round(vc.x / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal, Math.Round(vc.y / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal));
+
+                        double finalX = vc.x;
+                        double finalY = vc.y;
+
+
+                        ms.CellPoints.Add(new Point(Math.Round(finalX / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal, Math.Round(finalY / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal));
                         //ms.CellPoints.Add(new Point(vc.x, vc.y));
                     }
                 }

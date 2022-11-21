@@ -871,7 +871,7 @@ namespace SMT
             {
                 if (kvp.Value.Name == name)
                 {
-                    if (MainZoomControl.Mode == ZoomControl.ZoomControlModes.Custom)
+                    if (MainZoomControl.Mode == ZoomControl.ZoomControlModes.Custom && MapConf.FollowOnZoom)
                     {
                         MainZoomControl.Show(kvp.Value.LayoutX, kvp.Value.LayoutY, MainZoomControl.Zoom);
                     }
@@ -2655,30 +2655,6 @@ namespace SMT
                     MainCanvas.Children.Add(poly);
                 }
 
-                if ((ShowSovOwner) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
-                {
-                    string allianceName = EM.GetAllianceName(SystemAlliance);
-                    string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
-                    string coalitionName = string.Empty;
-
-                    string content = allianceTicker;
-
-                    if (MapConf.ShowCoalition && SystemCoalition != null)
-                    {
-                        content = SystemCoalition.Name + " (" + allianceTicker + ")";
-                    }
-
-                    if (SystemSubText != string.Empty)
-                    {
-                        SystemSubText += "\n";
-                    }
-                    SystemSubText += content;
-
-                    if (!AlliancesKeyList.Contains(SystemAlliance))
-                    {
-                        AlliancesKeyList.Add(SystemAlliance);
-                    }
-                }
 
                 if (system.OutOfRegion)
                 {
@@ -2705,6 +2681,33 @@ namespace SMT
                     MainCanvas.Children.Add(poly);
                 }
 
+                if ((ShowSovOwner) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
+                {
+                    string allianceName = EM.GetAllianceName(SystemAlliance);
+                    string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
+                    string coalitionName = string.Empty;
+
+                    string content = allianceTicker;
+
+                    if (MapConf.ShowCoalition && SystemCoalition != null)
+                    {
+                        content = SystemCoalition.Name + " (" + allianceTicker + ")";
+                    }
+
+                    if (SystemSubText != string.Empty)
+                    {
+                        SystemSubText += "\n";
+                    }
+                    SystemSubText += content;
+
+                    if (!AlliancesKeyList.Contains(SystemAlliance))
+                    {
+                        AlliancesKeyList.Add(SystemAlliance);
+                    }
+                }
+
+
+
                 if (!string.IsNullOrEmpty(SystemSubText))
                 {
                     Label sysSubText = new Label();
@@ -2712,6 +2715,7 @@ namespace SMT
                     sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
                     sysSubText.HorizontalContentAlignment = HorizontalAlignment.Center;
                     sysSubText.IsHitTestVisible = false;
+
 
                     if (MapConf.ActiveColourScheme.SystemSubTextSize > 0)
                     {

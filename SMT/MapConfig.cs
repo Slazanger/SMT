@@ -76,6 +76,8 @@ namespace SMT
 
         private bool m_drawRoute;
 
+        private bool m_followOnZoom;
+
         private string m_CustomEveLogFolderLocation;
 
         public MapConfig()
@@ -198,6 +200,23 @@ namespace SMT
                 OnPropertyChanged("DrawRoute");
             }
         }
+
+        public bool FollowOnZoom
+        {
+            get
+            {
+                return m_followOnZoom;
+            }
+            set
+            {
+                m_followOnZoom = value;
+                OnPropertyChanged("FollowOnZoom");
+            }
+        }
+
+
+        
+
 
         public bool LimitESIDataToRegion
         {
