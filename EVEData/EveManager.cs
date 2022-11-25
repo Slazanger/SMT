@@ -561,6 +561,39 @@ namespace SMT.EVEData
                 }
             }
 
+            string eveStaticDataJumpsExtraFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\mapSolarSystemJumpsExtra.csv";
+            if (File.Exists(eveStaticDataJumpsExtraFile))
+            {
+                StreamReader file = new StreamReader(eveStaticDataJumpsExtraFile);
+
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] bits = line.Split(',');
+
+                    string fromName = bits[0];
+                    string toName = bits[1];
+
+                    System from = GetEveSystem(fromName);
+                    System to = GetEveSystem(toName);
+
+                    if (from != null && to != null)
+                    {
+                        if (!from.Jumps.Contains(to.Name))
+                        {
+                            from.Jumps.Add(to.Name);
+                        }
+                        if (!to.Jumps.Contains(from.Name))
+                        {
+                            to.Jumps.Add(from.Name);
+                        }
+
+                    }
+                }
+            }
+
             // now open up the eve static data export and extract some info from it
             string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\staStations.csv";
             if (File.Exists(eveStaticDataStationsFile))
