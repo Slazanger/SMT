@@ -22,7 +22,7 @@ namespace SMT
         private const int SYSTEM_LINK_INDEX = 19;
         private const double SYSTEM_REGION_TEXT_WIDTH = 100;
         private const double SYSTEM_REGION_TEXT_X_OFFSET = -SYSTEM_REGION_TEXT_WIDTH / 2;
-        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 2;
+        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 6;
         private const double SYSTEM_SHAPE_OFFSET = SYSTEM_SHAPE_SIZE / 2;
         private const double SYSTEM_SHAPE_SIZE = 20;
         private const double SYSTEM_TEXT_TEXT_SIZE = 6;
@@ -2710,10 +2710,11 @@ namespace SMT
 
                 if (!string.IsNullOrEmpty(SystemSubText))
                 {
-                    Label sysSubText = new Label();
-                    sysSubText.Content = SystemSubText;
+                    TextBlock sysSubText = new TextBlock();
+                    sysSubText.Text = SystemSubText;
                     sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
-                    sysSubText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    
+                    sysSubText.TextAlignment = TextAlignment.Center;
                     sysSubText.IsHitTestVisible = false;
 
 
