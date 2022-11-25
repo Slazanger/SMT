@@ -409,7 +409,7 @@ namespace SMT.EVEData
                     float x = float.Parse(xn.Attributes["x"].Value);
                     float y = float.Parse(xn.Attributes["y"].Value);
 
-                    float RoundVal = 5.0f;
+                    float RoundVal = 10.0f;
                     x = (float)Math.Round(x / RoundVal, 0) * RoundVal;
                     y = (float)Math.Round(y / RoundVal, 0) * RoundVal;
 
@@ -1296,7 +1296,8 @@ namespace SMT.EVEData
 
                         SvgNet.Elements.SvgLineElement le = new SvgNet.Elements.SvgLineElement(from.X, from.Y, to.X, to.Y);
                         SvgNet.Types.SvgStyle lineStyle = new SvgNet.Types.SvgStyle();
-                        SvgNet.Types.SvgColor sc = new SvgNet.Types.SvgColor("black");
+                        SvgNet.Types.SvgColor sc = new SvgNet.Types.SvgColor("blue");
+
 
                         lineStyle.Set("stroke", sc);
                         lineStyle.Set("fill", sc);
