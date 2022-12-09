@@ -107,6 +107,8 @@ namespace SMT.EVEData
 
         public bool HasIceBelt { get; set; }
 
+        public bool HasBlueA0Star { get; set; }
+
         public bool HasJoveObservatory { get; set; }
 
         [XmlIgnoreAttribute]

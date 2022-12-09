@@ -679,6 +679,29 @@ namespace SMT.EVEData
 
             }
 
+            // now open up the blue a0 sun systems
+            string blueSunSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\a0BlueStarSystems.csv";
+            if (File.Exists(blueSunSystemsFile))
+            {
+                StreamReader file = new StreamReader(blueSunSystemsFile);
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    System s = GetEveSystem(line);
+                    if (s != null)
+                    {
+                        s.HasBlueA0Star = true;
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Data Creation Error");
+
+            }
+
 
             foreach (System s in Systems)
             {
