@@ -42,7 +42,7 @@ namespace SMT.EVEData
             backgroundWorker.RunWorkerCompleted += zkb_DoWorkComplete;
 
             DispatcherTimer dp = new DispatcherTimer();
-            dp.Interval = TimeSpan.FromSeconds(10);
+            dp.Interval = TimeSpan.FromSeconds(20);
             dp.Tick += Dp_Tick;
             dp.Start();
         }
