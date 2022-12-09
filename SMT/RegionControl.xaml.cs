@@ -55,6 +55,9 @@ namespace SMT
         private System.Windows.Media.Imaging.BitmapImage stormImageKin;
         private System.Windows.Media.Imaging.BitmapImage stormImageTherm;
 
+        private System.Windows.Media.Imaging.BitmapImage resourceImageIce;
+        private System.Windows.Media.Imaging.BitmapImage resourceImageOre;
+
         private EVEData.EveManager.JumpShip jumpShipType;
         private LocalCharacter m_ActiveCharacter;
 
@@ -151,6 +154,9 @@ namespace SMT
             stormImageExp = ResourceLoader.LoadBitmapFromResource("Images/cloud_explosive.png");
             stormImageKin = ResourceLoader.LoadBitmapFromResource("Images/cloud_kinetic.png");
             stormImageTherm = ResourceLoader.LoadBitmapFromResource("Images/cloud_thermal.png");
+            resourceImageIce = ResourceLoader.LoadBitmapFromResource("Images/ice.png");
+            resourceImageOre = ResourceLoader.LoadBitmapFromResource("Images/ore.png");
+
 
             helpIcon.MouseLeftButtonDown += HelpIcon_MouseLeftButtonDown;
         }
@@ -2381,6 +2387,10 @@ namespace SMT
                     if (system.ActualSystem.HasIceBelt)
                     {
                         systemShape.Fill = HasIceBrush;
+
+
+
+
                     }
 
                     // override with sec status colours
@@ -2406,6 +2416,37 @@ namespace SMT
                     Canvas.SetTop(systemShape, system.LayoutY - SYSTEM_SHAPE_OFFSET + 1);
                     Canvas.SetZIndex(systemShape, SYSTEM_Z_INDEX);
                     MainCanvas.Children.Add(systemShape);
+                }
+
+                if(system.ActualSystem.HasIceBelt || system.ActualSystem.HasBlueA0Star)
+                {
+                    string icons = "";
+                    // ☀❄ // ⛭☼ ☀ 
+
+                    if (system.ActualSystem.HasBlueA0Star)
+                    {
+                        icons += "⛭";
+                    }
+
+                    if (system.ActualSystem.HasIceBelt)
+                    {
+                        icons += "❄";
+                    }
+
+
+                    Label sysIcons = new Label();
+                    sysIcons.FontSize = 9;
+                    sysIcons.IsHitTestVisible = false;
+                    sysIcons.Content = icons;
+                    sysIcons.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    sysIcons.VerticalContentAlignment = VerticalAlignment.Center;
+                    sysIcons.Foreground = HasIceBrush;
+
+
+                    Canvas.SetLeft(sysIcons, system.LayoutX - SYSTEM_SHAPE_OFFSET + 14);
+                    Canvas.SetTop(sysIcons, system.LayoutY - SYSTEM_SHAPE_OFFSET - 7);
+                    Canvas.SetZIndex(sysIcons, SYSTEM_Z_INDEX + 5);
+                    MainCanvas.Children.Add(sysIcons);
                 }
 
                 if (needsOutline)
@@ -2743,6 +2784,89 @@ namespace SMT
             // now add the links
             foreach (GateHelper gh in systemLinks)
             {
+
+                /* 
+                 Sys links as curves
+
+                double smoothness = 0.02;
+
+                PathFigure pf = new PathFigure();
+                pf.StartPoint = new Point(gh.from.LayoutX, gh.from.LayoutY);
+
+                BezierSegment bs = new BezierSegment();
+                bs.IsSmoothJoin = true;
+
+                if (Math.Abs(gh.to.LayoutX - gh.from.LayoutX) < Math.Abs(gh.to.LayoutY - gh.from.LayoutY))
+                {
+                    bs.Point1 = new Point
+                    {
+                        X = gh.from.LayoutX + ((smoothness * (gh.to.LayoutX - gh.from.LayoutX))),
+                        Y = gh.from.LayoutY
+                    };
+
+                    bs.Point2 = new Point
+                    {
+                        X = gh.from.LayoutX + ((1 - smoothness) * (gh.to.LayoutX - gh.from.LayoutX)),
+                        Y = gh.from.LayoutY
+                    };
+
+                }
+                else
+                {
+                    bs.Point1 = new Point
+                    {
+                        X = gh.from.LayoutX,
+                        Y = gh.from.LayoutY + ((smoothness * (gh.to.LayoutY - gh.from.LayoutY))),
+                    };
+
+                    bs.Point2 = new Point
+                    {
+                        X = gh.from.LayoutX ,
+                        Y = gh.from.LayoutY + ((1 - smoothness) * (gh.to.LayoutY - gh.from.LayoutY)),
+                    };
+                }
+
+
+
+                bs.Point3 = new Point
+                {
+                    X = gh.to.LayoutX,
+                    Y = gh.to.LayoutY
+                };
+
+                PathSegmentCollection psc = new PathSegmentCollection();
+                psc.Add(bs);
+                pf.Segments = psc;
+
+                PathFigureCollection pfc = new PathFigureCollection();
+                pfc.Add(pf);
+
+                PathGeometry pg = new PathGeometry(pfc);
+
+                Path p = new Path();
+                p.Data = pg;
+                p.Stroke = NormalGateBrush;
+
+                if (gh.from.ActualSystem.ConstellationID != gh.to.ActualSystem.ConstellationID)
+                {
+                    p.Stroke = ConstellationGateBrush;
+                }
+
+                if (gh.from.ActualSystem.Region != gh.to.ActualSystem.Region)
+                {
+                    p.Stroke = RegionGateBrush;
+                }
+
+                p.StrokeThickness = 1.2;
+                p.Visibility = Visibility.Visible;
+
+                Canvas.SetZIndex(p, SYSTEM_LINK_INDEX);
+                MainCanvas.Children.Add(p);
+
+                */
+
+                
+                 
                 Line sysLink = new Line();
 
                 sysLink.X1 = gh.from.LayoutX;
@@ -2768,6 +2892,8 @@ namespace SMT
 
                 Canvas.SetZIndex(sysLink, SYSTEM_LINK_INDEX);
                 MainCanvas.Children.Add(sysLink);
+
+                
             }
 
             if (ShowJumpBridges && EM.JumpBridges != null)
