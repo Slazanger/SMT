@@ -99,6 +99,7 @@
                         <RowDefinition Height="25" />
                         <RowDefinition Height="25" />
                         <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
@@ -115,10 +116,12 @@
                     <Label Content="Jove Observatory" Grid.Row="2" Grid.Column="1" />
                     <Ellipse Width="20" Height="20" Stroke="Green" StrokeThickness="2.5" Grid.Row="3" Grid.Column="0" />
                     <Label Content="Thera Entrance" Grid.Row="3" Grid.Column="1" />
-                    <Rectangle Width="15" Height="15" Fill="LightBlue" StrokeThickness="2" Grid.Row="4" Grid.Column="0" />
+                    <Label Content="❄" Grid.Row="4" Grid.Column="0" />
                     <Label Content="Ice Belts" Grid.Row="4" Grid.Column="1" />
-                    <Polygon Points="0,14,7,0,14,14" Width="15" Height="15" Fill="DarkRed" Stroke="Black" StrokeThickness="2" Grid.Row="5" Grid.Column="0" />
-                    <Label Content="Trig Invasion" Grid.Row="5" Grid.Column="1" />
+                    <Label Content="⛭" Grid.Row="5" Grid.Column="0" />
+                    <Label Content="A0 Blue Sun" Grid.Row="5" Grid.Column="1" />
+                    <Polygon Points="0,14,7,0,14,14" Width="15" Height="15" Fill="DarkRed" Stroke="Black" StrokeThickness="2" Grid.Row="6" Grid.Column="0" />
+                    <Label Content="Trig Invasion" Grid.Row="6" Grid.Column="1" />
                 </Grid>
             </Border>
 

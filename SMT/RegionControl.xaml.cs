@@ -55,8 +55,6 @@ namespace SMT
         private System.Windows.Media.Imaging.BitmapImage stormImageKin;
         private System.Windows.Media.Imaging.BitmapImage stormImageTherm;
 
-        private System.Windows.Media.Imaging.BitmapImage resourceImageIce;
-        private System.Windows.Media.Imaging.BitmapImage resourceImageOre;
 
         private EVEData.EveManager.JumpShip jumpShipType;
         private LocalCharacter m_ActiveCharacter;
@@ -154,9 +152,6 @@ namespace SMT
             stormImageExp = ResourceLoader.LoadBitmapFromResource("Images/cloud_explosive.png");
             stormImageKin = ResourceLoader.LoadBitmapFromResource("Images/cloud_kinetic.png");
             stormImageTherm = ResourceLoader.LoadBitmapFromResource("Images/cloud_thermal.png");
-            resourceImageIce = ResourceLoader.LoadBitmapFromResource("Images/ice.png");
-            resourceImageOre = ResourceLoader.LoadBitmapFromResource("Images/ore.png");
-
 
             helpIcon.MouseLeftButtonDown += HelpIcon_MouseLeftButtonDown;
         }
@@ -1283,7 +1278,26 @@ namespace SMT
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
-                if (MapConf.LimitESIDataToRegion && sys.OutOfRegion)
+
+                bool isSystemOOR = sys.OutOfRegion;
+
+                if(Region.MetaRegion)
+                {
+                    var fws = EM.FactionWarfareSystems.FirstOrDefault(c => c.SystemName == sys.Name);
+                    if(fws == null)
+                    {
+                        isSystemOOR = true;
+                    }
+                    else
+                    {
+                        isSystemOOR = false;
+                    }
+
+                    
+                }
+
+
+                if (MapConf.LimitESIDataToRegion && isSystemOOR)
                 {
                     continue;
                 }
@@ -1894,12 +1908,29 @@ namespace SMT
             return null;
         }
 
+
         private void AddFWDataToMap()
         {
-            if(!ShowSovOwner)
+            if(!Region.MetaRegion || !ShowSovOwner)
             {
                 return;
             }
+
+            Brush FWLineBrushA = new SolidColorBrush(Colors.Yellow);
+            Brush FWLineBrushB = new SolidColorBrush(Colors.Orange);
+            Brush FWLineBrushC = new SolidColorBrush(Colors.OrangeRed);
+
+            DoubleCollection dashes = new DoubleCollection();
+            dashes.Add(1.0);
+            dashes.Add(3.0);
+
+            DoubleAnimation da = new DoubleAnimation();
+            da.From = 20;
+            da.To = 0;
+            da.By = 2;
+            da.Duration = new Duration(TimeSpan.FromSeconds(10));
+            da.RepeatBehavior = RepeatBehavior.Forever;
+            Timeline.SetDesiredFrameRate(da, 20);
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
@@ -1913,47 +1944,127 @@ namespace SMT
                     }
                 }
 
-
                 if (fsw == null)
                 {
                     continue;
                 }
 
+                if( fsw.SystemState == FactionWarfareSystemInfo.State.None)
+                {
+                    continue;
+                }
                 
-                                Polygon poly = new Polygon();
+                Polygon poly = new Polygon();
 
-                                foreach (Point p in sys.CellPoints)
+                foreach (Point p in sys.CellPoints)
+                {
+                    poly.Points.Add(p);
+                }
+
+                poly.Fill = GetBrushForFWState(fsw.SystemState, fsw.OccupierID);
+                poly.SnapsToDevicePixels = true;
+                poly.Stroke = null;
+                poly.StrokeThickness = 2;
+                poly.StrokeDashCap = PenLineCap.Round;
+                poly.StrokeLineJoin = PenLineJoin.Round;
+                MainCanvas.Children.Add(poly);
+                DynamicMapElements.Add(poly);
+
+                if(fsw.SystemState == FactionWarfareSystemInfo.State.Rearguard)
+                {
+                    foreach (FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    {                       
+                        if (i.SystemID != fsw.SystemID && i.OccupierID == fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation && sys.ActualSystem.Jumps.Contains(i.SystemName))
+                        {
+                            foreach (EVEData.MapSystem ms in Region.MapSystems.Values.ToList())
+                            {
+                                if (ms.Name == i.SystemName)
                                 {
-                                    poly.Points.Add(p);
+                                    Line l = new Line();
+                                    l.X1 = sys.LayoutX;
+                                    l.Y1 = sys.LayoutY;
+                                    l.X2 = ms.LayoutX;
+                                    l.Y2 = ms.LayoutY;
+                                    l.StrokeThickness = 1;
+                                    l.Stroke = FWLineBrushA;
+                                    l.StrokeDashArray = dashes;
+                                    l.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+                                    Canvas.SetZIndex(l, 19);
+                                    MainCanvas.Children.Add(l);
+                                    DynamicMapElements.Add(l);
+                                    break;
                                 }
 
-                                //poly.Fill
-                                poly.Fill = GetBrushForFWState(fsw.SystemState, fsw.OccupierID);
-                                poly.SnapsToDevicePixels = true;
-                                poly.Stroke = null;
-                                poly.StrokeThickness = 3;
-                                poly.StrokeDashCap = PenLineCap.Round;
-                                poly.StrokeLineJoin = PenLineJoin.Round;
-                                MainCanvas.Children.Add(poly);
-                                DynamicMapElements.Add(poly);
+                            }
+                        }
+                    }
+                }
+
+                if (fsw.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
+                {
+                    foreach (FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    {
+                        if (i.SystemID != fsw.SystemID && i.OccupierID == fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.Frontline && sys.ActualSystem.Jumps.Contains(i.SystemName))
+                        {
+                            foreach (EVEData.MapSystem ms in Region.MapSystems.Values.ToList())
+                            {
+                                if (ms.Name == i.SystemName)
+                                {
+                                    Line l = new Line();
+                                    l.X1 = sys.LayoutX;
+                                    l.Y1 = sys.LayoutY;
+                                    l.X2 = ms.LayoutX;
+                                    l.Y2 = ms.LayoutY;
+                                    l.StrokeThickness = 2;
+                                    l.Stroke = FWLineBrushB;
+                                    l.StrokeDashArray = dashes;
+                                    l.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+                                    Canvas.SetZIndex(l, 19);
+                                    MainCanvas.Children.Add(l);
+                                    DynamicMapElements.Add(l);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
 
 
+                if (fsw.SystemState == FactionWarfareSystemInfo.State.Frontline)
+                {
+                    foreach (FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    {
+                        if (i.SystemID != fsw.SystemID && i.OccupierID != fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.Frontline && sys.ActualSystem.Jumps.Contains(i.SystemName))
+                        {
+                            foreach (EVEData.MapSystem ms in Region.MapSystems.Values.ToList())
+                            {
+                                if (ms.Name == i.SystemName)
+  
+                                    Line l = new Line();
+                                    l.X1 = sys.LayoutX;
+                                    l.Y1 = sys.LayoutY;
+                                    l.X2 = ms.LayoutX;
+                                    l.Y2 = ms.LayoutY;
+                                    l.StrokeThickness = 3;
+                                    l.Stroke = FWLineBrushC;
+                                    l.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
 
-                /*
-                double fwIconSize = 50; 
-
-                Shape fwOwnerShape = new Ellipse() { Height = fwIconSize, Width = fwIconSize };
-                fwOwnerShape.Fill = GetBrushForFWState(fsw.SystemState, fsw.OccupierID); 
-
-                Canvas.SetZIndex(fwOwnerShape, 10);
-                Canvas.SetLeft(fwOwnerShape, sys.LayoutX - (fwIconSize / 2));
-                Canvas.SetTop(fwOwnerShape, sys.LayoutY - (fwIconSize / 2));
-                MainCanvas.Children.Add(fwOwnerShape);
-                DynamicMapElements.Add(fwOwnerShape);
-                */
-
+                                    Canvas.SetZIndex(l, 19);
+                                    MainCanvas.Children.Add(l);
+                                    DynamicMapElements.Add(l);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
+
+ 
+
 
         private void AddHighlightToSystem(string name)
         {
@@ -2199,6 +2310,27 @@ namespace SMT
 
                 Coalition SystemCoalition = null;
 
+
+
+                bool isSystemOOR = system.OutOfRegion;
+
+                if (Region.MetaRegion)
+                {
+                    var fws = EM.FactionWarfareSystems.FirstOrDefault(c => c.SystemName == system.Name);
+                    if (fws == null)
+                    {
+                        isSystemOOR = true;
+                    }
+                    else
+                    {
+                        isSystemOOR = false;
+                    }
+
+
+                }
+
+
+
                 double trueSecVal = system.ActualSystem.TrueSec;
                 if (MapConf.ShowSimpleSecurityView)
                 {
@@ -2384,14 +2516,6 @@ namespace SMT
                         systemShape.Fill = SysInRegionDarkBrush;
                     }
 
-                    if (system.ActualSystem.HasIceBelt)
-                    {
-                        systemShape.Fill = HasIceBrush;
-
-
-
-
-                    }
 
                     // override with sec status colours
                     if (ShowSystemSecurity)
@@ -2435,7 +2559,7 @@ namespace SMT
 
 
                     Label sysIcons = new Label();
-                    sysIcons.FontSize = 9;
+                    sysIcons.FontSize = 8;
                     sysIcons.IsHitTestVisible = false;
                     sysIcons.Content = icons;
                     sysIcons.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -2443,8 +2567,8 @@ namespace SMT
                     sysIcons.Foreground = HasIceBrush;
 
 
-                    Canvas.SetLeft(sysIcons, system.LayoutX - SYSTEM_SHAPE_OFFSET + 14);
-                    Canvas.SetTop(sysIcons, system.LayoutY - SYSTEM_SHAPE_OFFSET - 7);
+                    Canvas.SetLeft(sysIcons, system.LayoutX - SYSTEM_SHAPE_OFFSET + 11);
+                    Canvas.SetTop(sysIcons, system.LayoutY - SYSTEM_SHAPE_OFFSET - 9);
                     Canvas.SetZIndex(sysIcons, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(sysIcons);
                 }
@@ -2456,18 +2580,13 @@ namespace SMT
                     SystemOutline.StrokeThickness = 1.5;
                     SystemOutline.StrokeLineJoin = PenLineJoin.Round;
 
-                    if (system.OutOfRegion)
+                    if (isSystemOOR)
                     {
                         SystemOutline.Fill = SysOutRegionBrush;
                     }
                     else
                     {
                         SystemOutline.Fill = SysInRegionBrush;
-                    }
-
-                    if (system.ActualSystem.HasIceBelt)
-                    {
-                        SystemOutline.Fill = HasIceBrush;
                     }
 
                     // override with sec status colours
@@ -2535,7 +2654,7 @@ namespace SMT
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
                 }
 
-                if (system.OutOfRegion)
+                if (system.OutOfRegion && !Region.MetaRegion)
                 {
                     sysText.Foreground = SysOutRegionTextBrush;
                 }
@@ -2697,7 +2816,7 @@ namespace SMT
                 }
 
 
-                if (system.OutOfRegion)
+                if (isSystemOOR)
                 {
                     if (SystemSubText != string.Empty)
                     {
@@ -2705,8 +2824,8 @@ namespace SMT
                     }
                     SystemSubText += "(" + system.Region + ")";
 
-                    Polygon poly = new Polygon();
 
+                    Polygon poly = new Polygon();
                     foreach (Point p in system.CellPoints)
                     {
                         poly.Points.Add(p);
@@ -2764,7 +2883,7 @@ namespace SMT
                         sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                     }
 
-                    if (system.OutOfRegion)
+                    if (isSystemOOR)
                     {
                         sysSubText.Foreground = SysOutRegionTextBrush;
                     }

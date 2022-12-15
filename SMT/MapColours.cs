@@ -188,6 +188,8 @@ namespace SMT
             /*
                Note : these are rounded to the nearest 0.1..
 
+                old
+
                 #FF2FEFEF	1.0
                 #FF48F0C0	0.9
                 #FF00EF47	0.8
@@ -199,8 +201,27 @@ namespace SMT
                 #FFF04800	0.2
                 #FFD73000	0.1
                 #FFF00000	0.0
+
+                new 
+                
+                #FF2C74E0	1.0
+                #FF3A9AEB	0.9
+                #FF4ECEF8	0.8
+                #FF60D9A3	0.7
+                #FF71E554	0.6
+                #FFF3FD82	0.5
+                #FFDC6D07	0.4
+                #FFCE440F	0.3
+                #FFBC1117	0.2
+                #FF722020	0.1
+                #FF8D3264	0.0
+                
             */
 
+
+            /* Old Colour set
+             * 
+             * 
             Color secCol = (Color)ColorConverter.ConvertFromString("#FFF00000");
 
             if (GradeTrueSec && secStatus < 0.0)
@@ -256,6 +277,68 @@ namespace SMT
             if (secStatus > 0.95)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF2FEFEF");
+            }
+            */
+
+
+
+            Color secCol = (Color)ColorConverter.ConvertFromString("#FF8D3264");
+
+            if (GradeTrueSec && secStatus < 0.0)
+            {
+                secCol.R = (byte)(28 + (1.0 - (secStatus / -1.0)) * 113);
+                secCol.G = (byte)(10 + (1.0 - (secStatus / -1.0)) * 40);
+                secCol.B = (byte)(20 + (1.0 - (secStatus / -1.0)) * 0);
+            }
+
+            if (secStatus > 0.05)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF722020");
+            }
+
+            if (secStatus > 0.15)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFBC1117");
+            }
+
+            if (secStatus > 0.25)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFCE440F");
+            }
+
+            if (secStatus > 0.35)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFDC6D07");
+            }
+
+            if (secStatus > 0.45)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FFF3FD82");
+            }
+
+            if (secStatus > 0.55)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF71E554");
+            }
+
+            if (secStatus > 0.65)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF60D9A3");
+            }
+
+            if (secStatus > 0.75)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF4ECEF8");
+            }
+
+            if (secStatus > 0.85)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF3A9AEB");
+            }
+
+            if (secStatus > 0.95)
+            {
+                secCol = (Color)ColorConverter.ConvertFromString("#FF2C74E0");
             }
 
             return secCol;

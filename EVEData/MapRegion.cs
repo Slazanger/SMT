@@ -28,7 +28,7 @@ namespace SMT.EVEData
         /// <param name="faction">Faction (if any) of the region</param>
         /// <param name="universeViewX">X Location to render this on the universe map</param>
         /// <param name="universeViewY">Y Location to render this on the universe map</param>
-        public MapRegion(string name, string id, string faction, double universeViewX, double universeViewY)
+        public MapRegion(string name, string id, string faction, double universeViewX, double universeViewY, bool metaRegion = false)
         {
             Name = name;
             DotLanRef = name.Replace(" ", "_");
@@ -44,6 +44,8 @@ namespace SMT.EVEData
             HasHighSecSystems = false;
             HasLowSecSystems = false;
             HasNullSecSystems = false;
+
+            MetaRegion = metaRegion;
         }
 
         /// <summary>
@@ -66,6 +68,8 @@ namespace SMT.EVEData
         /// Gets or sets the region ID
         /// </summary>
         public string ID { get; set; }
+
+        public bool MetaRegion { get; set; }
 
         /// <summary>
         /// Gets or sets the dictionary of systems on this map

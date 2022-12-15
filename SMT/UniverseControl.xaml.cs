@@ -928,6 +928,11 @@ namespace SMT
                 Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
                 foreach (EVEData.MapRegion mr in EM.Regions)
                 {
+                    if(mr.MetaRegion)
+                    {
+                        continue;
+                    }
+
                     List<Point> scaledRegionPoints = new List<Point>();
 
                     foreach (Point p in mr.RegionOutline)

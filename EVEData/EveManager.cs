@@ -376,6 +376,10 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Wicked Creek", "10000006", string.Empty, 1580, 1230));
             Regions.Add(new MapRegion("Pochven", "10000008", "Triglavian", 50, 50));
 
+            Regions.Add(new MapRegion("Warzone - Amarr vs Minmatar", "", "Faction War", 50, 120, true));
+            Regions.Add(new MapRegion("Warzone - Caldari vs Gallente", "", "Faction War", 50, 190, true));
+
+
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
@@ -413,16 +417,26 @@ namespace SMT.EVEData
                     x = (float)Math.Round(x / RoundVal, 0) * RoundVal;
                     y = (float)Math.Round(y / RoundVal, 0) * RoundVal;
 
-                    string name = xn.Attributes["Name"].Value;
-                    string region = xn.Attributes["Region"].Value;
+
+                    string name;
+                    string region;
+
+                    
+                    if (xn.Attributes["Name"] == null)
+                    {
+                        name = GetEveSystemFromID(systemID).Name;
+                        region = GetEveSystemFromID(systemID).Region;
+                    }
+                    else
+                    {
+                        name = xn.Attributes["Name"].Value;
+                        region = xn.Attributes["Region"].Value;
+                    }
+
                     bool hasStation = false;
                     bool hasIceBelt = false;
 
-                    if(name == "Tama")
-                    {
-                        int test2 = 2;
-                        test2++;
-                    }
+
                     // create and add the system
                     if(region == rd.Name)
                     {
@@ -827,7 +841,8 @@ namespace SMT.EVEData
 
                 // generate filler points to help the voronoi to get better partitioning of open areas
                 int division = 5;
-                int minDistance = 120;
+                int minDistance = 100;
+                int minDistanceOOR = 200;
                 int margin = 180;
 
                 List<Vector2f> fillerPoints = new List<Vector2f>();
@@ -837,17 +852,38 @@ namespace SMT.EVEData
                     for (int iy = -margin; iy < 800 + margin; iy += division)
                     {
                         bool add = true;
-                        foreach(Vector2f vf in points)
+
+                        foreach(MapSystem ms in mr.MapSystems.Values.ToList())
                         {
-                            double dx = vf.x - ix;
-                            double dy = vf.y - iy;
+
+//                        }
+//                        foreach(Vector2f vf in points)
+//                        {
+
+
+                            double dx = ms.LayoutX - ix;
+                            double dy = ms.LayoutY - iy;
                             double l = Math.Sqrt(dx * dx + dy * dy);
 
-                            if (l < (minDistance))
+                            if(ms.OutOfRegion)
                             {
-                                add = false;
-                                break;
+                                if (l < (minDistanceOOR))
+                                {
+                                    add = false;
+                                    break;
+                                }
                             }
+                            else
+                            {
+                                if (l < (minDistance))
+                                {
+                                    add = false;
+                                    break;
+                                }
+                            }
+
+
+
                         }
 
                         if(add)
@@ -2284,7 +2320,7 @@ namespace SMT.EVEData
             }
 
             // for ease remove all "none" systems
-            FactionWarfareSystems.RemoveAll(sys => sys.SystemState == FactionWarfareSystemInfo.State.None);
+            //FactionWarfareSystems.RemoveAll(sys => sys.SystemState == FactionWarfareSystemInfo.State.None);
         }
 
         public void AddUpdateJumpBridge(string from, string to, long stationID)
