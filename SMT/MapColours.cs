@@ -288,7 +288,7 @@ namespace SMT
             {
                 secCol.R = (byte)(28 + (1.0 - (secStatus / -1.0)) * 113);
                 secCol.G = (byte)(10 + (1.0 - (secStatus / -1.0)) * 40);
-                secCol.B = (byte)(20 + (1.0 - (secStatus / -1.0)) * 0);
+                secCol.B = (byte)(20 + (1.0 - (secStatus / -1.0)) * 80);
             }
 
             if (secStatus > 0.05)

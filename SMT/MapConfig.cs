@@ -847,8 +847,10 @@ namespace SMT
                 SystemOutlineColour = Color.FromRgb(0, 0, 0),
                 InRegionSystemColour = Colors.SlateGray,
                 InRegionSystemTextColour = Colors.BlanchedAlmond,
-                OutRegionSystemColour = Color.FromRgb(128, 64, 64),
-                OutRegionSystemTextColour = (Color)ColorConverter.ConvertFromString("#FF726340"),
+                OutRegionSystemColour = (Color)ColorConverter.ConvertFromString("#FF272B2F"),
+                OutRegionSystemTextColour = (Color)ColorConverter.ConvertFromString("#FF7E8184"),
+
+                
 
                 UniverseSystemColour = Colors.SlateGray,
                 UniverseConstellationGateColour = Colors.SlateGray,

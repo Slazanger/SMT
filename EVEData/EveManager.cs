@@ -384,6 +384,14 @@ namespace SMT.EVEData
 
             Systems = new List<System>();
 
+
+
+
+
+
+
+
+
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
@@ -693,6 +701,30 @@ namespace SMT.EVEData
 
             }
 
+            // now open up the ice systems
+            string fwSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\factionWarfareSystems.csv";
+            if (File.Exists(fwSystemsFile))
+            {
+                StreamReader file = new StreamReader(fwSystemsFile);
+                // read the headers..
+                string line;
+                line = file.ReadLine();
+                while ((line = file.ReadLine()) != null)
+                {
+                    System s = GetEveSystem(line);
+                    if (s != null)
+                    {
+                        s.FactionWarSystem = true;
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Data Creation Error");
+            }
+
+            
+
             // now open up the blue a0 sun systems
             string blueSunSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\a0BlueStarSystems.csv";
             if (File.Exists(blueSunSystemsFile))
@@ -772,6 +804,8 @@ namespace SMT.EVEData
                 throw new Exception("Data Creation Error");
             }
 
+            
+
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
             {
@@ -842,7 +876,7 @@ namespace SMT.EVEData
                 // generate filler points to help the voronoi to get better partitioning of open areas
                 int division = 5;
                 int minDistance = 100;
-                int minDistanceOOR = 200;
+                int minDistanceOOR = 70;
                 int margin = 180;
 
                 List<Vector2f> fillerPoints = new List<Vector2f>();
@@ -855,12 +889,6 @@ namespace SMT.EVEData
 
                         foreach(MapSystem ms in mr.MapSystems.Values.ToList())
                         {
-
-//                        }
-//                        foreach(Vector2f vf in points)
-//                        {
-
-
                             double dx = ms.LayoutX - ix;
                             double dy = ms.LayoutY - iy;
                             double l = Math.Sqrt(dx * dx + dy * dy);
@@ -881,9 +909,6 @@ namespace SMT.EVEData
                                     break;
                                 }
                             }
-
-
-
                         }
 
                         if(add)
@@ -952,6 +977,11 @@ namespace SMT.EVEData
                         {
                             rr.HasNullSecSystems = true;
                         }
+                    }
+
+                    if(rr.MetaRegion)
+                    {
+                        ms.OutOfRegion = !ms.ActualSystem.FactionWarSystem;
                     }
                 }
             }
@@ -2234,6 +2264,7 @@ namespace SMT.EVEData
             ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
 
 
+            string debugListofSytems = "";
 
             if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
             {
@@ -2256,6 +2287,8 @@ namespace SMT.EVEData
                     fwsi.VictoryPointsThreshold = i.VictoryPointsThreshold;
 
                     FactionWarfareSystems.Add(fwsi);
+
+                    debugListofSytems += fwsi.SystemName + "\n";
                 }
             }
 

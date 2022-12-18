@@ -111,6 +111,8 @@ namespace SMT.EVEData
 
         public bool HasJoveObservatory { get; set; }
 
+        public bool FactionWarSystem { get; set; }
+
         [XmlIgnoreAttribute]
         public bool HasJumpBeacon { get; set; }
 
