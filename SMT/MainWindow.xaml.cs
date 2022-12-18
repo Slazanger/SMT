@@ -28,7 +28,7 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_114";
+        public const string SMT_VERSION = "SMT_115";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
 
@@ -63,7 +63,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (photon enabled : " + SMT_VERSION + ")";
+            Title = "SMT (null is purple : " + SMT_VERSION + ")";
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
@@ -124,6 +124,7 @@ namespace SMT
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
             bool initFromScratch = false;
+
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
