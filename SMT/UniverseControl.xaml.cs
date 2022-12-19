@@ -928,7 +928,7 @@ namespace SMT
                 Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
                 foreach (EVEData.MapRegion mr in EM.Regions)
                 {
-                    if(mr.MetaRegion)
+                    if (mr.MetaRegion || mr.Name == "Pochven")
                     {
                         continue;
                     }
@@ -1301,6 +1301,11 @@ namespace SMT
 
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
+                if (mr.MetaRegion || mr.Name == "Pochven")
+                {
+                    continue;
+                }
+
                 double X = mr.RegionX;
                 double Z = mr.RegionY;
 
