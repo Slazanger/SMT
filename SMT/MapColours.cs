@@ -202,8 +202,8 @@ namespace SMT
                 #FFD73000	0.1
                 #FFF00000	0.0
 
-                new 
-                
+                new
+
                 #FF2C74E0	1.0
                 #FF3A9AEB	0.9
                 #FF4ECEF8	0.8
@@ -215,13 +215,12 @@ namespace SMT
                 #FFBC1117	0.2
                 #FF722020	0.1
                 #FF8D3264	0.0
-                
+
             */
 
-
             /* Old Colour set
-             * 
-             * 
+             *
+             *
             Color secCol = (Color)ColorConverter.ConvertFromString("#FFF00000");
 
             if (GradeTrueSec && secStatus < 0.0)
@@ -279,8 +278,6 @@ namespace SMT
                 secCol = (Color)ColorConverter.ConvertFromString("#FF2FEFEF");
             }
             */
-
-
 
             Color secCol = (Color)ColorConverter.ConvertFromString("#FF8D3264");
 

@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ESI.NET
 {
@@ -69,7 +69,7 @@ namespace ESI.NET
                     response = await client.PutAsync(url, postBody).ConfigureAwait(false);
                     break;
             }
-            
+
             //Output final object
             var obj = new EsiResponse<T>(response, path);
             return obj;

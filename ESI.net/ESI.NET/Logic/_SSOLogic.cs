@@ -1,9 +1,4 @@
-﻿using ESI.NET.Enumerations;
-using ESI.NET.Models.Character;
-using ESI.NET.Models.SSO;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -13,6 +8,11 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using ESI.NET.Enumerations;
+using ESI.NET.Models.Character;
+using ESI.NET.Models.SSO;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace ESI.NET
 {
@@ -34,6 +34,7 @@ namespace ESI.NET
                 case DataSource.Tranquility:
                     _ssoUrl = "login.eveonline.com";
                     break;
+
                 case DataSource.Serenity:
                     _ssoUrl = "login.evepc.163.com";
                     break;
@@ -42,7 +43,7 @@ namespace ESI.NET
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="scope"></param>
         /// <param name="state"></param>
@@ -75,7 +76,7 @@ namespace ESI.NET
 
             return url;
         }
-        
+
         public static string GenerateChallengeCode()
         {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -102,17 +103,17 @@ namespace ESI.NET
                     var base64 = Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
                     body += $"&code_verifier={base64}&client_id={_config.ClientId}";
                 }
-            }   
+            }
             else if (grantType == GrantType.RefreshToken)
             {
                 body += $"&refresh_token={Uri.EscapeDataString(code)}";
 
-                if(codeChallenge != null)
+                if (codeChallenge != null)
                     body += $"&client_id={_config.ClientId}";
             }
 
             HttpContent postBody = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded");
-            if(codeChallenge == null)
+            if (codeChallenge == null)
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", _clientKey);
                 _client.DefaultRequestHeaders.Host = _ssoUrl;
@@ -124,7 +125,7 @@ namespace ESI.NET
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 string message = "unknown";
-                if(!string.IsNullOrEmpty(content))
+                if (!string.IsNullOrEmpty(content))
                 {
                     message = JsonConvert.DeserializeAnonymousType(content, new { error_description = string.Empty }).error_description;
                 }
@@ -201,7 +202,7 @@ namespace ESI.NET
                 var subjectClaim = jwtValidatedToken.Claims.SingleOrDefault(c => c.Type == "sub").Value;
                 var nameClaim = jwtValidatedToken.Claims.SingleOrDefault(c => c.Type == "name").Value;
                 var ownerClaim = jwtValidatedToken.Claims.SingleOrDefault(c => c.Type == "owner").Value;
-                
+
                 var returnedScopes = jwtValidatedToken.Claims.Where(c => c.Type == "scp");
                 var scopesClaim = string.Join(" ", returnedScopes.Select(s => s.Value));
 

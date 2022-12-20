@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ESI.NET.Models.Dogma
 {
-    class DynamicItem
+    internal class DynamicItem
     {
         [JsonProperty("created_by")]
         public int CreatedBy { get; set; }

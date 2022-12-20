@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-    
+
 namespace ESI.NET.Models
 {
     public class Images

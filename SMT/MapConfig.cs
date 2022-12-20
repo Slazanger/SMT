@@ -214,10 +214,6 @@ namespace SMT
             }
         }
 
-
-        
-
-
         public bool LimitESIDataToRegion
         {
             get
@@ -849,8 +845,6 @@ namespace SMT
                 InRegionSystemTextColour = Colors.BlanchedAlmond,
                 OutRegionSystemColour = (Color)ColorConverter.ConvertFromString("#FF272B2F"),
                 OutRegionSystemTextColour = (Color)ColorConverter.ConvertFromString("#FF7E8184"),
-
-                
 
                 UniverseSystemColour = Colors.SlateGray,
                 UniverseConstellationGateColour = Colors.SlateGray,

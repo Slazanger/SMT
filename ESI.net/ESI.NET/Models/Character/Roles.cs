@@ -15,6 +15,5 @@ namespace ESI.NET.Models.Character
 
         [JsonProperty("roles_at_other")]
         public string[] RolesAtOther { get; set; }
-
     }
 }

@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace ESI.NET.Models.Alliance
 {
@@ -25,6 +25,5 @@ namespace ESI.NET.Models.Alliance
 
         [JsonProperty("ticker")]
         public string Ticker { get; set; }
-
     }
 }

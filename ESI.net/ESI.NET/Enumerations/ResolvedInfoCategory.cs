@@ -16,6 +16,5 @@ namespace ESI.NET.Enumerations
         [EnumMember(Value = "station")] Station,
         [EnumMember(Value = "faction")] Faction,
         [EnumMember(Value = "structure")] Structure
-
     }
 }

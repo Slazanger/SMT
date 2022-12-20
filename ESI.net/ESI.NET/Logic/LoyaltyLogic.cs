@@ -1,8 +1,8 @@
-﻿using ESI.NET.Models.Loyalty;
-using ESI.NET.Models.SSO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.Loyalty;
+using ESI.NET.Models.SSO;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic

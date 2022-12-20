@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,7 +17,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
 using SMT.EVEData;
 
 namespace SMT
@@ -42,7 +40,6 @@ namespace SMT
 
         private Dictionary<string, long> CharacterNameIDCache;
         private Dictionary<long, string> CharacterIDNameCache;
-
 
         public JumpRoute CapitalRoute { get; set; }
 
@@ -957,7 +954,6 @@ namespace SMT
                         }
                     }
 
-
                     break;
                 }
             }
@@ -991,13 +987,10 @@ namespace SMT
                         }
                     }
 
-
                     break;
                 }
             }
         }
-
-
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -1101,6 +1094,7 @@ namespace SMT
                 RegionUC.ActiveCharacter.AddDestination(s.ID, false);
             }
         }
+
         private void AddJumpWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
             if (JumpRouteSystemDropDownAC.SelectedItem == null)
@@ -1122,7 +1116,6 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
 
@@ -1147,12 +1140,8 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
-
-
-
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1184,7 +1173,6 @@ namespace SMT
             });
         }
 
-
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
@@ -1199,7 +1187,6 @@ namespace SMT
                 catch { }
             }
         }
-
 
         private void ReCalculateRouteBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1541,7 +1528,6 @@ namespace SMT
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
-
             }
         }
 
@@ -1558,7 +1544,6 @@ namespace SMT
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
-
             }
         }
 
@@ -1849,7 +1834,6 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
 
@@ -1870,7 +1854,6 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
 
@@ -1892,9 +1875,7 @@ namespace SMT
                 {
                     lbAlternateMids.ItemsSource = null;
                 }
-
             }
-
         }
 
         private void CapitalWaypointsContextMenuMoveUp_Click(object sender, RoutedEventArgs e)
@@ -1904,7 +1885,6 @@ namespace SMT
                 CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex - 1);
                 CapitalRoute.Recalculate();
             }
-
         }
 
         private void CapitalWaypointsContextMenuMoveDown_Click(object sender, RoutedEventArgs e)
@@ -1914,7 +1894,6 @@ namespace SMT
                 CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex + 1);
                 CapitalRoute.Recalculate();
             }
-
         }
 
         private void CapitalWaypointsContextMenuDelete_Click(object sender, RoutedEventArgs e)
@@ -1961,7 +1940,6 @@ namespace SMT
         {
             string KillURL = "https://zkillboard.com/character/93280351/losses/";
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
-
         }
     }
 

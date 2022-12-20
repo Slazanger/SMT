@@ -1,6 +1,6 @@
-﻿using ESI.NET.Enumerations;
+﻿using System;
+using ESI.NET.Enumerations;
 using Newtonsoft.Json;
-using System;
 
 namespace ESI.NET.Models.Contracts
 {

@@ -1,8 +1,8 @@
-﻿using ESI.NET.Models.SSO;
-using ESI.NET.Models.Universe;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.SSO;
+using ESI.NET.Models.Universe;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic

@@ -9,6 +9,5 @@ namespace ESI.NET.Models.Corporation
 
         [JsonProperty("titles")]
         public int[] Titles { get; set; }
-
     }
 }

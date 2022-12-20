@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace ESI.NET
 {
@@ -57,14 +57,12 @@ namespace ESI.NET
                 }
                 else if (response.StatusCode == HttpStatusCode.NoContent)
                     Message = _noContentMessage[path];
-
             }
             catch (Exception ex)
             {
                 Message = response.Content.ReadAsStringAsync().Result;
                 Exception = ex;
             }
-            
         }
 
         public Guid RequestId { get; set; }

@@ -3,13 +3,11 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
@@ -20,7 +18,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Utils;
-
 
 namespace SMT.EVEData
 {
@@ -100,7 +97,6 @@ namespace SMT.EVEData
 
             ServerInfo = new EVEData.Server();
             Coalitions = new List<Coalition>();
-
         }
 
         /// <summary>
@@ -113,34 +109,25 @@ namespace SMT.EVEData
         /// </summary>
         public event IntelAddedEventHandler IntelAddedEvent;
 
-
-
-
         /// <summary>
         /// Ship Decloak Event Handler
         /// </summary>
         public delegate void ShipDecloakedEventHandler(string pilot, string text);
-
 
         /// <summary>
         /// Ship Decloaked
         /// </summary>
         public event ShipDecloakedEventHandler ShipDecloakedEvent;
 
-
         /// <summary>
         /// Combat Event Handler
         /// </summary>
         public delegate void CombatEventHandler(string pilot, string text);
 
-
         /// <summary>
         /// Combat Events
         /// </summary>
         public event CombatEventHandler CombatEvent;
-
-
-
 
         public enum JumpShip
         {
@@ -221,13 +208,11 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public ObservableCollection<LocalCharacter> LocalCharacters { get; set; }
 
-
         /// <summary>
         /// Gets or sets the list of Faction warfare systems
         /// </summary>
         [XmlIgnoreAttribute]
         public List<FactionWarfareSystemInfo> FactionWarfareSystems { get; set; }
-
 
         /// <summary>
         /// Gets or sets the master list of Regions
@@ -329,7 +314,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Etherium Reach", "10000027", string.Empty, 1570, 620));
             Regions.Add(new MapRegion("Everyshore", "10000037", "Gallente", 660, 730));
             Regions.Add(new MapRegion("Fade", "10000046", string.Empty, 720, 260));
-            Regions.Add(new MapRegion("Feythabolis", "10000056", string.Empty, 1070, 1510 ));
+            Regions.Add(new MapRegion("Feythabolis", "10000056", string.Empty, 1070, 1510));
             Regions.Add(new MapRegion("The Forge", "10000002", "Caldari", 1200, 620));
             Regions.Add(new MapRegion("Fountain", "10000058", string.Empty, 120, 500));
             Regions.Add(new MapRegion("Geminate", "10000029", "The Society", 1330, 490));
@@ -337,7 +322,7 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Great Wildlands", "10000011", "Thukker Tribe", 1630, 920));
             Regions.Add(new MapRegion("Heimatar", "10000030", "Minmatar", 1220, 860));
             Regions.Add(new MapRegion("Immensea", "10000025", string.Empty, 1350, 1230));
-            Regions.Add(new MapRegion("Impass", "10000031", string.Empty, 1200, 1390 ));
+            Regions.Add(new MapRegion("Impass", "10000031", string.Empty, 1200, 1390));
             Regions.Add(new MapRegion("Insmother", "10000009", string.Empty, 1880, 1160));
             Regions.Add(new MapRegion("Kador", "10000052", "Amarr", 660, 880));
             Regions.Add(new MapRegion("The Kalevala Expanse", "10000034", string.Empty, 1490, 370));
@@ -379,18 +364,9 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Warzone - Amarr vs Minmatar", "", "Faction War", 50, 120, true));
             Regions.Add(new MapRegion("Warzone - Caldari vs Gallente", "", "Faction War", 50, 190, true));
 
-
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
-
-
-
-
-
-
-
-
 
             // update the region cache
             foreach (MapRegion rd in Regions)
@@ -415,7 +391,7 @@ namespace SMT.EVEData
                 string systemsXpath = @"//*[@Type='system']";
                 XmlNodeList xnl = xmldoc.SelectNodes(systemsXpath);
 
-                foreach(XmlNode xn in xnl)
+                foreach (XmlNode xn in xnl)
                 {
                     long systemID = long.Parse(xn.Attributes["ID"].Value);
                     float x = float.Parse(xn.Attributes["x"].Value);
@@ -425,11 +401,9 @@ namespace SMT.EVEData
                     x = (float)Math.Round(x / RoundVal, 0) * RoundVal;
                     y = (float)Math.Round(y / RoundVal, 0) * RoundVal;
 
-
                     string name;
                     string region;
 
-                    
                     if (xn.Attributes["Name"] == null)
                     {
                         name = GetEveSystemFromID(systemID).Name;
@@ -444,12 +418,11 @@ namespace SMT.EVEData
                     bool hasStation = false;
                     bool hasIceBelt = false;
 
-
                     // create and add the system
-                    if(region == rd.Name)
+                    if (region == rd.Name)
                     {
                         System s = new System(name, systemID, rd.Name, hasStation, hasIceBelt);
-                        if(GetEveSystem(name) != null)
+                        if (GetEveSystem(name) != null)
                         {
                             int test = 0;
                             test++;
@@ -457,7 +430,6 @@ namespace SMT.EVEData
                         Systems.Add(s);
                         NameToSystem[name] = s;
                     }
-
 
                     // create and add the map version
                     rd.MapSystems[name] = new MapSystem
@@ -570,7 +542,7 @@ namespace SMT.EVEData
 
                     if (from != null && to != null)
                     {
-                        if(!from.Jumps.Contains(to.Name))
+                        if (!from.Jumps.Contains(to.Name))
                         {
                             from.Jumps.Add(to.Name);
                         }
@@ -578,7 +550,6 @@ namespace SMT.EVEData
                         {
                             to.Jumps.Add(from.Name);
                         }
-                            
                     }
                 }
             }
@@ -611,7 +582,6 @@ namespace SMT.EVEData
                         {
                             to.Jumps.Add(from.Name);
                         }
-
                     }
                 }
             }
@@ -641,7 +611,6 @@ namespace SMT.EVEData
             else
             {
                 throw new Exception("Data Creation Error");
-
             }
 
             // now open up the eve static data export and extract some info from it
@@ -673,10 +642,7 @@ namespace SMT.EVEData
             else
             {
                 throw new Exception("Data Creation Error");
-
             }
-
-
 
             // now open up the ice systems
             string iceSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\iceSystems.csv";
@@ -689,7 +655,7 @@ namespace SMT.EVEData
                 while ((line = file.ReadLine()) != null)
                 {
                     System s = GetEveSystem(line);
-                    if(s != null)
+                    if (s != null)
                     {
                         s.HasIceBelt = true;
                     }
@@ -698,7 +664,6 @@ namespace SMT.EVEData
             else
             {
                 throw new Exception("Data Creation Error");
-
             }
 
             // now open up the ice systems
@@ -723,8 +688,6 @@ namespace SMT.EVEData
                 throw new Exception("Data Creation Error");
             }
 
-            
-
             // now open up the blue a0 sun systems
             string blueSunSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\a0BlueStarSystems.csv";
             if (File.Exists(blueSunSystemsFile))
@@ -745,9 +708,7 @@ namespace SMT.EVEData
             else
             {
                 throw new Exception("Data Creation Error");
-
             }
-
 
             foreach (System s in Systems)
             {
@@ -757,7 +718,6 @@ namespace SMT.EVEData
                 s.TrigInvasionStatus = System.EdenComTrigStatus.None;
             }
 
- 
             string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\trigInvasionSystems.csv";
             if (File.Exists(trigSystemsFile))
             {
@@ -803,8 +763,6 @@ namespace SMT.EVEData
             {
                 throw new Exception("Data Creation Error");
             }
-
-            
 
             // now create the voronoi regions
             foreach (MapRegion mr in Regions)
@@ -862,8 +820,6 @@ namespace SMT.EVEData
                     }
                 }
 
-
-
                 // collect the system points to generate them from
                 List<Vector2f> points = new List<Vector2f>();
 
@@ -871,7 +827,6 @@ namespace SMT.EVEData
                 {
                     points.Add(new Vector2f(ms.LayoutX, ms.LayoutY));
                 }
-
 
                 // generate filler points to help the voronoi to get better partitioning of open areas
                 int division = 5;
@@ -881,19 +836,19 @@ namespace SMT.EVEData
 
                 List<Vector2f> fillerPoints = new List<Vector2f>();
 
-                for (int ix = -margin ; ix < 1050 + margin; ix += division)
+                for (int ix = -margin; ix < 1050 + margin; ix += division)
                 {
                     for (int iy = -margin; iy < 800 + margin; iy += division)
                     {
                         bool add = true;
 
-                        foreach(MapSystem ms in mr.MapSystems.Values.ToList())
+                        foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                         {
                             double dx = ms.LayoutX - ix;
                             double dy = ms.LayoutY - iy;
                             double l = Math.Sqrt(dx * dx + dy * dy);
 
-                            if(ms.OutOfRegion)
+                            if (ms.OutOfRegion)
                             {
                                 if (l < (minDistanceOOR))
                                 {
@@ -911,7 +866,7 @@ namespace SMT.EVEData
                             }
                         }
 
-                        if(add)
+                        if (add)
                         {
                             fillerPoints.Add(new Vector2f(ix, iy));
                         }
@@ -919,10 +874,7 @@ namespace SMT.EVEData
                 }
                 points.AddRange(fillerPoints);
 
-
-
-                Rectf clipRect = new Rectf(-margin, -margin, 1050+ 2*margin, 800 + 2*margin);
-
+                Rectf clipRect = new Rectf(-margin, -margin, 1050 + 2 * margin, 800 + 2 * margin);
 
                 // create the voronoi
                 csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, clipRect, 0);
@@ -946,7 +898,6 @@ namespace SMT.EVEData
 
                         double finalX = vc.x;
                         double finalY = vc.y;
-
 
                         ms.CellPoints.Add(new Point(Math.Round(finalX / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal, Math.Round(finalY / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal));
                         //ms.CellPoints.Add(new Point(vc.x, vc.y));
@@ -979,7 +930,7 @@ namespace SMT.EVEData
                         }
                     }
 
-                    if(rr.MetaRegion)
+                    if (rr.MetaRegion)
                     {
                         ms.OutOfRegion = !ms.ActualSystem.FactionWarSystem;
                     }
@@ -1278,7 +1229,6 @@ namespace SMT.EVEData
                 }
             }
 
-
             bool done = false;
             int iteration = 0;
             double minSpread = 19.0;
@@ -1339,15 +1289,13 @@ namespace SMT.EVEData
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
 
-
             foreach (MapRegion mr in Regions)
             {
                 SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(1050, 800);
 
                 Dictionary<string, SvgNet.Elements.SvgRectElement> systemElementMap = new Dictionary<string, SvgNet.Elements.SvgRectElement>();
 
-
-                foreach(MapSystem s in mr.MapSystems.Values)
+                foreach (MapSystem s in mr.MapSystems.Values)
                 {
                     SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.LayoutX, (float)s.LayoutY, 5, 5);
                     sre["Type"] = "system";
@@ -1355,28 +1303,22 @@ namespace SMT.EVEData
                     sre["ID"] = s.ActualSystem.ID;
                     sre["Region"] = s.Region;
 
-
-
                     systemElementMap[s.Name] = sre;
 
-                    SvgNet.Elements.SvgTextElement srtText = new SvgNet.Elements.SvgTextElement(s.Name, (float) s.LayoutX, (float) s.LayoutY);
-                    
-                    
-  
+                    SvgNet.Elements.SvgTextElement srtText = new SvgNet.Elements.SvgTextElement(s.Name, (float)s.LayoutX, (float)s.LayoutY);
+
                     svgRootElement.AddChild(sre);
                     svgRootElement.AddChild(srtText);
                 }
-
 
                 // add all the lines
 
                 foreach (MapSystem s in mr.MapSystems.Values)
                 {
-
                     SvgNet.Elements.SvgRectElement from = systemElementMap[s.Name];
                     foreach (string jumpSys in s.ActualSystem.Jumps)
                     {
-                        if(!mr.MapSystems.ContainsKey(jumpSys))
+                        if (!mr.MapSystems.ContainsKey(jumpSys))
                         {
                             continue;
                         }
@@ -1387,7 +1329,6 @@ namespace SMT.EVEData
                         SvgNet.Types.SvgStyle lineStyle = new SvgNet.Types.SvgStyle();
                         SvgNet.Types.SvgColor sc = new SvgNet.Types.SvgColor("blue");
 
-
                         lineStyle.Set("stroke", sc);
                         lineStyle.Set("fill", sc);
                         le.Style = lineStyle;
@@ -1396,16 +1337,15 @@ namespace SMT.EVEData
                     }
                 }
 
-
                 string svgStr = svgRootElement.WriteSVGString(false);
-                string filePath = $"{saveDataFolder}/SourceMaps/exported/{mr.DotLanRef}_layout.svg"; 
+                string filePath = $"{saveDataFolder}/SourceMaps/exported/{mr.DotLanRef}_layout.svg";
                 using (StreamWriter outputFile = new StreamWriter(filePath))
                 {
                     outputFile.WriteLine(svgStr);
                 }
             }
 
-            // now close 
+            // now close
             Application.Current.Shutdown();
         }
 
@@ -1645,14 +1585,7 @@ namespace SMT.EVEData
         {
             SystemIDToName = new SerializableDictionary<long, string>();
 
-
-
-
             Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
-
-
-
-
 
             Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
             ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
@@ -2182,12 +2115,10 @@ namespace SMT.EVEData
 
                 JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
 
-
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     TheraConnections.Clear();
                 }), DispatcherPriority.Normal, null);
-
 
                 // JSON feed is now in the format : {"id":38199,"signatureId":"QRQ","type":"wormhole","status":"scanned","wormholeMass":"stable","wormholeEol":"critical","wormholeEstimatedEol":"2018-02-25T20:41:21.000Z","wormholeDestinationSignatureId":"VHT","createdAt":"2018-02-25T04:41:21.000Z","updatedAt":"2018-02-25T16:41:46.000Z","deletedAt":null,"statusUpdatedAt":"2018-02-25T04:41:44.000Z","createdBy":"Erik Holden","createdById":"95598233","deletedBy":null,"deletedById":null,"wormholeSourceWormholeTypeId":91,"wormholeDestinationWormholeTypeId":140,"solarSystemId":31000005,"wormholeDestinationSolarSystemId":30001175,"sourceWormholeType":
                 while (jsr.Read())
@@ -2263,7 +2194,6 @@ namespace SMT.EVEData
 
             ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
 
-
             string debugListofSytems = "";
 
             if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
@@ -2278,7 +2208,6 @@ namespace SMT.EVEData
 
                     fwsi.OwnerID = i.OwnerFactionId;
                     fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName(i.OwnerFactionId);
-
 
                     fwsi.SystemID = i.SolarSystemId;
                     fwsi.SystemName = GetEveSystemNameFromID(i.SolarSystemId);
@@ -2306,14 +2235,13 @@ namespace SMT.EVEData
                             fws.SystemState = FactionWarfareSystemInfo.State.Frontline;
                         }
                     }
-
                 }
             }
 
             // step 2, itendify all commandline operations by flooding out one from the frontlines
             foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
             {
-                if(fws.SystemState == FactionWarfareSystemInfo.State.Frontline)
+                if (fws.SystemState == FactionWarfareSystemInfo.State.Frontline)
                 {
                     System s = GetEveSystemFromID(fws.SystemID);
 
@@ -2528,11 +2456,9 @@ namespace SMT.EVEData
         private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             string changedFile = e.FullPath;
-            
+
             string[] channelParts = e.Name.Split("_");
             string channelName = string.Join("_", channelParts, 0, channelParts.Length - 3);
-            
-
 
             bool processFile = false;
             bool localChat = false;

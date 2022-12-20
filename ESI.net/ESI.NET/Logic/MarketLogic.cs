@@ -1,9 +1,9 @@
-﻿using ESI.NET.Enumerations;
-using ESI.NET.Models.Market;
-using ESI.NET.Models.SSO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Enumerations;
+using ESI.NET.Models.Market;
+using ESI.NET.Models.SSO;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -44,9 +44,9 @@ namespace ESI.NET.Logic
         /// <param name="type_id"></param>
         /// <returns></returns>
         public async Task<EsiResponse<List<Order>>> RegionOrders(
-            int region_id, 
-            MarketOrderType order_type = MarketOrderType.All, 
-            int page = 1, 
+            int region_id,
+            MarketOrderType order_type = MarketOrderType.All,
+            int page = 1,
             int? type_id = null)
         {
             var parameters = new List<string>() { $"order_type={order_type.ToEsiValue()}" };

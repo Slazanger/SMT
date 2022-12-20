@@ -122,7 +122,6 @@ namespace SMT
 
         public MapConfig MapConf { get; set; }
 
-
         public bool FollowCharacter
         {
             get
@@ -686,7 +685,6 @@ namespace SMT
             {
                 string uRL = string.Format("https://evewho.com/alliance/{0}", ID);
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
-
             }
         }
 
@@ -759,7 +757,7 @@ namespace SMT
                 SystemColourOutlineBrush.Freeze();
 
                 ConstellationColourBrush.Freeze();
-                
+
                 SystemTextColourBrush.Freeze();
                 RegionTextColourBrush.Freeze();
                 GateColourBrush.Freeze();
@@ -823,7 +821,7 @@ namespace SMT
                         p = RegionGatePen;
                     }
 
-                    if(gh.from.Region == "Pochven")
+                    if (gh.from.Region == "Pochven")
                     {
                         p = PochvenGatePen;
                     }
@@ -882,7 +880,6 @@ namespace SMT
                     // Create a rectangle and draw it in the DrawingContext.
                     Rect rect = new Rect(X - 2, Z - 2, 4, 4);
 
-
                     Brush sysbrush = SystemColourNullSecBrush;
                     if (sys.TrueSec >= 0.45)
                     {
@@ -893,15 +890,14 @@ namespace SMT
                         sysbrush = SystemColourLowSecBrush;
                     }
 
-                    if(sys.HasNPCStation)
+                    if (sys.HasNPCStation)
                     {
                         drawingContext.DrawRectangle(sysbrush, SysOutlinePen, rect);
                     }
                     else
                     {
-                        drawingContext.DrawEllipse(sysbrush, SysOutlinePen, new Point(X, Z), 2, 2 );
+                        drawingContext.DrawEllipse(sysbrush, SysOutlinePen, new Point(X, Z), 2, 2);
                     }
-
 
                     // Persist the drawing content.
                     drawingContext.Close();
@@ -1054,8 +1050,6 @@ namespace SMT
                 Brush RouteBrush = new SolidColorBrush(Colors.Orange);
                 Brush RouteAltBrush = new SolidColorBrush(Colors.DarkRed);
 
-
-
                 if (MapConf.ShowCharacterNamesOnMap)
                 {
                     Pen p = new Pen(CharacterNameSysHighlightBrush, 1.0);
@@ -1159,21 +1153,17 @@ namespace SMT
                     }
                 }
 
-
                 if (CapitalRoute != null && CapitalRoute.CurrentRoute.Count > 1)
                 {
                     Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
                     dashedRoutePen.DashStyle = DashStyles.Dot;
                     Pen outlinePen = new Pen(activeRouteColour, 2);
-                    Pen outlineAltPen = new Pen(RouteAltBrush,2);
-
-
+                    Pen outlineAltPen = new Pen(RouteAltBrush, 2);
 
                     System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
 
                     //Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = routeVisual.RenderOpen();
-
 
                     // add the lines
                     for (int i = 1; i < CapitalRoute.CurrentRoute.Count; i++)
@@ -1182,9 +1172,6 @@ namespace SMT
 
                         EVEData.System sysA = EM.GetEveSystem(CapitalRoute.CurrentRoute[i - 1].SystemName);
                         EVEData.System sysB = EM.GetEveSystem(CapitalRoute.CurrentRoute[i].SystemName);
-
-
-
 
                         if (sysA != null && sysB != null)
                         {
@@ -1200,19 +1187,16 @@ namespace SMT
                             }
                             drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 6, 6);
 
-
                             //Create a rectangle and draw it in the DrawingContext.
                             drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
-
-
                         }
                     }
 
                     // add the alternates
                     List<string> alts = new List<string>();
-                    foreach(ObservableCollection<string> sss in CapitalRoute.AlternateMids.Values)
+                    foreach (ObservableCollection<string> sss in CapitalRoute.AlternateMids.Values)
                     {
-                        foreach(string s in sss)
+                        foreach (string s in sss)
                         {
                             if (!alts.Contains(s))
                             {
@@ -1220,26 +1204,22 @@ namespace SMT
                             }
                         }
                     }
-                    foreach(string s in alts)
+                    foreach (string s in alts)
                     {
                         EVEData.System sys = EM.GetEveSystem(s);
-                        if(s!=null)
+                        if (s != null)
                         {
                             double X = sys.UniverseX;
                             double Y = sys.UniverseY;
 
-                            drawingContext.DrawEllipse(RouteAltBrush, outlineAltPen, new Point( X, Y), 3 , 3);
-
+                            drawingContext.DrawEllipse(RouteAltBrush, outlineAltPen, new Point(X, Y), 3, 3);
                         }
-
                     }
 
                     drawingContext.Close();
 
                     VHRoute.AddChild(routeVisual, "ActiveRoute");
                 }
-
-
             }
         }
 
@@ -1370,7 +1350,6 @@ namespace SMT
 
             string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
-
         }
 
         /// <summary>
@@ -1385,7 +1364,6 @@ namespace SMT
 
             string uRL = string.Format("https://zkillboard.com/system/{0}/", eveSys.ID);
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
-
         }
 
         private void SysContexMenuShowInRegion_Click(object sender, RoutedEventArgs e)

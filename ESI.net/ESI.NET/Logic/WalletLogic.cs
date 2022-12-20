@@ -1,8 +1,8 @@
-﻿using ESI.NET.Models.SSO;
-using ESI.NET.Models.Wallet;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.SSO;
+using ESI.NET.Models.Wallet;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -53,7 +53,6 @@ namespace ESI.NET.Logic
                     $"page={page}"
                 },
                 token: _data.Token);
-
 
         /// <summary>
         /// /characters/{character_id}/wallet/transactions/

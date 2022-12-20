@@ -1,17 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Specialized;
-
+﻿using System.Collections.Specialized;
 
 namespace Utils
 {
     public class BindingQueue<T> : List<T>, INotifyCollectionChanged
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
         private int sizeLimit = 0;
 
         public void SetSizeLimit(int size)
         {
-            if(size >= 0 )
+            if (size >= 0)
             {
                 sizeLimit = size;
             }
@@ -19,14 +18,14 @@ namespace Utils
 
         public void Enqueue(T item)
         {
-            base.Insert(0,item);
+            base.Insert(0, item);
 
             if (CollectionChanged != null)
             {
-                CollectionChanged(this,new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+                CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
             }
 
-            if(sizeLimit !=0 && base.Count > sizeLimit)
+            if (sizeLimit != 0 && base.Count > sizeLimit)
             {
                 Dequeue();
             }
@@ -45,7 +44,7 @@ namespace Utils
         {
             int position = base.Count - 1;
             var item = base[position];
-            
+
             if (CollectionChanged != null)
             {
                 CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, position));
@@ -55,7 +54,5 @@ namespace Utils
 
             return item;
         }
-
     }
-
 }

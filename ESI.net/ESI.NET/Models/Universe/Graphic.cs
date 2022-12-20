@@ -27,6 +27,5 @@ namespace ESI.NET.Models.Universe
 
         [JsonProperty("icon_folder")]
         public string IconFolder { get; set; }
-
     }
 }

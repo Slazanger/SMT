@@ -70,9 +70,6 @@ namespace SMT
                     MainUniverseCanvas.Children.Remove(uie);
                 }
                 dynamicRegionsViewHighlightElements.Clear();
-
-
-                
             }
 
             AddDataToUniverse();
@@ -130,7 +127,6 @@ namespace SMT
                 regionShape.RadiusY = 10;
                 regionShape.IsHitTestVisible = false;
 
-
                 Canvas.SetLeft(regionShape, selectedRegion.UniverseViewX - 90);
                 Canvas.SetTop(regionShape, selectedRegion.UniverseViewY - 30);
                 Canvas.SetZIndex(regionShape, 23);
@@ -138,7 +134,7 @@ namespace SMT
                 dynamicRegionsViewHighlightElements.Add(regionShape);
 
                 // now add connected regions
-                foreach(string s in selectedRegion.RegionLinks)
+                foreach (string s in selectedRegion.RegionLinks)
                 {
                     EVEData.MapRegion mr = EVEData.EveManager.Instance.GetRegion(s);
 
@@ -151,13 +147,11 @@ namespace SMT
                     connectedRegion.RadiusY = 10;
                     connectedRegion.IsHitTestVisible = false;
 
-
                     Canvas.SetLeft(connectedRegion, mr.UniverseViewX - 90);
                     Canvas.SetTop(connectedRegion, mr.UniverseViewY - 30);
                     Canvas.SetZIndex(connectedRegion, 23);
                     MainUniverseCanvas.Children.Add(connectedRegion);
                     dynamicRegionsViewHighlightElements.Add(connectedRegion);
-
 
                     Line regionLink = new Line();
 
@@ -174,11 +168,7 @@ namespace SMT
                     Canvas.SetZIndex(regionLink, 21);
                     MainUniverseCanvas.Children.Add(regionLink);
                     dynamicRegionsViewHighlightElements.Add(regionLink);
-
-
                 }
-
-
             }
             else
             {
@@ -189,7 +179,6 @@ namespace SMT
                 dynamicRegionsViewHighlightElements.Clear();
             }
         }
-
 
         private void RegionShape_MouseDown(object sender, MouseButtonEventArgs e)
         {

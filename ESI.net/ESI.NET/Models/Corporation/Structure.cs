@@ -1,7 +1,7 @@
-﻿using ESI.NET.Enumerations;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using ESI.NET.Enumerations;
+using Newtonsoft.Json;
 
 namespace ESI.NET.Models.Corporation
 {

@@ -1,8 +1,8 @@
-﻿using ESI.NET.Models.Assets;
-using ESI.NET.Models.SSO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.Assets;
+using ESI.NET.Models.SSO;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -71,7 +71,6 @@ namespace ESI.NET.Logic
                 },
                 body: item_ids.ToArray(),
                 token: _data.Token);
-
 
         /// <summary>
         /// /corporations/{corporation_id}/assets/

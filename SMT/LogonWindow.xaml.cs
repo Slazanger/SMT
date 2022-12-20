@@ -29,7 +29,6 @@ namespace SMT
 
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(esiLogonURL) { UseShellExecute = true });
 
-
             try
             {
                 listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);

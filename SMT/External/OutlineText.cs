@@ -1,7 +1,5 @@
 ﻿// Based on : https://stackoverflow.com/questions/93650/apply-stroke-to-a-textblock-in-wpf
 
-
-
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -267,7 +265,6 @@ namespace SMT
               Brushes.Black,
               VisualTreeHelper.GetDpi(this).PixelsPerDip);
 
-
             UpdateFormattedText();
         }
 
@@ -300,6 +297,5 @@ namespace SMT
             EnsureFormattedText();
             _TextGeometry = _FormattedText.BuildGeometry(new Point(0, 0));
         }
-
     }
 }

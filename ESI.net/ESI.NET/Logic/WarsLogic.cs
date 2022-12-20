@@ -1,7 +1,7 @@
-﻿using ESI.NET.Models.Wars;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.Wars;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -10,7 +10,9 @@ namespace ESI.NET.Logic
     {
         private readonly HttpClient _client;
         private readonly EsiConfig _config;
-        public WarsLogic(HttpClient client, EsiConfig config) { _client = client; _config = config; }
+
+        public WarsLogic(HttpClient client, EsiConfig config)
+        { _client = client; _config = config; }
 
         /// <summary>
         /// /wars/

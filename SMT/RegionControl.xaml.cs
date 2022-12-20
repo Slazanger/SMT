@@ -35,7 +35,6 @@ namespace SMT
 
         private const int SYSTEM_Z_INDEX = 22;
 
-
         private readonly Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
         private Dictionary<string, EVEData.EveManager.JumpShip> activeJumpSpheres;
         private string currentCharacterJumpSystem;
@@ -56,7 +55,6 @@ namespace SMT
         private System.Windows.Media.Imaging.BitmapImage stormImageExp;
         private System.Windows.Media.Imaging.BitmapImage stormImageKin;
         private System.Windows.Media.Imaging.BitmapImage stormImageTherm;
-
 
         private EVEData.EveManager.JumpShip jumpShipType;
         private LocalCharacter m_ActiveCharacter;
@@ -1059,7 +1057,6 @@ namespace SMT
 
                     if (kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 3 || kvp.Key == 2 && addIndividualFleetMembers)
                     {
-
                         OutlinedTextBlock charText = new OutlinedTextBlock();
                         charText.Text = kvp.Value;
                         charText.IsHitTestVisible = false;
@@ -1272,14 +1269,12 @@ namespace SMT
 
             foreach (EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
-
                 bool isSystemOOR = sys.OutOfRegion;
 
                 if (Region.MetaRegion)
                 {
                     isSystemOOR = !sys.ActualSystem.FactionWarSystem;
                 }
-
 
                 if (MapConf.LimitESIDataToRegion && isSystemOOR)
                 {
@@ -1819,25 +1814,21 @@ namespace SMT
             }
         }
 
+        private Brush Gallente_FL = new SolidColorBrush(Color.FromArgb(100, 73, 171, 104));
+        private Brush Gallente_CLO = new SolidColorBrush(Color.FromArgb(100, 36, 90, 52));
+        private Brush Gallente_RG = new SolidColorBrush(Color.FromArgb(100, 13, 35, 19));
 
+        private Brush Caldari_FL = new SolidColorBrush(Color.FromArgb(100, 14, 186, 207));
+        private Brush Caldari_CLO = new SolidColorBrush(Color.FromArgb(100, 0, 110, 129));
+        private Brush Caldari_RG = new SolidColorBrush(Color.FromArgb(100, 0, 36, 43));
 
-        Brush Gallente_FL = new SolidColorBrush(Color.FromArgb(100, 73, 171, 104));
-        Brush Gallente_CLO = new SolidColorBrush(Color.FromArgb(100, 36, 90, 52));
-        Brush Gallente_RG = new SolidColorBrush(Color.FromArgb(100, 13, 35, 19));
+        private Brush Amarr_FL = new SolidColorBrush(Color.FromArgb(100, 216, 191, 25));
+        private Brush Amarr_CLO = new SolidColorBrush(Color.FromArgb(100, 138, 114, 14));
+        private Brush Amarr_RG = new SolidColorBrush(Color.FromArgb(100, 46, 36, 5));
 
-        Brush Caldari_FL = new SolidColorBrush(Color.FromArgb(100, 14, 186, 207));
-        Brush Caldari_CLO = new SolidColorBrush(Color.FromArgb(100, 0, 110, 129));
-        Brush Caldari_RG = new SolidColorBrush(Color.FromArgb(100, 0, 36, 43));
-
-        Brush Amarr_FL = new SolidColorBrush(Color.FromArgb(100, 216, 191, 25));
-        Brush Amarr_CLO = new SolidColorBrush(Color.FromArgb(100, 138, 114, 14));
-        Brush Amarr_RG = new SolidColorBrush(Color.FromArgb(100, 46, 36, 5));
-
-        Brush Minmatar_FL = new SolidColorBrush(Color.FromArgb(100, 221, 74, 79));
-        Brush Minmatar_CLO = new SolidColorBrush(Color.FromArgb(100, 140, 34, 41));
-        Brush Minmatar_RG = new SolidColorBrush(Color.FromArgb(100, 54, 11, 14));
-
-
+        private Brush Minmatar_FL = new SolidColorBrush(Color.FromArgb(100, 221, 74, 79));
+        private Brush Minmatar_CLO = new SolidColorBrush(Color.FromArgb(100, 140, 34, 41));
+        private Brush Minmatar_RG = new SolidColorBrush(Color.FromArgb(100, 54, 11, 14));
 
         private Brush GetBrushForFWState(FactionWarfareSystemInfo.State state, int Owner)
         {
@@ -1845,7 +1836,6 @@ namespace SMT
             //500002: "Minmatar Republic";
             //500003: "Amarr Empire";
             //500004: "Gallente Federation";
-
 
             switch (state)
             {
@@ -1884,12 +1874,10 @@ namespace SMT
                         }
                     }
                     break;
-
             }
 
             return null;
         }
-
 
         private void AddFWDataToMap()
         {
@@ -1977,7 +1965,6 @@ namespace SMT
                                     DynamicMapElements.Add(l);
                                     break;
                                 }
-
                             }
                         }
                     }
@@ -2013,7 +2000,6 @@ namespace SMT
                     }
                 }
 
-
                 if (fsw.SystemState == FactionWarfareSystemInfo.State.Frontline)
                 {
                     foreach (FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
@@ -2024,8 +2010,6 @@ namespace SMT
                             {
                                 if (ms.Name == i.SystemName)
                                 {
-
-
                                     Line l = new Line();
                                     l.X1 = sys.LayoutX;
                                     l.Y1 = sys.LayoutY;
@@ -2046,10 +2030,6 @@ namespace SMT
                 }
             }
         }
-
-
-
-
 
         private void AddHighlightToSystem(string name)
         {
@@ -2295,8 +2275,6 @@ namespace SMT
 
                 Coalition SystemCoalition = null;
 
-
-
                 bool isSystemOOR = system.OutOfRegion;
 
                 if (Region.MetaRegion)
@@ -2310,11 +2288,7 @@ namespace SMT
                     {
                         isSystemOOR = false;
                     }
-
-
                 }
-
-
 
                 double trueSecVal = system.ActualSystem.TrueSec;
                 if (MapConf.ShowSimpleSecurityView)
@@ -2476,7 +2450,6 @@ namespace SMT
                     needsOutline = true;
                 }
 
-
                 // override
                 if (ShowSystemADM)
                 {
@@ -2502,7 +2475,6 @@ namespace SMT
                     {
                         systemShape.Fill = SysInRegionDarkBrush;
                     }
-
 
                     // override with sec status colours
                     if (ShowSystemSecurity)
@@ -2532,7 +2504,7 @@ namespace SMT
                 if (system.ActualSystem.HasIceBelt || system.ActualSystem.HasBlueA0Star)
                 {
                     string icons = "";
-                    // ☀❄ // ⛭☼ ☀ 
+                    // ☀❄ // ⛭☼ ☀
 
                     if (system.ActualSystem.HasBlueA0Star)
                     {
@@ -2544,7 +2516,6 @@ namespace SMT
                         icons += "❄";
                     }
 
-
                     Label sysIcons = new Label();
                     sysIcons.FontSize = 8;
                     sysIcons.IsHitTestVisible = false;
@@ -2552,7 +2523,6 @@ namespace SMT
                     sysIcons.HorizontalContentAlignment = HorizontalAlignment.Center;
                     sysIcons.VerticalContentAlignment = VerticalAlignment.Center;
                     sysIcons.Foreground = HasIceBrush;
-
 
                     Canvas.SetLeft(sysIcons, system.LayoutX - SYSTEM_SHAPE_OFFSET + 11);
                     Canvas.SetTop(sysIcons, system.LayoutY - SYSTEM_SHAPE_OFFSET - 9);
@@ -2567,14 +2537,10 @@ namespace SMT
                 {
                     shapeSize = SYSTEM_SHAPE_OOR_SIZE;
                     shapeOffset = SYSTEM_SHAPE_OOR_OFFSET;
-
                 }
-
 
                 if (needsOutline)
                 {
-
-
                     Shape SystemOutline;
                     if (system.ActualSystem.HasNPCStation)
                     {
@@ -2584,7 +2550,6 @@ namespace SMT
                     {
                         SystemOutline = new Ellipse { Width = shapeSize, Height = shapeSize };
                     }
-
 
                     SystemOutline.Stroke = SysOutlineBrush;
                     SystemOutline.StrokeThickness = 1.5;
@@ -2684,7 +2649,6 @@ namespace SMT
                 sysText.VerticalContentAlignment = VerticalAlignment.Center;
                 sysText.Width = SYSTEM_TEXT_WIDTH;
 
-
                 Canvas.SetLeft(sysText, system.LayoutX + SYSTEM_TEXT_X_OFFSET);
                 Canvas.SetTop(sysText, system.LayoutY + sysTextOffset);
                 Canvas.SetZIndex(sysText, SYSTEM_Z_INDEX);
@@ -2759,7 +2723,7 @@ namespace SMT
                 {
                     Image JoveLogo = new Image
                     {
-                        Width = (shapeSize / 20 ) * 10,
+                        Width = (shapeSize / 20) * 10,
                         Height = (shapeSize / 20) * 10,
                         Name = "JoveLogo",
                         Source = joveLogoImage,
@@ -2828,7 +2792,6 @@ namespace SMT
                     MainCanvas.Children.Add(poly);
                 }
 
-
                 if (isSystemOOR)
                 {
                     if (SystemSubText != string.Empty)
@@ -2836,7 +2799,6 @@ namespace SMT
                         SystemSubText += "\n";
                     }
                     SystemSubText += "(" + system.Region + ")";
-
 
                     Polygon poly = new Polygon();
                     foreach (Point p in system.CellPoints)
@@ -2879,8 +2841,6 @@ namespace SMT
                     }
                 }
 
-
-
                 if (!string.IsNullOrEmpty(SystemSubText))
                 {
                     TextBlock sysSubText = new TextBlock();
@@ -2889,7 +2849,6 @@ namespace SMT
 
                     sysSubText.TextAlignment = TextAlignment.Center;
                     sysSubText.IsHitTestVisible = false;
-
 
                     if (MapConf.ActiveColourScheme.SystemSubTextSize > 0)
                     {
@@ -2906,8 +2865,6 @@ namespace SMT
                         sysSubText.Foreground = SysInRegionTextBrush;
                     }
 
-
-
                     Canvas.SetLeft(sysSubText, system.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
                     Canvas.SetTop(sysSubText, system.LayoutY + regionMarkerOffset);
                     Canvas.SetZIndex(sysSubText, SYSTEM_Z_INDEX);
@@ -2919,8 +2876,7 @@ namespace SMT
             // now add the links
             foreach (GateHelper gh in systemLinks)
             {
-
-                /* 
+                /*
                  Sys links as curves
 
                 double smoothness = 0.02;
@@ -2944,7 +2900,6 @@ namespace SMT
                         X = gh.from.LayoutX + ((1 - smoothness) * (gh.to.LayoutX - gh.from.LayoutX)),
                         Y = gh.from.LayoutY
                     };
-
                 }
                 else
                 {
@@ -2960,8 +2915,6 @@ namespace SMT
                         Y = gh.from.LayoutY + ((1 - smoothness) * (gh.to.LayoutY - gh.from.LayoutY)),
                     };
                 }
-
-
 
                 bs.Point3 = new Point
                 {
@@ -3000,8 +2953,6 @@ namespace SMT
 
                 */
 
-
-
                 Line sysLink = new Line();
 
                 sysLink.X1 = gh.from.LayoutX;
@@ -3027,8 +2978,6 @@ namespace SMT
 
                 Canvas.SetZIndex(sysLink, SYSTEM_LINK_INDEX);
                 MainCanvas.Children.Add(sysLink);
-
-
             }
 
             if (ShowJumpBridges && EM.JumpBridges != null)
@@ -3154,7 +3103,6 @@ namespace SMT
                 Brush fontColour = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF767576"));
                 Brush SelectedFont = new SolidColorBrush(Colors.White);
 
-
                 List<Label> AllianceNameListLabels = new List<Label>();
 
                 Thickness p = new Thickness(1);
@@ -3216,7 +3164,6 @@ namespace SMT
             {
                 string AURL = $"https://zkillboard.com/region/{Region.ID}/alliance/{AllianceID}/";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(AURL) { UseShellExecute = true });
-
             }
             else
             {
@@ -3278,7 +3225,7 @@ namespace SMT
             ReDrawMap(false);
         }
 
-        static private Color DarkenColour(Color inCol)
+        private static Color DarkenColour(Color inCol)
         {
             Color Dark = inCol;
             Dark.R = (Byte)(0.8 * Dark.R);
@@ -4004,7 +3951,6 @@ namespace SMT
 
             ReDrawMap(false);
         }
-
 
         private struct GateHelper
         {

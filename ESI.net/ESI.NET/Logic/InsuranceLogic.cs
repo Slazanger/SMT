@@ -1,7 +1,7 @@
-﻿using ESI.NET.Models.Insurance;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.Insurance;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -11,7 +11,8 @@ namespace ESI.NET.Logic
         private readonly HttpClient _client;
         private readonly EsiConfig _config;
 
-        public InsuranceLogic(HttpClient client, EsiConfig config) { _client = client; _config = config; }
+        public InsuranceLogic(HttpClient client, EsiConfig config)
+        { _client = client; _config = config; }
 
         /// <summary>
         /// /insurance/prices/

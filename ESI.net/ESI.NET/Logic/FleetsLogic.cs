@@ -1,9 +1,9 @@
-﻿using ESI.NET.Enumerations;
-using ESI.NET.Models.Fleets;
-using ESI.NET.Models.SSO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Enumerations;
+using ESI.NET.Models.Fleets;
+using ESI.NET.Models.SSO;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -236,9 +236,9 @@ namespace ESI.NET.Logic
                 { "fleet_id", fleet_id.ToString() },
                 { "squad_id", squad_id.ToString() }
             }, token: _data.Token);
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="motd"></param>
         /// <param name="is_free_move"></param>
@@ -272,10 +272,8 @@ namespace ESI.NET.Logic
 
             if (role == FleetRole.FleetCommander)
                 body = new { character_id, role = role.ToEsiValue() };
-
             else if (role == FleetRole.WingCommander)
                 body = new { character_id, role = role.ToEsiValue(), wing_id };
-
             else if (role == FleetRole.SquadCommander || role == FleetRole.SquadMember)
                 body = new { character_id, role = role.ToEsiValue(), wing_id, squad_id };
 

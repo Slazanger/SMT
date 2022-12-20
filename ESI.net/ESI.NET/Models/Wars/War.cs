@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ESI.NET.Models.Wars
 {
@@ -36,8 +36,6 @@ namespace ESI.NET.Models.Wars
         [JsonProperty("started")]
         public DateTime Started { get; set; }
     }
-
-
 
     public class Combatant
     {

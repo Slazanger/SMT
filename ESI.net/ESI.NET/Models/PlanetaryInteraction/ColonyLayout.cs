@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ESI.NET.Models.PlanetaryInteraction
 {
@@ -17,6 +17,7 @@ namespace ESI.NET.Models.PlanetaryInteraction
     }
 
     #region Level 1 nested classes
+
     public class Link
     {
         [JsonProperty("destination_pin_id")]
@@ -85,9 +86,11 @@ namespace ESI.NET.Models.PlanetaryInteraction
         [JsonProperty("waypoints")]
         public long[] Waypoints { get; set; }
     }
-    #endregion
+
+    #endregion Level 1 nested classes
 
     #region Level 2 nested classes
+
     public class Content
     {
         [JsonProperty("amount")]
@@ -114,9 +117,11 @@ namespace ESI.NET.Models.PlanetaryInteraction
         [JsonProperty("qty_per_cycle")]
         public int QuantityPerCycle { get; set; }
     }
-    #endregion
+
+    #endregion Level 2 nested classes
 
     #region Level 3 nested classes
+
     public class Factory
     {
         [JsonProperty("schematic_id")]
@@ -134,5 +139,6 @@ namespace ESI.NET.Models.PlanetaryInteraction
         [JsonProperty("longitude")]
         public decimal Longitude { get; set; }
     }
-    #endregion
+
+    #endregion Level 3 nested classes
 }

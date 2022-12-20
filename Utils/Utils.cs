@@ -1,13 +1,10 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-
 namespace Utils
 {
     public class Misc
     {
-
-
         public static Encoding GetEncoding(string filename)
         {
             // Read the BOM
@@ -47,8 +44,6 @@ namespace Utils
             return Encoding.Default;
         }
 
-
-
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetForegroundWindow();
 
@@ -80,7 +75,5 @@ namespace Utils
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-
-
     }
 }

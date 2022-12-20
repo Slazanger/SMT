@@ -36,6 +36,5 @@ namespace ESI.NET.Models.Universe
 
         [JsonProperty("willpower")]
         public int Willpower { get; set; }
-
     }
 }

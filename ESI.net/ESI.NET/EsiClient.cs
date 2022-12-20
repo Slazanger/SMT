@@ -1,20 +1,20 @@
-﻿using ESI.NET.Logic;
-using ESI.NET.Models.SSO;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using ESI.NET.Logic;
+using ESI.NET.Models.SSO;
+using Microsoft.Extensions.Options;
 
 namespace ESI.NET
 {
     public class EsiClient : IEsiClient
     {
-        readonly HttpClient client;
-        readonly EsiConfig config;
+        private readonly HttpClient client;
+        private readonly EsiConfig config;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="config"></param>
         public EsiClient(IOptions<EsiConfig> _config)
@@ -104,7 +104,6 @@ namespace ESI.NET
         public WalletLogic Wallet { get; set; }
         public WarsLogic Wars { get; set; }
 
-
         public void SetCharacterData(AuthorizedCharacterData data)
         {
             Assets = new AssetsLogic(client, config, data);
@@ -174,6 +173,7 @@ namespace ESI.NET
         WarsLogic Wars { get; set; }
 
         void SetCharacterData(AuthorizedCharacterData data);
+
         void SetIfNoneMatchHeader(string eTag);
     }
 }

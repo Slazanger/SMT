@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ESI.NET.Models.Character
 {
@@ -36,7 +36,6 @@ namespace ESI.NET.Models.Character
         [JsonProperty("owner_id")]
         public long OwnerId { get; set; }
     }
-
 
     public class ChannelUser
     {

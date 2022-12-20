@@ -81,7 +81,7 @@
                 <ColumnDefinition Width="7*" />
                 <ColumnDefinition Width="193*" />
             </Grid.ColumnDefinitions>
-            <zc:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" Grid.ColumnSpan="3" >
+            <zc:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" Grid.ColumnSpan="3">
                 <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" SnapsToDevicePixels="False" TextOptions.TextFormattingMode="Ideal" />
             </zc:ZoomControl>
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,0,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" Grid.Column="2" />
@@ -127,7 +127,7 @@
 
             <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3" Grid.ColumnSpan="3" />
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,140" x:Name="AllianceNameList" Visibility="Visible" Width="170" Panel.ZIndex="111" Grid.ColumnSpan="3">
-                <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom"/>
+                <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom" />
             </Border>
 
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="170" Height="123" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" CornerRadius="4" Panel.ZIndex="111"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}" Grid.ColumnSpan="3">

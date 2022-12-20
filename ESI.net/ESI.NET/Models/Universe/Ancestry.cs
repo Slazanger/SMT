@@ -21,6 +21,5 @@ namespace ESI.NET.Models.Universe
 
         [JsonProperty("icon_id")]
         public int IconId { get; set; }
-
     }
 }

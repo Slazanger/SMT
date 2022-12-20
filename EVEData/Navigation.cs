@@ -7,7 +7,6 @@
         PreferLow,
     }
 
-
     public class Navigation
     {
         public enum GateType
@@ -47,7 +46,6 @@
             }
         }
 
-
         public static List<string> GetSystemsWithinXLYFrom(string start, double LY, bool includeHighSecSystems, bool includePochvenSystems)
         {
             List<string> inRange = new List<string>();
@@ -68,7 +66,6 @@
                 if (sys == startSys)
                 {
                     continue;
-
                 }
 
                 double x = startSys.X - sys.X;
@@ -77,20 +74,19 @@
 
                 double length = Math.Sqrt((x * x) + (y * y) + (z * z)) / 9460730472580800.0;
 
-
                 bool shouldAdd = false;
 
                 if (length < LY)
                 {
                     shouldAdd = true;
                 }
-                
+
                 if (sys.HighSec & !includeHighSecSystems)
                 {
                     shouldAdd = false;
                 }
 
-                if(sys.Pochven & !includePochvenSystems)
+                if (sys.Pochven & !includePochvenSystems)
                 {
                     shouldAdd = false;
                 }
@@ -189,11 +185,10 @@
                     }
 
                     // cant jump into Pochven systems
-                    if(sys.Region == "Pochven")
+                    if (sys.Region == "Pochven")
                     {
                         continue;
                     }
-
 
                     double Distance = EveManager.Instance.GetRangeBetweenSystems(sys.Name, mn.Name);
                     if (Distance < MaxRange && Distance > 0)
@@ -334,7 +329,6 @@
             // build the path
 
             List<string> Route = new List<string>();
-
 
             bool rootError = false;
 

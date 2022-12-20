@@ -1,9 +1,9 @@
-﻿using ESI.NET.Enumerations;
-using ESI.NET.Models.Calendar;
-using ESI.NET.Models.SSO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Enumerations;
+using ESI.NET.Models.Calendar;
+using ESI.NET.Models.SSO;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -71,7 +71,7 @@ namespace ESI.NET.Logic
                 token: _data.Token);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="contract_id"></param>
         /// <returns></returns>

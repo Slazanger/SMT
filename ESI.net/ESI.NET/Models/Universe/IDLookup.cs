@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ESI.NET.Models.Universe
 {
@@ -37,6 +37,5 @@ namespace ESI.NET.Models.Universe
 
         [JsonProperty("structures")]
         public List<ResolvedInfo> Structures { get; set; } = new List<ResolvedInfo>();
-
     }
 }

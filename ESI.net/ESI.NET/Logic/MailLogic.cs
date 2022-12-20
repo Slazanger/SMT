@@ -1,8 +1,8 @@
-﻿using ESI.NET.Models.Mail;
-using ESI.NET.Models.SSO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.Mail;
+using ESI.NET.Models.SSO;
 using static ESI.NET.EsiRequest;
 
 namespace ESI.NET.Logic
@@ -159,7 +159,7 @@ namespace ESI.NET.Logic
                 },
                 body: BuildUpdateObject(is_read, labels),
                 token: _data.Token);
-        
+
         /// <summary>
         /// /characters/{character_id}/mail/{mail_id}/
         /// </summary>
@@ -175,7 +175,7 @@ namespace ESI.NET.Logic
                 token: _data.Token);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="is_read"></param>
         /// <param name="labels"></param>

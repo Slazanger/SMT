@@ -1,7 +1,7 @@
-﻿using ESI.NET.Models.SSO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ESI.NET.Models.SSO;
 using static ESI.NET.EsiRequest;
 using model = ESI.NET.Models.Opportunities;
 
@@ -13,7 +13,7 @@ namespace ESI.NET.Logic
         private readonly EsiConfig _config;
         private readonly AuthorizedCharacterData _data;
         private readonly int character_id;
-        
+
         public OpportunitiesLogic(HttpClient client, EsiConfig config, AuthorizedCharacterData data = null)
         {
             _client = client;

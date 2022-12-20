@@ -401,9 +401,9 @@
                                                     <ListBox x:Name="capitalRouteWaypointsLB" ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" AllowDrop="True">
                                                         <ListBox.ContextMenu>
                                                             <ContextMenu>
-                                                                <MenuItem Header="Move Up" Click="CapitalWaypointsContextMenuMoveUp_Click"/>
-                                                                <MenuItem Header="Move Down" Click="CapitalWaypointsContextMenuMoveDown_Click"/>
-                                                                <MenuItem Header="Delete" Click="CapitalWaypointsContextMenuDelete_Click"/>
+                                                                <MenuItem Header="Move Up" Click="CapitalWaypointsContextMenuMoveUp_Click" />
+                                                                <MenuItem Header="Move Down" Click="CapitalWaypointsContextMenuMoveDown_Click" />
+                                                                <MenuItem Header="Delete" Click="CapitalWaypointsContextMenuDelete_Click" />
                                                             </ContextMenu>
                                                         </ListBox.ContextMenu>
                                                     </ListBox>
@@ -430,7 +430,7 @@
 
                                             <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
-                                                    <Label x:Name="lblCapitalRouteSummary" Content=""/>
+                                                    <Label x:Name="lblCapitalRouteSummary" Content="" />
                                                     <DataGrid x:Name="dgCapitalRouteCurrentRoute" ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false"  SelectionChanged="CurrentCapitalRouteItem_Selected" IsReadOnly="True">
                                                         <DataGrid.CellStyle>
                                                             <Style TargetType="{x:Type DataGridCell}">
@@ -483,23 +483,22 @@
                                                             </Style>
                                                         </DataGrid.CellStyle>
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
                                                             <DataGridTextColumn Header="Distance (LY)" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                     </DataGrid>
-
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="Alternate Mids">
-                                                <StackPanel Orientation="Vertical" >
+                                                <StackPanel Orientation="Vertical">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Label Content="Alternates for : "/>
-                                                        <Label x:Name="lblAlternateMids"/>
+                                                        <Label Content="Alternates for : " />
+                                                        <Label x:Name="lblAlternateMids" />
                                                     </StackPanel>
                                                     <ListBox x:Name="lbAlternateMids">
                                                         <ListBox.ContextMenu>
                                                             <ContextMenu>
-                                                                <MenuItem Header="Use Alt" Click="CapitalRouteContextMenuUseAlt_Click"/>
+                                                                <MenuItem Header="Use Alt" Click="CapitalRouteContextMenuUseAlt_Click" />
                                                             </ContextMenu>
                                                         </ListBox.ContextMenu>
                                                     </ListBox>
@@ -509,7 +508,6 @@
                                     </ScrollViewer>
                                 </Grid>
                             </xcadl:LayoutAnchorable>
-
 
                             <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>

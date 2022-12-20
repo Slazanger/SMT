@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SMT.EVEData
+﻿namespace SMT.EVEData
 {
-    public  class FactionWarfareSystemInfo
+    public class FactionWarfareSystemInfo
     {
         public enum State
         {
@@ -28,7 +22,6 @@ namespace SMT.EVEData
         public string SystemName { get; set; }
         public int VictoryPoints { get; set; }
         public int VictoryPointsThreshold { get; set; }
-        
 
         public static string OwnerIDToName(int id)
         {
