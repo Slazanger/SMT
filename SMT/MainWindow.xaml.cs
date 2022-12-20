@@ -1963,7 +1963,7 @@ namespace SMT
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
 
         }
-
+    }
 
     /// <summary>
     /// TimeSpanConverter Sec statuc colour converter
