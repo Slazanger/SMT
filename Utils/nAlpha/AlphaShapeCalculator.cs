@@ -94,7 +94,7 @@
 
         private bool DoOtherPointsFallWithinDisk(Point center, Point p1, Point p2)
         {
-            return NearbyPoints(center).Count(p => p != p1 && p != p2) > 0;
+            return NearbyPoints(center).Any(p => p != p1 && p != p2);
         }
 
         private void AddEdge(Point p1, Point p2)

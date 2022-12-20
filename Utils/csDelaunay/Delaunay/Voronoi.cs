@@ -291,7 +291,7 @@
                     halfEdges.Add(bisector);
                     // Inserting two halfedges into edgelist constitutes Step 10:
                     // Insert bisector to the right of lbnd:
-                    edgeList.Insert(lbnd, bisector);
+                    EdgeList.Insert(lbnd, bisector);
 
                     // First half of Step 11:
                     if ((vertex = Vertex.Intersect(lbnd, bisector)) != null)
@@ -308,7 +308,7 @@
                     halfEdges.Add(bisector);
                     // Second halfedge for Step 10::
                     // Insert bisector to the right of lbnd:
-                    edgeList.Insert(lbnd, bisector);
+                    EdgeList.Insert(lbnd, bisector);
 
                     // Second half of Step 11:
                     if ((vertex = Vertex.Intersect(bisector, rbnd)) != null)
@@ -338,9 +338,9 @@
                     v.SetIndex();
                     lbnd.edge.SetVertex(lbnd.leftRight, v);
                     rbnd.edge.SetVertex(rbnd.leftRight, v);
-                    edgeList.Remove(lbnd);
+                    EdgeList.Remove(lbnd);
                     heap.Remove(rbnd);
-                    edgeList.Remove(rbnd);
+                    EdgeList.Remove(rbnd);
                     leftRight = LR.LEFT;
                     if (bottomSite.y > topSite.y)
                     {
@@ -353,7 +353,7 @@
                     edges.Add(edge);
                     bisector = Halfedge.Create(edge, leftRight);
                     halfEdges.Add(bisector);
-                    edgeList.Insert(llbnd, bisector);
+                    EdgeList.Insert(llbnd, bisector);
                     edge.SetVertex(LR.Other(leftRight), v);
                     if ((vertex = Vertex.Intersect(llbnd, bisector)) != null)
                     {
@@ -421,7 +421,7 @@
 			return DelaunayLinesForEdges(HullEdges());
 		}*/
 
-        private Site LeftRegion(Halfedge he, Site bottomMostSite)
+        private static Site LeftRegion(Halfedge he, Site bottomMostSite)
         {
             Edge edge = he.edge;
             if (edge == null)
@@ -431,7 +431,7 @@
             return edge.Site(he.leftRight);
         }
 
-        private Site RightRegion(Halfedge he, Site bottomMostSite)
+        private static Site RightRegion(Halfedge he, Site bottomMostSite)
         {
             Edge edge = he.edge;
             if (edge == null)

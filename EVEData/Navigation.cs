@@ -209,7 +209,7 @@
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)
         {
-            if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
+            if (!(MapNodes.ContainsKey(From)) || !(MapNodes.ContainsKey(To)) || From == "" || To == "")
 
             {
                 return null;
@@ -388,7 +388,7 @@
 
         public static List<RoutePoint> NavigateCapitals(string From, string To, double MaxLY, LocalCharacter lc, List<string> systemsToAvoid)
         {
-            if (!(MapNodes.Keys.Contains(From)) || !(MapNodes.Keys.Contains(To)) || From == "" || To == "")
+            if (!(MapNodes.ContainsKey(From)) || !(MapNodes.ContainsKey(To)) || From == "" || To == "")
             {
                 return null;
             }

@@ -1423,7 +1423,7 @@ namespace SMT.EVEData
         public string GetAllianceName(long id)
         {
             string name = string.Empty;
-            if (AllianceIDToName.Keys.Contains(id))
+            if (AllianceIDToName.ContainsKey(id))
             {
                 name = AllianceIDToName[id];
             }
@@ -1439,7 +1439,7 @@ namespace SMT.EVEData
         public string GetAllianceTicker(long id)
         {
             string ticker = string.Empty;
-            if (AllianceIDToTicker.Keys.Contains(id))
+            if (AllianceIDToTicker.ContainsKey(id))
             {
                 ticker = AllianceIDToTicker[id];
             }
@@ -1450,7 +1450,7 @@ namespace SMT.EVEData
         public string GetCharacterName(long id)
         {
             string name = string.Empty;
-            if (CharacterIDToName.Keys.Contains(id))
+            if (CharacterIDToName.ContainsKey(id))
             {
                 name = CharacterIDToName[id];
             }
@@ -1564,7 +1564,7 @@ namespace SMT.EVEData
         public string GetSystemNameFromSystemID(long id)
         {
             string name = string.Empty;
-            if (SystemIDToName.Keys.Contains(id))
+            if (SystemIDToName.ContainsKey(id))
             {
                 name = SystemIDToName[id];
             }
@@ -2062,7 +2062,7 @@ namespace SMT.EVEData
                         bool readFile = false;
                         foreach (string intelFilterStr in IntelFilters)
                         {
-                            if (file.Name.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
+                            if (file.Name.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
                             {
                                 readFile = true;
                                 break;
@@ -2151,12 +2151,12 @@ namespace SMT.EVEData
 
             foreach (KeyValuePair<string, MapSystem> kvp in r.MapSystems)
             {
-                if (kvp.Value.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.Keys.Contains(kvp.Value.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceTCU))
+                if (kvp.Value.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.ContainsKey(kvp.Value.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceTCU))
                 {
                     IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceTCU);
                 }
 
-                if (kvp.Value.ActualSystem.SOVAllianceIHUB != 0 && !AllianceIDToName.Keys.Contains(kvp.Value.ActualSystem.SOVAllianceIHUB) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceIHUB))
+                if (kvp.Value.ActualSystem.SOVAllianceIHUB != 0 && !AllianceIDToName.ContainsKey(kvp.Value.ActualSystem.SOVAllianceIHUB) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceIHUB))
                 {
                     IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceIHUB);
                 }
@@ -2201,7 +2201,7 @@ namespace SMT.EVEData
                         string wormHoleEOL = obj["wormholeEol"].ToString();
                         string type = obj["type"].ToString();
 
-                        if (type != null && type == "wormhole" && solarSystemId != 0 && wormHoleEOL != null && SystemIDToName.Keys.Contains(solarSystemId))
+                        if (type != null && type == "wormhole" && solarSystemId != 0 && wormHoleEOL != null && SystemIDToName.ContainsKey(solarSystemId))
                         {
                             System theraConnectionSystem = GetEveSystemFromID(solarSystemId);
 
@@ -2540,7 +2540,7 @@ namespace SMT.EVEData
             // check if the changed file path contains the name of a channel we're looking for
             foreach (string intelFilterStr in IntelFilters)
             {
-                if (changedFile.IndexOf(intelFilterStr, StringComparison.OrdinalIgnoreCase) >= 0)
+                if (changedFile.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
                 {
                     processFile = true;
                     break;
@@ -2565,7 +2565,7 @@ namespace SMT.EVEData
                     int fileReadFrom = 0;
 
                     // have we seen this file before
-                    if (intelFileReadPos.Keys.Contains<string>(changedFile))
+                    if (intelFileReadPos.ContainsKey(changedFile))
                     {
                         fileReadFrom = intelFileReadPos[changedFile];
                     }
@@ -2644,7 +2644,7 @@ namespace SMT.EVEData
 
                     while (line != null)
                     {                    // trim any items off the front
-                        if (line.Contains("[") && line.Contains("]"))
+                        if (line.Contains('[') && line.Contains(']'))
                         {
                             line = line.Substring(line.IndexOf("["));
                         }
@@ -2788,7 +2788,7 @@ namespace SMT.EVEData
                 int fileReadFrom = 0;
 
                 // have we seen this file before
-                if (gameFileReadPos.Keys.Contains<string>(changedFile))
+                if (gameFileReadPos.ContainsKey(changedFile))
                 {
                     fileReadFrom = gameFileReadPos[changedFile];
                 }
@@ -3001,47 +3001,6 @@ namespace SMT.EVEData
             }).Start();
         }
 
-        private async void UpdateCoalitionInfo()
-        {
-            Coalitions = new List<Coalition>();
-
-            string url = @"http://rischwa.net/api/coalitions/current";
-            string strContent = string.Empty;
-
-            try
-            {
-                HttpClient hc = new HttpClient();
-                var response = await hc.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-                strContent = await response.Content.ReadAsStringAsync();
-
-                var coalitions = CoalitionData.CoalitionInfo.FromJson(strContent);
-
-                if (coalitions != null)
-                {
-                    foreach (CoalitionData.Coalition cd in coalitions.Coalitions)
-                    {
-                        Coalition c = new Coalition();
-                        c.Name = cd.Name;
-                        c.ID = cd.Id;
-                        c.MemberAlliances = new List<long>();
-                        c.CoalitionColor = (Color)ColorConverter.ConvertFromString(cd.Color);
-                        //c.CoalitionBrush = new SolidColorBrush(c.CoalitionColor);
-
-                        foreach (CoalitionData.Alliance a in cd.Alliances)
-                        {
-                            c.MemberAlliances.Add(a.Id);
-                        }
-
-                        Coalitions.Add(c);
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
         private async void UpdateDotlanKillDeltaInfo()
         {
             foreach (MapRegion mr in Regions)
@@ -3230,7 +3189,7 @@ namespace SMT.EVEData
                         ss.DefendersScore = c.DefenderScore;
                         ss.Valid = true;
 
-                        if (AllianceIDToName.Keys.Contains(ss.DefendingAllianceID))
+                        if (AllianceIDToName.ContainsKey(ss.DefendingAllianceID))
                         {
                             ss.DefendingAllianceName = AllianceIDToName[ss.DefendingAllianceID];
                         }
@@ -3266,7 +3225,7 @@ namespace SMT.EVEData
 
                 foreach (SOVCampaign sc in ActiveSovCampaigns.ToList())
                 {
-                    if (string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.Keys.Contains(sc.DefendingAllianceID))
+                    if (string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.ContainsKey(sc.DefendingAllianceID))
                     {
                         sc.DefendingAllianceName = AllianceIDToName[sc.DefendingAllianceID];
                     }
@@ -3320,7 +3279,7 @@ namespace SMT.EVEData
                         JObject obj = JObject.Load(jsr);
                         long systemID = long.Parse(obj["system_id"].ToString());
 
-                        if (SystemIDToName.Keys.Contains(systemID))
+                        if (SystemIDToName.ContainsKey(systemID))
                         {
                             System es = GetEveSystem(SystemIDToName[systemID]);
                             if (es != null)

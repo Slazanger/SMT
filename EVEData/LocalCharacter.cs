@@ -1181,7 +1181,7 @@ namespace SMT.EVEData
 
                 if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
                 {
-                    if (!EveManager.Instance.SystemIDToName.Keys.Contains(esr.Data.SolarSystemId))
+                    if (!EveManager.Instance.SystemIDToName.ContainsKey(esr.Data.SolarSystemId))
                     {
                         Location = "";
                         Region = "";

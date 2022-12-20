@@ -106,7 +106,7 @@
             return halfedge;
         }
 
-        public void Insert(Halfedge lb, Halfedge newHalfedge)
+        public static void Insert(Halfedge lb, Halfedge newHalfedge)
         {
             newHalfedge.edgeListLeftNeighbor = lb;
             newHalfedge.edgeListRightNeighbor = lb.edgeListRightNeighbor;
@@ -120,7 +120,7 @@
 		 * @param halfEdge
 		 */
 
-        public void Remove(Halfedge halfedge)
+        public static void Remove(Halfedge halfedge)
         {
             halfedge.edgeListLeftNeighbor.edgeListRightNeighbor = halfedge.edgeListRightNeighbor;
             halfedge.edgeListRightNeighbor.edgeListLeftNeighbor = halfedge.edgeListLeftNeighbor;

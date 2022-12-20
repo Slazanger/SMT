@@ -122,14 +122,6 @@ namespace SMT
             new Point(18,17),
         };
 
-        private List<Point> SystemIcon_NPCStation = new List<Point>
-        {
-            new Point(2,16),
-            new Point(2,2),
-            new Point(16,2),
-            new Point(16,16),
-        };
-
         private System.Windows.Media.Imaging.BitmapImage trigLogoImage;
 
         // Timer to Re-draw the map
@@ -1845,8 +1837,6 @@ namespace SMT
         Brush Minmatar_CLO = new SolidColorBrush(Color.FromArgb(100, 140, 34, 41));
         Brush Minmatar_RG = new SolidColorBrush(Color.FromArgb(100, 54, 11, 14));
 
-        Brush FW_Outline = new SolidColorBrush(Color.FromArgb(150, 240, 240, 240));
-
 
 
         private Brush GetBrushForFWState(FactionWarfareSystemInfo.State state, int Owner)
@@ -3288,7 +3278,7 @@ namespace SMT
             ReDrawMap(false);
         }
 
-        private Color DarkenColour(Color inCol)
+        static private Color DarkenColour(Color inCol)
         {
             Color Dark = inCol;
             Dark.R = (Byte)(0.8 * Dark.R);

@@ -61,7 +61,7 @@ namespace SMT.EVEData
         public AnomData GetSystemAnomData(string sysName)
         {
             AnomData ret;
-            if (Systems.Keys.Contains(sysName))
+            if (Systems.ContainsKey(sysName))
             {
                 ret = Systems[sysName];
             }
