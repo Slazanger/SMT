@@ -94,6 +94,7 @@ namespace SMT.EVEData
             AllianceIDToName = new SerializableDictionary<long, string>();
             AllianceIDToTicker = new SerializableDictionary<long, string>();
             NameToSystem = new Dictionary<string, System>();
+            IDToSystem = new Dictionary<long, System>();
 
             ServerInfo = new EVEData.Server();
             Coalitions = new List<Coalition>();
@@ -283,6 +284,12 @@ namespace SMT.EVEData
         private Dictionary<string, System> NameToSystem { get; }
 
         /// <summary>
+        /// Gets or sets the ID to System dictionary
+        /// </summary>
+        private Dictionary<long, System> IDToSystem { get; }
+
+
+        /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
         public void CreateFromScratch()
@@ -429,6 +436,7 @@ namespace SMT.EVEData
                         }
                         Systems.Add(s);
                         NameToSystem[name] = s;
+                        IDToSystem[systemID] = s;
                     }
 
                     // create and add the map version
@@ -713,6 +721,7 @@ namespace SMT.EVEData
             foreach (System s in Systems)
             {
                 NameToSystem[s.Name] = s;
+                IDToSystem[s.ID] = s;
 
                 // default to no invasion
                 s.TrigInvasionStatus = System.EdenComTrigStatus.None;
@@ -1127,11 +1136,11 @@ namespace SMT.EVEData
             // now generate the 2d universe view coordinates
 
             double RenderSize = 5000;
-            double universeXMin = 0.0;
-            double universeXMax = 336522971264518000.0;
+            double universeXMin = 484452845697854000;
+            double universeXMax = -484452845697854000;
 
-            double universeZMin = -484452845697854000;
-            double universeZMax = 472860102256057000.0;
+            double universeZMin = 484452845697854000;
+            double universeZMax = -472860102256057000.0;
 
             foreach (EVEData.System sys in Systems)
             {
@@ -1428,12 +1437,9 @@ namespace SMT.EVEData
         /// <param name="id">ID of the system</param>
         public System GetEveSystemFromID(long id)
         {
-            foreach (System s in Systems)
+            if(IDToSystem.ContainsKey(id))
             {
-                if (s.ID == id)
-                {
-                    return s;
-                }
+                return IDToSystem[id];
             }
 
             return null;
@@ -1445,13 +1451,11 @@ namespace SMT.EVEData
         /// <param name="id">ID of the system</param>
         public string GetEveSystemNameFromID(long id)
         {
-            foreach (System s in Systems)
+            System s = GetEveSystemFromID(id);
+            if(s != null)
             {
-                if (s.ID == id)
-                {
-                    return s.Name;
-                }
-            }
+                return s.Name;
+            }    
 
             return string.Empty;
         }
@@ -1628,6 +1632,7 @@ namespace SMT.EVEData
             foreach (System s in Systems)
             {
                 NameToSystem[s.Name] = s;
+                IDToSystem[s.ID] = s;
             }
 
             // now add the beacons

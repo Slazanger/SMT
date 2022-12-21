@@ -744,9 +744,9 @@ namespace SMT
                 PochvenGateColourBrush = new SolidColorBrush(Colors.DimGray);
 
                 Color RegionShapeFillCol = MapConf.ActiveColourScheme.UniverseMapBackgroundColour;
-                RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.9);
-                RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.9);
-                RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.9);
+                RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.8);
+                RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.8);
+                RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.8);
 
                 RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
 
@@ -830,6 +830,7 @@ namespace SMT
                 }
 
                 gatesDrawingContext.Close();
+                //gatesDrawingVisual.CacheMode = new BitmapCache(3);
                 VHLinks.AddChild(gatesDrawingVisual, "link");
 
                 if (ShowJumpBridges)
@@ -921,43 +922,38 @@ namespace SMT
                     VHNames.AddChild(SystemTextVisual, null);
                 }
 
-                Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
-                foreach (EVEData.MapRegion mr in EM.Regions)
+                // region shapes
                 {
-                    if (mr.MetaRegion || mr.Name == "Pochven")
-                    {
-                        continue;
-                    }
+                    Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
+                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
 
-                    List<Point> scaledRegionPoints = new List<Point>();
+                    // Retrieve the DrawingContext in order to create new drawing content.
+                    DrawingContext drawingContext = dataDV.RenderOpen();
 
-                    foreach (Point p in mr.RegionOutline)
+                    foreach (EVEData.System sys in EM.Systems)
                     {
-                        double X = p.X;
+
+
+                        double X = sys.UniverseX;
 
                         // need to invert Z
-                        double Z = p.Y;
+                        double Z = sys.UniverseY;
 
-                        scaledRegionPoints.Add(new Point(X, Z));
+                        double blobSize = 55;
+
+
+                        drawingContext.DrawEllipse(RegionShapeColourBrush, RegionShapePen, new Point(X, Z), blobSize, blobSize);
+
+
                     }
+                    drawingContext.Close();
 
-                    StreamGeometry sg = new StreamGeometry();
-                    sg.FillRule = FillRule.Nonzero;
+                    dataDV.CacheMode = new BitmapCache(0.1);
+                    VHRegionShapes.AddChild(dataDV);
 
-                    using (StreamGeometryContext sgc = sg.Open())
-                    {
-                        sgc.BeginFigure(scaledRegionPoints[0], true, true);
-                        sgc.PolyLineTo(scaledRegionPoints.Skip(1).ToArray(), true, false);
-                    }
-
-                    System.Windows.Media.DrawingVisual RegionShapeVisual = new System.Windows.Media.DrawingVisual();
-                    DrawingContext regionShapeDrawingContext = RegionShapeVisual.RenderOpen();
-
-                    regionShapeDrawingContext.DrawGeometry(RegionShapeColourBrush, RegionShapePen, sg);
-
-                    regionShapeDrawingContext.Close();
-                    VHRegionShapes.AddChild(RegionShapeVisual, null);
                 }
+
+
             }
 
             if (DataRedraw)
