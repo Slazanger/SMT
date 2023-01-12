@@ -70,7 +70,7 @@ namespace SMT.EVEData
             LocalCharacters = new ObservableCollection<LocalCharacter>();
             VersionStr = version;
 
-            string SaveDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT";
+            string SaveDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMTAdapt";
             if (!Directory.Exists(SaveDataRoot))
             {
                 Directory.CreateDirectory(SaveDataRoot);
