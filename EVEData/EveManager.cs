@@ -1314,7 +1314,7 @@ namespace SMT.EVEData
 
                     systemElementMap[s.Name] = sre;
 
-                    SvgNet.Elements.SvgTextElement srtText = new SvgNet.Elements.SvgTextElement(s.Name, (float)s.LayoutX, (float)s.LayoutY);
+                    SvgNet.Elements.SvgTextElement srtText = new(s.Name, (float)s.LayoutX, (float)s.LayoutY);
 
                     svgRootElement.AddChild(sre);
                     svgRootElement.AddChild(srtText);
@@ -2100,7 +2100,7 @@ namespace SMT.EVEData
                 }
             }
 
-            ResolveAllianceIDs(IDToResolve);
+            _ = ResolveAllianceIDs ( IDToResolve );
         }
 
         /// <summary>

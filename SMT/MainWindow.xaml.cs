@@ -29,6 +29,7 @@ namespace SMT
         public const string SMT_VERSION = "SMT_115";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
+        private Overlay overlayWindow;
 
         private MediaPlayer mediaPlayer;
         private PreferencesWindow preferencesWindow;
@@ -42,6 +43,8 @@ namespace SMT
         private Dictionary<long, string> CharacterIDNameCache;
 
         public JumpRoute CapitalRoute { get; set; }
+
+        public EventHandler OnSelectedCharChangedEventHandler;
 
         /// <summary>
         /// Main Window
@@ -146,9 +149,15 @@ namespace SMT
 
             IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
             idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
+            
+            IntelData idthree = new IntelData ( "[ 2023.01.11 17:27:17 ] OW-TPO Sirius Sam, Vedmak on gate", "fake.intel" );
+            idthree.IntelString = "OW-TPO Sirius Sam, Vedmak on gate";
+            idthree.Systems = new List<string> () { "OW-TPO" };
+            idthree.IntelTime = DateTime.Now - TimeSpan.FromMinutes ( 4 );
 
             EVEManager.IntelDataList.Enqueue(id);
             EVEManager.IntelDataList.Enqueue(idtwo);
+            //EVEManager.IntelDataList.Enqueue ( idthree );
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -738,7 +747,9 @@ namespace SMT
 
         #region Characters
 
-        public EVEData.LocalCharacter ActiveCharacter { get; set; }
+        // Property now automatically fires an event when the active character changes.
+        private EVEData.LocalCharacter activeCharacter;
+        public EVEData.LocalCharacter ActiveCharacter { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke ( this, EventArgs.Empty ); } }
 
         /// <summary>
         ///  Add Character Button Clicked
@@ -1941,6 +1952,24 @@ namespace SMT
             string KillURL = "https://zkillboard.com/character/93280351/losses/";
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
         }
+
+        private void OverlayWindow_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if ( overlayWindow != null )
+            {
+                return;
+            }
+
+            overlayWindow = new Overlay(this);
+            overlayWindow.Closing += OnOverlayWindowClosing; 
+            overlayWindow.Show();            
+        }
+
+        public void OnOverlayWindowClosing (object sender, CancelEventArgs e)
+        {
+            overlayWindow = null;
+        }
+
     }
 
     /// <summary>

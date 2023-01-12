@@ -54,6 +54,7 @@
                 <MenuItem Header="File">
                     <MenuItem Header="Characters" Click="Characters_MenuItem_Click" />
                     <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
+                    <MenuItem Header="Overlay" Click="OverlayWindow_MenuItem_Click" />
                     <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
                 </MenuItem>
 

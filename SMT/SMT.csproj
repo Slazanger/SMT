@@ -171,6 +171,10 @@
     <Resource Include="Images\unknownChar.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\overlay_close.png" />
+    <Resource Include="Images\overlay_move.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Dirkster.AvalonDock.Themes.Expression">
       <Version>4.70.3</Version>
     </PackageReference>
