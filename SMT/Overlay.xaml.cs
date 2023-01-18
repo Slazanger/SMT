@@ -81,6 +81,9 @@ namespace SMT
             // Set up some events
             mainWindow.OnSelectedCharChangedEventHandler += SelectedCharChanged;
             SizeChanged += OnSizeChanged;
+            // We can only redraw stuff when the canvas is actually resized, otherwise dimensions will be wrong!
+            overlay_Canvas.SizeChanged += OnCanvasSizeChanged;
+
             // TODO: Add better handling for new intel events.
             // mw.EVEManager.IntelAddedEvent += OnIntelAdded;
 
@@ -151,6 +154,17 @@ namespace SMT
                 // Gather all intel data from EVEManager.
                 foreach (EVEData.IntelData intelDataset in mainWindow.EVEManager.IntelDataList)
                 {
+                    // Clean the system list to remove everything that is not a valid system.
+                    List<string> cleanedSystemList = new List<string>();
+                    foreach (string intelSystem in intelDataset.Systems)
+                    {
+                        if (mainWindow.EVEManager.GetEveSystem(intelSystem) != null)
+                        {
+                            cleanedSystemList.Add(intelSystem);
+                        }
+                    }
+                    intelDataset.Systems = cleanedSystemList;
+
                     if (intelDataset.Systems.Count == 0)
                         continue;
 
@@ -162,12 +176,31 @@ namespace SMT
                     if (intelData.Any(d => d.Item1.RawIntelString == intelDataset.RawIntelString))
                         continue;
 
+                    // Check if it is intel for an already existing system, throw out older entries.
+                    List<(EVEData.IntelData, List<Ellipse>)> deleteList = new List<(EVEData.IntelData, List<Ellipse>)>();
+                    foreach (string intelSystem in intelDataset.Systems)
+                    {
+                        foreach (var existingIntelDataset in intelData)
+                        {
+                            if (existingIntelDataset.Item1.Systems.Any(s => s == intelSystem))
+                            {
+                                deleteList.Add(existingIntelDataset);
+                            }
+                        }
+                    }
+                    foreach (var deleteEntry in deleteList)
+                    {
+                        foreach (Ellipse intelShape in deleteEntry.Item2)
+                        {
+                            overlay_Canvas.Children.Remove(intelShape);
+                        }
+                        intelData.Remove(deleteEntry);
+                    }
+
                     // Otherwise, add it.
                     intelData.Add((intelDataset, new List<Ellipse>()));
 
                 }
-
-
 
                 // Check all intel data in the list if it has expired.
                 foreach (var intelDataEntry in intelData)
@@ -182,7 +215,6 @@ namespace SMT
                         }
                     }
                 }
-
 
                 // Remove all expired entries.
                 intelData.RemoveAll(d => (DateTime.Now - d.Item1.IntelTime).TotalSeconds > intelLifetime);
@@ -293,7 +325,7 @@ namespace SMT
             EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
 
             // Bail out if the system does not exist. I.e. wormhole systems.
-            if ( currentSystem == null ) return;
+            if (currentSystem == null) return;
 
             List<List<EVEData.System>> hierarchie = new List<List<EVEData.System>>();
 
@@ -448,20 +480,37 @@ namespace SMT
         /// <param name="e"></param>
         public void SelectedCharChanged(object sender, EventArgs e)
         {
+            // Set the player name
+            if (mainWindow.ActiveCharacter != null)
+            {
+                overlay_CharNameTextblock.Text = mainWindow.ActiveCharacter.Name;
+            }
+            else
+            {
+                overlay_CharNameTextblock.Text = "";
+            }
             UpdateSystemList();
             UpdateIntelDataCoordinates();
         }
 
         /// <summary>
-        /// Handles resizing the window. On resizing the content of the map has
-        /// to be refreshed. Also the new size and position of the window 
-        /// is stored.
+        /// Handles resizing the window. On resizing the content the new size and 
+        /// position of the window is stored. Also the size of the canvas is updated.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnSizeChanged(object sender, EventArgs e)
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            overlay_Canvas.Height = Math.Max(this.Height - 30, 0);
+            overlay_Canvas.Height = Math.Max(e.NewSize.Height - 30, 1);
+        }
+
+        /// <summary>
+        /// When the canvas is resized we need to redraw the map.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnCanvasSizeChanged(object sender, SizeChangedEventArgs e)
+        {
             StoreOverlayWindowPosition();
             UpdateSystemList();
             UpdateIntelDataCoordinates();

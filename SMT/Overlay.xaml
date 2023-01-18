@@ -17,18 +17,20 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30px"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30px"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button Grid.Column="0" Grid.Row="0" PreviewMouseDown="Overlay_Window_Move" Background="Transparent" Opacity="0.5" ToolTip="Drag to move the overlay window." BorderThickness="0">
+        <TextBlock Grid.Column="1" Grid.Row="0"  Background="Transparent" Name="overlay_CharNameTextblock" HorizontalAlignment="Center" Text="" TextAlignment="Center" FontSize="12" Opacity="0.5" Margin="6" Foreground="White"/>
+        <Button Grid.Column="0" Grid.Row="0" PreviewMouseDown="Overlay_Window_Move" Opacity="0.5" ToolTip="Drag to move the overlay window." BorderThickness="0">
             <Image Source="/Images/overlay_move.png" Stretch="Fill"/>
         </Button>
-        <Button Grid.Column="1" Grid.Row="0" PreviewMouseDown="Overlay_Window_Close" Width="30" HorizontalAlignment="Right" Background="Transparent" Opacity="0.5" ToolTip="Click to close the overlay window." BorderThickness="0">
+        <Button Grid.Column="2" Grid.Row="0" PreviewMouseDown="Overlay_Window_Close" Width="30" HorizontalAlignment="Right" Background="Transparent" Opacity="0.5" ToolTip="Click to close the overlay window." BorderThickness="0">
             <Image Source="/Images/overlay_close.png" Stretch="Fill"/>
         </Button>
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" x:Name="overlay_CanvasContainer" >
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" x:Name="overlay_CanvasContainer" >
             <Canvas x:Name="overlay_Canvas" SnapsToDevicePixels="False" TextOptions.TextFormattingMode="Ideal" Height="570"/>
         </StackPanel>
     </Grid>
