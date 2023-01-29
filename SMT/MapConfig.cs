@@ -80,6 +80,10 @@ namespace SMT
 
         private string m_CustomEveLogFolderLocation;
 
+        private bool m_ClampMaxESIOverlayValue;
+
+        private int m_MaxESIOverlayValue;
+
         public MapConfig()
         {
             SetDefaults();
@@ -226,6 +230,41 @@ namespace SMT
                 OnPropertyChanged("LimitESIDataToRegion");
             }
         }
+
+        public bool ClampMaxESIOverlayValue
+        {
+            get
+            {
+                return m_ClampMaxESIOverlayValue;
+            }
+            set
+            {
+                m_ClampMaxESIOverlayValue = value;
+                OnPropertyChanged("ClampMaxESIOverlayValue");
+
+            }
+        }
+
+        public int MaxESIOverlayValue
+        {
+            get
+            {
+                return m_MaxESIOverlayValue;
+            }
+            set
+            {
+                if(value >= 30)
+                {
+                    m_MaxESIOverlayValue = value;
+                }
+                else
+                {
+                    m_MaxESIOverlayValue = 30;
+                }
+                OnPropertyChanged("MaxESIOverlayValue");
+            }
+        }
+
 
         [Category("Fleet")]
         [DisplayName("Max Fleet Per System")]
@@ -920,7 +959,8 @@ namespace SMT
             ShowJoveObservatories = true;
             ShowCynoBeacons = true;
             LimitESIDataToRegion = false;
-
+            ClampMaxESIOverlayValue = true;
+            MaxESIOverlayValue = 80;
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 

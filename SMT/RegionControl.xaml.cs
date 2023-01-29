@@ -1416,6 +1416,14 @@ namespace SMT
                     if (infoSize < 24)
                         infoSize = 24;
 
+                    if(MapConf.ClampMaxESIOverlayValue)
+                    {
+                        if(infoSize > MapConf.MaxESIOverlayValue)
+                        {
+                            infoSize = MapConf.MaxESIOverlayValue;
+                        }
+                    }
+
                     Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
                     infoCircle.Fill = infoColour;
 
@@ -1441,7 +1449,7 @@ namespace SMT
                     DynamicMapElements.Add(infoCircle);
                 }
 
-                if (infoSize > 60)
+ /*               if (infoSize > 60)
                 {
                     Shape infoCircle = new Ellipse() { Height = 30, Width = 30 };
                     infoCircle.Fill = infoLargeColour;
@@ -1452,6 +1460,7 @@ namespace SMT
                     MainCanvas.Children.Add(infoCircle);
                     DynamicMapElements.Add(infoCircle);
                 }
+ */
 
                 if ((sys.ActualSystem.SOVAllianceTCU != 0 || sys.ActualSystem.SOVAllianceIHUB != 0) && ShowStandings)
                 {
