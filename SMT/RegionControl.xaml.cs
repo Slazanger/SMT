@@ -1325,12 +1325,6 @@ namespace SMT
 
                     if (MapConf.ShowRattingDataAsDelta)
                     {
-                        /*                        if(!MapConf.ShowNegativeRattingDelta)
-                                                {
-                                                    infoValue = Math.Max(0, sys.ActualSystem.NPCKillsDeltaLastHour);
-                                                    infoSize = 0.15f * infoValue * ESIOverlayScale;
-                                                }
-                        */
                         if (MapConf.ShowNegativeRattingDelta)
                         {
                             infoValue = Math.Abs(sys.ActualSystem.NPCKillsDeltaLastHour);
@@ -1434,33 +1428,30 @@ namespace SMT
                     DynamicMapElements.Add(infoCircle);
                 }
 
-                if (ShowNPCKills && MapConf.ShowRattingDataAsDelta && !MapConf.ShowNegativeRattingDelta)
+                if (ShowNPCKills && MapConf.ShowRattingDataAsDelta && !MapConf.ShowNegativeRattingDelta && sys.ActualSystem.NPCKillsDeltaLastHour > 0)
                 {
-                    infoValue = Math.Max(0, sys.ActualSystem.NPCKillsDeltaLastHour);
+                    infoValue = Math.Abs(sys.ActualSystem.NPCKillsDeltaLastHour);
                     infoSize = 0.15f * infoValue * ESIOverlayScale;
+
+                    if (MapConf.ClampMaxESIOverlayValue)
+                    {
+                        if (infoSize > MapConf.MaxESIOverlayValue * .8)
+                        {
+                            infoSize = MapConf.MaxESIOverlayValue * .8;
+                        }
+                    }
 
                     Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
                     infoCircle.Fill = infoColourDelta;
 
-                    Canvas.SetZIndex(infoCircle, 11);
+                    Canvas.SetZIndex(infoCircle, 12);
                     Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
                     Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
                     MainCanvas.Children.Add(infoCircle);
                     DynamicMapElements.Add(infoCircle);
                 }
 
- /*               if (infoSize > 60)
-                {
-                    Shape infoCircle = new Ellipse() { Height = 30, Width = 30 };
-                    infoCircle.Fill = infoLargeColour;
 
-                    Canvas.SetZIndex(infoCircle, 11);
-                    Canvas.SetLeft(infoCircle, sys.LayoutX - (15));
-                    Canvas.SetTop(infoCircle, sys.LayoutY - (15));
-                    MainCanvas.Children.Add(infoCircle);
-                    DynamicMapElements.Add(infoCircle);
-                }
- */
 
                 if ((sys.ActualSystem.SOVAllianceTCU != 0 || sys.ActualSystem.SOVAllianceIHUB != 0) && ShowStandings)
                 {
