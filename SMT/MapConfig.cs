@@ -898,13 +898,13 @@ namespace SMT
                 MapBackgroundColour = Color.FromRgb(43, 43, 48),
                 RegionMarkerTextColour = Color.FromRgb(49, 49, 53),
                 RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0),
-                ESIOverlayColour = Color.FromRgb(188, 143, 143),
+                ESIOverlayColour = Color.FromRgb(33, 62, 86),
                 IntelOverlayColour = Color.FromRgb(178, 34, 34),
                 IntelClearOverlayColour = Colors.Orange,
 
-                NormalGateColour = Colors.DarkSlateBlue,
-                ConstellationGateColour = Colors.SlateGray,
-                RegionGateColour = Color.FromRgb(128, 64, 64),
+                NormalGateColour = (Color)ColorConverter.ConvertFromString("#B0C0C0C0"),
+                ConstellationGateColour = Colors.MediumSpringGreen,
+                RegionGateColour = Colors.LimeGreen,
                 SelectedSystemColour = Color.FromRgb(255, 255, 255),
                 CharacterHighlightColour = Color.FromRgb(170, 130, 180),
                 CharacterOfflineTextColour = Colors.DarkGray,
@@ -960,7 +960,7 @@ namespace SMT
             ShowCynoBeacons = true;
             LimitESIDataToRegion = false;
             ClampMaxESIOverlayValue = true;
-            MaxESIOverlayValue = 80;
+            MaxESIOverlayValue = 120;
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 
