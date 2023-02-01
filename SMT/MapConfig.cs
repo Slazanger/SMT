@@ -41,7 +41,7 @@ namespace SMT
         private bool m_ShowJoveObservatories;
         private bool m_ShowNegativeRattingDelta;
 
-        private bool m_ShowRattingDataAsDelta;
+        private bool m_ShowRattingDataAsDelta = true;
 
         private bool m_ShowRegionStandings;
         private bool m_ShowSimpleSecurityView;
