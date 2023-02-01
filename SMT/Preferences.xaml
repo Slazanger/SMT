@@ -256,6 +256,42 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
+                <TabItem Header="Overlay">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <GroupBox Header="General" Margin="4" Height="355">
+                                <StackPanel>
+
+                                
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Overlay Jump Range" />
+                                        <Slider x:Name="overlay_RangeSlider" Value="{Binding Path=OverlayRange}" Minimum="1" Maximum="10" TickFrequency="1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=IntelFreshTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="1" Maximum="900" Background="Transparent"  Foreground="White" />
+                                        <Label Content="First, Intel is fresh for x seconds" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=IntelStaleTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" />
+                                        <Label Content="Then, Intel is stale for x seconds" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=IntelHistoricTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
+                                        <Label Content="Finally, Intel is historic for x seconds" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
             </TabControl>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,2">
                 <Button Content="Default" Margin="3,0" Width="55" Click="Prefs_Default_Click" />

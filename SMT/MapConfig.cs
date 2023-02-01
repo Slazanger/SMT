@@ -84,6 +84,12 @@ namespace SMT
 
         private int m_MaxESIOverlayValue;
 
+        // Overlay settings
+        private int m_overlayRange = 5;
+        private float m_intelFreshTime = 30;
+        private float m_intelStaleTime = 120;
+        private float m_intelHistoricTime = 600;
+
         public MapConfig()
         {
             SetDefaults();
@@ -850,6 +856,66 @@ namespace SMT
             }
         }
 
+        [Category("Overlay")]
+        [DisplayName("Overlay System Jump Range")]
+        public int OverlayRange
+        {
+            get {
+                return m_overlayRange;
+            }
+            set {
+
+                m_overlayRange = value > 0 ? value : 1;
+
+                OnPropertyChanged("OverlayRange");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Intel Fresh Time")]
+        public float IntelFreshTime
+        {
+            get {
+                return m_intelFreshTime;
+            }
+            set {
+
+                m_intelFreshTime = value > 0 ? value : 1;
+
+                OnPropertyChanged("IntelFreshTime");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Intel Stale Time")]
+        public float IntelStaleTime
+        {
+            get {
+                return m_intelStaleTime;
+            }
+            set {
+
+                m_intelStaleTime = value > 0 ? value : 1;
+
+                OnPropertyChanged("IntelStaleTime");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Intel Fresh Time")]
+        public float IntelHistoricTime
+        {
+            get {
+                return m_intelHistoricTime;
+            }
+            set {
+
+                m_intelHistoricTime = value > 0 ? value : 1;
+
+                OnPropertyChanged("IntelHistoricTime");
+            }
+        }
+
         public int ZkillExpireTimeMinutes
         {
             get
@@ -898,13 +964,15 @@ namespace SMT
                 MapBackgroundColour = Color.FromRgb(43, 43, 48),
                 RegionMarkerTextColour = Color.FromRgb(49, 49, 53),
                 RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0),
-                ESIOverlayColour = Color.FromRgb(33, 62, 86),
+                ESIOverlayColour = (Color)ColorConverter.ConvertFromString("#FF74B071"),
+
+
                 IntelOverlayColour = Color.FromRgb(178, 34, 34),
                 IntelClearOverlayColour = Colors.Orange,
 
-                NormalGateColour = (Color)ColorConverter.ConvertFromString("#B0C0C0C0"),
-                ConstellationGateColour = Colors.MediumSpringGreen,
-                RegionGateColour = Colors.LimeGreen,
+                NormalGateColour = Colors.DarkSlateBlue,
+                ConstellationGateColour = Colors.SlateGray,
+                RegionGateColour = Color.FromRgb(128, 64, 64),
                 SelectedSystemColour = Color.FromRgb(255, 255, 255),
                 CharacterHighlightColour = Color.FromRgb(170, 130, 180),
                 CharacterOfflineTextColour = Colors.DarkGray,
@@ -965,6 +1033,12 @@ namespace SMT
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 
             IntelSoundVolume = 0.5f;
+
+            OverlayRange = 5;
+
+            IntelFreshTime = 30;
+            IntelStaleTime = 120;
+            IntelHistoricTime = 600;
         }
 
         protected void OnPropertyChanged(string name)
