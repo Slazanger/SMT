@@ -23,7 +23,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Column="1" Grid.Row="0"  Background="Transparent" Name="overlay_CharNameTextblock" HorizontalAlignment="Center" Text="" TextAlignment="Center" FontSize="12" Opacity="0.5" Margin="6" Foreground="White"/>
+        <TextBlock Grid.Column="1" Grid.Row="0"  Background="Transparent" Name="overlay_CharNameTextblock" HorizontalAlignment="Center" TextAlignment="Center" FontSize="12" Opacity="0.5" Margin="1" Foreground="White"/>
         <Button Grid.Column="0" Grid.Row="0" PreviewMouseDown="Overlay_Window_Move" Opacity="0.5" ToolTip="Drag to move the overlay window." BorderThickness="0">
             <Image Source="/Images/overlay_move.png" Stretch="Fill"/>
         </Button>

@@ -27,6 +27,7 @@ namespace SMT
     public partial class MainWindow : Window
     {
         public const string SMT_VERSION = "SMT_115";
+        public const string SMT_FOLDERBASE = "SMTAdapt";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
         private Overlay overlayWindow;
@@ -66,7 +67,7 @@ namespace SMT
             Title = "SMT (null is purple : " + SMT_VERSION + ")";
 
             // Load the Dock Manager Layout file
-            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
+            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + SMT_FOLDERBASE + "\\" + SMT_VERSION + "\\Layout.dat";
             if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
@@ -87,7 +88,7 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
+            string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + SMT_FOLDERBASE + "\\" + SMT_VERSION + "\\MapConfig.dat";
 
             if (File.Exists(mapConfigFileName))
             {
@@ -189,7 +190,7 @@ namespace SMT
 
             // load any custom universe view layout
             // Save any custom map Layout
-            string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+            string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + SMT_FOLDERBASE + "\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
             if (File.Exists(customLayoutFile))
             {
                 try
@@ -429,7 +430,7 @@ namespace SMT
         {
             // save off the dockmanager layout
 
-            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
+            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + SMT_FOLDERBASE + "\\" + SMT_VERSION + "\\Layout.dat";
             try
             {
                 AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
@@ -448,7 +449,7 @@ namespace SMT
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
                 // Save the Map Colours
-                string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
+                string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + SMT_FOLDERBASE + "\\" + SMT_VERSION + "\\MapConfig.dat";
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -470,7 +471,7 @@ namespace SMT
                 }
 
                 // Save any custom map Layout
-                string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+                string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + SMT_FOLDERBASE + "\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
                 using (TextWriter tw = new StreamWriter(customLayoutFile))
                 {
                     foreach (EVEData.System s in EVEManager.Systems)

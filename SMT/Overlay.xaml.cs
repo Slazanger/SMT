@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,14 +81,22 @@ namespace SMT
 
             // Set up some events
             mainWindow.OnSelectedCharChangedEventHandler += SelectedCharChanged;
+            mainWindow.MapConf.PropertyChanged += OverlayConf_PropertyChanged;
             SizeChanged += OnSizeChanged;
             // We can only redraw stuff when the canvas is actually resized, otherwise dimensions will be wrong!
             overlay_Canvas.SizeChanged += OnCanvasSizeChanged;
+
+            // Update settings
+            intelUrgentPeriod = mainWindow.MapConf.IntelFreshTime;
+            intelStalePeriod = mainWindow.MapConf.IntelStaleTime;
+            intelHistoryPeriod = mainWindow.MapConf.IntelHistoricTime;
+            overlayDepth = mainWindow.MapConf.OverlayRange + 1;
 
             // TODO: Add better handling for new intel events.
             // mw.EVEManager.IntelAddedEvent += OnIntelAdded;
 
             // Start the magic
+            UpdatePlayerInformationText();
             UpdateSystemList();
             CharacterLocationUpdateLoop();
             IntelOverlayUpdateLoop();
@@ -474,23 +483,62 @@ namespace SMT
         }
 
         /// <summary>
+        /// This is a callback that will be executed whenever a setting is changed.
+        /// It is set to filter only those settings that will affect the overlay window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OverlayConf_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IntelFreshTime")
+            {
+                intelUrgentPeriod = mainWindow.MapConf.IntelFreshTime;
+            }
+
+            if (e.PropertyName == "IntelStaleTime")
+            {
+                intelStalePeriod = mainWindow.MapConf.IntelStaleTime;
+            }
+
+            if (e.PropertyName == "IntelHistoricTime")
+            {
+                intelHistoryPeriod = mainWindow.MapConf.IntelHistoricTime;
+            }
+
+            if (e.PropertyName == "OverlayRange")
+            {
+                overlayDepth = mainWindow.MapConf.OverlayRange + 1;
+                UpdateSystemList();
+                UpdateIntelDataCoordinates();
+            }
+        }
+
+        /// <summary>
         /// When the character is changed, the map has to be redrawn with new data.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void SelectedCharChanged(object sender, EventArgs e)
+        {            
+            UpdatePlayerInformationText();
+            UpdateSystemList();
+            UpdateIntelDataCoordinates();
+        }
+
+        /// <summary>
+        /// Fetches the currently selected characters name and location and
+        /// displays it in the overlay window.
+        /// </summary>
+        public void UpdatePlayerInformationText ()
         {
-            // Set the player name
             if (mainWindow.ActiveCharacter != null)
             {
-                overlay_CharNameTextblock.Text = mainWindow.ActiveCharacter.Name;
+                overlay_CharNameTextblock.Text = mainWindow.ActiveCharacter.Name + "\n" + mainWindow.ActiveCharacter.Location;
             }
             else
             {
                 overlay_CharNameTextblock.Text = "";
             }
-            UpdateSystemList();
-            UpdateIntelDataCoordinates();
         }
 
         /// <summary>
