@@ -140,6 +140,7 @@ namespace SMT
                 // If the location differs from the last known location, trigger a change.
                 if (mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Location != currentPlayerSystem)
                 {
+                    UpdatePlayerInformationText();
                     UpdateSystemList();
                     UpdateIntelDataCoordinates();
                 }
