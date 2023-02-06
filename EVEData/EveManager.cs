@@ -70,7 +70,7 @@ namespace SMT.EVEData
             LocalCharacters = new ObservableCollection<LocalCharacter>();
             VersionStr = version;
 
-            string SaveDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT";
+            string SaveDataRoot = EveAppConfig.StorageRoot;
             if (!Directory.Exists(SaveDataRoot))
             {
                 Directory.CreateDirectory(SaveDataRoot);
@@ -78,7 +78,7 @@ namespace SMT.EVEData
 
             SaveDataRootFolder = SaveDataRoot;
 
-            SaveDataVersionFolder = SaveDataRoot + "\\" + VersionStr;
+            SaveDataVersionFolder = EveAppConfig.VersionStorage;
             if (!Directory.Exists(SaveDataVersionFolder))
             {
                 Directory.CreateDirectory(SaveDataVersionFolder);
@@ -1620,7 +1620,7 @@ namespace SMT.EVEData
 
             if (File.Exists(SaveDataVersionFolder + @"\AllianceTickers.dat"))
             {
-                AllianceIDToTicker = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceTickers.dat");
+                AllianceIDToTicker = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataRootFolder + @"\AllianceTickers.dat");
             }
 
             if (AllianceIDToTicker == null)
@@ -1636,7 +1636,7 @@ namespace SMT.EVEData
             }
 
             // now add the beacons
-            string cynoBeaconsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\CynoBeacons.txt";
+            string cynoBeaconsFile = SaveDataRootFolder + "\\CynoBeacons.txt";
             if (File.Exists(cynoBeaconsFile))
             {
                 StreamReader file = new StreamReader(cynoBeaconsFile);
@@ -1819,10 +1819,10 @@ namespace SMT.EVEData
             }
 
             // save the intel channels / intel filters
-            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelChannels.txt", IntelFilters);
-            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelClearFilters.txt", IntelClearFilters);
-            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelIgnoreFilters.txt", IntelIgnoreFilters);
-            File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\CynoBeacons.txt", beaconsToSave);
+            File.WriteAllLines(SaveDataRootFolder + @"\IntelChannels.txt", IntelFilters);
+            File.WriteAllLines(SaveDataRootFolder + @"\IntelClearFilters.txt", IntelClearFilters);
+            File.WriteAllLines(SaveDataRootFolder + @"\IntelIgnoreFilters.txt", IntelIgnoreFilters);
+            File.WriteAllLines(SaveDataRootFolder + @"\CynoBeacons.txt", beaconsToSave);
         }
 
         /// <summary>
@@ -1834,7 +1834,7 @@ namespace SMT.EVEData
             IntelDataList = new BindingQueue<IntelData>();
             IntelDataList.SetSizeLimit(50);
 
-            string intelFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelChannels.txt";
+            string intelFileFilter = SaveDataRootFolder + @"\IntelChannels.txt";
 
             if (File.Exists(intelFileFilter))
             {
@@ -1855,7 +1855,7 @@ namespace SMT.EVEData
             }
 
             IntelClearFilters = new List<string>();
-            string intelClearFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelClearFilters.txt";
+            string intelClearFileFilter = SaveDataRootFolder + @"\IntelClearFilters.txt";
 
             if (File.Exists(intelClearFileFilter))
             {
@@ -1878,7 +1878,7 @@ namespace SMT.EVEData
             }
 
             IntelIgnoreFilters = new List<string>();
-            string intelIgnoreFileFilter = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\IntelIgnoreFilters.txt";
+            string intelIgnoreFileFilter = SaveDataRootFolder + @"\IntelIgnoreFilters.txt";
 
             if (File.Exists(intelIgnoreFileFilter))
             {
@@ -2331,7 +2331,7 @@ namespace SMT.EVEData
                 EsiUrl = "https://esi.evetech.net/",
                 DataSource = DataSource.Tranquility,
                 ClientId = EveAppConfig.ClientID,
-                SecretKey = EveAppConfig.SecretKey,
+                SecretKey = "Unneeded",
                 CallbackUrl = EveAppConfig.CallbackURL,
                 UserAgent = "SMT-map-app",
             });

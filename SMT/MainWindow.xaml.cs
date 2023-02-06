@@ -26,7 +26,6 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_116";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
         private Overlay overlayWindow;
@@ -63,10 +62,10 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (null is purple : " + SMT_VERSION + ")";
+            Title = "SMT (null is purple : " + EveAppConfig.SMT_VERSION + ")";
 
             // Load the Dock Manager Layout file
-            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
+            string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
             if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
@@ -87,7 +86,7 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
+            string mapConfigFileName = EveAppConfig.VersionStorage + "MapConfig.dat";
 
             if (File.Exists(mapConfigFileName))
             {
@@ -116,7 +115,7 @@ namespace SMT
 
             CapitalRoute = new JumpRoute();
 
-            EVEManager = new EVEData.EveManager(SMT_VERSION);
+            EVEManager = new EVEData.EveManager(EveAppConfig.SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
             EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
 
@@ -183,7 +182,10 @@ namespace SMT
 
             // load any custom universe view layout
             // Save any custom map Layout
-            string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+
+
+            string customLayoutFile = EveAppConfig.VersionStorage + "CustomUniverseLayout.txt";
+
             if (File.Exists(customLayoutFile))
             {
                 try
@@ -423,7 +425,9 @@ namespace SMT
         {
             // save off the dockmanager layout
 
-            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
+            string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
+
+
             try
             {
                 AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
@@ -442,7 +446,8 @@ namespace SMT
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
                 // Save the Map Colours
-                string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
+                string mapConfigFileName = EveAppConfig.VersionStorage + "MapConfig.dat";
+
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -464,7 +469,8 @@ namespace SMT
                 }
 
                 // Save any custom map Layout
-                string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+                string customLayoutFile = EveAppConfig.VersionStorage + "CustomUniverseLayout.txt";
+
                 using (TextWriter tw = new StreamWriter(customLayoutFile))
                 {
                     foreach (EVEData.System s in EVEManager.Systems)
@@ -707,7 +713,7 @@ namespace SMT
             try
             {
                 HttpClient hc = new HttpClient();
-                hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", SMT_VERSION));
+                hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", EveAppConfig.SMT_VERSION));
                 var response = await hc.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 strContent = await response.Content.ReadAsStringAsync();
@@ -721,13 +727,13 @@ namespace SMT
 
             if (releaseInfo != null)
             {
-                if (releaseInfo.TagName != SMT_VERSION)
+                if (releaseInfo.TagName != EveAppConfig.SMT_VERSION)
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         NewVersionWindow nw = new NewVersionWindow();
                         nw.ReleaseInfo = releaseInfo.Body;
-                        nw.CurrentVersion = SMT_VERSION;
+                        nw.CurrentVersion = EveAppConfig.SMT_VERSION;
                         nw.NewVersion = releaseInfo.TagName;
                         nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
                         nw.Owner = this;
