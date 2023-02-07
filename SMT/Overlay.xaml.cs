@@ -572,8 +572,11 @@ namespace SMT
         /// <param name="e"></param>
         private void Overlay_Window_Move(object sender, MouseButtonEventArgs e)
         {
-            this.DragMove();
-            StoreOverlayWindowPosition();
+            if(e.ChangedButton == MouseButton.Left)
+            {
+                this.DragMove();
+                StoreOverlayWindowPosition();
+            }
             e.Handled = true;
         }
 
