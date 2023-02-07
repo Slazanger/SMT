@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,6 +13,32 @@ using System.Windows.Shapes;
 
 namespace SMT
 {
+    /// <summary>
+    /// This struct holds the data which is used on the overview for a system
+    /// that is currently shown. The purpose of this struct is to reduce the
+    /// need for recalculating or refetching certain data points.
+    /// </summary>
+    public struct OverlaySystemData
+    {
+        public EVEData.System system;
+        /// <summary>
+        /// The offset coordinate is in relation to the system the user
+        /// is currently in.
+        /// </summary>
+        public Vector2 offsetCoordinate;
+
+        public OverlaySystemData(EVEData.System sys)
+        {
+            system = sys;
+            offsetCoordinate = new Vector2(0f,0f);
+        }
+
+        public OverlaySystemData( EVEData.System sys, Vector2 coord )
+        {
+            system = sys;
+            offsetCoordinate = coord;
+        }
+    }
 
     /// <summary>
     /// The overlay window is a separate window that is set to always-on-top 
@@ -27,10 +54,13 @@ namespace SMT
         private List<(EVEData.IntelData, List<Ellipse>)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
 
         private Brush sysOutlineBrush;
+        private Brush sysLocationBrush;
+        private Brush outOfRegionSysOutlineBrush;
         private Brush intelUrgentOutlineBrush;
         private Brush intelStaleOutlineBrush;
         private Brush intelHistoryOutlineBrush;
         private Brush sysFillBrush;
+        private Brush outOfRegionSysFillBrush;
         private Brush intelFillBrush;
         private Brush jumpLineBrush;
         private Brush transparentBrush;
@@ -38,11 +68,24 @@ namespace SMT
         private PeriodicTimer intelTimer, characterUpdateTimer;
 
         private int overlayDepth = 8;
-        private string currentPlayerSystem = "";
+        private OverlaySystemData currentPlayerSystemData;
 
         private float intelUrgentPeriod = 300;
         private float intelStalePeriod = 300;
         private float intelHistoryPeriod = 600;
+
+        private float overlaySystemSize = 20f;
+
+        private bool gathererMode = true;
+        private bool gathererModeIncludesAdjacentRegions = false;
+
+        private float gathererMapScalingX = 1.0f;
+        private float gathererMapScalingY = 1.0f;
+        private float gathererMapScalingMin = 1.0f;
+        private float gathererMapLeftOffset = 0f;
+        private float gathererMapTopOffset = 0f;
+
+        private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
 
         public Overlay(MainWindow mw)
         {
@@ -54,6 +97,15 @@ namespace SMT
             // Set up all the brushes
             sysOutlineBrush = new SolidColorBrush(Colors.White);
             sysOutlineBrush.Opacity = 0.5;
+
+            outOfRegionSysOutlineBrush = new SolidColorBrush(Colors.White);
+            outOfRegionSysOutlineBrush.Opacity = 0.25f;
+
+            outOfRegionSysFillBrush = new SolidColorBrush(Colors.White);
+            outOfRegionSysFillBrush.Opacity = 0.1f;
+
+            sysLocationBrush = new SolidColorBrush(Colors.Green);
+            sysLocationBrush.Opacity = 0.5;
 
             intelUrgentOutlineBrush = new SolidColorBrush(Colors.Red);
             intelUrgentOutlineBrush.Opacity = 0.75;
@@ -96,10 +148,20 @@ namespace SMT
             // mw.EVEManager.IntelAddedEvent += OnIntelAdded;
 
             // Start the magic
+            RefreshCurrentView();
+            _ = CharacterLocationUpdateLoop();
+            _ = IntelOverlayUpdateLoop();
+        }
+
+        /// <summary>
+        /// Cleans up and then redraws the current overlay map.
+        /// This is called whenever significant data changes.
+        /// </summary>
+        private void RefreshCurrentView()
+        {
             UpdatePlayerInformationText();
             UpdateSystemList();
-            CharacterLocationUpdateLoop();
-            IntelOverlayUpdateLoop();
+            UpdateIntelDataCoordinates();
         }
 
         /// <summary>
@@ -138,11 +200,9 @@ namespace SMT
             while (await characterUpdateTimer.WaitForNextTickAsync())
             {
                 // If the location differs from the last known location, trigger a change.
-                if (mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Location != currentPlayerSystem)
+                if (mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Location != currentPlayerSystemData.system.Name)
                 {
-                    UpdatePlayerInformationText();
-                    UpdateSystemList();
-                    UpdateIntelDataCoordinates();
+                    RefreshCurrentView();
                 }
             }
         }
@@ -331,39 +391,123 @@ namespace SMT
 
             // Gather data
             string currentLocation = mainWindow.ActiveCharacter.Location;
-            currentPlayerSystem = currentLocation;
             EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
+            currentPlayerSystemData = new OverlaySystemData(currentSystem, new Vector2(0f, 0f));
 
             // Bail out if the system does not exist. I.e. wormhole systems.
             if (currentSystem == null) return;
 
-            List<List<EVEData.System>> hierarchie = new List<List<EVEData.System>>();
+            List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
             // Add the players location to the hierarchie.
-            hierarchie.Add(new List<EVEData.System>() { currentSystem });
+            hierarchie.Add(new List<OverlaySystemData>() { new OverlaySystemData(currentSystem, new Vector2(0f,0f)) });
+
             // Track which systems are already in the list to avoid doubles.
             systemsInList.Add(currentSystem.Name);
+
+            Vector2 maxCoord = new Vector2(float.MinValue, float.MinValue);
+            Vector2 minCoord = new Vector2(float.MaxValue, float.MaxValue);
 
             for (int i = 1; i < overlayDepth; i++)
             {
                 // Each depth level is represented by a list.
-                List<EVEData.System> currentDepth = new List<EVEData.System>();
+                List<OverlaySystemData> currentDepth = new List<OverlaySystemData>();
 
                 // For each depth the jumps in all systems in the previous depth will be collected.
-                foreach (EVEData.System previousDepthSystem in hierarchie[i - 1])
+                foreach (OverlaySystemData previousDepthSystem in hierarchie[i - 1])
                 {
-                    foreach (string jump in previousDepthSystem.Jumps)
+                    foreach (string jump in previousDepthSystem.system.Jumps)
                     {
-                        // Only add the system if it was not yet added.
-                        if (!systemsInList.Contains(jump))
+                        EVEData.System jumpSystem = mainWindow.EVEManager.GetEveSystem(jump);
+
+                        string sourceRegion = previousDepthSystem.system.Region;
+                        string targetRegion = jumpSystem.Region;
+
+                        if ( gathererMode == true || targetRegion == currentPlayerSystemData.system.Region || sourceRegion == currentPlayerSystemData.system.Region || (regionMirrorVectors.ContainsKey(targetRegion) && gathererModeIncludesAdjacentRegions) )
                         {
-                            currentDepth.Add(mainWindow.EVEManager.GetEveSystem(jump));
-                            systemsInList.Add(jump);
+
+                            // Only add the system if it was not yet added.
+                            if (!systemsInList.Contains(jump))
+                            {
+                                // if source and target have different regions it is a border system.
+                                if (sourceRegion != targetRegion)
+                                {
+
+                                    if (!regionMirrorVectors.ContainsKey(targetRegion))
+                                    {
+                                        Vector2 prevSystemInSourceRegionLayout = mainWindow.EVEManager.GetRegion(sourceRegion).MapSystems[previousDepthSystem.system.Name].Layout;
+                                        Vector2 jumpSystemInSourceRegionLayout = mainWindow.EVEManager.GetRegion(sourceRegion).MapSystems[jump].Layout;
+
+                                        Vector2 prevSystemInTargetRegionLayout = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[previousDepthSystem.system.Name].Layout;
+                                        Vector2 jumpSystemInTargetRegionLayout = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[jump].Layout;
+
+                                        Vector2 sourceRegionDirection = jumpSystemInSourceRegionLayout - prevSystemInSourceRegionLayout;
+                                        Vector2 targetRegionDirection = jumpSystemInTargetRegionLayout - prevSystemInTargetRegionLayout;
+
+                                        /*
+                                         * If the connecting vector between the systems has opposing directions
+                                         * in each region, we note that we need to mirror the systems in the target
+                                         * region to avoid overlap. This is messy and should be avoided.
+                                         */
+                                        if (Vector2.Dot(sourceRegionDirection, targetRegionDirection) < 0)
+                                        {
+                                            regionMirrorVectors.Add(targetRegion, true);
+                                        }
+                                        else
+                                        {
+                                            regionMirrorVectors.Add(targetRegion, false);
+                                        }
+                                    }
+                                }
+
+                                Vector2 originSystemCoord = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[previousDepthSystem.system.Name].Layout;
+                                Vector2 jumpSystemCoord = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[jump].Layout;
+
+                                Vector2 systemConnection = (jumpSystemCoord - originSystemCoord);
+
+                                // If we need to mirror it, rotate it by 180 degrees or PI radians.
+                                if (regionMirrorVectors.ContainsKey(targetRegion) && regionMirrorVectors[targetRegion])
+                                {
+                                    systemConnection = Vector2.Transform(systemConnection, Matrix3x2.CreateRotation((float)Math.PI));
+                                }
+
+                                Vector2 originOffset = previousDepthSystem.offsetCoordinate + systemConnection;
+
+                                maxCoord.X = Math.Max(maxCoord.X, originOffset.X);
+                                maxCoord.Y = Math.Max(maxCoord.Y, originOffset.Y);
+                                minCoord.X = Math.Min(minCoord.X, originOffset.X);
+                                minCoord.Y = Math.Min(minCoord.Y, originOffset.Y);
+
+                                currentDepth.Add(new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(jump), originOffset));
+                                systemsInList.Add(jump);
+                            }
                         }
                     }
                 }
                 hierarchie.Add(currentDepth);
             }
+
+            double canvasWidth = overlay_Canvas.RenderSize.Width;
+            double canvasHeight = overlay_Canvas.RenderSize.Height;
+
+            // The dimension of the area covered by all systems on the overlay.
+            float coordDimensionsX = maxCoord.X - minCoord.X;
+            float coordDimensionsY = maxCoord.Y - minCoord.Y;
+
+            // The scaling to bring the coordinates to the canvas area.
+            gathererMapScalingX = ((float)canvasWidth - (overlaySystemSize * 2f)) / coordDimensionsX;
+            gathererMapScalingY = ((float)canvasHeight - (overlaySystemSize * 2f)) / coordDimensionsY;
+            gathererMapScalingMin = Math.Min(gathererMapScalingX, gathererMapScalingY);
+
+            float gathererMapDimensionX = (maxCoord.X - minCoord.X) * gathererMapScalingMin;
+            float gathererMapDimensionY = (maxCoord.Y - minCoord.Y) * gathererMapScalingMin;
+
+            float emptySpaceX = (float)canvasWidth - gathererMapDimensionX;
+            float emptySpaceY = (float)canvasWidth - gathererMapDimensionY;
+
+            // How the systems need to be positioned to be displayed correctly.
+            gathererMapLeftOffset = (minCoord.X * gathererMapScalingX) - overlaySystemSize;
+            gathererMapTopOffset = (minCoord.Y * gathererMapScalingY) - overlaySystemSize;
 
             // Draw the systems.
             for (int i = 0; i < hierarchie.Count; i++)
@@ -429,7 +573,7 @@ namespace SMT
         /// <param name="depth">The current depth layer.</param>
         /// <param name="systems">The systems on the current depth layer.</param>
         /// <param name="maxDepth">The maxmium depth of the current map.</param>
-        private void DrawSystemsToOverlay(int depth, List<EVEData.System> systems, int maxDepth)
+        private void DrawSystemsToOverlay(int depth, List<OverlaySystemData> systems, int maxDepth)
         {
             // Fetch data and determine the sizes for rows and columns.
             double canvasWidth = overlay_Canvas.RenderSize.Width;
@@ -440,8 +584,17 @@ namespace SMT
             // In each depth the width of the columns is divided equally by the number of systems.
             for (int i = 0; i < systems.Count; i++)
             {
-                double left = (columnWidth / 2d) + (columnWidth * i);
-                double top = (rowHeight / 2d) + (rowHeight * depth);
+                double left, top;
+                if (gathererMode)
+                {
+                    left = (columnWidth / 2d) + (columnWidth * i);
+                    top = (rowHeight / 2d) + (rowHeight * depth);
+                }
+                else
+                {
+                    left = -gathererMapLeftOffset  + (systems[i].offsetCoordinate.X * gathererMapScalingMin);
+                    top = -gathererMapTopOffset + (systems[i].offsetCoordinate.Y * gathererMapScalingMin);
+                }
                 DrawSystemToOverlay(systems[i], left, top);
             }
         }
@@ -449,32 +602,45 @@ namespace SMT
         /// <summary>
         /// Draws a single system to the canvas.
         /// </summary>
-        /// <param name="system">The system to be drawn.</param>
+        /// <param name="systemData">The system to be drawn.</param>
         /// <param name="left">The position from the left edge.</param>
         /// <param name="top">The position from the top edge.</param>
         /// TODO: Make shape settings a global setting.
         /// TODO: Add more info to ToolTip or replace it with something else.
-        private void DrawSystemToOverlay(EVEData.System system, double left, double top)
+        private void DrawSystemToOverlay(OverlaySystemData systemData, double left, double top)
         {
             Ellipse systemShape = new Ellipse();
 
-            systemShape.Width = 20;
-            systemShape.Height = 20;
+            systemShape.Width = overlaySystemSize;
+            systemShape.Height = overlaySystemSize;
             systemShape.StrokeThickness = 1.5;
+            if ( systemData.system.Name == currentPlayerSystemData.system.Name )
+            {
+                systemShape.Fill = sysLocationBrush;
+            }
+            else
+            {
+                systemShape.Fill = sysFillBrush;
+            }
             systemShape.Stroke = sysOutlineBrush;
-            systemShape.Fill = sysFillBrush;
+            
+            if ( systemData.system.Region != currentPlayerSystemData.system.Region )
+            {
+                systemShape.Stroke = outOfRegionSysOutlineBrush;
+                systemShape.Fill = outOfRegionSysFillBrush;
+            }
 
             ToolTip systemTooltip = new ToolTip();
-            systemTooltip.Content = system.Name;
+            systemTooltip.Content = systemData.system.Name;
 
             systemShape.ToolTip = systemTooltip;
 
             double leftCoord = left - (systemShape.Width * 0.5);
             double topCoord = top - (systemShape.Height * 0.5);
 
-            if (!systemCoordinates.Any(s => s.Item1 == system.Name))
+            if (!systemCoordinates.Any(s => s.Item1 == systemData.system.Name))
             {
-                systemCoordinates.Add((system.Name, leftCoord, topCoord));
+                systemCoordinates.Add((systemData.system.Name, leftCoord, topCoord));
             }
 
             Canvas.SetLeft(systemShape, leftCoord);
@@ -509,8 +675,7 @@ namespace SMT
             if (e.PropertyName == "OverlayRange")
             {
                 overlayDepth = mainWindow.MapConf.OverlayRange + 1;
-                UpdateSystemList();
-                UpdateIntelDataCoordinates();
+                RefreshCurrentView();
             }
         }
 
@@ -520,10 +685,8 @@ namespace SMT
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void SelectedCharChanged(object sender, EventArgs e)
-        {            
-            UpdatePlayerInformationText();
-            UpdateSystemList();
-            UpdateIntelDataCoordinates();
+        {
+            RefreshCurrentView();
         }
 
         /// <summary>
@@ -560,9 +723,7 @@ namespace SMT
         /// <param name="e"></param>
         private void OnCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            StoreOverlayWindowPosition();
-            UpdateSystemList();
-            UpdateIntelDataCoordinates();
+            RefreshCurrentView ();
         }
 
         /// <summary>
@@ -588,6 +749,12 @@ namespace SMT
         private void Overlay_Window_Close(object sender, MouseButtonEventArgs e)
         {
             this.Close();
+        }
+
+        private void Overlay_ToggleHunterMode(object sender, MouseButtonEventArgs e)
+        {
+            gathererMode = !gathererMode;
+            RefreshCurrentView(); ;
         }
 
         /// <summary>

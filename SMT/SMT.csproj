@@ -173,6 +173,8 @@
   <ItemGroup>
     <Resource Include="Images\overlay_close.png" />
     <Resource Include="Images\overlay_move.png" />
+    <Resource Include="Images\overlay_gatherer.png" />
+    <Resource Include="Images\overlay_hunter.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dirkster.AvalonDock.Themes.Expression">
