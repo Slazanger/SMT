@@ -85,10 +85,12 @@ namespace SMT
         private int m_MaxESIOverlayValue;
 
         // Overlay settings
+        private float m_overlayOpacity = 0.5f;
         private int m_overlayRange = 5;
         private float m_intelFreshTime = 30;
         private float m_intelStaleTime = 120;
         private float m_intelHistoricTime = 600;
+        private bool m_overlayGathererMode = false;
 
         public MapConfig()
         {
@@ -857,6 +859,21 @@ namespace SMT
         }
 
         [Category("Overlay")]
+        [DisplayName("Overlay Window Content Opacity")]
+        public float OverlayOpacity
+        {
+            get {
+                return m_overlayOpacity;
+            }
+            set {
+
+                m_overlayOpacity = value > 0f ? value : 1f;
+
+                OnPropertyChanged("OverlayOpacity");
+            }
+        }
+
+        [Category("Overlay")]
         [DisplayName("Overlay System Jump Range")]
         public int OverlayRange
         {
@@ -868,6 +885,21 @@ namespace SMT
                 m_overlayRange = value > 0 ? value : 1;
 
                 OnPropertyChanged("OverlayRange");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay In Gatherer Mode")]
+        public bool OverlayGathererMode
+        {
+            get {
+                return m_overlayGathererMode;
+            }
+            set {
+
+                m_overlayGathererMode = value;
+
+                OnPropertyChanged("OverlayGathererMode");
             }
         }
 
@@ -1034,7 +1066,9 @@ namespace SMT
 
             IntelSoundVolume = 0.5f;
 
+            OverlayOpacity = 0.5f;
             OverlayRange = 5;
+            OverlayGathererMode = false;
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;

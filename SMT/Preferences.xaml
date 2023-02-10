@@ -235,6 +235,10 @@
                             <GroupBox Header="General" Margin="4" Height="355">
                                 <StackPanel>
 
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Overlay Window Content Opacity" />
+                                        <Slider x:Name="overlay_OpacitySlider" Value="{Binding Path=OverlayOpacity}" Minimum="0.05" Maximum="1.0" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
+                                    </StackPanel>
 
                                     <StackPanel Orientation="Vertical" Margin="0,2">
                                         <Label Content="Overlay Jump Range" />

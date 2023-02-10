@@ -1,8 +1,10 @@
-﻿using System;
+﻿using SMT.EVEData;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,11 +16,11 @@ using System.Windows.Shapes;
 namespace SMT
 {
     /// <summary>
-    /// This struct holds the data which is used on the overview for a system
-    /// that is currently shown. The purpose of this struct is to reduce the
+    /// This class holds the data which is used on the overview for a system
+    /// that is currently shown. The purpose of this class is to reduce the
     /// need for recalculating or refetching certain data points.
     /// </summary>
-    public struct OverlaySystemData
+    public class OverlaySystemData
     {
         public EVEData.System system;
         /// <summary>
@@ -26,17 +28,34 @@ namespace SMT
         /// is currently in.
         /// </summary>
         public Vector2 offsetCoordinate;
+        public Vector2 canvasCoordinate;
 
-        public OverlaySystemData(EVEData.System sys)
-        {
-            system = sys;
-            offsetCoordinate = new Vector2(0f,0f);
-        }
+        public int rattingDelta;
+        public Shape systemCanvasElement;
+        public Shape npcKillCanvasElement;
+        public Shape npcKillDeltaCanvasElement;
 
-        public OverlaySystemData( EVEData.System sys, Vector2 coord )
+        public int overlayTier = 0;
+
+        public OverlaySystemData(EVEData.System sys, Vector2 coord, Vector2 canvasCoord, int ratDelta, Shape shape, int ovrTier )
         {
             system = sys;
             offsetCoordinate = coord;
+            canvasCoordinate = canvasCoord;
+            rattingDelta = ratDelta;
+            systemCanvasElement = shape;
+            overlayTier = ovrTier;
+        }
+
+        public OverlaySystemData(EVEData.System sys) : this(sys, Vector2.Zero, Vector2.Zero, 0, null, 0) { }
+
+        public OverlaySystemData(EVEData.System sys, Vector2 coord) : this(sys, coord, Vector2.Zero, 0, null, 0) { }
+
+        public void CleanUpCanvas ( Canvas canvas, bool keepSystem = false )
+        {
+            if (!keepSystem && systemCanvasElement != null && canvas.Children.Contains(systemCanvasElement)) canvas.Children.Remove(systemCanvasElement);
+            if (npcKillCanvasElement != null && canvas.Children.Contains(npcKillCanvasElement)) canvas.Children.Remove(npcKillCanvasElement);
+            if (npcKillDeltaCanvasElement != null && canvas.Children.Contains(npcKillDeltaCanvasElement)) canvas.Children.Remove(npcKillDeltaCanvasElement);
         }
     }
 
@@ -50,11 +69,14 @@ namespace SMT
     {
 
         private MainWindow mainWindow;
-        private List<(string, double, double)> systemCoordinates = new List<(string, double, double)>();
-        private List<(EVEData.IntelData, List<Ellipse>)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
+        private Dictionary<string, OverlaySystemData> systemData = new Dictionary<string, OverlaySystemData>();
+        private List<(EVEData.IntelData data, List<Ellipse> ellipse)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
+        private List<Line> jumpLines = new List<Line>();
 
         private Brush sysOutlineBrush;
-        private Brush sysLocationBrush;
+        private Brush sysLocationOutlineBrush;
+        private Brush npcKillDataBrush;
+        private Brush npcKillDeltaDataBrush;
         private Brush outOfRegionSysOutlineBrush;
         private Brush intelUrgentOutlineBrush;
         private Brush intelStaleOutlineBrush;
@@ -65,7 +87,10 @@ namespace SMT
         private Brush jumpLineBrush;
         private Brush transparentBrush;
 
-        private PeriodicTimer intelTimer, characterUpdateTimer;
+        private Brush toolTipBackgroundBrush;
+        private Brush toolTipForegroundBrush;
+
+        private PeriodicTimer dataUpdateTimer, characterUpdateTimer;
 
         private int overlayDepth = 8;
         private OverlaySystemData currentPlayerSystemData;
@@ -74,10 +99,21 @@ namespace SMT
         private float intelStalePeriod = 300;
         private float intelHistoryPeriod = 600;
 
-        private float overlaySystemSize = 20f;
+        private float overlaySystemSizeGatherer = 20f;
+        private float overlaySystemSizeHunter = 10f;
+        private float CalculatedOverlaySystemSize { get => gathererMode ? overlaySystemSizeGatherer : overlaySystemSizeHunter; }
+
+        private float overlayIntelOversize = 10f;
+        private float CalculatedOverlayIntelOversize { get => overlayIntelOversize; }
 
         private bool gathererMode = true;
         private bool gathererModeIncludesAdjacentRegions = false;
+
+        private bool showNPCKillData = true;
+        private float npcKillDeltaMaxSize = 40f;
+        private float npcKillDeltaMaxEqualsKills = 500f;
+
+        private bool showNPCKillDeltaData = true;
 
         private float gathererMapScalingX = 1.0f;
         private float gathererMapScalingY = 1.0f;
@@ -92,41 +128,63 @@ namespace SMT
             InitializeComponent();
 
             // Restore the last window size and position
-            LoadOverlayWindowPosition();
+            LoadOverlayWindowPosition();           
+
+            overlay_Canvas.Opacity = mw.MapConf.OverlayOpacity;
+            gathererMode = mw.MapConf.OverlayGathererMode;
 
             // Set up all the brushes
-            sysOutlineBrush = new SolidColorBrush(Colors.White);
-            sysOutlineBrush.Opacity = 0.5;
+            sysOutlineBrush = new SolidColorBrush(Colors.DarkGray);
+            sysOutlineBrush.Opacity = 1f;
 
-            outOfRegionSysOutlineBrush = new SolidColorBrush(Colors.White);
-            outOfRegionSysOutlineBrush.Opacity = 0.25f;
+            npcKillDataBrush = new SolidColorBrush(mw.MapConf.ActiveColourScheme.ESIOverlayColour);
+            npcKillDataBrush.Opacity = 1f;
 
-            outOfRegionSysFillBrush = new SolidColorBrush(Colors.White);
-            outOfRegionSysFillBrush.Opacity = 0.1f;
+            Color npcDeltaColor = mw.MapConf.ActiveColourScheme.ESIOverlayColour;
+            npcDeltaColor.R = (byte)(npcDeltaColor.R * 0.4);
+            npcDeltaColor.G = (byte)(npcDeltaColor.G * 0.4);
+            npcDeltaColor.B = (byte)(npcDeltaColor.B * 0.4);
 
-            sysLocationBrush = new SolidColorBrush(Colors.Green);
-            sysLocationBrush.Opacity = 0.5;
+            npcKillDeltaDataBrush = new SolidColorBrush(npcDeltaColor);
+            npcKillDeltaDataBrush.Opacity = 1f;
+
+            outOfRegionSysFillBrush = new SolidColorBrush(Colors.DarkGray);
+            outOfRegionSysFillBrush.Opacity = 1f;
+
+            Color outOfRegionOutline = Colors.Red;
+            outOfRegionOutline.R = (byte)(outOfRegionOutline.R * 0.4);
+            outOfRegionOutline.G = (byte)(outOfRegionOutline.G * 0.4);
+            outOfRegionOutline.B = (byte)(outOfRegionOutline.B * 0.4);
+
+            outOfRegionSysOutlineBrush = new SolidColorBrush(outOfRegionOutline);
+            outOfRegionSysOutlineBrush.Opacity = 1f;
+
+            sysLocationOutlineBrush = new SolidColorBrush(Colors.Orange);
+            sysLocationOutlineBrush.Opacity = 1f;
 
             intelUrgentOutlineBrush = new SolidColorBrush(Colors.Red);
-            intelUrgentOutlineBrush.Opacity = 0.75;
+            intelUrgentOutlineBrush.Opacity = 1f;
 
             intelStaleOutlineBrush = new SolidColorBrush(Colors.Yellow);
-            intelStaleOutlineBrush.Opacity = 0.5;
+            intelStaleOutlineBrush.Opacity = 1f;
 
-            intelHistoryOutlineBrush = new SolidColorBrush(Colors.White);
-            intelHistoryOutlineBrush.Opacity = 0.25;
+            intelHistoryOutlineBrush = new SolidColorBrush(Colors.LightGray);
+            intelHistoryOutlineBrush.Opacity = 1f;
 
-            sysFillBrush = new SolidColorBrush(Colors.White);
-            sysFillBrush.Opacity = 0.2;
+            sysFillBrush = new SolidColorBrush(Colors.Gray);
+            sysFillBrush.Opacity = 1f;
 
             intelFillBrush = new SolidColorBrush(Colors.Red);
-            intelFillBrush.Opacity = 0.2;
+            intelFillBrush.Opacity = 0.25f;
 
             jumpLineBrush = new SolidColorBrush(Colors.White);
-            jumpLineBrush.Opacity = 0.5;
+            jumpLineBrush.Opacity = 0.5f;
 
             transparentBrush = new SolidColorBrush(Colors.White);
-            transparentBrush.Opacity = 0.0;
+            transparentBrush.Opacity = 0f;
+
+            toolTipBackgroundBrush = new SolidColorBrush(Colors.Black);
+            toolTipForegroundBrush = new SolidColorBrush(Colors.DarkGray);
 
             mainWindow = mw;
             if (mainWindow == null) return;
@@ -144,13 +202,26 @@ namespace SMT
             intelHistoryPeriod = mainWindow.MapConf.IntelHistoricTime;
             overlayDepth = mainWindow.MapConf.OverlayRange + 1;
 
+            RefreshButtonStates();
+
             // TODO: Add better handling for new intel events.
             // mw.EVEManager.IntelAddedEvent += OnIntelAdded;
 
             // Start the magic
             RefreshCurrentView();
             _ = CharacterLocationUpdateLoop();
-            _ = IntelOverlayUpdateLoop();
+            _ = DataOverlayUpdateLoop();
+        }
+
+        /// <summary>
+        /// The UI buttons that toggle different states will be exchanged based
+        /// on the value they are representing. This saves a few lines of xaml code
+        /// over doing it properly.
+        /// </summary>
+        private void RefreshButtonStates()
+        {
+            overlay_HunterButton.Visibility = gathererMode ? Visibility.Collapsed : Visibility.Visible;
+            overlay_GathererButton.Visibility = gathererMode ? Visibility.Visible : Visibility.Collapsed;
         }
 
         /// <summary>
@@ -162,6 +233,27 @@ namespace SMT
             UpdatePlayerInformationText();
             UpdateSystemList();
             UpdateIntelDataCoordinates();
+        }
+
+        /// <summary>
+        /// If the player is in a system without informations about the surroundings
+        /// like wormholes or abyssal, this will be called to wipe the overlay canvas
+        /// clean. Otherwise the last drawn map would persist.
+        /// </summary>
+        private void ClearView()
+        {
+            UpdatePlayerInformationText();
+            foreach ( var sD in systemData )
+            {
+                sD.Value.CleanUpCanvas(overlay_Canvas);
+            }
+            systemData.Clear();
+
+            foreach ( var line in jumpLines )
+            {
+                overlay_Canvas.Children.Remove( line );
+            }
+            jumpLines.Clear();
         }
 
         /// <summary>
@@ -200,130 +292,145 @@ namespace SMT
             while (await characterUpdateTimer.WaitForNextTickAsync())
             {
                 // If the location differs from the last known location, trigger a change.
-                if (mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Location != currentPlayerSystemData.system.Name)
+                if (mainWindow.ActiveCharacter != null)
                 {
-                    RefreshCurrentView();
-                }
+                    if ( currentPlayerSystemData.system == null )
+                    {
+                        RefreshCurrentView();
+                    } 
+                    else if ( mainWindow.ActiveCharacter.Location != currentPlayerSystemData.system.Name)
+                    {
+                        RefreshCurrentView();
+                    }
+                }                
             }
         }
 
         /// <summary>
-        /// Starts a timer that will periodically update the intel information.
+        /// Starts a timer that will periodically update the additional information displayed.
         /// </summary>
         /// <returns></returns>
         /// TODO: Make intervall a global setting.
-        private async Task IntelOverlayUpdateLoop()
+        private async Task DataOverlayUpdateLoop()
         {
-            intelTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            dataUpdateTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
 
-            while (await intelTimer.WaitForNextTickAsync())
+            while (await dataUpdateTimer.WaitForNextTickAsync())
+            {
+                UpdateIntelData();                
+            }
+        }
+
+        /// <summary>
+        /// Fetches the data from the manager and updates existing entries or
+        /// creates new ones which hold the intel data.
+        /// </summary>
+        private void UpdateIntelData ()
+        {
+            float intelLifetime = intelUrgentPeriod + intelStalePeriod + intelHistoryPeriod;
+
+            // Gather all intel data from EVEManager.
+            foreach (EVEData.IntelData intelDataset in mainWindow.EVEManager.IntelDataList)
+            {
+                // Clean the system list to remove everything that is not a valid system.
+                List<string> cleanedSystemList = new List<string>();
+                foreach (string intelSystem in intelDataset.Systems)
+                {
+                    if (mainWindow.EVEManager.GetEveSystem(intelSystem) != null)
+                    {
+                        cleanedSystemList.Add(intelSystem);
+                    }
+                }
+                intelDataset.Systems = cleanedSystemList;
+
+                if (intelDataset.Systems.Count == 0)
+                    continue;
+
+                // If it is older than the maximum lifetime, skip it.
+                if ((DateTime.Now - intelDataset.IntelTime).TotalSeconds > intelLifetime)
+                    continue;
+
+                // If we already have the data in the list, skip it.
+                if (intelData.Any(d => d.data.RawIntelString == intelDataset.RawIntelString))
+                    continue;
+
+                // Check if it is intel for an already existing system, throw out older entries.
+                List<(EVEData.IntelData data, List<Ellipse> ellipse)> deleteList = new List<(EVEData.IntelData, List<Ellipse>)>();
+                foreach (string intelSystem in intelDataset.Systems)
+                {
+                    foreach (var existingIntelDataset in intelData)
+                    {
+                        if (existingIntelDataset.data.Systems.Any(s => s == intelSystem))
+                        {
+                            deleteList.Add(existingIntelDataset);
+                        }
+                    }
+                }
+                foreach (var deleteEntry in deleteList)
+                {
+                    foreach (Ellipse intelShape in deleteEntry.ellipse)
+                    {
+                        overlay_Canvas.Children.Remove(intelShape);
+                    }
+                    intelData.Remove(deleteEntry);
+                }
+
+                // Otherwise, add it.
+                intelData.Add((intelDataset, new List<Ellipse>()));
+
+            }
+
+            // Check all intel data in the list if it has expired.
+            foreach (var intelDataEntry in intelData)
+            {
+                if ((DateTime.Now - intelDataEntry.data.IntelTime).TotalSeconds > intelLifetime)
+                {
+
+                    // If the intel data is past its lifetime, delete the shapes from the canvas.
+                    foreach (Ellipse intelShape in intelDataEntry.ellipse)
+                    {
+                        overlay_Canvas.Children.Remove(intelShape);
+                    }
+                }
+            }
+
+            // Remove all expired entries.
+            intelData.RemoveAll(d => (DateTime.Now - d.data.IntelTime).TotalSeconds > intelLifetime);
+
+            // Loop over all remaining, therfore current, entries.
+            foreach (var intelDataEntry in intelData)
             {
 
-                float intelLifetime = intelUrgentPeriod + intelStalePeriod + intelHistoryPeriod;
-
-                // Gather all intel data from EVEManager.
-                foreach (EVEData.IntelData intelDataset in mainWindow.EVEManager.IntelDataList)
+                // If there are no shapes, add them.
+                if (intelDataEntry.Item2.Count == 0)
                 {
-                    // Clean the system list to remove everything that is not a valid system.
-                    List<string> cleanedSystemList = new List<string>();
-                    foreach (string intelSystem in intelDataset.Systems)
+                    foreach (string systemName in intelDataEntry.data.Systems)
                     {
-                        if (mainWindow.EVEManager.GetEveSystem(intelSystem) != null)
-                        {
-                            cleanedSystemList.Add(intelSystem);
-                        }
-                    }
-                    intelDataset.Systems = cleanedSystemList;
-
-                    if (intelDataset.Systems.Count == 0)
-                        continue;
-
-                    // If it is older than the maximum lifetime, skip it.
-                    if ((DateTime.Now - intelDataset.IntelTime).TotalSeconds > intelLifetime)
-                        continue;
-
-                    // If we already have the data in the list, skip it.
-                    if (intelData.Any(d => d.Item1.RawIntelString == intelDataset.RawIntelString))
-                        continue;
-
-                    // Check if it is intel for an already existing system, throw out older entries.
-                    List<(EVEData.IntelData, List<Ellipse>)> deleteList = new List<(EVEData.IntelData, List<Ellipse>)>();
-                    foreach (string intelSystem in intelDataset.Systems)
-                    {
-                        foreach (var existingIntelDataset in intelData)
-                        {
-                            if (existingIntelDataset.Item1.Systems.Any(s => s == intelSystem))
-                            {
-                                deleteList.Add(existingIntelDataset);
-                            }
-                        }
-                    }
-                    foreach (var deleteEntry in deleteList)
-                    {
-                        foreach (Ellipse intelShape in deleteEntry.Item2)
-                        {
-                            overlay_Canvas.Children.Remove(intelShape);
-                        }
-                        intelData.Remove(deleteEntry);
-                    }
-
-                    // Otherwise, add it.
-                    intelData.Add((intelDataset, new List<Ellipse>()));
-
-                }
-
-                // Check all intel data in the list if it has expired.
-                foreach (var intelDataEntry in intelData)
-                {
-                    if ((DateTime.Now - intelDataEntry.Item1.IntelTime).TotalSeconds > intelLifetime)
-                    {
-
-                        // If the intel data is past its lifetime, delete the shapes from the canvas.
-                        foreach (Ellipse intelShape in intelDataEntry.Item2)
-                        {
-                            overlay_Canvas.Children.Remove(intelShape);
-                        }
+                        intelDataEntry.ellipse.Add(DrawIntelToOverlay(systemName));
                     }
                 }
 
-                // Remove all expired entries.
-                intelData.RemoveAll(d => (DateTime.Now - d.Item1.IntelTime).TotalSeconds > intelLifetime);
+                float intelAgeInSeconds = (float)(DateTime.Now - intelDataEntry.data.IntelTime).TotalSeconds;
 
-                // Loop over all remaining, therfore current, entries.
-                foreach (var intelDataEntry in intelData)
+                // Update the style.
+                foreach (Ellipse intelShape in intelDataEntry.ellipse)
                 {
 
-                    // If there are no shapes, add them.
-                    if (intelDataEntry.Item2.Count == 0)
+                    switch (intelAgeInSeconds)
                     {
-                        foreach (string systemName in intelDataEntry.Item1.Systems)
-                        {
-                            intelDataEntry.Item2.Add(DrawIntelToOverlay(systemName));
-                        }
-                    }
-
-                    float intelAgeInSeconds = (float)(DateTime.Now - intelDataEntry.Item1.IntelTime).TotalSeconds;
-
-                    // Update the style.
-                    foreach (Ellipse intelShape in intelDataEntry.Item2)
-                    {
-
-                        switch (intelAgeInSeconds)
-                        {
-                            case float age when age < intelUrgentPeriod:
-                                intelShape.Stroke = intelUrgentOutlineBrush;
-                                intelShape.Fill = intelFillBrush;
-                                break;
-                            case float age when age < intelUrgentPeriod + intelStalePeriod:
-                                intelShape.Stroke = intelStaleOutlineBrush;
-                                intelShape.Fill = transparentBrush;
-                                break;
-                            case float age when age >= intelUrgentPeriod + intelStalePeriod:
-                            default:
-                                intelShape.Stroke = intelHistoryOutlineBrush;
-                                intelShape.Fill = transparentBrush;
-                                break;
-                        }
+                        case float age when age < intelUrgentPeriod:
+                            intelShape.Stroke = intelUrgentOutlineBrush;
+                            intelShape.Fill = intelFillBrush;
+                            break;
+                        case float age when age < intelUrgentPeriod + intelStalePeriod:
+                            intelShape.Stroke = intelStaleOutlineBrush;
+                            intelShape.Fill = transparentBrush;
+                            break;
+                        case float age when age >= intelUrgentPeriod + intelStalePeriod:
+                        default:
+                            intelShape.Stroke = intelHistoryOutlineBrush;
+                            intelShape.Fill = transparentBrush;
+                            break;
                     }
                 }
             }
@@ -348,10 +455,10 @@ namespace SMT
                     bool visible = false;
 
                     // Check if the system exists in the list of currently shown systems.
-                    if (systemCoordinates.Any(s => s.Item1 == intelSystem))
-                    {
-                        (string, double, double) intelSystemCoordinate = systemCoordinates.Where(s => s.Item1 == intelSystem).First();
-                        intelSystemCoordinateVector = new Vector2f(intelSystemCoordinate.Item2 - 5, intelSystemCoordinate.Item3 - 5);
+                    if (systemData.ContainsKey(intelSystem))
+                    {                        
+                        Vector2 systemCoordinate = systemData[intelSystem].canvasCoordinate;
+                        intelSystemCoordinateVector = new Vector2f(systemCoordinate.X - (CalculatedOverlayIntelOversize / 2f), systemCoordinate.Y - (CalculatedOverlayIntelOversize / 2f));
                         visible = true;
                     }
                     else
@@ -360,16 +467,18 @@ namespace SMT
                     }
 
                     // Update the shape associated with the current intel entry.
-                    if (intelDataEntry.Item2.Count > i)
+                    if (intelDataEntry.ellipse.Count > i)
                     {
-                        Canvas.SetLeft(intelDataEntry.Item2[i], intelSystemCoordinateVector.x);
-                        Canvas.SetTop(intelDataEntry.Item2[i], intelSystemCoordinateVector.y);
+                        intelDataEntry.ellipse[i].Width = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+                        intelDataEntry.ellipse[i].Height = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+                        Canvas.SetLeft(intelDataEntry.ellipse[i], intelSystemCoordinateVector.x);
+                        Canvas.SetTop(intelDataEntry.ellipse[i], intelSystemCoordinateVector.y);
                         // If a system is not on the current map, hide it. Can be made visible later.
-                        intelDataEntry.Item2[i].Visibility = visible ? Visibility.Visible : Visibility.Hidden;
+                        intelDataEntry.ellipse[i].Visibility = visible ? Visibility.Visible : Visibility.Hidden;
                     }
 
                     // Since all children are deleted when resizing the canvas, we readd the intel shapes.
-                    overlay_Canvas.Children.Add(intelDataEntry.Item2[i]);
+                    if ( !overlay_Canvas.Children.Contains(intelDataEntry.ellipse[i]) ) overlay_Canvas.Children.Add(intelDataEntry.ellipse[i]);
                 }
             }
         }
@@ -382,9 +491,8 @@ namespace SMT
         private void UpdateSystemList()
         {
             // Cleanup
-            overlay_Canvas.Children.Clear();
+            //overlay_Canvas.Children.Clear();
             List<string> systemsInList = new List<string>();
-            systemCoordinates.Clear();
 
             // If there is no main window or no selected character, abort.
             if (mainWindow == null || mainWindow.ActiveCharacter == null) return;
@@ -392,15 +500,24 @@ namespace SMT
             // Gather data
             string currentLocation = mainWindow.ActiveCharacter.Location;
             EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
-            currentPlayerSystemData = new OverlaySystemData(currentSystem, new Vector2(0f, 0f));
+            currentPlayerSystemData = new OverlaySystemData(currentSystem);
 
             // Bail out if the system does not exist. I.e. wormhole systems.
-            if (currentSystem == null) return;
+            if (currentSystem == null)
+            {
+                //on your way out, mop up everything thats left
+                ClearView();
+                return;
+            }
 
             List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
             // Add the players location to the hierarchie.
-            hierarchie.Add(new List<OverlaySystemData>() { new OverlaySystemData(currentSystem, new Vector2(0f,0f)) });
+            hierarchie.Add(new List<OverlaySystemData>() { currentPlayerSystemData });
+            if ( !systemData.ContainsKey(currentPlayerSystemData.system.Name ) )
+            {
+                systemData.Add(currentPlayerSystemData.system.Name, currentPlayerSystemData);
+            }            
 
             // Track which systems are already in the list to avoid doubles.
             systemsInList.Add(currentSystem.Name);
@@ -480,6 +597,10 @@ namespace SMT
 
                                 currentDepth.Add(new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(jump), originOffset));
                                 systemsInList.Add(jump);
+                                if (!systemData.ContainsKey(jump))
+                                {
+                                    systemData.Add(jump, new OverlaySystemData(jumpSystem));
+                                }
                             }
                         }
                     }
@@ -495,8 +616,8 @@ namespace SMT
             float coordDimensionsY = maxCoord.Y - minCoord.Y;
 
             // The scaling to bring the coordinates to the canvas area.
-            gathererMapScalingX = ((float)canvasWidth - (overlaySystemSize * 2f)) / coordDimensionsX;
-            gathererMapScalingY = ((float)canvasHeight - (overlaySystemSize * 2f)) / coordDimensionsY;
+            gathererMapScalingX = ((float)canvasWidth - (CalculatedOverlaySystemSize * 2f)) / coordDimensionsX;
+            gathererMapScalingY = ((float)canvasHeight - (CalculatedOverlaySystemSize * 2f)) / coordDimensionsY;
             gathererMapScalingMin = Math.Min(gathererMapScalingX, gathererMapScalingY);
 
             float gathererMapDimensionX = (maxCoord.X - minCoord.X) * gathererMapScalingMin;
@@ -506,8 +627,24 @@ namespace SMT
             float emptySpaceY = (float)canvasWidth - gathererMapDimensionY;
 
             // How the systems need to be positioned to be displayed correctly.
-            gathererMapLeftOffset = (minCoord.X * gathererMapScalingX) - overlaySystemSize;
-            gathererMapTopOffset = (minCoord.Y * gathererMapScalingY) - overlaySystemSize;
+            gathererMapLeftOffset = (minCoord.X * gathererMapScalingX) - CalculatedOverlaySystemSize;
+            gathererMapTopOffset = (minCoord.Y * gathererMapScalingY) - CalculatedOverlaySystemSize;
+
+            List<string> deleteSystems = new List<string>();
+            foreach ( var overlaySystemData in systemData )
+            {
+                if ( !systemsInList.Contains(overlaySystemData.Key) )
+                {
+                    deleteSystems.Add(overlaySystemData.Key);
+                }
+            }
+
+            foreach (string sysName in deleteSystems)
+            {
+                // Clean up the canvas
+                systemData[sysName].CleanUpCanvas(overlay_Canvas);
+                systemData.Remove(sysName);
+            }
 
             // Draw the systems.
             for (int i = 0; i < hierarchie.Count; i++)
@@ -529,41 +666,77 @@ namespace SMT
         {
             // Keep track of the systems for which connections are already drawn.
             List<string> alreadyConnected = new List<string>();
+            int currentJumpIndex = 0;
+
+            foreach (Line jLine in jumpLines)
+            {
+                overlay_Canvas.Children.Remove(jLine);
+            }
+            jumpLines.Clear();
 
             foreach (string systemName in systemsInList)
             {
-                (string, double, double) currentCoordinate = systemCoordinates.Where(s => s.Item1 == systemName).First();
+                // (string, double, double) currentCoordinate = systemCoordinates.Where(s => s.Item1 == systemName).First();
+                Vector2 currentCoordinate = systemData[systemName].canvasCoordinate;
                 EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(systemName);
 
                 // Iterate over all the connections.
                 foreach (string connectedSystem in currentSystem.Jumps)
                 {
                     // Only draw a connection if the target system is visible and if it was not yet connected.
-                    if (systemCoordinates.Any(s => s.Item1 == connectedSystem) && !alreadyConnected.Contains(connectedSystem))
+                    if (systemData.ContainsKey(connectedSystem) && !alreadyConnected.Contains(connectedSystem))
                     {
-                        (string, double, double) connectedCoordinate = systemCoordinates.Where(s => s.Item1 == connectedSystem).First();
-                        Line connectionLine = new Line();
+                        // (string, double, double) connectedCoordinate = systemCoordinates.Where(s => s.Item1 == connectedSystem).First();
+                        Vector2 connectedCoordinate = systemData[connectedSystem].canvasCoordinate;
 
-                        Vector2f current = new Vector2f(currentCoordinate.Item2 + 10, currentCoordinate.Item3 + 10);
-                        Vector2f connected = new Vector2f(connectedCoordinate.Item2 + 10, connectedCoordinate.Item3 + 10);
+                        Line connectionLine;
+
+                        if ( currentJumpIndex + 1 > jumpLines.Count )
+                        {
+                            connectionLine = new Line();
+                            jumpLines.Add(connectionLine);
+                            currentJumpIndex++;
+                        }
+
+                        
+
+                        Vector2f current = new Vector2f(currentCoordinate.X + (CalculatedOverlaySystemSize / 2f), 
+                            currentCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
+                        Vector2f connected = new Vector2f(connectedCoordinate.X + (CalculatedOverlaySystemSize / 2f), 
+                            connectedCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
 
                         Vector2f currentToConnected = connected == current ? new Vector2f(0, 0) : Vector2f.Normalize(connected - current);
 
-                        Vector2f currentCorrected = current + (currentToConnected * 10);
-                        Vector2f connectedCorrected = connected - (currentToConnected * 10);
+                        Vector2f currentCorrected = current + (currentToConnected * (int)(CalculatedOverlaySystemSize / 2f));
+                        Vector2f connectedCorrected = connected - (currentToConnected * (int)(CalculatedOverlaySystemSize / 2f));
 
-                        connectionLine.X1 = currentCorrected.x;
-                        connectionLine.Y1 = currentCorrected.y;
-                        connectionLine.X2 = connectedCorrected.x;
-                        connectionLine.Y2 = connectedCorrected.y;
-                        connectionLine.Stroke = jumpLineBrush;
-                        connectionLine.StrokeThickness = 2;
+                        jumpLines[^1].X1 = currentCorrected.x;
+                        jumpLines[^1].Y1 = currentCorrected.y;
+                        jumpLines[^1].X2 = connectedCorrected.x;
+                        jumpLines[^1].Y2 = connectedCorrected.y;
+                        jumpLines[^1].Stroke = jumpLineBrush;
+                        jumpLines[^1].StrokeThickness = 2;
+                        //connectionLine.IsHitTestVisible=false;
 
-                        overlay_Canvas.Children.Add(connectionLine);
+                        if (!overlay_Canvas.Children.Contains(jumpLines[^1]))
+                        {
+                            overlay_Canvas.Children.Add(jumpLines[^1]);
+                        }
+                        Canvas.SetZIndex(jumpLines[^1], 25);
                     }
                 }
 
                 alreadyConnected.Add(systemName);
+            }
+
+            // Remove unused lines from canvas and then delete
+            if ( currentJumpIndex > jumpLines.Count )
+            {
+                foreach ( Line jLine in jumpLines.GetRange(currentJumpIndex, jumpLines.Count - currentJumpIndex ) )
+                {
+                    overlay_Canvas.Children.Remove( jLine );
+                }
+                jumpLines.RemoveRange(currentJumpIndex, jumpLines.Count - currentJumpIndex);
             }
         }
 
@@ -602,51 +775,134 @@ namespace SMT
         /// <summary>
         /// Draws a single system to the canvas.
         /// </summary>
-        /// <param name="systemData">The system to be drawn.</param>
+        /// <param name="sysData">The system to be drawn.</param>
         /// <param name="left">The position from the left edge.</param>
         /// <param name="top">The position from the top edge.</param>
         /// TODO: Make shape settings a global setting.
         /// TODO: Add more info to ToolTip or replace it with something else.
-        private void DrawSystemToOverlay(OverlaySystemData systemData, double left, double top)
+        private void DrawSystemToOverlay(OverlaySystemData sysData, double left, double top)
         {
-            Ellipse systemShape = new Ellipse();
+            if ( !systemData.ContainsKey(sysData.system.Name)) return;
 
-            systemShape.Width = overlaySystemSize;
-            systemShape.Height = overlaySystemSize;
-            systemShape.StrokeThickness = 1.5;
-            if ( systemData.system.Name == currentPlayerSystemData.system.Name )
+            if (systemData[sysData.system.Name].systemCanvasElement == null )
             {
-                systemShape.Fill = sysLocationBrush;
+                systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
+                //systemData[sysData.system.Name].systemCanvasElement.IsHitTestVisible = false;
+            }
+
+            systemData[sysData.system.Name].systemCanvasElement.Width = CalculatedOverlaySystemSize;
+            systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize;
+
+            systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = 2;
+
+            if ( sysData.system.Name == currentPlayerSystemData.system.Name )
+            {
+                systemData[sysData.system.Name].systemCanvasElement.Stroke = sysLocationOutlineBrush;
             }
             else
             {
-                systemShape.Fill = sysFillBrush;
+                systemData[sysData.system.Name].systemCanvasElement.Stroke = sysOutlineBrush;                
             }
-            systemShape.Stroke = sysOutlineBrush;
-            
-            if ( systemData.system.Region != currentPlayerSystemData.system.Region )
+            systemData[sysData.system.Name].systemCanvasElement.Fill = sysFillBrush;
+
+            if ( !gathererMode )
             {
-                systemShape.Stroke = outOfRegionSysOutlineBrush;
-                systemShape.Fill = outOfRegionSysFillBrush;
+                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(sysData.system.TrueSec, mainWindow.MapConf.ShowTrueSec));
+                systemData[sysData.system.Name].systemCanvasElement.Fill = securityColorFill;
+            }
+
+            
+            if ( sysData.system.Region != currentPlayerSystemData.system.Region )
+            {
+                systemData[sysData.system.Name].systemCanvasElement.Stroke = outOfRegionSysOutlineBrush;
+                systemData[sysData.system.Name].systemCanvasElement.Fill = outOfRegionSysFillBrush;
             }
 
             ToolTip systemTooltip = new ToolTip();
-            systemTooltip.Content = systemData.system.Name;
+            // Todo: NPC Kills == 0, delta == 0, jumps, hunter/gatherer
+            systemTooltip.Content = $"{sysData.system.Name}\nNPC Kills: {sysData.system.NPCKillsLastHour}\nDelta: {sysData.system.NPCKillsDeltaLastHour}";
+            systemTooltip.Background = toolTipBackgroundBrush;
+            systemTooltip.Foreground = toolTipForegroundBrush;
 
-            systemShape.ToolTip = systemTooltip;
+            ToolTipService.SetInitialShowDelay(systemData[sysData.system.Name].systemCanvasElement, 0);
 
-            double leftCoord = left - (systemShape.Width * 0.5);
-            double topCoord = top - (systemShape.Height * 0.5);
+            systemData[sysData.system.Name].systemCanvasElement.ToolTip = systemTooltip;
 
-            if (!systemCoordinates.Any(s => s.Item1 == systemData.system.Name))
+            double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
+            double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
+
+            systemData[sysData.system.Name].canvasCoordinate = new Vector2((float)leftCoord, (float)topCoord);
+
+            Canvas.SetLeft(systemData[sysData.system.Name].systemCanvasElement, leftCoord);
+            Canvas.SetTop(systemData[sysData.system.Name].systemCanvasElement, topCoord);
+            Canvas.SetZIndex(systemData[sysData.system.Name].systemCanvasElement, 100);
+            if ( !overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemCanvasElement) )
             {
-                systemCoordinates.Add((systemData.system.Name, leftCoord, topCoord));
+                systemData[sysData.system.Name].systemCanvasElement.Name = "system";
+                overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemCanvasElement);
+            }            
+
+            if ( showNPCKillData && !gathererMode ) DrawNPCKillsToOverlay ( sysData, left, top );
+        }
+
+        public void DrawNPCKillsToOverlay (OverlaySystemData sysData, double left, double top)
+        {
+            if (!systemData.ContainsKey(sysData.system.Name)) return;
+            int npcKillData = sysData.system.NPCKillsLastHour;
+
+            if (systemData[sysData.system.Name].npcKillCanvasElement == null)
+            {
+                systemData[sysData.system.Name].npcKillCanvasElement = new Ellipse();
             }
 
-            Canvas.SetLeft(systemShape, leftCoord);
-            Canvas.SetTop(systemShape, topCoord);
-            Canvas.SetZIndex(systemShape, 5);
-            overlay_Canvas.Children.Add(systemShape);
+            float killDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillData, 0f,Math.Abs(npcKillData) ) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
+
+            systemData[sysData.system.Name].npcKillCanvasElement.Width = CalculatedOverlaySystemSize + killDataCalculatedSize;
+            systemData[sysData.system.Name].npcKillCanvasElement.Height = CalculatedOverlaySystemSize + killDataCalculatedSize;
+            systemData[sysData.system.Name].npcKillCanvasElement.StrokeThickness = 0f;
+
+            systemData[sysData.system.Name].npcKillCanvasElement.Fill = npcKillDataBrush;
+
+            double leftCoord = left - (systemData[sysData.system.Name].npcKillCanvasElement.Width * 0.5);
+            double topCoord = top - (systemData[sysData.system.Name].npcKillCanvasElement.Height * 0.5);
+
+            Canvas.SetLeft(systemData[sysData.system.Name].npcKillCanvasElement, leftCoord);
+            Canvas.SetTop(systemData[sysData.system.Name].npcKillCanvasElement, topCoord);
+            Canvas.SetZIndex(systemData[sysData.system.Name].npcKillCanvasElement, 3);
+            if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillCanvasElement))
+            {
+                overlay_Canvas.Children.Add(systemData[sysData.system.Name].npcKillCanvasElement);
+            }
+
+            // Show delta?
+            if (!showNPCKillDeltaData) return;
+
+            int npcKillDelta = sysData.system.NPCKillsDeltaLastHour;
+
+            if (systemData[sysData.system.Name].npcKillDeltaCanvasElement == null)
+            {                
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement = new Ellipse();
+            }
+
+            float killDeltaDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillDelta, 0f, Math.Abs(npcKillDelta)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
+
+            systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
+            systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
+            systemData[sysData.system.Name].npcKillDeltaCanvasElement.StrokeThickness = 0f;
+
+            systemData[sysData.system.Name].npcKillDeltaCanvasElement.Fill = npcKillDeltaDataBrush;
+
+            leftCoord = left - (systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width * 0.5);
+            topCoord = top - (systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height * 0.5);
+
+            Canvas.SetLeft(systemData[sysData.system.Name].npcKillDeltaCanvasElement, leftCoord);
+            Canvas.SetTop(systemData[sysData.system.Name].npcKillDeltaCanvasElement, topCoord);
+            Canvas.SetZIndex(systemData[sysData.system.Name].npcKillDeltaCanvasElement, 4);
+            if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillDeltaCanvasElement))
+            {
+                overlay_Canvas.Children.Add(systemData[sysData.system.Name].npcKillDeltaCanvasElement);
+            }
+
         }
 
         /// <summary>
@@ -676,6 +932,11 @@ namespace SMT
             {
                 overlayDepth = mainWindow.MapConf.OverlayRange + 1;
                 RefreshCurrentView();
+            }
+
+            if (e.PropertyName == "OverlayOpacity")
+            {
+                overlay_Canvas.Opacity = mainWindow.MapConf.OverlayOpacity;
             }
         }
 
@@ -751,10 +1012,40 @@ namespace SMT
             this.Close();
         }
 
+        /// <summary>
+        /// Toggles the hunter mode.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Overlay_ToggleHunterMode(object sender, MouseButtonEventArgs e)
         {
-            gathererMode = !gathererMode;
-            RefreshCurrentView(); ;
+            gathererMode = false;
+            mainWindow.MapConf.OverlayGathererMode = gathererMode;
+
+            if (gathererMode)
+            {
+                foreach (KeyValuePair<string, OverlaySystemData> sysData in systemData)
+                {
+                    sysData.Value.CleanUpCanvas(overlay_Canvas, true);
+                }
+            }
+
+            RefreshButtonStates();
+            RefreshCurrentView();
+        }
+
+        private void Overlay_ToggleGathererMode(object sender, MouseButtonEventArgs e)
+        {
+            gathererMode = true;
+            mainWindow.MapConf.OverlayGathererMode = gathererMode;
+
+            foreach (KeyValuePair<string, OverlaySystemData> sysData in systemData)
+            {
+                sysData.Value.CleanUpCanvas(overlay_Canvas, true);
+            }
+
+            RefreshButtonStates();
+            RefreshCurrentView();
         }
 
         /// <summary>
@@ -769,10 +1060,11 @@ namespace SMT
             Vector2f intelSystemCoordinateVector;
 
             // Only draw a visible element if the system is currently visible on the map.
-            if (systemCoordinates.Any(s => s.Item1 == intelSystem))
+            if (systemData.ContainsKey(intelSystem))
             {
-                (string, double, double) intelSystemCoordinate = systemCoordinates.Where(s => s.Item1 == intelSystem).First();
-                intelSystemCoordinateVector = new Vector2f(intelSystemCoordinate.Item2 - 5, intelSystemCoordinate.Item3 - 5);
+                // (string name, double x, double y) intelSystemCoordinate = systemCoordinates.Where(s => s.name == intelSystem).First();
+                Vector2 intelSystemCoordinate = systemData[intelSystem].canvasCoordinate;
+                intelSystemCoordinateVector = new Vector2f(intelSystemCoordinate.X - (CalculatedOverlayIntelOversize / 2f), intelSystemCoordinate.Y - (CalculatedOverlayIntelOversize / 2f));
             }
             else
             {
@@ -780,15 +1072,16 @@ namespace SMT
                 intelShape.Visibility = Visibility.Hidden;
             }
 
-            intelShape.Width = 30;
-            intelShape.Height = 30;
-            intelShape.StrokeThickness = 6;
+            intelShape.Width = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+            intelShape.Height = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+            intelShape.StrokeThickness = CalculatedOverlayIntelOversize / 2f;
             intelShape.Stroke = intelUrgentOutlineBrush;
+            intelShape.IsHitTestVisible = false;
 
             Canvas.SetLeft(intelShape, intelSystemCoordinateVector.x);
             Canvas.SetTop(intelShape, intelSystemCoordinateVector.y);
-            Canvas.SetZIndex(intelShape, 1);
-            overlay_Canvas.Children.Add(intelShape);
+            Canvas.SetZIndex(intelShape, 90);
+            if ( !overlay_Canvas.Children.Contains(intelShape) ) overlay_Canvas.Children.Add(intelShape);
 
             return intelShape;
         }
