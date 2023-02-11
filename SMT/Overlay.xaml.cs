@@ -1,4 +1,5 @@
 ﻿using csDelaunay;
+using Microsoft.IdentityModel.Tokens;
 using SMT.EVEData;
 using System;
 using System.Collections.Generic;
@@ -216,6 +217,8 @@ namespace SMT
         private float npcKillDeltaMaxEqualsKills = 500f;
 
         private bool showNPCKillDeltaData = true;
+        private bool showCharName = true;
+        private bool showCharLocation = true;
 
         private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
 
@@ -224,10 +227,13 @@ namespace SMT
             InitializeComponent();
 
             // Restore the last window size and position
-            LoadOverlayWindowPosition();   
+            LoadOverlayWindowPosition();
 
+            this.Background.Opacity = mw.MapConf.OverlayBackgroundOpacity;
             overlay_Canvas.Opacity = mw.MapConf.OverlayOpacity;
             gathererMode = mw.MapConf.OverlayGathererMode;
+            showCharName = mw.MapConf.OverlayShowCharName;
+            showCharLocation = mw.MapConf.OverlayShowCharLocation;
 
             // Set up all the brushes
             sysOutlineBrush = new SolidColorBrush(Colors.DarkGray);
@@ -1072,6 +1078,25 @@ namespace SMT
             {
                 overlay_Canvas.Opacity = mainWindow.MapConf.OverlayOpacity;
             }
+
+            if (e.PropertyName == "OverlayBackgroundOpacity")
+            {
+                this.Background.Opacity = mainWindow.MapConf.OverlayBackgroundOpacity;
+            }
+
+            if (e.PropertyName == "OverlayShowCharName")
+            {
+                showCharName = mainWindow.MapConf.OverlayShowCharName;
+                UpdatePlayerInformationText();
+            }
+
+            if (e.PropertyName == "OverlayShowCharLocation")
+            {
+                showCharLocation = mainWindow.MapConf.OverlayShowCharLocation;
+                UpdatePlayerInformationText();
+            }
+
+
         }
 
         /// <summary>
@@ -1092,11 +1117,23 @@ namespace SMT
         {
             if (mainWindow.ActiveCharacter != null)
             {
-                overlay_CharNameTextblock.Text = mainWindow.ActiveCharacter.Name + "\n" + mainWindow.ActiveCharacter.Location;
+                string displayText = "";
+                if ( showCharName )
+                {
+                    displayText = mainWindow.ActiveCharacter.Name;
+                }
+
+                if ( showCharLocation )
+                {
+                    displayText += (displayText.IsNullOrEmpty() ? "" : "\n") + mainWindow.ActiveCharacter.Location;
+                }
+
+
+                overlay_CharNameTextblock.Text = displayText;
             }
             else
             {
-                overlay_CharNameTextblock.Text = "";
+                overlay_CharNameTextblock.Text = "No char selected";
             }
         }
 
