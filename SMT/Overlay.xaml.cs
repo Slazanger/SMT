@@ -1,4 +1,5 @@
-﻿using SMT.EVEData;
+﻿using csDelaunay;
+using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace SMT
@@ -28,6 +30,7 @@ namespace SMT
         /// is currently in.
         /// </summary>
         public Vector2 offsetCoordinate;
+        public Vector2 mapSystemCoordinate;
         public Vector2 canvasCoordinate;
 
         public int rattingDelta;
@@ -37,19 +40,20 @@ namespace SMT
 
         public int overlayTier = 0;
 
-        public OverlaySystemData(EVEData.System sys, Vector2 coord, Vector2 canvasCoord, int ratDelta, Shape shape, int ovrTier )
+        public OverlaySystemData(EVEData.System sys, Vector2 coord, Vector2 mapSysCoord, Vector2 canvasCoord, int ratDelta, Shape shape, int ovrTier )
         {
             system = sys;
             offsetCoordinate = coord;
+            mapSystemCoordinate = mapSysCoord;
             canvasCoordinate = canvasCoord;
             rattingDelta = ratDelta;
             systemCanvasElement = shape;
             overlayTier = ovrTier;
         }
 
-        public OverlaySystemData(EVEData.System sys) : this(sys, Vector2.Zero, Vector2.Zero, 0, null, 0) { }
+        public OverlaySystemData(EVEData.System sys) : this(sys, Vector2.Zero, Vector2.Zero, Vector2.Zero, 0, null, 0) { }
 
-        public OverlaySystemData(EVEData.System sys, Vector2 coord) : this(sys, coord, Vector2.Zero, 0, null, 0) { }
+        public OverlaySystemData(EVEData.System sys, Vector2 coord) : this(sys, coord, Vector2.Zero, Vector2.Zero, 0, null, 0) { }
 
         public void CleanUpCanvas ( Canvas canvas, bool keepSystem = false )
         {
@@ -58,6 +62,100 @@ namespace SMT
             if (npcKillDeltaCanvasElement != null && canvas.Children.Contains(npcKillDeltaCanvasElement)) canvas.Children.Remove(npcKillDeltaCanvasElement);
         }
     }
+
+    /// <summary>
+    /// A class to hold all the information necessary to draw systems to the canvas.
+    /// Does the data collection and computation to go from layout coordinates
+    /// to canvas coordinates.
+    /// </summary>
+    public class OverlayCanvasData
+    {
+        public Vector2 dimensions;
+        public Vector2 borderedDimensions { get { return dimensions - (Vector2.One * (2f * mapBorderMargin)); } }
+
+        public Vector2 unscaledMapExtendsMax;
+        public Vector2 unscaledMapExtendsMin;
+        public Vector2 unscaledMapDimensions { get { return new Vector2(unscaledMapExtendsMax.X - unscaledMapExtendsMin.X, unscaledMapExtendsMax.Y - unscaledMapExtendsMin.Y); } }
+
+        public Vector2 currentOriginCoordinates;
+
+        public float mapBorderMargin;
+        public float mapScalingX;
+        public float mapScalingY;
+        public float mapScalingMin {  get { return Math.Min(mapScalingY, mapScalingX); } }
+
+        public OverlayCanvasData ()
+        {
+            dimensions = Vector2.Zero;
+
+            unscaledMapExtendsMax = new Vector2(float.MinValue, float.MinValue);
+            unscaledMapExtendsMin = new Vector2(float.MaxValue, float.MaxValue);
+
+            currentOriginCoordinates = Vector2.Zero;
+
+            mapBorderMargin = 20f;
+            mapScalingX = 1f;
+            mapScalingY = 1f;
+        }
+
+        /// <summary>
+        /// Sets the current dimensions of the canvas element.
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void SetDimensions(double width, double height)
+        {
+            dimensions.X = (float)width;
+            dimensions.Y = (float)height;
+        }
+
+        /// <summary>
+        /// Resets the stored minimal and mixmum extends in layout coordinates.
+        /// </summary>
+        public void ResetExtends()
+        {
+            unscaledMapExtendsMax = new Vector2(float.MinValue, float.MinValue);
+            unscaledMapExtendsMin = new Vector2(float.MaxValue, float.MaxValue);
+        }
+
+        /// <summary>
+        /// Updates the min and max extends in layout coordinates.
+        /// </summary>
+        /// <param name="offsetCoordinates">Coordinates of a system in relation to the origin system (current player location).</param>
+        public void UpdateUnscaledExtends(Vector2 offsetCoordinates)
+        {
+            unscaledMapExtendsMax.X = Math.Max(unscaledMapExtendsMax.X, offsetCoordinates.X);
+            unscaledMapExtendsMax.Y = Math.Max(unscaledMapExtendsMax.Y, offsetCoordinates.Y);
+            unscaledMapExtendsMin.X = Math.Min(unscaledMapExtendsMin.X, offsetCoordinates.X);
+            unscaledMapExtendsMin.Y = Math.Min(unscaledMapExtendsMin.Y, offsetCoordinates.Y);
+            ComputeScaling();
+        }
+
+        /// <summary>
+        /// Computes the scaling needed to draw all systems onto the canvas.
+        /// </summary>
+        private void ComputeScaling ()
+        {
+            mapScalingX = (dimensions.X - (mapBorderMargin * 2f)) / unscaledMapDimensions.X;
+            mapScalingY = (dimensions.Y - (mapBorderMargin * 2f)) / unscaledMapDimensions.Y;
+        }
+
+        /// <summary>
+        /// Takes layout coordinates and converts them to canvas coordinates.
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <returns></returns>
+        public Vector2 CoordinateToCanvas(Vector2 coordinate)
+        {
+            Vector2 scaledMapDimensions = unscaledMapDimensions * mapScalingMin;
+            float emptySpaceOffsetX = (borderedDimensions.X - scaledMapDimensions.X) * 0.5f;
+            float emptySpaceOffsetY = (borderedDimensions.Y - scaledMapDimensions.Y) * 0.5f;
+            float canvasX = emptySpaceOffsetX + mapBorderMargin + (((coordinate.X - unscaledMapExtendsMin.X) * mapScalingMin) / borderedDimensions.X) * borderedDimensions.X;
+            float canvasY = emptySpaceOffsetY + mapBorderMargin + (((coordinate.Y - unscaledMapExtendsMin.Y) * mapScalingMin) / borderedDimensions.Y) * borderedDimensions.Y;
+            return new Vector2(canvasX, canvasY);
+        }
+    }
+
 
     /// <summary>
     /// The overlay window is a separate window that is set to always-on-top 
@@ -94,6 +192,7 @@ namespace SMT
 
         private int overlayDepth = 8;
         private OverlaySystemData currentPlayerSystemData;
+        private OverlayCanvasData canvasData = new OverlayCanvasData();
 
         private float intelUrgentPeriod = 300;
         private float intelStalePeriod = 300;
@@ -115,12 +214,6 @@ namespace SMT
 
         private bool showNPCKillDeltaData = true;
 
-        private float gathererMapScalingX = 1.0f;
-        private float gathererMapScalingY = 1.0f;
-        private float gathererMapScalingMin = 1.0f;
-        private float gathererMapLeftOffset = 0f;
-        private float gathererMapTopOffset = 0f;
-
         private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
 
         public Overlay(MainWindow mw)
@@ -128,7 +221,8 @@ namespace SMT
             InitializeComponent();
 
             // Restore the last window size and position
-            LoadOverlayWindowPosition();           
+            LoadOverlayWindowPosition();   
+            canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
 
             overlay_Canvas.Opacity = mw.MapConf.OverlayOpacity;
             gathererMode = mw.MapConf.OverlayGathererMode;
@@ -317,7 +411,16 @@ namespace SMT
 
             while (await dataUpdateTimer.WaitForNextTickAsync())
             {
-                UpdateIntelData();                
+                UpdateIntelData();
+                if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData(); 
+            }
+        }
+
+        private void UpdateNPCKillData ()
+        {
+            foreach ( var sysData in systemData )
+            {
+                DrawNPCKillsToOverlay(sysData.Value);
             }
         }
 
@@ -491,7 +594,8 @@ namespace SMT
         private void UpdateSystemList()
         {
             // Cleanup
-            //overlay_Canvas.Children.Clear();
+            canvasData.ResetExtends(); ;
+
             List<string> systemsInList = new List<string>();
 
             // If there is no main window or no selected character, abort.
@@ -519,11 +623,9 @@ namespace SMT
                 systemData.Add(currentPlayerSystemData.system.Name, currentPlayerSystemData);
             }            
 
+
             // Track which systems are already in the list to avoid doubles.
             systemsInList.Add(currentSystem.Name);
-
-            Vector2 maxCoord = new Vector2(float.MinValue, float.MinValue);
-            Vector2 minCoord = new Vector2(float.MaxValue, float.MaxValue);
 
             for (int i = 1; i < overlayDepth; i++)
             {
@@ -580,6 +682,12 @@ namespace SMT
                                 Vector2 originSystemCoord = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[previousDepthSystem.system.Name].Layout;
                                 Vector2 jumpSystemCoord = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[jump].Layout;
 
+                                if ( previousDepthSystem.system.Name == currentPlayerSystemData.system.Name )
+                                {
+                                    currentPlayerSystemData.mapSystemCoordinate = originSystemCoord;
+                                    canvasData.currentOriginCoordinates = originSystemCoord;
+                                }
+
                                 Vector2 systemConnection = (jumpSystemCoord - originSystemCoord);
 
                                 // If we need to mirror it, rotate it by 180 degrees or PI radians.
@@ -590,10 +698,7 @@ namespace SMT
 
                                 Vector2 originOffset = previousDepthSystem.offsetCoordinate + systemConnection;
 
-                                maxCoord.X = Math.Max(maxCoord.X, originOffset.X);
-                                maxCoord.Y = Math.Max(maxCoord.Y, originOffset.Y);
-                                minCoord.X = Math.Min(minCoord.X, originOffset.X);
-                                minCoord.Y = Math.Min(minCoord.Y, originOffset.Y);
+                                canvasData.UpdateUnscaledExtends(jumpSystemCoord);
 
                                 currentDepth.Add(new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(jump), originOffset));
                                 systemsInList.Add(jump);
@@ -601,34 +706,14 @@ namespace SMT
                                 {
                                     systemData.Add(jump, new OverlaySystemData(jumpSystem));
                                 }
+
+                                systemData[jump].mapSystemCoordinate = jumpSystemCoord;
                             }
                         }
                     }
                 }
                 hierarchie.Add(currentDepth);
             }
-
-            double canvasWidth = overlay_Canvas.RenderSize.Width;
-            double canvasHeight = overlay_Canvas.RenderSize.Height;
-
-            // The dimension of the area covered by all systems on the overlay.
-            float coordDimensionsX = maxCoord.X - minCoord.X;
-            float coordDimensionsY = maxCoord.Y - minCoord.Y;
-
-            // The scaling to bring the coordinates to the canvas area.
-            gathererMapScalingX = ((float)canvasWidth - (CalculatedOverlaySystemSize * 2f)) / coordDimensionsX;
-            gathererMapScalingY = ((float)canvasHeight - (CalculatedOverlaySystemSize * 2f)) / coordDimensionsY;
-            gathererMapScalingMin = Math.Min(gathererMapScalingX, gathererMapScalingY);
-
-            float gathererMapDimensionX = (maxCoord.X - minCoord.X) * gathererMapScalingMin;
-            float gathererMapDimensionY = (maxCoord.Y - minCoord.Y) * gathererMapScalingMin;
-
-            float emptySpaceX = (float)canvasWidth - gathererMapDimensionX;
-            float emptySpaceY = (float)canvasWidth - gathererMapDimensionY;
-
-            // How the systems need to be positioned to be displayed correctly.
-            gathererMapLeftOffset = (minCoord.X * gathererMapScalingX) - CalculatedOverlaySystemSize;
-            gathererMapTopOffset = (minCoord.Y * gathererMapScalingY) - CalculatedOverlaySystemSize;
 
             List<string> deleteSystems = new List<string>();
             foreach ( var overlaySystemData in systemData )
@@ -749,10 +834,8 @@ namespace SMT
         private void DrawSystemsToOverlay(int depth, List<OverlaySystemData> systems, int maxDepth)
         {
             // Fetch data and determine the sizes for rows and columns.
-            double canvasWidth = overlay_Canvas.RenderSize.Width;
-            double canvasHeight = overlay_Canvas.RenderSize.Height;
-            double rowHeight = canvasHeight / maxDepth;
-            double columnWidth = canvasWidth / systems.Count;
+            double rowHeight = canvasData.dimensions.Y / maxDepth;
+            double columnWidth = canvasData.dimensions.X / systems.Count;
 
             // In each depth the width of the columns is divided equally by the number of systems.
             for (int i = 0; i < systems.Count; i++)
@@ -765,8 +848,9 @@ namespace SMT
                 }
                 else
                 {
-                    left = -gathererMapLeftOffset  + (systems[i].offsetCoordinate.X * gathererMapScalingMin);
-                    top = -gathererMapTopOffset + (systems[i].offsetCoordinate.Y * gathererMapScalingMin);
+                    Vector2 canvasCoordinate = canvasData.CoordinateToCanvas(systemData[systems[i].system.Name].mapSystemCoordinate);
+                    left = canvasCoordinate.X;
+                    top = canvasCoordinate.Y;
                 }
                 DrawSystemToOverlay(systems[i], left, top);
             }
@@ -842,13 +926,17 @@ namespace SMT
                 overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemCanvasElement);
             }            
 
-            if ( showNPCKillData && !gathererMode ) DrawNPCKillsToOverlay ( sysData, left, top );
+            if ( showNPCKillData && !gathererMode ) DrawNPCKillsToOverlay ( sysData );
         }
 
-        public void DrawNPCKillsToOverlay (OverlaySystemData sysData, double left, double top)
+        public void DrawNPCKillsToOverlay (OverlaySystemData sysData)
         {
             if (!systemData.ContainsKey(sysData.system.Name)) return;
             int npcKillData = sysData.system.NPCKillsLastHour;
+
+            Vector2 canvasCoordinate = canvasData.CoordinateToCanvas(systemData[sysData.system.Name].mapSystemCoordinate);
+            float left = canvasCoordinate.X;
+            float top = canvasCoordinate.Y;
 
             if (systemData[sysData.system.Name].npcKillCanvasElement == null)
             {
@@ -985,6 +1073,7 @@ namespace SMT
         private void OnCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
             RefreshCurrentView ();
+            canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
         }
 
         /// <summary>

@@ -8,7 +8,9 @@
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         Topmost="True"
-        Visibility="Visible"        
+        Visibility="Visible"   
+        MinWidth="100"
+        MinHeight="100"
         Title="Overlay" Height="600" Width="600" AllowsTransparency="True">
     <Window.Background>
         <SolidColorBrush Opacity="0.2" Color="Black"></SolidColorBrush>
