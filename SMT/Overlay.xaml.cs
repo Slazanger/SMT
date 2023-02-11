@@ -222,7 +222,6 @@ namespace SMT
 
             // Restore the last window size and position
             LoadOverlayWindowPosition();   
-            canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
 
             overlay_Canvas.Opacity = mw.MapConf.OverlayOpacity;
             gathererMode = mw.MapConf.OverlayGathererMode;
@@ -324,6 +323,7 @@ namespace SMT
         /// </summary>
         private void RefreshCurrentView()
         {
+            canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
             UpdatePlayerInformationText();
             UpdateSystemList();
             UpdateIntelDataCoordinates();
@@ -594,7 +594,7 @@ namespace SMT
         private void UpdateSystemList()
         {
             // Cleanup
-            canvasData.ResetExtends(); ;
+            canvasData.ResetExtends();
 
             List<string> systemsInList = new List<string>();
 
