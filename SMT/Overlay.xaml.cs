@@ -3,6 +3,7 @@ using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text.RegularExpressions;
@@ -37,6 +38,7 @@ namespace SMT
         public Shape systemCanvasElement;
         public Shape npcKillCanvasElement;
         public Shape npcKillDeltaCanvasElement;
+        public EVEData.IntelData intelData;
 
         public int overlayTier = 0;
 
@@ -49,6 +51,7 @@ namespace SMT
             rattingDelta = ratDelta;
             systemCanvasElement = shape;
             overlayTier = ovrTier;
+            intelData = null;
         }
 
         public OverlaySystemData(EVEData.System sys) : this(sys, Vector2.Zero, Vector2.Zero, Vector2.Zero, 0, null, 0) { }
@@ -411,8 +414,14 @@ namespace SMT
 
             while (await dataUpdateTimer.WaitForNextTickAsync())
             {
-                UpdateIntelData();
-                if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData(); 
+                try
+                {
+                    UpdateIntelData();
+                    if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData();
+                }
+                catch (Exception ex)
+                {
+                }
             }
         }
 
@@ -459,16 +468,27 @@ namespace SMT
 
                 // Check if it is intel for an already existing system, throw out older entries.
                 List<(EVEData.IntelData data, List<Ellipse> ellipse)> deleteList = new List<(EVEData.IntelData, List<Ellipse>)>();
+                bool skipIntel = false;
+
                 foreach (string intelSystem in intelDataset.Systems)
                 {
                     foreach (var existingIntelDataset in intelData)
                     {
-                        if (existingIntelDataset.data.Systems.Any(s => s == intelSystem))
+                        if (existingIntelDataset.data.Systems.Any(s => s == intelSystem ))
                         {
-                            deleteList.Add(existingIntelDataset);
+                            if ( existingIntelDataset.data.IntelTime < intelDataset.IntelTime )
+                            {
+                                deleteList.Add(existingIntelDataset);
+                            }
+                            else
+                            {
+                                skipIntel = true;
+                            }
                         }
                     }
                 }
+                if (skipIntel) continue;
+
                 foreach (var deleteEntry in deleteList)
                 {
                     foreach (Ellipse intelShape in deleteEntry.ellipse)
@@ -513,6 +533,17 @@ namespace SMT
                     }
                 }
 
+                // Fill or update ToolTips
+                foreach (string systemName in intelDataEntry.data.Systems)
+                {
+                    if (!systemData.ContainsKey(systemName)) continue;
+                    if ( systemData[systemName].intelData == null || systemData[systemName].intelData != intelDataEntry.data)
+                    {
+                        systemData[systemName].intelData = intelDataEntry.data;
+                        UpdateSystemTooltip(systemData[systemName]);
+                    }
+                }
+                
                 float intelAgeInSeconds = (float)(DateTime.Now - intelDataEntry.data.IntelTime).TotalSeconds;
 
                 // Update the style.
@@ -581,9 +612,32 @@ namespace SMT
                     }
 
                     // Since all children are deleted when resizing the canvas, we readd the intel shapes.
-                    if ( !overlay_Canvas.Children.Contains(intelDataEntry.ellipse[i]) ) overlay_Canvas.Children.Add(intelDataEntry.ellipse[i]);
+                    if ( intelDataEntry.ellipse.Count > 0 )
+                    {
+                        if (!overlay_Canvas.Children.Contains(intelDataEntry.ellipse[i])) overlay_Canvas.Children.Add(intelDataEntry.ellipse[i]);
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Updates the tooltip content of a specific system.
+        /// </summary>
+        /// <param name="systemData"></param>
+        public void UpdateSystemTooltip(OverlaySystemData systemData)
+        {
+            if (systemData.systemCanvasElement.ToolTip == null) systemData.systemCanvasElement.ToolTip = new ToolTip();
+
+            // Todo: NPC Kills == 0, delta == 0, jumps, hunter/gatherer
+            string toolTipText = $"{systemData.system.Name}";
+            if (!gathererMode) toolTipText += $"\nNPC Kills: {systemData.system.NPCKillsLastHour}\nDelta: {systemData.system.NPCKillsDeltaLastHour}";
+            if (systemData.intelData != null) toolTipText += $"\nReported: {systemData.intelData.RawIntelString}";
+
+            ((ToolTip)systemData.systemCanvasElement.ToolTip).Content = toolTipText;
+            ((ToolTip)systemData.systemCanvasElement.ToolTip).Background = toolTipBackgroundBrush;
+            ((ToolTip)systemData.systemCanvasElement.ToolTip).Foreground = toolTipForegroundBrush;
+
+            ToolTipService.SetInitialShowDelay(systemData.systemCanvasElement, 0);
         }
 
         /// <summary>
@@ -902,15 +956,7 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement.Fill = outOfRegionSysFillBrush;
             }
 
-            ToolTip systemTooltip = new ToolTip();
-            // Todo: NPC Kills == 0, delta == 0, jumps, hunter/gatherer
-            systemTooltip.Content = $"{sysData.system.Name}\nNPC Kills: {sysData.system.NPCKillsLastHour}\nDelta: {sysData.system.NPCKillsDeltaLastHour}";
-            systemTooltip.Background = toolTipBackgroundBrush;
-            systemTooltip.Foreground = toolTipForegroundBrush;
-
-            ToolTipService.SetInitialShowDelay(systemData[sysData.system.Name].systemCanvasElement, 0);
-
-            systemData[sysData.system.Name].systemCanvasElement.ToolTip = systemTooltip;
+            UpdateSystemTooltip(systemData[sysData.system.Name]);
 
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
