@@ -250,7 +250,7 @@ namespace SMT
             npcKillDeltaDataBrush = new SolidColorBrush(npcDeltaColor);
             npcKillDeltaDataBrush.Opacity = 1f;
 
-            outOfRegionSysFillBrush = new SolidColorBrush(Colors.DarkGray);
+            outOfRegionSysFillBrush = new SolidColorBrush(Colors.Black);
             outOfRegionSysFillBrush.Opacity = 1f;
 
             Color outOfRegionOutline = Colors.Red;
@@ -709,6 +709,7 @@ namespace SMT
                             if (!systemsInList.Contains(jump))
                             {
                                 // if source and target have different regions it is a border system.
+                                /*
                                 if (sourceRegion != targetRegion)
                                 {
 
@@ -728,6 +729,7 @@ namespace SMT
                                          * in each region, we note that we need to mirror the systems in the target
                                          * region to avoid overlap. This is messy and should be avoided.
                                          */
+                                        /*
                                         if (Vector2.Dot(sourceRegionDirection, targetRegionDirection) < 0)
                                         {
                                             regionMirrorVectors.Add(targetRegion, true);
@@ -738,9 +740,10 @@ namespace SMT
                                         }
                                     }
                                 }
+                                */
 
-                                Vector2 originSystemCoord = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[previousDepthSystem.system.Name].Layout;
-                                Vector2 jumpSystemCoord = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[jump].Layout;
+                                Vector2 originSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[previousDepthSystem.system.Name].Layout;
+                                Vector2 jumpSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[jump].Layout;
 
                                 if ( previousDepthSystem.system.Name == currentPlayerSystemData.system.Name )
                                 {
@@ -751,10 +754,12 @@ namespace SMT
                                 Vector2 systemConnection = (jumpSystemCoord - originSystemCoord);
 
                                 // If we need to mirror it, rotate it by 180 degrees or PI radians.
+                                /*
                                 if (regionMirrorVectors.ContainsKey(targetRegion) && regionMirrorVectors[targetRegion])
                                 {
                                     systemConnection = Vector2.Transform(systemConnection, Matrix3x2.CreateRotation((float)Math.PI));
                                 }
+                                */
 
                                 Vector2 originOffset = previousDepthSystem.offsetCoordinate + systemConnection;
 
@@ -861,7 +866,6 @@ namespace SMT
                         jumpLines[^1].Y2 = connectedCorrected.y;
                         jumpLines[^1].Stroke = jumpLineBrush;
                         jumpLines[^1].StrokeThickness = 2;
-                        //connectionLine.IsHitTestVisible=false;
 
                         if (!overlay_Canvas.Children.Contains(jumpLines[^1]))
                         {
