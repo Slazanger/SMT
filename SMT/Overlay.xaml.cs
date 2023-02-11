@@ -176,6 +176,7 @@ namespace SMT
         private List<Line> jumpLines = new List<Line>();
 
         private Brush sysOutlineBrush;
+        private Brush sysTheraOutlineBrush;
         private Brush sysLocationOutlineBrush;
         private Brush npcKillDataBrush;
         private Brush npcKillDeltaDataBrush;
@@ -236,6 +237,12 @@ namespace SMT
             showCharLocation = mw.MapConf.OverlayShowCharLocation;
 
             // Set up all the brushes
+            sysOutlineBrush = new SolidColorBrush(Colors.DarkGray);
+            sysOutlineBrush.Opacity = 1f;
+
+            sysTheraOutlineBrush = new SolidColorBrush(mw.MapConf.ActiveColourScheme.TheraEntranceSystem);
+            sysTheraOutlineBrush.Opacity = 1f;
+
             sysOutlineBrush = new SolidColorBrush(Colors.DarkGray);
             sysOutlineBrush.Opacity = 1f;
 
@@ -638,6 +645,7 @@ namespace SMT
             string toolTipText = $"{systemData.system.Name}";
             if (!gathererMode) toolTipText += $"\nNPC Kills: {systemData.system.NPCKillsLastHour}\nDelta: {systemData.system.NPCKillsDeltaLastHour}";
             if (systemData.intelData != null) toolTipText += $"\nReported: {systemData.intelData.RawIntelString}";
+            // Todo: Add Thera
 
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Content = toolTipText;
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Background = toolTipBackgroundBrush;
@@ -964,6 +972,14 @@ namespace SMT
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = outOfRegionSysOutlineBrush;
                 systemData[sysData.system.Name].systemCanvasElement.Fill = outOfRegionSysFillBrush;
+            }
+
+            if ( mainWindow.EVEManager.TheraConnections.Any(t => t.System == sysData.system.Name) )
+            {
+                systemData[sysData.system.Name].systemCanvasElement.Stroke = sysTheraOutlineBrush;
+                systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = 4;
+                systemData[sysData.system.Name].systemCanvasElement.Width += 4;
+                systemData[sysData.system.Name].systemCanvasElement.Height += 4;
             }
 
             UpdateSystemTooltip(systemData[sysData.system.Name]);
