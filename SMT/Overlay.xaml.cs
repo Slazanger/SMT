@@ -642,7 +642,7 @@ namespace SMT
             if (systemData.systemCanvasElement.ToolTip == null) systemData.systemCanvasElement.ToolTip = new ToolTip();
 
             // Todo: NPC Kills == 0, delta == 0, jumps, hunter/gatherer
-            string toolTipText = $"{systemData.system.Name}";
+            string toolTipText = $"{systemData.system.Name} ({systemData.system.TrueSec.ToString("n2")})";
             if (!gathererMode) toolTipText += $"\nNPC Kills: {systemData.system.NPCKillsLastHour}\nDelta: {systemData.system.NPCKillsDeltaLastHour}";
             if (systemData.intelData != null) toolTipText += $"\nReported: {systemData.intelData.RawIntelString}";
             // Todo: Add Thera
@@ -694,6 +694,10 @@ namespace SMT
 
             // Track which systems are already in the list to avoid doubles.
             systemsInList.Add(currentSystem.Name);
+
+            currentPlayerSystemData.mapSystemCoordinate = mainWindow.EVEManager.GetRegion(currentSystem.Region).MapSystems[currentSystem.Name].Layout;
+            canvasData.currentOriginCoordinates = currentPlayerSystemData.mapSystemCoordinate;
+            systemData[currentPlayerSystemData.system.Name].mapSystemCoordinate = currentPlayerSystemData.mapSystemCoordinate;
 
             for (int i = 1; i < overlayDepth; i++)
             {
@@ -752,12 +756,6 @@ namespace SMT
 
                                 Vector2 originSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[previousDepthSystem.system.Name].Layout;
                                 Vector2 jumpSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[jump].Layout;
-
-                                if ( previousDepthSystem.system.Name == currentPlayerSystemData.system.Name )
-                                {
-                                    currentPlayerSystemData.mapSystemCoordinate = originSystemCoord;
-                                    canvasData.currentOriginCoordinates = originSystemCoord;
-                                }
 
                                 Vector2 systemConnection = (jumpSystemCoord - originSystemCoord);
 
@@ -977,9 +975,7 @@ namespace SMT
             if ( mainWindow.EVEManager.TheraConnections.Any(t => t.System == sysData.system.Name) )
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = sysTheraOutlineBrush;
-                systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = 4;
-                systemData[sysData.system.Name].systemCanvasElement.Width += 4;
-                systemData[sysData.system.Name].systemCanvasElement.Height += 4;
+                systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = 3;
             }
 
             UpdateSystemTooltip(systemData[sysData.system.Name]);
