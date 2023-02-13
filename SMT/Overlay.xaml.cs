@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static SMT.EVEData.Navigation;
@@ -224,6 +225,8 @@ namespace SMT
         private bool showCharName = true;
         private bool showCharLocation = true;
 
+        private DoubleAnimation dashAnimation;
+
         private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
 
         public Overlay(MainWindow mw)
@@ -316,6 +319,15 @@ namespace SMT
             intelStalePeriod = mainWindow.MapConf.IntelStaleTime;
             intelHistoryPeriod = mainWindow.MapConf.IntelHistoricTime;
             overlayDepth = mainWindow.MapConf.OverlayRange + 1;
+
+            // Initialize value animation to be used by dashed lines
+            dashAnimation = new DoubleAnimation();
+            dashAnimation.From = 20;
+            dashAnimation.To = 0;
+            dashAnimation.By = 2;
+            dashAnimation.Duration = new Duration(TimeSpan.FromSeconds(10));
+            dashAnimation.RepeatBehavior = RepeatBehavior.Forever;
+            Timeline.SetDesiredFrameRate(dashAnimation, 20);
 
             RefreshButtonStates();
 
@@ -602,7 +614,7 @@ namespace SMT
         /// </summary>
         private void UpdateRouteData()
         {            
-            if ( !gathererMode && mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Waypoints.Count > 0 )
+            if ( !gathererMode && mainWindow.MapConf.OverlayShowRoute && mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Waypoints.Count > 0 )
             {
                 List<RoutePoint> routePoints = mainWindow.ActiveCharacter.ActiveRoute.ToList();
 
@@ -631,9 +643,11 @@ namespace SMT
                     routeLines[i - 1].Y2 = segmentEndCanvasCoordinate.Y;
 
                     routeLines[i - 1].Stroke = routeLineBrush;
-                    routeLines[i - 1].StrokeThickness = 15;
+                    routeLines[i - 1].StrokeThickness = 4;
+                    routeLines[i - 1].StrokeDashArray = new DoubleCollection(new List<double> { 1.0, 1.0 });
+                    routeLines[i - 1].BeginAnimation(Shape.StrokeDashOffsetProperty, dashAnimation);
 
-                    Canvas.SetZIndex(routeLines[i - 1], 2);
+                    Canvas.SetZIndex(routeLines[i - 1], 95);
                 }                
 
                 while ( routeLines.Count > routePoints.Count - 1 )
@@ -1063,7 +1077,7 @@ namespace SMT
                 overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemCanvasElement);
             }            
 
-            if ( showNPCKillData && !gathererMode ) DrawNPCKillsToOverlay ( sysData );
+            if ( !gathererMode ) DrawNPCKillsToOverlay ( sysData );
         }
 
         public void DrawNPCKillsToOverlay (OverlaySystemData sysData)
@@ -1075,59 +1089,87 @@ namespace SMT
             float left = canvasCoordinate.X;
             float top = canvasCoordinate.Y;
 
-            if (systemData[sysData.system.Name].npcKillCanvasElement == null)
+            // Set to show NPC kills?
+            if (mainWindow.MapConf.OverlayShowNPCKills)
             {
-                systemData[sysData.system.Name].npcKillCanvasElement = new Ellipse();
+                if (systemData[sysData.system.Name].npcKillCanvasElement == null)
+                {
+                    systemData[sysData.system.Name].npcKillCanvasElement = new Ellipse();
+                }
+
+
+                float killDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillData, 0f, Math.Abs(npcKillData)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
+
+                systemData[sysData.system.Name].npcKillCanvasElement.Width = CalculatedOverlaySystemSize + killDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillCanvasElement.Height = CalculatedOverlaySystemSize + killDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillCanvasElement.StrokeThickness = 0f;
+
+                systemData[sysData.system.Name].npcKillCanvasElement.Fill = npcKillDataBrush;
+
+                double leftCoord = left - (systemData[sysData.system.Name].npcKillCanvasElement.Width * 0.5);
+                double topCoord = top - (systemData[sysData.system.Name].npcKillCanvasElement.Height * 0.5);
+
+                Canvas.SetLeft(systemData[sysData.system.Name].npcKillCanvasElement, leftCoord);
+                Canvas.SetTop(systemData[sysData.system.Name].npcKillCanvasElement, topCoord);
+                Canvas.SetZIndex(systemData[sysData.system.Name].npcKillCanvasElement, 3);
+                if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillCanvasElement))
+                {
+                    overlay_Canvas.Children.Add(systemData[sysData.system.Name].npcKillCanvasElement);
+                }
             }
-
-            float killDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillData, 0f,Math.Abs(npcKillData) ) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
-
-            systemData[sysData.system.Name].npcKillCanvasElement.Width = CalculatedOverlaySystemSize + killDataCalculatedSize;
-            systemData[sysData.system.Name].npcKillCanvasElement.Height = CalculatedOverlaySystemSize + killDataCalculatedSize;
-            systemData[sysData.system.Name].npcKillCanvasElement.StrokeThickness = 0f;
-
-            systemData[sysData.system.Name].npcKillCanvasElement.Fill = npcKillDataBrush;
-
-            double leftCoord = left - (systemData[sysData.system.Name].npcKillCanvasElement.Width * 0.5);
-            double topCoord = top - (systemData[sysData.system.Name].npcKillCanvasElement.Height * 0.5);
-
-            Canvas.SetLeft(systemData[sysData.system.Name].npcKillCanvasElement, leftCoord);
-            Canvas.SetTop(systemData[sysData.system.Name].npcKillCanvasElement, topCoord);
-            Canvas.SetZIndex(systemData[sysData.system.Name].npcKillCanvasElement, 3);
-            if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillCanvasElement))
+            else
             {
-                overlay_Canvas.Children.Add(systemData[sysData.system.Name].npcKillCanvasElement);
+                if (systemData[sysData.system.Name].npcKillCanvasElement != null)
+                {
+                    if (overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillCanvasElement))
+                    {
+                        overlay_Canvas.Children.Remove(systemData[sysData.system.Name].npcKillCanvasElement);
+                    }
+                    systemData[sysData.system.Name].npcKillCanvasElement = null;
+                }
             }
 
             // Show delta?
-            if (!showNPCKillDeltaData) return;
-
-            int npcKillDelta = sysData.system.NPCKillsDeltaLastHour;
-
-            if (systemData[sysData.system.Name].npcKillDeltaCanvasElement == null)
-            {                
-                systemData[sysData.system.Name].npcKillDeltaCanvasElement = new Ellipse();
-            }
-
-            float killDeltaDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillDelta, 0f, Math.Abs(npcKillDelta)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
-
-            systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
-            systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
-            systemData[sysData.system.Name].npcKillDeltaCanvasElement.StrokeThickness = 0f;
-
-            systemData[sysData.system.Name].npcKillDeltaCanvasElement.Fill = npcKillDeltaDataBrush;
-
-            leftCoord = left - (systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width * 0.5);
-            topCoord = top - (systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height * 0.5);
-
-            Canvas.SetLeft(systemData[sysData.system.Name].npcKillDeltaCanvasElement, leftCoord);
-            Canvas.SetTop(systemData[sysData.system.Name].npcKillDeltaCanvasElement, topCoord);
-            Canvas.SetZIndex(systemData[sysData.system.Name].npcKillDeltaCanvasElement, 4);
-            if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillDeltaCanvasElement))
+            if (mainWindow.MapConf.OverlayShowNPCKillDelta)
             {
-                overlay_Canvas.Children.Add(systemData[sysData.system.Name].npcKillDeltaCanvasElement);
-            }
 
+                int npcKillDelta = sysData.system.NPCKillsDeltaLastHour;
+
+                if (systemData[sysData.system.Name].npcKillDeltaCanvasElement == null)
+                {
+                    systemData[sysData.system.Name].npcKillDeltaCanvasElement = new Ellipse();
+                }
+
+                float killDeltaDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillDelta, 0f, Math.Abs(npcKillDelta)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
+
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.StrokeThickness = 0f;
+
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Fill = npcKillDeltaDataBrush;
+
+                double leftCoord = left - (systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width * 0.5);
+                double topCoord = top - (systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height * 0.5);
+
+                Canvas.SetLeft(systemData[sysData.system.Name].npcKillDeltaCanvasElement, leftCoord);
+                Canvas.SetTop(systemData[sysData.system.Name].npcKillDeltaCanvasElement, topCoord);
+                Canvas.SetZIndex(systemData[sysData.system.Name].npcKillDeltaCanvasElement, 4);
+                if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillDeltaCanvasElement))
+                {
+                    overlay_Canvas.Children.Add(systemData[sysData.system.Name].npcKillDeltaCanvasElement);
+                }
+            }
+            else
+            {
+                if (systemData[sysData.system.Name].npcKillDeltaCanvasElement != null)
+                {
+                    if (overlay_Canvas.Children.Contains(systemData[sysData.system.Name].npcKillDeltaCanvasElement))
+                    {
+                        overlay_Canvas.Children.Remove(systemData[sysData.system.Name].npcKillDeltaCanvasElement);
+                    }
+                    systemData[sysData.system.Name].npcKillDeltaCanvasElement = null;
+                }
+            }
         }
 
         /// <summary>

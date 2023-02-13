@@ -94,6 +94,9 @@ namespace SMT
         private bool m_overlayGathererMode = false;
         private bool m_overlayShowCharName = true;
         private bool m_overlayShowCharLocation = true;
+        private bool m_overlayShowNPCKills = true;
+        private bool m_overlayShowNPCKillDelta = true;
+        private bool m_overlayShowRoute = true;
 
         public MapConfig()
         {
@@ -952,6 +955,51 @@ namespace SMT
         }
 
         [Category("Overlay")]
+        [DisplayName("Overlay Show NPC Kills")]
+        public bool OverlayShowNPCKills
+        {
+            get {
+                return m_overlayShowNPCKills;
+            }
+            set {
+
+                m_overlayShowNPCKills = value;
+
+                OnPropertyChanged("OverlayShowNPCKills");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show NPC Kill Delta")]
+        public bool OverlayShowNPCKillDelta
+        {
+            get {
+                return m_overlayShowNPCKillDelta;
+            }
+            set {
+
+                m_overlayShowNPCKillDelta = value;
+
+                OnPropertyChanged("OverlayShowNPCKillDelta");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show Route")]
+        public bool OverlayShowRoute
+        {
+            get {
+                return m_overlayShowRoute;
+            }
+            set {
+
+                m_overlayShowRoute = value;
+
+                OnPropertyChanged("OverlayShowRoute");
+            }
+        }
+
+        [Category("Overlay")]
         [DisplayName("Overlay Intel Fresh Time")]
         public float IntelFreshTime
         {
@@ -1117,6 +1165,12 @@ namespace SMT
             OverlayOpacity = 0.5f;
             OverlayRange = 5;
             OverlayGathererMode = false;
+            OverlayShowCharName = true;
+            OverlayShowCharLocation = true;
+            OverlayShowNPCKills = true;
+            OverlayShowNPCKillDelta = true;
+            OverlayShowRoute = true;
+
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;
