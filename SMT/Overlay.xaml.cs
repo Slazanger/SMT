@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static SMT.EVEData.Navigation;
 
 namespace SMT
 {
@@ -174,6 +175,7 @@ namespace SMT
         private Dictionary<string, OverlaySystemData> systemData = new Dictionary<string, OverlaySystemData>();
         private List<(EVEData.IntelData data, List<Ellipse> ellipse)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
         private List<Line> jumpLines = new List<Line>();
+        private List<Line> routeLines = new List<Line>();
 
         private Brush sysOutlineBrush;
         private Brush sysTheraOutlineBrush;
@@ -188,6 +190,7 @@ namespace SMT
         private Brush outOfRegionSysFillBrush;
         private Brush intelFillBrush;
         private Brush jumpLineBrush;
+        private Brush routeLineBrush;
         private Brush transparentBrush;
 
         private Brush toolTipBackgroundBrush;
@@ -289,6 +292,9 @@ namespace SMT
             jumpLineBrush = new SolidColorBrush(Colors.White);
             jumpLineBrush.Opacity = 0.5f;
 
+            routeLineBrush = new SolidColorBrush(Colors.Yellow);
+            routeLineBrush.Opacity = 0.5f;
+
             transparentBrush = new SolidColorBrush(Colors.White);
             transparentBrush.Opacity = 0f;
 
@@ -343,6 +349,7 @@ namespace SMT
             UpdatePlayerInformationText();
             UpdateSystemList();
             UpdateIntelDataCoordinates();
+            UpdateRouteData();
         }
 
         /// <summary>
@@ -364,6 +371,12 @@ namespace SMT
                 overlay_Canvas.Children.Remove( line );
             }
             jumpLines.Clear();
+
+            foreach (var line in routeLines)
+            {
+                overlay_Canvas.Children.Remove(line);
+            }            
+            routeLines.Clear();
         }
 
         /// <summary>
@@ -431,6 +444,7 @@ namespace SMT
                 {
                     UpdateIntelData();
                     if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData();
+                    UpdateRouteData();
                 }
                 catch (Exception ex)
                 {
@@ -579,6 +593,61 @@ namespace SMT
                             intelShape.Fill = transparentBrush;
                             break;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Displays the current route in the hunter mode overlay.
+        /// </summary>
+        private void UpdateRouteData()
+        {            
+            if ( !gathererMode && mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Waypoints.Count > 0 )
+            {
+                List<RoutePoint> routePoints = mainWindow.ActiveCharacter.ActiveRoute.ToList();
+
+                if (routePoints.Count < 2) return;
+                
+                for (int i = 1; i < routePoints.Count; i++)
+                {
+                    RoutePoint segmentStart = routePoints[i-1];
+                    RoutePoint segmentEnd = routePoints[i];
+
+                    if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
+
+                    Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
+                    Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
+
+                    if (routeLines.Count < i)
+                    {
+                        routeLines.Add(new Line());                        
+                    }
+
+                    if (!overlay_Canvas.Children.Contains(routeLines[i-1])) overlay_Canvas.Children.Add(routeLines[i-1]);
+
+                    routeLines[i - 1].X1 = segmentStartCanvasCoordinate.X;
+                    routeLines[i - 1].Y1 = segmentStartCanvasCoordinate.Y;
+                    routeLines[i - 1].X2 = segmentEndCanvasCoordinate.X;
+                    routeLines[i - 1].Y2 = segmentEndCanvasCoordinate.Y;
+
+                    routeLines[i - 1].Stroke = routeLineBrush;
+                    routeLines[i - 1].StrokeThickness = 15;
+
+                    Canvas.SetZIndex(routeLines[i - 1], 2);
+                }                
+
+                while ( routeLines.Count > routePoints.Count - 1 )
+                {
+                    overlay_Canvas.Children.Remove(routeLines[^1]);
+                    routeLines.Remove(routeLines[^1]);
+                }
+            } 
+            else
+            {
+                while (routeLines.Count > 0)
+                {
+                    overlay_Canvas.Children.Remove(routeLines[^1]);
+                    routeLines.Remove(routeLines[^1]);
                 }
             }
         }
@@ -1173,6 +1242,7 @@ namespace SMT
         {
             RefreshCurrentView ();
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
+            StoreOverlayWindowPosition();
         }
 
         /// <summary>
@@ -1197,6 +1267,7 @@ namespace SMT
         /// <param name="e"></param>
         private void Overlay_Window_Close(object sender, MouseButtonEventArgs e)
         {
+            StoreOverlayWindowPosition();
             this.Close();
         }
 
