@@ -235,6 +235,15 @@
                             <GroupBox Header="General" Margin="4" Height="355">
                                 <StackPanel>
 
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Overlay Window Background Opacity" />
+                                        <Slider x:Name="overlay_BackgroundOpacitySlider" Value="{Binding Path=OverlayBackgroundOpacity}" Minimum="0.05" Maximum="1.0" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Overlay Window Content Opacity" />
+                                        <Slider x:Name="overlay_OpacitySlider" Value="{Binding Path=OverlayOpacity}" Minimum="0.05" Maximum="1.0" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
+                                    </StackPanel>
 
                                     <StackPanel Orientation="Vertical" Margin="0,2">
                                         <Label Content="Overlay Jump Range" />
@@ -254,6 +263,22 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <xctk:IntegerUpDown Value="{Binding Path=IntelHistoricTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
                                         <Label Content="Finally, Intel is historic for x seconds" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <GroupBox Margin="4" Height="355">
+                                <StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Margin="0,0">
+                                        <Label Content="Overlay Information" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharName}" Content="Show name of the active character" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharLocation}" Content="Show location of the active character" />
+                                        <Label Content="Hunter Mode Information" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKills}" Content="Show NPC kills" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="Show the current route" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>

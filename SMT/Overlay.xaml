@@ -8,7 +8,9 @@
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         Topmost="True"
-        Visibility="Visible"        
+        Visibility="Visible"   
+        MinWidth="100"
+        MinHeight="100"
         Title="Overlay" Height="600" Width="600" AllowsTransparency="True">
     <Window.Background>
         <SolidColorBrush Opacity="0.2" Color="Black"></SolidColorBrush>
@@ -23,15 +25,21 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"  Background="Transparent" Name="overlay_CharNameTextblock" HorizontalAlignment="Center" TextAlignment="Center" FontSize="16" Opacity="0.5" Margin="1" Foreground="White"/>
-        <Button Grid.Column="0" Grid.Row="0" PreviewMouseDown="Overlay_Window_Move" Opacity="0.5" ToolTip="Drag to move the overlay window." BorderThickness="0">
+        <TextBlock Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"  Background="Transparent" Name="overlay_CharNameTextblock" HorizontalAlignment="Center" TextAlignment="Center" FontSize="10" Opacity="0.5" Margin="1" Foreground="White" Text="No char selected"/>
+        <Button Grid.Column="0" Grid.Row="0" PreviewMouseDown="Overlay_Window_Move" Opacity="0.5" ToolTip="Drag to move the overlay window." BorderThickness="0" Background="Transparent">
             <Image Source="/Images/overlay_move.png" Stretch="Fill"/>
+        </Button>
+        <Button x:Name="overlay_HunterButton" Grid.Column="1" Grid.Row="0" PreviewMouseDown="Overlay_ToggleGathererMode" Opacity="0.5" ToolTip="Click to toggle overlay mode." BorderThickness="0" Background="Transparent" Width="20" HorizontalAlignment="Left" Visibility="Hidden">
+            <Image x:Name="overlay_HunterToggleImage" Source="/Images/overlay_hunter.png" Stretch="Fill"/>
+        </Button>
+        <Button x:Name="overlay_GathererButton" Grid.Column="1" Grid.Row="0" PreviewMouseDown="Overlay_ToggleHunterMode" Opacity="0.5" ToolTip="Click to toggle overlay mode." BorderThickness="0" Background="Transparent" Width="20" HorizontalAlignment="Left" Visibility="Hidden">
+            <Image x:Name="overlay_GathererToggleImage" Source="/Images/overlay_gatherer.png" Stretch="Fill"/>
         </Button>
         <Button Grid.Column="2" Grid.Row="0" PreviewMouseDown="Overlay_Window_Close" Width="20" HorizontalAlignment="Right" Background="Transparent" Opacity="0.5" ToolTip="Click to close the overlay window." BorderThickness="0">
             <Image Source="/Images/overlay_close.png" Stretch="Fill"/>
         </Button>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="3" x:Name="overlay_CanvasContainer" >
-            <Canvas x:Name="overlay_Canvas" SnapsToDevicePixels="False" TextOptions.TextFormattingMode="Ideal" Height="570"/>
+            <Canvas x:Name="overlay_Canvas" SnapsToDevicePixels="False" TextOptions.TextFormattingMode="Ideal" Height="570" ClipToBounds="True" IsHitTestVisible="true" Opacity="0.5"/>
         </StackPanel>
     </Grid>
 

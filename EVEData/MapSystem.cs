@@ -2,6 +2,7 @@
 // Map System
 //-----------------------------------------------------------------------
 
+using System.Numerics;
 using System.Windows;
 using System.Xml.Serialization;
 
@@ -34,6 +35,11 @@ namespace SMT.EVEData
         /// Gets or sets the Y Coordinate for the layout
         /// </summary>
         public double LayoutY { get; set; }
+
+        /// <summary>
+        /// A property to get the coordinate for the layout as a Vector2
+        /// </summary>
+        public Vector2 Layout { get => new Vector2((float)LayoutX, (float)LayoutY);  }
 
         /// <summary>
         /// Gets or sets the Name of the system

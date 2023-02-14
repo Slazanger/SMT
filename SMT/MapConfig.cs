@@ -85,10 +85,18 @@ namespace SMT
         private int m_MaxESIOverlayValue;
 
         // Overlay settings
+        private float m_overlayBackgroundOpacity = 0.2f;
+        private float m_overlayOpacity = 0.5f;
         private int m_overlayRange = 5;
         private float m_intelFreshTime = 30;
         private float m_intelStaleTime = 120;
         private float m_intelHistoricTime = 600;
+        private bool m_overlayGathererMode = false;
+        private bool m_overlayShowCharName = true;
+        private bool m_overlayShowCharLocation = true;
+        private bool m_overlayShowNPCKills = true;
+        private bool m_overlayShowNPCKillDelta = true;
+        private bool m_overlayShowRoute = true;
 
         public MapConfig()
         {
@@ -857,6 +865,36 @@ namespace SMT
         }
 
         [Category("Overlay")]
+        [DisplayName("Overlay Window Content Opacity")]
+        public float OverlayOpacity
+        {
+            get {
+                return m_overlayOpacity;
+            }
+            set {
+
+                m_overlayOpacity = value > 0f ? value : 1f;
+
+                OnPropertyChanged("OverlayOpacity");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Window Background Opacity")]
+        public float OverlayBackgroundOpacity
+        {
+            get {
+                return m_overlayBackgroundOpacity;
+            }
+            set {
+
+                m_overlayBackgroundOpacity = value > 0f ? value : 1f;
+
+                OnPropertyChanged("OverlayBackgroundOpacity");
+            }
+        }
+
+        [Category("Overlay")]
         [DisplayName("Overlay System Jump Range")]
         public int OverlayRange
         {
@@ -868,6 +906,96 @@ namespace SMT
                 m_overlayRange = value > 0 ? value : 1;
 
                 OnPropertyChanged("OverlayRange");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay In Gatherer Mode")]
+        public bool OverlayGathererMode
+        {
+            get {
+                return m_overlayGathererMode;
+            }
+            set {
+
+                m_overlayGathererMode = value;
+
+                OnPropertyChanged("OverlayGathererMode");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show Char Name")]
+        public bool OverlayShowCharName
+        {
+            get {
+                return m_overlayShowCharName;
+            }
+            set {
+
+                m_overlayShowCharName = value;
+
+                OnPropertyChanged("OverlayShowCharName");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show Char Location")]
+        public bool OverlayShowCharLocation
+        {
+            get {
+                return m_overlayShowCharLocation;
+            }
+            set {
+
+                m_overlayShowCharLocation = value;
+
+                OnPropertyChanged("OverlayShowCharLocation");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show NPC Kills")]
+        public bool OverlayShowNPCKills
+        {
+            get {
+                return m_overlayShowNPCKills;
+            }
+            set {
+
+                m_overlayShowNPCKills = value;
+
+                OnPropertyChanged("OverlayShowNPCKills");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show NPC Kill Delta")]
+        public bool OverlayShowNPCKillDelta
+        {
+            get {
+                return m_overlayShowNPCKillDelta;
+            }
+            set {
+
+                m_overlayShowNPCKillDelta = value;
+
+                OnPropertyChanged("OverlayShowNPCKillDelta");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show Route")]
+        public bool OverlayShowRoute
+        {
+            get {
+                return m_overlayShowRoute;
+            }
+            set {
+
+                m_overlayShowRoute = value;
+
+                OnPropertyChanged("OverlayShowRoute");
             }
         }
 
@@ -1034,7 +1162,15 @@ namespace SMT
 
             IntelSoundVolume = 0.5f;
 
+            OverlayOpacity = 0.5f;
             OverlayRange = 5;
+            OverlayGathererMode = false;
+            OverlayShowCharName = true;
+            OverlayShowCharLocation = true;
+            OverlayShowNPCKills = true;
+            OverlayShowNPCKillDelta = true;
+            OverlayShowRoute = true;
+
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;

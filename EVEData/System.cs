@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------
 
 using System.Xml.Serialization;
+using System.Numerics;
 
 namespace SMT.EVEData
 {
@@ -86,6 +87,11 @@ namespace SMT.EVEData
         public double ActualZ { get; set; }
 
         /// <summary>
+        /// A property to get the coordinate in real space for this system as a Vector3
+        /// </summary>
+        public Vector3 Actual {  get => new Vector3((float)ActualX, (float)ActualY, (float)ActualZ); }
+
+        /// <summary>
         /// the 2d X coordinate used to render on the universe view
         /// </summary>
         public double UniverseX { get; set; }
@@ -94,6 +100,11 @@ namespace SMT.EVEData
         /// the 2d Y coordinate used to render on the universe view
         /// </summary>
         public double UniverseY { get; set; }
+
+        /// <summary>
+        /// A property to get the coordinate used to render the system on the universe view as a Vector3
+        /// </summary>
+        public Vector2 Universe { get => new Vector2((float)UniverseX, (float)UniverseY); }
 
         [XmlIgnoreAttribute]
         public bool CustomUniverseLayout { get; set; }
