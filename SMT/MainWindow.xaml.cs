@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using ESI.NET.Models.Bookmarks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using SMT.EVEData;
@@ -664,6 +665,51 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
         }
 
+        private void ClearOldEVELogs_Click(object sender, RoutedEventArgs e)
+        {
+            string EVEGameLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Gamelogs";
+            {
+                DirectoryInfo di = new DirectoryInfo(EVEGameLogFolder);
+                FileInfo[] files = di.GetFiles("*.txt");
+                foreach (FileInfo file in files)
+                {
+                    // keep only recent files
+                    if (file.CreationTime < DateTime.Now.AddDays(-1))
+                    {
+                        try
+                        {
+                            File.Delete(file.FullName);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+
+            string EVEChatLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs";
+            {
+                DirectoryInfo di = new DirectoryInfo(EVEChatLogFolder);
+                FileInfo[] files = di.GetFiles("*.txt");
+                foreach (FileInfo file in files)
+                {
+                    // keep only recent files
+                    if (file.CreationTime < DateTime.Now.AddDays(-1))
+                    {
+                        try
+                        {
+                            File.Delete(file.FullName);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+        }
+
+
+
         private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (miFullScreenToggle.IsChecked)
@@ -749,7 +795,7 @@ namespace SMT
 
         // Property now automatically fires an event when the active character changes.
         private EVEData.LocalCharacter activeCharacter;
-        public EVEData.LocalCharacter ActiveCharacter { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke ( this, EventArgs.Empty ); } }
+        public EVEData.LocalCharacter ActiveCharacter { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty); } }
 
         /// <summary>
         ///  Add Character Button Clicked
@@ -1955,17 +2001,17 @@ namespace SMT
 
         private void OverlayWindow_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if ( overlayWindow != null )
+            if (overlayWindow != null)
             {
                 return;
             }
 
             overlayWindow = new Overlay(this);
-            overlayWindow.Closing += OnOverlayWindowClosing; 
-            overlayWindow.Show();            
+            overlayWindow.Closing += OnOverlayWindowClosing;
+            overlayWindow.Show();
         }
 
-        public void OnOverlayWindowClosing (object sender, CancelEventArgs e)
+        public void OnOverlayWindowClosing(object sender, CancelEventArgs e)
         {
             overlayWindow = null;
         }

@@ -60,6 +60,7 @@
 
                 <MenuItem Header="Data">
                     <MenuItem Header="Force ESI Update" Click="ForceESIUpdate_MenuItem_Click" />
+                    <MenuItem Header="Clear Old Eve logs" Click="ClearOldEVELogs_Click" />
                 </MenuItem>
 
                 <MenuItem Header="View">
