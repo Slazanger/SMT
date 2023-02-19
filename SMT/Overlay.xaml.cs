@@ -1,13 +1,8 @@
-﻿using csDelaunay;
-using Microsoft.IdentityModel.Tokens;
-using SMT.EVEData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,8 +10,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ESI.NET.Models.Universe;
+using Microsoft.IdentityModel.Tokens;
+using SMT.EVEData;
 using static SMT.EVEData.Navigation;
 
 namespace SMT
@@ -45,7 +42,7 @@ namespace SMT
 
         public int overlayTier = 0;
 
-        public OverlaySystemData(EVEData.System sys, Vector2 coord, Vector2 mapSysCoord, Vector2 canvasCoord, int ratDelta, Shape shape, int ovrTier )
+        public OverlaySystemData(EVEData.System sys, Vector2 coord, Vector2 mapSysCoord, Vector2 canvasCoord, int ratDelta, Shape shape, int ovrTier)
         {
             system = sys;
             offsetCoordinate = coord;
@@ -61,7 +58,7 @@ namespace SMT
 
         public OverlaySystemData(EVEData.System sys, Vector2 coord) : this(sys, coord, Vector2.Zero, Vector2.Zero, 0, null, 0) { }
 
-        public void CleanUpCanvas ( Canvas canvas, bool keepSystem = false )
+        public void CleanUpCanvas(Canvas canvas, bool keepSystem = false)
         {
             if (!keepSystem && systemCanvasElement != null && canvas.Children.Contains(systemCanvasElement)) canvas.Children.Remove(systemCanvasElement);
             if (npcKillCanvasElement != null && canvas.Children.Contains(npcKillCanvasElement)) canvas.Children.Remove(npcKillCanvasElement);
@@ -88,9 +85,9 @@ namespace SMT
         public float mapBorderMargin;
         public float mapScalingX;
         public float mapScalingY;
-        public float mapScalingMin {  get { return Math.Min(mapScalingY, mapScalingX); } }
+        public float mapScalingMin { get { return Math.Min(mapScalingY, mapScalingX); } }
 
-        public OverlayCanvasData ()
+        public OverlayCanvasData()
         {
             dimensions = Vector2.Zero;
 
@@ -140,7 +137,7 @@ namespace SMT
         /// <summary>
         /// Computes the scaling needed to draw all systems onto the canvas.
         /// </summary>
-        private void ComputeScaling ()
+        private void ComputeScaling()
         {
             mapScalingX = (dimensions.X - (mapBorderMargin * 2f)) / unscaledMapDimensions.X;
             mapScalingY = (dimensions.Y - (mapBorderMargin * 2f)) / unscaledMapDimensions.Y;
@@ -169,7 +166,7 @@ namespace SMT
     /// the systems that have intel reported.
     /// </summary>
     /// TODO: Consolidate different methods into single UpdateMap / RedrawMap methods.
-    public partial class Overlay: Window
+    public partial class Overlay : Window
     {
 
         private MainWindow mainWindow;
@@ -208,7 +205,7 @@ namespace SMT
         private float intelHistoryPeriod = 600;
 
         private float overlaySystemSizeGatherer = 20f;
-        private float overlaySystemSizeHunter = 10f;
+        private float overlaySystemSizeHunter = 5f;
         private float CalculatedOverlaySystemSize { get => gathererMode ? overlaySystemSizeGatherer : overlaySystemSizeHunter; }
 
         private float overlayIntelOversize = 10f;
@@ -372,22 +369,22 @@ namespace SMT
         private void ClearView()
         {
             UpdatePlayerInformationText();
-            foreach ( var sD in systemData )
+            foreach (var sD in systemData)
             {
                 sD.Value.CleanUpCanvas(overlay_Canvas);
             }
             systemData.Clear();
 
-            foreach ( var line in jumpLines )
+            foreach (var line in jumpLines)
             {
-                overlay_Canvas.Children.Remove( line );
+                overlay_Canvas.Children.Remove(line);
             }
             jumpLines.Clear();
 
             foreach (var line in routeLines)
             {
                 overlay_Canvas.Children.Remove(line);
-            }            
+            }
             routeLines.Clear();
         }
 
@@ -429,15 +426,15 @@ namespace SMT
                 // If the location differs from the last known location, trigger a change.
                 if (mainWindow.ActiveCharacter != null)
                 {
-                    if ( currentPlayerSystemData.system == null )
-                    {
-                        RefreshCurrentView();
-                    } 
-                    else if ( mainWindow.ActiveCharacter.Location != currentPlayerSystemData.system.Name)
+                    if (currentPlayerSystemData.system == null)
                     {
                         RefreshCurrentView();
                     }
-                }                
+                    else if (mainWindow.ActiveCharacter.Location != currentPlayerSystemData.system.Name || routeLines.Count > 0 && (routeLines.Count != mainWindow.ActiveCharacter.ActiveRoute.Count -1 ))
+                    {
+                        RefreshCurrentView();
+                    }
+                }
             }
         }
 
@@ -458,15 +455,15 @@ namespace SMT
                     if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData();
                     UpdateRouteData();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
             }
         }
 
-        private void UpdateNPCKillData ()
+        private void UpdateNPCKillData()
         {
-            foreach ( var sysData in systemData )
+            foreach (var sysData in systemData)
             {
                 DrawNPCKillsToOverlay(sysData.Value);
             }
@@ -476,7 +473,7 @@ namespace SMT
         /// Fetches the data from the manager and updates existing entries or
         /// creates new ones which hold the intel data.
         /// </summary>
-        private void UpdateIntelData ()
+        private void UpdateIntelData()
         {
             float intelLifetime = intelUrgentPeriod + intelStalePeriod + intelHistoryPeriod;
 
@@ -513,9 +510,9 @@ namespace SMT
                 {
                     foreach (var existingIntelDataset in intelData)
                     {
-                        if (existingIntelDataset.data.Systems.Any(s => s == intelSystem ))
+                        if (existingIntelDataset.data.Systems.Any(s => s == intelSystem))
                         {
-                            if ( existingIntelDataset.data.IntelTime < intelDataset.IntelTime )
+                            if (existingIntelDataset.data.IntelTime < intelDataset.IntelTime)
                             {
                                 deleteList.Add(existingIntelDataset);
                             }
@@ -539,7 +536,6 @@ namespace SMT
 
                 // Otherwise, add it.
                 intelData.Add((intelDataset, new List<Ellipse>()));
-
             }
 
             // Check all intel data in the list if it has expired.
@@ -576,13 +572,13 @@ namespace SMT
                 foreach (string systemName in intelDataEntry.data.Systems)
                 {
                     if (!systemData.ContainsKey(systemName)) continue;
-                    if ( systemData[systemName].intelData == null || systemData[systemName].intelData != intelDataEntry.data)
+                    if (systemData[systemName].intelData == null || systemData[systemName].intelData != intelDataEntry.data)
                     {
                         systemData[systemName].intelData = intelDataEntry.data;
                         UpdateSystemTooltip(systemData[systemName]);
                     }
                 }
-                
+
                 float intelAgeInSeconds = (float)(DateTime.Now - intelDataEntry.data.IntelTime).TotalSeconds;
 
                 // Update the style.
@@ -613,29 +609,32 @@ namespace SMT
         /// Displays the current route in the hunter mode overlay.
         /// </summary>
         private void UpdateRouteData()
-        {            
-            if ( !gathererMode && mainWindow.MapConf.OverlayShowRoute && mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Waypoints.Count > 0 )
+        {
+            // clear all 
+            while (routeLines.Count > 0)
+            {
+                overlay_Canvas.Children.Remove(routeLines[^1]);
+                routeLines.Remove(routeLines[^1]);
+            }
+
+            
+            if (!gathererMode && mainWindow.MapConf.OverlayShowRoute && mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Waypoints.Count > 0)
             {
                 List<RoutePoint> routePoints = mainWindow.ActiveCharacter.ActiveRoute.ToList();
 
                 if (routePoints.Count < 2) return;
-                
+
                 for (int i = 1; i < routePoints.Count; i++)
                 {
-                    RoutePoint segmentStart = routePoints[i-1];
+                    RoutePoint segmentStart = routePoints[i - 1];
                     RoutePoint segmentEnd = routePoints[i];
+
+                    routeLines.Add(new Line());
 
                     if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
 
-                    Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
-                    Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
-
-                    if (routeLines.Count < i)
-                    {
-                        routeLines.Add(new Line());                        
-                    }
-
-                    if (!overlay_Canvas.Children.Contains(routeLines[i-1])) overlay_Canvas.Children.Add(routeLines[i-1]);
+                    Vector2 segmentStartCanvasCoordinate = systemData[segmentStart.SystemName].mapSystemCoordinate * canvasData.dimensions.X;
+                    Vector2 segmentEndCanvasCoordinate = systemData[segmentEnd.SystemName].mapSystemCoordinate * canvasData.dimensions.X;
 
                     routeLines[i - 1].X1 = segmentStartCanvasCoordinate.X;
                     routeLines[i - 1].Y1 = segmentStartCanvasCoordinate.Y;
@@ -648,22 +647,10 @@ namespace SMT
                     routeLines[i - 1].BeginAnimation(Shape.StrokeDashOffsetProperty, dashAnimation);
 
                     Canvas.SetZIndex(routeLines[i - 1], 95);
-                }                
-
-                while ( routeLines.Count > routePoints.Count - 1 )
-                {
-                    overlay_Canvas.Children.Remove(routeLines[^1]);
-                    routeLines.Remove(routeLines[^1]);
-                }
-            } 
-            else
-            {
-                while (routeLines.Count > 0)
-                {
-                    overlay_Canvas.Children.Remove(routeLines[^1]);
-                    routeLines.Remove(routeLines[^1]);
+                    overlay_Canvas.Children.Add(routeLines[i - 1]);
                 }
             }
+
         }
 
         /// <summary>
@@ -686,7 +673,7 @@ namespace SMT
 
                     // Check if the system exists in the list of currently shown systems.
                     if (systemData.ContainsKey(intelSystem))
-                    {                        
+                    {
                         Vector2 systemCoordinate = systemData[intelSystem].canvasCoordinate;
                         intelSystemCoordinateVector = new Vector2f(systemCoordinate.X - (CalculatedOverlayIntelOversize / 2f), systemCoordinate.Y - (CalculatedOverlayIntelOversize / 2f));
                         visible = true;
@@ -708,7 +695,7 @@ namespace SMT
                     }
 
                     // Since all children are deleted when resizing the canvas, we readd the intel shapes.
-                    if ( intelDataEntry.ellipse.Count > 0 )
+                    if (intelDataEntry.ellipse.Count > 0)
                     {
                         if (!overlay_Canvas.Children.Contains(intelDataEntry.ellipse[i])) overlay_Canvas.Children.Add(intelDataEntry.ellipse[i]);
                     }
@@ -767,112 +754,101 @@ namespace SMT
 
             List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
-            // Add the players location to the hierarchie.
-            hierarchie.Add(new List<OverlaySystemData>() { currentPlayerSystemData });
-            if ( !systemData.ContainsKey(currentPlayerSystemData.system.Name ) )
+
+
+
+            // for Gathere mode collect the preset depth of systems
+            if(gathererMode)
             {
-                systemData.Add(currentPlayerSystemData.system.Name, currentPlayerSystemData);
-            }            
-
-
-            // Track which systems are already in the list to avoid doubles.
-            systemsInList.Add(currentSystem.Name);
-
-            currentPlayerSystemData.mapSystemCoordinate = mainWindow.EVEManager.GetRegion(currentSystem.Region).MapSystems[currentSystem.Name].Layout;
-            canvasData.currentOriginCoordinates = currentPlayerSystemData.mapSystemCoordinate;
-            systemData[currentPlayerSystemData.system.Name].mapSystemCoordinate = currentPlayerSystemData.mapSystemCoordinate;
-
-            for (int i = 1; i < overlayDepth; i++)
-            {
-                // Each depth level is represented by a list.
-                List<OverlaySystemData> currentDepth = new List<OverlaySystemData>();
-
-                // For each depth the jumps in all systems in the previous depth will be collected.
-                foreach (OverlaySystemData previousDepthSystem in hierarchie[i - 1])
+                // Add the players location to the hierarchie.
+                hierarchie.Add(new List<OverlaySystemData>() { currentPlayerSystemData });
+                if (!systemData.ContainsKey(currentPlayerSystemData.system.Name))
                 {
-                    foreach (string jump in previousDepthSystem.system.Jumps)
+                    systemData.Add(currentPlayerSystemData.system.Name, currentPlayerSystemData);
+                }
+
+                // Track which systems are already in the list to avoid doubles.
+                systemsInList.Add(currentSystem.Name);
+
+                currentPlayerSystemData.mapSystemCoordinate = mainWindow.EVEManager.GetRegion(currentSystem.Region).MapSystems[currentSystem.Name].Layout;
+                canvasData.currentOriginCoordinates = currentPlayerSystemData.mapSystemCoordinate;
+                systemData[currentPlayerSystemData.system.Name].mapSystemCoordinate = currentPlayerSystemData.mapSystemCoordinate;
+
+                for (int i = 1; i < overlayDepth; i++)
+                {
+                    // Each depth level is represented by a list.
+                    List<OverlaySystemData> currentDepth = new List<OverlaySystemData>();
+
+                    // For each depth the jumps in all systems in the previous depth will be collected.
+                    foreach (OverlaySystemData previousDepthSystem in hierarchie[i - 1])
                     {
-                        EVEData.System jumpSystem = mainWindow.EVEManager.GetEveSystem(jump);
-
-                        string sourceRegion = previousDepthSystem.system.Region;
-                        string targetRegion = jumpSystem.Region;
-
-                        if ( gathererMode == true || targetRegion == currentPlayerSystemData.system.Region || sourceRegion == currentPlayerSystemData.system.Region || (regionMirrorVectors.ContainsKey(targetRegion) && gathererModeIncludesAdjacentRegions) )
+                        foreach (string jump in previousDepthSystem.system.Jumps)
                         {
+                            EVEData.System jumpSystem = mainWindow.EVEManager.GetEveSystem(jump);
 
-                            // Only add the system if it was not yet added.
-                            if (!systemsInList.Contains(jump))
+                            string sourceRegion = previousDepthSystem.system.Region;
+                            string targetRegion = jumpSystem.Region;
+
+                            if (gathererMode == true || targetRegion == currentPlayerSystemData.system.Region || sourceRegion == currentPlayerSystemData.system.Region || (regionMirrorVectors.ContainsKey(targetRegion) && gathererModeIncludesAdjacentRegions))
                             {
-                                // if source and target have different regions it is a border system.
-                                /*
-                                if (sourceRegion != targetRegion)
-                                {
 
-                                    if (!regionMirrorVectors.ContainsKey(targetRegion))
+                                // Only add the system if it was not yet added.
+                                if (!systemsInList.Contains(jump))
+                                {
+                                    Vector2 originSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[previousDepthSystem.system.Name].Layout;
+                                    Vector2 jumpSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[jump].Layout;
+
+                                    Vector2 systemConnection = (jumpSystemCoord - originSystemCoord);
+
+                                    Vector2 originOffset = previousDepthSystem.offsetCoordinate + systemConnection;
+
+                                    canvasData.UpdateUnscaledExtends(jumpSystemCoord);
+
+                                    currentDepth.Add(new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(jump), originOffset));
+                                    systemsInList.Add(jump);
+                                    if (!systemData.ContainsKey(jump))
                                     {
-                                        Vector2 prevSystemInSourceRegionLayout = mainWindow.EVEManager.GetRegion(sourceRegion).MapSystems[previousDepthSystem.system.Name].Layout;
-                                        Vector2 jumpSystemInSourceRegionLayout = mainWindow.EVEManager.GetRegion(sourceRegion).MapSystems[jump].Layout;
-
-                                        Vector2 prevSystemInTargetRegionLayout = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[previousDepthSystem.system.Name].Layout;
-                                        Vector2 jumpSystemInTargetRegionLayout = mainWindow.EVEManager.GetRegion(jumpSystem.Region).MapSystems[jump].Layout;
-
-                                        Vector2 sourceRegionDirection = jumpSystemInSourceRegionLayout - prevSystemInSourceRegionLayout;
-                                        Vector2 targetRegionDirection = jumpSystemInTargetRegionLayout - prevSystemInTargetRegionLayout;
-
-                                        /*
-                                         * If the connecting vector between the systems has opposing directions
-                                         * in each region, we note that we need to mirror the systems in the target
-                                         * region to avoid overlap. This is messy and should be avoided.
-                                         */
-                                        /*
-                                        if (Vector2.Dot(sourceRegionDirection, targetRegionDirection) < 0)
-                                        {
-                                            regionMirrorVectors.Add(targetRegion, true);
-                                        }
-                                        else
-                                        {
-                                            regionMirrorVectors.Add(targetRegion, false);
-                                        }
+                                        systemData.Add(jump, new OverlaySystemData(jumpSystem));
                                     }
+
+                                    systemData[jump].mapSystemCoordinate = jumpSystemCoord;
                                 }
-                                */
-
-                                Vector2 originSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[previousDepthSystem.system.Name].Layout;
-                                Vector2 jumpSystemCoord = mainWindow.EVEManager.GetRegion(previousDepthSystem.system.Region).MapSystems[jump].Layout;
-
-                                Vector2 systemConnection = (jumpSystemCoord - originSystemCoord);
-
-                                // If we need to mirror it, rotate it by 180 degrees or PI radians.
-                                /*
-                                if (regionMirrorVectors.ContainsKey(targetRegion) && regionMirrorVectors[targetRegion])
-                                {
-                                    systemConnection = Vector2.Transform(systemConnection, Matrix3x2.CreateRotation((float)Math.PI));
-                                }
-                                */
-
-                                Vector2 originOffset = previousDepthSystem.offsetCoordinate + systemConnection;
-
-                                canvasData.UpdateUnscaledExtends(jumpSystemCoord);
-
-                                currentDepth.Add(new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(jump), originOffset));
-                                systemsInList.Add(jump);
-                                if (!systemData.ContainsKey(jump))
-                                {
-                                    systemData.Add(jump, new OverlaySystemData(jumpSystem));
-                                }
-
-                                systemData[jump].mapSystemCoordinate = jumpSystemCoord;
                             }
                         }
                     }
+                    hierarchie.Add(currentDepth);
                 }
-                hierarchie.Add(currentDepth);
+            }
+            // for hunter mode, take the entire region map
+            else
+            {
+                List<OverlaySystemData> hunterSystems = new List<OverlaySystemData>();
+
+                // source maps are 1050.0 width
+                float MapWidth = 1050.0F;
+
+
+                MapRegion mr = mainWindow.EVEManager.GetRegion(currentSystem.Region);
+                foreach(MapSystem ms in mr.MapSystems.Values)
+                {
+                    Vector2 newCoords = ms.Layout / MapWidth;
+                    if (!systemData.ContainsKey(ms.Name))
+                    {
+                        systemData.Add(ms.Name, new OverlaySystemData(ms.ActualSystem));
+                    }
+                    systemsInList.Add(ms.Name);
+                    hunterSystems.Add(new OverlaySystemData(ms.ActualSystem, newCoords));
+                    systemData[ms.Name].mapSystemCoordinate = newCoords;
+                }
+
+                hierarchie.Add(hunterSystems);
             }
 
+
             List<string> deleteSystems = new List<string>();
-            foreach ( var overlaySystemData in systemData )
+            foreach (var overlaySystemData in systemData)
             {
-                if ( !systemsInList.Contains(overlaySystemData.Key) )
+                if (!systemsInList.Contains(overlaySystemData.Key))
                 {
                     deleteSystems.Add(overlaySystemData.Key);
                 }
@@ -884,6 +860,8 @@ namespace SMT
                 systemData[sysName].CleanUpCanvas(overlay_Canvas);
                 systemData.Remove(sysName);
             }
+
+
 
             // Draw the systems.
             for (int i = 0; i < hierarchie.Count; i++)
@@ -930,18 +908,18 @@ namespace SMT
 
                         Line connectionLine;
 
-                        if ( currentJumpIndex + 1 > jumpLines.Count )
+                        if (currentJumpIndex + 1 > jumpLines.Count)
                         {
                             connectionLine = new Line();
                             jumpLines.Add(connectionLine);
                             currentJumpIndex++;
                         }
 
-                        
 
-                        Vector2f current = new Vector2f(currentCoordinate.X + (CalculatedOverlaySystemSize / 2f), 
+
+                        Vector2f current = new Vector2f(currentCoordinate.X + (CalculatedOverlaySystemSize / 2f),
                             currentCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
-                        Vector2f connected = new Vector2f(connectedCoordinate.X + (CalculatedOverlaySystemSize / 2f), 
+                        Vector2f connected = new Vector2f(connectedCoordinate.X + (CalculatedOverlaySystemSize / 2f),
                             connectedCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
 
                         Vector2f currentToConnected = connected == current ? new Vector2f(0, 0) : Vector2f.Normalize(connected - current);
@@ -954,7 +932,7 @@ namespace SMT
                         jumpLines[^1].X2 = connectedCorrected.x;
                         jumpLines[^1].Y2 = connectedCorrected.y;
                         jumpLines[^1].Stroke = jumpLineBrush;
-                        jumpLines[^1].StrokeThickness = 2;
+                        jumpLines[^1].StrokeThickness = gathererMode? 2:1 ;
 
                         if (!overlay_Canvas.Children.Contains(jumpLines[^1]))
                         {
@@ -968,11 +946,11 @@ namespace SMT
             }
 
             // Remove unused lines from canvas and then delete
-            if ( currentJumpIndex > jumpLines.Count )
+            if (currentJumpIndex > jumpLines.Count)
             {
-                foreach ( Line jLine in jumpLines.GetRange(currentJumpIndex, jumpLines.Count - currentJumpIndex ) )
+                foreach (Line jLine in jumpLines.GetRange(currentJumpIndex, jumpLines.Count - currentJumpIndex))
                 {
-                    overlay_Canvas.Children.Remove( jLine );
+                    overlay_Canvas.Children.Remove(jLine);
                 }
                 jumpLines.RemoveRange(currentJumpIndex, jumpLines.Count - currentJumpIndex);
             }
@@ -1001,9 +979,8 @@ namespace SMT
                 }
                 else
                 {
-                    Vector2 canvasCoordinate = canvasData.CoordinateToCanvas(systemData[systems[i].system.Name].mapSystemCoordinate);
-                    left = canvasCoordinate.X;
-                    top = canvasCoordinate.Y;
+                    left = systemData[systems[i].system.Name].mapSystemCoordinate.X * canvasData.dimensions.X;
+                    top = systemData[systems[i].system.Name].mapSystemCoordinate.Y * canvasData.dimensions.X;
                 }
                 DrawSystemToOverlay(systems[i], left, top);
             }
@@ -1019,46 +996,61 @@ namespace SMT
         /// TODO: Add more info to ToolTip or replace it with something else.
         private void DrawSystemToOverlay(OverlaySystemData sysData, double left, double top)
         {
-            if ( !systemData.ContainsKey(sysData.system.Name)) return;
+            if (!systemData.ContainsKey(sysData.system.Name)) return;
 
-            if (systemData[sysData.system.Name].systemCanvasElement == null )
+            if (systemData[sysData.system.Name].systemCanvasElement == null)
             {
                 systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
-                //systemData[sysData.system.Name].systemCanvasElement.IsHitTestVisible = false;
             }
 
             systemData[sysData.system.Name].systemCanvasElement.Width = CalculatedOverlaySystemSize;
             systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize;
+            systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode? 2:1;
+            
 
-            systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = 2;
-
-            if ( sysData.system.Name == currentPlayerSystemData.system.Name )
+            if (sysData.system.Name == currentPlayerSystemData.system.Name)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = sysLocationOutlineBrush;
+                if(!gathererMode)
+                {
+                    systemData[sysData.system.Name].systemCanvasElement.Width = 15;
+                    systemData[sysData.system.Name].systemCanvasElement.Height = 15;
+                }
             }
             else
             {
-                systemData[sysData.system.Name].systemCanvasElement.Stroke = sysOutlineBrush;                
+                systemData[sysData.system.Name].systemCanvasElement.Stroke = sysOutlineBrush;
             }
             systemData[sysData.system.Name].systemCanvasElement.Fill = sysFillBrush;
 
-            if ( !gathererMode )
+            if (!gathererMode)
             {
-                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(sysData.system.TrueSec, mainWindow.MapConf.ShowTrueSec));
+
+                double trueSecVal = sysData.system.TrueSec;
+                if (trueSecVal >= 0.45)
+                {
+                    trueSecVal = 1.0;
+                }
+                else if (trueSecVal > 0.0)
+                {
+                    trueSecVal = 0.4;
+                }
+
+                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, false));
                 systemData[sysData.system.Name].systemCanvasElement.Fill = securityColorFill;
             }
 
-            
-            if ( sysData.system.Region != currentPlayerSystemData.system.Region )
+
+            if (!gathererMode && sysData.system.Region != currentPlayerSystemData.system.Region)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = outOfRegionSysOutlineBrush;
                 systemData[sysData.system.Name].systemCanvasElement.Fill = outOfRegionSysFillBrush;
             }
 
-            if ( mainWindow.EVEManager.TheraConnections.Any(t => t.System == sysData.system.Name) )
+            if (mainWindow.EVEManager.TheraConnections.Any(t => t.System == sysData.system.Name))
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = sysTheraOutlineBrush;
-                systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = 3;
+                systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode? 3:5 ;
             }
 
             UpdateSystemTooltip(systemData[sysData.system.Name]);
@@ -1071,16 +1063,16 @@ namespace SMT
             Canvas.SetLeft(systemData[sysData.system.Name].systemCanvasElement, leftCoord);
             Canvas.SetTop(systemData[sysData.system.Name].systemCanvasElement, topCoord);
             Canvas.SetZIndex(systemData[sysData.system.Name].systemCanvasElement, 100);
-            if ( !overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemCanvasElement) )
+            if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemCanvasElement))
             {
                 systemData[sysData.system.Name].systemCanvasElement.Name = "system";
                 overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemCanvasElement);
-            }            
+            }
 
-            if ( !gathererMode ) DrawNPCKillsToOverlay ( sysData );
+//            if (!gathererMode) DrawNPCKillsToOverlay(sysData);
         }
 
-        public void DrawNPCKillsToOverlay (OverlaySystemData sysData)
+        public void DrawNPCKillsToOverlay(OverlaySystemData sysData)
         {
             if (!systemData.ContainsKey(sysData.system.Name)) return;
             int npcKillData = sysData.system.NPCKillsLastHour;
@@ -1240,17 +1232,17 @@ namespace SMT
         /// Fetches the currently selected characters name and location and
         /// displays it in the overlay window.
         /// </summary>
-        public void UpdatePlayerInformationText ()
+        public void UpdatePlayerInformationText()
         {
             if (mainWindow.ActiveCharacter != null)
             {
                 string displayText = "";
-                if ( showCharName )
+                if (showCharName)
                 {
                     displayText = mainWindow.ActiveCharacter.Name;
                 }
 
-                if ( showCharLocation )
+                if (showCharLocation)
                 {
                     displayText += (displayText.IsNullOrEmpty() ? "" : "\n") + mainWindow.ActiveCharacter.Location;
                 }
@@ -1282,7 +1274,7 @@ namespace SMT
         /// <param name="e"></param>
         private void OnCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            RefreshCurrentView ();
+            RefreshCurrentView();
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
             StoreOverlayWindowPosition();
         }
@@ -1294,7 +1286,7 @@ namespace SMT
         /// <param name="e"></param>
         private void Overlay_Window_Move(object sender, MouseButtonEventArgs e)
         {
-            if(e.ChangedButton == MouseButton.Left)
+            if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
                 StoreOverlayWindowPosition();
@@ -1382,7 +1374,7 @@ namespace SMT
             Canvas.SetLeft(intelShape, intelSystemCoordinateVector.x);
             Canvas.SetTop(intelShape, intelSystemCoordinateVector.y);
             Canvas.SetZIndex(intelShape, 90);
-            if ( !overlay_Canvas.Children.Contains(intelShape) ) overlay_Canvas.Children.Add(intelShape);
+            if (!overlay_Canvas.Children.Contains(intelShape)) overlay_Canvas.Children.Add(intelShape);
 
             return intelShape;
         }
