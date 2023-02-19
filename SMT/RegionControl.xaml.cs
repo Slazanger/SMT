@@ -406,8 +406,8 @@ namespace SMT
                     };
                     SovFightLogo.IsHitTestVisible = false;
 
-                    Canvas.SetLeft(SovFightLogo, ms.LayoutX - SYSTEM_SHAPE_OFFSET + 5);
-                    Canvas.SetTop(SovFightLogo, ms.LayoutY - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetLeft(SovFightLogo, ms.Layout.X - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetTop(SovFightLogo, ms.Layout.Y - SYSTEM_SHAPE_OFFSET + 5);
                     Canvas.SetZIndex(SovFightLogo, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(SovFightLogo);
                     DynamicMapElements.Add(SovFightLogo);
@@ -421,8 +421,8 @@ namespace SMT
                         activeSovFightShape.StrokeLineJoin = PenLineJoin.Round;
                         activeSovFightShape.Fill = ActiveSovFightBrush;
 
-                        Canvas.SetLeft(activeSovFightShape, ms.LayoutX - (SYSTEM_SHAPE_OFFSET + 9));
-                        Canvas.SetTop(activeSovFightShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 9));
+                        Canvas.SetLeft(activeSovFightShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 9));
+                        Canvas.SetTop(activeSovFightShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 9));
                         Canvas.SetZIndex(activeSovFightShape, SYSTEM_Z_INDEX - 3);
                         MainCanvas.Children.Add(activeSovFightShape);
                         DynamicMapElements.Add(activeSovFightShape);
@@ -456,8 +456,8 @@ namespace SMT
                     TheraShape.StrokeLineJoin = PenLineJoin.Round;
                     TheraShape.Fill = TheraBrush;
 
-                    Canvas.SetLeft(TheraShape, ms.LayoutX - (SYSTEM_SHAPE_OFFSET + 3));
-                    Canvas.SetTop(TheraShape, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetLeft(TheraShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(TheraShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX - 3);
                     MainCanvas.Children.Add(TheraShape);
                 }
@@ -486,8 +486,8 @@ namespace SMT
                     poiLbl.Foreground = POIBrush;
                     poiLbl.FontWeight = FontWeights.Bold;
 
-                    Canvas.SetLeft(poiLbl, ms.LayoutX - (SYSTEM_SHAPE_OFFSET + 3));
-                    Canvas.SetTop(poiLbl, ms.LayoutY - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetLeft(poiLbl, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(poiLbl, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(poiLbl, SYSTEM_Z_INDEX + 13);
                     MainCanvas.Children.Add(poiLbl);
                     DynamicMapElements.Add(poiLbl);
@@ -543,8 +543,8 @@ namespace SMT
                             break;
                     }
 
-                    Canvas.SetLeft(stormCloud, ms.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
-                    Canvas.SetTop(stormCloud, ms.LayoutY - SYSTEM_SHAPE_OFFSET - 11);
+                    Canvas.SetLeft(stormCloud, ms.Layout.X - SYSTEM_SHAPE_OFFSET - 15);
+                    Canvas.SetTop(stormCloud, ms.Layout.Y - SYSTEM_SHAPE_OFFSET - 11);
                     Canvas.SetZIndex(stormCloud, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(stormCloud);
                     DynamicMapElements.Add(stormCloud);
@@ -567,8 +567,8 @@ namespace SMT
                                 Opacity = 1.0,
                             };
 
-                            Canvas.SetLeft(strongStormCloud, mss.LayoutX - SYSTEM_SHAPE_OFFSET - 15);
-                            Canvas.SetTop(strongStormCloud, mss.LayoutY - SYSTEM_SHAPE_OFFSET - 11);
+                            Canvas.SetLeft(strongStormCloud, mss.Layout.X - SYSTEM_SHAPE_OFFSET - 15);
+                            Canvas.SetTop(strongStormCloud, mss.Layout.Y - SYSTEM_SHAPE_OFFSET - 11);
                             Canvas.SetZIndex(strongStormCloud, SYSTEM_Z_INDEX + 5);
                             MainCanvas.Children.Add(strongStormCloud);
                             DynamicMapElements.Add(strongStormCloud);
@@ -593,8 +593,8 @@ namespace SMT
                                 // Opacity = 0.5,
                             };
 
-                            Canvas.SetLeft(weakStormCloud, msw.LayoutX - SYSTEM_SHAPE_OFFSET - 10);
-                            Canvas.SetTop(weakStormCloud, msw.LayoutY - SYSTEM_SHAPE_OFFSET - 6);
+                            Canvas.SetLeft(weakStormCloud, msw.Layout.X - SYSTEM_SHAPE_OFFSET - 10);
+                            Canvas.SetTop(weakStormCloud, msw.Layout.Y - SYSTEM_SHAPE_OFFSET - 6);
                             Canvas.SetZIndex(weakStormCloud, SYSTEM_Z_INDEX + 5);
                             MainCanvas.Children.Add(weakStormCloud);
                             DynamicMapElements.Add(weakStormCloud);
@@ -627,9 +627,9 @@ namespace SMT
                 {
                     Polygon TrigShape;
                     TrigShape = new Polygon();
-                    TrigShape.Points.Add(new Point(ms.LayoutX - 13, ms.LayoutY + 6));
-                    TrigShape.Points.Add(new Point(ms.LayoutX, ms.LayoutY - 14));
-                    TrigShape.Points.Add(new Point(ms.LayoutX + 13, ms.LayoutY + 6));
+                    TrigShape.Points.Add(new Point(ms.Layout.X - 13, ms.Layout.Y + 6));
+                    TrigShape.Points.Add(new Point(ms.Layout.X, ms.Layout.Y - 14));
+                    TrigShape.Points.Add(new Point(ms.Layout.X + 13, ms.Layout.Y + 6));
 
                     TrigShape.Stroke = trigOutlineBrush;
                     TrigShape.StrokeThickness = 1;
@@ -866,7 +866,7 @@ namespace SMT
                 {
                     if (MainZoomControl.Mode == ZoomControl.ZoomControlModes.Custom && MapConf.FollowOnZoom)
                     {
-                        MainZoomControl.Show(kvp.Value.LayoutX, kvp.Value.LayoutY, MainZoomControl.Zoom);
+                        MainZoomControl.Show(kvp.Value.Layout.X, kvp.Value.Layout.Y, MainZoomControl.Zoom);
                     }
 
                     SystemDropDownAC.SelectedItem = kvp.Value;
@@ -1091,8 +1091,8 @@ namespace SMT
                             charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
                         }
 
-                        Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
-                        Canvas.SetTop(charText, ms.LayoutY + textYOffset);
+                        Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
+                        Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
                         Canvas.SetZIndex(charText, 40);
                         MainCanvas.Children.Add(charText);
                         DynamicMapElements.Add(charText);
@@ -1113,8 +1113,8 @@ namespace SMT
                         charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
                     }
 
-                    Canvas.SetLeft(charText, ms.LayoutX + textXOffset);
-                    Canvas.SetTop(charText, ms.LayoutY + textYOffset);
+                    Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
+                    Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
                     Canvas.SetZIndex(charText, 40);
                     MainCanvas.Children.Add(charText);
                     DynamicMapElements.Add(charText);
@@ -1143,8 +1143,8 @@ namespace SMT
 
                 highlightSystemCircle.StrokeDashArray = dashes;
 
-                Canvas.SetLeft(highlightSystemCircle, ms.LayoutX - circleOffset);
-                Canvas.SetTop(highlightSystemCircle, ms.LayoutY - circleOffset);
+                Canvas.SetLeft(highlightSystemCircle, ms.Layout.X - circleOffset);
+                Canvas.SetTop(highlightSystemCircle, ms.Layout.Y - circleOffset);
                 Canvas.SetZIndex(highlightSystemCircle, 25);
 
                 MainCanvas.Children.Add(highlightSystemCircle);
@@ -1191,8 +1191,8 @@ namespace SMT
                     WarninghighlightSystemCircle.Stroke = new SolidColorBrush(Colors.IndianRed);
                     WarninghighlightSystemCircle.StrokeThickness = 3;
 
-                    Canvas.SetLeft(WarninghighlightSystemCircle, mss.LayoutX - warningCircleSizeOffset);
-                    Canvas.SetTop(WarninghighlightSystemCircle, mss.LayoutY - warningCircleSizeOffset);
+                    Canvas.SetLeft(WarninghighlightSystemCircle, mss.Layout.X - warningCircleSizeOffset);
+                    Canvas.SetTop(WarninghighlightSystemCircle, mss.Layout.Y - warningCircleSizeOffset);
                     Canvas.SetZIndex(WarninghighlightSystemCircle, 24);
                     MainCanvas.Children.Add(WarninghighlightSystemCircle);
                     DynamicMapElements.Add(WarninghighlightSystemCircle);
@@ -1410,9 +1410,9 @@ namespace SMT
                     if (infoSize < 24)
                         infoSize = 24;
 
-                    if(MapConf.ClampMaxESIOverlayValue)
+                    if (MapConf.ClampMaxESIOverlayValue)
                     {
-                        if(infoSize > MapConf.MaxESIOverlayValue)
+                        if (infoSize > MapConf.MaxESIOverlayValue)
                         {
                             infoSize = MapConf.MaxESIOverlayValue;
                         }
@@ -1422,8 +1422,8 @@ namespace SMT
                     infoCircle.Fill = infoColour;
 
                     Canvas.SetZIndex(infoCircle, 10);
-                    Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
-                    Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
+                    Canvas.SetLeft(infoCircle, sys.Layout.X - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.Layout.Y - (infoSize / 2));
                     MainCanvas.Children.Add(infoCircle);
                     DynamicMapElements.Add(infoCircle);
                 }
@@ -1445,8 +1445,8 @@ namespace SMT
                     infoCircle.Fill = infoColourDelta;
 
                     Canvas.SetZIndex(infoCircle, 12);
-                    Canvas.SetLeft(infoCircle, sys.LayoutX - (infoSize / 2));
-                    Canvas.SetTop(infoCircle, sys.LayoutY - (infoSize / 2));
+                    Canvas.SetLeft(infoCircle, sys.Layout.X - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.Layout.Y - (infoSize / 2));
                     MainCanvas.Children.Add(infoCircle);
                     DynamicMapElements.Add(infoCircle);
                 }
@@ -1750,8 +1750,8 @@ namespace SMT
                             InRangeMarker.StrokeLineJoin = PenLineJoin.Round;
                             InRangeMarker.Fill = HighlightBrush;
 
-                            Canvas.SetLeft(InRangeMarker, sys.LayoutX - halfShapeSize);
-                            Canvas.SetTop(InRangeMarker, sys.LayoutY - halfShapeSize);
+                            Canvas.SetLeft(InRangeMarker, sys.Layout.X - halfShapeSize);
+                            Canvas.SetTop(InRangeMarker, sys.Layout.Y - halfShapeSize);
                             Canvas.SetZIndex(InRangeMarker, SYSTEM_Z_INDEX - 4);
 
                             MainCanvas.Children.Add(InRangeMarker);
@@ -1805,8 +1805,8 @@ namespace SMT
                         infoCircle.Fill = zkbColour;
 
                         Canvas.SetZIndex(infoCircle, 11);
-                        Canvas.SetLeft(infoCircle, sys.LayoutX - (ZKBValue / 2));
-                        Canvas.SetTop(infoCircle, sys.LayoutY - (ZKBValue / 2));
+                        Canvas.SetLeft(infoCircle, sys.Layout.X - (ZKBValue / 2));
+                        Canvas.SetTop(infoCircle, sys.Layout.Y - (ZKBValue / 2));
                         MainCanvas.Children.Add(infoCircle);
                         DynamicMapElements.Add(infoCircle);
                     }
@@ -1951,10 +1951,10 @@ namespace SMT
                                 if (ms.Name == i.SystemName)
                                 {
                                     Line l = new Line();
-                                    l.X1 = sys.LayoutX;
-                                    l.Y1 = sys.LayoutY;
-                                    l.X2 = ms.LayoutX;
-                                    l.Y2 = ms.LayoutY;
+                                    l.X1 = sys.Layout.X;
+                                    l.Y1 = sys.Layout.Y;
+                                    l.X2 = ms.Layout.X;
+                                    l.Y2 = ms.Layout.Y;
                                     l.StrokeThickness = 1;
                                     l.Stroke = FWLineBrushA;
                                     l.StrokeDashArray = dashes;
@@ -1981,10 +1981,10 @@ namespace SMT
                                 if (ms.Name == i.SystemName)
                                 {
                                     Line l = new Line();
-                                    l.X1 = sys.LayoutX;
-                                    l.Y1 = sys.LayoutY;
-                                    l.X2 = ms.LayoutX;
-                                    l.Y2 = ms.LayoutY;
+                                    l.X1 = sys.Layout.X;
+                                    l.Y1 = sys.Layout.Y;
+                                    l.X2 = ms.Layout.X;
+                                    l.Y2 = ms.Layout.Y;
                                     l.StrokeThickness = 2;
                                     l.Stroke = FWLineBrushB;
                                     l.StrokeDashArray = dashes;
@@ -2011,10 +2011,10 @@ namespace SMT
                                 if (ms.Name == i.SystemName)
                                 {
                                     Line l = new Line();
-                                    l.X1 = sys.LayoutX;
-                                    l.Y1 = sys.LayoutY;
-                                    l.X2 = ms.LayoutX;
-                                    l.Y2 = ms.LayoutY;
+                                    l.X1 = sys.Layout.X;
+                                    l.Y1 = sys.Layout.Y;
+                                    l.X2 = ms.Layout.X;
+                                    l.Y2 = ms.Layout.Y;
                                     l.StrokeThickness = 3;
                                     l.Stroke = FWLineBrushC;
                                     l.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
@@ -2061,8 +2061,8 @@ namespace SMT
 
                 highlightSystemCircle.StrokeDashArray = dashes;
 
-                Canvas.SetLeft(highlightSystemCircle, selectedSys.LayoutX - circleOffset);
-                Canvas.SetTop(highlightSystemCircle, selectedSys.LayoutY - circleOffset);
+                Canvas.SetLeft(highlightSystemCircle, selectedSys.Layout.X - circleOffset);
+                Canvas.SetTop(highlightSystemCircle, selectedSys.Layout.Y - circleOffset);
                 Canvas.SetZIndex(highlightSystemCircle, 19);
 
                 MainCanvas.Children.Add(highlightSystemCircle);
@@ -2119,11 +2119,11 @@ namespace SMT
 
                     Line routeLine = new Line();
 
-                    routeLine.X1 = from.LayoutX;
-                    routeLine.Y1 = from.LayoutY;
+                    routeLine.X1 = from.Layout.X;
+                    routeLine.Y1 = from.Layout.Y;
 
-                    routeLine.X2 = to.LayoutX;
-                    routeLine.Y2 = to.LayoutY;
+                    routeLine.X2 = to.Layout.X;
+                    routeLine.Y2 = to.Layout.Y;
 
                     routeLine.StrokeThickness = 5;
                     routeLine.Visibility = Visibility.Visible;
@@ -2203,8 +2203,8 @@ namespace SMT
                             intelShape.Fill = intelBlobBrush;
                         }
 
-                        Canvas.SetLeft(intelShape, sys.LayoutX - circleOffset);
-                        Canvas.SetTop(intelShape, sys.LayoutY - circleOffset);
+                        Canvas.SetLeft(intelShape, sys.Layout.X - circleOffset);
+                        Canvas.SetTop(intelShape, sys.Layout.Y - circleOffset);
                         Canvas.SetZIndex(intelShape, 15);
                         MainCanvas.Children.Add(intelShape);
 
@@ -2495,8 +2495,8 @@ namespace SMT
                         systemShape.IsHitTestVisible = false;
                     }
 
-                    Canvas.SetLeft(systemShape, mapSystem.LayoutX - SYSTEM_SHAPE_OFFSET + 1);
-                    Canvas.SetTop(systemShape, mapSystem.LayoutY - SYSTEM_SHAPE_OFFSET + 1);
+                    Canvas.SetLeft(systemShape, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 1);
+                    Canvas.SetTop(systemShape, mapSystem.Layout.Y - SYSTEM_SHAPE_OFFSET + 1);
                     Canvas.SetZIndex(systemShape, SYSTEM_Z_INDEX);
                     MainCanvas.Children.Add(systemShape);
                 }
@@ -2524,8 +2524,8 @@ namespace SMT
                     sysIcons.VerticalContentAlignment = VerticalAlignment.Center;
                     sysIcons.Foreground = HasIceBrush;
 
-                    Canvas.SetLeft(sysIcons, mapSystem.LayoutX - SYSTEM_SHAPE_OFFSET + 11);
-                    Canvas.SetTop(sysIcons, mapSystem.LayoutY - SYSTEM_SHAPE_OFFSET - 9);
+                    Canvas.SetLeft(sysIcons, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 11);
+                    Canvas.SetTop(sysIcons, mapSystem.Layout.Y - SYSTEM_SHAPE_OFFSET - 9);
                     Canvas.SetZIndex(sysIcons, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(sysIcons);
                 }
@@ -2596,8 +2596,8 @@ namespace SMT
                     SystemOutline.MouseEnter += ShapeMouseOverHandler;
                     SystemOutline.MouseLeave += ShapeMouseOverHandler;
 
-                    Canvas.SetLeft(SystemOutline, mapSystem.LayoutX - shapeOffset);
-                    Canvas.SetTop(SystemOutline, mapSystem.LayoutY - shapeOffset);
+                    Canvas.SetLeft(SystemOutline, mapSystem.Layout.X - shapeOffset);
+                    Canvas.SetTop(SystemOutline, mapSystem.Layout.Y - shapeOffset);
                     Canvas.SetZIndex(SystemOutline, SYSTEM_Z_INDEX - 1);
                     MainCanvas.Children.Add(SystemOutline);
                 }
@@ -2615,8 +2615,8 @@ namespace SMT
                     sovADM.Height = shapeSize + 2;
                     sovADM.Foreground = DarkTextColourBrush;
 
-                    Canvas.SetLeft(sovADM, mapSystem.LayoutX - (shapeOffset + 1));
-                    Canvas.SetTop(sovADM, mapSystem.LayoutY - (shapeOffset + 1));
+                    Canvas.SetLeft(sovADM, mapSystem.Layout.X - (shapeOffset + 1));
+                    Canvas.SetTop(sovADM, mapSystem.Layout.Y - (shapeOffset + 1));
                     Canvas.SetZIndex(sovADM, SYSTEM_Z_INDEX - 1);
                     MainCanvas.Children.Add(sovADM);
                 }
@@ -2649,8 +2649,8 @@ namespace SMT
                 sysText.VerticalContentAlignment = VerticalAlignment.Center;
                 sysText.Width = SYSTEM_TEXT_WIDTH;
 
-                Canvas.SetLeft(sysText, mapSystem.LayoutX + SYSTEM_TEXT_X_OFFSET);
-                Canvas.SetTop(sysText, mapSystem.LayoutY + sysTextOffset);
+                Canvas.SetLeft(sysText, mapSystem.Layout.X + SYSTEM_TEXT_X_OFFSET);
+                Canvas.SetTop(sysText, mapSystem.Layout.Y + sysTextOffset);
                 Canvas.SetZIndex(sysText, SYSTEM_Z_INDEX);
 
                 MainCanvas.Children.Add(sysText);
@@ -2713,8 +2713,8 @@ namespace SMT
                     CynoBeaconLogo.StrokeLineJoin = PenLineJoin.Round;
                     CynoBeaconLogo.Fill = new SolidColorBrush(Colors.OrangeRed);
 
-                    Canvas.SetLeft(CynoBeaconLogo, mapSystem.LayoutX + 7);
-                    Canvas.SetTop(CynoBeaconLogo, mapSystem.LayoutY - 12);
+                    Canvas.SetLeft(CynoBeaconLogo, mapSystem.Layout.X + 7);
+                    Canvas.SetTop(CynoBeaconLogo, mapSystem.Layout.Y - 12);
                     Canvas.SetZIndex(CynoBeaconLogo, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(CynoBeaconLogo);
                 }
@@ -2733,8 +2733,8 @@ namespace SMT
 
                     RenderOptions.SetBitmapScalingMode(JoveLogo, BitmapScalingMode.NearestNeighbor);
 
-                    Canvas.SetLeft(JoveLogo, mapSystem.LayoutX - (JoveLogo.Width / 2));
-                    Canvas.SetTop(JoveLogo, mapSystem.LayoutY - (JoveLogo.Height / 2));
+                    Canvas.SetLeft(JoveLogo, mapSystem.Layout.X - (JoveLogo.Width / 2));
+                    Canvas.SetTop(JoveLogo, mapSystem.Layout.Y - (JoveLogo.Height / 2));
                     Canvas.SetZIndex(JoveLogo, SYSTEM_Z_INDEX + 5);
                     MainCanvas.Children.Add(JoveLogo);
                 }
@@ -2865,8 +2865,8 @@ namespace SMT
                         sysSubText.Foreground = SysInRegionTextBrush;
                     }
 
-                    Canvas.SetLeft(sysSubText, mapSystem.LayoutX + SYSTEM_REGION_TEXT_X_OFFSET);
-                    Canvas.SetTop(sysSubText, mapSystem.LayoutY + regionMarkerOffset);
+                    Canvas.SetLeft(sysSubText, mapSystem.Layout.X + SYSTEM_REGION_TEXT_X_OFFSET);
+                    Canvas.SetTop(sysSubText, mapSystem.Layout.Y + regionMarkerOffset);
                     Canvas.SetZIndex(sysSubText, SYSTEM_Z_INDEX);
 
                     MainCanvas.Children.Add(sysSubText);
@@ -2882,44 +2882,44 @@ namespace SMT
                 double smoothness = 0.02;
 
                 PathFigure pf = new PathFigure();
-                pf.StartPoint = new Point(gh.from.LayoutX, gh.from.LayoutY);
+                pf.StartPoint = new Point(gh.from.Layout.X, gh.from.Layout.Y);
 
                 BezierSegment bs = new BezierSegment();
                 bs.IsSmoothJoin = true;
 
-                if (Math.Abs(gh.to.LayoutX - gh.from.LayoutX) < Math.Abs(gh.to.LayoutY - gh.from.LayoutY))
+                if (Math.Abs(gh.to.Layout.X - gh.from.Layout.X) < Math.Abs(gh.to.Layout.Y - gh.from.Layout.Y))
                 {
                     bs.Point1 = new Point
                     {
-                        X = gh.from.LayoutX + ((smoothness * (gh.to.LayoutX - gh.from.LayoutX))),
-                        Y = gh.from.LayoutY
+                        X = gh.from.Layout.X + ((smoothness * (gh.to.Layout.X - gh.from.Layout.X))),
+                        Y = gh.from.Layout.Y
                     };
 
                     bs.Point2 = new Point
                     {
-                        X = gh.from.LayoutX + ((1 - smoothness) * (gh.to.LayoutX - gh.from.LayoutX)),
-                        Y = gh.from.LayoutY
+                        X = gh.from.Layout.X + ((1 - smoothness) * (gh.to.Layout.X - gh.from.Layout.X)),
+                        Y = gh.from.Layout.Y
                     };
                 }
                 else
                 {
                     bs.Point1 = new Point
                     {
-                        X = gh.from.LayoutX,
-                        Y = gh.from.LayoutY + ((smoothness * (gh.to.LayoutY - gh.from.LayoutY))),
+                        X = gh.from.Layout.X,
+                        Y = gh.from.Layout.Y + ((smoothness * (gh.to.Layout.Y - gh.from.Layout.Y))),
                     };
 
                     bs.Point2 = new Point
                     {
-                        X = gh.from.LayoutX ,
-                        Y = gh.from.LayoutY + ((1 - smoothness) * (gh.to.LayoutY - gh.from.LayoutY)),
+                        X = gh.from.Layout.X ,
+                        Y = gh.from.Layout.Y + ((1 - smoothness) * (gh.to.Layout.Y - gh.from.Layout.Y)),
                     };
                 }
 
                 bs.Point3 = new Point
                 {
-                    X = gh.to.LayoutX,
-                    Y = gh.to.LayoutY
+                    X = gh.to.Layout.X,
+                    Y = gh.to.Layout.Y
                 };
 
                 PathSegmentCollection psc = new PathSegmentCollection();
@@ -2955,11 +2955,11 @@ namespace SMT
 
                 Line sysLink = new Line();
 
-                sysLink.X1 = gh.from.LayoutX;
-                sysLink.Y1 = gh.from.LayoutY;
+                sysLink.X1 = gh.from.Layout.X;
+                sysLink.Y1 = gh.from.Layout.Y;
 
-                sysLink.X2 = gh.to.LayoutX;
-                sysLink.Y2 = gh.to.LayoutY;
+                sysLink.X2 = gh.to.Layout.X;
+                sysLink.Y2 = gh.to.Layout.Y;
 
                 sysLink.Stroke = NormalGateBrush;
 
@@ -3000,12 +3000,12 @@ namespace SMT
                             to = EM.GetEveSystem(jb.To);
                         }
 
-                        Point startPoint = new Point(from.LayoutX, from.LayoutY);
+                        Point startPoint = new Point(from.Layout.X, from.Layout.Y);
                         Point endPoint;
 
                         if (!Region.IsSystemOnMap(jb.To) || !Region.IsSystemOnMap(jb.From))
                         {
-                            endPoint = new Point(from.LayoutX - 20, from.LayoutY - 40);
+                            endPoint = new Point(from.Layout.X - 20, from.Layout.Y - 40);
 
                             Shape jbOutofSystemBlob = new Ellipse() { Height = 6, Width = 6 };
                             Canvas.SetLeft(jbOutofSystemBlob, endPoint.X - 3);
@@ -3035,8 +3035,8 @@ namespace SMT
                             }
                             jbOutofRegionText.IsHitTestVisible = false;
 
-                            Canvas.SetLeft(jbOutofRegionText, from.LayoutX - 20);
-                            Canvas.SetTop(jbOutofRegionText, from.LayoutY - 60);
+                            Canvas.SetLeft(jbOutofRegionText, from.Layout.X - 20);
+                            Canvas.SetTop(jbOutofRegionText, from.Layout.Y - 60);
                             Canvas.SetZIndex(jbOutofRegionText, SYSTEM_Z_INDEX);
 
                             MainCanvas.Children.Add(jbOutofRegionText);
@@ -3044,7 +3044,7 @@ namespace SMT
                         else
                         {
                             EVEData.MapSystem toSys = Region.MapSystems[jb.To];
-                            endPoint = new Point(toSys.LayoutX, toSys.LayoutY);
+                            endPoint = new Point(toSys.Layout.X, toSys.Layout.Y);
                         }
 
                         Line jbLine = new Line();
@@ -3372,6 +3372,15 @@ namespace SMT
                     }
                     FollowCharacter = false;
                     SelectSystem(selectedSys.Name);
+                    
+                    /// SJS HACK!!!
+                    if(ActiveCharacter != null) 
+                    {
+                        ActiveCharacter.Location = selectedSys.Name;
+                        ActiveCharacter.Region = selectedSys.Region;
+
+                    }
+
                     ReDrawMap(redraw);
                 }
 
@@ -3618,14 +3627,14 @@ namespace SMT
 
                             SystemInfoPopupSP.Children.Add(jbl);
 
-                            from.X = selectedSys.LayoutX;
-                            from.Y = selectedSys.LayoutY;
+                            from.X = selectedSys.Layout.X;
+                            from.Y = selectedSys.Layout.Y;
 
                             if (Region.IsSystemOnMap(jb.To) && !jb.Disabled)
                             {
                                 MapSystem ms = Region.MapSystems[jb.To];
-                                to.X = ms.LayoutX;
-                                to.Y = ms.LayoutY;
+                                to.X = ms.Layout.X;
+                                to.Y = ms.Layout.Y;
                                 AddJBHighlight = true;
                             }
                         }
@@ -3647,14 +3656,14 @@ namespace SMT
 
                             SystemInfoPopupSP.Children.Add(jbl);
 
-                            from.X = selectedSys.LayoutX;
-                            from.Y = selectedSys.LayoutY;
+                            from.X = selectedSys.Layout.X;
+                            from.Y = selectedSys.Layout.Y;
 
                             if (Region.IsSystemOnMap(jb.From) && !jb.Disabled)
                             {
                                 MapSystem ms = Region.MapSystems[jb.From];
-                                to.X = ms.LayoutX;
-                                to.Y = ms.LayoutY;
+                                to.X = ms.Layout.X;
+                                to.Y = ms.Layout.Y;
                                 AddJBHighlight = true;
                             }
                         }

@@ -4,6 +4,7 @@
 
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -378,7 +379,7 @@ namespace SMT.EVEData
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
-                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\data\SourceMaps\raw\" + rd.DotLanRef + "_layout.svg";
+                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\..\EVEData\data\SourceMaps\raw\" + rd.DotLanRef + "_layout.svg";
 
                 if (!File.Exists(localSVG))
                 {
@@ -443,8 +444,7 @@ namespace SMT.EVEData
                     rd.MapSystems[name] = new MapSystem
                     {
                         Name = name,
-                        LayoutX = x,
-                        LayoutY = y,
+                        Layout = new Vector2(x, y),
                         Region = region,
                         OutOfRegion = rd.Name != region,
                     };
@@ -452,7 +452,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\mapSolarSystems.csv";
+            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapSolarSystems.csv";
             if (File.Exists(eveStaticDataSolarSystemFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
@@ -499,7 +499,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export for the regions and extract some info from it
-            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\mapRegions.csv";
+            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapRegions.csv";
             if (File.Exists(eveStaticDataRegionFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataRegionFile);
@@ -530,7 +530,7 @@ namespace SMT.EVEData
                 throw new Exception("Data Creation Error");
             }
 
-            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\mapSolarSystemJumps.csv";
+            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapSolarSystemJumps.csv";
             if (File.Exists(eveStaticDataJumpsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsFile);
@@ -562,7 +562,7 @@ namespace SMT.EVEData
                 }
             }
 
-            string eveStaticDataJumpsExtraFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\mapSolarSystemJumpsExtra.csv";
+            string eveStaticDataJumpsExtraFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapSolarSystemJumpsExtra.csv";
             if (File.Exists(eveStaticDataJumpsExtraFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsExtraFile);
@@ -595,7 +595,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\staStations.csv";
+            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\staStations.csv";
             if (File.Exists(eveStaticDataStationsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataStationsFile);
@@ -622,7 +622,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataConstellationFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\mapConstellations.csv";
+            string eveStaticDataConstellationFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapConstellations.csv";
             if (File.Exists(eveStaticDataConstellationFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataConstellationFile);
@@ -653,7 +653,7 @@ namespace SMT.EVEData
             }
 
             // now open up the ice systems
-            string iceSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\iceSystems.csv";
+            string iceSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\iceSystems.csv";
             if (File.Exists(iceSystemsFile))
             {
                 StreamReader file = new StreamReader(iceSystemsFile);
@@ -675,7 +675,7 @@ namespace SMT.EVEData
             }
 
             // now open up the ice systems
-            string fwSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\factionWarfareSystems.csv";
+            string fwSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\factionWarfareSystems.csv";
             if (File.Exists(fwSystemsFile))
             {
                 StreamReader file = new StreamReader(fwSystemsFile);
@@ -697,7 +697,7 @@ namespace SMT.EVEData
             }
 
             // now open up the blue a0 sun systems
-            string blueSunSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\a0BlueStarSystems.csv";
+            string blueSunSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\a0BlueStarSystems.csv";
             if (File.Exists(blueSunSystemsFile))
             {
                 StreamReader file = new StreamReader(blueSunSystemsFile);
@@ -727,7 +727,7 @@ namespace SMT.EVEData
                 s.TrigInvasionStatus = System.EdenComTrigStatus.None;
             }
 
-            string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\trigInvasionSystems.csv";
+            string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\trigInvasionSystems.csv";
             if (File.Exists(trigSystemsFile))
             {
                 StreamReader file = new StreamReader(trigSystemsFile);
@@ -779,7 +779,7 @@ namespace SMT.EVEData
                 // enforce a minimum spread
                 bool mrDone = false;
                 int mrIteration = 0;
-                double mrMinSpread = 49.0;
+                float mrMinSpread = 49.0f;
 
                 while (!mrDone)
                 {
@@ -795,11 +795,11 @@ namespace SMT.EVEData
                                 continue;
                             }
 
-                            double dx = sysA.LayoutX - sysB.LayoutX;
-                            double dy = sysA.LayoutY - sysB.LayoutY;
-                            double l = Math.Sqrt(dx * dx + dy * dy);
+                            float dx = sysA.Layout.X - sysB.Layout.X;
+                            float dy = sysA.Layout.Y - sysB.Layout.Y;
+                            float l = (float)Math.Sqrt(dx * dx + dy * dy);
 
-                            double s = mrMinSpread - l;
+                            float s = mrMinSpread - l;
 
                             if (s > 0)
                             {
@@ -809,11 +809,8 @@ namespace SMT.EVEData
                                 dx = dx / l;
                                 dy = dy / l;
 
-                                sysB.LayoutX -= dx * s / 2;
-                                sysB.LayoutY -= dy * s / 2;
-
-                                sysA.LayoutX += dx * s / 2;
-                                sysA.LayoutY += dy * s / 2;
+                                sysB.Layout = new Vector2(sysB.Layout.X - (dx * s / 2), sysB.Layout.Y - (dy * s / 2));
+                                sysA.Layout = new Vector2(sysB.Layout.X + (dx * s / 2), sysB.Layout.Y + (dy * s / 2));
                             }
                         }
                     }
@@ -834,7 +831,7 @@ namespace SMT.EVEData
 
                 foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                 {
-                    points.Add(new Vector2f(ms.LayoutX, ms.LayoutY));
+                    points.Add(new Vector2f(ms.Layout.X, ms.Layout.Y));
                 }
 
                 // generate filler points to help the voronoi to get better partitioning of open areas
@@ -853,8 +850,8 @@ namespace SMT.EVEData
 
                         foreach (MapSystem ms in mr.MapSystems.Values.ToList())
                         {
-                            double dx = ms.LayoutX - ix;
-                            double dy = ms.LayoutY - iy;
+                            double dx = ms.Layout.X - ix;
+                            double dy = ms.Layout.Y - iy;
                             double l = Math.Sqrt(dx * dx + dy * dy);
 
                             if (ms.OutOfRegion)
@@ -896,8 +893,7 @@ namespace SMT.EVEData
                     i++;
 
                     List<Vector2f> cellList = s.Region(clipRect);
-                    ms.LayoutX = s.x;
-                    ms.LayoutY = s.y;
+                    ms.Layout = new Vector2(s.x, s.y);
 
                     ms.CellPoints = new List<Point>();
 
@@ -979,7 +975,7 @@ namespace SMT.EVEData
             }
 
             // now get the ships
-            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\invTypes.csv";
+            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\invTypes.csv";
             if (File.Exists(eveStaticDataItemTypesFile))
             {
                 ShipTypes = new SerializableDictionary<string, string>();
@@ -1098,7 +1094,7 @@ namespace SMT.EVEData
             }
 
             // now add the jove systems
-            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\EVEData\data\JoveSystems.csv";
+            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\JoveSystems.csv";
             if (File.Exists(eveStaticDataJoveObservatories))
             {
                 StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
@@ -1292,7 +1288,7 @@ namespace SMT.EVEData
 
             // now serialise the classes to disk
 
-            string saveDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\data\";
+            string saveDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\..\EVEData\data\";
 
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
@@ -1306,7 +1302,7 @@ namespace SMT.EVEData
 
                 foreach (MapSystem s in mr.MapSystems.Values)
                 {
-                    SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.LayoutX, (float)s.LayoutY, 5, 5);
+                    SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.Layout.X, (float)s.Layout.Y, 5, 5);
                     sre["Type"] = "system";
                     sre["Name"] = s.Name;
                     sre["ID"] = s.ActualSystem.ID;
@@ -1314,7 +1310,7 @@ namespace SMT.EVEData
 
                     systemElementMap[s.Name] = sre;
 
-                    SvgNet.Elements.SvgTextElement srtText = new(s.Name, (float)s.LayoutX, (float)s.LayoutY);
+                    SvgNet.Elements.SvgTextElement srtText = new(s.Name, (float)s.Layout.X, (float)s.Layout.Y);
 
                     svgRootElement.AddChild(sre);
                     svgRootElement.AddChild(srtText);
@@ -1437,7 +1433,7 @@ namespace SMT.EVEData
         /// <param name="id">ID of the system</param>
         public System GetEveSystemFromID(long id)
         {
-            if(IDToSystem.ContainsKey(id))
+            if (IDToSystem.ContainsKey(id))
             {
                 return IDToSystem[id];
             }
@@ -1452,10 +1448,10 @@ namespace SMT.EVEData
         public string GetEveSystemNameFromID(long id)
         {
             System s = GetEveSystemFromID(id);
-            if(s != null)
+            if (s != null)
             {
                 return s.Name;
-            }    
+            }
 
             return string.Empty;
         }
@@ -2100,7 +2096,7 @@ namespace SMT.EVEData
                 }
             }
 
-            _ = ResolveAllianceIDs ( IDToResolve );
+            _ = ResolveAllianceIDs(IDToResolve);
         }
 
         /// <summary>

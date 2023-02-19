@@ -1775,10 +1775,10 @@ namespace SMT
                             ii.DrawType = InfoItem.ShapeType.ArcLine;
                         }
 
-                        ii.X1 = (int)fromMS.LayoutX;
-                        ii.Y1 = (int)fromMS.LayoutY;
-                        ii.X2 = (int)toMS.LayoutX;
-                        ii.Y2 = (int)toMS.LayoutY;
+                        ii.X1 = (int)fromMS.Layout.X;
+                        ii.Y1 = (int)fromMS.Layout.Y;
+                        ii.X2 = (int)toMS.Layout.X;
+                        ii.Y2 = (int)toMS.Layout.Y;
                         ii.Size = lineThickness;
                         ii.Region = region;
                         ii.Fill = c;
@@ -1810,8 +1810,8 @@ namespace SMT
 
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Circle;
-                        ii.X1 = (int)fromMS.LayoutX;
-                        ii.Y1 = (int)fromMS.LayoutY;
+                        ii.X1 = (int)fromMS.Layout.X;
+                        ii.Y1 = (int)fromMS.Layout.Y;
                         ii.Size = radius;
                         ii.Region = region;
                         ii.Fill = c;
