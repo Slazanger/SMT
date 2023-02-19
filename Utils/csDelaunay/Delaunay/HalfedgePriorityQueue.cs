@@ -125,7 +125,7 @@
 
         private bool IsEmpty(int bucket)
         {
-            return (hash[bucket].nextInPriorityQueue == null);
+            return hash[bucket].nextInPriorityQueue == null;
         }
 
         /*

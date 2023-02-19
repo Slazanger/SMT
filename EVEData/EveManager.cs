@@ -810,7 +810,7 @@ namespace SMT.EVEData
                                 dy = dy / l;
 
                                 sysB.Layout = new Vector2(sysB.Layout.X - (dx * s / 2), sysB.Layout.Y - (dy * s / 2));
-                                sysA.Layout = new Vector2(sysB.Layout.X + (dx * s / 2), sysB.Layout.Y + (dy * s / 2));
+                                sysA.Layout = new Vector2(sysA.Layout.X + (dx * s / 2), sysA.Layout.Y + (dy * s / 2));
                             }
                         }
                     }

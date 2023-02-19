@@ -206,7 +206,7 @@
             {
                 ReorderEdges();
                 region = ClipToBounds(clippingBounds);
-                if ((new Polygon(region)).PolyWinding() == Winding.CLOCKWISE)
+                if (new Polygon(region).PolyWinding() == Winding.CLOCKWISE)
                 {
                     region.Reverse();
                 }

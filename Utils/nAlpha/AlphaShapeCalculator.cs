@@ -137,7 +137,7 @@
         private Tuple<Point, Point> CalculateAlphaDiskCenters(Point p1, Point p2)
         {
             double distanceBetweenPoints = p1.DistanceTo(p2);
-            double distanceFromConnectionLine = Math.Sqrt(Radius * Radius - distanceBetweenPoints * distanceBetweenPoints / 4);
+            double distanceFromConnectionLine = Math.Sqrt((Radius * Radius) - (distanceBetweenPoints * distanceBetweenPoints / 4));
 
             Point centerOfConnectionLine = p1.CenterTo(p2);
             Point vector = p1.VectorTo(p2);
@@ -150,10 +150,10 @@
             Point normalVector = new Point(vector.Y, -vector.X);
             return
                 new Tuple<Point, Point>(
-                    new Point(center.X + normalVector.X * distanceFromConnectionLine,
-                        center.Y + normalVector.Y * distanceFromConnectionLine),
-                    new Point(center.X - normalVector.X * distanceFromConnectionLine,
-                        center.Y - normalVector.Y * distanceFromConnectionLine));
+                    new Point(center.X + (normalVector.X * distanceFromConnectionLine),
+                        center.Y + (normalVector.Y * distanceFromConnectionLine)),
+                    new Point(center.X - (normalVector.X * distanceFromConnectionLine),
+                        center.Y - (normalVector.Y * distanceFromConnectionLine)));
         }
 
         private Shape GetShape()

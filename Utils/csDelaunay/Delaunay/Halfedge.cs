@@ -89,7 +89,7 @@
                 }
                 else
                 {
-                    above = p.x + p.y * edge.b > edge.c;
+                    above = p.x + (p.y * edge.b) > edge.c;
                     if (edge.b < 0)
                     {
                         above = !above;
@@ -102,7 +102,7 @@
                 if (!fast)
                 {
                     dxs = topSite.x - edge.LeftSite.x;
-                    above = edge.b * (dxp * dxp - dyp * dyp) < dxs * dyp * (1 + 2 * dxp / dxs + edge.b * edge.b);
+                    above = edge.b * ((dxp * dxp) - (dyp * dyp)) < dxs * dyp * (1 + (2 * dxp / dxs) + (edge.b * edge.b));
                     if (edge.b < 0)
                     {
                         above = !above;
@@ -111,11 +111,11 @@
             }
             else
             {
-                y1 = edge.c - edge.a * p.x;
+                y1 = edge.c - (edge.a * p.x);
                 t1 = p.y - y1;
                 t2 = p.x - topSite.x;
                 t3 = y1 - topSite.y;
-                above = t1 * t1 > t2 * t2 + t3 * t3;
+                above = t1 * t1 > (t2 * t2) + (t3 * t3);
             }
             return this.leftRight == LR.LEFT ? above : !above;
         }

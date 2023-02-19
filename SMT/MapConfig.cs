@@ -267,7 +267,7 @@ namespace SMT
             }
             set
             {
-                if(value >= 30)
+                if (value >= 30)
                 {
                     m_MaxESIOverlayValue = value;
                 }
@@ -868,10 +868,12 @@ namespace SMT
         [DisplayName("Overlay Window Content Opacity")]
         public float OverlayOpacity
         {
-            get {
+            get
+            {
                 return m_overlayOpacity;
             }
-            set {
+            set
+            {
 
                 m_overlayOpacity = value > 0f ? value : 1f;
 
@@ -883,10 +885,12 @@ namespace SMT
         [DisplayName("Overlay Window Background Opacity")]
         public float OverlayBackgroundOpacity
         {
-            get {
+            get
+            {
                 return m_overlayBackgroundOpacity;
             }
-            set {
+            set
+            {
 
                 m_overlayBackgroundOpacity = value > 0f ? value : 1f;
 
@@ -898,10 +902,12 @@ namespace SMT
         [DisplayName("Overlay System Jump Range")]
         public int OverlayRange
         {
-            get {
+            get
+            {
                 return m_overlayRange;
             }
-            set {
+            set
+            {
 
                 m_overlayRange = value > 0 ? value : 1;
 
@@ -913,10 +919,12 @@ namespace SMT
         [DisplayName("Overlay In Gatherer Mode")]
         public bool OverlayGathererMode
         {
-            get {
+            get
+            {
                 return m_overlayGathererMode;
             }
-            set {
+            set
+            {
 
                 m_overlayGathererMode = value;
 
@@ -928,10 +936,12 @@ namespace SMT
         [DisplayName("Overlay Show Char Name")]
         public bool OverlayShowCharName
         {
-            get {
+            get
+            {
                 return m_overlayShowCharName;
             }
-            set {
+            set
+            {
 
                 m_overlayShowCharName = value;
 
@@ -943,10 +953,12 @@ namespace SMT
         [DisplayName("Overlay Show Char Location")]
         public bool OverlayShowCharLocation
         {
-            get {
+            get
+            {
                 return m_overlayShowCharLocation;
             }
-            set {
+            set
+            {
 
                 m_overlayShowCharLocation = value;
 
@@ -958,10 +970,12 @@ namespace SMT
         [DisplayName("Overlay Show NPC Kills")]
         public bool OverlayShowNPCKills
         {
-            get {
+            get
+            {
                 return m_overlayShowNPCKills;
             }
-            set {
+            set
+            {
 
                 m_overlayShowNPCKills = value;
 
@@ -973,10 +987,12 @@ namespace SMT
         [DisplayName("Overlay Show NPC Kill Delta")]
         public bool OverlayShowNPCKillDelta
         {
-            get {
+            get
+            {
                 return m_overlayShowNPCKillDelta;
             }
-            set {
+            set
+            {
 
                 m_overlayShowNPCKillDelta = value;
 
@@ -988,10 +1004,12 @@ namespace SMT
         [DisplayName("Overlay Show Route")]
         public bool OverlayShowRoute
         {
-            get {
+            get
+            {
                 return m_overlayShowRoute;
             }
-            set {
+            set
+            {
 
                 m_overlayShowRoute = value;
 
@@ -1003,10 +1021,12 @@ namespace SMT
         [DisplayName("Overlay Intel Fresh Time")]
         public float IntelFreshTime
         {
-            get {
+            get
+            {
                 return m_intelFreshTime;
             }
-            set {
+            set
+            {
 
                 m_intelFreshTime = value > 0 ? value : 1;
 
@@ -1018,10 +1038,12 @@ namespace SMT
         [DisplayName("Overlay Intel Stale Time")]
         public float IntelStaleTime
         {
-            get {
+            get
+            {
                 return m_intelStaleTime;
             }
-            set {
+            set
+            {
 
                 m_intelStaleTime = value > 0 ? value : 1;
 
@@ -1033,10 +1055,12 @@ namespace SMT
         [DisplayName("Overlay Intel Fresh Time")]
         public float IntelHistoricTime
         {
-            get {
+            get
+            {
                 return m_intelHistoricTime;
             }
-            set {
+            set
+            {
 
                 m_intelHistoricTime = value > 0 ? value : 1;
 

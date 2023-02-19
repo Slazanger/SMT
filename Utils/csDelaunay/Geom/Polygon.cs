@@ -40,7 +40,7 @@
                 nextIndex = (index + 1) % n;
                 point = vertices[index];
                 next = vertices[nextIndex];
-                signedDoubleArea += point.x * next.y - next.x * point.y;
+                signedDoubleArea += (point.x * next.y) - (next.x * point.y);
             }
 
             return signedDoubleArea;

@@ -144,7 +144,7 @@
                         y0 = region[j].y;
                         x1 = region[j + 1].x;
                         y1 = region[j + 1].y;
-                        a = x0 * y1 - x1 * y0;
+                        a = (x0 * y1) - (x1 * y0);
                         signedArea += a;
                         centroid.x += (x0 + x1) * a;
                         centroid.y += (y0 + y1) * a;
@@ -154,14 +154,14 @@
                     y0 = region[region.Count - 1].y;
                     x1 = region[0].x;
                     y1 = region[0].y;
-                    a = x0 * y1 - x1 * y0;
+                    a = (x0 * y1) - (x1 * y0);
                     signedArea += a;
                     centroid.x += (x0 + x1) * a;
                     centroid.y += (y0 + y1) * a;
 
                     signedArea *= 0.5f;
-                    centroid.x /= (6 * signedArea);
-                    centroid.y /= (6 * signedArea);
+                    centroid.x /= 6 * signedArea;
+                    centroid.y /= 6 * signedArea;
                     // Move site to the centroid of its Voronoi cell
                     newPoints.Add(centroid);
                     site = sites.Next();

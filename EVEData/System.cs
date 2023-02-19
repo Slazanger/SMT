@@ -2,8 +2,8 @@
 // System
 //-----------------------------------------------------------------------
 
-using System.Xml.Serialization;
 using System.Numerics;
+using System.Xml.Serialization;
 
 namespace SMT.EVEData
 {
@@ -89,7 +89,7 @@ namespace SMT.EVEData
         /// <summary>
         /// A property to get the coordinate in real space for this system as a Vector3
         /// </summary>
-        public Vector3 Actual {  get => new Vector3((float)ActualX, (float)ActualY, (float)ActualZ); }
+        public Vector3 Actual { get => new Vector3((float)ActualX, (float)ActualY, (float)ActualZ); }
 
         /// <summary>
         /// the 2d X coordinate used to render on the universe view

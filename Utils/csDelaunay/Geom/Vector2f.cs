@@ -25,7 +25,7 @@ public struct Vector2f
     {
         get
         {
-            return (float)Math.Sqrt(x * x + y * y);
+            return (float)Math.Sqrt((x * x) + (y * y));
         }
     }
 
@@ -33,7 +33,7 @@ public struct Vector2f
     {
         float cx = b.x - a.x;
         float cy = b.y - a.y;
-        return cx * cx + cy * cy;
+        return (cx * cx) + (cy * cy);
     }
 
     public static Vector2f Max(Vector2f a, Vector2f b)
@@ -97,7 +97,7 @@ public struct Vector2f
 
     public override int GetHashCode()
     {
-        return x.GetHashCode() ^ y.GetHashCode() << 2;
+        return x.GetHashCode() ^ (y.GetHashCode() << 2);
     }
 
     public void Normalize()
