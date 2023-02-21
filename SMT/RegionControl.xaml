@@ -82,7 +82,7 @@
                 <ColumnDefinition Width="193*" />
             </Grid.ColumnDefinitions>
             <zc:ZoomControl x:Name="MainZoomControl" MinZoom="0.2" MaxZoom="10" Margin="0" Grid.ColumnSpan="3">
-                <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" />
+                <Canvas x:Name="MainCanvas"   Margin="5" Width="1050" Height="800" SnapsToDevicePixels="False" TextOptions.TextFormattingMode="Ideal" />
             </zc:ZoomControl>
             <Label x:Name="label"  HorizontalAlignment="Right" Margin="0,0,50,0" VerticalAlignment="Bottom" FontSize="30" Panel.ZIndex="50" FontWeight="Bold" Grid.Column="2" />
 
@@ -93,6 +93,7 @@
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="top" Margin="0,46,20,0" x:Name="HelpList" Visibility="Hidden" Width="175" Panel.ZIndex="111" Grid.Column="2">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="25" />
                         <RowDefinition Height="25" />
                         <RowDefinition Height="25" />
                         <RowDefinition Height="25" />
@@ -115,16 +116,18 @@
                     <Label Content="Jove Observatory" Grid.Row="2" Grid.Column="1" />
                     <Ellipse Width="20" Height="20" Stroke="Green" StrokeThickness="2.5" Grid.Row="3" Grid.Column="0" />
                     <Label Content="Thera Entrance" Grid.Row="3" Grid.Column="1" />
-                    <Rectangle Width="15" Height="15" Fill="LightBlue" StrokeThickness="2" Grid.Row="4" Grid.Column="0" />
+                    <Label Content="❄" Grid.Row="4" Grid.Column="0" />
                     <Label Content="Ice Belts" Grid.Row="4" Grid.Column="1" />
-                    <Polygon Points="0,14,7,0,14,14" Width="15" Height="15" Fill="DarkRed" Stroke="Black" StrokeThickness="2" Grid.Row="5" Grid.Column="0" />
-                    <Label Content="Trig Invasion" Grid.Row="5" Grid.Column="1" />
+                    <Label Content="⛭" Grid.Row="5" Grid.Column="0" />
+                    <Label Content="A0 Blue Sun" Grid.Row="5" Grid.Column="1" />
+                    <Polygon Points="0,14,7,0,14,14" Width="15" Height="15" Fill="DarkRed" Stroke="Black" StrokeThickness="2" Grid.Row="6" Grid.Column="0" />
+                    <Label Content="Trig Invasion" Grid.Row="6" Grid.Column="1" />
                 </Grid>
             </Border>
 
             <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3" Grid.ColumnSpan="3" />
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,140" x:Name="AllianceNameList" Visibility="Visible" Width="170" Panel.ZIndex="111" Grid.ColumnSpan="3">
-                <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom"/>
+                <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom" />
             </Border>
 
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="170" Height="123" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" CornerRadius="4" Panel.ZIndex="111"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}" Grid.ColumnSpan="3">

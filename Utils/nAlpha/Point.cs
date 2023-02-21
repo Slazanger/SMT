@@ -47,7 +47,7 @@
 
         public double DistanceTo(Point p)
         {
-            double val = (X - p.X) * (X - p.X) + (Y - p.Y) * (Y - p.Y);
+            double val = ((X - p.X) * (X - p.X)) + ((Y - p.Y) * (Y - p.Y));
             return Math.Sqrt(val);
         }
 

@@ -41,7 +41,7 @@ namespace SMT
         private bool m_ShowJoveObservatories;
         private bool m_ShowNegativeRattingDelta;
 
-        private bool m_ShowRattingDataAsDelta;
+        private bool m_ShowRattingDataAsDelta = true;
 
         private bool m_ShowRegionStandings;
         private bool m_ShowSimpleSecurityView;
@@ -76,7 +76,27 @@ namespace SMT
 
         private bool m_drawRoute;
 
+        private bool m_followOnZoom;
+
         private string m_CustomEveLogFolderLocation;
+
+        private bool m_ClampMaxESIOverlayValue;
+
+        private int m_MaxESIOverlayValue;
+
+        // Overlay settings
+        private float m_overlayBackgroundOpacity = 0.2f;
+        private float m_overlayOpacity = 0.5f;
+        private int m_overlayRange = 5;
+        private float m_intelFreshTime = 30;
+        private float m_intelStaleTime = 120;
+        private float m_intelHistoricTime = 600;
+        private bool m_overlayGathererMode = false;
+        private bool m_overlayShowCharName = true;
+        private bool m_overlayShowCharLocation = true;
+        private bool m_overlayShowNPCKills = true;
+        private bool m_overlayShowNPCKillDelta = true;
+        private bool m_overlayShowRoute = true;
 
         public MapConfig()
         {
@@ -199,6 +219,19 @@ namespace SMT
             }
         }
 
+        public bool FollowOnZoom
+        {
+            get
+            {
+                return m_followOnZoom;
+            }
+            set
+            {
+                m_followOnZoom = value;
+                OnPropertyChanged("FollowOnZoom");
+            }
+        }
+
         public bool LimitESIDataToRegion
         {
             get
@@ -211,6 +244,41 @@ namespace SMT
                 OnPropertyChanged("LimitESIDataToRegion");
             }
         }
+
+        public bool ClampMaxESIOverlayValue
+        {
+            get
+            {
+                return m_ClampMaxESIOverlayValue;
+            }
+            set
+            {
+                m_ClampMaxESIOverlayValue = value;
+                OnPropertyChanged("ClampMaxESIOverlayValue");
+
+            }
+        }
+
+        public int MaxESIOverlayValue
+        {
+            get
+            {
+                return m_MaxESIOverlayValue;
+            }
+            set
+            {
+                if (value >= 30)
+                {
+                    m_MaxESIOverlayValue = value;
+                }
+                else
+                {
+                    m_MaxESIOverlayValue = 30;
+                }
+                OnPropertyChanged("MaxESIOverlayValue");
+            }
+        }
+
 
         [Category("Fleet")]
         [DisplayName("Max Fleet Per System")]
@@ -796,6 +864,210 @@ namespace SMT
             }
         }
 
+        [Category("Overlay")]
+        [DisplayName("Overlay Window Content Opacity")]
+        public float OverlayOpacity
+        {
+            get
+            {
+                return m_overlayOpacity;
+            }
+            set
+            {
+
+                m_overlayOpacity = value > 0f ? value : 1f;
+
+                OnPropertyChanged("OverlayOpacity");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Window Background Opacity")]
+        public float OverlayBackgroundOpacity
+        {
+            get
+            {
+                return m_overlayBackgroundOpacity;
+            }
+            set
+            {
+
+                m_overlayBackgroundOpacity = value > 0f ? value : 1f;
+
+                OnPropertyChanged("OverlayBackgroundOpacity");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay System Jump Range")]
+        public int OverlayRange
+        {
+            get
+            {
+                return m_overlayRange;
+            }
+            set
+            {
+
+                m_overlayRange = value > 0 ? value : 1;
+
+                OnPropertyChanged("OverlayRange");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay In Gatherer Mode")]
+        public bool OverlayGathererMode
+        {
+            get
+            {
+                return m_overlayGathererMode;
+            }
+            set
+            {
+
+                m_overlayGathererMode = value;
+
+                OnPropertyChanged("OverlayGathererMode");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show Char Name")]
+        public bool OverlayShowCharName
+        {
+            get
+            {
+                return m_overlayShowCharName;
+            }
+            set
+            {
+
+                m_overlayShowCharName = value;
+
+                OnPropertyChanged("OverlayShowCharName");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show Char Location")]
+        public bool OverlayShowCharLocation
+        {
+            get
+            {
+                return m_overlayShowCharLocation;
+            }
+            set
+            {
+
+                m_overlayShowCharLocation = value;
+
+                OnPropertyChanged("OverlayShowCharLocation");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show NPC Kills")]
+        public bool OverlayShowNPCKills
+        {
+            get
+            {
+                return m_overlayShowNPCKills;
+            }
+            set
+            {
+
+                m_overlayShowNPCKills = value;
+
+                OnPropertyChanged("OverlayShowNPCKills");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show NPC Kill Delta")]
+        public bool OverlayShowNPCKillDelta
+        {
+            get
+            {
+                return m_overlayShowNPCKillDelta;
+            }
+            set
+            {
+
+                m_overlayShowNPCKillDelta = value;
+
+                OnPropertyChanged("OverlayShowNPCKillDelta");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Show Route")]
+        public bool OverlayShowRoute
+        {
+            get
+            {
+                return m_overlayShowRoute;
+            }
+            set
+            {
+
+                m_overlayShowRoute = value;
+
+                OnPropertyChanged("OverlayShowRoute");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Intel Fresh Time")]
+        public float IntelFreshTime
+        {
+            get
+            {
+                return m_intelFreshTime;
+            }
+            set
+            {
+
+                m_intelFreshTime = value > 0 ? value : 1;
+
+                OnPropertyChanged("IntelFreshTime");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Intel Stale Time")]
+        public float IntelStaleTime
+        {
+            get
+            {
+                return m_intelStaleTime;
+            }
+            set
+            {
+
+                m_intelStaleTime = value > 0 ? value : 1;
+
+                OnPropertyChanged("IntelStaleTime");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay Intel Fresh Time")]
+        public float IntelHistoricTime
+        {
+            get
+            {
+                return m_intelHistoricTime;
+            }
+            set
+            {
+
+                m_intelHistoricTime = value > 0 ? value : 1;
+
+                OnPropertyChanged("IntelHistoricTime");
+            }
+        }
+
         public int ZkillExpireTimeMinutes
         {
             get
@@ -828,8 +1100,8 @@ namespace SMT
                 SystemOutlineColour = Color.FromRgb(0, 0, 0),
                 InRegionSystemColour = Colors.SlateGray,
                 InRegionSystemTextColour = Colors.BlanchedAlmond,
-                OutRegionSystemColour = Color.FromRgb(128, 64, 64),
-                OutRegionSystemTextColour = (Color)ColorConverter.ConvertFromString("#FF726340"),
+                OutRegionSystemColour = (Color)ColorConverter.ConvertFromString("#FF272B2F"),
+                OutRegionSystemTextColour = (Color)ColorConverter.ConvertFromString("#FF7E8184"),
 
                 UniverseSystemColour = Colors.SlateGray,
                 UniverseConstellationGateColour = Colors.SlateGray,
@@ -844,7 +1116,9 @@ namespace SMT
                 MapBackgroundColour = Color.FromRgb(43, 43, 48),
                 RegionMarkerTextColour = Color.FromRgb(49, 49, 53),
                 RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0),
-                ESIOverlayColour = Color.FromRgb(188, 143, 143),
+                ESIOverlayColour = (Color)ColorConverter.ConvertFromString("#FF74B071"),
+
+
                 IntelOverlayColour = Color.FromRgb(178, 34, 34),
                 IntelClearOverlayColour = Colors.Orange,
 
@@ -862,7 +1136,7 @@ namespace SMT
                 FleetMemberTextColour = Colors.White,
 
                 JumpRangeInColour = Color.FromRgb(255, 165, 0),
-                JumpRangeInColourHighlight = Color.FromArgb(20, 82, 135, 155),
+                JumpRangeInColourHighlight = Color.FromArgb(20, 82, 135, 125),
                 JumpRangeOverlapHighlight = Colors.DarkBlue,
 
                 ActiveIncursionColour = Color.FromRgb(110, 82, 77),
@@ -905,11 +1179,26 @@ namespace SMT
             ShowJoveObservatories = true;
             ShowCynoBeacons = true;
             LimitESIDataToRegion = false;
-
+            ClampMaxESIOverlayValue = true;
+            MaxESIOverlayValue = 120;
             UniverseMaxZoomDisplaySystems = 1.3f;
             UniverseMaxZoomDisplaySystemsText = 2.0f;
 
             IntelSoundVolume = 0.5f;
+
+            OverlayOpacity = 0.5f;
+            OverlayRange = 5;
+            OverlayGathererMode = false;
+            OverlayShowCharName = true;
+            OverlayShowCharLocation = true;
+            OverlayShowNPCKills = true;
+            OverlayShowNPCKillDelta = true;
+            OverlayShowRoute = true;
+
+
+            IntelFreshTime = 30;
+            IntelStaleTime = 120;
+            IntelHistoricTime = 600;
         }
 
         protected void OnPropertyChanged(string name)

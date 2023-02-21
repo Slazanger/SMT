@@ -16,7 +16,6 @@ namespace SMT.EVEData
 
         public Dictionary<string, ObservableCollection<string>> AlternateMids { get; set; }
 
-
         public JumpRoute()
         {
             MaxLY = 7.0;
@@ -29,7 +28,6 @@ namespace SMT.EVEData
                 AvoidRegions = new ObservableCollection<string>();
                 AvoidSystems = new ObservableCollection<string>();
                 AlternateMids = new Dictionary<string, ObservableCollection<string>>();
-
             }), DispatcherPriority.Normal, null);
         }
 
@@ -39,7 +37,6 @@ namespace SMT.EVEData
             {
                 CurrentRoute.Clear();
             }), DispatcherPriority.Normal, null);
-
 
             if (WayPoints.Count < 2)
             {
@@ -58,9 +55,7 @@ namespace SMT.EVEData
 
             List<string> avoidSystems = AvoidSystems.ToList();
 
-
             AlternateMids.Clear();
-
 
             // loop through all the waypoints
             for (int i = 1; i < WayPoints.Count; i++)
@@ -68,19 +63,16 @@ namespace SMT.EVEData
                 start = end;
                 end = WayPoints[i];
 
-
-
                 List<Navigation.RoutePoint> sysList = Navigation.NavigateCapitals(start, end, actualMaxLY, null, avoidSystems);
 
                 if (sysList != null)
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
-
                         foreach (Navigation.RoutePoint s in sysList)
                         {
                             // for multiple waypoint routes, the first in the new and last item in the list will be the same system, so remove
-                            if(CurrentRoute.Count > 0 && CurrentRoute.Last().SystemName == s.SystemName)
+                            if (CurrentRoute.Count > 0 && CurrentRoute.Last().SystemName == s.SystemName)
                             {
                                 CurrentRoute.Last().LY = s.LY;
                             }
@@ -90,7 +82,7 @@ namespace SMT.EVEData
                             }
                         }
 
-                        if(sysList.Count > 2 )
+                        if (sysList.Count > 2)
                         {
                             for (int j = 2; j < sysList.Count; j++)
                             {
@@ -104,13 +96,10 @@ namespace SMT.EVEData
                                 {
                                     if (mid != CurrentRoute[j - 1].SystemName)
                                     {
-
-
                                         AlternateMids[CurrentRoute[j - 1].SystemName].Add(mid);
                                     }
                                 }
                             }
-
                         }
                     }), DispatcherPriority.Normal, null);
                 }

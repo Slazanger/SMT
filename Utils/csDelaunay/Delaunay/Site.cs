@@ -128,7 +128,7 @@
             edges.Add(edge);
         }
 
-        public int Compare(Site s1, Site s2)
+        public static int Compare(Site s1, Site s2)
         {
             return s1.CompareTo(s2);
         }
@@ -206,7 +206,7 @@
             {
                 ReorderEdges();
                 region = ClipToBounds(clippingBounds);
-                if ((new Polygon(region)).PolyWinding() == Winding.CLOCKWISE)
+                if (new Polygon(region).PolyWinding() == Winding.CLOCKWISE)
                 {
                     region.Reverse();
                 }
@@ -439,12 +439,6 @@
             region = null;
 
             return this;
-        }
-
-        private void Move(Vector2f p)
-        {
-            Clear();
-            coord = p;
         }
 
         private Site NeighborSite(Edge edge)

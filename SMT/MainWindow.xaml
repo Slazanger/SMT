@@ -13,7 +13,7 @@
 
         x:Class="SMT.MainWindow"
         mc:Ignorable="d"
-        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip">
+        Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip" RenderOptions.ClearTypeHint="Enabled" TextOptions.TextFormattingMode="Ideal">
 
     <Window.Resources>
 
@@ -54,11 +54,13 @@
                 <MenuItem Header="File">
                     <MenuItem Header="Characters" Click="Characters_MenuItem_Click" />
                     <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
+                    <MenuItem Header="Overlay" Click="OverlayWindow_MenuItem_Click" />
                     <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
                 </MenuItem>
 
                 <MenuItem Header="Data">
                     <MenuItem Header="Force ESI Update" Click="ForceESIUpdate_MenuItem_Click" />
+                    <MenuItem Header="Clear Old Eve logs" Click="ClearOldEVELogs_Click" />
                 </MenuItem>
 
                 <MenuItem Header="View">
@@ -212,11 +214,11 @@
                                         <RowDefinition Height="25" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2">
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2" IsEnabled="false">
                                         <Label Content="Gate SearchFilter : " />
                                         <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
                                     </StackPanel>
-                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" Grid.Row="1" />
+                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" Grid.Row="1" IsEnabled="false" />
                                     <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2" />
                                     <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3" />
                                     <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" Grid.Row="4" />
@@ -401,9 +403,9 @@
                                                     <ListBox x:Name="capitalRouteWaypointsLB" ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" AllowDrop="True">
                                                         <ListBox.ContextMenu>
                                                             <ContextMenu>
-                                                                <MenuItem Header="Move Up" Click="CapitalWaypointsContextMenuMoveUp_Click"/>
-                                                                <MenuItem Header="Move Down" Click="CapitalWaypointsContextMenuMoveDown_Click"/>
-                                                                <MenuItem Header="Delete" Click="CapitalWaypointsContextMenuDelete_Click"/>
+                                                                <MenuItem Header="Move Up" Click="CapitalWaypointsContextMenuMoveUp_Click" />
+                                                                <MenuItem Header="Move Down" Click="CapitalWaypointsContextMenuMoveDown_Click" />
+                                                                <MenuItem Header="Delete" Click="CapitalWaypointsContextMenuDelete_Click" />
                                                             </ContextMenu>
                                                         </ListBox.ContextMenu>
                                                     </ListBox>
@@ -430,7 +432,7 @@
 
                                             <GroupBox Header="Route">
                                                 <StackPanel Margin="4">
-                                                    <Label x:Name="lblCapitalRouteSummary" Content=""/>
+                                                    <Label x:Name="lblCapitalRouteSummary" Content="" />
                                                     <DataGrid x:Name="dgCapitalRouteCurrentRoute" ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false"  SelectionChanged="CurrentCapitalRouteItem_Selected" IsReadOnly="True">
                                                         <DataGrid.CellStyle>
                                                             <Style TargetType="{x:Type DataGridCell}">
@@ -483,23 +485,22 @@
                                                             </Style>
                                                         </DataGrid.CellStyle>
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False"/>
+                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
                                                             <DataGridTextColumn Header="Distance (LY)" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                     </DataGrid>
-
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="Alternate Mids">
-                                                <StackPanel Orientation="Vertical" >
+                                                <StackPanel Orientation="Vertical">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Label Content="Alternates for : "/>
-                                                        <Label x:Name="lblAlternateMids"/>
+                                                        <Label Content="Alternates for : " />
+                                                        <Label x:Name="lblAlternateMids" />
                                                     </StackPanel>
                                                     <ListBox x:Name="lbAlternateMids">
                                                         <ListBox.ContextMenu>
                                                             <ContextMenu>
-                                                                <MenuItem Header="Use Alt" Click="CapitalRouteContextMenuUseAlt_Click"/>
+                                                                <MenuItem Header="Use Alt" Click="CapitalRouteContextMenuUseAlt_Click" />
                                                             </ContextMenu>
                                                         </ListBox.ContextMenu>
                                                     </ListBox>
@@ -509,7 +510,6 @@
                                     </ScrollViewer>
                                 </Grid>
                             </xcadl:LayoutAnchorable>
-
 
                             <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>

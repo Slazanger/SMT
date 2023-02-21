@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using ESI.NET.Models.Bookmarks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using SMT.EVEData;
@@ -26,9 +27,9 @@ namespace SMT
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string SMT_VERSION = "SMT_111";
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
+        private Overlay overlayWindow;
 
         private MediaPlayer mediaPlayer;
         private PreferencesWindow preferencesWindow;
@@ -38,7 +39,12 @@ namespace SMT
 
         private List<InfoItem> InfoLayer;
 
+        private Dictionary<string, long> CharacterNameIDCache;
+        private Dictionary<long, string> CharacterIDNameCache;
+
         public JumpRoute CapitalRoute { get; set; }
+
+        public EventHandler OnSelectedCharChangedEventHandler;
 
         /// <summary>
         /// Main Window
@@ -52,12 +58,15 @@ namespace SMT
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
             mediaPlayer.Open(woopUri);
 
+            CharacterNameIDCache = new Dictionary<string, long>();
+            CharacterIDNameCache = new Dictionary<long, string>();
+
             InitializeComponent();
 
-            Title = "SMT (a new step : " + SMT_VERSION + ")";
+            Title = "SMT (null is purple : " + EveAppConfig.SMT_VERSION + ")";
 
             // Load the Dock Manager Layout file
-            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
+            string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
             if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
@@ -78,7 +87,7 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
+            string mapConfigFileName = EveAppConfig.VersionStorage + "MapConfig.dat";
 
             if (File.Exists(mapConfigFileName))
             {
@@ -107,7 +116,7 @@ namespace SMT
 
             CapitalRoute = new JumpRoute();
 
-            EVEManager = new EVEData.EveManager(SMT_VERSION);
+            EVEManager = new EVEData.EveManager(EveAppConfig.SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
             EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
 
@@ -115,6 +124,7 @@ namespace SMT
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
             bool initFromScratch = false;
+
             if (initFromScratch)
             {
                 EVEManager.CreateFromScratch();
@@ -140,8 +150,8 @@ namespace SMT
             IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
             idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
 
-            EVEManager.IntelDataList.Add(id);
-            EVEManager.IntelDataList.Add(idtwo);
+            EVEManager.IntelDataList.Enqueue(id);
+            EVEManager.IntelDataList.Enqueue(idtwo);
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -173,7 +183,10 @@ namespace SMT
 
             // load any custom universe view layout
             // Save any custom map Layout
-            string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+
+
+            string customLayoutFile = EveAppConfig.VersionStorage + "CustomUniverseLayout.txt";
+
             if (File.Exists(customLayoutFile))
             {
                 try
@@ -413,7 +426,9 @@ namespace SMT
         {
             // save off the dockmanager layout
 
-            string dockManagerLayoutName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\Layout.dat";
+            string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
+
+
             try
             {
                 AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
@@ -432,7 +447,8 @@ namespace SMT
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
                 // Save the Map Colours
-                string mapConfigFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\MapConfig.dat";
+                string mapConfigFileName = EveAppConfig.VersionStorage + "MapConfig.dat";
+
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -454,7 +470,8 @@ namespace SMT
                 }
 
                 // Save any custom map Layout
-                string customLayoutFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMT\\" + SMT_VERSION + "\\CustomUniverseLayout.txt";
+                string customLayoutFile = EveAppConfig.VersionStorage + "CustomUniverseLayout.txt";
+
                 using (TextWriter tw = new StreamWriter(customLayoutFile))
                 {
                     foreach (EVEData.System s in EVEManager.Systems)
@@ -648,6 +665,51 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
         }
 
+        private void ClearOldEVELogs_Click(object sender, RoutedEventArgs e)
+        {
+            string EVEGameLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Gamelogs";
+            {
+                DirectoryInfo di = new DirectoryInfo(EVEGameLogFolder);
+                FileInfo[] files = di.GetFiles("*.txt");
+                foreach (FileInfo file in files)
+                {
+                    // keep only recent files
+                    if (file.CreationTime < DateTime.Now.AddDays(-1))
+                    {
+                        try
+                        {
+                            File.Delete(file.FullName);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+
+            string EVEChatLogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\Chatlogs";
+            {
+                DirectoryInfo di = new DirectoryInfo(EVEChatLogFolder);
+                FileInfo[] files = di.GetFiles("*.txt");
+                foreach (FileInfo file in files)
+                {
+                    // keep only recent files
+                    if (file.CreationTime < DateTime.Now.AddDays(-1))
+                    {
+                        try
+                        {
+                            File.Delete(file.FullName);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+        }
+
+
+
         private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (miFullScreenToggle.IsChecked)
@@ -697,7 +759,7 @@ namespace SMT
             try
             {
                 HttpClient hc = new HttpClient();
-                hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", SMT_VERSION));
+                hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", EveAppConfig.SMT_VERSION));
                 var response = await hc.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 strContent = await response.Content.ReadAsStringAsync();
@@ -711,13 +773,13 @@ namespace SMT
 
             if (releaseInfo != null)
             {
-                if (releaseInfo.TagName != SMT_VERSION)
+                if (releaseInfo.TagName != EveAppConfig.SMT_VERSION)
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         NewVersionWindow nw = new NewVersionWindow();
                         nw.ReleaseInfo = releaseInfo.Body;
-                        nw.CurrentVersion = SMT_VERSION;
+                        nw.CurrentVersion = EveAppConfig.SMT_VERSION;
                         nw.NewVersion = releaseInfo.TagName;
                         nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
                         nw.Owner = this;
@@ -731,7 +793,9 @@ namespace SMT
 
         #region Characters
 
-        public EVEData.LocalCharacter ActiveCharacter { get; set; }
+        // Property now automatically fires an event when the active character changes.
+        private EVEData.LocalCharacter activeCharacter;
+        public EVEData.LocalCharacter ActiveCharacter { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty); } }
 
         /// <summary>
         ///  Add Character Button Clicked
@@ -861,7 +925,7 @@ namespace SMT
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                EVEManager.IntelDataList.Clear();
+                EVEManager.IntelDataList.ClearAll();
             }), DispatcherPriority.ApplicationIdle);
         }
 
@@ -869,7 +933,7 @@ namespace SMT
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                EVEManager.GameLogList.Clear();
+                EVEManager.GameLogList.ClearAll();
             }), DispatcherPriority.ApplicationIdle);
         }
 
@@ -947,7 +1011,6 @@ namespace SMT
                         }
                     }
 
-
                     break;
                 }
             }
@@ -981,13 +1044,10 @@ namespace SMT
                         }
                     }
 
-
                     break;
                 }
             }
         }
-
-
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -1091,6 +1151,7 @@ namespace SMT
                 RegionUC.ActiveCharacter.AddDestination(s.ID, false);
             }
         }
+
         private void AddJumpWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
             if (JumpRouteSystemDropDownAC.SelectedItem == null)
@@ -1112,7 +1173,6 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
 
@@ -1137,12 +1197,8 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
-
-
-
 
         private void ClearWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1174,7 +1230,6 @@ namespace SMT
             });
         }
 
-
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
@@ -1189,7 +1244,6 @@ namespace SMT
                 catch { }
             }
         }
-
 
         private void ReCalculateRouteBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1531,7 +1585,6 @@ namespace SMT
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
-
             }
         }
 
@@ -1548,7 +1601,6 @@ namespace SMT
             {
                 string KillURL = "https://zkillboard.com/kill/" + zkbs.KillID + "/";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
-
             }
         }
 
@@ -1645,7 +1697,7 @@ namespace SMT
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
-            string infoObjectsFile = AppDomain.CurrentDomain.BaseDirectory + @"\EVEData\data\InfoObjects.txt";
+            string infoObjectsFile = AppDomain.CurrentDomain.BaseDirectory + @"\\data\InfoObjects.txt";
             if (File.Exists(infoObjectsFile))
             {
                 StreamReader file = new StreamReader(infoObjectsFile);
@@ -1723,10 +1775,10 @@ namespace SMT
                             ii.DrawType = InfoItem.ShapeType.ArcLine;
                         }
 
-                        ii.X1 = (int)fromMS.LayoutX;
-                        ii.Y1 = (int)fromMS.LayoutY;
-                        ii.X2 = (int)toMS.LayoutX;
-                        ii.Y2 = (int)toMS.LayoutY;
+                        ii.X1 = (int)fromMS.Layout.X;
+                        ii.Y1 = (int)fromMS.Layout.Y;
+                        ii.X2 = (int)toMS.Layout.X;
+                        ii.Y2 = (int)toMS.Layout.Y;
                         ii.Size = lineThickness;
                         ii.Region = region;
                         ii.Fill = c;
@@ -1758,8 +1810,8 @@ namespace SMT
 
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Circle;
-                        ii.X1 = (int)fromMS.LayoutX;
-                        ii.Y1 = (int)fromMS.LayoutY;
+                        ii.X1 = (int)fromMS.Layout.X;
+                        ii.Y1 = (int)fromMS.Layout.Y;
                         ii.Size = radius;
                         ii.Region = region;
                         ii.Fill = c;
@@ -1839,7 +1891,6 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
 
@@ -1860,13 +1911,12 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
-
             }
         }
 
         private void CurrentCapitalRouteItem_Selected(object sender, RoutedEventArgs e)
         {
-            if(dgCapitalRouteCurrentRoute.SelectedItem != null)
+            if (dgCapitalRouteCurrentRoute.SelectedItem != null)
             {
                 Navigation.RoutePoint rp = dgCapitalRouteCurrentRoute.SelectedItem as Navigation.RoutePoint;
                 string sel = rp.SystemName;
@@ -1874,7 +1924,7 @@ namespace SMT
                 UniverseUC.ShowSystem(sel);
 
                 lblAlternateMids.Content = sel;
-                if(CapitalRoute.AlternateMids.ContainsKey(sel))
+                if (CapitalRoute.AlternateMids.ContainsKey(sel))
                 {
                     lbAlternateMids.ItemsSource = CapitalRoute.AlternateMids[sel];
                 }
@@ -1882,29 +1932,25 @@ namespace SMT
                 {
                     lbAlternateMids.ItemsSource = null;
                 }
-                
             }
-
         }
 
         private void CapitalWaypointsContextMenuMoveUp_Click(object sender, RoutedEventArgs e)
         {
-            if(capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != 0)
+            if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != 0)
             {
                 CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex - 1);
                 CapitalRoute.Recalculate();
             }
-            
         }
 
         private void CapitalWaypointsContextMenuMoveDown_Click(object sender, RoutedEventArgs e)
         {
-            if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != CapitalRoute.WayPoints.Count -1 )
+            if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != CapitalRoute.WayPoints.Count - 1)
             {
                 CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex + 1);
                 CapitalRoute.Recalculate();
             }
-            
         }
 
         private void CapitalWaypointsContextMenuDelete_Click(object sender, RoutedEventArgs e)
@@ -1924,13 +1970,13 @@ namespace SMT
 
                 // need to find where to insert the new waypoint
                 int waypointIndex = -1;
-                foreach(Navigation.RoutePoint rp in CapitalRoute.CurrentRoute)
+                foreach (Navigation.RoutePoint rp in CapitalRoute.CurrentRoute)
                 {
-                    if(rp.SystemName == CapitalRoute.WayPoints[waypointIndex +1])
+                    if (rp.SystemName == CapitalRoute.WayPoints[waypointIndex + 1])
                     {
                         waypointIndex++;
                     }
-                    if(CapitalRoute.AlternateMids.ContainsKey(rp.SystemName))
+                    if (CapitalRoute.AlternateMids.ContainsKey(rp.SystemName))
                     {
                         foreach (string alt in CapitalRoute.AlternateMids[rp.SystemName])
                         {
@@ -1946,7 +1992,30 @@ namespace SMT
                 CapitalRoute.Recalculate();
             }
         }
-        
+
+        private void btnUnseenFits_Click(object sender, RoutedEventArgs e)
+        {
+            string KillURL = "https://zkillboard.com/character/93280351/losses/";
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(KillURL) { UseShellExecute = true });
+        }
+
+        private void OverlayWindow_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (overlayWindow != null)
+            {
+                return;
+            }
+
+            overlayWindow = new Overlay(this);
+            overlayWindow.Closing += OnOverlayWindowClosing;
+            overlayWindow.Show();
+        }
+
+        public void OnOverlayWindowClosing(object sender, CancelEventArgs e)
+        {
+            overlayWindow = null;
+        }
+
     }
 
     /// <summary>

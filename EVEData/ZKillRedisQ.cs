@@ -42,7 +42,7 @@ namespace SMT.EVEData
             backgroundWorker.RunWorkerCompleted += zkb_DoWorkComplete;
 
             DispatcherTimer dp = new DispatcherTimer();
-            dp.Interval = TimeSpan.FromSeconds(10);
+            dp.Interval = TimeSpan.FromSeconds(20);
             dp.Tick += Dp_Tick;
             dp.Start();
         }
@@ -95,7 +95,7 @@ namespace SMT.EVEData
 
                 zs.KillTime = z.Package.Killmail.KillmailTime.ToLocalTime();
                 string shipID = z.Package.Killmail.Victim.ShipTypeId.ToString();
-                if (EveManager.Instance.ShipTypes.Keys.Contains(shipID))
+                if (EveManager.Instance.ShipTypes.ContainsKey(shipID))
                 {
                     zs.ShipType = EveManager.Instance.ShipTypes[shipID];
                 }
@@ -123,7 +123,7 @@ namespace SMT.EVEData
             {
                 if (KillStream[i].VictimAllianceName == string.Empty)
                 {
-                    if (!EveManager.Instance.AllianceIDToTicker.Keys.Contains(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
+                    if (!EveManager.Instance.AllianceIDToTicker.ContainsKey(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
                     {
                         AllianceIDs.Add(KillStream[i].VictimAllianceID);
                     }

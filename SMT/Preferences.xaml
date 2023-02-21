@@ -80,6 +80,14 @@
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrigInvasions}" Content="Show Trig Invasions" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=FollowOnZoom}" Content="Follow Selected System when Zoomed" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ClampMaxESIOverlayValue}" Content="Clamp overlay Data to Maximum" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,0">
+                                        <xctk:IntegerUpDown Margin="1,3" Value="{Binding Path=MaxESIOverlayValue}" Minimum="30" Maximum="300" Width="60"  Foreground="White" />
+                                        <Label>Maximum Overlay Size</Label>
+                                    </StackPanel>
+
+
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -216,6 +224,68 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
+                <TabItem Header="Overlay">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <GroupBox Header="General" Margin="4" Height="355">
+                                <StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Overlay Window Background Opacity" />
+                                        <Slider x:Name="overlay_BackgroundOpacitySlider" Value="{Binding Path=OverlayBackgroundOpacity}" Minimum="0.05" Maximum="1.0" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Overlay Window Content Opacity" />
+                                        <Slider x:Name="overlay_OpacitySlider" Value="{Binding Path=OverlayOpacity}" Minimum="0.05" Maximum="1.0" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Margin="0,2">
+                                        <Label Content="Overlay Jump Range" />
+                                        <Slider x:Name="overlay_RangeSlider" Value="{Binding Path=OverlayRange}" Minimum="1" Maximum="10" TickFrequency="1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=IntelFreshTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="1" Maximum="900" Background="Transparent"  Foreground="White" />
+                                        <Label Content="First, Intel is fresh for x seconds" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=IntelStaleTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" />
+                                        <Label Content="Then, Intel is stale for x seconds" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <xctk:IntegerUpDown Value="{Binding Path=IntelHistoricTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
+                                        <Label Content="Finally, Intel is historic for x seconds" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <GroupBox Margin="4" Height="355">
+                                <StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Margin="0,0">
+                                        <Label Content="Overlay Information" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharName}" Content="Show name of the active character" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharLocation}" Content="Show location of the active character" />
+                                        <Label Content="Hunter Mode Information" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKills}" Content="Show NPC kills" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="Show the current route" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+
                 <TabItem Header="Colours">
                     <Grid Height="362">
                         <ScrollViewer>

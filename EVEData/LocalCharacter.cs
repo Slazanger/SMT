@@ -22,8 +22,6 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public SemaphoreSlim UpdateLock;
 
-
-
         [XmlIgnoreAttribute]
         public bool warningSystemsNeedsUpdate;
 
@@ -146,7 +144,6 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public ObservableCollection<Navigation.RoutePoint> ActiveRoute { get; set; }
-
 
         public bool DangerZoneActive { get; set; }
         public bool DeepSearchEnabled { get; set; }
@@ -388,7 +385,6 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public ObservableCollection<string> JumpWaypoints { get; set; }
 
-
         /// <summary>
         /// Add Destination to the route
         /// </summary>
@@ -411,7 +407,6 @@ namespace SMT.EVEData
             esiRouteNeedsUpdate = true;
         }
 
-
         public void ClearAllWaypoints()
         {
             lock (ActiveRouteLock)
@@ -422,7 +417,6 @@ namespace SMT.EVEData
             routeNeedsUpdate = true;
             esiSendRouteClear = true;
         }
-
 
         public async Task<List<JumpBridge>> FindJumpGates(string JumpBridgeFilterString = " » ")
         {
@@ -559,7 +553,6 @@ namespace SMT.EVEData
             return ClipboardText;
         }
 
-
         public void RecalcRoute()
         {
             routeNeedsUpdate = true;
@@ -608,7 +601,6 @@ namespace SMT.EVEData
                     routeNeedsUpdate = false;
                     UpdateActiveRoute();
                 }
-
 
                 if (warningSystemsNeedsUpdate)
                 {
@@ -831,7 +823,6 @@ namespace SMT.EVEData
                 esiRouteUpdating = false;
             }
         }
-
 
         /// <summary>
         /// Update the characters FleetInfo
@@ -1181,7 +1172,7 @@ namespace SMT.EVEData
 
                 if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
                 {
-                    if (!EveManager.Instance.SystemIDToName.Keys.Contains(esr.Data.SolarSystemId))
+                    if (!EveManager.Instance.SystemIDToName.ContainsKey(esr.Data.SolarSystemId))
                     {
                         Location = "";
                         Region = "";

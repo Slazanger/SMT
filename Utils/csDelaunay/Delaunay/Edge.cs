@@ -28,7 +28,7 @@
             dy = s1.y - s0.y;
             absdx = dx > 0 ? dx : -dx;
             absdy = dy > 0 ? dy : -dy;
-            c = s0.x * dx + s0.y * dy + (dx * dx + dy * dy) * 0.5f;
+            c = (s0.x * dx) + (s0.y * dy) + (((dx * dx) + (dy * dy)) * 0.5f);
 
             if (absdx > absdy)
             {
@@ -189,7 +189,7 @@
                 {
                     return;
                 }
-                x0 = c - b * y0;
+                x0 = c - (b * y0);
 
                 y1 = ymax;
                 if (vertex1 != null && vertex1.y < ymax)
@@ -200,7 +200,7 @@
                 {
                     return;
                 }
-                x1 = c - b * y1;
+                x1 = c - (b * y1);
 
                 if ((x0 > xmax && x1 > xmax) || (x0 < xmin && x1 < xmin))
                 {
@@ -240,7 +240,7 @@
                 {
                     return;
                 }
-                y0 = c - a * x0;
+                y0 = c - (a * x0);
 
                 x1 = xmax;
                 if (vertex1 != null && vertex1.x < xmax)
@@ -251,7 +251,7 @@
                 {
                     return;
                 }
-                y1 = c - a * x1;
+                y1 = c - (a * x1);
 
                 if ((y0 > ymax && y1 > ymax) || (y0 < ymin && y1 < ymin))
                 {

@@ -15,6 +15,7 @@ namespace SMT
     public partial class RegionsViewControl : UserControl
     {
         private List<UIElement> dynamicRegionsViewElements = new List<UIElement>();
+        private List<UIElement> dynamicRegionsViewHighlightElements = new List<UIElement>();
 
         public MapConfig MapConf { get; set; }
         public EVEData.LocalCharacter ActiveCharacter { get; set; }
@@ -63,6 +64,12 @@ namespace SMT
                     MainUniverseCanvas.Children.Remove(uie);
                 }
                 dynamicRegionsViewElements.Clear();
+
+                foreach (UIElement uie in dynamicRegionsViewHighlightElements)
+                {
+                    MainUniverseCanvas.Children.Remove(uie);
+                }
+                dynamicRegionsViewHighlightElements.Clear();
             }
 
             AddDataToUniverse();
@@ -98,6 +105,78 @@ namespace SMT
             else
             {
                 RegionCharacterInfo.IsOpen = false;
+            }
+        }
+
+        private void RegionShape_MouseOverHandler(object sender, MouseEventArgs e)
+        {
+            Shape obj = sender as Shape;
+            EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
+
+            if (obj.IsMouseOver)
+            {
+                Brush HighlightOutlineBrush = new SolidColorBrush(Colors.Black);
+                Brush ConnectedHighlightOutlineBrush = new SolidColorBrush(Colors.SlateGray);
+
+                // add circle for system
+                Rectangle regionShape = new Rectangle() { Height = 60, Width = 180 };
+                regionShape.Stroke = HighlightOutlineBrush;
+                regionShape.StrokeThickness = 6;
+                regionShape.StrokeLineJoin = PenLineJoin.Round;
+                regionShape.RadiusX = 10;
+                regionShape.RadiusY = 10;
+                regionShape.IsHitTestVisible = false;
+
+                Canvas.SetLeft(regionShape, selectedRegion.UniverseViewX - 90);
+                Canvas.SetTop(regionShape, selectedRegion.UniverseViewY - 30);
+                Canvas.SetZIndex(regionShape, 23);
+                MainUniverseCanvas.Children.Add(regionShape);
+                dynamicRegionsViewHighlightElements.Add(regionShape);
+
+                // now add connected regions
+                foreach (string s in selectedRegion.RegionLinks)
+                {
+                    EVEData.MapRegion mr = EVEData.EveManager.Instance.GetRegion(s);
+
+                    // add circle for system
+                    Rectangle connectedRegion = new Rectangle() { Height = 60, Width = 180 };
+                    connectedRegion.Stroke = ConnectedHighlightOutlineBrush;
+                    connectedRegion.StrokeThickness = 6;
+                    connectedRegion.StrokeLineJoin = PenLineJoin.Round;
+                    connectedRegion.RadiusX = 10;
+                    connectedRegion.RadiusY = 10;
+                    connectedRegion.IsHitTestVisible = false;
+
+                    Canvas.SetLeft(connectedRegion, mr.UniverseViewX - 90);
+                    Canvas.SetTop(connectedRegion, mr.UniverseViewY - 30);
+                    Canvas.SetZIndex(connectedRegion, 23);
+                    MainUniverseCanvas.Children.Add(connectedRegion);
+                    dynamicRegionsViewHighlightElements.Add(connectedRegion);
+
+                    Line regionLink = new Line();
+
+                    regionLink.X1 = mr.UniverseViewX;
+                    regionLink.Y1 = mr.UniverseViewY;
+
+                    regionLink.X2 = selectedRegion.UniverseViewX;
+                    regionLink.Y2 = selectedRegion.UniverseViewY;
+
+                    regionLink.Stroke = ConnectedHighlightOutlineBrush;
+                    regionLink.StrokeThickness = 3;
+                    regionLink.Visibility = Visibility.Visible;
+
+                    Canvas.SetZIndex(regionLink, 21);
+                    MainUniverseCanvas.Children.Add(regionLink);
+                    dynamicRegionsViewHighlightElements.Add(regionLink);
+                }
+            }
+            else
+            {
+                foreach (UIElement uie in dynamicRegionsViewHighlightElements)
+                {
+                    MainUniverseCanvas.Children.Remove(uie);
+                }
+                dynamicRegionsViewHighlightElements.Clear();
             }
         }
 
@@ -182,21 +261,21 @@ namespace SMT
 
                 if (addTheraConnection)
                 {
-                    Rectangle theraShape = new Rectangle() { Width = 8, Height = 8 };
+                    Rectangle theraShape = new Rectangle() { Width = 16, Height = 16 };
 
                     theraShape.Stroke = sysOutlineBrush;
-                    theraShape.StrokeThickness = 1;
+                    theraShape.StrokeThickness = 2;
                     theraShape.StrokeLineJoin = PenLineJoin.Round;
-                    theraShape.RadiusX = 2;
-                    theraShape.RadiusY = 2;
+                    theraShape.RadiusX = 4;
+                    theraShape.RadiusY = 4;
                     theraShape.Fill = theraBrush;
 
                     theraShape.DataContext = mr;
                     theraShape.MouseEnter += RegionThera_ShapeMouseOverHandler;
                     theraShape.MouseLeave += RegionThera_ShapeMouseOverHandler;
 
-                    Canvas.SetLeft(theraShape, mr.UniverseViewX + 28);
-                    Canvas.SetTop(theraShape, mr.UniverseViewY + 3);
+                    Canvas.SetLeft(theraShape, mr.UniverseViewX + 56);
+                    Canvas.SetTop(theraShape, mr.UniverseViewY + 6);
                     Canvas.SetZIndex(theraShape, 22);
                     MainUniverseCanvas.Children.Add(theraShape);
                     dynamicRegionsViewElements.Add(theraShape);
@@ -215,21 +294,21 @@ namespace SMT
 
                 if (addCharacter && MapConf.ShowCharacterNamesOnMap)
                 {
-                    Rectangle characterShape = new Rectangle() { Width = 8, Height = 8 };
+                    Rectangle characterShape = new Rectangle() { Width = 16, Height = 16 };
 
                     characterShape.Stroke = sysOutlineBrush;
-                    characterShape.StrokeThickness = 1;
+                    characterShape.StrokeThickness = 2;
                     characterShape.StrokeLineJoin = PenLineJoin.Round;
-                    characterShape.RadiusX = 2;
-                    characterShape.RadiusY = 2;
+                    characterShape.RadiusX = 4;
+                    characterShape.RadiusY = 4;
                     characterShape.Fill = characterBrush;
 
                     characterShape.DataContext = mr;
                     characterShape.MouseEnter += RegionCharacter_ShapeMouseOverHandler;
                     characterShape.MouseLeave += RegionCharacter_ShapeMouseOverHandler;
 
-                    Canvas.SetLeft(characterShape, mr.UniverseViewX + 28);
-                    Canvas.SetTop(characterShape, mr.UniverseViewY - 11);
+                    Canvas.SetLeft(characterShape, mr.UniverseViewX + 56);
+                    Canvas.SetTop(characterShape, mr.UniverseViewY - 22);
                     Canvas.SetZIndex(characterShape, 23);
                     MainUniverseCanvas.Children.Add(characterShape);
                     dynamicRegionsViewElements.Add(characterShape);
@@ -257,15 +336,17 @@ namespace SMT
             foreach (EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
             {
                 // add circle for system
-                Rectangle regionShape = new Rectangle() { Height = 30, Width = 80 };
+                Rectangle regionShape = new Rectangle() { Height = 60, Width = 180 };
                 regionShape.Stroke = sysOutlineBrush;
-                regionShape.StrokeThickness = 1.5;
+                regionShape.StrokeThickness = 3;
                 regionShape.StrokeLineJoin = PenLineJoin.Round;
-                regionShape.RadiusX = 5;
-                regionShape.RadiusY = 5;
+                regionShape.RadiusX = 10;
+                regionShape.RadiusY = 10;
                 regionShape.Fill = sysInRegionBrush;
                 regionShape.MouseDown += RegionShape_MouseDown;
                 regionShape.DataContext = mr;
+                regionShape.MouseEnter += RegionShape_MouseOverHandler;
+                regionShape.MouseLeave += RegionShape_MouseOverHandler;
 
                 if (mr.Faction == "Amarr")
                 {
@@ -434,17 +515,18 @@ namespace SMT
                     regionShape.Fill = new SolidColorBrush(c);
                 }
 
-                Canvas.SetLeft(regionShape, mr.UniverseViewX - 40);
-                Canvas.SetTop(regionShape, mr.UniverseViewY - 15);
+                Canvas.SetLeft(regionShape, mr.UniverseViewX - 90);
+                Canvas.SetTop(regionShape, mr.UniverseViewY - 30);
                 Canvas.SetZIndex(regionShape, 22);
                 MainUniverseCanvas.Children.Add(regionShape);
 
                 Label regionText = new Label();
-                regionText.Width = 80;
-                regionText.Height = 27;
+                regionText.Width = 180;
+                regionText.Height = 54;
                 regionText.Content = mr.Name;
                 regionText.Foreground = sysOutlineBrush;
-                regionText.FontSize = 10;
+                regionText.FontSize = 24;
+                regionText.FontWeight = FontWeights.Bold;
                 regionText.HorizontalAlignment = HorizontalAlignment.Center;
                 regionText.VerticalAlignment = VerticalAlignment.Center;
                 regionText.IsHitTestVisible = false;
@@ -452,19 +534,19 @@ namespace SMT
                 regionText.HorizontalContentAlignment = HorizontalAlignment.Center;
                 regionText.VerticalContentAlignment = VerticalAlignment.Center;
 
-                Canvas.SetLeft(regionText, mr.UniverseViewX - 40);
-                Canvas.SetTop(regionText, mr.UniverseViewY - 15);
+                Canvas.SetLeft(regionText, mr.UniverseViewX - 90);
+                Canvas.SetTop(regionText, mr.UniverseViewY - 30);
                 Canvas.SetZIndex(regionText, 23);
                 MainUniverseCanvas.Children.Add(regionText);
 
                 if (!string.IsNullOrEmpty(mr.Faction))
                 {
                     Label factionText = new Label();
-                    factionText.Width = 80;
-                    factionText.Height = 30;
+                    factionText.Width = 180;
+                    factionText.Height = 60;
                     factionText.Content = mr.Faction;
                     factionText.Foreground = sysOutlineBrush;
-                    factionText.FontSize = 6;
+                    factionText.FontSize = 12;
                     factionText.HorizontalAlignment = HorizontalAlignment.Center;
                     factionText.VerticalAlignment = VerticalAlignment.Center;
                     factionText.IsHitTestVisible = false;
@@ -472,8 +554,8 @@ namespace SMT
                     factionText.HorizontalContentAlignment = HorizontalAlignment.Center;
                     factionText.VerticalContentAlignment = VerticalAlignment.Bottom;
 
-                    Canvas.SetLeft(factionText, mr.UniverseViewX - 40);
-                    Canvas.SetTop(factionText, mr.UniverseViewY - 15);
+                    Canvas.SetLeft(factionText, mr.UniverseViewX - 90);
+                    Canvas.SetTop(factionText, mr.UniverseViewY - 30);
                     Canvas.SetZIndex(factionText, 23);
                     MainUniverseCanvas.Children.Add(factionText);
                 }
@@ -491,7 +573,7 @@ namespace SMT
                     regionLink.Y2 = or.UniverseViewY;
 
                     regionLink.Stroke = sysOutlineBrush;
-                    regionLink.StrokeThickness = 1;
+                    regionLink.StrokeThickness = 2;
                     regionLink.Visibility = Visibility.Visible;
 
                     Canvas.SetZIndex(regionLink, 21);

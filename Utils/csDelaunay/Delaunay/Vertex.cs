@@ -67,15 +67,15 @@
                 return null;
             }
 
-            determinant = edge0.a * edge1.b - edge0.b * edge1.a;
+            determinant = (edge0.a * edge1.b) - (edge0.b * edge1.a);
             if (Math.Abs(determinant) < 1E-10)
             {
                 // The edges are parallel
                 return null;
             }
 
-            intersectionX = (edge0.c * edge1.b - edge1.c * edge0.b) / determinant;
-            intersectionY = (edge1.c * edge0.a - edge0.c * edge1.a) / determinant;
+            intersectionX = ((edge0.c * edge1.b) - (edge1.c * edge0.b)) / determinant;
+            intersectionY = ((edge1.c * edge0.a) - (edge0.c * edge1.a)) / determinant;
 
             if (Voronoi.CompareByYThenX(edge0.RightSite, edge1.RightSite) < 0)
             {

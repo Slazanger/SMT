@@ -2,6 +2,7 @@
 // System
 //-----------------------------------------------------------------------
 
+using System.Numerics;
 using System.Xml.Serialization;
 
 namespace SMT.EVEData
@@ -86,6 +87,11 @@ namespace SMT.EVEData
         public double ActualZ { get; set; }
 
         /// <summary>
+        /// A property to get the coordinate in real space for this system as a Vector3
+        /// </summary>
+        public Vector3 Actual { get => new Vector3((float)ActualX, (float)ActualY, (float)ActualZ); }
+
+        /// <summary>
         /// the 2d X coordinate used to render on the universe view
         /// </summary>
         public double UniverseX { get; set; }
@@ -94,6 +100,11 @@ namespace SMT.EVEData
         /// the 2d Y coordinate used to render on the universe view
         /// </summary>
         public double UniverseY { get; set; }
+
+        /// <summary>
+        /// A property to get the coordinate used to render the system on the universe view as a Vector3
+        /// </summary>
+        public Vector2 Universe { get => new Vector2((float)UniverseX, (float)UniverseY); }
 
         [XmlIgnoreAttribute]
         public bool CustomUniverseLayout { get; set; }
@@ -107,7 +118,11 @@ namespace SMT.EVEData
 
         public bool HasIceBelt { get; set; }
 
+        public bool HasBlueA0Star { get; set; }
+
         public bool HasJoveObservatory { get; set; }
+
+        public bool FactionWarSystem { get; set; }
 
         [XmlIgnoreAttribute]
         public bool HasJumpBeacon { get; set; }

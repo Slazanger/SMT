@@ -122,7 +122,6 @@ namespace SMT
 
         public MapConfig MapConf { get; set; }
 
-
         public bool FollowCharacter
         {
             get
@@ -498,7 +497,7 @@ namespace SMT
                     double Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
                     Distance = Distance / 9460730472580800.0;
 
-                    if (Distance < kvp.Value && Distance > 0.0 && es.TrueSec <= 0.45)
+                    if (Distance < kvp.Value && Distance > 0.0 && es.TrueSec <= 0.45 && es.Region != "Pochven")
                     {
                         if (inRange == true)
                         {
@@ -686,7 +685,6 @@ namespace SMT
             {
                 string uRL = string.Format("https://evewho.com/alliance/{0}", ID);
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
-
             }
         }
 
@@ -696,12 +694,18 @@ namespace SMT
         }
 
         private Brush SystemColourBrush;
+        private Brush SystemColourHiSecBrush;
+        private Brush SystemColourLowSecBrush;
+        private Brush SystemColourNullSecBrush;
+        private Brush SystemColourOutlineBrush;
+
         private Brush ConstellationColourBrush;
         private Brush SystemTextColourBrush;
         private Brush RegionTextColourBrush;
         private Brush RegionTextZoomedOutColourBrush;
         private Brush GateColourBrush;
         private Brush RegionGateColourBrush;
+        private Brush PochvenGateColourBrush;
         private Brush JumpBridgeColourBrush;
         private Brush DataColourBrush;
         private Brush BackgroundColourBrush;
@@ -723,6 +727,11 @@ namespace SMT
             if (FullRedraw)
             {
                 SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemColour);
+                SystemColourHiSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(1.0, false));
+                SystemColourLowSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(0.4, false));
+                SystemColourNullSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(-0.5, true));
+                SystemColourOutlineBrush = new SolidColorBrush(Colors.Black);
+
                 ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseConstellationGateColour);
                 SystemTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemTextColour);
                 RegionTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
@@ -732,16 +741,23 @@ namespace SMT
                 DataColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
                 BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseMapBackgroundColour);
                 RegionGateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseRegionGateColour);
+                PochvenGateColourBrush = new SolidColorBrush(Colors.DimGray);
 
                 Color RegionShapeFillCol = MapConf.ActiveColourScheme.UniverseMapBackgroundColour;
-                RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.9);
-                RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.9);
-                RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.9);
+                RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.8);
+                RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.8);
+                RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.8);
 
                 RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
 
                 SystemColourBrush.Freeze();
+                SystemColourHiSecBrush.Freeze();
+                SystemColourLowSecBrush.Freeze();
+                SystemColourNullSecBrush.Freeze();
+                SystemColourOutlineBrush.Freeze();
+
                 ConstellationColourBrush.Freeze();
+
                 SystemTextColourBrush.Freeze();
                 RegionTextColourBrush.Freeze();
                 GateColourBrush.Freeze();
@@ -780,6 +796,8 @@ namespace SMT
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
                 Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
+                Pen SysOutlinePen = new Pen(SystemColourOutlineBrush, 0.3);
+                Pen PochvenGatePen = new Pen(PochvenGateColourBrush, 0.3);
 
                 System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
@@ -803,10 +821,16 @@ namespace SMT
                         p = RegionGatePen;
                     }
 
+                    if (gh.from.Region == "Pochven")
+                    {
+                        p = PochvenGatePen;
+                    }
+
                     gatesDrawingContext.DrawLine(p, new Point(X1, Y1), new Point(X2, Y2));
                 }
 
                 gatesDrawingContext.Close();
+                //gatesDrawingVisual.CacheMode = new BitmapCache(3);
                 VHLinks.AddChild(gatesDrawingVisual, "link");
 
                 if (ShowJumpBridges)
@@ -856,7 +880,25 @@ namespace SMT
 
                     // Create a rectangle and draw it in the DrawingContext.
                     Rect rect = new Rect(X - 2, Z - 2, 4, 4);
-                    drawingContext.DrawRectangle(SystemColourBrush, null, rect);
+
+                    Brush sysbrush = SystemColourNullSecBrush;
+                    if (sys.TrueSec >= 0.45)
+                    {
+                        sysbrush = SystemColourHiSecBrush;
+                    }
+                    else if (sys.TrueSec > 0.0)
+                    {
+                        sysbrush = SystemColourLowSecBrush;
+                    }
+
+                    if (sys.HasNPCStation)
+                    {
+                        drawingContext.DrawRectangle(sysbrush, SysOutlinePen, rect);
+                    }
+                    else
+                    {
+                        drawingContext.DrawEllipse(sysbrush, SysOutlinePen, new Point(X, Z), 2, 2);
+                    }
 
                     // Persist the drawing content.
                     drawingContext.Close();
@@ -880,38 +922,38 @@ namespace SMT
                     VHNames.AddChild(SystemTextVisual, null);
                 }
 
-                Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
-                foreach (EVEData.MapRegion mr in EM.Regions)
+                // region shapes
                 {
-                    List<Point> scaledRegionPoints = new List<Point>();
+                    Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
+                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
 
-                    foreach (Point p in mr.RegionOutline)
+                    // Retrieve the DrawingContext in order to create new drawing content.
+                    DrawingContext drawingContext = dataDV.RenderOpen();
+
+                    foreach (EVEData.System sys in EM.Systems)
                     {
-                        double X = p.X;
+
+
+                        double X = sys.UniverseX;
 
                         // need to invert Z
-                        double Z = p.Y;
+                        double Z = sys.UniverseY;
 
-                        scaledRegionPoints.Add(new Point(X, Z));
+                        double blobSize = 55;
+
+
+                        drawingContext.DrawEllipse(RegionShapeColourBrush, RegionShapePen, new Point(X, Z), blobSize, blobSize);
+
+
                     }
+                    drawingContext.Close();
 
-                    StreamGeometry sg = new StreamGeometry();
-                    sg.FillRule = FillRule.Nonzero;
+                    dataDV.CacheMode = new BitmapCache(0.1);
+                    VHRegionShapes.AddChild(dataDV);
 
-                    using (StreamGeometryContext sgc = sg.Open())
-                    {
-                        sgc.BeginFigure(scaledRegionPoints[0], true, true);
-                        sgc.PolyLineTo(scaledRegionPoints.Skip(1).ToArray(), true, false);
-                    }
-
-                    System.Windows.Media.DrawingVisual RegionShapeVisual = new System.Windows.Media.DrawingVisual();
-                    DrawingContext regionShapeDrawingContext = RegionShapeVisual.RenderOpen();
-
-                    regionShapeDrawingContext.DrawGeometry(RegionShapeColourBrush, RegionShapePen, sg);
-
-                    regionShapeDrawingContext.Close();
-                    VHRegionShapes.AddChild(RegionShapeVisual, null);
                 }
+
+
             }
 
             if (DataRedraw)
@@ -1003,8 +1045,6 @@ namespace SMT
                 Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
                 Brush RouteBrush = new SolidColorBrush(Colors.Orange);
                 Brush RouteAltBrush = new SolidColorBrush(Colors.DarkRed);
-
-
 
                 if (MapConf.ShowCharacterNamesOnMap)
                 {
@@ -1109,21 +1149,17 @@ namespace SMT
                     }
                 }
 
-
                 if (CapitalRoute != null && CapitalRoute.CurrentRoute.Count > 1)
                 {
                     Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
                     dashedRoutePen.DashStyle = DashStyles.Dot;
                     Pen outlinePen = new Pen(activeRouteColour, 2);
-                    Pen outlineAltPen = new Pen(RouteAltBrush,2);
-
-
+                    Pen outlineAltPen = new Pen(RouteAltBrush, 2);
 
                     System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
 
                     //Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = routeVisual.RenderOpen();
-
 
                     // add the lines
                     for (int i = 1; i < CapitalRoute.CurrentRoute.Count; i++)
@@ -1132,9 +1168,6 @@ namespace SMT
 
                         EVEData.System sysA = EM.GetEveSystem(CapitalRoute.CurrentRoute[i - 1].SystemName);
                         EVEData.System sysB = EM.GetEveSystem(CapitalRoute.CurrentRoute[i].SystemName);
-
-
-
 
                         if (sysA != null && sysB != null)
                         {
@@ -1150,19 +1183,16 @@ namespace SMT
                             }
                             drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 6, 6);
 
-
                             //Create a rectangle and draw it in the DrawingContext.
                             drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
-
-
                         }
                     }
 
                     // add the alternates
                     List<string> alts = new List<string>();
-                    foreach(ObservableCollection<string> sss in CapitalRoute.AlternateMids.Values)
+                    foreach (ObservableCollection<string> sss in CapitalRoute.AlternateMids.Values)
                     {
-                        foreach(string s in sss)
+                        foreach (string s in sss)
                         {
                             if (!alts.Contains(s))
                             {
@@ -1170,26 +1200,22 @@ namespace SMT
                             }
                         }
                     }
-                    foreach(string s in alts)
+                    foreach (string s in alts)
                     {
                         EVEData.System sys = EM.GetEveSystem(s);
-                        if(s!=null)
+                        if (s != null)
                         {
                             double X = sys.UniverseX;
                             double Y = sys.UniverseY;
 
-                            drawingContext.DrawEllipse(RouteAltBrush, outlineAltPen, new Point( X, Y), 3 , 3);
-
+                            drawingContext.DrawEllipse(RouteAltBrush, outlineAltPen, new Point(X, Y), 3, 3);
                         }
-
                     }
 
                     drawingContext.Close();
 
                     VHRoute.AddChild(routeVisual, "ActiveRoute");
                 }
-
-
             }
         }
 
@@ -1251,6 +1277,11 @@ namespace SMT
 
             foreach (EVEData.MapRegion mr in EM.Regions)
             {
+                if (mr.MetaRegion || mr.Name == "Pochven")
+                {
+                    continue;
+                }
+
                 double X = mr.RegionX;
                 double Z = mr.RegionY;
 
@@ -1315,7 +1346,6 @@ namespace SMT
 
             string uRL = string.Format("http://evemaps.dotlan.net/map/{0}/{1}", rd.DotLanRef, eveSys.Name);
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
-
         }
 
         /// <summary>
@@ -1330,7 +1360,6 @@ namespace SMT
 
             string uRL = string.Format("https://zkillboard.com/system/{0}/", eveSys.ID);
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
-
         }
 
         private void SysContexMenuShowInRegion_Click(object sender, RoutedEventArgs e)

@@ -22,7 +22,8 @@
     <UseWindowsForms>True</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Platforms>x64</Platforms>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>smt_bomb_icon.ico</ApplicationIcon>
@@ -45,7 +46,8 @@
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <PlatformTarget>x64</PlatformTarget>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>False</EnableNETAnalyzers>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -171,8 +173,14 @@
     <Resource Include="Images\unknownChar.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\overlay_close.png" />
+    <Resource Include="Images\overlay_move.png" />
+    <Resource Include="Images\overlay_gatherer.png" />
+    <Resource Include="Images\overlay_hunter.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Dirkster.AvalonDock.Themes.Expression">
-      <Version>4.70.1</Version>
+      <Version>4.71.2</Version>
     </PackageReference>
     <PackageReference Include="DotNetKit.Wpf.AutoCompleteComboBox">
       <Version>1.4.0</Version>
@@ -180,21 +188,13 @@
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit">
       <Version>5.0.103</Version>
     </PackageReference>
-    <PackageReference Include="ESI.NET">
-      <Version>2021.12.12</Version>
-    </PackageReference>
-    <PackageReference Include="HtmlAgilityPack">
-      <Version>1.11.43</Version>
-    </PackageReference>
+    <PackageReference Include="ESI.NET" Version="2023.2.11" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
-      <Version>7.1.2</Version>
+      <Version>7.1.3</Version>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="WPFThemes.DarkBlend">
       <Version>1.0.8</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EVEData\EVEData.csproj" />

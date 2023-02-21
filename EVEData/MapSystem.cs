@@ -2,6 +2,7 @@
 // Map System
 //-----------------------------------------------------------------------
 
+using System.Numerics;
 using System.Windows;
 using System.Xml.Serialization;
 
@@ -25,15 +26,11 @@ namespace SMT.EVEData
         /// </summary>
         public List<Point> CellPoints { get; set; }
 
-        /// <summary>
-        /// Gets or sets the X Coordinate for the layout
-        /// </summary>
-        public double LayoutX { get; set; }
 
         /// <summary>
-        /// Gets or sets the Y Coordinate for the layout
+        /// A property to get the coordinate for the layout as a Vector2
         /// </summary>
-        public double LayoutY { get; set; }
+        public Vector2 Layout { get; set; }
 
         /// <summary>
         /// Gets or sets the Name of the system

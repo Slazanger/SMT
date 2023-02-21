@@ -68,7 +68,7 @@ namespace SMT.EVEData
                         itemsToKeep.Add(sigID);
 
                         // valid sig
-                        if (Anoms.Keys.Contains(sigID))
+                        if (Anoms.ContainsKey(sigID))
                         {
                             // updating an existing one
                             Anom an = Anoms[sigID];
