@@ -10,12 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ESI.NET" Version="2023.2.11" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="SvgNet" Version="3.3.3" /> 
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ESI.net\ESI.NET\ESI.NET.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 	<ItemGroup>
