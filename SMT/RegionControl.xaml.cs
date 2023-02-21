@@ -3373,14 +3373,6 @@ namespace SMT
                     FollowCharacter = false;
                     SelectSystem(selectedSys.Name);
                     
-                    /// SJS HACK!!!
-                    if(ActiveCharacter != null) 
-                    {
-                        ActiveCharacter.Location = selectedSys.Name;
-                        ActiveCharacter.Region = selectedSys.Region;
-
-                    }
-
                     ReDrawMap(redraw);
                 }
 
