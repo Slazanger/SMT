@@ -213,6 +213,7 @@ namespace SMT
 
         private bool gathererMode = true;
         private bool gathererModeIncludesAdjacentRegions = false;
+        private bool hunterModeShowFullRegion = false;
 
         private bool showNPCKillData = true;
         private float npcKillDeltaMaxSize = 40f;
@@ -236,6 +237,7 @@ namespace SMT
             this.Background.Opacity = mw.MapConf.OverlayBackgroundOpacity;
             overlay_Canvas.Opacity = mw.MapConf.OverlayOpacity;
             gathererMode = mw.MapConf.OverlayGathererMode;
+            hunterModeShowFullRegion = mw.MapConf.OverlayHunterModeShowFullRegion;
             showCharName = mw.MapConf.OverlayShowCharName;
             showCharLocation = mw.MapConf.OverlayShowCharLocation;
 
@@ -633,8 +635,8 @@ namespace SMT
 
                     if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
 
-                    Vector2 segmentStartCanvasCoordinate = systemData[segmentStart.SystemName].mapSystemCoordinate * canvasData.dimensions.X;
-                    Vector2 segmentEndCanvasCoordinate = systemData[segmentEnd.SystemName].mapSystemCoordinate * canvasData.dimensions.X;
+                    Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
+                    Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
 
                     routeLines[i - 1].X1 = segmentStartCanvasCoordinate.X;
                     routeLines[i - 1].Y1 = segmentStartCanvasCoordinate.Y;
@@ -754,11 +756,8 @@ namespace SMT
 
             List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
-
-
-
             // for Gathere mode collect the preset depth of systems
-            if(gathererMode)
+            if ( gathererMode || (!gathererMode && !hunterModeShowFullRegion))
             {
                 // Add the players location to the hierarchie.
                 hierarchie.Add(new List<OverlaySystemData>() { currentPlayerSystemData });
@@ -831,11 +830,12 @@ namespace SMT
                 MapRegion mr = mainWindow.EVEManager.GetRegion(currentSystem.Region);
                 foreach(MapSystem ms in mr.MapSystems.Values)
                 {
-                    Vector2 newCoords = ms.Layout / MapWidth;
+                    Vector2 newCoords = ms.Layout;
                     if (!systemData.ContainsKey(ms.Name))
-                    {
+                    {                        
                         systemData.Add(ms.Name, new OverlaySystemData(ms.ActualSystem));
                     }
+                    canvasData.UpdateUnscaledExtends(ms.Layout);
                     systemsInList.Add(ms.Name);
                     hunterSystems.Add(new OverlaySystemData(ms.ActualSystem, newCoords));
                     systemData[ms.Name].mapSystemCoordinate = newCoords;
@@ -979,8 +979,9 @@ namespace SMT
                 }
                 else
                 {
-                    left = systemData[systems[i].system.Name].mapSystemCoordinate.X * canvasData.dimensions.X;
-                    top = systemData[systems[i].system.Name].mapSystemCoordinate.Y * canvasData.dimensions.X;
+                    Vector2 canvasCoordinate = canvasData.CoordinateToCanvas(systemData[systems[i].system.Name].mapSystemCoordinate);
+                    left = canvasCoordinate.X;
+                    top = canvasCoordinate.Y;
                 }
                 DrawSystemToOverlay(systems[i], left, top);
             }
@@ -1213,6 +1214,12 @@ namespace SMT
             {
                 showCharLocation = mainWindow.MapConf.OverlayShowCharLocation;
                 UpdatePlayerInformationText();
+            }
+
+            if (e.PropertyName == "OverlayHunterModeShowFullRegion")
+            {
+                hunterModeShowFullRegion = mainWindow.MapConf.OverlayHunterModeShowFullRegion;
+                RefreshCurrentView();
             }
 
 
