@@ -116,14 +116,6 @@ public class DockFactory : Factory
 
 
 
-        var homeView = new HomeViewModel
-        {
-            Id = "Home",
-            Title = "Home",
-            ActiveDockable = mainLayout,
-            VisibleDockables = CreateList<IDockable>(mainLayout)
-        };
-
         var rootDock = CreateRootDock();
 
         rootDock.IsCollapsable = false;

@@ -20,29 +20,7 @@
   <Grid RowDefinitions="Auto,*,25" ColumnDefinitions="Auto,*" Background="Transparent">
     <Menu Grid.Row="0" Grid.Column="0" VerticalAlignment="Top">
       <MenuItem Header="_File">
-        <MenuItem Header="_New Layout" Command="{Binding NewLayout}" />
-      </MenuItem>
-      <MenuItem Header="_Window" DataContext="{Binding Layout}">
-        <MenuItem Header="_Exit Windows" Command="{Binding ExitWindows}" />
-        <Separator />
-        <MenuItem Header="_Show Windows" Command="{Binding ShowWindows}" />
-      </MenuItem>
-      <MenuItem Header="_Options">
-        <MenuItem x:Name="OptionsIsDragEnabled" Header="Enable Drag">
-          <MenuItem.Icon>
-            <CheckBox IsChecked="{Binding $parent[Window].(id:DockProperties.IsDragEnabled)}"
-                      BorderThickness="0"
-                      IsHitTestVisible="False" />
-          </MenuItem.Icon>
-        </MenuItem>
-        <Separator />
-        <MenuItem x:Name="OptionsIsDropEnabled" Header="Enable Drop">
-          <MenuItem.Icon>
-            <CheckBox IsChecked="{Binding $parent[Window].(id:DockProperties.IsDropEnabled)}"
-                      BorderThickness="0"
-                      IsHitTestVisible="False" />
-          </MenuItem.Icon>
-        </MenuItem>
+        <MenuItem Header="_Quit" Command="{Binding Quit}" />
       </MenuItem>
     </Menu>
 
