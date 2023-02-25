@@ -30,4 +30,9 @@
     <PackageReference Include="Dock.Model.Mvvm" Version="11.0.0-preview5" />
     <PackageReference Include="Dock.Serializer" Version="11.0.0-preview5" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\Tools\FleetView.axaml.cs">
+      <DependentUpon>FleetView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

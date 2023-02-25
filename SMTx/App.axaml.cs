@@ -1,41 +1,39 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using SMTx.Themes;
 using SMTx.ViewModels;
 using SMTx.Views;
-using Dock.Model.Core;
-using SMTx.Models;
-using Avalonia.Markup.Xaml.Styling;
-using Avalonia.Styling;
-using System;
-using Avalonia.Themes.Fluent;
 
-namespace SMTx
+namespace SMTx;
+
+public class App : Application
 {
-    public partial class App : Application
+    public static IThemeManager? ThemeManager;
+
+    public override void Initialize()
     {
-        public override void Initialize()
+#if true
+        ThemeManager = new FluentThemeManager();
+#else
+        ThemeManager = new SimpleThemeManager();
+#endif
+        ThemeManager.Initialize(this);
+
+        AvaloniaXamlLoader.Load(this);
+        ThemeManager.Switch(1);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        // DockManager.s_enableSplitToWindow = true;
+
+        var mainWindowViewModel = new MainWindowViewModel();
+
+        switch (ApplicationLifetime)
         {
-            SetupTheme();
-
-            AvaloniaXamlLoader.Load(this);
-        }
-
-        public override void OnFrameworkInitializationCompleted()
-        {
-            var factory = new DockFactory(new Eve());
-            var layout = factory.CreateLayout();
-            factory.InitLayout(layout);
-
-            var mainWindowViewModel = new MainWindowViewModel()
+            case IClassicDesktopStyleApplicationLifetime desktopLifetime:
             {
-                Factory = factory,
-                Layout = layout
-            };
-
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
-            {
-
                 var mainWindow = new MainWindow
                 {
                     DataContext = mainWindowViewModel
@@ -43,29 +41,19 @@ namespace SMTx
 
                 mainWindow.Closing += (_, _) =>
                 {
-                    if (layout is IDock dock)
-                    {
-                        if (dock.Close.CanExecute(null))
-                        {
-                            dock.Close.Execute(null);
-                        }
-                    }
+                    mainWindowViewModel.CloseLayout();
                 };
 
                 desktopLifetime.MainWindow = mainWindow;
 
                 desktopLifetime.Exit += (_, _) =>
                 {
-                    if (layout is IDock dock)
-                    {
-                        if (dock.Close.CanExecute(null))
-                        {
-                            dock.Close.Execute(null);
-                        }
-                    }
+                    mainWindowViewModel.CloseLayout();
                 };
+                    
+                break;
             }
-            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewLifetime)
+            case ISingleViewApplicationLifetime singleViewLifetime:
             {
                 var mainView = new MainView()
                 {
@@ -73,44 +61,11 @@ namespace SMTx
                 };
 
                 singleViewLifetime.MainView = mainView;
+
+                break;
             }
-            base.OnFrameworkInitializationCompleted();
-
-            
-
-
         }
 
-        public void SetupTheme()
-        {
-            Uri baseUri = new("avares://SMTx/Styles");
-
-            Styles dockFluent = new()
-            {
-                new StyleInclude(baseUri)
-                {
-                    Source = new Uri("avares://Dock.Avalonia/Themes/DockFluentTheme.axaml")
-                }
-            };
-
-            Styles darkFluent = new()
-            {
-                new StyleInclude(baseUri)
-                {
-                    Source = new Uri("avares://SMTx/Themes/FluentDark.axaml")
-                }
-            };
-
-            var fluentTheme = new FluentTheme();
-
-
-
-            Application.Current.RequestedThemeVariant = ThemeVariant.Dark;
-            Styles.Add(fluentTheme);
-            Styles.Add(dockFluent);
-            Styles.Add(darkFluent);
-            
-        }
+        base.OnFrameworkInitializationCompleted();
     }
-    
 }
