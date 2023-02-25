@@ -1,9 +1,15 @@
-﻿using Dock.Model.Core;
-using ReactiveUI;
+﻿using System.Diagnostics;
+using System.Windows.Input;
+using SMTx.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Dock.Model.Controls;
+using Dock.Model.Core;
+
 
 namespace SMTx.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ObservableObject
     {
         private IFactory _factory;
         private IDock _layout;
@@ -12,19 +18,19 @@ namespace SMTx.ViewModels
         public IFactory Factory
         {
             get => _factory;
-            set => this.RaiseAndSetIfChanged(ref _factory, value);
+            set => SetProperty(ref _factory, value);
         }
 
         public IDock Layout
         {
             get => _layout;
-            set => this.RaiseAndSetIfChanged(ref _layout, value);
+            set => SetProperty(ref _layout, value);
         }
 
         public string CurrentView
         {
             get => _currentView;
-            set => this.RaiseAndSetIfChanged(ref _currentView, value);
+            set => SetProperty(ref _currentView, value);
         }
     }
 }

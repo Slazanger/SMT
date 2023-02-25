@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using CommunityToolkit.Mvvm.ComponentModel;
 using SMTx.ViewModels;
 using Dock.Model.Core;
 
@@ -8,22 +9,35 @@ namespace SMTx
 {
     public class ViewLocator : IDataTemplate
     {
-        public IControl Build(object data)
+        public Control Build(object? data)
         {
-            var name = data.GetType().FullName!.Replace("ViewModel", "View");
-            var type = Type.GetType(name);
-
-            if (type != null)
+            var name = data?.GetType().FullName?.Replace("ViewModel", "View");
+            if (name is null)
             {
-                return (Control)Activator.CreateInstance(type)!;
+                return new TextBlock { Text = "Invalid Data Type" };
             }
-
-            return new TextBlock { Text = "Not Found: " + name };
+            var type = Type.GetType(name);
+            if (type is { })
+            {
+                var instance = Activator.CreateInstance(type);
+                if (instance is { })
+                {
+                    return (Control)instance;
+                }
+                else
+                {
+                    return new TextBlock { Text = "Create Instance Failed: " + type.FullName };
+                }
+            }
+            else
+            {
+                return new TextBlock { Text = "Not Found: " + name };
+            }
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
-            return data is ViewModelBase || data is IDockable;
+            return data is ObservableObject || data is IDockable;
         }
     }
 }

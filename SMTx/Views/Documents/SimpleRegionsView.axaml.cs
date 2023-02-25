@@ -1,11 +1,12 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace SMTx.Views
+namespace SMTx.Views.Documents
 {
-    public partial class MainWindow : Window
+    public partial class SimpleRegionsView : UserControl
     {
-        public MainWindow()
+        public SimpleRegionsView()
         {
             InitializeComponent();
         }

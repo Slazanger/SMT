@@ -5,6 +5,10 @@ using SMTx.ViewModels;
 using SMTx.Views;
 using Dock.Model.Core;
 using SMTx.Models;
+using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Styling;
+using System;
+using Avalonia.Themes.Fluent;
 
 namespace SMTx
 {
@@ -12,12 +16,14 @@ namespace SMTx
     {
         public override void Initialize()
         {
+            SetupTheme();
+
             AvaloniaXamlLoader.Load(this);
         }
 
         public override void OnFrameworkInitializationCompleted()
         {
-            var factory = new MainDockFactory(new Eve());
+            var factory = new DockFactory(new Eve());
             var layout = factory.CreateLayout();
             factory.InitLayout(layout);
 
@@ -69,6 +75,41 @@ namespace SMTx
                 singleViewLifetime.MainView = mainView;
             }
             base.OnFrameworkInitializationCompleted();
+
+            
+
+
+        }
+
+        public void SetupTheme()
+        {
+            Uri baseUri = new("avares://SMTx/Styles");
+
+            Styles dockFluent = new()
+            {
+                new StyleInclude(baseUri)
+                {
+                    Source = new Uri("avares://Dock.Avalonia/Themes/DockFluentTheme.axaml")
+                }
+            };
+
+            Styles darkFluent = new()
+            {
+                new StyleInclude(baseUri)
+                {
+                    Source = new Uri("avares://SMTx/Themes/FluentDark.axaml")
+                }
+            };
+
+            var fluentTheme = new FluentTheme();
+
+
+
+            Application.Current.RequestedThemeVariant = ThemeVariant.Dark;
+            Styles.Add(fluentTheme);
+            Styles.Add(dockFluent);
+            Styles.Add(darkFluent);
+            
         }
     }
     

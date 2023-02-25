@@ -1,18 +1,36 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:SMTx.ViewModels"
+		xmlns:views="using:SMTx.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:id="using:Dock.Avalonia"
 		xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" 
+		
+		d:DesignWidth="800" 
+		d:DesignHeight="450"
         x:Class="SMTx.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="SMTx">
+        Title="SMTx"
+		UseLayoutRounding="True" 
+		RenderOptions.BitmapInterpolationMode="HighQuality"
+        WindowState="Normal" 
+		WindowStartupLocation="CenterScreen"
+        Foreground="{DynamicResource DockThemeForegroundBrush}"
+        BorderThickness="1" BorderBrush="{DynamicResource DockThemeBorderLowBrush}"
+        FontFamily="Segoe UI, SF Pro Display, Noto Sans, Cantarel"
+		id:DockProperties.IsDragEnabled="True" 
+		id:DockProperties.IsDropEnabled="True"
+		>
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-	<idc:DockControl Layout="{Binding Layout}"/>
+	<Panel>
+		<views:MainView/>
+	</Panel>
+	
 
 </Window>

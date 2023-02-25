@@ -1,11 +1,12 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace SMTx.Views
+namespace SMTx.Views.Tools
 {
-    public partial class MainWindow : Window
+    public partial class AnomsView : UserControl
     {
-        public MainWindow()
+        public AnomsView()
         {
             InitializeComponent();
         }
