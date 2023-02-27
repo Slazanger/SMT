@@ -347,7 +347,13 @@ namespace SMT
         /// <returns>The size for the canvas element for the system.</returns>
         private float CalculatedOverlaySystemSize(string systemName)
         {
-            return gathererMode ? overlaySystemSizeGatherer : (currentPlayerSystemData != null && currentPlayerSystemData.system != null && systemName == currentPlayerSystemData.system.Name ? overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier : overlaySystemSizeHunter);
+            if (gathererMode) 
+                return overlaySystemSizeGatherer;
+
+            if (systemName == currentPlayerSystemData?.system?.Name)
+                return overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier;
+
+            return overlaySystemSizeHunter;
         }
 
         /// <summary>
