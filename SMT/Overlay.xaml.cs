@@ -840,10 +840,6 @@ namespace SMT
             {
                 List<OverlaySystemData> hunterSystems = new List<OverlaySystemData>();
 
-                // source maps are 1050.0 width
-                float MapWidth = 1050.0F;
-
-
                 MapRegion mr = mainWindow.EVEManager.GetRegion(currentSystem.Region);
                 foreach(MapSystem ms in mr.MapSystems.Values)
                 {
