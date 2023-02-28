@@ -206,7 +206,7 @@ namespace SMT
 
         private float overlaySystemSizeGatherer = 20f;
         private float overlaySystemSizeHunter = 5f;
-        private float CalculatedOverlaySystemSize { get => gathererMode ? overlaySystemSizeGatherer : overlaySystemSizeHunter; }
+        private float overlayCurrentSystemSizeHunterModifier = 3f;
 
         private float overlayIntelOversize = 10f;
         private float CalculatedOverlayIntelOversize { get => overlayIntelOversize; }
@@ -337,6 +337,23 @@ namespace SMT
             RefreshCurrentView();
             _ = CharacterLocationUpdateLoop();
             _ = DataOverlayUpdateLoop();
+        }
+
+        /// <summary>
+        /// Calculates the actual size for the canvas element that represents a system. 
+        /// Takes into account if it is the current system the player is in.
+        /// </summary>
+        /// <param name="systemName">The name of the system for which the size should be calculated.</param>
+        /// <returns>The size for the canvas element for the system.</returns>
+        private float CalculatedOverlaySystemSize(string systemName)
+        {
+            if (gathererMode) 
+                return overlaySystemSizeGatherer;
+
+            if (systemName == currentPlayerSystemData?.system?.Name)
+                return overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier;
+
+            return overlaySystemSizeHunter;
         }
 
         /// <summary>
@@ -688,8 +705,8 @@ namespace SMT
                     // Update the shape associated with the current intel entry.
                     if (intelDataEntry.ellipse.Count > i)
                     {
-                        intelDataEntry.ellipse[i].Width = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
-                        intelDataEntry.ellipse[i].Height = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+                        intelDataEntry.ellipse[i].Width = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
+                        intelDataEntry.ellipse[i].Height = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
                         Canvas.SetLeft(intelDataEntry.ellipse[i], intelSystemCoordinateVector.x);
                         Canvas.SetTop(intelDataEntry.ellipse[i], intelSystemCoordinateVector.y);
                         // If a system is not on the current map, hide it. Can be made visible later.
@@ -823,10 +840,6 @@ namespace SMT
             {
                 List<OverlaySystemData> hunterSystems = new List<OverlaySystemData>();
 
-                // source maps are 1050.0 width
-                float MapWidth = 1050.0F;
-
-
                 MapRegion mr = mainWindow.EVEManager.GetRegion(currentSystem.Region);
                 foreach(MapSystem ms in mr.MapSystems.Values)
                 {
@@ -917,15 +930,15 @@ namespace SMT
 
 
 
-                        Vector2f current = new Vector2f(currentCoordinate.X + (CalculatedOverlaySystemSize / 2f),
-                            currentCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
-                        Vector2f connected = new Vector2f(connectedCoordinate.X + (CalculatedOverlaySystemSize / 2f),
-                            connectedCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
+                        Vector2f current = new Vector2f(currentCoordinate.X + (CalculatedOverlaySystemSize(currentSystem.Name) / 2f),
+                            currentCoordinate.Y + (CalculatedOverlaySystemSize(currentSystem.Name) / 2f));
+                        Vector2f connected = new Vector2f(connectedCoordinate.X + (CalculatedOverlaySystemSize(connectedSystem) / 2f),
+                            connectedCoordinate.Y + (CalculatedOverlaySystemSize(connectedSystem) / 2f));
 
                         Vector2f currentToConnected = connected == current ? new Vector2f(0, 0) : Vector2f.Normalize(connected - current);
 
-                        Vector2f currentCorrected = current + (currentToConnected * (int)(CalculatedOverlaySystemSize / 2f));
-                        Vector2f connectedCorrected = connected - (currentToConnected * (int)(CalculatedOverlaySystemSize / 2f));
+                        Vector2f currentCorrected = current + (currentToConnected * (int)(CalculatedOverlaySystemSize(currentSystem.Name) / 2f));
+                        Vector2f connectedCorrected = connected - (currentToConnected * (int)(CalculatedOverlaySystemSize(connectedSystem) / 2f));
 
                         jumpLines[^1].X1 = currentCorrected.x;
                         jumpLines[^1].Y1 = currentCorrected.y;
@@ -1004,19 +1017,14 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
             }
 
-            systemData[sysData.system.Name].systemCanvasElement.Width = CalculatedOverlaySystemSize;
-            systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize;
+            systemData[sysData.system.Name].systemCanvasElement.Width = CalculatedOverlaySystemSize(sysData.system.Name);
+            systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name);
             systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode? 2:1;
             
 
             if (sysData.system.Name == currentPlayerSystemData.system.Name)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = sysLocationOutlineBrush;
-                if(!gathererMode)
-                {
-                    systemData[sysData.system.Name].systemCanvasElement.Width = 15;
-                    systemData[sysData.system.Name].systemCanvasElement.Height = 15;
-                }
             }
             else
             {
@@ -1093,8 +1101,8 @@ namespace SMT
 
                 float killDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillData, 0f, Math.Abs(npcKillData)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
 
-                systemData[sysData.system.Name].npcKillCanvasElement.Width = CalculatedOverlaySystemSize + killDataCalculatedSize;
-                systemData[sysData.system.Name].npcKillCanvasElement.Height = CalculatedOverlaySystemSize + killDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillCanvasElement.Width = CalculatedOverlaySystemSize(sysData.system.Name) + killDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name) + killDataCalculatedSize;
                 systemData[sysData.system.Name].npcKillCanvasElement.StrokeThickness = 0f;
 
                 systemData[sysData.system.Name].npcKillCanvasElement.Fill = npcKillDataBrush;
@@ -1135,8 +1143,8 @@ namespace SMT
 
                 float killDeltaDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillDelta, 0f, Math.Abs(npcKillDelta)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
 
-                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
-                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width = CalculatedOverlaySystemSize(sysData.system.Name) + killDeltaDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name) + killDeltaDataCalculatedSize;
                 systemData[sysData.system.Name].npcKillDeltaCanvasElement.StrokeThickness = 0f;
 
                 systemData[sysData.system.Name].npcKillDeltaCanvasElement.Fill = npcKillDeltaDataBrush;
@@ -1372,8 +1380,8 @@ namespace SMT
                 intelShape.Visibility = Visibility.Hidden;
             }
 
-            intelShape.Width = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
-            intelShape.Height = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+            intelShape.Width = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
+            intelShape.Height = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
             intelShape.StrokeThickness = CalculatedOverlayIntelOversize / 2f;
             intelShape.Stroke = intelUrgentOutlineBrush;
             intelShape.IsHitTestVisible = false;
