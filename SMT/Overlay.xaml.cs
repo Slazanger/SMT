@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
@@ -229,10 +230,7 @@ namespace SMT
 
         public Overlay(MainWindow mw)
         {
-            InitializeComponent();
-
-            // Restore the last window size and position
-            LoadOverlayWindowPosition();
+            InitializeComponent();            
 
             this.Background.Opacity = mw.MapConf.OverlayBackgroundOpacity;
             overlay_Canvas.Opacity = mw.MapConf.OverlayOpacity;
@@ -310,6 +308,7 @@ namespace SMT
             mainWindow.OnSelectedCharChangedEventHandler += SelectedCharChanged;
             mainWindow.MapConf.PropertyChanged += OverlayConf_PropertyChanged;
             SizeChanged += OnSizeChanged;
+            Closing += Overlay_Closing;
             // We can only redraw stuff when the canvas is actually resized, otherwise dimensions will be wrong!
             overlay_Canvas.SizeChanged += OnCanvasSizeChanged;
 
@@ -337,6 +336,12 @@ namespace SMT
             RefreshCurrentView();
             _ = CharacterLocationUpdateLoop();
             _ = DataOverlayUpdateLoop();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            LoadOverlayWindowPosition();
         }
 
         /// <summary>
@@ -412,10 +417,7 @@ namespace SMT
         /// </summary>
         private void LoadOverlayWindowPosition()
         {
-            this.Top = Properties.Settings.Default.overlay_window_top;
-            this.Left = Properties.Settings.Default.overlay_window_left;
-            this.Width = Properties.Settings.Default.overlay_window_width;
-            this.Height = Properties.Settings.Default.overlay_window_height;
+            WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, Properties.Settings.Default.OverlayWindow_placement);
         }
 
         /// <summary>
@@ -423,11 +425,13 @@ namespace SMT
         /// </summary>
         private void StoreOverlayWindowPosition()
         {
-            Properties.Settings.Default.overlay_window_top = this.Top;
-            Properties.Settings.Default.overlay_window_left = this.Left;
-            Properties.Settings.Default.overlay_window_width = this.Width;
-            Properties.Settings.Default.overlay_window_height = this.Height;
+            Properties.Settings.Default.OverlayWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(this).Handle);
             Properties.Settings.Default.Save();
+        }
+
+        private void Overlay_Closing(object sender, CancelEventArgs e)
+        {
+            StoreOverlayWindowPosition();
         }
 
         /// <summary>
@@ -1291,7 +1295,6 @@ namespace SMT
         {
             RefreshCurrentView();
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
-            StoreOverlayWindowPosition();
         }
 
         /// <summary>
@@ -1304,7 +1307,6 @@ namespace SMT
             if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
-                StoreOverlayWindowPosition();
             }
             e.Handled = true;
         }
@@ -1316,7 +1318,6 @@ namespace SMT
         /// <param name="e"></param>
         private void Overlay_Window_Close(object sender, MouseButtonEventArgs e)
         {
-            StoreOverlayWindowPosition();
             this.Close();
         }
 
