@@ -2,17 +2,11 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SMT.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="overlay_window_top" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">100</Value>
+    <Setting Name="MainWindow_placement" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="overlay_window_left" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">100</Value>
-    </Setting>
-    <Setting Name="overlay_window_width" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">600</Value>
-    </Setting>
-    <Setting Name="overlay_window_height" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">600</Value>
+    <Setting Name="OverlayWindow_placement" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
