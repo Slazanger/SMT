@@ -2947,6 +2947,7 @@ namespace SMT.EVEData
                 try
                 {
                     HttpClient hc = new HttpClient();
+                    hc.DefaultRequestHeaders.Add("User-Agent", EveAppConfig.SMT_VERSION);
                     var response = await hc.GetAsync(url);
                     response.EnsureSuccessStatusCode();
                     strContent = await response.Content.ReadAsStringAsync();
