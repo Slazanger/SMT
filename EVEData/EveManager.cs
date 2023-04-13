@@ -1711,28 +1711,32 @@ namespace SMT.EVEData
                 return;
             }
 
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+            try
             {
-                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
                 {
-                    if (ri.Category == ResolvedInfoCategory.Alliance)
+                    foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
                     {
-                        ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
+                        if (ri.Category == ResolvedInfoCategory.Alliance)
+                        {
+                            ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
 
-                        if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
-                        {
-                            AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
-                            AllianceIDToName[ri.Id] = esraA.Data.Name;
-                        }
-                        else
-                        {
-                            AllianceIDToTicker[ri.Id] = "???????????????";
-                            AllianceIDToName[ri.Id] = "?????";
+                            if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
+                            {
+                                AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
+                                AllianceIDToName[ri.Id] = esraA.Data.Name;
+                            }
+                            else
+                            {
+                                AllianceIDToTicker[ri.Id] = "???????????????";
+                                AllianceIDToName[ri.Id] = "?????";
+                            }
                         }
                     }
                 }
             }
+            catch { }
         }
 
         /// <summary>
@@ -1760,17 +1764,21 @@ namespace SMT.EVEData
                 return;
             }
 
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+            try
             {
-                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
                 {
-                    if (ri.Category == ResolvedInfoCategory.Character)
+                    foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
                     {
-                        CharacterIDToName[ri.Id] = ri.Name;
+                        if (ri.Category == ResolvedInfoCategory.Character)
+                        {
+                            CharacterIDToName[ri.Id] = ri.Name;
+                        }
                     }
                 }
             }
+            catch { }
         }
 
         /// <summary>
@@ -2193,96 +2201,100 @@ namespace SMT.EVEData
         {
             FactionWarfareSystems.Clear();
 
-            ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
-
-            string debugListofSytems = "";
-
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
+            try
             {
-                foreach (ESI.NET.Models.FactionWarfare.FactionWarfareSystem i in esr.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
+
+                string debugListofSytems = "";
+
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
                 {
-                    FactionWarfareSystemInfo fwsi = new FactionWarfareSystemInfo();
-                    fwsi.SystemState = FactionWarfareSystemInfo.State.None;
-
-                    fwsi.OccupierID = i.OccupierFactionId;
-                    fwsi.OccupierName = FactionWarfareSystemInfo.OwnerIDToName(i.OccupierFactionId);
-
-                    fwsi.OwnerID = i.OwnerFactionId;
-                    fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName(i.OwnerFactionId);
-
-                    fwsi.SystemID = i.SolarSystemId;
-                    fwsi.SystemName = GetEveSystemNameFromID(i.SolarSystemId);
-                    fwsi.LinkSystemID = 0;
-                    fwsi.VictoryPoints = i.VictoryPoints;
-                    fwsi.VictoryPointsThreshold = i.VictoryPointsThreshold;
-
-                    FactionWarfareSystems.Add(fwsi);
-
-                    debugListofSytems += fwsi.SystemName + "\n";
-                }
-            }
-
-            // step 1, identify all the Frontline systems, these will be systems with connections to other systems with a different occupier
-            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
-            {
-                System s = GetEveSystemFromID(fws.SystemID);
-                foreach (string js in s.Jumps)
-                {
-                    foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                    foreach (ESI.NET.Models.FactionWarfare.FactionWarfareSystem i in esr.Data)
                     {
-                        if (fwss.SystemName == js && fwss.OccupierID != fws.OccupierID)
-                        {
-                            fwss.SystemState = FactionWarfareSystemInfo.State.Frontline;
-                            fws.SystemState = FactionWarfareSystemInfo.State.Frontline;
-                        }
+                        FactionWarfareSystemInfo fwsi = new FactionWarfareSystemInfo();
+                        fwsi.SystemState = FactionWarfareSystemInfo.State.None;
+
+                        fwsi.OccupierID = i.OccupierFactionId;
+                        fwsi.OccupierName = FactionWarfareSystemInfo.OwnerIDToName(i.OccupierFactionId);
+
+                        fwsi.OwnerID = i.OwnerFactionId;
+                        fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName(i.OwnerFactionId);
+
+                        fwsi.SystemID = i.SolarSystemId;
+                        fwsi.SystemName = GetEveSystemNameFromID(i.SolarSystemId);
+                        fwsi.LinkSystemID = 0;
+                        fwsi.VictoryPoints = i.VictoryPoints;
+                        fwsi.VictoryPointsThreshold = i.VictoryPointsThreshold;
+
+                        FactionWarfareSystems.Add(fwsi);
+
+                        debugListofSytems += fwsi.SystemName + "\n";
                     }
                 }
-            }
 
-            // step 2, itendify all commandline operations by flooding out one from the frontlines
-            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
-            {
-                if (fws.SystemState == FactionWarfareSystemInfo.State.Frontline)
+                // step 1, identify all the Frontline systems, these will be systems with connections to other systems with a different occupier
+                foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
                 {
                     System s = GetEveSystemFromID(fws.SystemID);
-
                     foreach (string js in s.Jumps)
                     {
                         foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
                         {
-                            if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                            if (fwss.SystemName == js && fwss.OccupierID != fws.OccupierID)
                             {
-                                fwss.SystemState = FactionWarfareSystemInfo.State.CommandLineOperation;
-                                fwss.LinkSystemID = fws.SystemID;
+                                fwss.SystemState = FactionWarfareSystemInfo.State.Frontline;
+                                fws.SystemState = FactionWarfareSystemInfo.State.Frontline;
                             }
                         }
                     }
                 }
-            }
 
-            // step 3, itendify all Rearguard operations by flooding out one from the command lines
-            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
-            {
-                if (fws.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
+                // step 2, itendify all commandline operations by flooding out one from the frontlines
+                foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
                 {
-                    System s = GetEveSystemFromID(fws.SystemID);
-
-                    foreach (string js in s.Jumps)
+                    if (fws.SystemState == FactionWarfareSystemInfo.State.Frontline)
                     {
-                        foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                        System s = GetEveSystemFromID(fws.SystemID);
+
+                        foreach (string js in s.Jumps)
                         {
-                            if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                            foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
                             {
-                                fwss.SystemState = FactionWarfareSystemInfo.State.Rearguard;
-                                fwss.LinkSystemID = fws.SystemID;
+                                if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                                {
+                                    fwss.SystemState = FactionWarfareSystemInfo.State.CommandLineOperation;
+                                    fwss.LinkSystemID = fws.SystemID;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // for ease remove all "none" systems
-            //FactionWarfareSystems.RemoveAll(sys => sys.SystemState == FactionWarfareSystemInfo.State.None);
+                // step 3, itendify all Rearguard operations by flooding out one from the command lines
+                foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
+                {
+                    if (fws.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
+                    {
+                        System s = GetEveSystemFromID(fws.SystemID);
+
+                        foreach (string js in s.Jumps)
+                        {
+                            foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                            {
+                                if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                                {
+                                    fwss.SystemState = FactionWarfareSystemInfo.State.Rearguard;
+                                    fwss.LinkSystemID = fws.SystemID;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // for ease remove all "none" systems
+                //FactionWarfareSystems.RemoveAll(sys => sys.SystemState == FactionWarfareSystemInfo.State.None);
+            }
+            catch { }
         }
 
         public void AddUpdateJumpBridge(string from, string to, long stationID)
@@ -3265,20 +3277,24 @@ namespace SMT.EVEData
         /// </summary>
         private async void UpdateServerInfo()
         {
-            ESI.NET.EsiResponse<ESI.NET.Models.Status.Status> esr = await ESIClient.Status.Retrieve();
+            try
+            {
+                ESI.NET.EsiResponse<ESI.NET.Models.Status.Status> esr = await ESIClient.Status.Retrieve();
 
-            if (ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
-            {
-                ServerInfo.Name = "Tranquility";
-                ServerInfo.NumPlayers = esr.Data.Players;
-                ServerInfo.ServerVersion = esr.Data.ServerVersion.ToString();
+                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
+                {
+                    ServerInfo.Name = "Tranquility";
+                    ServerInfo.NumPlayers = esr.Data.Players;
+                    ServerInfo.ServerVersion = esr.Data.ServerVersion.ToString();
+                }
+                else
+                {
+                    ServerInfo.Name = "Tranquility";
+                    ServerInfo.NumPlayers = 0;
+                    ServerInfo.ServerVersion = "";
+                }
             }
-            else
-            {
-                ServerInfo.Name = "Tranquility";
-                ServerInfo.NumPlayers = 0;
-                ServerInfo.ServerVersion = "";
-            }
+            catch { }
         }
     }
 }
