@@ -1306,7 +1306,13 @@ namespace SMT
         {
             if (e.ChangedButton == MouseButton.Left)
             {
+                // This is a quick way to avoid snapping by just disallowing the resizing during drag.
+                this.ResizeMode = ResizeMode.NoResize;
+
                 this.DragMove();
+
+                // Since this not asynchronous, we can just restore the resizing here.
+                this.ResizeMode = ResizeMode.CanResizeWithGrip;
             }
             e.Handled = true;
         }
