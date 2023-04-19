@@ -1586,7 +1586,6 @@ namespace SMT.EVEData
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
-
             Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
             ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
 
@@ -1595,34 +1594,10 @@ namespace SMT.EVEData
                 SystemIDToName[s.ID] = s.Name;
             }
 
-            if (File.Exists(SaveDataVersionFolder + @"\CharacterNames.dat"))
-            {
-                CharacterIDToName = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\CharacterNames.dat");
-            }
-            if (CharacterIDToName == null)
-            {
-                CharacterIDToName = new SerializableDictionary<long, string>();
-            }
+            CharacterIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToTicker = new SerializableDictionary<long, string>();
 
-            if (File.Exists(SaveDataVersionFolder + @"\AllianceNames.dat"))
-            {
-                AllianceIDToName = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceNames.dat");
-            }
-
-            if (AllianceIDToName == null)
-            {
-                AllianceIDToName = new SerializableDictionary<long, string>();
-            }
-
-            if (File.Exists(SaveDataVersionFolder + @"\AllianceTickers.dat"))
-            {
-                AllianceIDToTicker = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataRootFolder + @"\AllianceTickers.dat");
-            }
-
-            if (AllianceIDToTicker == null)
-            {
-                AllianceIDToTicker = new SerializableDictionary<long, string>();
-            }
 
             // patch up any links
             foreach (System s in Systems)
@@ -1805,10 +1780,6 @@ namespace SMT.EVEData
                 xms.Serialize(tw, saveList);
             }
 
-            // now serialise the caches to disk
-            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(CharacterIDToName, SaveDataVersionFolder + @"\CharacterNames.dat");
-            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
-            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
 
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             Serialization.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
