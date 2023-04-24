@@ -1665,7 +1665,6 @@ namespace SMT
                     if (!string.IsNullOrEmpty(currentJumpCharacter))
                     {
                         double Distance = EM.GetRangeBetweenSystems(currentCharacterJumpSystem, sys.Name);
-                        Distance = Distance / 9460730472580800.0;
 
                         double Max = 0.1f;
 
@@ -1695,8 +1694,6 @@ namespace SMT
                         }
 
                         double Distance = EM.GetRangeBetweenSystems(key, sys.Name);
-                        Distance = Distance / 9460730472580800.0;
-
                         double Max = 0.1f;
 
                         switch (activeJumpSpheres[key])

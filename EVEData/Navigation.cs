@@ -72,7 +72,7 @@
                 double y = startSys.Y - sys.Y;
                 double z = startSys.Z - sys.Z;
 
-                double length = Math.Sqrt((x * x) + (y * y) + (z * z)) / 9460730472580800.0;
+                double length = Math.Sqrt((x * x) + (y * y) + (z * z)) ;
 
                 bool shouldAdd = false;
 
@@ -171,7 +171,7 @@
 
             UpdateJumpBridges(jumpBridges);
 
-            double MaxRange = 10 * 9460730472580800.0;
+            double MaxRange = 10;
 
             // now create the jumpable system links
             foreach (MapNode mn in MapNodes.Values)
@@ -195,7 +195,7 @@
                     {
                         JumpLink jl = new JumpLink();
                         jl.System = sys.Name;
-                        jl.RangeLY = Distance / 9460730472580800.0;
+                        jl.RangeLY = Distance ;
                         mn.JumpableSystems.Add(jl);
                     }
                 }
@@ -482,7 +482,7 @@
 
                 if (i > 0)
                 {
-                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]) / 9460730472580800.0;
+                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]);
                 }
                 ActualRoute.Add(RP);
             }

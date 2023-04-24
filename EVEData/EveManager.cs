@@ -2,6 +2,7 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Numerics;
@@ -469,18 +470,22 @@ namespace SMT.EVEData
                     string systemID = bits[2];
                     string systemName = bits[3]; // SystemIDToName[SystemID];
 
-                    double x = Convert.ToDouble(bits[4]);
-                    double y = Convert.ToDouble(bits[5]);
-                    double z = Convert.ToDouble(bits[6]);
+                    decimal LYScale = 9460730472580800.0m;
+
+                    decimal x = Convert.ToDecimal(bits[4]);
+                    decimal y = Convert.ToDecimal(bits[5]);
+                    decimal z = Convert.ToDecimal(bits[6]);
                     double security = Convert.ToDouble(bits[21]);
                     double radius = Convert.ToDouble(bits[23]);
 
                     System s = GetEveSystem(systemName);
                     if (s != null)
                     {
-                        s.ActualX = x;
-                        s.ActualY = y;
-                        s.ActualZ = z;
+                        // note : scale the coordinates to Light Year scale as at M double doesnt have enough precision however decimal doesnt 
+                        // have the range for the calculations
+                        s.ActualX = (double) ( x / LYScale);
+                        s.ActualY = (double) ( y / LYScale) ;
+                        s.ActualZ = (double) (z / LYScale );
                         s.TrueSec = security;
                         s.ConstellationID = constID;
                         s.RadiusAU = radius / 149597870700;
@@ -520,8 +525,8 @@ namespace SMT.EVEData
                     MapRegion r = GetRegion(regionName);
                     if (r != null)
                     {
-                        r.RegionX = x;
-                        r.RegionY = z;
+                        r.RegionX = x / 9460730472580800.0;
+                        r.RegionY = z / 9460730472580800.0;
                     }
                 }
             }
@@ -1194,7 +1199,7 @@ namespace SMT.EVEData
                 }
 
                 nAlpha.AlphaShapeCalculator shapeCalc = new nAlpha.AlphaShapeCalculator();
-                shapeCalc.Alpha = 1 / (20 * 9460730472580800.0 * 5.22295244275827E-15);
+                shapeCalc.Alpha = 1 / (20 * 5.22295244275827E-15);
                 shapeCalc.CloseShape = true;
 
                 nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());

@@ -113,7 +113,7 @@ namespace SMT
         }
 
         private double m_ESIOverlayScale = 1.0f;
-        private double universeScale = 5.22295244275827E-15; // note this is calculated based off 5000x5000 at the data compile time
+        private double universeScale = 49.412945332043492; // note this is calculated based off 5000x5000 at the data compile time
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
@@ -474,7 +474,7 @@ namespace SMT
             {
                 EVEData.System ssys = EM.GetEveSystem(kvp.Key);
 
-                double Radius = 9460730472580800.0 * kvp.Value * universeScale; ;
+                double Radius = kvp.Value * universeScale; ;
 
                 double X = ssys.UniverseX;
                 double Z = ssys.UniverseY;
@@ -495,7 +495,7 @@ namespace SMT
                 foreach (KeyValuePair<string, double> kvp in activeJumpSpheres)
                 {
                     double Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
-                    Distance = Distance / 9460730472580800.0;
+
 
                     if (Distance < kvp.Value && Distance > 0.0 && es.TrueSec <= 0.45 && es.Region != "Pochven")
                     {
