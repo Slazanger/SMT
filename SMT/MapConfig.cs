@@ -30,6 +30,7 @@ namespace SMT
 
         private int m_MaxIntelSeconds;
 
+        private bool m_showCompactCharactersOnMap = false;
         private bool m_showOfflineCharactersOnMap = true;
         private bool m_ShowCharacterNamesOnMap = true;
         private bool m_ShowCoalition;
@@ -440,6 +441,20 @@ namespace SMT
                 OnPropertyChanged("ShowCharacterNamesOnMap");
             }
         }
+
+        public bool ShowCompactCharactersOnMap
+        {
+            get
+            {
+                return m_showCompactCharactersOnMap;
+            }
+            set
+            {
+                m_showCompactCharactersOnMap = value;
+                OnPropertyChanged("ShowCompactCharactersOnMap");
+            }
+        }
+
 
         public bool ShowOfflineCharactersOnMap
         {
