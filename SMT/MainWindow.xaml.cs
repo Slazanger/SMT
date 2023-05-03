@@ -219,24 +219,6 @@ namespace SMT
                 catch { }
             }
 
-            RegionUC.MapConf = MapConf;
-            RegionUC.Init();
-            RegionUC.SelectRegion(MapConf.DefaultRegion);
-
-            RegionUC.RegionChanged += RegionUC_RegionChanged;
-            RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
-
-            UniverseUC.MapConf = MapConf;
-            UniverseUC.CapitalRoute = CapitalRoute;
-            UniverseUC.Init();
-            UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
-
-            RegionsViewUC.MapConf = MapConf;
-            RegionsViewUC.Init();
-            RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
-
-            AppStatusBar.DataContext = EVEManager.ServerInfo;
-
             // load the anom data
             string anomDataFilename = EVEManager.SaveDataVersionFolder + @"\Anoms.dat";
             if (File.Exists(anomDataFilename))
@@ -261,7 +243,29 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
+
+            RegionUC.MapConf = MapConf;
             RegionUC.ANOMManager = ANOMManager;
+            RegionUC.Init();
+            RegionUC.SelectRegion(MapConf.DefaultRegion);
+
+            RegionUC.RegionChanged += RegionUC_RegionChanged;
+            RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
+
+            UniverseUC.MapConf = MapConf;
+            UniverseUC.CapitalRoute = CapitalRoute;
+            UniverseUC.Init();
+            UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+
+            RegionsViewUC.MapConf = MapConf;
+            RegionsViewUC.Init();
+            RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
+
+            AppStatusBar.DataContext = EVEManager.ServerInfo;
+
+
+
+
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
