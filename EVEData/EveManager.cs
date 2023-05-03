@@ -470,7 +470,11 @@ namespace SMT.EVEData
                     string systemID = bits[2];
                     string systemName = bits[3]; // SystemIDToName[SystemID];
 
-                    decimal LYScale = 9460730472580800.0m;
+                    //CCP have their own version of what a Light Year is.. so instead of 9460730472580800.0 its this
+                    // beware when converting units
+                    decimal LYScale = 9460000000000000.0m;
+
+
 
                     decimal x = Convert.ToDecimal(bits[4]);
                     decimal y = Convert.ToDecimal(bits[5]);
@@ -483,9 +487,9 @@ namespace SMT.EVEData
                     {
                         // note : scale the coordinates to Light Year scale as at M double doesnt have enough precision however decimal doesnt 
                         // have the range for the calculations
-                        s.ActualX = (double) ( x / LYScale);
-                        s.ActualY = (double) ( y / LYScale) ;
-                        s.ActualZ = (double) (z / LYScale );
+                        s.ActualX = x / LYScale;
+                        s.ActualY = y / LYScale;
+                        s.ActualZ = z / LYScale;
                         s.TrueSec = security;
                         s.ConstellationID = constID;
                         s.RadiusAU = radius / 149597870700;
@@ -1145,38 +1149,38 @@ namespace SMT.EVEData
 
             foreach (EVEData.System sys in Systems)
             {
-                if (sys.ActualX < universeXMin)
+                if ((double)sys.ActualX < universeXMin)
                 {
-                    universeXMin = sys.ActualX;
+                    universeXMin = (double)sys.ActualX;
                 }
 
-                if (sys.ActualX > universeXMax)
+                if ((double)sys.ActualX > universeXMax)
                 {
-                    universeXMax = sys.ActualX;
+                    universeXMax = (double)sys.ActualX;
                 }
 
-                if (sys.ActualZ < universeZMin)
+                if ((double)sys.ActualZ < universeZMin)
                 {
-                    universeZMin = sys.ActualZ;
+                    universeZMin = (double)sys.ActualZ;
                 }
 
-                if (sys.ActualZ > universeZMax)
+                if ((double)sys.ActualZ > universeZMax)
                 {
-                    universeZMax = sys.ActualZ;
+                    universeZMax = (double)sys.ActualZ;
                 }
             }
             double universeWidth = universeXMax - universeXMin;
             double universeDepth = universeZMax - universeZMin;
-            double XScale = (RenderSize) / universeWidth;
-            double ZScale = (RenderSize) / universeDepth;
+            double XScale = RenderSize / universeWidth;
+            double ZScale = RenderSize / universeDepth;
             double universeScale = Math.Min(XScale, ZScale);
 
             foreach (EVEData.System sys in Systems)
             {
-                double X = (sys.ActualX - universeXMin) * universeScale;
+                double X = ((double)sys.ActualX - universeXMin) * universeScale;
 
                 // need to invert Z
-                double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+                double Z = (universeDepth - ((double)sys.ActualZ - universeZMin)) * universeScale;
 
                 sys.UniverseX = X;
                 sys.UniverseY = Z;
@@ -1464,21 +1468,21 @@ namespace SMT.EVEData
         /// <summary>
         /// Calculate the range between the two systems
         /// </summary>
-        public double GetRangeBetweenSystems(string from, string to)
+        public decimal GetRangeBetweenSystems(string from, string to)
         {
             System systemFrom = GetEveSystem(from);
             System systemTo = GetEveSystem(to);
 
-            if (systemFrom == null || systemTo == null)
+            if (systemFrom == null || systemTo == null || from == to)
             {
-                return 0.0;
+                return 0.0M;
             }
 
-            double x = systemFrom.ActualX - systemTo.ActualX;
-            double y = systemFrom.ActualY - systemTo.ActualY;
-            double z = systemFrom.ActualZ - systemTo.ActualZ;
+            decimal x = systemFrom.ActualX - systemTo.ActualX;
+            decimal y = systemFrom.ActualY - systemTo.ActualY;
+            decimal z = systemFrom.ActualZ - systemTo.ActualZ;
 
-            double length = Math.Sqrt((x * x) + (y * y) + (z * z));
+            decimal length = DecimalMath.DecimalEx.Sqrt((x * x) + (y * y) + (z * z));
 
             return length;
         }
