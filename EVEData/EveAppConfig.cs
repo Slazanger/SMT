@@ -19,12 +19,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_117";
+        public const string SMT_VERSION = "SMT_Avalonia";
 
         /// <summary>
         /// Folder to store all of the data from
         /// </summary>
-        public static readonly string StorageRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\";
+        public static readonly string StorageRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMTx\";
 
         /// <summary>
         /// Folder to store all of the data from
