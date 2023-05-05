@@ -2,6 +2,7 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Numerics;
@@ -469,18 +470,26 @@ namespace SMT.EVEData
                     string systemID = bits[2];
                     string systemName = bits[3]; // SystemIDToName[SystemID];
 
-                    double x = Convert.ToDouble(bits[4]);
-                    double y = Convert.ToDouble(bits[5]);
-                    double z = Convert.ToDouble(bits[6]);
+                    //CCP have their own version of what a Light Year is.. so instead of 9460730472580800.0 its this
+                    // beware when converting units
+                    decimal LYScale = 9460000000000000.0m;
+
+
+
+                    decimal x = Convert.ToDecimal(bits[4]);
+                    decimal y = Convert.ToDecimal(bits[5]);
+                    decimal z = Convert.ToDecimal(bits[6]);
                     double security = Convert.ToDouble(bits[21]);
                     double radius = Convert.ToDouble(bits[23]);
 
                     System s = GetEveSystem(systemName);
                     if (s != null)
                     {
-                        s.ActualX = x;
-                        s.ActualY = y;
-                        s.ActualZ = z;
+                        // note : scale the coordinates to Light Year scale as at M double doesnt have enough precision however decimal doesnt 
+                        // have the range for the calculations
+                        s.ActualX = x / LYScale;
+                        s.ActualY = y / LYScale;
+                        s.ActualZ = z / LYScale;
                         s.TrueSec = security;
                         s.ConstellationID = constID;
                         s.RadiusAU = radius / 149597870700;
@@ -520,8 +529,8 @@ namespace SMT.EVEData
                     MapRegion r = GetRegion(regionName);
                     if (r != null)
                     {
-                        r.RegionX = x;
-                        r.RegionY = z;
+                        r.RegionX = x / 9460730472580800.0;
+                        r.RegionY = z / 9460730472580800.0;
                     }
                 }
             }
@@ -1140,38 +1149,38 @@ namespace SMT.EVEData
 
             foreach (EVEData.System sys in Systems)
             {
-                if (sys.ActualX < universeXMin)
+                if ((double)sys.ActualX < universeXMin)
                 {
-                    universeXMin = sys.ActualX;
+                    universeXMin = (double)sys.ActualX;
                 }
 
-                if (sys.ActualX > universeXMax)
+                if ((double)sys.ActualX > universeXMax)
                 {
-                    universeXMax = sys.ActualX;
+                    universeXMax = (double)sys.ActualX;
                 }
 
-                if (sys.ActualZ < universeZMin)
+                if ((double)sys.ActualZ < universeZMin)
                 {
-                    universeZMin = sys.ActualZ;
+                    universeZMin = (double)sys.ActualZ;
                 }
 
-                if (sys.ActualZ > universeZMax)
+                if ((double)sys.ActualZ > universeZMax)
                 {
-                    universeZMax = sys.ActualZ;
+                    universeZMax = (double)sys.ActualZ;
                 }
             }
             double universeWidth = universeXMax - universeXMin;
             double universeDepth = universeZMax - universeZMin;
-            double XScale = (RenderSize) / universeWidth;
-            double ZScale = (RenderSize) / universeDepth;
+            double XScale = RenderSize / universeWidth;
+            double ZScale = RenderSize / universeDepth;
             double universeScale = Math.Min(XScale, ZScale);
 
             foreach (EVEData.System sys in Systems)
             {
-                double X = (sys.ActualX - universeXMin) * universeScale;
+                double X = ((double)sys.ActualX - universeXMin) * universeScale;
 
                 // need to invert Z
-                double Z = (universeDepth - (sys.ActualZ - universeZMin)) * universeScale;
+                double Z = (universeDepth - ((double)sys.ActualZ - universeZMin)) * universeScale;
 
                 sys.UniverseX = X;
                 sys.UniverseY = Z;
@@ -1194,7 +1203,7 @@ namespace SMT.EVEData
                 }
 
                 nAlpha.AlphaShapeCalculator shapeCalc = new nAlpha.AlphaShapeCalculator();
-                shapeCalc.Alpha = 1 / (20 * 9460730472580800.0 * 5.22295244275827E-15);
+                shapeCalc.Alpha = 1 / (20 * 5.22295244275827E-15);
                 shapeCalc.CloseShape = true;
 
                 nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
@@ -1459,21 +1468,21 @@ namespace SMT.EVEData
         /// <summary>
         /// Calculate the range between the two systems
         /// </summary>
-        public double GetRangeBetweenSystems(string from, string to)
+        public decimal GetRangeBetweenSystems(string from, string to)
         {
             System systemFrom = GetEveSystem(from);
             System systemTo = GetEveSystem(to);
 
-            if (systemFrom == null || systemTo == null)
+            if (systemFrom == null || systemTo == null || from == to)
             {
-                return 0.0;
+                return 0.0M;
             }
 
-            double x = systemFrom.ActualX - systemTo.ActualX;
-            double y = systemFrom.ActualY - systemTo.ActualY;
-            double z = systemFrom.ActualZ - systemTo.ActualZ;
+            decimal x = systemFrom.ActualX - systemTo.ActualX;
+            decimal y = systemFrom.ActualY - systemTo.ActualY;
+            decimal z = systemFrom.ActualZ - systemTo.ActualZ;
 
-            double length = Math.Sqrt((x * x) + (y * y) + (z * z));
+            decimal length = DecimalMath.DecimalEx.Sqrt((x * x) + (y * y) + (z * z));
 
             return length;
         }
@@ -1586,7 +1595,6 @@ namespace SMT.EVEData
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
-
             Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
             ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
 
@@ -1595,34 +1603,10 @@ namespace SMT.EVEData
                 SystemIDToName[s.ID] = s.Name;
             }
 
-            if (File.Exists(SaveDataVersionFolder + @"\CharacterNames.dat"))
-            {
-                CharacterIDToName = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\CharacterNames.dat");
-            }
-            if (CharacterIDToName == null)
-            {
-                CharacterIDToName = new SerializableDictionary<long, string>();
-            }
+            CharacterIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToTicker = new SerializableDictionary<long, string>();
 
-            if (File.Exists(SaveDataVersionFolder + @"\AllianceNames.dat"))
-            {
-                AllianceIDToName = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataVersionFolder + @"\AllianceNames.dat");
-            }
-
-            if (AllianceIDToName == null)
-            {
-                AllianceIDToName = new SerializableDictionary<long, string>();
-            }
-
-            if (File.Exists(SaveDataVersionFolder + @"\AllianceTickers.dat"))
-            {
-                AllianceIDToTicker = Serialization.DeserializeFromDisk<SerializableDictionary<long, string>>(SaveDataRootFolder + @"\AllianceTickers.dat");
-            }
-
-            if (AllianceIDToTicker == null)
-            {
-                AllianceIDToTicker = new SerializableDictionary<long, string>();
-            }
 
             // patch up any links
             foreach (System s in Systems)
@@ -1711,28 +1695,32 @@ namespace SMT.EVEData
                 return;
             }
 
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+            try
             {
-                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
                 {
-                    if (ri.Category == ResolvedInfoCategory.Alliance)
+                    foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
                     {
-                        ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
+                        if (ri.Category == ResolvedInfoCategory.Alliance)
+                        {
+                            ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
 
-                        if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
-                        {
-                            AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
-                            AllianceIDToName[ri.Id] = esraA.Data.Name;
-                        }
-                        else
-                        {
-                            AllianceIDToTicker[ri.Id] = "???????????????";
-                            AllianceIDToName[ri.Id] = "?????";
+                            if (ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
+                            {
+                                AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
+                                AllianceIDToName[ri.Id] = esraA.Data.Name;
+                            }
+                            else
+                            {
+                                AllianceIDToTicker[ri.Id] = "???????????????";
+                                AllianceIDToName[ri.Id] = "?????";
+                            }
                         }
                     }
                 }
             }
+            catch { }
         }
 
         /// <summary>
@@ -1760,17 +1748,21 @@ namespace SMT.EVEData
                 return;
             }
 
-            ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+            try
             {
-                foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
                 {
-                    if (ri.Category == ResolvedInfoCategory.Character)
+                    foreach (ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
                     {
-                        CharacterIDToName[ri.Id] = ri.Name;
+                        if (ri.Category == ResolvedInfoCategory.Character)
+                        {
+                            CharacterIDToName[ri.Id] = ri.Name;
+                        }
                     }
                 }
             }
+            catch { }
         }
 
         /// <summary>
@@ -1797,10 +1789,6 @@ namespace SMT.EVEData
                 xms.Serialize(tw, saveList);
             }
 
-            // now serialise the caches to disk
-            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(CharacterIDToName, SaveDataVersionFolder + @"\CharacterNames.dat");
-            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToName, SaveDataVersionFolder + @"\AllianceNames.dat");
-            Serialization.SerializeToDisk<SerializableDictionary<long, string>>(AllianceIDToTicker, SaveDataVersionFolder + @"\AllianceTickers.dat");
 
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             Serialization.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
@@ -2193,96 +2181,100 @@ namespace SMT.EVEData
         {
             FactionWarfareSystems.Clear();
 
-            ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
-
-            string debugListofSytems = "";
-
-            if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
+            try
             {
-                foreach (ESI.NET.Models.FactionWarfare.FactionWarfareSystem i in esr.Data)
+                ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
+
+                string debugListofSytems = "";
+
+                if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
                 {
-                    FactionWarfareSystemInfo fwsi = new FactionWarfareSystemInfo();
-                    fwsi.SystemState = FactionWarfareSystemInfo.State.None;
-
-                    fwsi.OccupierID = i.OccupierFactionId;
-                    fwsi.OccupierName = FactionWarfareSystemInfo.OwnerIDToName(i.OccupierFactionId);
-
-                    fwsi.OwnerID = i.OwnerFactionId;
-                    fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName(i.OwnerFactionId);
-
-                    fwsi.SystemID = i.SolarSystemId;
-                    fwsi.SystemName = GetEveSystemNameFromID(i.SolarSystemId);
-                    fwsi.LinkSystemID = 0;
-                    fwsi.VictoryPoints = i.VictoryPoints;
-                    fwsi.VictoryPointsThreshold = i.VictoryPointsThreshold;
-
-                    FactionWarfareSystems.Add(fwsi);
-
-                    debugListofSytems += fwsi.SystemName + "\n";
-                }
-            }
-
-            // step 1, identify all the Frontline systems, these will be systems with connections to other systems with a different occupier
-            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
-            {
-                System s = GetEveSystemFromID(fws.SystemID);
-                foreach (string js in s.Jumps)
-                {
-                    foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                    foreach (ESI.NET.Models.FactionWarfare.FactionWarfareSystem i in esr.Data)
                     {
-                        if (fwss.SystemName == js && fwss.OccupierID != fws.OccupierID)
-                        {
-                            fwss.SystemState = FactionWarfareSystemInfo.State.Frontline;
-                            fws.SystemState = FactionWarfareSystemInfo.State.Frontline;
-                        }
+                        FactionWarfareSystemInfo fwsi = new FactionWarfareSystemInfo();
+                        fwsi.SystemState = FactionWarfareSystemInfo.State.None;
+
+                        fwsi.OccupierID = i.OccupierFactionId;
+                        fwsi.OccupierName = FactionWarfareSystemInfo.OwnerIDToName(i.OccupierFactionId);
+
+                        fwsi.OwnerID = i.OwnerFactionId;
+                        fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName(i.OwnerFactionId);
+
+                        fwsi.SystemID = i.SolarSystemId;
+                        fwsi.SystemName = GetEveSystemNameFromID(i.SolarSystemId);
+                        fwsi.LinkSystemID = 0;
+                        fwsi.VictoryPoints = i.VictoryPoints;
+                        fwsi.VictoryPointsThreshold = i.VictoryPointsThreshold;
+
+                        FactionWarfareSystems.Add(fwsi);
+
+                        debugListofSytems += fwsi.SystemName + "\n";
                     }
                 }
-            }
 
-            // step 2, itendify all commandline operations by flooding out one from the frontlines
-            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
-            {
-                if (fws.SystemState == FactionWarfareSystemInfo.State.Frontline)
+                // step 1, identify all the Frontline systems, these will be systems with connections to other systems with a different occupier
+                foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
                 {
                     System s = GetEveSystemFromID(fws.SystemID);
-
                     foreach (string js in s.Jumps)
                     {
                         foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
                         {
-                            if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                            if (fwss.SystemName == js && fwss.OccupierID != fws.OccupierID)
                             {
-                                fwss.SystemState = FactionWarfareSystemInfo.State.CommandLineOperation;
-                                fwss.LinkSystemID = fws.SystemID;
+                                fwss.SystemState = FactionWarfareSystemInfo.State.Frontline;
+                                fws.SystemState = FactionWarfareSystemInfo.State.Frontline;
                             }
                         }
                     }
                 }
-            }
 
-            // step 3, itendify all Rearguard operations by flooding out one from the command lines
-            foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
-            {
-                if (fws.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
+                // step 2, itendify all commandline operations by flooding out one from the frontlines
+                foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
                 {
-                    System s = GetEveSystemFromID(fws.SystemID);
-
-                    foreach (string js in s.Jumps)
+                    if (fws.SystemState == FactionWarfareSystemInfo.State.Frontline)
                     {
-                        foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                        System s = GetEveSystemFromID(fws.SystemID);
+
+                        foreach (string js in s.Jumps)
                         {
-                            if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                            foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
                             {
-                                fwss.SystemState = FactionWarfareSystemInfo.State.Rearguard;
-                                fwss.LinkSystemID = fws.SystemID;
+                                if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                                {
+                                    fwss.SystemState = FactionWarfareSystemInfo.State.CommandLineOperation;
+                                    fwss.LinkSystemID = fws.SystemID;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // for ease remove all "none" systems
-            //FactionWarfareSystems.RemoveAll(sys => sys.SystemState == FactionWarfareSystemInfo.State.None);
+                // step 3, itendify all Rearguard operations by flooding out one from the command lines
+                foreach (FactionWarfareSystemInfo fws in FactionWarfareSystems)
+                {
+                    if (fws.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
+                    {
+                        System s = GetEveSystemFromID(fws.SystemID);
+
+                        foreach (string js in s.Jumps)
+                        {
+                            foreach (FactionWarfareSystemInfo fwss in FactionWarfareSystems)
+                            {
+                                if (fwss.SystemName == js && fwss.SystemState == FactionWarfareSystemInfo.State.None && fwss.OccupierID == fws.OccupierID)
+                                {
+                                    fwss.SystemState = FactionWarfareSystemInfo.State.Rearguard;
+                                    fwss.LinkSystemID = fws.SystemID;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // for ease remove all "none" systems
+                //FactionWarfareSystems.RemoveAll(sys => sys.SystemState == FactionWarfareSystemInfo.State.None);
+            }
+            catch { }
         }
 
         public void AddUpdateJumpBridge(string from, string to, long stationID)
@@ -2947,6 +2939,7 @@ namespace SMT.EVEData
                 try
                 {
                     HttpClient hc = new HttpClient();
+                    hc.DefaultRequestHeaders.Add("User-Agent", EveAppConfig.SMT_VERSION);
                     var response = await hc.GetAsync(url);
                     response.EnsureSuccessStatusCode();
                     strContent = await response.Content.ReadAsStringAsync();
@@ -3264,20 +3257,24 @@ namespace SMT.EVEData
         /// </summary>
         private async void UpdateServerInfo()
         {
-            ESI.NET.EsiResponse<ESI.NET.Models.Status.Status> esr = await ESIClient.Status.Retrieve();
+            try
+            {
+                ESI.NET.EsiResponse<ESI.NET.Models.Status.Status> esr = await ESIClient.Status.Retrieve();
 
-            if (ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
-            {
-                ServerInfo.Name = "Tranquility";
-                ServerInfo.NumPlayers = esr.Data.Players;
-                ServerInfo.ServerVersion = esr.Data.ServerVersion.ToString();
+                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
+                {
+                    ServerInfo.Name = "Tranquility";
+                    ServerInfo.NumPlayers = esr.Data.Players;
+                    ServerInfo.ServerVersion = esr.Data.ServerVersion.ToString();
+                }
+                else
+                {
+                    ServerInfo.Name = "Tranquility";
+                    ServerInfo.NumPlayers = 0;
+                    ServerInfo.ServerVersion = "";
+                }
             }
-            else
-            {
-                ServerInfo.Name = "Tranquility";
-                ServerInfo.NumPlayers = 0;
-                ServerInfo.ServerVersion = "";
-            }
+            catch { }
         }
     }
 }

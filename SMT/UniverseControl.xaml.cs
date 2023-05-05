@@ -113,7 +113,7 @@ namespace SMT
         }
 
         private double m_ESIOverlayScale = 1.0f;
-        private double universeScale = 5.22295244275827E-15; // note this is calculated based off 5000x5000 at the data compile time
+        private double universeScale = 49.412945332043492; // note this is calculated based off 5000x5000 at the data compile time
         private bool m_ShowNPCKills;
         private bool m_ShowPodKills;
         private bool m_ShowShipKills;
@@ -281,7 +281,7 @@ namespace SMT
 
         private List<GateHelper> universeSysLinksCache;
 
-        private List<KeyValuePair<string, double>> activeJumpSpheres;
+        private List<KeyValuePair<string, decimal>> activeJumpSpheres;
 
         private EVEData.EveManager EM;
 
@@ -308,7 +308,7 @@ namespace SMT
             EM = EVEData.EveManager.Instance;
 
             universeSysLinksCache = new List<GateHelper>();
-            activeJumpSpheres = new List<KeyValuePair<string, double>>();
+            activeJumpSpheres = new List<KeyValuePair<string, decimal>>();
 
             VHSystems = new VisualHost();
             VHSystems.HitTestEnabled = true;
@@ -443,7 +443,7 @@ namespace SMT
                 return;
             }
 
-            foreach (KeyValuePair<string, double> kvp in activeJumpSpheres)
+            foreach (KeyValuePair<string, decimal> kvp in activeJumpSpheres)
             {
                 if (kvp.Key == sys.Name)
                 {
@@ -454,7 +454,7 @@ namespace SMT
 
             if (LY > 0)
             {
-                activeJumpSpheres.Add(new KeyValuePair<string, double>(sys.Name, LY));
+                activeJumpSpheres.Add(new KeyValuePair<string, decimal>(sys.Name, (decimal)LY));
             }
 
             Brush rangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColourHighlight);
@@ -470,11 +470,11 @@ namespace SMT
             System.Windows.Media.DrawingVisual rangeCircleDV = new System.Windows.Media.DrawingVisual();
             DrawingContext drawingContext = rangeCircleDV.RenderOpen();
 
-            foreach (KeyValuePair<string, double> kvp in activeJumpSpheres)
+            foreach (KeyValuePair<string, decimal> kvp in activeJumpSpheres)
             {
                 EVEData.System ssys = EM.GetEveSystem(kvp.Key);
 
-                double Radius = 9460730472580800.0 * kvp.Value * universeScale; ;
+                double Radius = (double)(kvp.Value * (decimal)universeScale); 
 
                 double X = ssys.UniverseX;
                 double Z = ssys.UniverseY;
@@ -492,12 +492,12 @@ namespace SMT
                 bool inRange = false;
                 bool overlap = false;
 
-                foreach (KeyValuePair<string, double> kvp in activeJumpSpheres)
+                foreach (KeyValuePair<string, decimal> kvp in activeJumpSpheres)
                 {
-                    double Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
-                    Distance = Distance / 9460730472580800.0;
+                    decimal Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
 
-                    if (Distance < kvp.Value && Distance > 0.0 && es.TrueSec <= 0.45 && es.Region != "Pochven")
+
+                    if (Distance < kvp.Value && Distance > 0.0m && es.TrueSec <= 0.45 && es.Region != "Pochven")
                     {
                         if (inRange == true)
                         {

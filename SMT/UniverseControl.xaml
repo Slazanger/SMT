@@ -60,7 +60,7 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -73,7 +73,7 @@
                     </ItemsPanelTemplate>
                 </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
             </dotNetKitControls:AutoCompleteComboBox>
-            <Button x:Name="RecentreBtn" Click="RecentreBtn_Click" Padding="0">
+            <Button x:Name="RecentreBtn" Click="RecentreBtn_Click" Padding="0" Height="20" Width="20">
                 <Image Source="Images/recentre.png" />
             </Button>
 

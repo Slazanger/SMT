@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
@@ -218,24 +219,6 @@ namespace SMT
                 catch { }
             }
 
-            RegionUC.MapConf = MapConf;
-            RegionUC.Init();
-            RegionUC.SelectRegion(MapConf.DefaultRegion);
-
-            RegionUC.RegionChanged += RegionUC_RegionChanged;
-            RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
-
-            UniverseUC.MapConf = MapConf;
-            UniverseUC.CapitalRoute = CapitalRoute;
-            UniverseUC.Init();
-            UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
-
-            RegionsViewUC.MapConf = MapConf;
-            RegionsViewUC.Init();
-            RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
-
-            AppStatusBar.DataContext = EVEManager.ServerInfo;
-
             // load the anom data
             string anomDataFilename = EVEManager.SaveDataVersionFolder + @"\Anoms.dat";
             if (File.Exists(anomDataFilename))
@@ -260,7 +243,29 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
+
+            RegionUC.MapConf = MapConf;
             RegionUC.ANOMManager = ANOMManager;
+            RegionUC.Init();
+            RegionUC.SelectRegion(MapConf.DefaultRegion);
+
+            RegionUC.RegionChanged += RegionUC_RegionChanged;
+            RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
+
+            UniverseUC.MapConf = MapConf;
+            UniverseUC.CapitalRoute = CapitalRoute;
+            UniverseUC.Init();
+            UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+
+            RegionsViewUC.MapConf = MapConf;
+            RegionsViewUC.Init();
+            RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
+
+            AppStatusBar.DataContext = EVEManager.ServerInfo;
+
+
+
+
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
@@ -270,6 +275,7 @@ namespace SMT
 
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
+            Closing += MainWindow_Closing;
             Closed += MainWindow_Closed;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
@@ -329,6 +335,12 @@ namespace SMT
             };
 
             CheckGitHubVersion();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, Properties.Settings.Default.MainWindow_placement);
         }
 
         private void SaveDefaultLayout()
@@ -420,6 +432,15 @@ namespace SMT
                 }
             }
             return content;
+        }
+
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            // Store the main window position and size
+
+            Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
+            Properties.Settings.Default.Save();
+            
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
@@ -206,13 +207,14 @@ namespace SMT
 
         private float overlaySystemSizeGatherer = 20f;
         private float overlaySystemSizeHunter = 5f;
-        private float CalculatedOverlaySystemSize { get => gathererMode ? overlaySystemSizeGatherer : overlaySystemSizeHunter; }
+        private float overlayCurrentSystemSizeHunterModifier = 3f;
 
         private float overlayIntelOversize = 10f;
         private float CalculatedOverlayIntelOversize { get => overlayIntelOversize; }
 
         private bool gathererMode = true;
         private bool gathererModeIncludesAdjacentRegions = false;
+        private bool hunterModeShowFullRegion = false;
 
         private bool showNPCKillData = true;
         private float npcKillDeltaMaxSize = 40f;
@@ -228,14 +230,12 @@ namespace SMT
 
         public Overlay(MainWindow mw)
         {
-            InitializeComponent();
-
-            // Restore the last window size and position
-            LoadOverlayWindowPosition();
+            InitializeComponent();            
 
             this.Background.Opacity = mw.MapConf.OverlayBackgroundOpacity;
             overlay_Canvas.Opacity = mw.MapConf.OverlayOpacity;
             gathererMode = mw.MapConf.OverlayGathererMode;
+            hunterModeShowFullRegion = mw.MapConf.OverlayHunterModeShowFullRegion;
             showCharName = mw.MapConf.OverlayShowCharName;
             showCharLocation = mw.MapConf.OverlayShowCharLocation;
 
@@ -308,6 +308,7 @@ namespace SMT
             mainWindow.OnSelectedCharChangedEventHandler += SelectedCharChanged;
             mainWindow.MapConf.PropertyChanged += OverlayConf_PropertyChanged;
             SizeChanged += OnSizeChanged;
+            Closing += Overlay_Closing;
             // We can only redraw stuff when the canvas is actually resized, otherwise dimensions will be wrong!
             overlay_Canvas.SizeChanged += OnCanvasSizeChanged;
 
@@ -335,6 +336,29 @@ namespace SMT
             RefreshCurrentView();
             _ = CharacterLocationUpdateLoop();
             _ = DataOverlayUpdateLoop();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            LoadOverlayWindowPosition();
+        }
+
+        /// <summary>
+        /// Calculates the actual size for the canvas element that represents a system. 
+        /// Takes into account if it is the current system the player is in.
+        /// </summary>
+        /// <param name="systemName">The name of the system for which the size should be calculated.</param>
+        /// <returns>The size for the canvas element for the system.</returns>
+        private float CalculatedOverlaySystemSize(string systemName)
+        {
+            if (gathererMode) 
+                return overlaySystemSizeGatherer;
+
+            if (systemName == currentPlayerSystemData?.system?.Name)
+                return overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier;
+
+            return overlaySystemSizeHunter;
         }
 
         /// <summary>
@@ -393,10 +417,7 @@ namespace SMT
         /// </summary>
         private void LoadOverlayWindowPosition()
         {
-            this.Top = Properties.Settings.Default.overlay_window_top;
-            this.Left = Properties.Settings.Default.overlay_window_left;
-            this.Width = Properties.Settings.Default.overlay_window_width;
-            this.Height = Properties.Settings.Default.overlay_window_height;
+            WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, Properties.Settings.Default.OverlayWindow_placement);
         }
 
         /// <summary>
@@ -404,11 +425,13 @@ namespace SMT
         /// </summary>
         private void StoreOverlayWindowPosition()
         {
-            Properties.Settings.Default.overlay_window_top = this.Top;
-            Properties.Settings.Default.overlay_window_left = this.Left;
-            Properties.Settings.Default.overlay_window_width = this.Width;
-            Properties.Settings.Default.overlay_window_height = this.Height;
+            Properties.Settings.Default.OverlayWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(this).Handle);
             Properties.Settings.Default.Save();
+        }
+
+        private void Overlay_Closing(object sender, CancelEventArgs e)
+        {
+            StoreOverlayWindowPosition();
         }
 
         /// <summary>
@@ -633,8 +656,8 @@ namespace SMT
 
                     if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
 
-                    Vector2 segmentStartCanvasCoordinate = systemData[segmentStart.SystemName].mapSystemCoordinate * canvasData.dimensions.X;
-                    Vector2 segmentEndCanvasCoordinate = systemData[segmentEnd.SystemName].mapSystemCoordinate * canvasData.dimensions.X;
+                    Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
+                    Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
 
                     routeLines[i - 1].X1 = segmentStartCanvasCoordinate.X;
                     routeLines[i - 1].Y1 = segmentStartCanvasCoordinate.Y;
@@ -686,8 +709,8 @@ namespace SMT
                     // Update the shape associated with the current intel entry.
                     if (intelDataEntry.ellipse.Count > i)
                     {
-                        intelDataEntry.ellipse[i].Width = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
-                        intelDataEntry.ellipse[i].Height = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+                        intelDataEntry.ellipse[i].Width = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
+                        intelDataEntry.ellipse[i].Height = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
                         Canvas.SetLeft(intelDataEntry.ellipse[i], intelSystemCoordinateVector.x);
                         Canvas.SetTop(intelDataEntry.ellipse[i], intelSystemCoordinateVector.y);
                         // If a system is not on the current map, hide it. Can be made visible later.
@@ -754,11 +777,8 @@ namespace SMT
 
             List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
-
-
-
             // for Gathere mode collect the preset depth of systems
-            if(gathererMode)
+            if ( gathererMode || (!gathererMode && !hunterModeShowFullRegion))
             {
                 // Add the players location to the hierarchie.
                 hierarchie.Add(new List<OverlaySystemData>() { currentPlayerSystemData });
@@ -824,18 +844,15 @@ namespace SMT
             {
                 List<OverlaySystemData> hunterSystems = new List<OverlaySystemData>();
 
-                // source maps are 1050.0 width
-                float MapWidth = 1050.0F;
-
-
                 MapRegion mr = mainWindow.EVEManager.GetRegion(currentSystem.Region);
                 foreach(MapSystem ms in mr.MapSystems.Values)
                 {
-                    Vector2 newCoords = ms.Layout / MapWidth;
+                    Vector2 newCoords = ms.Layout;
                     if (!systemData.ContainsKey(ms.Name))
-                    {
+                    {                        
                         systemData.Add(ms.Name, new OverlaySystemData(ms.ActualSystem));
                     }
+                    canvasData.UpdateUnscaledExtends(ms.Layout);
                     systemsInList.Add(ms.Name);
                     hunterSystems.Add(new OverlaySystemData(ms.ActualSystem, newCoords));
                     systemData[ms.Name].mapSystemCoordinate = newCoords;
@@ -917,15 +934,15 @@ namespace SMT
 
 
 
-                        Vector2f current = new Vector2f(currentCoordinate.X + (CalculatedOverlaySystemSize / 2f),
-                            currentCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
-                        Vector2f connected = new Vector2f(connectedCoordinate.X + (CalculatedOverlaySystemSize / 2f),
-                            connectedCoordinate.Y + (CalculatedOverlaySystemSize / 2f));
+                        Vector2f current = new Vector2f(currentCoordinate.X + (CalculatedOverlaySystemSize(currentSystem.Name) / 2f),
+                            currentCoordinate.Y + (CalculatedOverlaySystemSize(currentSystem.Name) / 2f));
+                        Vector2f connected = new Vector2f(connectedCoordinate.X + (CalculatedOverlaySystemSize(connectedSystem) / 2f),
+                            connectedCoordinate.Y + (CalculatedOverlaySystemSize(connectedSystem) / 2f));
 
                         Vector2f currentToConnected = connected == current ? new Vector2f(0, 0) : Vector2f.Normalize(connected - current);
 
-                        Vector2f currentCorrected = current + (currentToConnected * (int)(CalculatedOverlaySystemSize / 2f));
-                        Vector2f connectedCorrected = connected - (currentToConnected * (int)(CalculatedOverlaySystemSize / 2f));
+                        Vector2f currentCorrected = current + (currentToConnected * (int)(CalculatedOverlaySystemSize(currentSystem.Name) / 2f));
+                        Vector2f connectedCorrected = connected - (currentToConnected * (int)(CalculatedOverlaySystemSize(connectedSystem) / 2f));
 
                         jumpLines[^1].X1 = currentCorrected.x;
                         jumpLines[^1].Y1 = currentCorrected.y;
@@ -979,8 +996,9 @@ namespace SMT
                 }
                 else
                 {
-                    left = systemData[systems[i].system.Name].mapSystemCoordinate.X * canvasData.dimensions.X;
-                    top = systemData[systems[i].system.Name].mapSystemCoordinate.Y * canvasData.dimensions.X;
+                    Vector2 canvasCoordinate = canvasData.CoordinateToCanvas(systemData[systems[i].system.Name].mapSystemCoordinate);
+                    left = canvasCoordinate.X;
+                    top = canvasCoordinate.Y;
                 }
                 DrawSystemToOverlay(systems[i], left, top);
             }
@@ -1003,19 +1021,14 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
             }
 
-            systemData[sysData.system.Name].systemCanvasElement.Width = CalculatedOverlaySystemSize;
-            systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize;
+            systemData[sysData.system.Name].systemCanvasElement.Width = CalculatedOverlaySystemSize(sysData.system.Name);
+            systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name);
             systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode? 2:1;
             
 
             if (sysData.system.Name == currentPlayerSystemData.system.Name)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = sysLocationOutlineBrush;
-                if(!gathererMode)
-                {
-                    systemData[sysData.system.Name].systemCanvasElement.Width = 15;
-                    systemData[sysData.system.Name].systemCanvasElement.Height = 15;
-                }
             }
             else
             {
@@ -1092,8 +1105,8 @@ namespace SMT
 
                 float killDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillData, 0f, Math.Abs(npcKillData)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
 
-                systemData[sysData.system.Name].npcKillCanvasElement.Width = CalculatedOverlaySystemSize + killDataCalculatedSize;
-                systemData[sysData.system.Name].npcKillCanvasElement.Height = CalculatedOverlaySystemSize + killDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillCanvasElement.Width = CalculatedOverlaySystemSize(sysData.system.Name) + killDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name) + killDataCalculatedSize;
                 systemData[sysData.system.Name].npcKillCanvasElement.StrokeThickness = 0f;
 
                 systemData[sysData.system.Name].npcKillCanvasElement.Fill = npcKillDataBrush;
@@ -1134,8 +1147,8 @@ namespace SMT
 
                 float killDeltaDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillDelta, 0f, Math.Abs(npcKillDelta)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
 
-                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
-                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height = CalculatedOverlaySystemSize + killDeltaDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Width = CalculatedOverlaySystemSize(sysData.system.Name) + killDeltaDataCalculatedSize;
+                systemData[sysData.system.Name].npcKillDeltaCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name) + killDeltaDataCalculatedSize;
                 systemData[sysData.system.Name].npcKillDeltaCanvasElement.StrokeThickness = 0f;
 
                 systemData[sysData.system.Name].npcKillDeltaCanvasElement.Fill = npcKillDeltaDataBrush;
@@ -1215,6 +1228,12 @@ namespace SMT
                 UpdatePlayerInformationText();
             }
 
+            if (e.PropertyName == "OverlayHunterModeShowFullRegion")
+            {
+                hunterModeShowFullRegion = mainWindow.MapConf.OverlayHunterModeShowFullRegion;
+                RefreshCurrentView();
+            }
+
 
         }
 
@@ -1276,7 +1295,6 @@ namespace SMT
         {
             RefreshCurrentView();
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
-            StoreOverlayWindowPosition();
         }
 
         /// <summary>
@@ -1288,8 +1306,13 @@ namespace SMT
         {
             if (e.ChangedButton == MouseButton.Left)
             {
+                // This is a quick way to avoid snapping by just disallowing the resizing during drag.
+                this.ResizeMode = ResizeMode.NoResize;
+
                 this.DragMove();
-                StoreOverlayWindowPosition();
+
+                // Since this not asynchronous, we can just restore the resizing here.
+                this.ResizeMode = ResizeMode.CanResizeWithGrip;
             }
             e.Handled = true;
         }
@@ -1301,7 +1324,6 @@ namespace SMT
         /// <param name="e"></param>
         private void Overlay_Window_Close(object sender, MouseButtonEventArgs e)
         {
-            StoreOverlayWindowPosition();
             this.Close();
         }
 
@@ -1365,8 +1387,8 @@ namespace SMT
                 intelShape.Visibility = Visibility.Hidden;
             }
 
-            intelShape.Width = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
-            intelShape.Height = CalculatedOverlaySystemSize + CalculatedOverlayIntelOversize;
+            intelShape.Width = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
+            intelShape.Height = CalculatedOverlaySystemSize(intelSystem) + CalculatedOverlayIntelOversize;
             intelShape.StrokeThickness = CalculatedOverlayIntelOversize / 2f;
             intelShape.Stroke = intelUrgentOutlineBrush;
             intelShape.IsHitTestVisible = false;

@@ -74,22 +74,17 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the X coordinate in real space for this system
         /// </summary>
-        public double ActualX { get; set; }
+        public decimal ActualX { get; set; }
 
         /// <summary>
         /// Gets or sets the Y coordinate in real space for this system
         /// </summary>
-        public double ActualY { get; set; }
+        public decimal ActualY { get; set; }
 
         /// <summary>
         /// Gets or sets the Z coordinate in real space for this system
         /// </summary>
-        public double ActualZ { get; set; }
-
-        /// <summary>
-        /// A property to get the coordinate in real space for this system as a Vector3
-        /// </summary>
-        public Vector3 Actual { get => new Vector3((float)ActualX, (float)ActualY, (float)ActualZ); }
+        public decimal ActualZ { get; set; }
 
         /// <summary>
         /// the 2d X coordinate used to render on the universe view

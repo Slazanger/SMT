@@ -49,21 +49,21 @@
     </Window.Resources>
 
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Background="{DynamicResource MenuBackground}" Height="27">
-            <Menu Style="{DynamicResource ResourceKey={x:Type Menu}}">
-                <MenuItem Header="File">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Background="{DynamicResource MenuBackground}" Height="Auto">
+            <Menu Style="{DynamicResource ResourceKey={x:Type Menu}}" Height="Auto">
+                <MenuItem Header="File" Height="Auto">
                     <MenuItem Header="Characters" Click="Characters_MenuItem_Click" />
                     <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
                     <MenuItem Header="Overlay" Click="OverlayWindow_MenuItem_Click" />
                     <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
                 </MenuItem>
 
-                <MenuItem Header="Data">
+                <MenuItem Header="Data"  Height="Auto">
                     <MenuItem Header="Force ESI Update" Click="ForceESIUpdate_MenuItem_Click" />
                     <MenuItem Header="Clear Old Eve logs" Click="ClearOldEVELogs_Click" />
                 </MenuItem>
 
-                <MenuItem Header="View">
+                <MenuItem Header="View" Height="Auto" >
                     <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
                     <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
                 </MenuItem>
@@ -73,7 +73,7 @@
             <ComboBox x:Name="CurrentActiveCharacterCombo" Width="180"  IsReadOnly="True" SelectionChanged="CurrentActiveCharacterCombo_Selected"  Height="18" />
         </StackPanel>
 
-        <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom">
+        <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom" Height="Auto">
             <StatusBarItem>
                 <TextBlock><Run Text="EVE Time :" /></TextBlock>
             </StatusBarItem>

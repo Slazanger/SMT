@@ -10,6 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using SMT.EVEData;
 using SMT.ResourceUsage;
+using Windows.Gaming.Preview.GamesEnumeration;
 
 namespace SMT
 {
@@ -966,12 +967,12 @@ namespace SMT
                 int type = 0;
                 if (!c.IsOnline)
                 {
-                    type = 1;
+                    type = 2;
                 }
 
                 if (!string.IsNullOrEmpty(c.GameLogWarningText))
                 {
-                    type = 3;
+                    type = 1;
                 }
 
                 NameTrackingLocationMap[c.Location].Add(new KeyValuePair<int, string>(type, c.Name));
@@ -1015,7 +1016,7 @@ namespace SMT
                         {
                             displayName += " (" + fm.ShipType + ")";
                         }
-                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<int, string>(2, displayName));
+                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<int, string>(3, displayName));
                     }
                 }
             }
@@ -1023,13 +1024,16 @@ namespace SMT
             foreach (string lkvpk in NameTrackingLocationMap.Keys)
             {
                 List<KeyValuePair<int, string>> lkvp = NameTrackingLocationMap[lkvpk];
+
+                lkvp = lkvp.OrderByDescending(o => o.Key).ToList();
+
                 EVEData.MapSystem ms = Region.MapSystems[lkvpk];
 
                 bool addIndividualFleetMembers = true;
                 int fleetMemberCount = 0;
                 foreach (KeyValuePair<int, string> kvp in lkvp)
                 {
-                    if (kvp.Key == 2)
+                    if (kvp.Key == 3)
                     {
                         fleetMemberCount++;
                     }
@@ -1048,58 +1052,78 @@ namespace SMT
                 SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
                 SolidColorBrush characterTextOutline = new SolidColorBrush(Colors.Black);
 
-                foreach (KeyValuePair<int, string> kvp in lkvp)
+                if(MapConf.ShowCompactCharactersOnMap)
                 {
-                    if (kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
-                    {
-                        continue;
-                    }
+                    OutlinedTextBlock charText = new OutlinedTextBlock();
+                    charText.Text = lkvp.Count.ToString();
+                    charText.IsHitTestVisible = false;
+                    charText.Stroke = characterTextOutline;
+                    charText.Fill = localCharacterText;
+                    charText.StrokeThickness = 2;
 
-                    if (kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 3 || kvp.Key == 2 && addIndividualFleetMembers)
-                    {
-                        OutlinedTextBlock charText = new OutlinedTextBlock();
-                        charText.Text = kvp.Value;
-                        charText.IsHitTestVisible = false;
-                        charText.Stroke = characterTextOutline;
-                        charText.Fill = localCharacterText;
-                        charText.StrokeThickness = 2;
+                    Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
+                    Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
+                    Canvas.SetZIndex(charText, 40);
+                    MainCanvas.Children.Add(charText);
+                    DynamicMapElements.Add(charText);
 
-                        switch (kvp.Key)
+                }
+                else
+                {
+                    foreach (KeyValuePair<int, string> kvp in lkvp)
+                    {
+                        if (kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
                         {
-                            case 0:
-                                charText.Fill = localCharacterText;
-
-                                break;
-
-                            case 1:
-                                charText.Fill = localCharacterOfflineText;
-                                charText.Text += "(Offline)";
-                                break;
-
-                            case 2:
-                                charText.Fill = fleetMemberText;
-                                break;
-
-                            case 3:
-                                charText.Fill = localCharacterText;
-                                charText.Text = "⚠ " + kvp.Value + " ⚠";
-                                break;
+                            continue;
                         }
 
-                        if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                        if (kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 2 || kvp.Key == 3 && addIndividualFleetMembers)
                         {
-                            charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
+                            OutlinedTextBlock charText = new OutlinedTextBlock();
+                            charText.Text = kvp.Value;
+                            charText.IsHitTestVisible = false;
+                            charText.Stroke = characterTextOutline;
+                            charText.Fill = localCharacterText;
+                            charText.StrokeThickness = 2;
+
+                            switch (kvp.Key)
+                            {
+                                case 0:
+                                    charText.Fill = localCharacterText;
+
+                                    break;
+
+                                case 2:
+                                    charText.Fill = localCharacterOfflineText;
+                                    charText.Text += "(Offline)";
+                                    break;
+
+                                case 3:
+                                    charText.Fill = fleetMemberText;
+                                    break;
+
+                                case 1:
+                                    charText.Fill = localCharacterText;
+                                    charText.Text = "⚠ " + kvp.Value + " ⚠";
+                                    break;
+                            }
+
+                            if (MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                            {
+                                charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
+                            }
+
+                            Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
+                            Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
+                            Canvas.SetZIndex(charText, 40);
+                            MainCanvas.Children.Add(charText);
+                            DynamicMapElements.Add(charText);
+
+                            textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
                         }
-
-                        Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
-                        Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
-                        Canvas.SetZIndex(charText, 40);
-                        MainCanvas.Children.Add(charText);
-                        DynamicMapElements.Add(charText);
-
-                        textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
                     }
                 }
+
 
                 if (!addIndividualFleetMembers)
                 {
@@ -1664,24 +1688,23 @@ namespace SMT
                     // check character
                     if (!string.IsNullOrEmpty(currentJumpCharacter))
                     {
-                        double Distance = EM.GetRangeBetweenSystems(currentCharacterJumpSystem, sys.Name);
-                        Distance = Distance / 9460730472580800.0;
+                        decimal Distance = EM.GetRangeBetweenSystems(currentCharacterJumpSystem, sys.Name);
 
-                        double Max = 0.1f;
+                        decimal Max = 0.1m;
 
                         switch (jumpShipType)
                         {
-                            case EVEData.EveManager.JumpShip.Super: { Max = 6.0; } break;
-                            case EVEData.EveManager.JumpShip.Titan: { Max = 6.0; } break;
-                            case EVEData.EveManager.JumpShip.Dread: { Max = 7.0; } break;
-                            case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0; } break;
-                            case EVEData.EveManager.JumpShip.FAX: { Max = 7.0; } break;
-                            case EVEData.EveManager.JumpShip.Blops: { Max = 8.0; } break;
-                            case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0; } break;
-                            case EVEData.EveManager.JumpShip.JF: { Max = 10.0; } break;
+                            case EVEData.EveManager.JumpShip.Super: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Titan: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Dread: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.FAX: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Blops: { Max = 8.0m; } break;
+                            case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0m; } break;
+                            case EVEData.EveManager.JumpShip.JF: { Max = 10.0m; } break;
                         }
 
-                        if (Distance < Max && Distance > 0.0 && sys.ActualSystem.TrueSec <= 0.45 && currentCharacterJumpSystem != sys.Name)
+                        if (Distance < Max && Distance > 0.0m && sys.ActualSystem.TrueSec <= 0.45 && currentCharacterJumpSystem != sys.Name)
                         {
                             AddHighlight = true;
                         }
@@ -1694,24 +1717,22 @@ namespace SMT
                             continue;
                         }
 
-                        double Distance = EM.GetRangeBetweenSystems(key, sys.Name);
-                        Distance = Distance / 9460730472580800.0;
-
-                        double Max = 0.1f;
+                        decimal Distance = EM.GetRangeBetweenSystems(key, sys.Name);
+                        decimal Max = 0.1m;
 
                         switch (activeJumpSpheres[key])
                         {
-                            case EVEData.EveManager.JumpShip.Super: { Max = 6.0; } break;
-                            case EVEData.EveManager.JumpShip.Titan: { Max = 6.0; } break;
-                            case EVEData.EveManager.JumpShip.Dread: { Max = 7.0; } break;
-                            case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0; } break;
-                            case EVEData.EveManager.JumpShip.FAX: { Max = 7.0; } break;
-                            case EVEData.EveManager.JumpShip.Blops: { Max = 8.0; } break;
-                            case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0; } break;
-                            case EVEData.EveManager.JumpShip.JF: { Max = 10.0; } break;
+                            case EVEData.EveManager.JumpShip.Super: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Titan: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Dread: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.FAX: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Blops: { Max = 8.0m; } break;
+                            case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0m; } break;
+                            case EVEData.EveManager.JumpShip.JF: { Max = 10.0m; } break;
                         }
 
-                        if (Distance < Max && Distance > 0.0 && sys.ActualSystem.TrueSec <= 0.45 && key != sys.Name)
+                        if (Distance < Max && Distance > 0.0m && sys.ActualSystem.TrueSec <= 0.45 && key != sys.Name)
                         {
                             if (AddHighlight)
                             {
@@ -3527,15 +3548,53 @@ namespace SMT
 
                 Label header = new Label();
                 header.Content = selectedSys.Name;
-                header.FontWeight = FontWeights.Bold;
-                header.FontSize = 13;
+                header.FontWeight = FontWeights.Bold;      
+                header.FontSize = 14;
                 header.Padding = one;
                 header.Margin = one;
                 header.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
 
                 SystemInfoPopupSP.Children.Add(header);
-
                 SystemInfoPopupSP.Children.Add(new Separator());
+
+
+                bool needSeperator = false;
+                List<string> charNames = new List<string>();
+                foreach(LocalCharacter c in EM.LocalCharacters)
+                {   
+
+
+                    if(c.Location == selectedSys.Name)
+                    {
+                        needSeperator = true;
+                        Label characterlabel = new Label();
+                        string cname = c.Name;
+                        if(!c.IsOnline)
+                        {
+                            cname += " (Offline)";
+                        }
+                        charNames.Add(cname);
+                    }
+                }
+
+                charNames.Sort();
+
+                foreach(string s in charNames)
+                {
+                    Label characterlabel = new Label();
+                    characterlabel.Padding = one;
+                    characterlabel.Margin = one;
+                    characterlabel.Content = s;
+
+                    characterlabel.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    SystemInfoPopupSP.Children.Add(characterlabel);
+                }
+
+                if(needSeperator)
+                {
+                    SystemInfoPopupSP.Children.Add(new Separator());
+                }
+
 
                 Label constellation = new Label();
                 constellation.Padding = one;

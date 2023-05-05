@@ -30,6 +30,7 @@ namespace SMT
 
         private int m_MaxIntelSeconds;
 
+        private bool m_showCompactCharactersOnMap = false;
         private bool m_showOfflineCharactersOnMap = true;
         private bool m_ShowCharacterNamesOnMap = true;
         private bool m_ShowCoalition;
@@ -92,6 +93,7 @@ namespace SMT
         private float m_intelStaleTime = 120;
         private float m_intelHistoricTime = 600;
         private bool m_overlayGathererMode = false;
+        private bool m_overlayHunterModeShowFullRegion = true;
         private bool m_overlayShowCharName = true;
         private bool m_overlayShowCharLocation = true;
         private bool m_overlayShowNPCKills = true;
@@ -439,6 +441,20 @@ namespace SMT
                 OnPropertyChanged("ShowCharacterNamesOnMap");
             }
         }
+
+        public bool ShowCompactCharactersOnMap
+        {
+            get
+            {
+                return m_showCompactCharactersOnMap;
+            }
+            set
+            {
+                m_showCompactCharactersOnMap = value;
+                OnPropertyChanged("ShowCompactCharactersOnMap");
+            }
+        }
+
 
         public bool ShowOfflineCharactersOnMap
         {
@@ -929,6 +945,21 @@ namespace SMT
                 m_overlayGathererMode = value;
 
                 OnPropertyChanged("OverlayGathererMode");
+            }
+        }
+
+        [Category("Overlay")]
+        [DisplayName("Overlay In Hunter Mode Shows Full Region")]
+        public bool OverlayHunterModeShowFullRegion
+        {
+            get {
+                return m_overlayHunterModeShowFullRegion;
+            }
+            set {
+
+                m_overlayHunterModeShowFullRegion = value;
+
+                OnPropertyChanged("OverlayHunterModeShowFullRegion");
             }
         }
 

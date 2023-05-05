@@ -68,15 +68,15 @@
                     continue;
                 }
 
-                double x = startSys.X - sys.X;
-                double y = startSys.Y - sys.Y;
-                double z = startSys.Z - sys.Z;
+                decimal x = startSys.X - sys.X;
+                decimal y = startSys.Y - sys.Y;
+                decimal z = startSys.Z - sys.Z;
 
-                double length = Math.Sqrt((x * x) + (y * y) + (z * z)) / 9460730472580800.0;
+                decimal length = DecimalMath.DecimalEx.Sqrt((x * x) + (y * y) + (z * z)) ;
 
                 bool shouldAdd = false;
 
-                if (length < LY)
+                if (length < (decimal)LY)
                 {
                     shouldAdd = true;
                 }
@@ -171,7 +171,7 @@
 
             UpdateJumpBridges(jumpBridges);
 
-            double MaxRange = 10 * 9460730472580800.0;
+            decimal MaxRange = 10;
 
             // now create the jumpable system links
             foreach (MapNode mn in MapNodes.Values)
@@ -190,12 +190,12 @@
                         continue;
                     }
 
-                    double Distance = EveManager.Instance.GetRangeBetweenSystems(sys.Name, mn.Name);
+                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sys.Name, mn.Name);
                     if (Distance < MaxRange && Distance > 0)
                     {
                         JumpLink jl = new JumpLink();
                         jl.System = sys.Name;
-                        jl.RangeLY = Distance / 9460730472580800.0;
+                        jl.RangeLY = Distance ;
                         mn.JumpableSystems.Add(jl);
                     }
                 }
@@ -358,7 +358,7 @@
                     RP.SystemName = Route[i];
                     RP.ActualSystem = EveManager.Instance.GetEveSystem(Route[i]);
                     RP.GateToTake = GateType.StarGate;
-                    RP.LY = 0.0;
+                    RP.LY = 0.0m;
 
                     if (i < Route.Count - 1)
                     {
@@ -424,7 +424,7 @@
                 // walk the connections
                 foreach (JumpLink connection in CurrentNode.JumpableSystems)
                 {
-                    if (connection.RangeLY > MaxLY)
+                    if (connection.RangeLY > (decimal)MaxLY)
                     {
                         continue;
                     }
@@ -443,9 +443,9 @@
                         AvoidFactor = 0.0;
                     }
 
-                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor + AvoidFactor < CMN.MinCostToStart)
+                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + (double)connection.RangeLY + ExtraJumpFactor + AvoidFactor < CMN.MinCostToStart)
                     {
-                        CMN.MinCostToStart = CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor + AvoidFactor;
+                        CMN.MinCostToStart = CurrentNode.MinCostToStart + (double)connection.RangeLY + ExtraJumpFactor + AvoidFactor;
                         CMN.NearestToStart = CurrentNode;
                         if (!OpenList.Contains(CMN))
                         {
@@ -477,12 +477,12 @@
             {
                 RoutePoint RP = new RoutePoint();
                 RP.GateToTake = GateType.JumpTo;
-                RP.LY = 0.0;
+                RP.LY = 0.0m;
                 RP.SystemName = Route[i];
 
                 if (i > 0)
                 {
-                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]) / 9460730472580800.0;
+                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]);
                 }
                 ActualRoute.Add(RP);
             }
@@ -527,14 +527,14 @@
 
         private struct JumpLink
         {
-            public double RangeLY;
+            public decimal RangeLY;
             public string System;
         }
 
         public class RoutePoint
         {
             public GateType GateToTake { get; set; }
-            public double LY { get; set; }
+            public decimal LY { get; set; }
             public string SystemName { get; set; }
 
             public System ActualSystem { get; set; }
@@ -552,7 +552,7 @@
                     s += " (Thera)";
                 }
 
-                if (GateToTake == GateType.JumpTo && LY > 0.0)
+                if (GateToTake == GateType.JumpTo && LY > 0.0m)
                 {
                     s += " (Jump To, Range " + LY.ToString("0.##") + " )";
                 }
@@ -572,9 +572,9 @@
             public string TheraInSig;
             public string TheraOutSig;
             public bool Visited;
-            public double X;
-            public double Y;
-            public double Z;
+            public decimal X;
+            public decimal Y;
+            public decimal Z;
             public List<string> Connections { get; set; }
             public bool HighSec { get; set; }
             public bool Pochven { get; set; }

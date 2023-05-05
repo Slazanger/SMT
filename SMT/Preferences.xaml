@@ -7,13 +7,13 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Name="PrefsWindow"
-        Title="Preferences" Height="455" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
+        Title="Preferences" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Window.Resources>
         <local:JoinStringConverter  x:Key="stringJoiner" />
     </Window.Resources>
 
-    <Grid Background="{DynamicResource ButtonBorder}">
-        <DockPanel>
+    <Grid Background="{DynamicResource ButtonBorder}" Height="Auto" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" >
+        <DockPanel HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
             <TabControl x:Name="tabControl" DockPanel.Dock="Top">
                 <TabItem Header="General">
                     <Grid>
@@ -24,7 +24,7 @@
 
                         <StackPanel Grid.Column="0" Grid.ColumnSpan="2">
                             <StackPanel>
-                                <GroupBox Margin="4" Height="115">
+                                <GroupBox Margin="4" Height="Auto">
                                     <GroupBox.Header>
                                         <TextBlock FontWeight="Bold">General</TextBlock>
                                     </GroupBox.Header>
@@ -49,7 +49,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <GroupBox Header="Performance" Margin="4" Height="325">
+                            <GroupBox Header="Performance" Margin="4" Height="Auto">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3">Disable jump bridges path animation</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=DisableRoutePathAnimation}" Margin="0,3">Disable route path animation</CheckBox>
@@ -58,7 +58,7 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Region/Universe" HorizontalAlignment="Left">
+                <TabItem Header="Region" HorizontalAlignment="Left">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
@@ -66,7 +66,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <GroupBox Header="Region" Margin="4" Height="355">
+                            <GroupBox  Margin="4" Height="Auto">
                                 <StackPanel>
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowActiveIncursions}" Content="Show Active Incursions" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowJoveObservatories}" Content="Show Jove Observatories" />
@@ -78,10 +78,7 @@
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowRattingDataAsDelta}" Content="Show Ratting Data as Delta" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSimpleSecurityView}" Content="Show Simple Security View (Just HS/LS/null)" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrigInvasions}" Content="Show Trig Invasions" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=FollowOnZoom}" Content="Follow Selected System when Zoomed" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ClampMaxESIOverlayValue}" Content="Clamp overlay Data to Maximum" />
+
                                     <StackPanel Orientation="Horizontal" Margin="0,0">
                                         <xctk:IntegerUpDown Margin="1,3" Value="{Binding Path=MaxESIOverlayValue}" Minimum="30" Maximum="300" Width="60"  Foreground="White" />
                                         <Label>Maximum Overlay Size</Label>
@@ -93,7 +90,29 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <GroupBox Header="Universe" Margin="4" Height="355">
+                            <GroupBox Margin="4" Height="Auto">
+                                <StackPanel>
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCompactCharactersOnMap}" Content="Compact Character Mode" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
+                                    
+
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=FollowOnZoom}" Content="Follow Selected System when Zoomed" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ClampMaxESIOverlayValue}" Content="Clamp overlay Data to Maximum" />
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Universe" HorizontalAlignment="Left">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <GroupBox Margin="4" Height="auto">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,0">
                                         <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
@@ -104,11 +123,21 @@
                                         <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
                                         <Label Content="Text Max Zoom" />
                                     </StackPanel>
+
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <GroupBox  Margin="4" Height="auto">
+                                <StackPanel>
+
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
                     </Grid>
                 </TabItem>
+
 
                 <TabItem Header="Intel">
                     <Grid>
@@ -153,7 +182,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <GroupBox Margin="4" Height="355">
+                            <GroupBox Margin="4" Height="auto">
 
                                 <StackPanel Orientation="Vertical">
                                     <Label>Channel Filters</Label>
@@ -175,7 +204,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <GroupBox Header="General" Margin="4" Height="355">
+                            <GroupBox Header="General" Margin="4" Height="auto">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=ShowCoalition}" Margin="0,2">Show SOV as Coalitions</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=SOVShowConflicts}" Margin="0,2">Highlight SOV conflict areas</CheckBox>
@@ -193,7 +222,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <GroupBox Header="Beacons" Margin="4" Height="355">
+                            <GroupBox Header="Beacons" Margin="4" Height="auto">
                                 <StackPanel>
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons" />
                                     <TextBox Width="271" Height="300" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=CynoBeaconSystems, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
@@ -210,7 +239,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <GroupBox Header="General" Margin="4" Height="355">
+                            <GroupBox Header="General" Margin="4" Height="auto">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=FleetShowOnMap}" Margin="0,2">Show Fleet Members</CheckBox>
                                     <CheckBox IsChecked="{Binding Path=FleetShowShipType}" Margin="0,2">Show Fleet Member Ship Type</CheckBox>
@@ -232,7 +261,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <GroupBox Header="General" Margin="4" Height="355">
+                            <GroupBox Header="General" Margin="4" Height="auto">
                                 <StackPanel>
 
                                     <StackPanel Orientation="Vertical" Margin="0,2">
@@ -268,7 +297,7 @@
                             </GroupBox>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
-                            <GroupBox Margin="4" Height="355">
+                            <GroupBox Margin="4" Height="auto">
                                 <StackPanel>
 
                                     <StackPanel Orientation="Vertical" Margin="0,0">
@@ -279,6 +308,7 @@
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKills}" Content="Show NPC kills" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="Show the current route" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayHunterModeShowFullRegion}" Content="Show the full region in hunter mode" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
@@ -310,7 +340,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <GroupBox Header="General" Margin="4" Height="355">
+                            <GroupBox Header="General" Margin="4" Height="auto">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=Debug_EnableMapEdit}" Margin="0,2">Enable Universe Map Edits</CheckBox>
                                 </StackPanel>
