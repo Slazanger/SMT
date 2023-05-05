@@ -10,10 +10,5 @@ namespace SMTx.Views.Tools
         {
             InitializeComponent();
         }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
     }
 }

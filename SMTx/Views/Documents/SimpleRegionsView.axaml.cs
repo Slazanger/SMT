@@ -11,9 +11,5 @@ namespace SMTx.Views.Documents
             InitializeComponent();
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
     }
 }

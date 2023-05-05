@@ -3,15 +3,10 @@ using Avalonia.Markup.Xaml;
 
 namespace SMTx.Views.Documents;
 
-public class DocumentView : UserControl
+public partial class DocumentView : UserControl
 {
     public DocumentView()
     {
         InitializeComponent();
-    }
-
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
     }
 }

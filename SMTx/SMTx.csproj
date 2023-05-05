@@ -19,16 +19,17 @@
 	<TrimmableAssembly Include="Avalonia.Themes.Default" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview5" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview5" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview5" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
-    <PackageReference Include="Dock.Avalonia" Version="11.0.0-preview5" />
-    <PackageReference Include="Dock.Model" Version="11.0.0-preview5" />
-    <PackageReference Include="Dock.Model.Mvvm" Version="11.0.0-preview5" />
-    <PackageReference Include="Dock.Serializer" Version="11.0.0-preview5" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview6" />
+    <PackageReference Include="Dock.Avalonia" Version="11.0.0-preview6" />
+    <PackageReference Include="Dock.Model" Version="11.0.0-preview6" />
+    <PackageReference Include="Dock.Model.Avalonia" Version="11.0.0-preview6" />
+    <PackageReference Include="Dock.Model.Mvvm" Version="11.0.0-preview6" />
+    <PackageReference Include="Dock.Serializer" Version="11.0.0-preview6" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\Tools\FleetView.axaml.cs">
