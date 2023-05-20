@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Numerics;
@@ -2724,6 +2725,19 @@ namespace SMT.EVEData
                         {
                             // now can read the next line
                             l = file.ReadLine(); // should be the "Listener : <CharName>"
+
+                            // something wrong with the log file; clear
+                            if(!l.Contains("Listener"))
+                            {
+
+                                if(gameFileReadPos.ContainsKey(changedFile))
+                                {
+                                    gameFileReadPos.Remove(changedFile);
+                                }
+
+                                return;
+                            }
+
                             fileReadFrom++;
 
                             gamelogFileCharacterMap[changedFile] = l.Split(':')[1].Trim();
@@ -2736,9 +2750,20 @@ namespace SMT.EVEData
                             l = file.ReadLine();
                             fileReadFrom++;
 
+                            // as its new; skip the entire file -1
                             break;
                         }
                     }
+
+                    while (!file.EndOfStream)
+                    {
+                        string l = file.ReadLine();
+                        fileReadFrom++;
+                    }
+
+                    // back one line
+                    fileReadFrom--;
+
 
                     file.BaseStream.Seek(0, SeekOrigin.Begin);
                 }
@@ -2805,7 +2830,7 @@ namespace SMT.EVEData
                                 }
                             }
 
-                            if (line.Contains("cloak deactivates due to a pulse from a Mobile Observatory"))
+                            if (line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") || line.Contains("Your cloak deactivates due to proximity to")) 
                             {
                                 if (ShipDecloakedEvent != null)
                                 {

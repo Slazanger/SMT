@@ -64,7 +64,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (null is purple : " + EveAppConfig.SMT_VERSION + ")";
+            Title = "SMT (Eve is 20! : " + EveAppConfig.SMT_VERSION + ")";
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
@@ -1718,7 +1718,7 @@ namespace SMT
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
-            string infoObjectsFile = AppDomain.CurrentDomain.BaseDirectory + @"\\data\InfoObjects.txt";
+            string infoObjectsFile = EveAppConfig.StorageRoot + @"\InfoObjects.txt";
             if (File.Exists(infoObjectsFile))
             {
                 StreamReader file = new StreamReader(infoObjectsFile);
