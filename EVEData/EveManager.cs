@@ -16,6 +16,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using ESI.NET;
 using ESI.NET.Enumerations;
+using ESI.NET.Models.Corporation;
 using ESI.NET.Models.SSO;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -2338,6 +2339,7 @@ namespace SMT.EVEData
                 "esi-characters.read_standings.v1",
                 "esi-location.read_online.v1",
                 "esi-characters.read_fatigue.v1",
+                "esi-corporations.read_contacts.v1",
                 "esi-alliances.read_contacts.v1"
             };
 
