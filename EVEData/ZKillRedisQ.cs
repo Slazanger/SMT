@@ -72,12 +72,18 @@ namespace SMT.EVEData
                 {
                     strContent = response.Content.ReadAsStringAsync().Result;
                 }
+                else
+                {
+                    strContent = "Error";
+                }
             }
             catch
             {
                 e.Result = -1;
                 return;
             }
+
+
 
             ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
             if (z != null && z.Package != null)

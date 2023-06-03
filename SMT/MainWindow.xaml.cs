@@ -128,7 +128,6 @@ namespace SMT
 
             if (initFromScratch)
             {
-                EVEManager.CreateFromScratch();
                 SaveDefaultLayout();
                 return;
             }

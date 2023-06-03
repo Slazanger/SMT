@@ -296,7 +296,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
-        public void CreateFromScratch()
+        public void CreateFromScratch(string sourceFolder, string outputFolder)
         {
             // allow parsing to work for all locales (comma/dot in csv float)
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -382,7 +382,7 @@ namespace SMT.EVEData
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
-                string localSVG = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\..\EVEData\data\SourceMaps\raw\" + rd.DotLanRef + "_layout.svg";
+                string localSVG = sourceFolder + @"\data\SourceMaps\raw\" + rd.DotLanRef + "_layout.svg";
 
                 if (!File.Exists(localSVG))
                 {
@@ -455,7 +455,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataSolarSystemFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapSolarSystems.csv";
+            string eveStaticDataSolarSystemFile = sourceFolder + @"\data\mapSolarSystems.csv";
             if (File.Exists(eveStaticDataSolarSystemFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
@@ -510,7 +510,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export for the regions and extract some info from it
-            string eveStaticDataRegionFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapRegions.csv";
+            string eveStaticDataRegionFile = sourceFolder + @"\data\mapRegions.csv";
             if (File.Exists(eveStaticDataRegionFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataRegionFile);
@@ -541,7 +541,7 @@ namespace SMT.EVEData
                 throw new Exception("Data Creation Error");
             }
 
-            string eveStaticDataJumpsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapSolarSystemJumps.csv";
+            string eveStaticDataJumpsFile = sourceFolder + @"\data\mapSolarSystemJumps.csv";
             if (File.Exists(eveStaticDataJumpsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsFile);
@@ -573,7 +573,7 @@ namespace SMT.EVEData
                 }
             }
 
-            string eveStaticDataJumpsExtraFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapSolarSystemJumpsExtra.csv";
+            string eveStaticDataJumpsExtraFile = sourceFolder + @"\data\mapSolarSystemJumpsExtra.csv";
             if (File.Exists(eveStaticDataJumpsExtraFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataJumpsExtraFile);
@@ -606,7 +606,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataStationsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\staStations.csv";
+            string eveStaticDataStationsFile = sourceFolder + @"\data\staStations.csv";
             if (File.Exists(eveStaticDataStationsFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataStationsFile);
@@ -633,7 +633,7 @@ namespace SMT.EVEData
             }
 
             // now open up the eve static data export and extract some info from it
-            string eveStaticDataConstellationFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\mapConstellations.csv";
+            string eveStaticDataConstellationFile = sourceFolder + @"\data\mapConstellations.csv";
             if (File.Exists(eveStaticDataConstellationFile))
             {
                 StreamReader file = new StreamReader(eveStaticDataConstellationFile);
@@ -664,7 +664,7 @@ namespace SMT.EVEData
             }
 
             // now open up the ice systems
-            string iceSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\iceSystems.csv";
+            string iceSystemsFile = sourceFolder + @"\data\iceSystems.csv";
             if (File.Exists(iceSystemsFile))
             {
                 StreamReader file = new StreamReader(iceSystemsFile);
@@ -686,7 +686,7 @@ namespace SMT.EVEData
             }
 
             // now open up the ice systems
-            string fwSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\factionWarfareSystems.csv";
+            string fwSystemsFile = sourceFolder + @"\data\factionWarfareSystems.csv";
             if (File.Exists(fwSystemsFile))
             {
                 StreamReader file = new StreamReader(fwSystemsFile);
@@ -708,7 +708,7 @@ namespace SMT.EVEData
             }
 
             // now open up the blue a0 sun systems
-            string blueSunSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\a0BlueStarSystems.csv";
+            string blueSunSystemsFile = sourceFolder + @"\data\a0BlueStarSystems.csv";
             if (File.Exists(blueSunSystemsFile))
             {
                 StreamReader file = new StreamReader(blueSunSystemsFile);
@@ -738,7 +738,7 @@ namespace SMT.EVEData
                 s.TrigInvasionStatus = System.EdenComTrigStatus.None;
             }
 
-            string trigSystemsFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\trigInvasionSystems.csv";
+            string trigSystemsFile = sourceFolder + @"\data\trigInvasionSystems.csv";
             if (File.Exists(trigSystemsFile))
             {
                 StreamReader file = new StreamReader(trigSystemsFile);
@@ -986,7 +986,7 @@ namespace SMT.EVEData
             }
 
             // now get the ships
-            string eveStaticDataItemTypesFile = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\invTypes.csv";
+            string eveStaticDataItemTypesFile = sourceFolder + @"\data\invTypes.csv";
             if (File.Exists(eveStaticDataItemTypesFile))
             {
                 ShipTypes = new SerializableDictionary<string, string>();
@@ -1105,7 +1105,7 @@ namespace SMT.EVEData
             }
 
             // now add the jove systems
-            string eveStaticDataJoveObservatories = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\..\..\..\EVEData\data\JoveSystems.csv";
+            string eveStaticDataJoveObservatories = sourceFolder + @"\data\JoveSystems.csv";
             if (File.Exists(eveStaticDataJoveObservatories))
             {
                 StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
@@ -1299,70 +1299,13 @@ namespace SMT.EVEData
 
             // now serialise the classes to disk
 
-            string saveDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\..\EVEData\data\";
+            string saveDataFolder = outputFolder + @"\data\";
 
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
 
-            foreach (MapRegion mr in Regions)
-            {
-                SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(1050, 800);
 
-                Dictionary<string, SvgNet.Elements.SvgRectElement> systemElementMap = new Dictionary<string, SvgNet.Elements.SvgRectElement>();
-
-                foreach (MapSystem s in mr.MapSystems.Values)
-                {
-                    SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.Layout.X, (float)s.Layout.Y, 5, 5);
-                    sre["Type"] = "system";
-                    sre["Name"] = s.Name;
-                    sre["ID"] = s.ActualSystem.ID;
-                    sre["Region"] = s.Region;
-
-                    systemElementMap[s.Name] = sre;
-
-                    SvgNet.Elements.SvgTextElement srtText = new(s.Name, (float)s.Layout.X, (float)s.Layout.Y);
-
-                    svgRootElement.AddChild(sre);
-                    svgRootElement.AddChild(srtText);
-                }
-
-                // add all the lines
-
-                foreach (MapSystem s in mr.MapSystems.Values)
-                {
-                    SvgNet.Elements.SvgRectElement from = systemElementMap[s.Name];
-                    foreach (string jumpSys in s.ActualSystem.Jumps)
-                    {
-                        if (!mr.MapSystems.ContainsKey(jumpSys))
-                        {
-                            continue;
-                        }
-
-                        SvgNet.Elements.SvgRectElement to = systemElementMap[jumpSys];
-
-                        SvgNet.Elements.SvgLineElement le = new SvgNet.Elements.SvgLineElement(from.X, from.Y, to.X, to.Y);
-                        SvgNet.Types.SvgStyle lineStyle = new SvgNet.Types.SvgStyle();
-                        SvgNet.Types.SvgColor sc = new SvgNet.Types.SvgColor("blue");
-
-                        lineStyle.Set("stroke", sc);
-                        lineStyle.Set("fill", sc);
-                        le.Style = lineStyle;
-
-                        svgRootElement.AddChild(le);
-                    }
-                }
-
-                string svgStr = svgRootElement.WriteSVGString(false);
-                string filePath = $"{saveDataFolder}/SourceMaps/exported/{mr.DotLanRef}_layout.svg";
-                using (StreamWriter outputFile = new StreamWriter(filePath))
-                {
-                    outputFile.WriteLine(svgStr);
-                }
-            }
-
-            // now close
-            Application.Current.Shutdown();
         }
 
         /// <summary>
