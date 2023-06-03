@@ -19,7 +19,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_120";
+        public const string SMT_VERSION = "121";
+
+        /// <summary>
+        /// SMT Version Tagline
+        /// </summary>
+        public const string SMT_TITLE = "Hydrated Chromium Oxide";
 
         /// <summary>
         /// Folder to store all of the data from
@@ -29,7 +34,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Folder to store all of the data from
         /// </summary>
-        public static readonly string VersionStorage = StorageRoot + $"{SMT_VERSION}\\";
+        public static readonly string VersionStorage = StorageRoot + "SMT_" + $"{SMT_VERSION}\\";
 
 
 
