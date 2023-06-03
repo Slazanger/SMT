@@ -1259,23 +1259,26 @@ namespace SMT
             if (!string.IsNullOrEmpty(currentJumpCharacter))
             {
                 EVEData.System js = EM.GetEveSystem(currentCharacterJumpSystem);
-                string text = "";
-                if (MapConf.ShowCharacterNamesOnMap)
+                if(js != null)
                 {
-                    text = $"{jumpShipType} range from {currentJumpCharacter} : {currentCharacterJumpSystem} ({js.Region})";
-                }
-                else
-                {
-                    text = $"{jumpShipType} range from {currentCharacterJumpSystem} ({js.Region})";
-                }
+                    string text = "";
+                    if (MapConf.ShowCharacterNamesOnMap)
+                    {
+                        text = $"{jumpShipType} range from {currentJumpCharacter} : {currentCharacterJumpSystem} ({js.Region})";
+                    }
+                    else
+                    {
+                        text = $"{jumpShipType} range from {currentCharacterJumpSystem} ({js.Region})";
+                    }
 
-                Label l = new Label();
-                l.Content = text;
-                l.FontSize = 14;
-                l.FontWeight = FontWeights.Bold;
-                l.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+                    Label l = new Label();
+                    l.Content = text;
+                    l.FontSize = 14;
+                    l.FontWeight = FontWeights.Bold;
+                    l.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
 
-                BridgeInfoStackPanel.Children.Add(l);
+                    BridgeInfoStackPanel.Children.Add(l);
+                }
             }
             foreach (string key in activeJumpSpheres.Keys)
             {
