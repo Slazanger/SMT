@@ -95,7 +95,7 @@ namespace SMT
             ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
             ColoursPropertyGrid.CollapseAllProperties();
             ColoursPropertyGrid.Update();
-            ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged; ;
+            ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged;
 
             intelVolumeSlider.ValueChanged += IntelVolumeChanged_ValueChanged;
         }

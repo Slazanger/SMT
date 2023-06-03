@@ -64,7 +64,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT (Eve is 20! : " + EveAppConfig.SMT_VERSION + ")";
+            Title = "SMT v" + EveAppConfig.SMT_VERSION + ": " + EveAppConfig.SMT_TITLE;
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
