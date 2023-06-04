@@ -794,7 +794,7 @@ namespace SMT
 
             if (releaseInfo != null)
             {
-                if (releaseInfo.TagName != EveAppConfig.SMT_VERSION )
+                if (releaseInfo.TagName != EveAppConfig.SMT_VERSION)
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
