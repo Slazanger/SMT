@@ -64,7 +64,7 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = "SMT v" + EveAppConfig.SMT_VERSION + ": " + EveAppConfig.SMT_TITLE;
+            Title = (EveAppConfig.SMT_VERSION).Replace("SMT_", "SMT: [v") + "] - " + EveAppConfig.SMT_TITLE;
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
@@ -794,7 +794,7 @@ namespace SMT
 
             if (releaseInfo != null)
             {
-                if (releaseInfo.TagName != EveAppConfig.SMT_VERSION)
+                if (releaseInfo.TagName != EveAppConfig.SMT_VERSION )
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
