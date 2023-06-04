@@ -22,6 +22,8 @@ namespace SMT
 
         private MediaPlayer mediaPlayer;
 
+        private bool isInitialLoad = true; // Flag to track initial load of preferences window
+
         public PreferencesWindow()
         {
             InitializeComponent();
@@ -96,7 +98,7 @@ namespace SMT
             ColoursPropertyGrid.CollapseAllProperties();
             ColoursPropertyGrid.Update();
             ColoursPropertyGrid.PropertyValueChanged += ColoursPropertyGrid_PropertyValueChanged;
-
+            
             intelVolumeSlider.ValueChanged += IntelVolumeChanged_ValueChanged;
         }
 
@@ -108,6 +110,11 @@ namespace SMT
 
         private void IntelVolumeChanged_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (isInitialLoad)
+            {
+                isInitialLoad = false;
+                return; // Skip sound playback on initial load
+            }
             mediaPlayer.Stop();
             mediaPlayer.Volume = MapConf.IntelSoundVolume;
             mediaPlayer.Position = new TimeSpan(0, 0, 0);
