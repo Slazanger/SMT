@@ -474,7 +474,7 @@ namespace SMT
             {
                 EVEData.System ssys = EM.GetEveSystem(kvp.Key);
 
-                double Radius = (double)(kvp.Value * (decimal)universeScale); 
+                double Radius = (double)(kvp.Value * (decimal)universeScale);
 
                 double X = ssys.UniverseX;
                 double Z = ssys.UniverseY;
@@ -495,7 +495,6 @@ namespace SMT
                 foreach (KeyValuePair<string, decimal> kvp in activeJumpSpheres)
                 {
                     decimal Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
-
 
                     if (Distance < kvp.Value && Distance > 0.0m && es.TrueSec <= 0.45 && es.Region != "Pochven")
                     {
@@ -932,8 +931,6 @@ namespace SMT
 
                     foreach (EVEData.System sys in EM.Systems)
                     {
-
-
                         double X = sys.UniverseX;
 
                         // need to invert Z
@@ -941,19 +938,13 @@ namespace SMT
 
                         double blobSize = 55;
 
-
                         drawingContext.DrawEllipse(RegionShapeColourBrush, RegionShapePen, new Point(X, Z), blobSize, blobSize);
-
-
                     }
                     drawingContext.Close();
 
                     dataDV.CacheMode = new BitmapCache(0.1);
                     VHRegionShapes.AddChild(dataDV);
-
                 }
-
-
             }
 
             if (DataRedraw)

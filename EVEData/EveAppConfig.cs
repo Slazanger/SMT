@@ -19,7 +19,7 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_120";
+        public const string SMT_VERSION = "SMT_121";
 
         /// <summary>
         /// SMT Version Tagline
@@ -35,8 +35,5 @@ namespace SMT.EVEData
         /// Folder to store all of the data from
         /// </summary>
         public static readonly string VersionStorage = StorageRoot + $"{SMT_VERSION}\\";
-
-
-
     }
 }

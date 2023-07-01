@@ -23,9 +23,6 @@
 	    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="data\InfoObjects.txt">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	  <None Update="data\MapLayout.dat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

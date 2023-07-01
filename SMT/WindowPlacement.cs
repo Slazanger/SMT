@@ -13,7 +13,6 @@ namespace SMT
     /// here: https://engy.us/blog/2010/03/08/saving-window-size-and-location-in-wpf-and-winforms/
     /// </summary>
 
-
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
