@@ -72,7 +72,7 @@
                 decimal y = startSys.Y - sys.Y;
                 decimal z = startSys.Z - sys.Z;
 
-                decimal length = DecimalMath.DecimalEx.Sqrt((x * x) + (y * y) + (z * z)) ;
+                decimal length = DecimalMath.DecimalEx.Sqrt((x * x) + (y * y) + (z * z));
 
                 bool shouldAdd = false;
 
@@ -195,7 +195,7 @@
                     {
                         JumpLink jl = new JumpLink();
                         jl.System = sys.Name;
-                        jl.RangeLY = Distance ;
+                        jl.RangeLY = Distance;
                         mn.JumpableSystems.Add(jl);
                     }
                 }

@@ -72,6 +72,10 @@ namespace SMT.EVEData
                 {
                     strContent = response.Content.ReadAsStringAsync().Result;
                 }
+                else
+                {
+                    strContent = "Error";
+                }
             }
             catch
             {

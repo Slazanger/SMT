@@ -87,6 +87,7 @@ namespace SMT
 
         // Overlay settings
         private float m_overlayBackgroundOpacity = 0.2f;
+
         private float m_overlayOpacity = 0.5f;
         private int m_overlayRange = 5;
         private float m_intelFreshTime = 30;
@@ -257,7 +258,6 @@ namespace SMT
             {
                 m_ClampMaxESIOverlayValue = value;
                 OnPropertyChanged("ClampMaxESIOverlayValue");
-
             }
         }
 
@@ -280,7 +280,6 @@ namespace SMT
                 OnPropertyChanged("MaxESIOverlayValue");
             }
         }
-
 
         [Category("Fleet")]
         [DisplayName("Max Fleet Per System")]
@@ -454,7 +453,6 @@ namespace SMT
                 OnPropertyChanged("ShowCompactCharactersOnMap");
             }
         }
-
 
         public bool ShowOfflineCharactersOnMap
         {
@@ -890,7 +888,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayOpacity = value > 0f ? value : 1f;
 
                 OnPropertyChanged("OverlayOpacity");
@@ -907,7 +904,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayBackgroundOpacity = value > 0f ? value : 1f;
 
                 OnPropertyChanged("OverlayBackgroundOpacity");
@@ -924,7 +920,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayRange = value > 0 ? value : 1;
 
                 OnPropertyChanged("OverlayRange");
@@ -941,7 +936,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayGathererMode = value;
 
                 OnPropertyChanged("OverlayGathererMode");
@@ -952,11 +946,12 @@ namespace SMT
         [DisplayName("Overlay In Hunter Mode Shows Full Region")]
         public bool OverlayHunterModeShowFullRegion
         {
-            get {
+            get
+            {
                 return m_overlayHunterModeShowFullRegion;
             }
-            set {
-
+            set
+            {
                 m_overlayHunterModeShowFullRegion = value;
 
                 OnPropertyChanged("OverlayHunterModeShowFullRegion");
@@ -973,7 +968,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayShowCharName = value;
 
                 OnPropertyChanged("OverlayShowCharName");
@@ -990,7 +984,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayShowCharLocation = value;
 
                 OnPropertyChanged("OverlayShowCharLocation");
@@ -1007,7 +1000,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayShowNPCKills = value;
 
                 OnPropertyChanged("OverlayShowNPCKills");
@@ -1024,7 +1016,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayShowNPCKillDelta = value;
 
                 OnPropertyChanged("OverlayShowNPCKillDelta");
@@ -1041,7 +1032,6 @@ namespace SMT
             }
             set
             {
-
                 m_overlayShowRoute = value;
 
                 OnPropertyChanged("OverlayShowRoute");
@@ -1058,7 +1048,6 @@ namespace SMT
             }
             set
             {
-
                 m_intelFreshTime = value > 0 ? value : 1;
 
                 OnPropertyChanged("IntelFreshTime");
@@ -1075,7 +1064,6 @@ namespace SMT
             }
             set
             {
-
                 m_intelStaleTime = value > 0 ? value : 1;
 
                 OnPropertyChanged("IntelStaleTime");
@@ -1092,7 +1080,6 @@ namespace SMT
             }
             set
             {
-
                 m_intelHistoricTime = value > 0 ? value : 1;
 
                 OnPropertyChanged("IntelHistoricTime");
@@ -1148,7 +1135,6 @@ namespace SMT
                 RegionMarkerTextColour = Color.FromRgb(49, 49, 53),
                 RegionMarkerTextColourFull = Color.FromRgb(0, 0, 0),
                 ESIOverlayColour = (Color)ColorConverter.ConvertFromString("#FF74B071"),
-
 
                 IntelOverlayColour = Color.FromRgb(178, 34, 34),
                 IntelClearOverlayColour = Colors.Orange,
@@ -1225,7 +1211,6 @@ namespace SMT
             OverlayShowNPCKills = true;
             OverlayShowNPCKillDelta = true;
             OverlayShowRoute = true;
-
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;

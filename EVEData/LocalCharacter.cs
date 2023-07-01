@@ -982,7 +982,6 @@ namespace SMT.EVEData
                 ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
-                //if (CorporationID == -1 || AllianceID == -1)
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esr = await esiClient.Character.Information((int)ID);
 
@@ -994,45 +993,134 @@ namespace SMT.EVEData
                 }
 
                 // if we have an alliance, and no current standings set
-                if (AllianceID != 0 && Standings.Count == 0)
+                if (Standings.Count == 0)
                 {
                     int page = 0;
                     int maxPageCount = 1;
-                    do
+                    ESI.NET.EsiResponse<List<ESI.NET.Models.Contacts.Contact>> esr;
+
+                    if (AllianceID != 0)
                     {
-                        page++;
-
-                        // SJS here.. list modifeied exception
-
-                        esiClient.SetCharacterData(ESIAuthData);
-                        ESI.NET.EsiResponse<List<ESI.NET.Models.Contacts.Contact>> esr = await esiClient.Contacts.ListForAlliance(page);
-
-                        if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
+                        page = 0;
+                        maxPageCount = 1;
+                        do
                         {
-                            if (esr.Pages.HasValue)
-                            {
-                                maxPageCount = (int)esr.Pages;
-                            }
+                            page++;
 
-                            if (esr.Data == null)
-                            {
-                                // in an alliance with no contacts
-                                continue;
-                            }
+                            // SJS here.. list modifeied exception
 
-                            foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
-                            {
-                                Standings[con.ContactId] = (float)con.Standing;
-                                // Removed LabelMap[con.ContactId] = con.LabelIds;
+                            esiClient.SetCharacterData(ESIAuthData);
+                            esr = await esiClient.Contacts.ListForAlliance(page);
 
-                                if (con.ContactType == "alliance")
+                            if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
+                            {
+                                if (esr.Pages.HasValue)
                                 {
-                                    AllianceToResolve.Add(con.ContactId);
+                                    maxPageCount = (int)esr.Pages;
+                                }
+
+                                if (esr.Data == null)
+                                {
+                                    // in an alliance with no contacts
+                                    continue;
+                                }
+
+                                foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
+                                {
+                                    Standings[con.ContactId] = (float)con.Standing;
+                                    // Removed LabelMap[con.ContactId] = con.LabelIds;
+
+                                    if (con.ContactType == "alliance")
+                                    {
+                                        AllianceToResolve.Add(con.ContactId);
+                                    }
                                 }
                             }
                         }
+                        while (page < maxPageCount);
                     }
-                    while (page < maxPageCount);
+
+                    if (CorporationID != 0)
+                    {
+                        page = 0;
+                        maxPageCount = 1;
+                        do
+                        {
+                            page++;
+
+                            // SJS here.. list modifeied exception
+
+                            esiClient.SetCharacterData(ESIAuthData);
+                            esr = await esiClient.Contacts.ListForCorporation(page);
+
+                            if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
+                            {
+                                if (esr.Pages.HasValue)
+                                {
+                                    maxPageCount = (int)esr.Pages;
+                                }
+
+                                if (esr.Data == null)
+                                {
+                                    // in an corp with no contacts
+                                    continue;
+                                }
+
+                                foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
+                                {
+                                    Standings[con.ContactId] = (float)con.Standing;
+                                    // Removed LabelMap[con.ContactId] = con.LabelIds;
+
+                                    if (con.ContactType == "alliance")
+                                    {
+                                        AllianceToResolve.Add(con.ContactId);
+                                    }
+                                }
+                            }
+                        }
+                        while (page < maxPageCount);
+                    }
+
+                    // personal contacts
+                    {
+                        page = 0;
+                        maxPageCount = 1;
+                        do
+                        {
+                            page++;
+
+                            // SJS here.. list modifeied exception
+
+                            esiClient.SetCharacterData(ESIAuthData);
+                            esr = await esiClient.Contacts.ListForCharacter(page);
+
+                            if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
+                            {
+                                if (esr.Pages.HasValue)
+                                {
+                                    maxPageCount = (int)esr.Pages;
+                                }
+
+                                if (esr.Data == null)
+                                {
+                                    // in an alliance with no contacts
+                                    continue;
+                                }
+
+                                foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
+                                {
+                                    Standings[con.ContactId] = (float)con.Standing;
+                                    // Removed LabelMap[con.ContactId] = con.LabelIds;
+
+                                    if (con.ContactType == "alliance")
+                                    {
+                                        AllianceToResolve.Add(con.ContactId);
+                                    }
+                                }
+                            }
+                        }
+                        while (page < maxPageCount);
+                    }
                 }
 
                 // get the character portrait
