@@ -6,6 +6,10 @@
              Name="Dock Avalonia Demo"
              x:Class="SMTx.App">
 
+	<Application.DataTemplates>
+		<local:ViewLocator />
+	</Application.DataTemplates>
+
 
   <Application.Styles>
 

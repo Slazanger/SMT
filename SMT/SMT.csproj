@@ -47,7 +47,8 @@
     <AnalysisLevel>latest-all</AnalysisLevel>
     <PlatformTarget>x64</PlatformTarget>
     <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
-    <EnableNETAnalyzers>False</EnableNETAnalyzers>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+	 <AnalysisMode>All</AnalysisMode>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>bin\x64\Debug\</OutputPath>

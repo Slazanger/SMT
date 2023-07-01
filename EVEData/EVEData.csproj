@@ -6,7 +6,8 @@
     <Nullable>disable</Nullable>
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
-    <EnableNETAnalyzers>False</EnableNETAnalyzers>
+	  <EnableNETAnalyzers>true</EnableNETAnalyzers>
+	  <AnalysisMode>All</AnalysisMode>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,6 +6,8 @@
 	<!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
 	<TrimMode>copyused</TrimMode>
 	<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+	  <EnableNETAnalyzers>true</EnableNETAnalyzers>
+	  <AnalysisMode>All</AnalysisMode>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -19,6 +21,11 @@
 	<TrimmableAssembly Include="Avalonia.Themes.Default" />
   </ItemGroup>
   <ItemGroup>
+	<PackageReference Include="DesktopNotifications" Version="1.2.0" />
+	<PackageReference Include="DesktopNotifications.Apple" Version="1.2.0" />
+	<PackageReference Include="DesktopNotifications.Avalonia" Version="1.2.0" />
+	<PackageReference Include="DesktopNotifications.FreeDesktop" Version="1.2.0" />
+	<PackageReference Include="DesktopNotifications.Windows" Version="1.2.0" />
     <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
