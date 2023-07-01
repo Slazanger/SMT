@@ -1052,7 +1052,7 @@ namespace SMT
                 SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
                 SolidColorBrush characterTextOutline = new SolidColorBrush(Colors.Black);
 
-                if(MapConf.ShowCompactCharactersOnMap)
+                if (MapConf.ShowCompactCharactersOnMap)
                 {
                     OutlinedTextBlock charText = new OutlinedTextBlock();
                     charText.Text = lkvp.Count.ToString();
@@ -1066,7 +1066,6 @@ namespace SMT
                     Canvas.SetZIndex(charText, 40);
                     MainCanvas.Children.Add(charText);
                     DynamicMapElements.Add(charText);
-
                 }
                 else
                 {
@@ -1123,7 +1122,6 @@ namespace SMT
                         }
                     }
                 }
-
 
                 if (!addIndividualFleetMembers)
                 {
@@ -1259,7 +1257,7 @@ namespace SMT
             if (!string.IsNullOrEmpty(currentJumpCharacter))
             {
                 EVEData.System js = EM.GetEveSystem(currentCharacterJumpSystem);
-                if(js != null)
+                if (js != null)
                 {
                     string text = "";
                     if (MapConf.ShowCharacterNamesOnMap)
@@ -1477,8 +1475,6 @@ namespace SMT
                     MainCanvas.Children.Add(infoCircle);
                     DynamicMapElements.Add(infoCircle);
                 }
-
-
 
                 if ((sys.ActualSystem.SOVAllianceTCU != 0 || sys.ActualSystem.SOVAllianceIHUB != 0) && ShowStandings)
                 {
@@ -3396,7 +3392,7 @@ namespace SMT
                     }
                     FollowCharacter = false;
                     SelectSystem(selectedSys.Name);
-                    
+
                     ReDrawMap(redraw);
                 }
 
@@ -3551,7 +3547,7 @@ namespace SMT
 
                 Label header = new Label();
                 header.Content = selectedSys.Name;
-                header.FontWeight = FontWeights.Bold;      
+                header.FontWeight = FontWeights.Bold;
                 header.FontSize = 14;
                 header.Padding = one;
                 header.Margin = one;
@@ -3560,19 +3556,16 @@ namespace SMT
                 SystemInfoPopupSP.Children.Add(header);
                 SystemInfoPopupSP.Children.Add(new Separator());
 
-
                 bool needSeperator = false;
                 List<string> charNames = new List<string>();
-                foreach(LocalCharacter c in EM.LocalCharacters)
-                {   
-
-
-                    if(c.Location == selectedSys.Name)
+                foreach (LocalCharacter c in EM.LocalCharacters)
+                {
+                    if (c.Location == selectedSys.Name)
                     {
                         needSeperator = true;
                         Label characterlabel = new Label();
                         string cname = c.Name;
-                        if(!c.IsOnline)
+                        if (!c.IsOnline)
                         {
                             cname += " (Offline)";
                         }
@@ -3582,7 +3575,7 @@ namespace SMT
 
                 charNames.Sort();
 
-                foreach(string s in charNames)
+                foreach (string s in charNames)
                 {
                     Label characterlabel = new Label();
                     characterlabel.Padding = one;
@@ -3593,11 +3586,10 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(characterlabel);
                 }
 
-                if(needSeperator)
+                if (needSeperator)
                 {
                     SystemInfoPopupSP.Children.Add(new Separator());
                 }
-
 
                 Label constellation = new Label();
                 constellation.Padding = one;

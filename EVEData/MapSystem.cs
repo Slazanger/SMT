@@ -26,7 +26,6 @@ namespace SMT.EVEData
         /// </summary>
         public List<Point> CellPoints { get; set; }
 
-
         /// <summary>
         /// A property to get the coordinate for the layout as a Vector2
         /// </summary>

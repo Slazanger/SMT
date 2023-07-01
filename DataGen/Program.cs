@@ -2,18 +2,17 @@
 
 namespace DataGen
 {
-    static class Program
+    internal static class Program
     {
-        static SMT.EVEData.EveManager EM { get; set; }
+        private static SMT.EVEData.EveManager EM { get; set; }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // Data Creation
             Console.WriteLine("Creating SMT Data");
 
             // Initialise the Main Mananger
             EM = new(SMT.EVEData.EveAppConfig.SMT_VERSION);
-
 
             string inputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\EVEData\";
             string outputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\EVEData\";
@@ -25,8 +24,7 @@ namespace DataGen
             WriteDebugSVGs(outputDataFolder);
         }
 
-
-        static void WriteDebugSVGs(string outputFolder)
+        private static void WriteDebugSVGs(string outputFolder)
         {
             foreach (MapRegion mr in EM.Regions)
             {
@@ -84,6 +82,5 @@ namespace DataGen
                 }
             }
         }
-
     }
 }

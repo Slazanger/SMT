@@ -12,7 +12,7 @@
         <local:JoinStringConverter  x:Key="stringJoiner" />
     </Window.Resources>
 
-    <Grid Background="{DynamicResource ButtonBorder}" Height="Auto" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" >
+    <Grid Background="{DynamicResource ButtonBorder}" Height="Auto" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
         <DockPanel HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
             <TabControl x:Name="tabControl" DockPanel.Dock="Top">
                 <TabItem Header="General">
@@ -83,8 +83,6 @@
                                         <xctk:IntegerUpDown Margin="1,3" Value="{Binding Path=MaxESIOverlayValue}" Minimum="30" Maximum="300" Width="60"  Foreground="White" />
                                         <Label>Maximum Overlay Size</Label>
                                     </StackPanel>
-
-
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -94,7 +92,6 @@
                                 <StackPanel>
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCompactCharactersOnMap}" Content="Compact Character Mode" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
-                                    
 
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=FollowOnZoom}" Content="Follow Selected System when Zoomed" />
@@ -123,7 +120,6 @@
                                         <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
                                         <Label Content="Text Max Zoom" />
                                     </StackPanel>
-
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -131,13 +127,11 @@
                         <StackPanel Grid.Column="1">
                             <GroupBox  Margin="4" Height="auto">
                                 <StackPanel>
-
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
                     </Grid>
                 </TabItem>
-
 
                 <TabItem Header="Intel">
                     <Grid>

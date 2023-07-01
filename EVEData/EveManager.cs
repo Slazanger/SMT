@@ -2,8 +2,6 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Numerics;
@@ -16,7 +14,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using ESI.NET;
 using ESI.NET.Enumerations;
-using ESI.NET.Models.Corporation;
 using ESI.NET.Models.SSO;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -292,7 +289,6 @@ namespace SMT.EVEData
         /// </summary>
         private Dictionary<long, System> IDToSystem { get; }
 
-
         /// <summary>
         /// Scrape the maps from dotlan and initialise the region data from dotlan
         /// </summary>
@@ -476,8 +472,6 @@ namespace SMT.EVEData
                     // beware when converting units
                     decimal LYScale = 9460000000000000.0m;
 
-
-
                     decimal x = Convert.ToDecimal(bits[4]);
                     decimal y = Convert.ToDecimal(bits[5]);
                     decimal z = Convert.ToDecimal(bits[6]);
@@ -487,7 +481,7 @@ namespace SMT.EVEData
                     System s = GetEveSystem(systemName);
                     if (s != null)
                     {
-                        // note : scale the coordinates to Light Year scale as at M double doesnt have enough precision however decimal doesnt 
+                        // note : scale the coordinates to Light Year scale as at M double doesnt have enough precision however decimal doesnt
                         // have the range for the calculations
                         s.ActualX = x / LYScale;
                         s.ActualY = y / LYScale;
@@ -1304,8 +1298,6 @@ namespace SMT.EVEData
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
-
-
         }
 
         /// <summary>
@@ -1552,7 +1544,6 @@ namespace SMT.EVEData
             AllianceIDToName = new SerializableDictionary<long, string>();
             AllianceIDToTicker = new SerializableDictionary<long, string>();
 
-
             // patch up any links
             foreach (System s in Systems)
             {
@@ -1733,7 +1724,6 @@ namespace SMT.EVEData
             {
                 xms.Serialize(tw, saveList);
             }
-
 
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             Serialization.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
@@ -2672,10 +2662,9 @@ namespace SMT.EVEData
                             l = file.ReadLine(); // should be the "Listener : <CharName>"
 
                             // something wrong with the log file; clear
-                            if(!l.Contains("Listener"))
+                            if (!l.Contains("Listener"))
                             {
-
-                                if(gameFileReadPos.ContainsKey(changedFile))
+                                if (gameFileReadPos.ContainsKey(changedFile))
                                 {
                                     gameFileReadPos.Remove(changedFile);
                                 }
@@ -2708,7 +2697,6 @@ namespace SMT.EVEData
 
                     // back one line
                     fileReadFrom--;
-
 
                     file.BaseStream.Seek(0, SeekOrigin.Begin);
                 }
@@ -2775,7 +2763,7 @@ namespace SMT.EVEData
                                 }
                             }
 
-                            if (line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") || line.Contains("Your cloak deactivates due to proximity to")) 
+                            if (line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") || line.Contains("Your cloak deactivates due to proximity to"))
                             {
                                 if (ShipDecloakedEvent != null)
                                 {

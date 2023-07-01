@@ -83,8 +83,6 @@ namespace SMT.EVEData
                 return;
             }
 
-
-
             ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
             if (z != null && z.Package != null)
             {

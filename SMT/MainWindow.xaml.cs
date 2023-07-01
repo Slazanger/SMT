@@ -184,7 +184,6 @@ namespace SMT
             // load any custom universe view layout
             // Save any custom map Layout
 
-
             string customLayoutFile = EveAppConfig.VersionStorage + "CustomUniverseLayout.txt";
 
             if (File.Exists(customLayoutFile))
@@ -242,7 +241,6 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
-
             RegionUC.MapConf = MapConf;
             RegionUC.ANOMManager = ANOMManager;
             RegionUC.Init();
@@ -261,10 +259,6 @@ namespace SMT
             RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
 
             AppStatusBar.DataContext = EVEManager.ServerInfo;
-
-
-
-
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
@@ -439,7 +433,6 @@ namespace SMT
 
             Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
             Properties.Settings.Default.Save();
-            
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -447,7 +440,6 @@ namespace SMT
             // save off the dockmanager layout
 
             string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
-
 
             try
             {
@@ -468,7 +460,6 @@ namespace SMT
 
                 // Save the Map Colours
                 string mapConfigFileName = EveAppConfig.VersionStorage + "MapConfig.dat";
-
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -728,8 +719,6 @@ namespace SMT
             }
         }
 
-
-
         private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (miFullScreenToggle.IsChecked)
@@ -815,7 +804,9 @@ namespace SMT
 
         // Property now automatically fires an event when the active character changes.
         private EVEData.LocalCharacter activeCharacter;
-        public EVEData.LocalCharacter ActiveCharacter { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty); } }
+
+        public EVEData.LocalCharacter ActiveCharacter
+        { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty); } }
 
         /// <summary>
         ///  Add Character Button Clicked
@@ -2035,7 +2026,6 @@ namespace SMT
         {
             overlayWindow = null;
         }
-
     }
 
     /// <summary>

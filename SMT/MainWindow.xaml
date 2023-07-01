@@ -63,7 +63,7 @@
                     <MenuItem Header="Clear Old Eve logs" Click="ClearOldEVELogs_Click" />
                 </MenuItem>
 
-                <MenuItem Header="View" Height="Auto" >
+                <MenuItem Header="View" Height="Auto">
                     <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
                     <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
                 </MenuItem>
