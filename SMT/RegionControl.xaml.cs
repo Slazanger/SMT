@@ -11,7 +11,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using SMT.EVEData;
 using SMT.ResourceUsage;
-using Windows.Gaming.Preview.GamesEnumeration;
 
 namespace SMT
 {
@@ -1663,7 +1662,7 @@ namespace SMT
                 if (SystemAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null && ShowSovOwner)
                 {
                     Polygon poly = new Polygon();
-                    poly.Fill = new SolidColorBrush(SystemCoalition.CoalitionColor);
+                    poly.Fill = new SolidColorBrush(Color.FromArgb(SystemCoalition.CoalitionColor.A, SystemCoalition.CoalitionColor.R, SystemCoalition.CoalitionColor.G, SystemCoalition.CoalitionColor.B));
                     poly.SnapsToDevicePixels = true;
                     poly.Stroke = poly.Fill;
                     poly.StrokeThickness = 0.4;

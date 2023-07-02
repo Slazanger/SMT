@@ -16,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using ESI.NET.Models.Bookmarks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using SMT.EVEData;
