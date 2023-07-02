@@ -15,10 +15,10 @@ using System.Xml.Serialization;
 using ESI.NET;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
+using EVEDataUtils;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using EVEDataUtils;
 
 namespace SMT.EVEData
 {
@@ -912,7 +912,7 @@ namespace SMT.EVEData
                         int X = (int)(Math.Round(finalX / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal);
                         int Y = (int)(Math.Round(finalY / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal);
 
-                        ms.CellPoints.Add(new Vector2(X,Y));
+                        ms.CellPoints.Add(new Vector2(X, Y));
                     }
                 }
             }

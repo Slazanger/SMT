@@ -1,5 +1,4 @@
-﻿using System.Windows.Media;
-using Color = System.Windows.Media.Color;
+﻿using Color = System.Drawing.Color;
 
 namespace SMT.EVEData
 {

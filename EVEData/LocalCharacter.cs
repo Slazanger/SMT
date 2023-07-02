@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using ESI.NET.Enumerations;
@@ -45,6 +44,7 @@ namespace SMT.EVEData
         private bool m_isOnline;
 
         private bool m_ObservatoryDecloakWarningEnabled;
+
         private bool m_CombatWarningEnabled;
 
         private bool routeNeedsUpdate = false;

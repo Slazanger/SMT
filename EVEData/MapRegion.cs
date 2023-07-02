@@ -3,7 +3,6 @@
 //-----------------------------------------------------------------------
 
 using System.Numerics;
-using System.Windows;
 using EVEDataUtils;
 
 namespace SMT.EVEData
