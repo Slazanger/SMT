@@ -4,18 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SMT", "SMT\SMT.csproj", "{D2916D4D-8A38-4195-97D8-25676ADA0AE3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{A762F726-205C-4F86-BD87-FB90A89B5E85} = {A762F726-205C-4F86-BD87-FB90A89B5E85}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EVEData", "EVEData\EVEData.csproj", "{26F78663-FF78-43F7-8AFB-20955DDF3EDE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{A762F726-205C-4F86-BD87-FB90A89B5E85} = {A762F726-205C-4F86-BD87-FB90A89B5E85}
-	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj", "{A762F726-205C-4F86-BD87-FB90A89B5E85}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataGen", "DataGen\DataGen.csproj", "{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataGen", "DataGen\DataGen.csproj", "{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,14 +33,6 @@ Global
 		{26F78663-FF78-43F7-8AFB-20955DDF3EDE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{26F78663-FF78-43F7-8AFB-20955DDF3EDE}.Release|x64.ActiveCfg = Release|Any CPU
 		{26F78663-FF78-43F7-8AFB-20955DDF3EDE}.Release|x64.Build.0 = Release|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Debug|x64.Build.0 = Debug|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Release|x64.ActiveCfg = Release|Any CPU
-		{A762F726-205C-4F86-BD87-FB90A89B5E85}.Release|x64.Build.0 = Release|Any CPU
 		{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}.Debug|x64.ActiveCfg = Debug|Any CPU
