@@ -80,11 +80,13 @@ namespace SMT
     public class OverlayCanvasData
     {
         public Vector2 dimensions;
+
         public Vector2 borderedDimensions
         { get { return dimensions - (Vector2.One * (2f * mapBorderMargin)); } }
 
         public Vector2 unscaledMapExtendsMax;
         public Vector2 unscaledMapExtendsMin;
+
         public Vector2 unscaledMapDimensions
         { get { return new Vector2(unscaledMapExtendsMax.X - unscaledMapExtendsMin.X, unscaledMapExtendsMax.Y - unscaledMapExtendsMin.Y); } }
 
@@ -93,6 +95,7 @@ namespace SMT
         public float mapBorderMargin;
         public float mapScalingX;
         public float mapScalingY;
+
         public float mapScalingMin
         { get { return Math.Min(mapScalingY, mapScalingX); } }
 

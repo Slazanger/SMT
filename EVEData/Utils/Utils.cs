@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Text;
 
 namespace EVEDataUtils
 {
@@ -52,6 +51,5 @@ namespace EVEDataUtils
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-
     }
 }

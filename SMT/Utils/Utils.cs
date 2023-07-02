@@ -28,8 +28,5 @@ namespace Utils
             }
             return strTitle;
         }
-
-
-
     }
 }
