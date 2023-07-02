@@ -1,12 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
-using Utils;
+using EVEDataUtils;
 
 namespace SMT.EVEData
 {
@@ -45,13 +44,12 @@ namespace SMT.EVEData
         private bool m_isOnline;
 
         private bool m_ObservatoryDecloakWarningEnabled;
+
         private bool m_CombatWarningEnabled;
 
         private bool routeNeedsUpdate = false;
 
         private int ssoErrorCount = 0;
-
-        private static BitmapImage unknownChar = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
@@ -104,19 +102,6 @@ namespace SMT.EVEData
             IsOnline = true;
             CombatWarningEnabled = true;
             ObservatoryDecloakWarningEnabled = true;
-
-            if (unknownChar == null)
-            {
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    unknownChar = SMT.ResourceUsage.ResourceLoader.LoadBitmapFromResource("Images/unknownChar.png");
-                }), DispatcherPriority.Normal, null);
-            }
-
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                Portrait = unknownChar;
-            }), DispatcherPriority.Normal, null);
         }
 
         /// <summary>
@@ -368,7 +353,7 @@ namespace SMT.EVEData
         public List<string> WarningSystems { get; set; }
 
         [XmlIgnoreAttribute]
-        public BitmapImage Portrait { get; set; }
+        public Uri PortraitLocation { get; set; }
 
         [XmlIgnoreAttribute]
         public String AlertText { get; set; }
@@ -1147,18 +1132,7 @@ namespace SMT.EVEData
 
                 if (File.Exists(characterPortrait))
                 {
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
-                    {
-                        try
-                        {
-                            Uri imageLoc = new Uri(characterPortrait);
-                            Portrait = new BitmapImage(imageLoc);
-                        }
-                        catch
-                        {
-                            // something wrong with the portrait
-                        }
-                    }), DispatcherPriority.Normal, null);
+                    PortraitLocation = new Uri(characterPortrait);
                 }
 
                 //get the corp info

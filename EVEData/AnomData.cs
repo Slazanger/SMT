@@ -2,7 +2,7 @@
 // EVE Anom Data
 //-----------------------------------------------------------------------
 
-using Utils;
+using EVEDataUtils;
 
 namespace SMT.EVEData
 {

@@ -75,7 +75,7 @@ namespace DataGen
                 }
 
                 string svgStr = svgRootElement.WriteSVGString(false);
-                string filePath = $"{outputFolder}/SourceMaps/exported/{mr.DotLanRef}_layout.svg";
+                string filePath = $"{outputFolder}/data/SourceMaps/exported/{mr.DotLanRef}_layout.svg";
                 using (StreamWriter outputFile = new StreamWriter(filePath))
                 {
                     outputFile.WriteLine(svgStr);
