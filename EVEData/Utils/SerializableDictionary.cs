@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace Utils
+namespace EVEDataUtils
 {
     [XmlRoot("dictionary")]
     public class SerializableDictionary<TKey, TValue>

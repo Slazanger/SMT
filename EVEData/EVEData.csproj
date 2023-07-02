@@ -18,12 +18,8 @@
   <ItemGroup>
     <PackageReference Include="DecimalMath.DecimalEx" Version="1.0.2" />
     <PackageReference Include="ESI.NET" Version="2023.4.15" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.48" />
     <PackageReference Include="SvgNet" Version="3.3.3" /> 
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 	<ItemGroup>
 	    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />

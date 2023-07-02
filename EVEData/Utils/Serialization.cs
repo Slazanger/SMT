@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.Serialization;
 
-namespace Utils
+namespace EVEDataUtils
 {
     public class Serialization
     {

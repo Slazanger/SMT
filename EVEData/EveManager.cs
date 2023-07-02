@@ -18,7 +18,7 @@ using ESI.NET.Models.SSO;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Utils;
+using EVEDataUtils;
 
 namespace SMT.EVEData
 {
@@ -900,7 +900,7 @@ namespace SMT.EVEData
                     List<Vector2f> cellList = s.Region(clipRect);
                     ms.Layout = new Vector2(s.x, s.y);
 
-                    ms.CellPoints = new List<Point>();
+                    ms.CellPoints = new List<Vector2>();
 
                     foreach (Vector2f vc in cellList)
                     {
@@ -909,8 +909,10 @@ namespace SMT.EVEData
                         double finalX = vc.x;
                         double finalY = vc.y;
 
-                        ms.CellPoints.Add(new Point(Math.Round(finalX / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal, Math.Round(finalY / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal));
-                        //ms.CellPoints.Add(new Point(vc.x, vc.y));
+                        int X = (int)(Math.Round(finalX / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal);
+                        int Y = (int)(Math.Round(finalY / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal);
+
+                        ms.CellPoints.Add(new Vector2(X,Y));
                     }
                 }
             }
@@ -1204,7 +1206,7 @@ namespace SMT.EVEData
 
                 nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
 
-                mr.RegionOutline = new List<Point>();
+                mr.RegionOutline = new List<Vector2>();
 
                 List<Tuple<int, int>> processed = new List<Tuple<int, int>>();
 
@@ -1220,7 +1222,7 @@ namespace SMT.EVEData
 
                         if (i.Item1 == CurrentPoint)
                         {
-                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
+                            mr.RegionOutline.Add(new Vector2((int)ns.Vertices[CurrentPoint].X, (int)ns.Vertices[CurrentPoint].Y));
                             CurrentPoint = i.Item2;
                             processed.Add(i);
                             break;
@@ -1228,7 +1230,7 @@ namespace SMT.EVEData
 
                         if (i.Item2 == CurrentPoint)
                         {
-                            mr.RegionOutline.Add(new Point(ns.Vertices[CurrentPoint].X, ns.Vertices[CurrentPoint].Y));
+                            mr.RegionOutline.Add(new Vector2((int)ns.Vertices[CurrentPoint].X, (int)ns.Vertices[CurrentPoint].Y));
                             CurrentPoint = i.Item1;
                             processed.Add(i);
                             break;
@@ -2635,7 +2637,7 @@ namespace SMT.EVEData
 
             try
             {
-                Encoding fe = Misc.GetEncoding(changedFile);
+                Encoding fe = EVEDataUtils.Misc.GetEncoding(changedFile);
                 FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 StreamReader file = new StreamReader(ifs, fe);

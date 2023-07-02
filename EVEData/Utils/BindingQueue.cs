@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace Utils
+namespace EVEDataUtils
 {
     public class BindingQueue<T> : List<T>, INotifyCollectionChanged
     {
