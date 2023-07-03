@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel;
-using Utils;
+using EVEDataUtils;
 
 namespace SMT.EVEData
 {

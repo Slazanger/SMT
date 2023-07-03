@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,7 +11,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using SMT.EVEData;
 using SMT.ResourceUsage;
-using Windows.Gaming.Preview.GamesEnumeration;
 
 namespace SMT
 {
@@ -1646,9 +1646,10 @@ namespace SMT
                         poly.StrokeLineJoin = PenLineJoin.Round;
                         poly.Stretch = Stretch.None;
 
-                        foreach (Point p in sys.CellPoints)
+                        foreach (Vector2 p in sys.CellPoints)
                         {
-                            poly.Points.Add(p);
+                            System.Windows.Point wp = new Point(p.X, p.Y);
+                            poly.Points.Add(wp);
                         }
 
                         MainCanvas.Children.Add(poly);
@@ -1661,16 +1662,17 @@ namespace SMT
                 if (SystemAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null && ShowSovOwner)
                 {
                     Polygon poly = new Polygon();
-                    poly.Fill = new SolidColorBrush(SystemCoalition.CoalitionColor);
+                    poly.Fill = new SolidColorBrush(Color.FromArgb(SystemCoalition.CoalitionColor.A, SystemCoalition.CoalitionColor.R, SystemCoalition.CoalitionColor.G, SystemCoalition.CoalitionColor.B));
                     poly.SnapsToDevicePixels = true;
                     poly.Stroke = poly.Fill;
                     poly.StrokeThickness = 0.4;
                     poly.StrokeDashCap = PenLineCap.Round;
                     poly.StrokeLineJoin = PenLineJoin.Round;
 
-                    foreach (Point p in sys.CellPoints)
+                    foreach (Vector2 p in sys.CellPoints)
                     {
-                        poly.Points.Add(p);
+                        System.Windows.Point wp = new Point(p.X, p.Y);
+                        poly.Points.Add(wp);
                     }
 
                     MainCanvas.Children.Add(poly);
@@ -1781,9 +1783,10 @@ namespace SMT
                         {
                             Polygon poly = new Polygon();
 
-                            foreach (Point p in sys.CellPoints)
+                            foreach (Vector2 p in sys.CellPoints)
                             {
-                                poly.Points.Add(p);
+                                System.Windows.Point wp = new Point(p.X, p.Y);
+                                poly.Points.Add(wp);
                             }
 
                             poly.Fill = HighlightBrush;
@@ -1946,9 +1949,10 @@ namespace SMT
 
                 Polygon poly = new Polygon();
 
-                foreach (Point p in sys.CellPoints)
+                foreach (Vector2 p in sys.CellPoints)
                 {
-                    poly.Points.Add(p);
+                    System.Windows.Point wp = new Point(p.X, p.Y);
+                    poly.Points.Add(wp);
                 }
 
                 poly.Fill = GetBrushForFWState(fsw.SystemState, fsw.OccupierID);
@@ -2709,9 +2713,10 @@ namespace SMT
                     {
                         Polygon poly = new Polygon();
 
-                        foreach (Point p in mapSystem.CellPoints)
+                        foreach (Vector2 p in mapSystem.CellPoints)
                         {
-                            poly.Points.Add(p);
+                            System.Windows.Point wp = new Point(p.X, p.Y);
+                            poly.Points.Add(wp);
                         }
 
                         //poly.Fill
@@ -2766,9 +2771,10 @@ namespace SMT
                     {
                         Polygon poly = new Polygon();
 
-                        foreach (Point p in mapSystem.CellPoints)
+                        foreach (Vector2 p in mapSystem.CellPoints)
                         {
-                            poly.Points.Add(p);
+                            System.Windows.Point wp = new Point(p.X, p.Y);
+                            poly.Points.Add(wp);
                         }
 
                         //poly.Fill
@@ -2797,9 +2803,10 @@ namespace SMT
                 {
                     Polygon poly = new Polygon();
 
-                    foreach (Point p in mapSystem.CellPoints)
+                    foreach (Vector2 p in mapSystem.CellPoints)
                     {
-                        poly.Points.Add(p);
+                        System.Windows.Point wp = new Point(p.X, p.Y);
+                        poly.Points.Add(wp);
                     }
 
                     poly.Fill = SelectedAllianceBrush;
@@ -2821,9 +2828,10 @@ namespace SMT
                     SystemSubText += "(" + mapSystem.Region + ")";
 
                     Polygon poly = new Polygon();
-                    foreach (Point p in mapSystem.CellPoints)
+                    foreach (Vector2 p in mapSystem.CellPoints)
                     {
-                        poly.Points.Add(p);
+                        System.Windows.Point wp = new Point(p.X, p.Y);
+                        poly.Points.Add(wp);
                     }
 
                     //poly.Fill

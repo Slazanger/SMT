@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SvgNet" Version="3.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EVEData\EVEData.csproj" />
   </ItemGroup>
 

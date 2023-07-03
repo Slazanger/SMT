@@ -16,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using ESI.NET.Models.Bookmarks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using SMT.EVEData;
@@ -1010,7 +1009,7 @@ namespace SMT
                                 ToastContentBuilder tb = new ToastContentBuilder();
                                 tb.AddText("SMT Alert");
                                 tb.AddText("Character : " + character + "(" + lc.Location + ")");
-                                tb.AddInlineImage(lc.Portrait.UriSource);
+                                tb.AddInlineImage(lc.PortraitLocation);
                                 tb.AddText(text);
                                 tb.AddArgument("character", character);
                                 tb.SetToastScenario(ToastScenario.Alarm);
@@ -1043,7 +1042,7 @@ namespace SMT
                                 ToastContentBuilder tb = new ToastContentBuilder();
                                 tb.AddText("SMT Alert");
                                 tb.AddText("Character : " + character + "(" + lc.Location + ")");
-                                tb.AddInlineImage(lc.Portrait.UriSource);
+                                tb.AddInlineImage(lc.PortraitLocation);
                                 tb.AddText(text);
                                 tb.AddArgument("character", character);
                                 tb.SetToastScenario(ToastScenario.Alarm);
@@ -1849,7 +1848,7 @@ namespace SMT
                 ToastContentBuilder tb = new ToastContentBuilder();
                 tb.AddText("SMT Alert");
                 tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
-                tb.AddInlineImage(lc.Portrait.UriSource);
+                tb.AddInlineImage(lc.PortraitLocation);
                 tb.AddText(line);
                 tb.AddArgument("character", characterName);
                 tb.SetToastScenario(ToastScenario.Alarm);

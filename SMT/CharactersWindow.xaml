@@ -32,7 +32,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <WrapPanel>
-                            <Image Source="{Binding Portrait}" Width="32" Height="32" Margin="1" />
+                        <Image Source="{Binding PortraitLocation}" Width="32" Height="32" Margin="1" />
                             <TextBlock Text="{Binding Name}" FontSize="16" />
                         </WrapPanel>
                     </DataTemplate>
@@ -61,7 +61,7 @@
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
-            <Image Source="{Binding Portrait}" Width="170" Height="170" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10" />
+            <Image Source="{Binding PortraitLocation}" Width="170" Height="170" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10" />
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="-40,30" Grid.RowSpan="2">
                 <TextBlock Text="{Binding Name}" FontSize="24" Foreground="White" />
 
