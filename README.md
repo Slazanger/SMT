@@ -11,7 +11,6 @@ Discord :  https://discord.gg/QSuJjNn
 - download [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/compare)
 - install using .NET desktop development
 - clone a repository locally using the GitHub url
-- Error "Current solution contains incorrect configurations mappings. ..." in the yellow status bar is fixed clicking the provided button to "Open Configuration Manager", and just close it.
 - Add nuget.org package source in NuGet Package Manager:</br> Tools>NuGet Package Manager>Package Manager Settings>Package Sources>Add(+):</br>&nbsp;&nbsp;Name:nuget.org, Source:https://www.nuget.org/api/v2/ . </br>Otherwise you get missing package errors.
 - run using Debug>Start Without Debugging
 - to submit changes: fork on GitHub, clone and edit your fork, create a pull request
