@@ -1041,14 +1041,14 @@ namespace SMT
                 }
             }
 
-            if (flashWindow)
+            if (playSound)
             {
                 mediaPlayer.Stop();
                 mediaPlayer.Volume = MapConf.IntelSoundVolume;
                 mediaPlayer.Position = new TimeSpan(0, 0, 0);
                 mediaPlayer.Play();
             }
-            if (MapConf.FlashWindow)
+            if (flashWindow)
             {
                 FlashWindow.Flash(AppWindow, 5);
             }
@@ -2276,21 +2276,6 @@ namespace SMT
             /// </summary>
             public uint dwTimeout;
         }
-
-        /// <summary>
-        /// Stop flashing. The system restores the window to its original stae.
-        /// </summary>
-        public const uint FLASHW_STOP = 0;
-
-        /// <summary>
-        /// Flash the window caption.
-        /// </summary>
-        public const uint FLASHW_CAPTION = 1;
-
-        /// <summary>
-        /// Flash the taskbar button.
-        /// </summary>
-        public const uint FLASHW_TRAY = 2;
 
         /// <summary>
         /// Flash both the window caption and taskbar button.
