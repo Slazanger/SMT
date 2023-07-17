@@ -273,7 +273,6 @@ namespace SMT
             Closed += MainWindow_Closed;
             StateChanged += MainWindow_StateChanged;
 
-
             EVEManager.IntelAddedEvent += OnIntelAdded;
             EVEManager.ShipDecloakedEvent += OnShipDecloaked;
             EVEManager.CombatEvent += OnCombatEvent;

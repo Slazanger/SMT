@@ -131,7 +131,8 @@ namespace SMT
                 OnPropertyChanged("AlwaysOnTop");
             }
         }
-        
+
+        [Category("General")]
         [DisplayName("Minimize to tray")]
         public bool MinimizeToTray 
         {
@@ -141,7 +142,7 @@ namespace SMT
             }
             set
             {
-                if (m_MinimizeToTray)
+                if (!value)
                 {
                     CloseToTray = false;
                 }
@@ -150,6 +151,7 @@ namespace SMT
             }
         }
 
+        [Category("General")]
         [DisplayName("Close to tray")]
         public bool CloseToTray
         {
@@ -459,7 +461,7 @@ namespace SMT
             }
             set
             {
-                if (m_PlayIntelSound)
+                if (!value)
                 {
                     PlaySoundOnlyInDangerZone = false;
                 }
@@ -482,7 +484,7 @@ namespace SMT
             }
             set
             {
-                if (m_FlashWindow)
+                if (!value)
                 {
                     FlashWindowOnlyInDangerZone = false;
                 }
