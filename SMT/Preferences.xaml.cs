@@ -147,4 +147,29 @@ namespace SMT
             return oc;
         }
     }
+
+    public class NegateBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                if (boolValue)
+                {
+                    return "True";
+                }
+                else
+                {
+                    return "False";
+                }
+            }
+
+            return System.Windows.Data.Binding.DoNothing;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

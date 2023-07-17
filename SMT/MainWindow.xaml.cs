@@ -46,6 +46,8 @@ namespace SMT
 
         public EventHandler OnSelectedCharChangedEventHandler;
 
+        System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
+
         /// <summary>
         /// Main Window
         /// </summary>
@@ -269,6 +271,8 @@ namespace SMT
 
             Closing += MainWindow_Closing;
             Closed += MainWindow_Closed;
+            StateChanged += MainWindow_StateChanged;
+
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
             EVEManager.ShipDecloakedEvent += OnShipDecloaked;
@@ -325,6 +329,17 @@ namespace SMT
                     }
                 }
             };
+
+            using (System.Diagnostics.Process currentProcess = System.Diagnostics.Process.GetCurrentProcess())
+            {
+                nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(currentProcess.MainModule.FileName);
+            }
+            nIcon.Visible = false;
+            nIcon.Text = "SMT";
+            nIcon.DoubleClick += NIcon_DClick;
+            nIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            nIcon.ContextMenuStrip.Items.Add("Show", null, NIcon_DClick);
+            nIcon.ContextMenuStrip.Items.Add("Exit", null, NIcon_Exit);
 
             CheckGitHubVersion();
         }
@@ -428,6 +443,15 @@ namespace SMT
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
+            if (MapConf.CloseToTray && MapConf.MinimizeToTray && AppWindow.ShowInTaskbar != false)
+            {
+                e.Cancel = true;
+                AppWindow.Hide();
+                AppWindow.ShowInTaskbar = false;
+                nIcon.Visible = true;
+                return;
+            }
+
             // Store the main window position and size
 
             Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
@@ -518,6 +542,35 @@ namespace SMT
             EVEManager.ShutDown();
         }
 
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == WindowState.Minimized)
+            {
+                if (MapConf.MinimizeToTray)
+                {
+                    AppWindow.Hide();
+                    AppWindow.ShowInTaskbar = false;
+                    nIcon.Visible = true;
+                }
+            }
+        }
+
+        private void NIcon_DClick(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = true;
+            this.Visibility = Visibility.Visible;
+            this.Show();
+            this.WindowState = WindowState.Normal;
+            nIcon.Visible = false;
+            this.Activate();
+        }
+
+        private void NIcon_Exit(object sender, EventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
+
         private void SovCampaignList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (sender != null)
@@ -588,6 +641,14 @@ namespace SMT
                 else
                 {
                     this.Topmost = false;
+                }
+            }
+
+            if (e.PropertyName == "MinimizeToTray")
+            {
+                if (MapConf.MinimizeToTray)
+                {
+
                 }
             }
 

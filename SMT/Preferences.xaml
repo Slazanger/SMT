@@ -10,6 +10,7 @@
         Title="Preferences" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Window.Resources>
         <local:JoinStringConverter  x:Key="stringJoiner" />
+        <local:NegateBooleanConverter x:Key="NegateBooleanConverter" />
     </Window.Resources>
 
     <Grid Background="{DynamicResource ButtonBorder}" Height="Auto" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -33,6 +34,13 @@
                                         <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
                                         <CheckBox x:Name="syncESIPositionChk" Margin="0,3" Checked="syncESIPositionChk_Checked" Unchecked="syncESIPositionChk_Checked">Use ESI for character positions</CheckBox>
                                         <CheckBox IsChecked="{Binding Path=DrawRoute}" Margin="0,3" Content="Draw Route" />
+                                        <CheckBox IsChecked="{Binding MinimizeToTray}" Margin="0,3" Content="Minimize to tray" />
+                                        <CheckBox IsChecked="{Binding CloseToTray}" Margin="0,3" Content="Close to tray">
+                                            <CheckBox.IsEnabled>
+                                                <Binding Path="MinimizeToTray" Converter="{StaticResource NegateBooleanConverter}" />
+                                            </CheckBox.IsEnabled>
+                                        </CheckBox>
+
                                     </StackPanel>
                                 </GroupBox>
 

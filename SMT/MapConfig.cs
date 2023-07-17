@@ -16,6 +16,9 @@ namespace SMT
 
         private bool m_AlwaysOnTop;
 
+        private bool m_MinimizeToTray;
+        private bool m_CloseToTray;
+
         private string m_DefaultRegion;
 
         private bool m_LimitESIDataToRegion;
@@ -120,6 +123,38 @@ namespace SMT
             {
                 m_AlwaysOnTop = value;
                 OnPropertyChanged("AlwaysOnTop");
+            }
+        }
+        
+        [DisplayName("Minimize to tray")]
+        public bool MinimizeToTray 
+        {
+            get
+            {
+                return m_MinimizeToTray;
+            }
+            set
+            {
+                if (m_MinimizeToTray)
+                {
+                    CloseToTray = false;
+                }
+                m_MinimizeToTray = value;
+                OnPropertyChanged("MinimizeToTray");
+            }
+        }
+
+        [DisplayName("Close to tray")]
+        public bool CloseToTray
+        {
+            get
+            {
+                return m_CloseToTray;
+            }
+            set
+            {
+                m_CloseToTray = value;
+                OnPropertyChanged("CloseToTray");
             }
         }
 
@@ -1180,6 +1215,8 @@ namespace SMT
             UpcomingSovMinutes = 30;
             ZkillExpireTimeMinutes = 30;
             AlwaysOnTop = false;
+            MinimizeToTray = false;
+            CloseToTray = false;
             ShowToolBox = true;
             ShowZKillData = true;
             ShowTrueSec = true;
