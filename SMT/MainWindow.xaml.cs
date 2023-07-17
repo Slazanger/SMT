@@ -1024,8 +1024,8 @@ namespace SMT
                                 {
                                     if (ls == s)
                                     {
-                                        playSound = true;
-                                        flashWindow = true;
+                                        playSound = playSound || MapConf.PlaySoundOnlyInDangerZone;
+                                        flashWindow = flashWindow || MapConf.FlashWindowOnlyInDangerZone;
                                         break;
                                     }
                                 }
@@ -1040,14 +1040,14 @@ namespace SMT
                 }
             }
 
-            if (playSound)
+            if (playSound || (!MapConf.PlaySoundOnlyInDangerZone && MapConf.PlayIntelSound))
             {
                 mediaPlayer.Stop();
                 mediaPlayer.Volume = MapConf.IntelSoundVolume;
                 mediaPlayer.Position = new TimeSpan(0, 0, 0);
                 mediaPlayer.Play();
             }
-            if (flashWindow)
+            if (flashWindow || (!MapConf.FlashWindowOnlyInDangerZone && MapConf.FlashWindow))
             {
                 FlashWindow.Flash(AppWindow, 5);
             }
