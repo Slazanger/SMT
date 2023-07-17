@@ -1003,14 +1003,16 @@ namespace SMT
         private void OnIntelAdded(List<string> intelsystems)
         {
             bool playSound = false;
+            bool flashWindow = false;
 
-            if (MapConf.PlayIntelSound)
+            if (MapConf.PlayIntelSound || MapConf.FlashWindow)
             {
-                if (MapConf.PlaySoundOnlyInDangerZone)
+                if (MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
                     if (MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
                     {
                         playSound = true;
+                        flashWindow = true;
                     }
 
                     foreach (string s in intelsystems)
@@ -1024,6 +1026,7 @@ namespace SMT
                                     if (ls == s)
                                     {
                                         playSound = true;
+                                        flashWindow = true;
                                         break;
                                     }
                                 }
@@ -1034,10 +1037,11 @@ namespace SMT
                 else
                 {
                     playSound = true;
+                    flashWindow = true;
                 }
             }
 
-            if (playSound)
+            if (flashWindow)
             {
                 mediaPlayer.Stop();
                 mediaPlayer.Volume = MapConf.IntelSoundVolume;

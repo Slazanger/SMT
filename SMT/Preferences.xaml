@@ -153,8 +153,7 @@
                                 <StackPanel>
 
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2">Warning on Unknown</CheckBox>
-                                    <CheckBox IsChecked="{Binding FlashWindow}" Margin="0,3" Content="Flash window on new intel"/>
+                                    <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window"/>
                                     <StackPanel Orientation="Vertical" Margin="0,2">
                                         <Label Content="Warning Sound Volume" />
                                         <Slider x:Name="intelVolumeSlider" Value="{Binding Path=IntelSoundVolume}" Minimum="0" Maximum="1" TickFrequency="0.1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
@@ -179,7 +178,17 @@
                             <GroupBox Header="DangerZone" Margin="4">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2">Limit Sound to Dangerzone</CheckBox>
+                                    <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2" Content="Limit Sound to Dangerzone">
+                                        <CheckBox.IsEnabled>
+                                            <Binding Path="PlayIntelSound" Converter="{StaticResource NegateBooleanConverter}" />
+                                        </CheckBox.IsEnabled>
+                                    </CheckBox>
+                                    <CheckBox IsChecked="{Binding Path=FlashWindowOnlyInDangerZone}" Margin="0,2" Content="Limit Window Flash to Dangerzone">
+                                        <CheckBox.IsEnabled>
+                                            <Binding Path="FlashWindow" Converter="{StaticResource NegateBooleanConverter}" />
+                                        </CheckBox.IsEnabled>
+                                    </CheckBox>
+                                    <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2">Warning on Unknown</CheckBox>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>

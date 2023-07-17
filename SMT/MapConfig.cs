@@ -20,6 +20,10 @@ namespace SMT
         private bool m_CloseToTray;
 
         private bool m_FlashWindow;
+        private bool m_FlashWindowOnlyInDangerZone;
+
+        private bool m_PlayIntelSound;
+        private bool m_PlaySoundOnlyInDangerZone;
 
         private string m_DefaultRegion;
 
@@ -157,20 +161,6 @@ namespace SMT
             {
                 m_CloseToTray = value;
                 OnPropertyChanged("CloseToTray");
-            }
-        }
-
-        [DisplayName("Flash window on new intel")]
-        public bool FlashWindow
-        {
-            get
-            {
-                return m_FlashWindow;
-            }
-            set
-            {
-                m_FlashWindow = value;
-                OnPropertyChanged("FlashWindow");
             }
         }
 
@@ -461,11 +451,45 @@ namespace SMT
 
         [Category("Intel")]
         [DisplayName("Warning Sound")]
-        public bool PlayIntelSound { get; set; }
+        public bool PlayIntelSound
+        {
+            get
+            {
+                return m_PlayIntelSound;
+            }
+            set
+            {
+                if (m_PlayIntelSound)
+                {
+                    PlaySoundOnlyInDangerZone = false;
+                }
+                m_PlayIntelSound = value;
+                OnPropertyChanged("PlayIntelSound");
+            }
+        }
 
         [Category("Intel")]
         [DisplayName("Warning On Unknown")]
         public bool PlayIntelSoundOnUnknown { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Flash Window on New Intel")]
+        public bool FlashWindow
+        {
+            get
+            {
+                return m_FlashWindow;
+            }
+            set
+            {
+                if (m_FlashWindow)
+                {
+                    FlashWindowOnlyInDangerZone = false;
+                }
+                m_FlashWindow = value;
+                OnPropertyChanged("FlashWindow");
+            }
+        }
 
         [Category("Intel")]
         [DisplayName("Warning Sound Volume")]
@@ -473,7 +497,33 @@ namespace SMT
 
         [Category("Intel")]
         [DisplayName("Limit Sound to Dangerzone")]
-        public bool PlaySoundOnlyInDangerZone { get; set; }
+        public bool PlaySoundOnlyInDangerZone
+        {
+            get
+            {
+                return m_PlaySoundOnlyInDangerZone;
+            }
+            set
+            {
+                m_PlaySoundOnlyInDangerZone = value;
+                OnPropertyChanged("PlaySoundOnlyInDangerZone");
+            }
+        }
+
+        [Category("Intel")]
+        [DisplayName("Limit Window Flash to Dangerzone")]
+        public bool FlashWindowOnlyInDangerZone
+        {
+            get
+            {
+                return m_FlashWindowOnlyInDangerZone;
+            }
+            set
+            {
+                m_FlashWindowOnlyInDangerZone = value;
+                OnPropertyChanged("FlashWindowOnlyInDangerZone");
+            }
+        }
 
         [Category("Incursions")]
         [DisplayName("Show Active Incursions")]
