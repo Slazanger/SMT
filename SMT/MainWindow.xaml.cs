@@ -644,14 +644,6 @@ namespace SMT
                 }
             }
 
-            if (e.PropertyName == "MinimizeToTray")
-            {
-                if (MapConf.MinimizeToTray)
-                {
-
-                }
-            }
-
             if (e.PropertyName == "ShowZKillData")
             {
                 EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
@@ -1051,6 +1043,10 @@ namespace SMT
                 mediaPlayer.Volume = MapConf.IntelSoundVolume;
                 mediaPlayer.Position = new TimeSpan(0, 0, 0);
                 mediaPlayer.Play();
+            }
+            if (MapConf.FlashWindow)
+            {
+                FlashWindow.Flash(AppWindow, 5);
             }
         }
 
@@ -2240,6 +2236,97 @@ namespace SMT
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    ///  Window Flashing helper
+    /// </summary>
+    public static class FlashWindow
+    {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct FLASHWINFO
+        {
+            /// <summary>
+            /// The size of the structure in bytes.
+            /// </summary>
+            public uint cbSize;
+            /// <summary>
+            /// A Handle to the Window to be Flashed. The window can be either opened or minimized.
+            /// </summary>
+            public IntPtr hwnd;
+            /// <summary>
+            /// The Flash Status.
+            /// </summary>
+            public uint dwFlags;
+            /// <summary>
+            /// The number of times to Flash the window.
+            /// </summary>
+            public uint uCount;
+            /// <summary>
+            /// The rate at which the Window is to be flashed, in milliseconds. If Zero, the function uses the default cursor blink rate.
+            /// </summary>
+            public uint dwTimeout;
+        }
+
+        /// <summary>
+        /// Stop flashing. The system restores the window to its original stae.
+        /// </summary>
+        public const uint FLASHW_STOP = 0;
+
+        /// <summary>
+        /// Flash the window caption.
+        /// </summary>
+        public const uint FLASHW_CAPTION = 1;
+
+        /// <summary>
+        /// Flash the taskbar button.
+        /// </summary>
+        public const uint FLASHW_TRAY = 2;
+
+        /// <summary>
+        /// Flash both the window caption and taskbar button.
+        /// This is equivalent to setting the FLASHW_CAPTION | FLASHW_TRAY flags.
+        /// </summary>
+        public const uint FLASHW_ALL = 3;
+
+        private static FLASHWINFO Create_FLASHWINFO(IntPtr handle, uint flags, uint count, uint timeout)
+        {
+            FLASHWINFO fi = new FLASHWINFO();
+            fi.cbSize = Convert.ToUInt32(System.Runtime.InteropServices.Marshal.SizeOf(fi));
+            fi.hwnd = handle;
+            fi.dwFlags = flags;
+            fi.uCount = count;
+            fi.dwTimeout = timeout;
+            return fi;
+        }
+
+        /// <summary>
+        /// Flash the specified Window for the specified number of times
+        /// </summary>
+        /// <param name="window">The Window to Flash.</param>
+        /// <param name="count">The number of times to Flash.</param>
+        /// <returns></returns>
+        public static bool Flash(System.Windows.Window window, uint count)
+        {
+            if (Win2000OrLater)
+            {
+                FLASHWINFO fi = Create_FLASHWINFO(new System.Windows.Interop.WindowInteropHelper(window).Handle, FLASHW_ALL, count, 0);
+                return FlashWindowEx(ref fi);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// A boolean value indicating whether the application is running on Windows 2000 or later.
+        /// </summary>
+        private static bool Win2000OrLater
+        {
+            get { return System.Environment.OSVersion.Version.Major >= 5; }
         }
     }
 }

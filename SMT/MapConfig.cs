@@ -19,6 +19,8 @@ namespace SMT
         private bool m_MinimizeToTray;
         private bool m_CloseToTray;
 
+        private bool m_FlashWindow;
+
         private string m_DefaultRegion;
 
         private bool m_LimitESIDataToRegion;
@@ -155,6 +157,20 @@ namespace SMT
             {
                 m_CloseToTray = value;
                 OnPropertyChanged("CloseToTray");
+            }
+        }
+
+        [DisplayName("Flash window on new intel")]
+        public bool FlashWindow
+        {
+            get
+            {
+                return m_FlashWindow;
+            }
+            set
+            {
+                m_FlashWindow = value;
+                OnPropertyChanged("FlashWindow");
             }
         }
 
@@ -1217,6 +1233,7 @@ namespace SMT
             AlwaysOnTop = false;
             MinimizeToTray = false;
             CloseToTray = false;
+            FlashWindow = false;
             ShowToolBox = true;
             ShowZKillData = true;
             ShowTrueSec = true;
