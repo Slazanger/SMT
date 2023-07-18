@@ -1035,8 +1035,8 @@ namespace SMT
                 }
                 else
                 {
-                    playSound = true;
-                    flashWindow = true;
+                    playSound = MapConf.PlayIntelSound;
+                    flashWindow = MapConf.FlashWindow;
                 }
             }
 
