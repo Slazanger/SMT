@@ -46,6 +46,8 @@ namespace SMT
 
         public EventHandler OnSelectedCharChangedEventHandler;
 
+        System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
+
         /// <summary>
         /// Main Window
         /// </summary>
@@ -269,6 +271,7 @@ namespace SMT
 
             Closing += MainWindow_Closing;
             Closed += MainWindow_Closed;
+            StateChanged += MainWindow_StateChanged;
 
             EVEManager.IntelAddedEvent += OnIntelAdded;
             EVEManager.ShipDecloakedEvent += OnShipDecloaked;
@@ -325,6 +328,17 @@ namespace SMT
                     }
                 }
             };
+
+            using (System.Diagnostics.Process currentProcess = System.Diagnostics.Process.GetCurrentProcess())
+            {
+                nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(currentProcess.MainModule.FileName);
+            }
+            nIcon.Visible = false;
+            nIcon.Text = "SMT";
+            nIcon.DoubleClick += NIcon_DClick;
+            nIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            nIcon.ContextMenuStrip.Items.Add("Show", null, NIcon_DClick);
+            nIcon.ContextMenuStrip.Items.Add("Exit", null, NIcon_Exit);
 
             CheckGitHubVersion();
         }
@@ -428,6 +442,15 @@ namespace SMT
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
+            if (MapConf.CloseToTray && MapConf.MinimizeToTray && AppWindow.ShowInTaskbar != false)
+            {
+                e.Cancel = true;
+                AppWindow.Hide();
+                AppWindow.ShowInTaskbar = false;
+                nIcon.Visible = true;
+                return;
+            }
+
             // Store the main window position and size
 
             Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
@@ -516,6 +539,35 @@ namespace SMT
             // save the character data
             EVEManager.SaveData();
             EVEManager.ShutDown();
+        }
+
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == WindowState.Minimized)
+            {
+                if (MapConf.MinimizeToTray)
+                {
+                    AppWindow.Hide();
+                    AppWindow.ShowInTaskbar = false;
+                    nIcon.Visible = true;
+                }
+            }
+        }
+
+        private void NIcon_DClick(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = true;
+            this.Visibility = Visibility.Visible;
+            this.Show();
+            this.WindowState = WindowState.Normal;
+            nIcon.Visible = false;
+            this.Activate();
+        }
+
+        private void NIcon_Exit(object sender, EventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
 
         private void SovCampaignList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -950,14 +1002,16 @@ namespace SMT
         private void OnIntelAdded(List<string> intelsystems)
         {
             bool playSound = false;
+            bool flashWindow = false;
 
-            if (MapConf.PlayIntelSound)
+            if (MapConf.PlayIntelSound || MapConf.FlashWindow)
             {
-                if (MapConf.PlaySoundOnlyInDangerZone)
+                if (MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
                     if (MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
                     {
                         playSound = true;
+                        flashWindow = true;
                     }
 
                     foreach (string s in intelsystems)
@@ -970,7 +1024,8 @@ namespace SMT
                                 {
                                     if (ls == s)
                                     {
-                                        playSound = true;
+                                        playSound = playSound || MapConf.PlaySoundOnlyInDangerZone;
+                                        flashWindow = flashWindow || MapConf.FlashWindowOnlyInDangerZone;
                                         break;
                                     }
                                 }
@@ -980,16 +1035,21 @@ namespace SMT
                 }
                 else
                 {
-                    playSound = true;
+                    playSound = MapConf.PlayIntelSound;
+                    flashWindow = MapConf.FlashWindow;
                 }
             }
 
-            if (playSound)
+            if (playSound || (!MapConf.PlaySoundOnlyInDangerZone && MapConf.PlayIntelSound))
             {
                 mediaPlayer.Stop();
                 mediaPlayer.Volume = MapConf.IntelSoundVolume;
                 mediaPlayer.Position = new TimeSpan(0, 0, 0);
                 mediaPlayer.Play();
+            }
+            if (flashWindow || (!MapConf.FlashWindowOnlyInDangerZone && MapConf.FlashWindow))
+            {
+                FlashWindow.Flash(AppWindow, 5);
             }
         }
 
@@ -2179,6 +2239,82 @@ namespace SMT
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    ///  Window Flashing helper
+    /// </summary>
+    public static class FlashWindow
+    {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct FLASHWINFO
+        {
+            /// <summary>
+            /// The size of the structure in bytes.
+            /// </summary>
+            public uint cbSize;
+            /// <summary>
+            /// A Handle to the Window to be Flashed. The window can be either opened or minimized.
+            /// </summary>
+            public IntPtr hwnd;
+            /// <summary>
+            /// The Flash Status.
+            /// </summary>
+            public uint dwFlags;
+            /// <summary>
+            /// The number of times to Flash the window.
+            /// </summary>
+            public uint uCount;
+            /// <summary>
+            /// The rate at which the Window is to be flashed, in milliseconds. If Zero, the function uses the default cursor blink rate.
+            /// </summary>
+            public uint dwTimeout;
+        }
+
+        /// <summary>
+        /// Flash both the window caption and taskbar button.
+        /// This is equivalent to setting the FLASHW_CAPTION | FLASHW_TRAY flags.
+        /// </summary>
+        public const uint FLASHW_ALL = 3;
+
+        private static FLASHWINFO Create_FLASHWINFO(IntPtr handle, uint flags, uint count, uint timeout)
+        {
+            FLASHWINFO fi = new FLASHWINFO();
+            fi.cbSize = Convert.ToUInt32(System.Runtime.InteropServices.Marshal.SizeOf(fi));
+            fi.hwnd = handle;
+            fi.dwFlags = flags;
+            fi.uCount = count;
+            fi.dwTimeout = timeout;
+            return fi;
+        }
+
+        /// <summary>
+        /// Flash the specified Window for the specified number of times
+        /// </summary>
+        /// <param name="window">The Window to Flash.</param>
+        /// <param name="count">The number of times to Flash.</param>
+        /// <returns></returns>
+        public static bool Flash(System.Windows.Window window, uint count)
+        {
+            if (Win2000OrLater)
+            {
+                FLASHWINFO fi = Create_FLASHWINFO(new System.Windows.Interop.WindowInteropHelper(window).Handle, FLASHW_ALL, count, 0);
+                return FlashWindowEx(ref fi);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// A boolean value indicating whether the application is running on Windows 2000 or later.
+        /// </summary>
+        private static bool Win2000OrLater
+        {
+            get { return System.Environment.OSVersion.Version.Major >= 5; }
         }
     }
 }
