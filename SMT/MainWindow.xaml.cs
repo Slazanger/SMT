@@ -1532,7 +1532,7 @@ namespace SMT
             {
                 return;
             }
-            String jbText = Clipboard.GetText(TextDataFormat.Text);
+            String jbText = Clipboard.GetText(TextDataFormat.UnicodeText);
 
             Regex rx = new Regex(
                 @"<url=showinfo:35841//([0-9]+)>(.*?) » (.*?) - .*?</url>|^[\t ]*([0-9]+) (.*) --> (.*)",
