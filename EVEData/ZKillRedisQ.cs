@@ -1,10 +1,10 @@
 ﻿//-----------------------------------------------------------------------
 // ZKillboard ReDisQ feed
 //-----------------------------------------------------------------------
+using System.Timers;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Threading;
+using Timer = System.Timers.Timer;
 
 namespace SMT.EVEData
 {
@@ -19,7 +19,19 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
         /// </summary>
-        public ObservableCollection<ZKBDataSimple> KillStream { get; set; }
+        public List<ZKBDataSimple> KillStream { get; set; }
+
+
+        /// <summary>
+        /// Kills Added Event Handler
+        /// </summary>
+        public delegate void KillsAddedHandler();
+
+        /// <summary>
+        /// Kills Added Events
+        /// </summary>
+        public event KillsAddedHandler KillsAddedEvent;
+
 
         public int KillExpireTimeMinutes { get; set; }
 
@@ -33,7 +45,7 @@ namespace SMT.EVEData
         /// </summary>
         public void Initialise()
         {
-            KillStream = new ObservableCollection<ZKBDataSimple>();
+            KillStream = new List<ZKBDataSimple>();
 
             backgroundWorker = new BackgroundWorker();
             backgroundWorker.WorkerSupportsCancellation = true;
@@ -41,10 +53,10 @@ namespace SMT.EVEData
             backgroundWorker.DoWork += zkb_DoWork;
             backgroundWorker.RunWorkerCompleted += zkb_DoWorkComplete;
 
-            DispatcherTimer dp = new DispatcherTimer();
-            dp.Interval = TimeSpan.FromSeconds(20);
-            dp.Tick += Dp_Tick;
-            dp.Start();
+            Timer dp = new Timer(1000);
+            dp.Elapsed += Dp_Tick;
+            dp.AutoReset = true;
+            dp.Enabled = true;
         }
 
         public void ShutDown()
@@ -57,6 +69,10 @@ namespace SMT.EVEData
             if (!backgroundWorker.IsBusy && !PauseUpdate)
             {
                 backgroundWorker.RunWorkerAsync();
+            }
+            else
+            {
+
             }
         }
 
@@ -110,17 +126,30 @@ namespace SMT.EVEData
 
                 zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                KillStream.Insert(0, zs);
+
+                if (KillsAddedEvent != null)
                 {
-                    KillStream.Insert(0, zs);
-                }));
+                    KillsAddedEvent();
+                }
+
             }
+            else
+            {
+                // no killmail, wait 10s
+                Thread.Sleep(10000);
+            }
+
+
+
 
             e.Result = 0;
         }
 
         private void zkb_DoWorkComplete(object sender, RunWorkerCompletedEventArgs e)
         {
+            bool updatedKillList = false;
+
             List<long> AllianceIDs = new List<long>();
 
             for (int i = KillStream.Count - 1; i >= 0; i--)
@@ -139,15 +168,23 @@ namespace SMT.EVEData
 
                 if (KillStream[i].KillTime + TimeSpan.FromMinutes(KillExpireTimeMinutes) < DateTimeOffset.Now)
                 {
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
-                    {
-                        KillStream.RemoveAt(i);
-                    }));
+                    KillStream.RemoveAt(i);
+
+                    updatedKillList = true;
                 }
             }
             if (AllianceIDs.Count > 0)
             {
                 EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
+            }
+
+            if(updatedKillList)
+            {
+                // kills are coming in so fast that this is redundant                    
+                if (KillsAddedEvent != null)
+                {
+                    KillsAddedEvent();
+                }
             }
         }
 
