@@ -653,6 +653,13 @@ namespace SMT
             EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
 
+
+            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
+            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
+            GlobalSystemDropDownAC.SelectedItem = null;
+            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+
+
             DynamicMapElements = new List<UIElement>();
             DynamicMapElementsRangeMarkers = new List<UIElement>();
             DynamicMapElementsRouteHighlight = new List<UIElement>();
@@ -683,12 +690,12 @@ namespace SMT
 
             DataContext = this;
 
-            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
-            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
-            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+
 
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
+            
+
 
             PropertyChanged += MapObjectChanged;
         }
@@ -3273,7 +3280,7 @@ namespace SMT
 
             EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
 
-            if (sd != null)
+            if (sd != null && Region != null)
             {
                 bool ChangeRegion = sd.Region != Region.Name;
                 SelectSystem(sd.Name, ChangeRegion);

@@ -288,6 +288,8 @@ namespace SMT
             zKBFeedview.Refresh();
             zKBFeedview.Filter = ZKBFeedFilter;
 
+            EVEManager.ZKillFeed.KillsAddedEvent += OnZKillsAdded;
+
             foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
             {
                 lc.Location = "";
@@ -341,6 +343,9 @@ namespace SMT
             nIcon.ContextMenuStrip.Items.Add("Exit", null, NIcon_Exit);
 
             CheckGitHubVersion();
+
+
+            RegionUC.SelectRegion(MapConf.DefaultRegion);
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -455,6 +460,8 @@ namespace SMT
 
             Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
             Properties.Settings.Default.Save();
+
+            EVEManager.ZKillFeed.KillsAddedEvent -= OnZKillsAdded;
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -1118,6 +1125,21 @@ namespace SMT
                 }
             }
         }
+
+
+        private void OnZKillsAdded()
+        {
+            if(Application.Current != null)
+            {
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+                }), DispatcherPriority.Normal, null);
+
+            }
+        }
+
+
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
