@@ -282,7 +282,7 @@ namespace SMT.EVEData
 
         public ObservableCollection<Storm> MetaliminalStorms { get; set; }
 
-        public ObservableCollection<POI> PointsOfInterest { get; set; }
+        public List<POI> PointsOfInterest { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -1735,7 +1735,7 @@ namespace SMT.EVEData
         public void SaveData()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
-            ObservableCollection<LocalCharacter> saveList = new ObservableCollection<LocalCharacter>();
+            List<LocalCharacter> saveList = new List<LocalCharacter>();
 
             foreach (LocalCharacter c in LocalCharacters)
             {
@@ -1745,7 +1745,7 @@ namespace SMT.EVEData
                 }
             }
 
-            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
+            XmlSerializer xms = new XmlSerializer(typeof(List<LocalCharacter>));
             string dataFilename = SaveDataRootFolder + @"\Characters_" + LocalCharacter.SaveVersion + ".dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
@@ -2332,7 +2332,7 @@ namespace SMT.EVEData
 
         private void InitPOI()
         {
-            PointsOfInterest = new ObservableCollection<POI>();
+            PointsOfInterest = new List<POI>();
 
             try
             {
@@ -2823,13 +2823,13 @@ namespace SMT.EVEData
 
             try
             {
-                ObservableCollection<LocalCharacter> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
+                List<LocalCharacter> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(List<LocalCharacter>));
 
                 FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
-                loadList = (ObservableCollection<LocalCharacter>)xms.Deserialize(xmlr);
+                loadList = (List<LocalCharacter>)xms.Deserialize(xmlr);
 
                 foreach (LocalCharacter c in loadList)
                 {
