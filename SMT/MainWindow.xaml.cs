@@ -165,7 +165,7 @@ namespace SMT
 
             EVEManager.UpdateMetaliminalStorms();
 
-            EVEManager.LocalCharacters.CollectionChanged += LocalCharacters_CollectionChanged;
+            EVEManager.LocalCharacterUpdateEvent += LocalCharacters_CollectionChanged;
 
             CharactersList.ItemsSource = EVEManager.LocalCharacters;
             CurrentActiveCharacterCombo.ItemsSource = EVEManager.LocalCharacters;
@@ -407,7 +407,7 @@ namespace SMT
             CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
         }
 
-        private void LocalCharacters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void LocalCharacters_CollectionChanged()
         {
             CollectionViewSource.GetDefaultView(CharactersList.ItemsSource).Refresh();
         }
@@ -940,7 +940,7 @@ namespace SMT
             UniverseUC.ActiveCharacter = null;
             OnCharacterSelectionChanged();
 
-            EVEManager.LocalCharacters.Remove(lc);
+            EVEManager.RemoveCharacter(lc);
         }
 
         private void CurrentActiveCharacterCombo_Selected(object sender, SelectionChangedEventArgs e)

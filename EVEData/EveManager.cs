@@ -68,7 +68,7 @@ namespace SMT.EVEData
         /// </summary>
         public EveManager(string version)
         {
-            LocalCharacters = new ObservableCollection<LocalCharacter>();
+            LocalCharacters = new List<LocalCharacter>();
             VersionStr = version;
 
             string SaveDataRoot = EveAppConfig.StorageRoot;
@@ -172,6 +172,18 @@ namespace SMT.EVEData
         /// </summary>
         public event SovCampaignUpdatedHandler SovUpdateEvent;
 
+        /// <summary>
+        /// Local Characters Updated Event Handler
+        /// </summary>
+        public delegate void LocalCharactersUpdatedHandler();
+
+        /// <summary>
+        /// Local Characters Updated Events
+        /// </summary>
+        public event LocalCharactersUpdatedHandler LocalCharacterUpdateEvent;
+
+
+
 
         public List<SOVCampaign> ActiveSovCampaigns { get; set; }
 
@@ -216,11 +228,12 @@ namespace SMT.EVEData
         /// </summary>
         public ObservableCollection<JumpBridge> JumpBridges { get; set; }
 
+
         /// <summary>
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<LocalCharacter> LocalCharacters { get; set; }
+        public List<LocalCharacter> LocalCharacters { get; set; }
 
         /// <summary>
         /// Gets or sets the list of Faction warfare systems
@@ -1516,11 +1529,12 @@ namespace SMT.EVEData
             if (esiChar == null)
             {
                 esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
+                LocalCharacters.Add(esiChar);
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                if(LocalCharacterUpdateEvent != null)
                 {
-                    LocalCharacters.Add(esiChar);
-                }), DispatcherPriority.Normal, null);
+                    LocalCharacterUpdateEvent();
+                }
             }
 
             esiChar.ESIRefreshToken = acd.RefreshToken;
@@ -2484,10 +2498,11 @@ namespace SMT.EVEData
 
                                     if (addChar)
                                     {
-                                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                                        LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
+                                        if(LocalCharacterUpdateEvent != null)
                                         {
-                                            LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        }), DispatcherPriority.Normal, null);
+                                            LocalCharacterUpdateEvent();
+                                        }
                                     }
 
                                     break;
@@ -2532,95 +2547,89 @@ namespace SMT.EVEData
                             {
                                 string system = line.Split(':').Last().Trim();
 
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                foreach (EVEData.LocalCharacter c in LocalCharacters)
                                 {
-                                    foreach (EVEData.LocalCharacter c in LocalCharacters)
+                                    if (c.LocalChatFile == changedFile)
                                     {
-                                        if (c.LocalChatFile == changedFile)
-                                        {
-                                            c.Location = system;
-                                        }
+                                        c.Location = system;
                                     }
-                                }), DispatcherPriority.Normal, null);
+                                }
                             }
                         }
                         else
                         {
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            // check if it is in the intel list already (ie if you have multiple clients running)
+                            bool addToIntel = true;
+
+                            int start = line.IndexOf('>') + 1;
+                            string newIntelString = line.Substring(start);
+
+                            if (newIntelString != null)
                             {
-                                // check if it is in the intel list already (ie if you have multiple clients running)
-                                bool addToIntel = true;
-
-                                int start = line.IndexOf('>') + 1;
-                                string newIntelString = line.Substring(start);
-
-                                if (newIntelString != null)
+                                foreach (EVEData.IntelData idl in IntelDataList)
                                 {
-                                    foreach (EVEData.IntelData idl in IntelDataList)
+                                    if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
                                     {
-                                        if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
-                                        {
-                                            addToIntel = false;
-                                            break;
-                                        }
+                                        addToIntel = false;
+                                        break;
                                     }
                                 }
-                                else
-                                {
-                                    addToIntel = false;
-                                }
+                            }
+                            else
+                            {
+                                addToIntel = false;
+                            }
 
-                                if (line.Contains("Channel MOTD:"))
-                                {
-                                    addToIntel = false;
-                                }
+                            if (line.Contains("Channel MOTD:"))
+                            {
+                                addToIntel = false;
+                            }
 
-                                if (addToIntel)
-                                {
-                                    EVEData.IntelData id = new EVEData.IntelData(line, channelName);
+                            if (addToIntel)
+                            {
+                                EVEData.IntelData id = new EVEData.IntelData(line, channelName);
 
-                                    foreach (string s in id.IntelString.Split(' '))
+                                foreach (string s in id.IntelString.Split(' '))
+                                {
+                                    if (s == "" || s.Length < 3)
                                     {
-                                        if (s == "" || s.Length < 3)
-                                        {
-                                            continue;
-                                        }
+                                        continue;
+                                    }
 
-                                        // check if we should ignore this message (maybe we could put this before every other checks ?)
-                                        foreach (String ignoreMarker in IntelIgnoreFilters)
+                                    // check if we should ignore this message (maybe we could put this before every other checks ?)
+                                    foreach (String ignoreMarker in IntelIgnoreFilters)
+                                    {
+                                        if (ignoreMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
                                         {
-                                            if (ignoreMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                            {
-                                                // do not even add to the intel list
-                                                return;
-                                            }
-                                        }
-
-                                        foreach (String clearMarker in IntelClearFilters)
-                                        {
-                                            if (clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                            {
-                                                id.ClearNotification = true;
-                                            }
-                                        }
-
-                                        foreach (System sys in Systems)
-                                        {
-                                            if (sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                                            {
-                                                id.Systems.Add(sys.Name);
-                                            }
+                                            // do not even add to the intel list
+                                            return;
                                         }
                                     }
 
-                                    IntelDataList.Enqueue(id);
-
-                                    if (IntelAddedEvent != null && !id.ClearNotification)
+                                    foreach (String clearMarker in IntelClearFilters)
                                     {
-                                        IntelAddedEvent(id.Systems);
+                                        if (clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                        {
+                                            id.ClearNotification = true;
+                                        }
+                                    }
+
+                                    foreach (System sys in Systems)
+                                    {
+                                        if (sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                                        {
+                                            id.Systems.Add(sys.Name);
+                                        }
                                     }
                                 }
-                            }), DispatcherPriority.Normal, null);
+
+                                IntelDataList.Enqueue(id);
+
+                                if (IntelAddedEvent != null && !id.ClearNotification)
+                                {
+                                    IntelAddedEvent(id.Systems);
+                                }
+                            }
                         }
 
                         line = file.ReadLine();
@@ -2831,6 +2840,11 @@ namespace SMT.EVEData
                     c.Region = string.Empty;
 
                     LocalCharacters.Add(c);
+
+                    if(LocalCharacterUpdateEvent != null)
+                    {
+                        LocalCharacterUpdateEvent();
+                    }
                 }
             }
             catch
@@ -3247,6 +3261,16 @@ namespace SMT.EVEData
                 }
             }
             catch { }
+        }
+
+        public void RemoveCharacter(LocalCharacter lc)
+        {
+            LocalCharacters.Remove(lc);
+
+            if(LocalCharacterUpdateEvent != null)
+            {
+                LocalCharacterUpdateEvent();
+            }
         }
     }
 }

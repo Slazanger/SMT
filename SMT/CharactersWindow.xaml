@@ -9,6 +9,7 @@
         xmlns:eveData="clr-namespace:SMT.EVEData;assembly=EVEData"
         mc:Ignorable="d"
         Closed="Window_Closed"
+        Loaded="Window_Loaded"
         Title="Characters" Height="450" Width="750" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 
     <Window.Resources>

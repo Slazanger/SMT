@@ -288,6 +288,7 @@ namespace SMT.EVEData
 
                 // clear the warning everytime the location updates
                 GameLogWarningText = "";
+                OnPropertyChanged("Location");
             }
         }
 
