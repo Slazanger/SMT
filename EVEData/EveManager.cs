@@ -161,7 +161,19 @@ namespace SMT.EVEData
 
         public string EVELogFolder { get; set; }
 
-        public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
+
+        /// <summary>
+        /// Sov Campaign Updated Event Handler
+        /// </summary>
+        public delegate void SovCampaignUpdatedHandler();
+
+        /// <summary>
+        /// Kills Added Events
+        /// </summary>
+        public event SovCampaignUpdatedHandler SovUpdateEvent;
+
+
+        public List<SOVCampaign> ActiveSovCampaigns { get; set; }
 
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
@@ -2294,7 +2306,7 @@ namespace SMT.EVEData
             InitFactionWarfareInfo();
             InitPOI();
 
-            ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
+            ActiveSovCampaigns = new List<SOVCampaign>();
 
             InitZKillFeed();
 
@@ -3009,6 +3021,9 @@ namespace SMT.EVEData
         {
             try
             {
+                bool sendUpdateEvent = false;
+
+
                 foreach (SOVCampaign sc in ActiveSovCampaigns)
                 {
                     sc.Valid = false;
@@ -3059,10 +3074,13 @@ namespace SMT.EVEData
                                 ss.Type = "TCU";
                             }
 
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                ActiveSovCampaigns.Add(ss);
-                            }), DispatcherPriority.Normal, null);
+                            ActiveSovCampaigns.Add(ss);
+                            sendUpdateEvent = true;
+                        }
+
+                        if(ss.AttackersScore != c.AttackersScore || ss.DefendersScore != c.DefenderScore )
+                        {
+                            sendUpdateEvent = true;
                         }
 
                         ss.AttackersScore = c.AttackersScore;
@@ -3112,25 +3130,19 @@ namespace SMT.EVEData
 
                     if (sc.Valid == false)
                     {
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                        {
-                            ActiveSovCampaigns.Remove(sc);
-                        }), DispatcherPriority.Normal, null);
+                        ActiveSovCampaigns.Remove(sc);
+                        sendUpdateEvent = true;
                     }
                 }
 
-                // super hack : I want to update the both the times and filter colour that
-                // this gets used for but the binding neither seem to propigate the change
-                // but this forces a listchanged which ultimately triggers a refresh
-                // ugly and to be fixed after some investigation
+                if(sendUpdateEvent)
                 {
-                    SOVCampaign hackSC = new SOVCampaign();
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    if(SovUpdateEvent != null)
                     {
-                        ActiveSovCampaigns.Add(hackSC);
-                        ActiveSovCampaigns.Remove(hackSC);
-                    }), DispatcherPriority.Normal, null);
+                        SovUpdateEvent();
+                    }
                 }
+
             }
             catch { }
         }

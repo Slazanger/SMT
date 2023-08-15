@@ -177,7 +177,7 @@ namespace SMT
             MetaliminalStormList.ItemsSource = EVEManager.MetaliminalStorms;
 
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
-            EVEManager.ActiveSovCampaigns.CollectionChanged += ActiveSovCampaigns_CollectionChanged;
+            EVEManager.SovUpdateEvent += ActiveSovCampaigns_CollectionChanged;
 
             LoadInfoObjects();
             UpdateJumpBridgeSummary();
@@ -402,7 +402,7 @@ namespace SMT
 
         private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; set; }
 
-        private void ActiveSovCampaigns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void ActiveSovCampaigns_CollectionChanged()
         {
             CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
         }
