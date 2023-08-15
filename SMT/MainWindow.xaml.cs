@@ -311,11 +311,14 @@ namespace SMT
                         {
                             // Need to dispatch to UI thread if performing UI operations
                             Application.Current.Dispatcher.Invoke(delegate
-                            {
+                            {                               
                                 ActiveCharacter = lc;
                                 CurrentActiveCharacterCombo.SelectedItem = lc;
 
                                 FleetMembersList.ItemsSource = lc.FleetInfo.Members;
+                                lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
+                                lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
+
                                 CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
 
                                 RegionUC.FollowCharacter = true;
@@ -901,6 +904,8 @@ namespace SMT
                         ActiveCharacter = lc;
                         CurrentActiveCharacterCombo.SelectedItem = lc;
 
+                        lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
+                        lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
                         FleetMembersList.ItemsSource = lc.FleetInfo.Members;
                         CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
 
@@ -922,6 +927,8 @@ namespace SMT
             }
 
             EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
+
+            lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
 
             ActiveCharacter = null;
             FleetMembersList.ItemsSource = null;
@@ -953,6 +960,9 @@ namespace SMT
 
                 FleetMembersList.ItemsSource = lc.FleetInfo.Members;
                 CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+                lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
+                lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
+
 
                 RegionsViewUC.ActiveCharacter = lc;
                 RegionUC.UpdateActiveCharacter(lc);
@@ -977,6 +987,8 @@ namespace SMT
                         CurrentActiveCharacterCombo.SelectedItem = lc;
                         FleetMembersList.ItemsSource = lc.FleetInfo.Members;
                         CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+                        lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
+                        lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
                         RegionUC.UpdateActiveCharacter(lc);
                         UniverseUC.UpdateActiveCharacter(lc);
 
@@ -984,6 +996,18 @@ namespace SMT
                     }
                 }
             }
+        }
+
+
+        public void OnFleetMemebersUpdate(LocalCharacter c)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+
+            }), DispatcherPriority.ApplicationIdle);
+
+
         }
 
         #endregion Characters

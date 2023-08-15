@@ -174,6 +174,17 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public Fleet FleetInfo { get; set; }
 
+
+        /// <summary>
+        /// Fleet Updated Event Handler
+        /// </summary>
+        public delegate void FleetUpdatedHandler( LocalCharacter fleetOwner);
+
+        /// <summary>
+        /// Fleet Updated Events
+        /// </summary>
+        public event FleetUpdatedHandler FleetUpdatedEvent;
+
         public bool IsOnline
         {
             get
@@ -821,6 +832,8 @@ namespace SMT.EVEData
 
             try
             {
+                bool sendFleetUpdatedEvent = false;
+
                 ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
@@ -839,11 +852,8 @@ namespace SMT.EVEData
                     else
                     {
                         FleetInfo.FleetID = 0;
-
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                        {
-                            FleetInfo.Members.Clear();
-                        }), DispatcherPriority.Normal);
+                        FleetInfo.Members.Clear();
+                        sendFleetUpdatedEvent = true;
                     }
                 }
 
@@ -876,11 +886,8 @@ namespace SMT.EVEData
                             {
                                 fm = new Fleet.FleetMember();
                                 fm.IsValid = true;
-
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
-                                {
-                                    FleetInfo.Members.Add(fm);
-                                }), DispatcherPriority.Normal);
+                                FleetInfo.Members.Add(fm);
+                                sendFleetUpdatedEvent = true;
                             }
 
                             EVEData.System es = EveManager.Instance.GetEveSystemFromID(esifm.SolarSystemId);
@@ -923,10 +930,8 @@ namespace SMT.EVEData
                         {
                             if (!ff.IsValid)
                             {
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
-                                {
-                                    FleetInfo.Members.Remove(ff);
-                                }), DispatcherPriority.Normal);
+                                FleetInfo.Members.Remove(ff);
+                                sendFleetUpdatedEvent = true;
                             }
                         }
                     }
@@ -936,10 +941,16 @@ namespace SMT.EVEData
                         FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(60);
                         FleetInfo.FleetID = 0;
 
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                        {
-                            FleetInfo.Members.Clear();
-                        }), DispatcherPriority.Normal);
+                        FleetInfo.Members.Clear();
+                        sendFleetUpdatedEvent = true;
+                    }
+                }
+
+                if(sendFleetUpdatedEvent)
+                {
+                    if(FleetUpdatedEvent!=null)
+                    {
+                        FleetUpdatedEvent(this);
                     }
                 }
             }
