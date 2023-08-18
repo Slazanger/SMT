@@ -173,6 +173,8 @@ namespace SMT
             FleetMembersList.DataContext = this;
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
+            EVEManager.TheraUpdateEvent += TheraConnections_CollectionChanged;
+
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
             MetaliminalStormList.ItemsSource = EVEManager.MetaliminalStorms;
 
@@ -349,6 +351,11 @@ namespace SMT
 
 
             RegionUC.SelectRegion(MapConf.DefaultRegion);
+        }
+
+        private void TheraConnections_CollectionChanged()
+        {
+            CollectionViewSource.GetDefaultView(TheraConnectionsList.ItemsSource).Refresh();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
