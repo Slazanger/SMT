@@ -97,8 +97,6 @@ namespace SMT.EVEData
 
             UseAnsiblexGates = true;
 
-            KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
-
             IsOnline = true;
             CombatWarningEnabled = true;
             ObservatoryDecloakWarningEnabled = true;
@@ -251,8 +249,6 @@ namespace SMT.EVEData
         }
 
         public string WarningState { get; set; }
-
-        public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
 
         [XmlIgnoreAttribute]
         public Dictionary<long, long> LabelMap { get; set; }
