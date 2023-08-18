@@ -24,6 +24,20 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public bool warningSystemsNeedsUpdate;
 
+
+
+        /// <summary>
+        /// Ship Decloak Event Handler
+        /// </summary>
+        public delegate void RouteUpdatedEventHandler();
+
+        /// <summary>
+        /// Ship Decloaked
+        /// </summary>
+        public event RouteUpdatedEventHandler RouteUpdatedEvent;
+
+
+
         private bool esiRouteNeedsUpdate;
 
         private bool esiRouteUpdating;
@@ -50,6 +64,9 @@ namespace SMT.EVEData
         private bool routeNeedsUpdate = false;
 
         private int ssoErrorCount = 0;
+
+
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
@@ -78,8 +95,8 @@ namespace SMT.EVEData
             int randomOffset = R.Next(90);
             FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(randomOffset);
 
-            Waypoints = new ObservableCollection<string>();
-            ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
+            Waypoints = new List<string>();
+            ActiveRoute = new List<Navigation.RoutePoint>();
 
             ActiveRouteLock = new object();
             UpdateLock = new SemaphoreSlim(1);
@@ -126,7 +143,7 @@ namespace SMT.EVEData
         /// Gets or sets the current active route
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<Navigation.RoutePoint> ActiveRoute { get; set; }
+        public List<Navigation.RoutePoint> ActiveRoute { get; set; }
 
         public bool DangerZoneActive { get; set; }
         public bool DeepSearchEnabled { get; set; }
@@ -373,10 +390,10 @@ namespace SMT.EVEData
         public bool TrigStandingsGood { get; set; }
 
         [XmlIgnoreAttribute]
-        public ObservableCollection<string> Waypoints { get; set; }
+        public List<string> Waypoints { get; set; }
 
         [XmlIgnoreAttribute]
-        public ObservableCollection<string> JumpWaypoints { get; set; }
+        public List<string> JumpWaypoints { get; set; }
 
         /// <summary>
         /// Add Destination to the route
@@ -593,6 +610,12 @@ namespace SMT.EVEData
                 {
                     routeNeedsUpdate = false;
                     UpdateActiveRoute();
+
+                    if (RouteUpdatedEvent != null)
+                    {
+                        RouteUpdatedEvent();
+                    }
+
                 }
 
                 if (warningSystemsNeedsUpdate)
@@ -692,7 +715,6 @@ namespace SMT.EVEData
                         // failed to clear route
                     }
                 }
-
                 return;
             }
 
@@ -714,18 +736,15 @@ namespace SMT.EVEData
                 }
                 Navigation.UpdateTheraConnections(currentActiveTheraConnections);
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                lock (ActiveRouteLock)
                 {
-                    lock (ActiveRouteLock)
+                    if (Location == Waypoints[0])
                     {
-                        if (Location == Waypoints[0])
-                        {
-                            Waypoints.RemoveAt(0);
-                        }
+                        Waypoints.RemoveAt(0);
                     }
+                }
 
-                    ActiveRoute.Clear();
-                }), DispatcherPriority.Normal);
+                ActiveRoute.Clear();
 
                 // loop through all the waypoints
                 for (int i = 0; i < Waypoints.Count; i++)
@@ -737,16 +756,13 @@ namespace SMT.EVEData
 
                     if (sysList != null)
                     {
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        lock (ActiveRouteLock)
                         {
-                            lock (ActiveRouteLock)
+                            foreach (Navigation.RoutePoint s in sysList)
                             {
-                                foreach (Navigation.RoutePoint s in sysList)
-                                {
-                                    ActiveRoute.Add(s);
-                                }
+                                ActiveRoute.Add(s);
                             }
-                        }), DispatcherPriority.Normal, null);
+                        }
                     }
                 }
             }

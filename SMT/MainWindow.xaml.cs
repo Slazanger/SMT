@@ -322,6 +322,10 @@ namespace SMT
                                 lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
                                 lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
 
+                                lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
+                                lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
+
+
                                 CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
 
                                 RegionUC.FollowCharacter = true;
@@ -919,6 +923,10 @@ namespace SMT
 
                         lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
                         lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
+
+                        lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
+                        lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
+
                         FleetMembersList.ItemsSource = lc.FleetInfo.Members;
                         CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
 
@@ -932,6 +940,15 @@ namespace SMT
             }
         }
 
+        private void OnCharacterRouteUpdate()
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(dgActiveCharacterRoute.ItemsSource).Refresh();
+                CollectionViewSource.GetDefaultView(lbActiveCharacterWaypoints.ItemsSource).Refresh();
+            }), DispatcherPriority.ApplicationIdle);
+        }
+
         private void CharactersListMenuItemDelete_Click(object sender, RoutedEventArgs e)
         {
             if (CharactersList.SelectedIndex == -1)
@@ -942,6 +959,10 @@ namespace SMT
             EVEData.LocalCharacter lc = CharactersList.SelectedItem as EVEData.LocalCharacter;
 
             lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
+            lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
+
+
+
 
             ActiveCharacter = null;
             FleetMembersList.ItemsSource = null;
@@ -976,6 +997,9 @@ namespace SMT
                 lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
                 lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
 
+                lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
+                lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
+
 
                 RegionsViewUC.ActiveCharacter = lc;
                 RegionUC.UpdateActiveCharacter(lc);
@@ -1002,6 +1026,10 @@ namespace SMT
                         CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
                         lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
                         lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
+
+                        lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
+                        lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
+
                         RegionUC.UpdateActiveCharacter(lc);
                         UniverseUC.UpdateActiveCharacter(lc);
 
