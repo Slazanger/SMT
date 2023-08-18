@@ -177,6 +177,7 @@ namespace SMT
 
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
             MetaliminalStormList.ItemsSource = EVEManager.MetaliminalStorms;
+            EVEManager.StormsUpdateEvent += Storms_CollectionChanged;
 
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
             EVEManager.SovUpdateEvent += ActiveSovCampaigns_CollectionChanged;
@@ -351,6 +352,11 @@ namespace SMT
 
 
             RegionUC.SelectRegion(MapConf.DefaultRegion);
+        }
+
+        private void Storms_CollectionChanged()
+        {
+            CollectionViewSource.GetDefaultView(MetaliminalStormList.ItemsSource).Refresh();
         }
 
         private void TheraConnections_CollectionChanged()

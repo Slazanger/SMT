@@ -168,7 +168,7 @@ namespace SMT.EVEData
         public delegate void SovCampaignUpdatedHandler();
 
         /// <summary>
-        /// Kills Added Events
+        /// Sov Campaign updated Added Events
         /// </summary>
         public event SovCampaignUpdatedHandler SovUpdateEvent;
 
@@ -179,10 +179,20 @@ namespace SMT.EVEData
         public delegate void TheraUpdatedHandler();
 
         /// <summary>
-        /// Kills Added Events
+        /// Thera Updated Added Events
         /// </summary>
         public event TheraUpdatedHandler TheraUpdateEvent;
 
+
+        /// <summary>
+        /// Storms Updated Event Handler
+        /// </summary>
+        public delegate void StormsUpdatedHandler();
+
+        /// <summary>
+        /// Storms Updated Added Events
+        /// </summary>
+        public event StormsUpdatedHandler StormsUpdateEvent;
 
 
         /// <summary>
@@ -294,7 +304,7 @@ namespace SMT.EVEData
 
         public bool UseESIForCharacterPositions { get; set; }
 
-        public ObservableCollection<Storm> MetaliminalStorms { get; set; }
+        public List<Storm> MetaliminalStorms { get; set; }
 
         public List<POI> PointsOfInterest { get; set; }
 
@@ -1630,13 +1640,13 @@ namespace SMT.EVEData
 
             try
             {
-                ObservableCollection<JumpBridge> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<JumpBridge>));
+                List<JumpBridge> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(List<JumpBridge>));
 
                 FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
-                loadList = (ObservableCollection<JumpBridge>)xms.Deserialize(xmlr);
+                loadList = (List<JumpBridge>)xms.Deserialize(xmlr);
 
                 foreach (JumpBridge j in loadList)
                 {
@@ -2119,20 +2129,17 @@ namespace SMT.EVEData
 
         public void UpdateMetaliminalStorms()
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                MetaliminalStorms.Clear();
+            MetaliminalStorms.Clear();
 
-                List<Storm> ls = Storm.GetStorms();
-                foreach (Storm s in ls)
+            List<Storm> ls = Storm.GetStorms();
+            foreach (Storm s in ls)
+            {
+                System sys = GetEveSystem(s.System);
+                if (sys != null)
                 {
-                    System sys = GetEveSystem(s.System);
-                    if (sys != null)
-                    {
-                        MetaliminalStorms.Add(s);
-                    }
+                    MetaliminalStorms.Add(s);
                 }
-            }), DispatcherPriority.Normal, null);
+            }
 
             // now update the Strong and weak areas around the storm
             foreach (Storm s in MetaliminalStorms)
@@ -2150,6 +2157,10 @@ namespace SMT.EVEData
                 strongArea.Remove(s.Name);
 
                 s.StrongArea = strongArea;
+            }
+            if (StormsUpdateEvent!=null)
+            {
+                StormsUpdateEvent();
             }
         }
 
@@ -2401,7 +2412,7 @@ namespace SMT.EVEData
 
         private void InitMetaliminalStorms()
         {
-            MetaliminalStorms = new ObservableCollection<Storm>();
+            MetaliminalStorms = new List<Storm>();
         }
 
         private void InitFactionWarfareInfo()
