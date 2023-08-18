@@ -1261,6 +1261,33 @@ namespace SMT
 
         #region Route
 
+        private void refreshJumpRouteUI()
+        {
+            if (capitalRouteWaypointsLB.ItemsSource != null)
+            {
+                CollectionViewSource.GetDefaultView(capitalRouteWaypointsLB.ItemsSource).Refresh();
+            }
+
+            if(capitalRouteAvoidLB.ItemsSource != null)
+            {
+                CollectionViewSource.GetDefaultView(capitalRouteAvoidLB.ItemsSource).Refresh();
+            }
+
+            if(dgCapitalRouteCurrentRoute.ItemsSource != null)
+            {
+                CollectionViewSource.GetDefaultView(dgCapitalRouteCurrentRoute.ItemsSource).Refresh();
+            }
+
+
+            // lbAlternateMids could be null, need to check..
+
+            if (lbAlternateMids.ItemsSource != null) 
+            {
+                CollectionViewSource.GetDefaultView(lbAlternateMids.ItemsSource).Refresh();
+            }
+            
+        }
+
         private void AddWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
             if (RegionUC.ActiveCharacter == null)
@@ -1301,6 +1328,8 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
+
+                refreshJumpRouteUI();
             }
         }
 
@@ -1325,6 +1354,8 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
+
+                refreshJumpRouteUI();
             }
         }
 
@@ -1339,23 +1370,18 @@ namespace SMT
 
         private void ClearJumpWaypointsBtn_Click(object sender, RoutedEventArgs e)
         {
-            // Need to dispatch to UI thread if performing UI operations
-            Application.Current.Dispatcher.Invoke(delegate
-            {
-                CapitalRoute.WayPoints.Clear();
-                CapitalRoute.CurrentRoute.Clear();
-                lbAlternateMids.ItemsSource = null;
-                lblAlternateMids.Content = "";
-            });
+            CapitalRoute.WayPoints.Clear();
+            CapitalRoute.CurrentRoute.Clear();
+            lbAlternateMids.ItemsSource = null;
+            lblAlternateMids.Content = "";
+
+            refreshJumpRouteUI();
         }
 
         private void ClearJumpAvoidSystemsBtn_Click(object sender, RoutedEventArgs e)
         {
-            // Need to dispatch to UI thread if performing UI operations
-            Application.Current.Dispatcher.Invoke(delegate
-            {
-                CapitalRoute.AvoidSystems.Clear();
-            });
+            CapitalRoute.AvoidSystems.Clear();
+            refreshJumpRouteUI();
         }
 
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
@@ -2035,6 +2061,8 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
+
+                refreshJumpRouteUI();
             }
         }
 
@@ -2055,6 +2083,8 @@ namespace SMT
                 {
                     lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
                 }
+
+                refreshJumpRouteUI();
             }
         }
 
@@ -2076,6 +2106,8 @@ namespace SMT
                 {
                     lbAlternateMids.ItemsSource = null;
                 }
+
+
             }
         }
 
@@ -2083,8 +2115,12 @@ namespace SMT
         {
             if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != 0)
             {
-                CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex - 1);
+                string sys = CapitalRoute.WayPoints[capitalRouteWaypointsLB.SelectedIndex];
+                CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
+                CapitalRoute.WayPoints.Insert(capitalRouteWaypointsLB.SelectedIndex - 1, sys);
+
                 CapitalRoute.Recalculate();
+                refreshJumpRouteUI();
             }
         }
 
@@ -2092,8 +2128,13 @@ namespace SMT
         {
             if (capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != CapitalRoute.WayPoints.Count - 1)
             {
-                CapitalRoute.WayPoints.Move(capitalRouteWaypointsLB.SelectedIndex, capitalRouteWaypointsLB.SelectedIndex + 1);
+                string sys = CapitalRoute.WayPoints[capitalRouteWaypointsLB.SelectedIndex];
+                CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
+                CapitalRoute.WayPoints.Insert(capitalRouteWaypointsLB.SelectedIndex + 1, sys);
+
+
                 CapitalRoute.Recalculate();
+                refreshJumpRouteUI();
             }
         }
 
@@ -2103,6 +2144,7 @@ namespace SMT
             {
                 CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
                 CapitalRoute.Recalculate();
+                refreshJumpRouteUI();
             }
         }
 
@@ -2134,6 +2176,7 @@ namespace SMT
                 }
 
                 CapitalRoute.Recalculate();
+                refreshJumpRouteUI();
             }
         }
 

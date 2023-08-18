@@ -420,7 +420,7 @@
 
                                             <GroupBox Header="Avoidance">
                                                 <StackPanel Margin="4">
-                                                    <ListBox ItemsSource="{Binding CapitalRoute.AvoidSystems}" MinHeight="50" Margin="2" />
+                                                    <ListBox x:Name="capitalRouteAvoidLB"  ItemsSource="{Binding CapitalRoute.AvoidSystems}" MinHeight="50" Margin="2" />
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteAvoidSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
                                                         <Button x:Name="AddJumpAvoidSystemsBtn" Click="AddJumpAvoidSystemsBtn_Click"  Content="Add Avoidance" Margin="2" />
