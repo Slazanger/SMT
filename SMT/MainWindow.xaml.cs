@@ -1390,6 +1390,8 @@ namespace SMT
         {
             EVEManager.JumpBridges.Clear();
             EVEData.Navigation.ClearJumpBridges();
+
+            CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
         }
 
         private void DeleteJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1404,7 +1406,7 @@ namespace SMT
             EVEManager.JumpBridges.Remove(jb);
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges);
             RegionUC.ReDrawMap(true);
 
             EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
@@ -1412,6 +1414,8 @@ namespace SMT
             {
                 c.RecalcRoute();
             }
+
+            CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
             UpdateJumpBridgeSummary();
         }
 
@@ -1427,7 +1431,7 @@ namespace SMT
             jb.Disabled = !jb.Disabled;
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges);
             RegionUC.ReDrawMap(true);
 
             EVEData.LocalCharacter c = RegionUC.ActiveCharacter as EVEData.LocalCharacter;
@@ -1436,6 +1440,7 @@ namespace SMT
                 c.RecalcRoute();
             }
 
+            CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
             UpdateJumpBridgeSummary();
         }
 
@@ -1573,7 +1578,7 @@ namespace SMT
             }
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges);
             UpdateJumpBridgeSummary();
             RegionUC.ReDrawMap(true);
 
@@ -1582,6 +1587,9 @@ namespace SMT
             JumpBridgeList.IsEnabled = true;
             ImportPasteJumpGatesBtn.IsEnabled = true;
             ExportJumpGatesBtn.IsEnabled = true;
+            CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
+
+
         }
 
         private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
@@ -1628,9 +1636,11 @@ namespace SMT
             }
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges.ToList());
+            EVEData.Navigation.UpdateJumpBridges(EVEManager.JumpBridges);
             UpdateJumpBridgeSummary();
             RegionUC.ReDrawMap(true);
+            CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
+
         }
 
         private void UpdateJumpBridgeSummary()

@@ -211,6 +211,7 @@ namespace SMT.EVEData
         public List<Coalition> Coalitions { get; set; }
 
         public ESI.NET.EsiClient ESIClient { get; set; }
+
         public List<string> ESIScopes { get; set; }
 
         /// <summary>
@@ -226,7 +227,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current list of Jump Bridges
         /// </summary>
-        public ObservableCollection<JumpBridge> JumpBridges { get; set; }
+        public List<JumpBridge> JumpBridges { get; set; }
 
 
         /// <summary>
@@ -1549,7 +1550,7 @@ namespace SMT.EVEData
 
         public void InitNavigation()
         {
-            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges.ToList());
+            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges);
         }
 
         /// <summary>
@@ -1606,7 +1607,7 @@ namespace SMT.EVEData
         /// </summary>
         public void LoadJumpBridgeData()
         {
-            JumpBridges = new ObservableCollection<JumpBridge>();
+            JumpBridges = new List<JumpBridge>();
 
             string dataFilename = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             if (!File.Exists(dataFilename))
@@ -1754,7 +1755,7 @@ namespace SMT.EVEData
             }
 
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
-            Serialization.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
+            Serialization.SerializeToDisk<List<JumpBridge>>(JumpBridges, jbFileName);
 
             List<string> beaconsToSave = new List<string>();
             foreach (System s in Systems)
