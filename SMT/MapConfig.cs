@@ -12,7 +12,6 @@ namespace SMT
         public MapColours ActiveColourScheme;
 
         [Category("Navigation")]
-        public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
 
         private bool m_AlwaysOnTop;
 
@@ -1291,7 +1290,6 @@ namespace SMT
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
             ShowActiveIncursions = true;
-            StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
             SOVBasedITCU = true;
             UseESIForCharacterPositions = true;

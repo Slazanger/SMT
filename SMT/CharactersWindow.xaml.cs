@@ -13,6 +13,18 @@ namespace SMT
             InitializeComponent();
         }
 
+
+        private void Window_Loaded(object sender, EventArgs e)
+        {
+            MainWindow mw = Owner as MainWindow;
+            mw.EVEManager.LocalCharacterUpdateEvent += EVEManager_LocalCharacterUpdateEvent;
+        }
+
+        private void EVEManager_LocalCharacterUpdateEvent()
+        {
+            characterLV.Items.Refresh();
+        }
+
         private void characterLV_Selected(object sender, RoutedEventArgs e)
         {
             characterInfoGrid.DataContext = characterLV.SelectedItem;
@@ -25,6 +37,10 @@ namespace SMT
             {
                 lc.warningSystemsNeedsUpdate = true;
             }
+
+            MainWindow mw = Owner as MainWindow;
+            mw.EVEManager.LocalCharacterUpdateEvent -= EVEManager_LocalCharacterUpdateEvent;
+
         }
 
         private void AddCharacter_Click(object sender, RoutedEventArgs e)
@@ -71,11 +87,9 @@ namespace SMT
                     mw.RegionUC.UpdateActiveCharacter();
                     mw.UniverseUC.ActiveCharacter = null;
                     mw.OnCharacterSelectionChanged();
-
-                    mw.EVEManager.LocalCharacters.Remove(lc);
-
+                    mw.EVEManager.RemoveCharacter(lc);
+                    
                     characterLV.Items.Refresh();
-
                     characterInfoGrid.Visibility = Visibility.Hidden;
                 }
             }

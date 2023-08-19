@@ -7,18 +7,15 @@
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
-
 
 
   <ItemGroup>
     <PackageReference Include="DecimalMath.DecimalEx" Version="1.0.2" />
     <PackageReference Include="ESI.NET" Version="2023.4.15" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.50" /> 
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.48" /> 
   </ItemGroup>
-	<ItemGroup>
-	    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
-	</ItemGroup>
 	<ItemGroup>
 	  <None Update="data\MapLayout.dat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -1,7 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Threading;
 using System.Xml.Serialization;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
@@ -23,6 +21,20 @@ namespace SMT.EVEData
 
         [XmlIgnoreAttribute]
         public bool warningSystemsNeedsUpdate;
+
+
+
+        /// <summary>
+        /// Ship Decloak Event Handler
+        /// </summary>
+        public delegate void RouteUpdatedEventHandler();
+
+        /// <summary>
+        /// Ship Decloaked
+        /// </summary>
+        public event RouteUpdatedEventHandler RouteUpdatedEvent;
+
+
 
         private bool esiRouteNeedsUpdate;
 
@@ -51,6 +63,9 @@ namespace SMT.EVEData
 
         private int ssoErrorCount = 0;
 
+
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
         /// </summary>
@@ -78,8 +93,8 @@ namespace SMT.EVEData
             int randomOffset = R.Next(90);
             FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(randomOffset);
 
-            Waypoints = new ObservableCollection<string>();
-            ActiveRoute = new ObservableCollection<Navigation.RoutePoint>();
+            Waypoints = new List<string>();
+            ActiveRoute = new List<Navigation.RoutePoint>();
 
             ActiveRouteLock = new object();
             UpdateLock = new SemaphoreSlim(1);
@@ -96,8 +111,6 @@ namespace SMT.EVEData
             DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
 
             UseAnsiblexGates = true;
-
-            KnownStructures = new SerializableDictionary<string, ObservableCollection<Structure>>();
 
             IsOnline = true;
             CombatWarningEnabled = true;
@@ -128,7 +141,7 @@ namespace SMT.EVEData
         /// Gets or sets the current active route
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<Navigation.RoutePoint> ActiveRoute { get; set; }
+        public List<Navigation.RoutePoint> ActiveRoute { get; set; }
 
         public bool DangerZoneActive { get; set; }
         public bool DeepSearchEnabled { get; set; }
@@ -173,6 +186,17 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public Fleet FleetInfo { get; set; }
+
+
+        /// <summary>
+        /// Fleet Updated Event Handler
+        /// </summary>
+        public delegate void FleetUpdatedHandler( LocalCharacter fleetOwner);
+
+        /// <summary>
+        /// Fleet Updated Events
+        /// </summary>
+        public event FleetUpdatedHandler FleetUpdatedEvent;
 
         public bool IsOnline
         {
@@ -241,8 +265,6 @@ namespace SMT.EVEData
 
         public string WarningState { get; set; }
 
-        public SerializableDictionary<String, ObservableCollection<Structure>> KnownStructures { get; set; }
-
         [XmlIgnoreAttribute]
         public Dictionary<long, long> LabelMap { get; set; }
 
@@ -277,6 +299,7 @@ namespace SMT.EVEData
 
                 // clear the warning everytime the location updates
                 GameLogWarningText = "";
+                OnPropertyChanged("Location");
             }
         }
 
@@ -365,10 +388,10 @@ namespace SMT.EVEData
         public bool TrigStandingsGood { get; set; }
 
         [XmlIgnoreAttribute]
-        public ObservableCollection<string> Waypoints { get; set; }
+        public List<string> Waypoints { get; set; }
 
         [XmlIgnoreAttribute]
-        public ObservableCollection<string> JumpWaypoints { get; set; }
+        public List<string> JumpWaypoints { get; set; }
 
         /// <summary>
         /// Add Destination to the route
@@ -585,6 +608,12 @@ namespace SMT.EVEData
                 {
                     routeNeedsUpdate = false;
                     UpdateActiveRoute();
+
+                    if (RouteUpdatedEvent != null)
+                    {
+                        RouteUpdatedEvent();
+                    }
+
                 }
 
                 if (warningSystemsNeedsUpdate)
@@ -684,7 +713,6 @@ namespace SMT.EVEData
                         // failed to clear route
                     }
                 }
-
                 return;
             }
 
@@ -706,18 +734,15 @@ namespace SMT.EVEData
                 }
                 Navigation.UpdateTheraConnections(currentActiveTheraConnections);
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                lock (ActiveRouteLock)
                 {
-                    lock (ActiveRouteLock)
+                    if (Location == Waypoints[0])
                     {
-                        if (Location == Waypoints[0])
-                        {
-                            Waypoints.RemoveAt(0);
-                        }
+                        Waypoints.RemoveAt(0);
                     }
+                }
 
-                    ActiveRoute.Clear();
-                }), DispatcherPriority.Normal);
+                ActiveRoute.Clear();
 
                 // loop through all the waypoints
                 for (int i = 0; i < Waypoints.Count; i++)
@@ -729,16 +754,13 @@ namespace SMT.EVEData
 
                     if (sysList != null)
                     {
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        lock (ActiveRouteLock)
                         {
-                            lock (ActiveRouteLock)
+                            foreach (Navigation.RoutePoint s in sysList)
                             {
-                                foreach (Navigation.RoutePoint s in sysList)
-                                {
-                                    ActiveRoute.Add(s);
-                                }
+                                ActiveRoute.Add(s);
                             }
-                        }), DispatcherPriority.Normal, null);
+                        }
                     }
                 }
             }
@@ -821,6 +843,8 @@ namespace SMT.EVEData
 
             try
             {
+                bool sendFleetUpdatedEvent = false;
+
                 ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
@@ -839,11 +863,8 @@ namespace SMT.EVEData
                     else
                     {
                         FleetInfo.FleetID = 0;
-
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                        {
-                            FleetInfo.Members.Clear();
-                        }), DispatcherPriority.Normal);
+                        FleetInfo.Members.Clear();
+                        sendFleetUpdatedEvent = true;
                     }
                 }
 
@@ -876,11 +897,8 @@ namespace SMT.EVEData
                             {
                                 fm = new Fleet.FleetMember();
                                 fm.IsValid = true;
-
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
-                                {
-                                    FleetInfo.Members.Add(fm);
-                                }), DispatcherPriority.Normal);
+                                FleetInfo.Members.Add(fm);
+                                sendFleetUpdatedEvent = true;
                             }
 
                             EVEData.System es = EveManager.Instance.GetEveSystemFromID(esifm.SolarSystemId);
@@ -923,10 +941,8 @@ namespace SMT.EVEData
                         {
                             if (!ff.IsValid)
                             {
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
-                                {
-                                    FleetInfo.Members.Remove(ff);
-                                }), DispatcherPriority.Normal);
+                                FleetInfo.Members.Remove(ff);
+                                sendFleetUpdatedEvent = true;
                             }
                         }
                     }
@@ -936,10 +952,16 @@ namespace SMT.EVEData
                         FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(60);
                         FleetInfo.FleetID = 0;
 
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                        {
-                            FleetInfo.Members.Clear();
-                        }), DispatcherPriority.Normal);
+                        FleetInfo.Members.Clear();
+                        sendFleetUpdatedEvent = true;
+                    }
+                }
+
+                if(sendFleetUpdatedEvent)
+                {
+                    if(FleetUpdatedEvent!=null)
+                    {
+                        FleetUpdatedEvent(this);
                     }
                 }
             }
