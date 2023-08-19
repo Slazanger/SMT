@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -141,7 +142,9 @@ namespace SMT
             EVEManager.SetupGameLogWatcher();
             EVEManager.SetupLogFileTriggers();
 
-            RawIntelBox.ItemsSource = EVEManager.IntelDataList;
+            IntelCache = new ObservableCollection<IntelData>();
+
+            RawIntelBox.ItemsSource = IntelCache;
             RawGameDataBox.ItemsSource = EVEManager.GameLogList;
 
             // add test intel with debug info
@@ -151,8 +154,8 @@ namespace SMT
             IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
             idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
 
-            EVEManager.IntelDataList.Enqueue(id);
-            EVEManager.IntelDataList.Enqueue(idtwo);
+            IntelCache.Add(id);
+            IntelCache.Add(idtwo);
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -276,7 +279,8 @@ namespace SMT
             Closed += MainWindow_Closed;
             StateChanged += MainWindow_StateChanged;
 
-            EVEManager.IntelAddedEvent += OnIntelAdded;
+            EVEManager.IntelUpdatedEvent += OnIntelUpdated;
+            EVEManager.GameLogAddedEvent += OnGamelogAdded;
             EVEManager.ShipDecloakedEvent += OnShipDecloaked;
             EVEManager.CombatEvent += OnCombatEvent;
 
@@ -358,14 +362,29 @@ namespace SMT
             RegionUC.SelectRegion(MapConf.DefaultRegion);
         }
 
+        private void OnGamelogAdded()
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(RawGameDataBox.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
+           
+        }
+
         private void Storms_CollectionChanged()
         {
-            CollectionViewSource.GetDefaultView(MetaliminalStormList.ItemsSource).Refresh();
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(MetaliminalStormList.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
         }
 
         private void TheraConnections_CollectionChanged()
         {
-            CollectionViewSource.GetDefaultView(TheraConnectionsList.ItemsSource).Refresh();
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(TheraConnectionsList.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -421,12 +440,18 @@ namespace SMT
 
         private void ActiveSovCampaigns_CollectionChanged()
         {
-            CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
         }
 
         private void LocalCharacters_CollectionChanged()
         {
-            CollectionViewSource.GetDefaultView(CharactersList.ItemsSource).Refresh();
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(CharactersList.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
         }
 
         private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
@@ -627,9 +652,14 @@ namespace SMT
             if (uiRefreshCounter == 5)
             {
                 uiRefreshCounter = 0;
+
                 if (FleetMembersList.ItemsSource != null)
                 {
-                    CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+
+                    }), DispatcherPriority.Normal);
                 }
             }
             if (MapConf.SyncActiveCharacterBasedOnActiveEVEClient)
@@ -871,7 +901,7 @@ namespace SMT
                         nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
                         nw.Owner = this;
                         nw.ShowDialog();
-                    }), DispatcherPriority.ApplicationIdle);
+                    }), DispatcherPriority.Normal);
                 }
             }
         }
@@ -946,7 +976,7 @@ namespace SMT
             {
                 CollectionViewSource.GetDefaultView(dgActiveCharacterRoute.ItemsSource).Refresh();
                 CollectionViewSource.GetDefaultView(lbActiveCharacterWaypoints.ItemsSource).Refresh();
-            }), DispatcherPriority.ApplicationIdle);
+            }), DispatcherPriority.Normal);
         }
 
         private void CharactersListMenuItemDelete_Click(object sender, RoutedEventArgs e)
@@ -1046,7 +1076,7 @@ namespace SMT
             {
                 CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
 
-            }), DispatcherPriority.ApplicationIdle);
+            }), DispatcherPriority.Normal);
 
 
         }
@@ -1055,12 +1085,13 @@ namespace SMT
 
         #region intel
 
+        ObservableCollection<EVEData.IntelData> IntelCache;
+
         private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                EVEManager.IntelDataList.ClearAll();
-            }), DispatcherPriority.ApplicationIdle);
+            EVEManager.IntelDataList.ClearAll();
+            IntelCache.Clear();
+
         }
 
         private void ClearGameLogBtn_Click(object sender, RoutedEventArgs e)
@@ -1068,25 +1099,73 @@ namespace SMT
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 EVEManager.GameLogList.ClearAll();
-            }), DispatcherPriority.ApplicationIdle);
+                CollectionViewSource.GetDefaultView(RawGameDataBox.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
         }
 
-        private void OnIntelAdded(List<string> intelsystems)
+        private void OnIntelUpdated(List<IntelData> idl)
         {
             bool playSound = false;
             bool flashWindow = false;
+
+
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                List<IntelData> removeList = new List<IntelData>();
+                List<IntelData> addList = new List<IntelData>();
+
+                // remove old
+
+                if(IntelCache.Count > 50)
+                {
+                    foreach (IntelData id in IntelCache)
+                    {
+                        if (!idl.Contains(id))
+                        {
+                            removeList.Add(id);
+                        }
+                    }
+
+                    foreach (IntelData id in removeList)
+                    {
+                        IntelCache.Remove(id);
+                    }
+                }
+
+  
+
+                // add new
+                foreach (IntelData id in idl)
+                {
+                    if(!IntelCache.Contains(id))
+                    {
+                        IntelCache.Insert(0, id);
+                    }
+                }
+            }), DispatcherPriority.Normal);
+
+
+            IntelData id = IntelCache[0];
+
+
+
+            if (id.ClearNotification)
+            {
+                // do nothing for now
+                return;
+            }
 
             if (MapConf.PlayIntelSound || MapConf.FlashWindow)
             {
                 if (MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
-                    if (MapConf.PlayIntelSoundOnUnknown && intelsystems.Count == 0)
+                    if (MapConf.PlayIntelSoundOnUnknown && id.Systems.Count == 0)
                     {
                         playSound = true;
                         flashWindow = true;
                     }
 
-                    foreach (string s in intelsystems)
+                    foreach (string s in id.Systems)
                     {
                         foreach (EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                         {
@@ -1112,17 +1191,22 @@ namespace SMT
                 }
             }
 
-            if (playSound || (!MapConf.PlaySoundOnlyInDangerZone && MapConf.PlayIntelSound))
+            Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                mediaPlayer.Stop();
-                mediaPlayer.Volume = MapConf.IntelSoundVolume;
-                mediaPlayer.Position = new TimeSpan(0, 0, 0);
-                mediaPlayer.Play();
-            }
-            if (flashWindow || (!MapConf.FlashWindowOnlyInDangerZone && MapConf.FlashWindow))
-            {
-                FlashWindow.Flash(AppWindow, 5);
-            }
+                if (playSound || (!MapConf.PlaySoundOnlyInDangerZone && MapConf.PlayIntelSound))
+                {
+                    mediaPlayer.Stop();
+                    mediaPlayer.Volume = MapConf.IntelSoundVolume;
+                    mediaPlayer.Position = new TimeSpan(0, 0, 0);
+                    mediaPlayer.Play();
+                }
+                if (flashWindow || (!MapConf.FlashWindowOnlyInDangerZone && MapConf.FlashWindow))
+                {
+                    FlashWindow.Flash(AppWindow, 5);
+                }
+
+            }), DispatcherPriority.Normal);
+
         }
 
         private void OnShipDecloaked(string character, string text)
@@ -1304,29 +1388,31 @@ namespace SMT
 
         private void refreshJumpRouteUI()
         {
-            if (capitalRouteWaypointsLB.ItemsSource != null)
+            Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                CollectionViewSource.GetDefaultView(capitalRouteWaypointsLB.ItemsSource).Refresh();
-            }
+                if (capitalRouteWaypointsLB.ItemsSource != null)
+                {
+                    CollectionViewSource.GetDefaultView(capitalRouteWaypointsLB.ItemsSource).Refresh();
+                }
 
-            if(capitalRouteAvoidLB.ItemsSource != null)
-            {
-                CollectionViewSource.GetDefaultView(capitalRouteAvoidLB.ItemsSource).Refresh();
-            }
+                if (capitalRouteAvoidLB.ItemsSource != null)
+                {
+                    CollectionViewSource.GetDefaultView(capitalRouteAvoidLB.ItemsSource).Refresh();
+                }
 
-            if(dgCapitalRouteCurrentRoute.ItemsSource != null)
-            {
-                CollectionViewSource.GetDefaultView(dgCapitalRouteCurrentRoute.ItemsSource).Refresh();
-            }
+                if (dgCapitalRouteCurrentRoute.ItemsSource != null)
+                {
+                    CollectionViewSource.GetDefaultView(dgCapitalRouteCurrentRoute.ItemsSource).Refresh();
+                }
 
 
-            // lbAlternateMids could be null, need to check..
+                // lbAlternateMids could be null, need to check..
 
-            if (lbAlternateMids.ItemsSource != null) 
-            {
-                CollectionViewSource.GetDefaultView(lbAlternateMids.ItemsSource).Refresh();
-            }
-            
+                if (lbAlternateMids.ItemsSource != null)
+                {
+                    CollectionViewSource.GetDefaultView(lbAlternateMids.ItemsSource).Refresh();
+                }
+            }), DispatcherPriority.Normal, null);
         }
 
         private void AddWaypointsBtn_Click(object sender, RoutedEventArgs e)

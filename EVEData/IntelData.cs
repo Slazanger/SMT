@@ -2,13 +2,27 @@
 // Intel Data
 //-----------------------------------------------------------------------
 
+using System.ComponentModel;
+
 namespace SMT.EVEData
 {
     /// <summary>
     /// Intel Data, Represents a single line of intel data
     /// </summary>
-    public class IntelData
+    public class IntelData : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+
         /// <summary>
         ///  Initializes a new instance of the <see cref="IntelData" /> class
         /// </summary>

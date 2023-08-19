@@ -102,14 +102,26 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Intel Added Event Handler
+        /// Intel Updated Event Handler
         /// </summary>
-        public delegate void IntelAddedEventHandler(List<string> systems);
+        public delegate void IntelUpdatedEventHandler(List<IntelData> idl );
+
+        /// <summary>
+        /// Intel Updated Event
+        /// </summary>
+        public event IntelUpdatedEventHandler IntelUpdatedEvent;
+
+
+        /// <summary>
+        /// GameLog Added Event Handler
+        /// </summary>
+        public delegate void GameLogAddedEventHandler();
 
         /// <summary>
         /// Intel Added Event
         /// </summary>
-        public event IntelAddedEventHandler IntelAddedEvent;
+        public event GameLogAddedEventHandler GameLogAddedEvent;
+
 
         /// <summary>
         /// Ship Decloak Event Handler
@@ -240,12 +252,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Intel List
         /// </summary>
-        public BindingQueue<EVEData.IntelData> IntelDataList { get; set; }
+        public FixedQueue<EVEData.IntelData> IntelDataList { get; set; }
 
         /// <summary>
         /// Gets or sets the Gamelog List
         /// </summary>
-        public BindingQueue<EVEData.GameLogData> GameLogList { get; set; }
+        public FixedQueue<EVEData.GameLogData> GameLogList { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of Jump Bridges
@@ -1801,9 +1813,10 @@ namespace SMT.EVEData
         /// </summary>
         public void SetupIntelWatcher()
         {
-            IntelFilters = new List<string>();
-            IntelDataList = new BindingQueue<IntelData>();
+            IntelDataList = new FixedQueue<IntelData>();
             IntelDataList.SetSizeLimit(50);
+            
+            IntelFilters = new List<string>();
 
             string intelFileFilter = SaveDataRootFolder + @"\IntelChannels.txt";
 
@@ -1899,7 +1912,7 @@ namespace SMT.EVEData
             gameFileReadPos = new Dictionary<string, int>();
             gamelogFileCharacterMap = new Dictionary<string, string>();
 
-            GameLogList = new BindingQueue<GameLogData>();
+            GameLogList = new FixedQueue<GameLogData>();
             GameLogList.SetSizeLimit(50);
 
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
@@ -2444,6 +2457,7 @@ namespace SMT.EVEData
             bool processFile = false;
             bool localChat = false;
 
+
             // check if the changed file path contains the name of a channel we're looking for
             foreach (string intelFilterStr in IntelFilters)
             {
@@ -2609,6 +2623,7 @@ namespace SMT.EVEData
                                 addToIntel = false;
                             }
 
+                            
                             if (addToIntel)
                             {
                                 EVEData.IntelData id = new EVEData.IntelData(line, channelName);
@@ -2649,9 +2664,9 @@ namespace SMT.EVEData
 
                                 IntelDataList.Enqueue(id);
 
-                                if (IntelAddedEvent != null && !id.ClearNotification)
+                                if (IntelUpdatedEvent != null)
                                 {
-                                    IntelAddedEvent(id.Systems);
+                                    IntelUpdatedEvent(IntelDataList);
                                 }
                             }
                         }
@@ -2784,18 +2799,19 @@ namespace SMT.EVEData
                     // strip the formatting from the log
                     line = Regex.Replace(line, "<.*?>", String.Empty);
 
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    GameLogData gd = new GameLogData()
                     {
-                        GameLogData gd = new GameLogData()
-                        {
-                            Character = characterName,
-                            Text = line,
-                            Severity = type,
-                            Time = DateTime.Now,
-                        };
+                        Character = characterName,
+                        Text = line,
+                        Severity = type,
+                        Time = DateTime.Now,
+                    };
 
-                        GameLogList.Enqueue(gd);
-                    }), DispatcherPriority.Normal, null);
+                    GameLogList.Enqueue(gd);
+                    if(GameLogAddedEvent != null)
+                    {
+                        GameLogAddedEvent();
+                    }
 
                     foreach (LocalCharacter lc in LocalCharacters)
                     {
