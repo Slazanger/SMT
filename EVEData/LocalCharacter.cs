@@ -1,7 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Threading;
 using System.Xml.Serialization;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;

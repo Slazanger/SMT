@@ -8,8 +8,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Windows;
-using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using ESI.NET;

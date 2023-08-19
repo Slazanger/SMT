@@ -10,20 +10,12 @@
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="NewFolder\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
-    <None Remove="NewFolder\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DecimalMath.DecimalEx" Version="1.0.2" />
     <PackageReference Include="ESI.NET" Version="2023.4.15" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.48" /> 
   </ItemGroup>
-	<ItemGroup>
-	    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
-	</ItemGroup>
 	<ItemGroup>
 	  <None Update="data\MapLayout.dat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
