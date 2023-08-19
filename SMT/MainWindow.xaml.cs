@@ -143,9 +143,10 @@ namespace SMT
             EVEManager.SetupLogFileTriggers();
 
             IntelCache = new ObservableCollection<IntelData>();
-
             RawIntelBox.ItemsSource = IntelCache;
-            RawGameDataBox.ItemsSource = EVEManager.GameLogList;
+
+            GameLogCache = new ObservableCollection<GameLogData>();
+            RawGameDataBox.ItemsSource = GameLogCache;
 
             // add test intel with debug info
             IntelData id = new IntelData("[00:00] blah.... > blah", "System");
@@ -280,7 +281,7 @@ namespace SMT
             StateChanged += MainWindow_StateChanged;
 
             EVEManager.IntelUpdatedEvent += OnIntelUpdated;
-            EVEManager.GameLogAddedEvent += OnGamelogAdded;
+            EVEManager.GameLogAddedEvent += OnGamelogUpdated;
             EVEManager.ShipDecloakedEvent += OnShipDecloaked;
             EVEManager.CombatEvent += OnCombatEvent;
 
@@ -362,13 +363,43 @@ namespace SMT
             RegionUC.SelectRegion(MapConf.DefaultRegion);
         }
 
-        private void OnGamelogAdded()
+        private void OnGamelogUpdated(List<EVEData.GameLogData> gll)
         {
+
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                CollectionViewSource.GetDefaultView(RawGameDataBox.ItemsSource).Refresh();
+                List<GameLogData> removeList = new List<GameLogData>();
+                List<GameLogData> addList = new List<GameLogData>();
+
+                // remove old
+
+                if (GameLogCache.Count > 50)
+                {
+                    foreach (GameLogData gl in GameLogCache)
+                    {
+                        if (!gll.Contains(gl))
+                        {
+                            removeList.Add(gl);
+                        }
+                    }
+
+                    foreach (GameLogData gl in removeList)
+                    {
+                        GameLogCache.Remove(gl);
+                    }
+                }
+
+
+
+                // add new
+                foreach (GameLogData gl in gll)
+                {
+                    if (!GameLogCache.Contains(gl))
+                    {
+                        GameLogCache.Insert(0, gl);
+                    }
+                }
             }), DispatcherPriority.Normal);
-           
         }
 
         private void Storms_CollectionChanged()
@@ -1087,6 +1118,8 @@ namespace SMT
 
         ObservableCollection<EVEData.IntelData> IntelCache;
 
+        ObservableCollection<EVEData.GameLogData> GameLogCache;
+
         private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEManager.IntelDataList.ClearAll();
@@ -1096,11 +1129,8 @@ namespace SMT
 
         private void ClearGameLogBtn_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                EVEManager.GameLogList.ClearAll();
-                CollectionViewSource.GetDefaultView(RawGameDataBox.ItemsSource).Refresh();
-            }), DispatcherPriority.Normal);
+            EVEManager.GameLogList.ClearAll();
+            GameLogCache.Clear();
         }
 
         private void OnIntelUpdated(List<IntelData> idl)

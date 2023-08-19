@@ -115,7 +115,7 @@ namespace SMT.EVEData
         /// <summary>
         /// GameLog Added Event Handler
         /// </summary>
-        public delegate void GameLogAddedEventHandler();
+        public delegate void GameLogAddedEventHandler(List<GameLogData> gll);
 
         /// <summary>
         /// Intel Added Event
@@ -2810,7 +2810,7 @@ namespace SMT.EVEData
                     GameLogList.Enqueue(gd);
                     if(GameLogAddedEvent != null)
                     {
-                        GameLogAddedEvent();
+                        GameLogAddedEvent(GameLogList);
                     }
 
                     foreach (LocalCharacter lc in LocalCharacters)
