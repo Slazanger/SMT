@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Media;
 using System.Xml.Serialization;
@@ -12,7 +11,6 @@ namespace SMT
         public MapColours ActiveColourScheme;
 
         [Category("Navigation")]
-
         private bool m_AlwaysOnTop;
 
         private bool m_MinimizeToTray;
@@ -133,7 +131,7 @@ namespace SMT
 
         [Category("General")]
         [DisplayName("Minimize to tray")]
-        public bool MinimizeToTray 
+        public bool MinimizeToTray
         {
             get
             {

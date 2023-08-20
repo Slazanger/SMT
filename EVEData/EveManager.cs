@@ -2,7 +2,7 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
-using System.Collections.ObjectModel;
+using System.Data;
 using System.Globalization;
 using System.Numerics;
 using System.Text;
@@ -75,6 +75,8 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(SaveDataRoot);
             }
 
+            DataRootFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
+
             SaveDataRootFolder = SaveDataRoot;
 
             SaveDataVersionFolder = EveAppConfig.VersionStorage;
@@ -83,7 +85,7 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(SaveDataVersionFolder);
             }
 
-            string characterSaveFolder = SaveDataRootFolder + "\\Portraits";
+            string characterSaveFolder = Path.Combine(SaveDataRootFolder, "Portraits");
             if (!Directory.Exists(characterSaveFolder))
             {
                 Directory.CreateDirectory(characterSaveFolder);
@@ -102,13 +104,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Intel Updated Event Handler
         /// </summary>
-        public delegate void IntelUpdatedEventHandler(List<IntelData> idl );
+        public delegate void IntelUpdatedEventHandler(List<IntelData> idl);
 
         /// <summary>
         /// Intel Updated Event
         /// </summary>
         public event IntelUpdatedEventHandler IntelUpdatedEvent;
-
 
         /// <summary>
         /// GameLog Added Event Handler
@@ -119,7 +120,6 @@ namespace SMT.EVEData
         /// Intel Added Event
         /// </summary>
         public event GameLogAddedEventHandler GameLogAddedEvent;
-
 
         /// <summary>
         /// Ship Decloak Event Handler
@@ -171,7 +171,6 @@ namespace SMT.EVEData
 
         public string EVELogFolder { get; set; }
 
-
         /// <summary>
         /// Sov Campaign Updated Event Handler
         /// </summary>
@@ -181,7 +180,6 @@ namespace SMT.EVEData
         /// Sov Campaign updated Added Events
         /// </summary>
         public event SovCampaignUpdatedHandler SovUpdateEvent;
-
 
         /// <summary>
         /// Thera Connections Updated Event Handler
@@ -193,7 +191,6 @@ namespace SMT.EVEData
         /// </summary>
         public event TheraUpdatedHandler TheraUpdateEvent;
 
-
         /// <summary>
         /// Storms Updated Event Handler
         /// </summary>
@@ -204,7 +201,6 @@ namespace SMT.EVEData
         /// </summary>
         public event StormsUpdatedHandler StormsUpdateEvent;
 
-
         /// <summary>
         /// Local Characters Updated Event Handler
         /// </summary>
@@ -214,9 +210,6 @@ namespace SMT.EVEData
         /// Local Characters Updated Events
         /// </summary>
         public event LocalCharactersUpdatedHandler LocalCharacterUpdateEvent;
-
-
-
 
         public List<SOVCampaign> ActiveSovCampaigns { get; set; }
 
@@ -262,7 +255,6 @@ namespace SMT.EVEData
         /// </summary>
         public List<JumpBridge> JumpBridges { get; set; }
 
-
         /// <summary>
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
@@ -279,6 +271,12 @@ namespace SMT.EVEData
         /// Gets or sets the master list of Regions
         /// </summary>
         public List<MapRegion> Regions { get; set; }
+
+
+        /// <summary>
+        /// Location of the static data distributed with the exectuable
+        /// </summary>
+        public string DataRootFolder { get; set; }
 
         /// <summary>
         /// Gets or sets the folder to cache dotland svg's etc to
@@ -437,6 +435,8 @@ namespace SMT.EVEData
             // update the region cache
             foreach (MapRegion rd in Regions)
             {
+
+
                 string localSVG = sourceFolder + @"\data\SourceMaps\raw\" + rd.DotLanRef + "_layout.svg";
 
                 if (!File.Exists(localSVG))
@@ -1355,11 +1355,9 @@ namespace SMT.EVEData
             // cache the navigation data
             SerializableDictionary<string, List<string>> jumpRangeCache = Navigation.CreateStaticNavigationCache(Systems);
 
-
             // now serialise the classes to disk
 
             string saveDataFolder = outputFolder + @"\data\";
-
 
             Serialization.SerializeToDisk<SerializableDictionary<string, List<string>>>(jumpRangeCache, saveDataFolder + @"\JumpRangeCache.dat");
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
@@ -1571,7 +1569,7 @@ namespace SMT.EVEData
                 esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
                 LocalCharacters.Add(esiChar);
 
-                if(LocalCharacterUpdateEvent != null)
+                if (LocalCharacterUpdateEvent != null)
                 {
                     LocalCharacterUpdateEvent();
                 }
@@ -1591,11 +1589,13 @@ namespace SMT.EVEData
         {
             SerializableDictionary<string, List<string>> jumpRangeCache;
 
-            string JRC = AppDomain.CurrentDomain.BaseDirectory +@"\data\JumpRangeCache.dat";
+            string DataRootPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
+
+            string JRC = Path.Combine(DataRootPath, "JumpRangeCache.dat");
 
             if (!File.Exists(JRC))
             {
-                throw new NotImplementedException();    
+                throw new NotImplementedException();
             }
             jumpRangeCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, List<string>>>(JRC);
             Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges, jumpRangeCache);
@@ -1608,10 +1608,11 @@ namespace SMT.EVEData
         {
             SystemIDToName = new SerializableDictionary<long, string>();
 
-            Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
-            Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
-            ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
 
+            Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(Path.Combine(DataRootFolder, "MapLayout.dat"));
+            Systems = Serialization.DeserializeFromDisk<List<System>>(Path.Combine(DataRootFolder, "Systems.dat"));
+
+            ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(Path.Combine(DataRootFolder, "ShipTypes.dat"));
 
             foreach (System s in Systems)
             {
@@ -1630,7 +1631,7 @@ namespace SMT.EVEData
             }
 
             // now add the beacons
-            string cynoBeaconsFile = SaveDataRootFolder + "\\CynoBeacons.txt";
+            string cynoBeaconsFile = Path.Combine(SaveDataRootFolder,  "CynoBeacons.txt");
             if (File.Exists(cynoBeaconsFile))
             {
                 StreamReader file = new StreamReader(cynoBeaconsFile);
@@ -1658,7 +1659,7 @@ namespace SMT.EVEData
         {
             JumpBridges = new List<JumpBridge>();
 
-            string dataFilename = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
+            string dataFilename = Path.Combine(SaveDataRootFolder,  "JumpBridges_" + JumpBridge.SaveVersion + ".dat");
             if (!File.Exists(dataFilename))
             {
                 return;
@@ -1796,14 +1797,14 @@ namespace SMT.EVEData
             }
 
             XmlSerializer xms = new XmlSerializer(typeof(List<LocalCharacter>));
-            string dataFilename = SaveDataRootFolder + @"\Characters_" + LocalCharacter.SaveVersion + ".dat";
+            string dataFilename = Path.Combine(SaveDataRootFolder, "Characters_" + LocalCharacter.SaveVersion + ".dat");
 
             using (TextWriter tw = new StreamWriter(dataFilename))
             {
                 xms.Serialize(tw, saveList);
             }
 
-            string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
+            string jbFileName = Path.Combine(SaveDataRootFolder, "JumpBridges_" + JumpBridge.SaveVersion + ".dat");
             Serialization.SerializeToDisk<List<JumpBridge>>(JumpBridges, jbFileName);
 
             List<string> beaconsToSave = new List<string>();
@@ -1816,10 +1817,10 @@ namespace SMT.EVEData
             }
 
             // save the intel channels / intel filters
-            File.WriteAllLines(SaveDataRootFolder + @"\IntelChannels.txt", IntelFilters);
-            File.WriteAllLines(SaveDataRootFolder + @"\IntelClearFilters.txt", IntelClearFilters);
-            File.WriteAllLines(SaveDataRootFolder + @"\IntelIgnoreFilters.txt", IntelIgnoreFilters);
-            File.WriteAllLines(SaveDataRootFolder + @"\CynoBeacons.txt", beaconsToSave);
+            File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelChannels.txt"), IntelFilters);
+            File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelClearFilters.txt"), IntelClearFilters);
+            File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelIgnoreFilters.txt"), IntelIgnoreFilters);
+            File.WriteAllLines(Path.Combine(SaveDataRootFolder, "CynoBeacons.txt"), beaconsToSave);
         }
 
         /// <summary>
@@ -1829,10 +1830,10 @@ namespace SMT.EVEData
         {
             IntelDataList = new FixedQueue<IntelData>();
             IntelDataList.SetSizeLimit(50);
-            
+
             IntelFilters = new List<string>();
 
-            string intelFileFilter = SaveDataRootFolder + @"\IntelChannels.txt";
+            string intelFileFilter = Path.Combine(SaveDataRootFolder, "IntelChannels.txt");
 
             if (File.Exists(intelFileFilter))
             {
@@ -1853,7 +1854,7 @@ namespace SMT.EVEData
             }
 
             IntelClearFilters = new List<string>();
-            string intelClearFileFilter = SaveDataRootFolder + @"\IntelClearFilters.txt";
+            string intelClearFileFilter = Path.Combine(SaveDataRootFolder, "IntelClearFilters.txt");
 
             if (File.Exists(intelClearFileFilter))
             {
@@ -1876,7 +1877,7 @@ namespace SMT.EVEData
             }
 
             IntelIgnoreFilters = new List<string>();
-            string intelIgnoreFileFilter = SaveDataRootFolder + @"\IntelIgnoreFilters.txt";
+            string intelIgnoreFileFilter = Path.Combine(SaveDataRootFolder, "IntelIgnoreFilters.txt");
 
             if (File.Exists(intelIgnoreFileFilter))
             {
@@ -1901,10 +1902,11 @@ namespace SMT.EVEData
 
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
-                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs";
+                string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" }; 
+                EVELogFolder =  Path.Combine(logFolderLoc);
             }
 
-            string chatlogFolder = EVELogFolder + @"\Chatlogs\\";
+            string chatlogFolder = Path.Combine(EVELogFolder, "Chatlogs");
 
             if (Directory.Exists(chatlogFolder))
             {
@@ -1931,10 +1933,11 @@ namespace SMT.EVEData
 
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
-                EVELogFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\EVE\logs\";
+                string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
+                EVELogFolder = Path.Combine(logFolderLoc);
             }
 
-            string gameLogFolder = EVELogFolder + @"\Gamelogs\\";
+            string gameLogFolder = Path.Combine(EVELogFolder, "Gamelogs") ;
 
             if (Directory.Exists(gameLogFolder))
             {
@@ -1959,8 +1962,8 @@ namespace SMT.EVEData
             // doesnt get updated until something other than the eve client reads these files
 
             List<string> logFolders = new List<string>();
-            string chatLogFolder = EVELogFolder + @"\Chatlogs\";
-            string gameLogFolder = EVELogFolder + @"\Gamelogs\";
+            string chatLogFolder = Path.Combine(EVELogFolder, "Chatlogs");
+            string gameLogFolder = Path.Combine(EVELogFolder, "Gamelogs");
 
             logFolders.Add(chatLogFolder);
             logFolders.Add(gameLogFolder);
@@ -2147,8 +2150,7 @@ namespace SMT.EVEData
                 return;
             }
 
-
-            if(TheraUpdateEvent != null) 
+            if (TheraUpdateEvent != null)
             {
                 TheraUpdateEvent();
             }
@@ -2185,7 +2187,7 @@ namespace SMT.EVEData
 
                 s.StrongArea = strongArea;
             }
-            if (StormsUpdateEvent!=null)
+            if (StormsUpdateEvent != null)
             {
                 StormsUpdateEvent();
             }
@@ -2387,7 +2389,7 @@ namespace SMT.EVEData
 
             try
             {
-                string POIcsv = AppDomain.CurrentDomain.BaseDirectory + @"\data\POI.csv";
+                string POIcsv = Path.Combine(DataRootFolder, "POI.csv");
                 if (File.Exists(POIcsv))
                 {
                     StreamReader file = new StreamReader(POIcsv);
@@ -2471,7 +2473,6 @@ namespace SMT.EVEData
             bool processFile = false;
             bool localChat = false;
 
-
             // check if the changed file path contains the name of a channel we're looking for
             foreach (string intelFilterStr in IntelFilters)
             {
@@ -2551,7 +2552,7 @@ namespace SMT.EVEData
                                     if (addChar)
                                     {
                                         LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        if(LocalCharacterUpdateEvent != null)
+                                        if (LocalCharacterUpdateEvent != null)
                                         {
                                             LocalCharacterUpdateEvent();
                                         }
@@ -2637,7 +2638,6 @@ namespace SMT.EVEData
                                 addToIntel = false;
                             }
 
-                            
                             if (addToIntel)
                             {
                                 EVEData.IntelData id = new EVEData.IntelData(line, channelName);
@@ -2822,7 +2822,7 @@ namespace SMT.EVEData
                     };
 
                     GameLogList.Enqueue(gd);
-                    if(GameLogAddedEvent != null)
+                    if (GameLogAddedEvent != null)
                     {
                         GameLogAddedEvent(GameLogList);
                     }
@@ -2869,7 +2869,8 @@ namespace SMT.EVEData
         /// </summary>
         private void LoadCharacters()
         {
-            string dataFilename = SaveDataRootFolder + @"\Characters_" + LocalCharacter.SaveVersion + ".dat";
+
+            string dataFilename = Path.Combine(SaveDataRootFolder,  "Characters_" + LocalCharacter.SaveVersion + ".dat");
             if (!File.Exists(dataFilename))
             {
                 return;
@@ -2895,7 +2896,7 @@ namespace SMT.EVEData
 
                     LocalCharacters.Add(c);
 
-                    if(LocalCharacterUpdateEvent != null)
+                    if (LocalCharacterUpdateEvent != null)
                     {
                         LocalCharacterUpdateEvent();
                     }
@@ -3091,7 +3092,6 @@ namespace SMT.EVEData
             {
                 bool sendUpdateEvent = false;
 
-
                 foreach (SOVCampaign sc in ActiveSovCampaigns)
                 {
                     sc.Valid = false;
@@ -3146,7 +3146,7 @@ namespace SMT.EVEData
                             sendUpdateEvent = true;
                         }
 
-                        if(ss.AttackersScore != c.AttackersScore || ss.DefendersScore != c.DefenderScore )
+                        if (ss.AttackersScore != c.AttackersScore || ss.DefendersScore != c.DefenderScore)
                         {
                             sendUpdateEvent = true;
                         }
@@ -3203,14 +3203,13 @@ namespace SMT.EVEData
                     }
                 }
 
-                if(sendUpdateEvent)
+                if (sendUpdateEvent)
                 {
-                    if(SovUpdateEvent != null)
+                    if (SovUpdateEvent != null)
                     {
                         SovUpdateEvent();
                     }
                 }
-
             }
             catch { }
         }
@@ -3321,7 +3320,7 @@ namespace SMT.EVEData
         {
             LocalCharacters.Remove(lc);
 
-            if(LocalCharacterUpdateEvent != null)
+            if (LocalCharacterUpdateEvent != null)
             {
                 LocalCharacterUpdateEvent();
             }

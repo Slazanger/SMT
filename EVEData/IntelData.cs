@@ -22,7 +22,6 @@ namespace SMT.EVEData
             }
         }
 
-
         /// <summary>
         ///  Initializes a new instance of the <see cref="IntelData" /> class
         /// </summary>

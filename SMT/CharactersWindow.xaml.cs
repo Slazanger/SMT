@@ -13,7 +13,6 @@ namespace SMT
             InitializeComponent();
         }
 
-
         private void Window_Loaded(object sender, EventArgs e)
         {
             MainWindow mw = Owner as MainWindow;
@@ -40,7 +39,6 @@ namespace SMT
 
             MainWindow mw = Owner as MainWindow;
             mw.EVEManager.LocalCharacterUpdateEvent -= EVEManager_LocalCharacterUpdateEvent;
-
         }
 
         private void AddCharacter_Click(object sender, RoutedEventArgs e)
@@ -88,7 +86,7 @@ namespace SMT
                     mw.UniverseUC.ActiveCharacter = null;
                     mw.OnCharacterSelectionChanged();
                     mw.EVEManager.RemoveCharacter(lc);
-                    
+
                     characterLV.Items.Refresh();
                     characterInfoGrid.Visibility = Visibility.Hidden;
                 }

@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using EVEDataUtils;
+﻿using EVEDataUtils;
 
 namespace SMT.EVEData
 {
@@ -150,7 +149,7 @@ namespace SMT.EVEData
             {
                 foreach (System sysb in eveSystems)
                 {
-                    if(sysa == sysb)
+                    if (sysa == sysb)
                     {
                         continue;
                     }
@@ -166,7 +165,7 @@ namespace SMT.EVEData
                         continue;
                     }
 
-                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysa.Name,sysb.Name);
+                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysa.Name, sysb.Name);
                     if (Distance < maxRange && Distance > 0)
                     {
                         if (!rangeCache.ContainsKey(sysa.Name))
@@ -219,10 +218,10 @@ namespace SMT.EVEData
 
             decimal MaxRange = 10;
 
-            foreach(string s in jumpRangeCache.Keys)
+            foreach (string s in jumpRangeCache.Keys)
             {
                 MapNode sysMN = MapNodes[s];
-                foreach(string t in jumpRangeCache[s])
+                foreach (string t in jumpRangeCache[s])
                 {
                     decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysMN.Name, t);
                     if (Distance < MaxRange && Distance > 0)
@@ -234,8 +233,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
- 
         }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)

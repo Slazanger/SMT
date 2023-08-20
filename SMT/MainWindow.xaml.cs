@@ -47,7 +47,7 @@ namespace SMT
 
         public EventHandler OnSelectedCharChangedEventHandler;
 
-        System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
+        private System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
 
         /// <summary>
         /// Main Window
@@ -319,7 +319,7 @@ namespace SMT
                         {
                             // Need to dispatch to UI thread if performing UI operations
                             Application.Current.Dispatcher.Invoke(delegate
-                            {                               
+                            {
                                 ActiveCharacter = lc;
                                 CurrentActiveCharacterCombo.SelectedItem = lc;
 
@@ -329,7 +329,6 @@ namespace SMT
 
                                 lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
                                 lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
-
 
                                 CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
 
@@ -359,13 +358,11 @@ namespace SMT
 
             CheckGitHubVersion();
 
-
             RegionUC.SelectRegion(MapConf.DefaultRegion);
         }
 
         private void OnGamelogUpdated(List<EVEData.GameLogData> gll)
         {
-
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 List<GameLogData> removeList = new List<GameLogData>();
@@ -388,8 +385,6 @@ namespace SMT
                         GameLogCache.Remove(gl);
                     }
                 }
-
-
 
                 // add new
                 foreach (GameLogData gl in gll)
@@ -624,7 +619,6 @@ namespace SMT
             EVEManager.ShutDown();
         }
 
-
         private void MainWindow_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState == WindowState.Minimized)
@@ -689,7 +683,6 @@ namespace SMT
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
-
                     }), DispatcherPriority.Normal);
                 }
             }
@@ -1022,9 +1015,6 @@ namespace SMT
             lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
             lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
 
-
-
-
             ActiveCharacter = null;
             FleetMembersList.ItemsSource = null;
 
@@ -1060,7 +1050,6 @@ namespace SMT
 
                 lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
                 lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
-
 
                 RegionsViewUC.ActiveCharacter = lc;
                 RegionUC.UpdateActiveCharacter(lc);
@@ -1100,31 +1089,26 @@ namespace SMT
             }
         }
 
-
         public void OnFleetMemebersUpdate(LocalCharacter c)
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
-
             }), DispatcherPriority.Normal);
-
-
         }
 
         #endregion Characters
 
         #region intel
 
-        ObservableCollection<EVEData.IntelData> IntelCache;
+        private ObservableCollection<EVEData.IntelData> IntelCache;
 
-        ObservableCollection<EVEData.GameLogData> GameLogCache;
+        private ObservableCollection<EVEData.GameLogData> GameLogCache;
 
         private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEManager.IntelDataList.ClearAll();
             IntelCache.Clear();
-
         }
 
         private void ClearGameLogBtn_Click(object sender, RoutedEventArgs e)
@@ -1138,7 +1122,6 @@ namespace SMT
             bool playSound = false;
             bool flashWindow = false;
 
-
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 List<IntelData> removeList = new List<IntelData>();
@@ -1146,7 +1129,7 @@ namespace SMT
 
                 // remove old
 
-                if(IntelCache.Count > 50)
+                if (IntelCache.Count > 50)
                 {
                     foreach (IntelData id in IntelCache)
                     {
@@ -1162,22 +1145,17 @@ namespace SMT
                     }
                 }
 
-  
-
                 // add new
                 foreach (IntelData id in idl)
                 {
-                    if(!IntelCache.Contains(id))
+                    if (!IntelCache.Contains(id))
                     {
                         IntelCache.Insert(0, id);
                     }
                 }
             }), DispatcherPriority.Normal);
 
-
             IntelData id = IntelCache[0];
-
-
 
             if (id.ClearNotification)
             {
@@ -1234,9 +1212,7 @@ namespace SMT
                 {
                     FlashWindow.Flash(AppWindow, 5);
                 }
-
             }), DispatcherPriority.Normal);
-
         }
 
         private void OnShipDecloaked(string character, string text)
@@ -1256,8 +1232,8 @@ namespace SMT
                                 tb.AddText("SMT Alert");
                                 tb.AddText("Character : " + character + "(" + lc.Location + ")");
 
-                                // add the character portrait if we have one                                
-                                if(lc.PortraitLocation != null )
+                                // add the character portrait if we have one
+                                if (lc.PortraitLocation != null)
                                 {
                                     tb.AddInlineImage(lc.PortraitLocation);
                                 }
@@ -1295,7 +1271,7 @@ namespace SMT
                                 tb.AddText("SMT Alert");
                                 tb.AddText("Character : " + character + "(" + lc.Location + ")");
 
-                                // add the character portrait if we have one                                
+                                // add the character portrait if we have one
                                 if (lc.PortraitLocation != null)
                                 {
                                     tb.AddInlineImage(lc.PortraitLocation);
@@ -1317,20 +1293,16 @@ namespace SMT
             }
         }
 
-
         private void OnZKillsAdded()
         {
-            if(Application.Current != null)
+            if (Application.Current != null)
             {
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
                 }), DispatcherPriority.Normal, null);
-
             }
         }
-
-
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -1434,7 +1406,6 @@ namespace SMT
                 {
                     CollectionViewSource.GetDefaultView(dgCapitalRouteCurrentRoute.ItemsSource).Refresh();
                 }
-
 
                 // lbAlternateMids could be null, need to check..
 
@@ -1771,8 +1742,6 @@ namespace SMT
             ImportPasteJumpGatesBtn.IsEnabled = true;
             ExportJumpGatesBtn.IsEnabled = true;
             CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
-
-
         }
 
         private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
@@ -1823,7 +1792,6 @@ namespace SMT
             UpdateJumpBridgeSummary();
             RegionUC.ReDrawMap(true);
             CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
-
         }
 
         private void UpdateJumpBridgeSummary()
@@ -2018,7 +1986,7 @@ namespace SMT
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
-            string infoObjectsFile = EveAppConfig.StorageRoot + @"\InfoObjects.txt";
+            string infoObjectsFile = Path.Combine(EveAppConfig.StorageRoot, "InfoObjects.txt");
             if (File.Exists(infoObjectsFile))
             {
                 StreamReader file = new StreamReader(infoObjectsFile);
@@ -2160,7 +2128,7 @@ namespace SMT
                 tb.AddText("SMT Alert");
                 tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
 
-                // add the character portrait if we have one                                
+                // add the character portrait if we have one
                 if (lc.PortraitLocation != null)
                 {
                     tb.AddInlineImage(lc.PortraitLocation);
@@ -2263,8 +2231,6 @@ namespace SMT
                 {
                     lbAlternateMids.ItemsSource = null;
                 }
-
-
             }
         }
 
@@ -2288,7 +2254,6 @@ namespace SMT
                 string sys = CapitalRoute.WayPoints[capitalRouteWaypointsLB.SelectedIndex];
                 CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
                 CapitalRoute.WayPoints.Insert(capitalRouteWaypointsLB.SelectedIndex + 1, sys);
-
 
                 CapitalRoute.Recalculate();
                 refreshJumpRouteUI();
@@ -2532,18 +2497,22 @@ namespace SMT
             /// The size of the structure in bytes.
             /// </summary>
             public uint cbSize;
+
             /// <summary>
             /// A Handle to the Window to be Flashed. The window can be either opened or minimized.
             /// </summary>
             public IntPtr hwnd;
+
             /// <summary>
             /// The Flash Status.
             /// </summary>
             public uint dwFlags;
+
             /// <summary>
             /// The number of times to Flash the window.
             /// </summary>
             public uint uCount;
+
             /// <summary>
             /// The rate at which the Window is to be flashed, in milliseconds. If Zero, the function uses the default cursor blink rate.
             /// </summary>

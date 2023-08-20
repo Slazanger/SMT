@@ -17,7 +17,6 @@ namespace DataGen
             string inputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
             string outputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
 
-
             // Re-Create data
             EM.CreateFromScratch(inputDataFolder, outputDataFolder);
 
