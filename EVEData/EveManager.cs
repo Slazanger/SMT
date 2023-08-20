@@ -8,8 +8,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Windows;
-using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using ESI.NET;
@@ -68,7 +66,7 @@ namespace SMT.EVEData
         /// </summary>
         public EveManager(string version)
         {
-            LocalCharacters = new ObservableCollection<LocalCharacter>();
+            LocalCharacters = new List<LocalCharacter>();
             VersionStr = version;
 
             string SaveDataRoot = EveAppConfig.StorageRoot;
@@ -102,14 +100,26 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Intel Added Event Handler
+        /// Intel Updated Event Handler
         /// </summary>
-        public delegate void IntelAddedEventHandler(List<string> systems);
+        public delegate void IntelUpdatedEventHandler(List<IntelData> idl );
+
+        /// <summary>
+        /// Intel Updated Event
+        /// </summary>
+        public event IntelUpdatedEventHandler IntelUpdatedEvent;
+
+
+        /// <summary>
+        /// GameLog Added Event Handler
+        /// </summary>
+        public delegate void GameLogAddedEventHandler(List<GameLogData> gll);
 
         /// <summary>
         /// Intel Added Event
         /// </summary>
-        public event IntelAddedEventHandler IntelAddedEvent;
+        public event GameLogAddedEventHandler GameLogAddedEvent;
+
 
         /// <summary>
         /// Ship Decloak Event Handler
@@ -161,7 +171,54 @@ namespace SMT.EVEData
 
         public string EVELogFolder { get; set; }
 
-        public ObservableCollection<SOVCampaign> ActiveSovCampaigns { get; set; }
+
+        /// <summary>
+        /// Sov Campaign Updated Event Handler
+        /// </summary>
+        public delegate void SovCampaignUpdatedHandler();
+
+        /// <summary>
+        /// Sov Campaign updated Added Events
+        /// </summary>
+        public event SovCampaignUpdatedHandler SovUpdateEvent;
+
+
+        /// <summary>
+        /// Thera Connections Updated Event Handler
+        /// </summary>
+        public delegate void TheraUpdatedHandler();
+
+        /// <summary>
+        /// Thera Updated Added Events
+        /// </summary>
+        public event TheraUpdatedHandler TheraUpdateEvent;
+
+
+        /// <summary>
+        /// Storms Updated Event Handler
+        /// </summary>
+        public delegate void StormsUpdatedHandler();
+
+        /// <summary>
+        /// Storms Updated Added Events
+        /// </summary>
+        public event StormsUpdatedHandler StormsUpdateEvent;
+
+
+        /// <summary>
+        /// Local Characters Updated Event Handler
+        /// </summary>
+        public delegate void LocalCharactersUpdatedHandler();
+
+        /// <summary>
+        /// Local Characters Updated Events
+        /// </summary>
+        public event LocalCharactersUpdatedHandler LocalCharacterUpdateEvent;
+
+
+
+
+        public List<SOVCampaign> ActiveSovCampaigns { get; set; }
 
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
@@ -187,28 +244,30 @@ namespace SMT.EVEData
         public List<Coalition> Coalitions { get; set; }
 
         public ESI.NET.EsiClient ESIClient { get; set; }
+
         public List<string> ESIScopes { get; set; }
 
         /// <summary>
         /// Gets or sets the Intel List
         /// </summary>
-        public BindingQueue<EVEData.IntelData> IntelDataList { get; set; }
+        public FixedQueue<EVEData.IntelData> IntelDataList { get; set; }
 
         /// <summary>
         /// Gets or sets the Gamelog List
         /// </summary>
-        public BindingQueue<EVEData.GameLogData> GameLogList { get; set; }
+        public FixedQueue<EVEData.GameLogData> GameLogList { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of Jump Bridges
         /// </summary>
-        public ObservableCollection<JumpBridge> JumpBridges { get; set; }
+        public List<JumpBridge> JumpBridges { get; set; }
+
 
         /// <summary>
         /// Gets or sets the list of Characters we are tracking
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<LocalCharacter> LocalCharacters { get; set; }
+        public List<LocalCharacter> LocalCharacters { get; set; }
 
         /// <summary>
         /// Gets or sets the list of Faction warfare systems
@@ -251,13 +310,13 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current list of thera connections
         /// </summary>
-        public ObservableCollection<TheraConnection> TheraConnections { get; set; }
+        public List<TheraConnection> TheraConnections { get; set; }
 
         public bool UseESIForCharacterPositions { get; set; }
 
-        public ObservableCollection<Storm> MetaliminalStorms { get; set; }
+        public List<Storm> MetaliminalStorms { get; set; }
 
-        public ObservableCollection<POI> PointsOfInterest { get; set; }
+        public List<POI> PointsOfInterest { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
@@ -1293,10 +1352,16 @@ namespace SMT.EVEData
                 }
             }
 
+            // cache the navigation data
+            SerializableDictionary<string, List<string>> jumpRangeCache = Navigation.CreateStaticNavigationCache(Systems);
+
+
             // now serialise the classes to disk
 
             string saveDataFolder = outputFolder + @"\data\";
 
+
+            Serialization.SerializeToDisk<SerializableDictionary<string, List<string>>>(jumpRangeCache, saveDataFolder + @"\JumpRangeCache.dat");
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
@@ -1504,11 +1569,12 @@ namespace SMT.EVEData
             if (esiChar == null)
             {
                 esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
+                LocalCharacters.Add(esiChar);
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                if(LocalCharacterUpdateEvent != null)
                 {
-                    LocalCharacters.Add(esiChar);
-                }), DispatcherPriority.Normal, null);
+                    LocalCharacterUpdateEvent();
+                }
             }
 
             esiChar.ESIRefreshToken = acd.RefreshToken;
@@ -1523,7 +1589,16 @@ namespace SMT.EVEData
 
         public void InitNavigation()
         {
-            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges.ToList());
+            SerializableDictionary<string, List<string>> jumpRangeCache;
+
+            string JRC = AppDomain.CurrentDomain.BaseDirectory +@"\data\JumpRangeCache.dat";
+
+            if (!File.Exists(JRC))
+            {
+                throw new NotImplementedException();    
+            }
+            jumpRangeCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, List<string>>>(JRC);
+            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges, jumpRangeCache);
         }
 
         /// <summary>
@@ -1536,6 +1611,7 @@ namespace SMT.EVEData
             Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
             Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
             ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
+
 
             foreach (System s in Systems)
             {
@@ -1580,7 +1656,7 @@ namespace SMT.EVEData
         /// </summary>
         public void LoadJumpBridgeData()
         {
-            JumpBridges = new ObservableCollection<JumpBridge>();
+            JumpBridges = new List<JumpBridge>();
 
             string dataFilename = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
             if (!File.Exists(dataFilename))
@@ -1590,13 +1666,13 @@ namespace SMT.EVEData
 
             try
             {
-                ObservableCollection<JumpBridge> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<JumpBridge>));
+                List<JumpBridge> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(List<JumpBridge>));
 
                 FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
-                loadList = (ObservableCollection<JumpBridge>)xms.Deserialize(xmlr);
+                loadList = (List<JumpBridge>)xms.Deserialize(xmlr);
 
                 foreach (JumpBridge j in loadList)
                 {
@@ -1709,7 +1785,7 @@ namespace SMT.EVEData
         public void SaveData()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
-            ObservableCollection<LocalCharacter> saveList = new ObservableCollection<LocalCharacter>();
+            List<LocalCharacter> saveList = new List<LocalCharacter>();
 
             foreach (LocalCharacter c in LocalCharacters)
             {
@@ -1719,7 +1795,7 @@ namespace SMT.EVEData
                 }
             }
 
-            XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
+            XmlSerializer xms = new XmlSerializer(typeof(List<LocalCharacter>));
             string dataFilename = SaveDataRootFolder + @"\Characters_" + LocalCharacter.SaveVersion + ".dat";
 
             using (TextWriter tw = new StreamWriter(dataFilename))
@@ -1728,7 +1804,7 @@ namespace SMT.EVEData
             }
 
             string jbFileName = SaveDataRootFolder + @"\JumpBridges_" + JumpBridge.SaveVersion + ".dat";
-            Serialization.SerializeToDisk<ObservableCollection<JumpBridge>>(JumpBridges, jbFileName);
+            Serialization.SerializeToDisk<List<JumpBridge>>(JumpBridges, jbFileName);
 
             List<string> beaconsToSave = new List<string>();
             foreach (System s in Systems)
@@ -1751,9 +1827,10 @@ namespace SMT.EVEData
         /// </summary>
         public void SetupIntelWatcher()
         {
-            IntelFilters = new List<string>();
-            IntelDataList = new BindingQueue<IntelData>();
+            IntelDataList = new FixedQueue<IntelData>();
             IntelDataList.SetSizeLimit(50);
+            
+            IntelFilters = new List<string>();
 
             string intelFileFilter = SaveDataRootFolder + @"\IntelChannels.txt";
 
@@ -1849,7 +1926,7 @@ namespace SMT.EVEData
             gameFileReadPos = new Dictionary<string, int>();
             gamelogFileCharacterMap = new Dictionary<string, string>();
 
-            GameLogList = new BindingQueue<GameLogData>();
+            GameLogList = new FixedQueue<GameLogData>();
             GameLogList.SetSizeLimit(50);
 
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
@@ -2041,10 +2118,7 @@ namespace SMT.EVEData
 
                 JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    TheraConnections.Clear();
-                }), DispatcherPriority.Normal, null);
+                TheraConnections.Clear();
 
                 // JSON feed is now in the format : {"id":38199,"signatureId":"QRQ","type":"wormhole","status":"scanned","wormholeMass":"stable","wormholeEol":"critical","wormholeEstimatedEol":"2018-02-25T20:41:21.000Z","wormholeDestinationSignatureId":"VHT","createdAt":"2018-02-25T04:41:21.000Z","updatedAt":"2018-02-25T16:41:46.000Z","deletedAt":null,"statusUpdatedAt":"2018-02-25T04:41:44.000Z","createdBy":"Erik Holden","createdById":"95598233","deletedBy":null,"deletedById":null,"wormholeSourceWormholeTypeId":91,"wormholeDestinationWormholeTypeId":140,"solarSystemId":31000005,"wormholeDestinationSolarSystemId":30001175,"sourceWormholeType":
                 while (jsr.Read())
@@ -2063,11 +2137,7 @@ namespace SMT.EVEData
                             System theraConnectionSystem = GetEveSystemFromID(solarSystemId);
 
                             TheraConnection tc = new TheraConnection(theraConnectionSystem.Name, theraConnectionSystem.Region, inSignatureId, outSignatureId, wormHoleEOL);
-
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                TheraConnections.Add(tc);
-                            }), DispatcherPriority.Normal, null);
+                            TheraConnections.Add(tc);
                         }
                     }
                 }
@@ -2076,24 +2146,27 @@ namespace SMT.EVEData
             {
                 return;
             }
+
+
+            if(TheraUpdateEvent != null) 
+            {
+                TheraUpdateEvent();
+            }
         }
 
         public void UpdateMetaliminalStorms()
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                MetaliminalStorms.Clear();
+            MetaliminalStorms.Clear();
 
-                List<Storm> ls = Storm.GetStorms();
-                foreach (Storm s in ls)
+            List<Storm> ls = Storm.GetStorms();
+            foreach (Storm s in ls)
+            {
+                System sys = GetEveSystem(s.System);
+                if (sys != null)
                 {
-                    System sys = GetEveSystem(s.System);
-                    if (sys != null)
-                    {
-                        MetaliminalStorms.Add(s);
-                    }
+                    MetaliminalStorms.Add(s);
                 }
-            }), DispatcherPriority.Normal, null);
+            }
 
             // now update the Strong and weak areas around the storm
             foreach (Storm s in MetaliminalStorms)
@@ -2111,6 +2184,10 @@ namespace SMT.EVEData
                 strongArea.Remove(s.Name);
 
                 s.StrongArea = strongArea;
+            }
+            if (StormsUpdateEvent!=null)
+            {
+                StormsUpdateEvent();
             }
         }
 
@@ -2294,7 +2371,7 @@ namespace SMT.EVEData
             InitFactionWarfareInfo();
             InitPOI();
 
-            ActiveSovCampaigns = new ObservableCollection<SOVCampaign>();
+            ActiveSovCampaigns = new List<SOVCampaign>();
 
             InitZKillFeed();
 
@@ -2306,7 +2383,7 @@ namespace SMT.EVEData
 
         private void InitPOI()
         {
-            PointsOfInterest = new ObservableCollection<POI>();
+            PointsOfInterest = new List<POI>();
 
             try
             {
@@ -2356,13 +2433,13 @@ namespace SMT.EVEData
         /// </summary>
         private void InitTheraConnections()
         {
-            TheraConnections = new ObservableCollection<TheraConnection>();
+            TheraConnections = new List<TheraConnection>();
             UpdateTheraConnections();
         }
 
         private void InitMetaliminalStorms()
         {
-            MetaliminalStorms = new ObservableCollection<Storm>();
+            MetaliminalStorms = new List<Storm>();
         }
 
         private void InitFactionWarfareInfo()
@@ -2393,6 +2470,7 @@ namespace SMT.EVEData
 
             bool processFile = false;
             bool localChat = false;
+
 
             // check if the changed file path contains the name of a channel we're looking for
             foreach (string intelFilterStr in IntelFilters)
@@ -2472,10 +2550,11 @@ namespace SMT.EVEData
 
                                     if (addChar)
                                     {
-                                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                                        LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
+                                        if(LocalCharacterUpdateEvent != null)
                                         {
-                                            LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        }), DispatcherPriority.Normal, null);
+                                            LocalCharacterUpdateEvent();
+                                        }
                                     }
 
                                     break;
@@ -2520,95 +2599,90 @@ namespace SMT.EVEData
                             {
                                 string system = line.Split(':').Last().Trim();
 
-                                Application.Current.Dispatcher.Invoke((Action)(() =>
+                                foreach (EVEData.LocalCharacter c in LocalCharacters)
                                 {
-                                    foreach (EVEData.LocalCharacter c in LocalCharacters)
+                                    if (c.LocalChatFile == changedFile)
                                     {
-                                        if (c.LocalChatFile == changedFile)
-                                        {
-                                            c.Location = system;
-                                        }
+                                        c.Location = system;
                                     }
-                                }), DispatcherPriority.Normal, null);
+                                }
                             }
                         }
                         else
                         {
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
+                            // check if it is in the intel list already (ie if you have multiple clients running)
+                            bool addToIntel = true;
+
+                            int start = line.IndexOf('>') + 1;
+                            string newIntelString = line.Substring(start);
+
+                            if (newIntelString != null)
                             {
-                                // check if it is in the intel list already (ie if you have multiple clients running)
-                                bool addToIntel = true;
-
-                                int start = line.IndexOf('>') + 1;
-                                string newIntelString = line.Substring(start);
-
-                                if (newIntelString != null)
+                                foreach (EVEData.IntelData idl in IntelDataList)
                                 {
-                                    foreach (EVEData.IntelData idl in IntelDataList)
+                                    if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
                                     {
-                                        if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
-                                        {
-                                            addToIntel = false;
-                                            break;
-                                        }
+                                        addToIntel = false;
+                                        break;
                                     }
                                 }
-                                else
-                                {
-                                    addToIntel = false;
-                                }
+                            }
+                            else
+                            {
+                                addToIntel = false;
+                            }
 
-                                if (line.Contains("Channel MOTD:"))
-                                {
-                                    addToIntel = false;
-                                }
+                            if (line.Contains("Channel MOTD:"))
+                            {
+                                addToIntel = false;
+                            }
 
-                                if (addToIntel)
-                                {
-                                    EVEData.IntelData id = new EVEData.IntelData(line, channelName);
+                            
+                            if (addToIntel)
+                            {
+                                EVEData.IntelData id = new EVEData.IntelData(line, channelName);
 
-                                    foreach (string s in id.IntelString.Split(' '))
+                                foreach (string s in id.IntelString.Split(' '))
+                                {
+                                    if (s == "" || s.Length < 3)
                                     {
-                                        if (s == "" || s.Length < 3)
-                                        {
-                                            continue;
-                                        }
+                                        continue;
+                                    }
 
-                                        // check if we should ignore this message (maybe we could put this before every other checks ?)
-                                        foreach (String ignoreMarker in IntelIgnoreFilters)
+                                    // check if we should ignore this message (maybe we could put this before every other checks ?)
+                                    foreach (String ignoreMarker in IntelIgnoreFilters)
+                                    {
+                                        if (ignoreMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
                                         {
-                                            if (ignoreMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                            {
-                                                // do not even add to the intel list
-                                                return;
-                                            }
-                                        }
-
-                                        foreach (String clearMarker in IntelClearFilters)
-                                        {
-                                            if (clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                            {
-                                                id.ClearNotification = true;
-                                            }
-                                        }
-
-                                        foreach (System sys in Systems)
-                                        {
-                                            if (sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                                            {
-                                                id.Systems.Add(sys.Name);
-                                            }
+                                            // do not even add to the intel list
+                                            return;
                                         }
                                     }
 
-                                    IntelDataList.Enqueue(id);
-
-                                    if (IntelAddedEvent != null && !id.ClearNotification)
+                                    foreach (String clearMarker in IntelClearFilters)
                                     {
-                                        IntelAddedEvent(id.Systems);
+                                        if (clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                        {
+                                            id.ClearNotification = true;
+                                        }
+                                    }
+
+                                    foreach (System sys in Systems)
+                                    {
+                                        if (sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                                        {
+                                            id.Systems.Add(sys.Name);
+                                        }
                                     }
                                 }
-                            }), DispatcherPriority.Normal, null);
+
+                                IntelDataList.Enqueue(id);
+
+                                if (IntelUpdatedEvent != null)
+                                {
+                                    IntelUpdatedEvent(IntelDataList);
+                                }
+                            }
                         }
 
                         line = file.ReadLine();
@@ -2739,18 +2813,19 @@ namespace SMT.EVEData
                     // strip the formatting from the log
                     line = Regex.Replace(line, "<.*?>", String.Empty);
 
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    GameLogData gd = new GameLogData()
                     {
-                        GameLogData gd = new GameLogData()
-                        {
-                            Character = characterName,
-                            Text = line,
-                            Severity = type,
-                            Time = DateTime.Now,
-                        };
+                        Character = characterName,
+                        Text = line,
+                        Severity = type,
+                        Time = DateTime.Now,
+                    };
 
-                        GameLogList.Enqueue(gd);
-                    }), DispatcherPriority.Normal, null);
+                    GameLogList.Enqueue(gd);
+                    if(GameLogAddedEvent != null)
+                    {
+                        GameLogAddedEvent(GameLogList);
+                    }
 
                     foreach (LocalCharacter lc in LocalCharacters)
                     {
@@ -2802,13 +2877,13 @@ namespace SMT.EVEData
 
             try
             {
-                ObservableCollection<LocalCharacter> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(ObservableCollection<LocalCharacter>));
+                List<LocalCharacter> loadList;
+                XmlSerializer xms = new XmlSerializer(typeof(List<LocalCharacter>));
 
                 FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
-                loadList = (ObservableCollection<LocalCharacter>)xms.Deserialize(xmlr);
+                loadList = (List<LocalCharacter>)xms.Deserialize(xmlr);
 
                 foreach (LocalCharacter c in loadList)
                 {
@@ -2819,6 +2894,11 @@ namespace SMT.EVEData
                     c.Region = string.Empty;
 
                     LocalCharacters.Add(c);
+
+                    if(LocalCharacterUpdateEvent != null)
+                    {
+                        LocalCharacterUpdateEvent();
+                    }
                 }
             }
             catch
@@ -3009,6 +3089,9 @@ namespace SMT.EVEData
         {
             try
             {
+                bool sendUpdateEvent = false;
+
+
                 foreach (SOVCampaign sc in ActiveSovCampaigns)
                 {
                     sc.Valid = false;
@@ -3059,10 +3142,13 @@ namespace SMT.EVEData
                                 ss.Type = "TCU";
                             }
 
-                            Application.Current.Dispatcher.Invoke((Action)(() =>
-                            {
-                                ActiveSovCampaigns.Add(ss);
-                            }), DispatcherPriority.Normal, null);
+                            ActiveSovCampaigns.Add(ss);
+                            sendUpdateEvent = true;
+                        }
+
+                        if(ss.AttackersScore != c.AttackersScore || ss.DefendersScore != c.DefenderScore )
+                        {
+                            sendUpdateEvent = true;
                         }
 
                         ss.AttackersScore = c.AttackersScore;
@@ -3112,25 +3198,19 @@ namespace SMT.EVEData
 
                     if (sc.Valid == false)
                     {
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                        {
-                            ActiveSovCampaigns.Remove(sc);
-                        }), DispatcherPriority.Normal, null);
+                        ActiveSovCampaigns.Remove(sc);
+                        sendUpdateEvent = true;
                     }
                 }
 
-                // super hack : I want to update the both the times and filter colour that
-                // this gets used for but the binding neither seem to propigate the change
-                // but this forces a listchanged which ultimately triggers a refresh
-                // ugly and to be fixed after some investigation
+                if(sendUpdateEvent)
                 {
-                    SOVCampaign hackSC = new SOVCampaign();
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    if(SovUpdateEvent != null)
                     {
-                        ActiveSovCampaigns.Add(hackSC);
-                        ActiveSovCampaigns.Remove(hackSC);
-                    }), DispatcherPriority.Normal, null);
+                        SovUpdateEvent();
+                    }
                 }
+
             }
             catch { }
         }
@@ -3235,6 +3315,16 @@ namespace SMT.EVEData
                 }
             }
             catch { }
+        }
+
+        public void RemoveCharacter(LocalCharacter lc)
+        {
+            LocalCharacters.Remove(lc);
+
+            if(LocalCharacterUpdateEvent != null)
+            {
+                LocalCharacterUpdateEvent();
+            }
         }
     }
 }

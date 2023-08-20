@@ -1181,7 +1181,7 @@ namespace SMT
 
                     // add the alternates
                     List<string> alts = new List<string>();
-                    foreach (ObservableCollection<string> sss in CapitalRoute.AlternateMids.Values)
+                    foreach (List<string> sss in CapitalRoute.AlternateMids.Values)
                     {
                         foreach (string s in sss)
                         {

@@ -12,9 +12,17 @@ namespace SMT
         public MapColours ActiveColourScheme;
 
         [Category("Navigation")]
-        public ObservableCollection<StaticJumpOverlay> StaticJumpPoints;
 
         private bool m_AlwaysOnTop;
+
+        private bool m_MinimizeToTray;
+        private bool m_CloseToTray;
+
+        private bool m_FlashWindow;
+        private bool m_FlashWindowOnlyInDangerZone;
+
+        private bool m_PlayIntelSound;
+        private bool m_PlaySoundOnlyInDangerZone;
 
         private string m_DefaultRegion;
 
@@ -120,6 +128,40 @@ namespace SMT
             {
                 m_AlwaysOnTop = value;
                 OnPropertyChanged("AlwaysOnTop");
+            }
+        }
+
+        [Category("General")]
+        [DisplayName("Minimize to tray")]
+        public bool MinimizeToTray 
+        {
+            get
+            {
+                return m_MinimizeToTray;
+            }
+            set
+            {
+                if (!value)
+                {
+                    CloseToTray = false;
+                }
+                m_MinimizeToTray = value;
+                OnPropertyChanged("MinimizeToTray");
+            }
+        }
+
+        [Category("General")]
+        [DisplayName("Close to tray")]
+        public bool CloseToTray
+        {
+            get
+            {
+                return m_CloseToTray;
+            }
+            set
+            {
+                m_CloseToTray = value;
+                OnPropertyChanged("CloseToTray");
             }
         }
 
@@ -410,11 +452,45 @@ namespace SMT
 
         [Category("Intel")]
         [DisplayName("Warning Sound")]
-        public bool PlayIntelSound { get; set; }
+        public bool PlayIntelSound
+        {
+            get
+            {
+                return m_PlayIntelSound;
+            }
+            set
+            {
+                if (!value)
+                {
+                    PlaySoundOnlyInDangerZone = false;
+                }
+                m_PlayIntelSound = value;
+                OnPropertyChanged("PlayIntelSound");
+            }
+        }
 
         [Category("Intel")]
         [DisplayName("Warning On Unknown")]
         public bool PlayIntelSoundOnUnknown { get; set; }
+
+        [Category("Intel")]
+        [DisplayName("Flash Window on New Intel")]
+        public bool FlashWindow
+        {
+            get
+            {
+                return m_FlashWindow;
+            }
+            set
+            {
+                if (!value)
+                {
+                    FlashWindowOnlyInDangerZone = false;
+                }
+                m_FlashWindow = value;
+                OnPropertyChanged("FlashWindow");
+            }
+        }
 
         [Category("Intel")]
         [DisplayName("Warning Sound Volume")]
@@ -422,7 +498,33 @@ namespace SMT
 
         [Category("Intel")]
         [DisplayName("Limit Sound to Dangerzone")]
-        public bool PlaySoundOnlyInDangerZone { get; set; }
+        public bool PlaySoundOnlyInDangerZone
+        {
+            get
+            {
+                return m_PlaySoundOnlyInDangerZone;
+            }
+            set
+            {
+                m_PlaySoundOnlyInDangerZone = value;
+                OnPropertyChanged("PlaySoundOnlyInDangerZone");
+            }
+        }
+
+        [Category("Intel")]
+        [DisplayName("Limit Window Flash to Dangerzone")]
+        public bool FlashWindowOnlyInDangerZone
+        {
+            get
+            {
+                return m_FlashWindowOnlyInDangerZone;
+            }
+            set
+            {
+                m_FlashWindowOnlyInDangerZone = value;
+                OnPropertyChanged("FlashWindowOnlyInDangerZone");
+            }
+        }
 
         [Category("Incursions")]
         [DisplayName("Show Active Incursions")]
@@ -1180,12 +1282,14 @@ namespace SMT
             UpcomingSovMinutes = 30;
             ZkillExpireTimeMinutes = 30;
             AlwaysOnTop = false;
+            MinimizeToTray = false;
+            CloseToTray = false;
+            FlashWindow = false;
             ShowToolBox = true;
             ShowZKillData = true;
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
             ShowActiveIncursions = true;
-            StaticJumpPoints = new ObservableCollection<StaticJumpOverlay>();
             SOVShowConflicts = true;
             SOVBasedITCU = true;
             UseESIForCharacterPositions = true;
