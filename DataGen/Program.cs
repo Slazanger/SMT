@@ -13,9 +13,10 @@ namespace DataGen
 
             // Initialise the Main Mananger
             EM = new(SMT.EVEData.EveAppConfig.SMT_VERSION);
+            EveManager.Instance = EM;
+            string inputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
+            string outputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
 
-            string inputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\EVEData\";
-            string outputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\EVEData\";
 
             // Re-Create data
             EM.CreateFromScratch(inputDataFolder, outputDataFolder);

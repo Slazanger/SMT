@@ -1,4 +1,7 @@
-﻿namespace SMT.EVEData
+﻿using System.Reflection.Metadata.Ecma335;
+using EVEDataUtils;
+
+namespace SMT.EVEData
 {
     public enum RoutingMode
     {
@@ -136,7 +139,50 @@
             return sysList;
         }
 
-        public static void InitNavigation(List<System> eveSystems, List<JumpBridge> jumpBridges)
+        public static SerializableDictionary<string, List<string>> CreateStaticNavigationCache(List<System> eveSystems)
+        {
+            SerializableDictionary<string, List<string>> rangeCache = new SerializableDictionary<string, List<string>>();
+
+            decimal maxRange = 10;
+
+            // now create the jumpable system links
+            foreach (System sysa in eveSystems)
+            {
+                foreach (System sysb in eveSystems)
+                {
+                    if(sysa == sysb)
+                    {
+                        continue;
+                    }
+                    // cant jump into highsec systems
+                    if (sysb.TrueSec > 0.45)
+                    {
+                        continue;
+                    }
+
+                    // cant jump into Pochven systems
+                    if (sysb.Region == "Pochven")
+                    {
+                        continue;
+                    }
+
+                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysa.Name,sysb.Name);
+                    if (Distance < maxRange && Distance > 0)
+                    {
+                        if (!rangeCache.ContainsKey(sysa.Name))
+                        {
+                            rangeCache[sysa.Name] = new List<string>();
+                        }
+
+                        rangeCache[sysa.Name].Add(sysb.Name);
+                    }
+                }
+            }
+
+            return rangeCache;
+        }
+
+        public static void InitNavigation(List<System> eveSystems, List<JumpBridge> jumpBridges, SerializableDictionary<string, List<string>> jumpRangeCache)
         {
             MapNodes = new Dictionary<string, MapNode>();
 
@@ -173,33 +219,23 @@
 
             decimal MaxRange = 10;
 
-            // now create the jumpable system links
-            foreach (MapNode mn in MapNodes.Values)
+            foreach(string s in jumpRangeCache.Keys)
             {
-                foreach (System sys in eveSystems)
+                MapNode sysMN = MapNodes[s];
+                foreach(string t in jumpRangeCache[s])
                 {
-                    // cant jump into highsec systems
-                    if (sys.TrueSec > 0.45)
-                    {
-                        continue;
-                    }
-
-                    // cant jump into Pochven systems
-                    if (sys.Region == "Pochven")
-                    {
-                        continue;
-                    }
-
-                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sys.Name, mn.Name);
+                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysMN.Name, t);
                     if (Distance < MaxRange && Distance > 0)
                     {
                         JumpLink jl = new JumpLink();
-                        jl.System = sys.Name;
+                        jl.System = t;
                         jl.RangeLY = Distance;
-                        mn.JumpableSystems.Add(jl);
+                        sysMN.JumpableSystems.Add(jl);
                     }
                 }
             }
+
+ 
         }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)
