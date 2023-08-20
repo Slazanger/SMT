@@ -1,8 +1,9 @@
-﻿using Dock.Model.Mvvm.Controls;
-using SMT.EVEData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Avalonia.Threading;
+using Dock.Model.Mvvm.Controls;
+using SMT.EVEData;
 
 namespace SMTx.ViewModels.Tools
 {
@@ -33,6 +34,45 @@ namespace SMTx.ViewModels.Tools
         public GameLogFeedViewModel()
         {
             GameLogData = new ObservableCollection<GameLogData>();
+            EveManager.Instance.GameLogAddedEvent += EM_GameLogAddedEvent;
+        }
+
+        private void EM_GameLogAddedEvent(List<GameLogData> gll)
+        {
+            Dispatcher.UIThread.Invoke((Action)(() =>
+            {
+                List<GameLogData> removeList = new List<GameLogData>();
+                List<GameLogData> addList = new List<GameLogData>();
+
+                // remove old
+
+                if (GameLogData.Count > 50)
+                {
+                    foreach (GameLogData gl in GameLogData)
+                    {
+                        if (!gll.Contains(gl))
+                        {
+                            removeList.Add(gl);
+                        }
+                    }
+
+                    foreach (GameLogData gl in removeList)
+                    {
+                        GameLogData.Remove(gl);
+                    }
+                }
+
+
+
+                // add new
+                foreach (GameLogData gl in gll)
+                {
+                    if (!GameLogData.Contains(gl))
+                    {
+                        GameLogData.Insert(0, gl);
+                    }
+                }
+            }), DispatcherPriority.Normal);
         }
 
         public GameLogFeedViewModel(IEnumerable<GameLogData> gameLogData)
