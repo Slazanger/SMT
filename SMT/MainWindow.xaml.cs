@@ -1986,7 +1986,7 @@ namespace SMT
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
-            string infoObjectsFile = EveAppConfig.StorageRoot + @"\InfoObjects.txt";
+            string infoObjectsFile = Path.Combine(EveAppConfig.StorageRoot, "InfoObjects.txt");
             if (File.Exists(infoObjectsFile))
             {
                 StreamReader file = new StreamReader(infoObjectsFile);

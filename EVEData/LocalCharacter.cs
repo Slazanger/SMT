@@ -1120,7 +1120,8 @@ namespace SMT.EVEData
                 }
 
                 // get the character portrait
-                string characterPortrait = EveManager.Instance.SaveDataRootFolder + "\\Portraits\\" + ID;
+                string portraitRoot = Path.Combine(EveManager.Instance.SaveDataRootFolder, "Portraits");
+                string characterPortrait = Path.Combine(portraitRoot, ID.ToString());
                 if (!File.Exists(characterPortrait))
                 {
                     ESI.NET.EsiResponse<ESI.NET.Models.Images> esri = await esiClient.Character.Portrait((int)ID);

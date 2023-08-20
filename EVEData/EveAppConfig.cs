@@ -2,14 +2,13 @@
 // EVE App Config
 //-----------------------------------------------------------------------
 
+using System.IO;
+
 namespace SMT.EVEData
 {
     public class EveAppConfig
     {
-        /// <summary>
-        /// Client ID from the EVE Developer setup
-        /// </summary>
-        public const string ClientID = "Client ID here";
+        #region Fields
 
         /// <summary>
         /// Callback URL for eve
@@ -17,9 +16,9 @@ namespace SMT.EVEData
         public const string CallbackURL = @"http://localhost:8762/callback/";
 
         /// <summary>
-        /// SMT Version
+        /// Client ID from the EVE Developer setup
         /// </summary>
-        public const string SMT_VERSION = "SMT_121";
+        public const string ClientID = "ID Goes here.. ";
 
         /// <summary>
         /// SMT Version Tagline
@@ -27,13 +26,21 @@ namespace SMT.EVEData
         public const string SMT_TITLE = "Hydrated Chromium Oxide";
 
         /// <summary>
-        /// Folder to store all of the data from
+        /// SMT Version
         /// </summary>
-        public static readonly string StorageRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SMT\";
+        public const string SMT_VERSION = "SMT_121";
 
         /// <summary>
         /// Folder to store all of the data from
         /// </summary>
-        public static readonly string VersionStorage = StorageRoot + $"{SMT_VERSION}\\";
+        public static readonly string StorageRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SMT");
+
+        /// <summary>
+        /// Folder to store all of the data from
+        /// </summary>
+        public static readonly string VersionStorage = Path.Combine(StorageRoot, $"{SMT_VERSION}");
+
+
+        #endregion Fields
     }
 }
