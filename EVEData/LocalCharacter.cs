@@ -1,9 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Xml.Serialization;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
-using EVEDataUtils;
 
 namespace SMT.EVEData
 {
@@ -22,8 +20,6 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public bool warningSystemsNeedsUpdate;
 
-
-
         /// <summary>
         /// Ship Decloak Event Handler
         /// </summary>
@@ -33,8 +29,6 @@ namespace SMT.EVEData
         /// Ship Decloaked
         /// </summary>
         public event RouteUpdatedEventHandler RouteUpdatedEvent;
-
-
 
         private bool esiRouteNeedsUpdate;
 
@@ -62,9 +56,6 @@ namespace SMT.EVEData
         private bool routeNeedsUpdate = false;
 
         private int ssoErrorCount = 0;
-
-
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
@@ -187,11 +178,10 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public Fleet FleetInfo { get; set; }
 
-
         /// <summary>
         /// Fleet Updated Event Handler
         /// </summary>
-        public delegate void FleetUpdatedHandler( LocalCharacter fleetOwner);
+        public delegate void FleetUpdatedHandler(LocalCharacter fleetOwner);
 
         /// <summary>
         /// Fleet Updated Events
@@ -613,7 +603,6 @@ namespace SMT.EVEData
                     {
                         RouteUpdatedEvent();
                     }
-
                 }
 
                 if (warningSystemsNeedsUpdate)
@@ -957,9 +946,9 @@ namespace SMT.EVEData
                     }
                 }
 
-                if(sendFleetUpdatedEvent)
+                if (sendFleetUpdatedEvent)
                 {
-                    if(FleetUpdatedEvent!=null)
+                    if (FleetUpdatedEvent != null)
                     {
                         FleetUpdatedEvent(this);
                     }

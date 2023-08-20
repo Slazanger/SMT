@@ -1,8 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // ZKillboard ReDisQ feed
 //-----------------------------------------------------------------------
-using System.Timers;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Timer = System.Timers.Timer;
 
@@ -21,7 +19,6 @@ namespace SMT.EVEData
         /// </summary>
         public List<ZKBDataSimple> KillStream { get; set; }
 
-
         /// <summary>
         /// Kills Added Event Handler
         /// </summary>
@@ -31,7 +28,6 @@ namespace SMT.EVEData
         /// Kills Added Events
         /// </summary>
         public event KillsAddedHandler KillsAddedEvent;
-
 
         public int KillExpireTimeMinutes { get; set; }
 
@@ -72,7 +68,6 @@ namespace SMT.EVEData
             }
             else
             {
-
             }
         }
 
@@ -132,16 +127,12 @@ namespace SMT.EVEData
                 {
                     KillsAddedEvent();
                 }
-
             }
             else
             {
                 // no killmail, wait 10s
                 Thread.Sleep(10000);
             }
-
-
-
 
             e.Result = 0;
         }
@@ -178,9 +169,9 @@ namespace SMT.EVEData
                 EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
             }
 
-            if(updatedKillList)
+            if (updatedKillList)
             {
-                // kills are coming in so fast that this is redundant                    
+                // kills are coming in so fast that this is redundant
                 if (KillsAddedEvent != null)
                 {
                     KillsAddedEvent();

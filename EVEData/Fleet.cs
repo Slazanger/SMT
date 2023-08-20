@@ -2,8 +2,6 @@
 // Fleet
 //-----------------------------------------------------------------------
 
-using System.Collections.ObjectModel;
-
 namespace SMT.EVEData
 {
     /// <summary>
@@ -26,10 +24,6 @@ namespace SMT.EVEData
             FleetMOTD = string.Empty;
             Members = new List<FleetMember>();
         }
-
-
-
-
 
         /// <summary>
         /// Gets or sets the fleet id used in all ESI Fleet operations

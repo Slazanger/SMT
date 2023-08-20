@@ -40,7 +40,6 @@
                                                 <Binding Path="MinimizeToTray" Converter="{StaticResource NegateBooleanConverter}" />
                                             </CheckBox.IsEnabled>
                                         </CheckBox>
-
                                     </StackPanel>
                                 </GroupBox>
 
@@ -153,7 +152,7 @@
                                 <StackPanel>
 
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window"/>
+                                    <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window" />
                                     <StackPanel Orientation="Vertical" Margin="0,2">
                                         <Label Content="Warning Sound Volume" />
                                         <Slider x:Name="intelVolumeSlider" Value="{Binding Path=IntelSoundVolume}" Minimum="0" Maximum="1" TickFrequency="0.1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />

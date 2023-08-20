@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
-using Timer = System.Timers.Timer;
 using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
+using Timer = System.Timers.Timer;
 
 namespace SMT.EVEData
 {
@@ -16,12 +16,10 @@ namespace SMT.EVEData
             // EVE Time is basically UTC time
             ServerTime = DateTime.UtcNow;
 
-
             Timer timer = new Timer(10000);
             timer.Elapsed += new ElapsedEventHandler(UpdateServerTime); ;
             timer.AutoReset = true;
             timer.Enabled = true;
-
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

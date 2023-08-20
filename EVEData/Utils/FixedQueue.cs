@@ -1,8 +1,6 @@
-﻿using System.Collections.Specialized;
-
-namespace EVEDataUtils
+﻿namespace EVEDataUtils
 {
-    public class FixedQueue<T> : List<T> 
+    public class FixedQueue<T> : List<T>
     {
         private int sizeLimit = 0;
 

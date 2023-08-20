@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace SMT.EVEData
+﻿namespace SMT.EVEData
 {
     public class JumpRoute
     {
@@ -22,8 +20,6 @@ namespace SMT.EVEData
             WayPoints = new List<string>();
             AvoidSystems = new List<string>();
             AlternateMids = new Dictionary<string, List<string>>();
-
-
         }
 
         public void Recalculate()

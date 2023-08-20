@@ -653,12 +653,10 @@ namespace SMT
             EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
 
-
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.SelectedItem = null;
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
-
 
             DynamicMapElements = new List<UIElement>();
             DynamicMapElementsRangeMarkers = new List<UIElement>();
@@ -690,12 +688,8 @@ namespace SMT
 
             DataContext = this;
 
-
-
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
             SystemDropDownAC.ItemsSource = newList;
-            
-
 
             PropertyChanged += MapObjectChanged;
         }

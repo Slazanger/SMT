@@ -2,7 +2,6 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Numerics;
 using System.Text;
@@ -102,13 +101,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Intel Updated Event Handler
         /// </summary>
-        public delegate void IntelUpdatedEventHandler(List<IntelData> idl );
+        public delegate void IntelUpdatedEventHandler(List<IntelData> idl);
 
         /// <summary>
         /// Intel Updated Event
         /// </summary>
         public event IntelUpdatedEventHandler IntelUpdatedEvent;
-
 
         /// <summary>
         /// GameLog Added Event Handler
@@ -119,7 +117,6 @@ namespace SMT.EVEData
         /// Intel Added Event
         /// </summary>
         public event GameLogAddedEventHandler GameLogAddedEvent;
-
 
         /// <summary>
         /// Ship Decloak Event Handler
@@ -171,7 +168,6 @@ namespace SMT.EVEData
 
         public string EVELogFolder { get; set; }
 
-
         /// <summary>
         /// Sov Campaign Updated Event Handler
         /// </summary>
@@ -181,7 +177,6 @@ namespace SMT.EVEData
         /// Sov Campaign updated Added Events
         /// </summary>
         public event SovCampaignUpdatedHandler SovUpdateEvent;
-
 
         /// <summary>
         /// Thera Connections Updated Event Handler
@@ -193,7 +188,6 @@ namespace SMT.EVEData
         /// </summary>
         public event TheraUpdatedHandler TheraUpdateEvent;
 
-
         /// <summary>
         /// Storms Updated Event Handler
         /// </summary>
@@ -204,7 +198,6 @@ namespace SMT.EVEData
         /// </summary>
         public event StormsUpdatedHandler StormsUpdateEvent;
 
-
         /// <summary>
         /// Local Characters Updated Event Handler
         /// </summary>
@@ -214,9 +207,6 @@ namespace SMT.EVEData
         /// Local Characters Updated Events
         /// </summary>
         public event LocalCharactersUpdatedHandler LocalCharacterUpdateEvent;
-
-
-
 
         public List<SOVCampaign> ActiveSovCampaigns { get; set; }
 
@@ -261,7 +251,6 @@ namespace SMT.EVEData
         /// Gets or sets the current list of Jump Bridges
         /// </summary>
         public List<JumpBridge> JumpBridges { get; set; }
-
 
         /// <summary>
         /// Gets or sets the list of Characters we are tracking
@@ -1355,11 +1344,9 @@ namespace SMT.EVEData
             // cache the navigation data
             SerializableDictionary<string, List<string>> jumpRangeCache = Navigation.CreateStaticNavigationCache(Systems);
 
-
             // now serialise the classes to disk
 
             string saveDataFolder = outputFolder + @"\data\";
-
 
             Serialization.SerializeToDisk<SerializableDictionary<string, List<string>>>(jumpRangeCache, saveDataFolder + @"\JumpRangeCache.dat");
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
@@ -1571,7 +1558,7 @@ namespace SMT.EVEData
                 esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
                 LocalCharacters.Add(esiChar);
 
-                if(LocalCharacterUpdateEvent != null)
+                if (LocalCharacterUpdateEvent != null)
                 {
                     LocalCharacterUpdateEvent();
                 }
@@ -1591,11 +1578,11 @@ namespace SMT.EVEData
         {
             SerializableDictionary<string, List<string>> jumpRangeCache;
 
-            string JRC = AppDomain.CurrentDomain.BaseDirectory +@"\data\JumpRangeCache.dat";
+            string JRC = AppDomain.CurrentDomain.BaseDirectory + @"\data\JumpRangeCache.dat";
 
             if (!File.Exists(JRC))
             {
-                throw new NotImplementedException();    
+                throw new NotImplementedException();
             }
             jumpRangeCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, List<string>>>(JRC);
             Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges, jumpRangeCache);
@@ -1611,7 +1598,6 @@ namespace SMT.EVEData
             Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
             Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
             ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
-
 
             foreach (System s in Systems)
             {
@@ -1829,7 +1815,7 @@ namespace SMT.EVEData
         {
             IntelDataList = new FixedQueue<IntelData>();
             IntelDataList.SetSizeLimit(50);
-            
+
             IntelFilters = new List<string>();
 
             string intelFileFilter = SaveDataRootFolder + @"\IntelChannels.txt";
@@ -2147,8 +2133,7 @@ namespace SMT.EVEData
                 return;
             }
 
-
-            if(TheraUpdateEvent != null) 
+            if (TheraUpdateEvent != null)
             {
                 TheraUpdateEvent();
             }
@@ -2185,7 +2170,7 @@ namespace SMT.EVEData
 
                 s.StrongArea = strongArea;
             }
-            if (StormsUpdateEvent!=null)
+            if (StormsUpdateEvent != null)
             {
                 StormsUpdateEvent();
             }
@@ -2471,7 +2456,6 @@ namespace SMT.EVEData
             bool processFile = false;
             bool localChat = false;
 
-
             // check if the changed file path contains the name of a channel we're looking for
             foreach (string intelFilterStr in IntelFilters)
             {
@@ -2551,7 +2535,7 @@ namespace SMT.EVEData
                                     if (addChar)
                                     {
                                         LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        if(LocalCharacterUpdateEvent != null)
+                                        if (LocalCharacterUpdateEvent != null)
                                         {
                                             LocalCharacterUpdateEvent();
                                         }
@@ -2637,7 +2621,6 @@ namespace SMT.EVEData
                                 addToIntel = false;
                             }
 
-                            
                             if (addToIntel)
                             {
                                 EVEData.IntelData id = new EVEData.IntelData(line, channelName);
@@ -2822,7 +2805,7 @@ namespace SMT.EVEData
                     };
 
                     GameLogList.Enqueue(gd);
-                    if(GameLogAddedEvent != null)
+                    if (GameLogAddedEvent != null)
                     {
                         GameLogAddedEvent(GameLogList);
                     }
@@ -2895,7 +2878,7 @@ namespace SMT.EVEData
 
                     LocalCharacters.Add(c);
 
-                    if(LocalCharacterUpdateEvent != null)
+                    if (LocalCharacterUpdateEvent != null)
                     {
                         LocalCharacterUpdateEvent();
                     }
@@ -3091,7 +3074,6 @@ namespace SMT.EVEData
             {
                 bool sendUpdateEvent = false;
 
-
                 foreach (SOVCampaign sc in ActiveSovCampaigns)
                 {
                     sc.Valid = false;
@@ -3146,7 +3128,7 @@ namespace SMT.EVEData
                             sendUpdateEvent = true;
                         }
 
-                        if(ss.AttackersScore != c.AttackersScore || ss.DefendersScore != c.DefenderScore )
+                        if (ss.AttackersScore != c.AttackersScore || ss.DefendersScore != c.DefenderScore)
                         {
                             sendUpdateEvent = true;
                         }
@@ -3203,14 +3185,13 @@ namespace SMT.EVEData
                     }
                 }
 
-                if(sendUpdateEvent)
+                if (sendUpdateEvent)
                 {
-                    if(SovUpdateEvent != null)
+                    if (SovUpdateEvent != null)
                     {
                         SovUpdateEvent();
                     }
                 }
-
             }
             catch { }
         }
@@ -3321,7 +3302,7 @@ namespace SMT.EVEData
         {
             LocalCharacters.Remove(lc);
 
-            if(LocalCharacterUpdateEvent != null)
+            if (LocalCharacterUpdateEvent != null)
             {
                 LocalCharacterUpdateEvent();
             }
