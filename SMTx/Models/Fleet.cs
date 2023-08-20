@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SMTx.Models
 {
-    internal class Anoms
+    internal class Fleet
     {
     }
 }

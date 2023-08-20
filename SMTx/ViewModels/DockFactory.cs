@@ -9,6 +9,7 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
+using SMTx.Models;
 
 namespace SMTx.ViewModels;
 
@@ -138,19 +139,17 @@ public class DockFactory : Factory
             ["SimpleRegionsID"] = () => new SimpleRegionsViewModel(),
 
 
-            ["AnomsID"] = () => new AnomsViewModel(),
-            ["CharactersID"] = () => new CharactersViewModel(),
-            ["FleetID"] = () => new FleetViewModel(),
-            ["GameLogFeedID"] = () => new GameLogFeedViewModel(),
-            ["IntelFeedID"] = () => new IntelFeedViewModel(),
-            ["JumpGateNetworkID"] = () => new JumpGateNetworkViewModel(),
-            ["JumpRoutePlannerID"] = () => new JumpRoutePlannerViewModel(),
-            ["RouteID"] = () => new RouteViewModel(),
-            ["SovCampaignsID"] = () => new SOVCampaignsViewModel(),
-            ["StormsID"] = () => new StormsViewModel(),
-            ["TheraID"] = () => new TheraViewModel(),
-            ["ZKillFeedID"] = () => new ZKillFeedViewModel(),
-
+            ["AnomsID"] = () => new Anoms(),
+            ["FleetID"] = () => new Fleet(),
+            ["GameLogFeedID"] = () => new GameLogFeed(),
+            ["IntelFeedID"] = () => new IntelFeed(),
+            ["JumpGateNetworkID"] = () => new JumpGateNetwork(),
+            ["JumpRoutePlannerID"] = () => new JumpRoutePlanner(),
+            ["RouteID"] = () => new Route(),
+            ["SovCampaignsID"] = () => new SOVCampaigns(),
+            ["StormsID"] = () => new Storms(),
+            ["TheraID"] = () => new Thera(),
+            ["ZKillFeedID"] = () => new ZkillFeed(),
 
             ["Dashboard"] = () => layout,
             ["Home"] = () => _context

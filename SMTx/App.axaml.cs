@@ -1,9 +1,13 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using SMT.EVEData;
 using SMTx.Themes;
 using SMTx.ViewModels;
 using SMTx.Views;
+
+
+
 
 namespace SMTx;
 
@@ -11,8 +15,30 @@ public class App : Application
 {
     public static IThemeManager? ThemeManager;
 
+
+    public EveManager EVEManager { get; set; }
+
+    private void CreateEVEManager()
+    {
+
+        EVEManager = new EveManager(EveAppConfig.SMT_VERSION);
+        EveManager.Instance = EVEManager;
+
+        EVEManager.LoadFromDisk();
+        EVEManager.SetupIntelWatcher();
+        EVEManager.SetupGameLogWatcher();
+        EVEManager.SetupLogFileTriggers();
+        EVEManager.LoadJumpBridgeData();
+        EVEManager.UpdateESIUniverseData();
+        EVEManager.InitNavigation();
+        EVEManager.UpdateMetaliminalStorms();
+    }
+
+
+
     public override void Initialize()
     {
+        CreateEVEManager();
         ThemeManager = new FluentThemeManager();
         ThemeManager.Initialize(this);
 
@@ -22,8 +48,6 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // DockManager.s_enableSplitToWindow = true;
-
         var mainWindowViewModel = new MainWindowViewModel();
 
         switch (ApplicationLifetime)
