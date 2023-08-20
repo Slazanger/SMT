@@ -1,16 +1,36 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:vm="using:SMTx.ViewModels.Tools"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+<UserControl
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:vm="using:SMTx.ViewModels.Tools"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
 			 x:DataType="vm:GameLogFeedViewModel"
              x:Class="SMTx.Views.Tools.GameLogFeedView">
-	<Grid Focusable="True">
-		<StackPanel>
-			<TextBlock Text="{Binding Id}"/>
-			<TextBlock Text="{Binding Title}"/>
-			<TextBlock Text="{Binding Context}"/>
-		</StackPanel>
+	<Grid Focusable="True" HorizontalAlignment="Stretch" >
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+		<ScrollViewer
+			  Grid.Row="0"
+			  HorizontalScrollBarVisibility="Disabled"
+			  HorizontalAlignment="Stretch"
+			  VerticalScrollBarVisibility="Auto">
+			<StackPanel HorizontalAlignment="Stretch">
+				<ItemsControl ItemsSource="{Binding GameLogData}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<DockPanel Margin="5">
+								<SelectableTextBlock Foreground="Cyan" Padding="0,0,5,0" Text="{Binding Character, FallbackValue='', StringFormat='{}[{0}]'}" FontSize="{Binding $parent[UserControl].DataContext.TextSize, FallbackValue=12, Mode=OneWay}" VerticalAlignment="Top" />
+								<SelectableTextBlock Foreground="Yellow" Padding="0,0,5,0" Text="{Binding Time, StringFormat='{}{0:HH:mm}'}" FontSize="{Binding $parent[UserControl].DataContext.TextSize, FallbackValue=12, Mode=OneWay}" TextWrapping="Wrap" VerticalAlignment="Top" />
+								<SelectableTextBlock Foreground="White" Text="{Binding Text}" FontSize="{Binding $parent[UserControl].DataContext.TextSize, FallbackValue=12, Mode=OneWay}" TextWrapping="WrapWithOverflow" VerticalAlignment="Top" />
+							</DockPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
+		</ScrollViewer>
+		<Button Content="Clear GameLog" Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" x:Name="ClearGameLogBtn" Command="{Binding ClearGameLog}" />
 	</Grid>
 </UserControl>
