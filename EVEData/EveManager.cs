@@ -1352,10 +1352,16 @@ namespace SMT.EVEData
                 }
             }
 
+            // cache the navigation data
+            SerializableDictionary<string, List<string>> jumpRangeCache = Navigation.CreateStaticNavigationCache(Systems);
+
+
             // now serialise the classes to disk
 
             string saveDataFolder = outputFolder + @"\data\";
 
+
+            Serialization.SerializeToDisk<SerializableDictionary<string, List<string>>>(jumpRangeCache, saveDataFolder + @"\JumpRangeCache.dat");
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
@@ -1583,7 +1589,16 @@ namespace SMT.EVEData
 
         public void InitNavigation()
         {
-            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges);
+            SerializableDictionary<string, List<string>> jumpRangeCache;
+
+            string JRC = AppDomain.CurrentDomain.BaseDirectory +@"\data\JumpRangeCache.dat";
+
+            if (!File.Exists(JRC))
+            {
+                throw new NotImplementedException();    
+            }
+            jumpRangeCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, List<string>>>(JRC);
+            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges, jumpRangeCache);
         }
 
         /// <summary>
@@ -1596,6 +1611,7 @@ namespace SMT.EVEData
             Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\MapLayout.dat");
             Systems = Serialization.DeserializeFromDisk<List<System>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\Systems.dat");
             ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(AppDomain.CurrentDomain.BaseDirectory + @"\data\ShipTypes.dat");
+
 
             foreach (System s in Systems)
             {
