@@ -17,6 +17,9 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.48" /> 
   </ItemGroup>
 	<ItemGroup>
+	  <None Update="data\JumpRangeCache.dat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="data\MapLayout.dat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
