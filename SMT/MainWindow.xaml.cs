@@ -1227,25 +1227,36 @@ namespace SMT
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
-                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                                ToastContentBuilder tb = new ToastContentBuilder();
-                                tb.AddText("SMT Alert");
-                                tb.AddText("Character : " + character + "(" + lc.Location + ")");
-
-                                // add the character portrait if we have one
-                                if (lc.PortraitLocation != null)
+                                try
                                 {
-                                    tb.AddInlineImage(lc.PortraitLocation);
+                                  // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                  ToastContentBuilder tb = new ToastContentBuilder();
+                                  tb.AddText("SMT Alert");
+                                  tb.AddText("Character : " + character + "(" + lc.Location + ")");
+
+                                  // add the character portrait if we have one
+                                  if (lc.PortraitLocation != null)
+                                  {
+                                      tb.AddInlineImage(lc.PortraitLocation);
+                                  }
+
+                                  tb.AddText(text);
+                                  tb.AddArgument("character", character);
+                                  tb.SetToastScenario(ToastScenario.Alarm);
+                                  tb.SetToastDuration(ToastDuration.Long);
+                                  Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                  tb.AddAudio(woopUri);
+                                  tb.Show();
                                 }
 
-                                tb.AddText(text);
-                                tb.AddArgument("character", character);
-                                tb.SetToastScenario(ToastScenario.Alarm);
-                                tb.SetToastDuration(ToastDuration.Long);
-                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                                tb.AddAudio(woopUri);
-                                tb.Show();
-                            }), DispatcherPriority.Normal, null);
+                                catch
+                                {
+                                    // sometimes caused by this : 
+                                    // https://github.com/CommunityToolkit/WindowsCommunityToolkit/issues/4858
+                                }
+
+                          }), DispatcherPriority.Normal, null);
+
                         }
                     }
 
@@ -1266,24 +1277,33 @@ namespace SMT
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
-                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                                ToastContentBuilder tb = new ToastContentBuilder();
-                                tb.AddText("SMT Alert");
-                                tb.AddText("Character : " + character + "(" + lc.Location + ")");
-
-                                // add the character portrait if we have one
-                                if (lc.PortraitLocation != null)
+                                try
                                 {
-                                    tb.AddInlineImage(lc.PortraitLocation);
+                                    // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                    ToastContentBuilder tb = new ToastContentBuilder();
+                                    tb.AddText("SMT Alert");
+                                    tb.AddText("Character : " + character + "(" + lc.Location + ")");
+
+                                    // add the character portrait if we have one
+                                    if (lc.PortraitLocation != null)
+                                    {
+                                        tb.AddInlineImage(lc.PortraitLocation);
+                                    }
+
+                                    tb.AddText(text);
+                                    tb.AddArgument("character", character);
+                                    tb.SetToastScenario(ToastScenario.Alarm);
+                                    tb.SetToastDuration(ToastDuration.Long);
+                                    Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                    tb.AddAudio(woopUri);
+                                    tb.Show();
+                                }
+                                catch
+                                {
+                                    // sometimes caused by this : 
+                                    // https://github.com/CommunityToolkit/WindowsCommunityToolkit/issues/4858
                                 }
 
-                                tb.AddText(text);
-                                tb.AddArgument("character", character);
-                                tb.SetToastScenario(ToastScenario.Alarm);
-                                tb.SetToastDuration(ToastDuration.Long);
-                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                                tb.AddAudio(woopUri);
-                                tb.Show();
                             }), DispatcherPriority.Normal, null);
                         }
                     }
