@@ -1829,7 +1829,7 @@ namespace SMT.EVEData
         public void SetupIntelWatcher()
         {
             IntelDataList = new FixedQueue<IntelData>();
-            IntelDataList.SetSizeLimit(50);
+            IntelDataList.SetSizeLimit(250);
 
             IntelFilters = new List<string>();
 

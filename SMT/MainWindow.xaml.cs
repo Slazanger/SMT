@@ -1129,7 +1129,7 @@ namespace SMT
 
                 // remove old
 
-                if (IntelCache.Count > 50)
+                if (IntelCache.Count >= 250)
                 {
                     foreach (IntelData id in IntelCache)
                     {
