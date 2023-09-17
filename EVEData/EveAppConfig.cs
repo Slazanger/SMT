@@ -23,12 +23,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "Hydrated Chromium Oxide";
+        public const string SMT_TITLE = "Status ? Best not to ask..";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_123";
+        public const string SMT_VERSION = "SMT_124";
 
         /// <summary>
         /// Folder to store all of the data from
