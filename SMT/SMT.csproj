@@ -180,7 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dirkster.AvalonDock.Themes.Expression">
-      <Version>4.72.0</Version>
+      <Version>4.72.1</Version>
     </PackageReference>
     <PackageReference Include="DotNetKit.Wpf.AutoCompleteComboBox">
       <Version>1.6.0</Version>
