@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Transactions;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
@@ -2638,25 +2639,26 @@ namespace SMT.EVEData
                                 addToIntel = false;
                             }
 
+                            foreach (String ignoreMarker in IntelIgnoreFilters)
+                            {
+                                if (line.IndexOf(ignoreMarker, StringComparison.OrdinalIgnoreCase) != -1)
+                                {
+                                    addToIntel = false;
+                                    break;
+                                }
+                            }
+
+
                             if (addToIntel)
                             {
                                 EVEData.IntelData id = new EVEData.IntelData(line, channelName);
+
 
                                 foreach (string s in id.IntelString.Split(' '))
                                 {
                                     if (s == "" || s.Length < 3)
                                     {
                                         continue;
-                                    }
-
-                                    // check if we should ignore this message (maybe we could put this before every other checks ?)
-                                    foreach (String ignoreMarker in IntelIgnoreFilters)
-                                    {
-                                        if (ignoreMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            // do not even add to the intel list
-                                            return;
-                                        }
                                     }
 
                                     foreach (String clearMarker in IntelClearFilters)
@@ -2682,6 +2684,7 @@ namespace SMT.EVEData
                                 {
                                     IntelUpdatedEvent(IntelDataList);
                                 }
+
                             }
                         }
 
