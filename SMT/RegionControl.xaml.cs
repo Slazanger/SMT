@@ -2797,7 +2797,7 @@ namespace SMT
                     }
                 }
 
-                long SystemAlliance = 0;
+                int SystemAlliance = 0;
 
                 if (MapConf.SOVBasedITCU)
                 {
@@ -3144,7 +3144,7 @@ namespace SMT
 
                 Thickness p = new Thickness(1);
 
-                foreach (long allianceID in AlliancesKeyList)
+                foreach (int allianceID in AlliancesKeyList)
                 {
                     string allianceName = EM.GetAllianceName(allianceID);
                     string allianceTicker = EM.GetAllianceTicker(allianceID);

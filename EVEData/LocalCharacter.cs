@@ -859,7 +859,7 @@ namespace SMT.EVEData
 
                 if (FleetInfo.FleetID != 0 && FleetInfo.IsFleetBoss)
                 {
-                    List<long> characterIDsToResolve = new List<long>();
+                    List<int> characterIDsToResolve = new List<int>();
 
                     ESI.NET.EsiResponse<List<ESI.NET.Models.Fleets.Member>> esrf = await esiClient.Fleets.Members(FleetInfo.FleetID);
                     if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Fleets.Member>>(esrf))
@@ -971,7 +971,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            List<long> AllianceToResolve = new List<long>();
+            List<int> AllianceToResolve = new List<int>();
 
             try
             {
