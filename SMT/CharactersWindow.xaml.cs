@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
+using SMT.EVEData;
+using System.Windows.Threading;
 
 namespace SMT
 {
@@ -21,7 +24,11 @@ namespace SMT
 
         private void EVEManager_LocalCharacterUpdateEvent()
         {
-            characterLV.Items.Refresh();
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                characterLV.Items.Refresh();
+            }), DispatcherPriority.Normal);
+
         }
 
         private void characterLV_Selected(object sender, RoutedEventArgs e)

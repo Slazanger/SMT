@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using SMT.EVEData;
 using SMT.ResourceUsage;
 
@@ -835,7 +836,12 @@ namespace SMT
             //                ActiveCharacter.UpdateStructureInfoForRegion2(regionName);
             //            }
 
-            ReDrawMap(true);
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                ReDrawMap(true);
+            }), DispatcherPriority.Normal);
+
+
 
             // select the item in the dropdown
             RegionSelectCB.SelectedItem = Region;
@@ -2199,7 +2205,9 @@ namespace SMT
             Brush intelBlobBrush = new SolidColorBrush(MapConf.ActiveColourScheme.IntelOverlayColour);
             Brush intelClearBlobBrush = new SolidColorBrush(MapConf.ActiveColourScheme.IntelClearOverlayColour);
 
-            foreach (EVEData.IntelData id in EM.IntelDataList)
+
+            //The tolist creates a temporary copy; however this is updated on a second thread
+            foreach (EVEData.IntelData id in EM.IntelDataList.ToList())
             {
                 foreach (string sysStr in id.Systems)
                 {
@@ -2789,7 +2797,7 @@ namespace SMT
                     }
                 }
 
-                long SystemAlliance = 0;
+                int SystemAlliance = 0;
 
                 if (MapConf.SOVBasedITCU)
                 {
@@ -3136,7 +3144,7 @@ namespace SMT
 
                 Thickness p = new Thickness(1);
 
-                foreach (long allianceID in AlliancesKeyList)
+                foreach (int allianceID in AlliancesKeyList)
                 {
                     string allianceName = EM.GetAllianceName(allianceID);
                     string allianceTicker = EM.GetAllianceTicker(allianceID);
@@ -3300,7 +3308,11 @@ namespace SMT
 
         private void MapObjectChanged(object sender, PropertyChangedEventArgs e)
         {
-            ReDrawMap(true);
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                ReDrawMap(true);
+            }), DispatcherPriority.Normal);
+
         }
 
         /// <summary>
@@ -4013,7 +4025,11 @@ namespace SMT
                 }
             }
 
-            ReDrawMap(false);
+
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                ReDrawMap(false);
+            }), DispatcherPriority.Normal);
         }
 
         private struct GateHelper

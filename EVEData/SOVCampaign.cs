@@ -35,7 +35,7 @@ namespace SMT.EVEData
         }
 
         public int CampaignID { get; set; }
-        public long DefendingAllianceID { get; set; }
+        public int DefendingAllianceID { get; set; }
         public string DefendingAllianceName { get; set; }
         public string System { get; set; }
         public string Region { get; set; }

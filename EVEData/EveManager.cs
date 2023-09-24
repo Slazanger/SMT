@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Transactions;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
@@ -91,9 +92,9 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(characterSaveFolder);
             }
 
-            CharacterIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToTicker = new SerializableDictionary<long, string>();
+            CharacterIDToName = new SerializableDictionary<int, string>();
+            AllianceIDToName = new SerializableDictionary<int, string>();
+            AllianceIDToTicker = new SerializableDictionary<int, string>();
             NameToSystem = new Dictionary<string, System>();
             IDToSystem = new Dictionary<long, System>();
 
@@ -216,12 +217,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
-        public SerializableDictionary<long, string> AllianceIDToName { get; set; }
+        public SerializableDictionary<int, string> AllianceIDToName { get; set; }
 
         /// <summary>
         /// Gets or sets the Alliance ID to Alliance Ticker dictionary
         /// </summary>
-        public SerializableDictionary<long, string> AllianceIDToTicker { get; set; }
+        public SerializableDictionary<int, string> AllianceIDToTicker { get; set; }
 
         /// <summary>
         /// Gets or sets the character cache
@@ -232,7 +233,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
-        public SerializableDictionary<long, string> CharacterIDToName { get; set; }
+        public SerializableDictionary<int, string> CharacterIDToName { get; set; }
 
         public List<Coalition> Coalitions { get; set; }
 
@@ -1376,7 +1377,7 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="id">Alliance ID</param>
         /// <returns>Alliance Name</returns>
-        public string GetAllianceName(long id)
+        public string GetAllianceName(int id)
         {
             string name = string.Empty;
             if (AllianceIDToName.ContainsKey(id))
@@ -1392,7 +1393,7 @@ namespace SMT.EVEData
         /// </summary>
         /// <param name="id">Alliance ID</param>
         /// <returns>Alliance Ticker</returns>
-        public string GetAllianceTicker(long id)
+        public string GetAllianceTicker(int id)
         {
             string ticker = string.Empty;
             if (AllianceIDToTicker.ContainsKey(id))
@@ -1403,7 +1404,7 @@ namespace SMT.EVEData
             return ticker;
         }
 
-        public string GetCharacterName(long id)
+        public string GetCharacterName(int id)
         {
             string name = string.Empty;
             if (CharacterIDToName.ContainsKey(id))
@@ -1619,9 +1620,9 @@ namespace SMT.EVEData
                 SystemIDToName[s.ID] = s.Name;
             }
 
-            CharacterIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToTicker = new SerializableDictionary<long, string>();
+            CharacterIDToName = new SerializableDictionary<int, string>();
+            AllianceIDToName = new SerializableDictionary<int, string>();
+            AllianceIDToTicker = new SerializableDictionary<int, string>();
 
             // patch up any links
             foreach (System s in Systems)
@@ -1688,7 +1689,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Alliance and Ticker data for specified list
         /// </summary>
-        public async Task ResolveAllianceIDs(List<long> IDs)
+        public async Task ResolveAllianceIDs(List<int> IDs)
         {
             if (IDs.Count == 0)
             {
@@ -1696,8 +1697,8 @@ namespace SMT.EVEData
             }
 
             // strip out any ID's we already know..
-            List<long> UnknownIDs = new List<long>();
-            foreach (long l in IDs)
+            List<int> UnknownIDs = new List<int>();
+            foreach (int l in IDs)
             {
                 if (!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l))
                 {
@@ -1741,7 +1742,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the Character ID data for specified list
         /// </summary>
-        public async Task ResolveCharacterIDs(List<long> IDs)
+        public async Task ResolveCharacterIDs(List<int> IDs)
         {
             if (IDs.Count == 0)
             {
@@ -1749,8 +1750,8 @@ namespace SMT.EVEData
             }
 
             // strip out any ID's we already know..
-            List<long> UnknownIDs = new List<long>();
-            foreach (long l in IDs)
+            List<int> UnknownIDs = new List<int>();
+            foreach (int l in IDs)
             {
                 if (!CharacterIDToName.ContainsKey(l))
                 {
@@ -1829,7 +1830,7 @@ namespace SMT.EVEData
         public void SetupIntelWatcher()
         {
             IntelDataList = new FixedQueue<IntelData>();
-            IntelDataList.SetSizeLimit(50);
+            IntelDataList.SetSizeLimit(250);
 
             IntelFilters = new List<string>();
 
@@ -2086,7 +2087,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            List<long> IDToResolve = new List<long>();
+            List<int> IDToResolve = new List<int>();
 
             foreach (KeyValuePair<string, MapSystem> kvp in r.MapSystems)
             {
@@ -2638,25 +2639,26 @@ namespace SMT.EVEData
                                 addToIntel = false;
                             }
 
+                            foreach (String ignoreMarker in IntelIgnoreFilters)
+                            {
+                                if (line.IndexOf(ignoreMarker, StringComparison.OrdinalIgnoreCase) != -1)
+                                {
+                                    addToIntel = false;
+                                    break;
+                                }
+                            }
+
+
                             if (addToIntel)
                             {
                                 EVEData.IntelData id = new EVEData.IntelData(line, channelName);
+
 
                                 foreach (string s in id.IntelString.Split(' '))
                                 {
                                     if (s == "" || s.Length < 3)
                                     {
                                         continue;
-                                    }
-
-                                    // check if we should ignore this message (maybe we could put this before every other checks ?)
-                                    foreach (String ignoreMarker in IntelIgnoreFilters)
-                                    {
-                                        if (ignoreMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            // do not even add to the intel list
-                                            return;
-                                        }
                                     }
 
                                     foreach (String clearMarker in IntelClearFilters)
@@ -2682,6 +2684,7 @@ namespace SMT.EVEData
                                 {
                                     IntelUpdatedEvent(IntelDataList);
                                 }
+
                             }
                         }
 
@@ -3097,7 +3100,7 @@ namespace SMT.EVEData
                     sc.Valid = false;
                 }
 
-                List<long> allianceIDsToResolve = new List<long>();
+                List<int> allianceIDsToResolve = new List<int>();
 
                 ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Campaign>> esr = await ESIClient.Sovereignty.Campaigns();
                 if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Campaign>>(esr))
@@ -3245,7 +3248,7 @@ namespace SMT.EVEData
                             {
                                 if (obj["alliance_id"] != null)
                                 {
-                                    es.SOVAllianceTCU = long.Parse(obj["alliance_id"].ToString());
+                                    es.SOVAllianceTCU = int.Parse(obj["alliance_id"].ToString());
                                 }
                             }
                         }

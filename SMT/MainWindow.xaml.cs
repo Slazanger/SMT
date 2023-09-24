@@ -69,7 +69,7 @@ namespace SMT
             Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
 
             // Load the Dock Manager Layout file
-            string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
+            string dockManagerLayoutName = Path.Combine(EveAppConfig.VersionStorage, "Layout.dat");
             if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
@@ -90,7 +90,7 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = EveAppConfig.VersionStorage + "MapConfig.dat";
+            string mapConfigFileName = Path.Combine(EveAppConfig.VersionStorage, "MapConfig.dat");
 
             if (File.Exists(mapConfigFileName))
             {
@@ -192,7 +192,7 @@ namespace SMT
             // load any custom universe view layout
             // Save any custom map Layout
 
-            string customLayoutFile = EveAppConfig.VersionStorage + "CustomUniverseLayout.txt";
+            string customLayoutFile = Path.Combine(EveAppConfig.VersionStorage, "CustomUniverseLayout.txt");
 
             if (File.Exists(customLayoutFile))
             {
@@ -539,7 +539,7 @@ namespace SMT
         {
             // save off the dockmanager layout
 
-            string dockManagerLayoutName = EveAppConfig.VersionStorage + "Layout.dat";
+            string dockManagerLayoutName = Path.Combine(EveAppConfig.VersionStorage, "Layout.dat");
 
             try
             {
@@ -559,7 +559,7 @@ namespace SMT
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
                 // Save the Map Colours
-                string mapConfigFileName = EveAppConfig.VersionStorage + "MapConfig.dat";
+                string mapConfigFileName = Path.Combine(EveAppConfig.VersionStorage, "MapConfig.dat");
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -581,7 +581,7 @@ namespace SMT
                 }
 
                 // Save any custom map Layout
-                string customLayoutFile = EveAppConfig.VersionStorage + "CustomUniverseLayout.txt";
+                string customLayoutFile = Path.Combine(EveAppConfig.VersionStorage, "CustomUniverseLayout.txt");
 
                 using (TextWriter tw = new StreamWriter(customLayoutFile))
                 {
@@ -1129,7 +1129,7 @@ namespace SMT
 
                 // remove old
 
-                if (IntelCache.Count > 50)
+                if (IntelCache.Count >= 250)
                 {
                     foreach (IntelData id in IntelCache)
                     {
@@ -1227,25 +1227,36 @@ namespace SMT
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
-                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                                ToastContentBuilder tb = new ToastContentBuilder();
-                                tb.AddText("SMT Alert");
-                                tb.AddText("Character : " + character + "(" + lc.Location + ")");
-
-                                // add the character portrait if we have one
-                                if (lc.PortraitLocation != null)
+                                try
                                 {
-                                    tb.AddInlineImage(lc.PortraitLocation);
+                                  // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                  ToastContentBuilder tb = new ToastContentBuilder();
+                                  tb.AddText("SMT Alert");
+                                  tb.AddText("Character : " + character + "(" + lc.Location + ")");
+
+                                  // add the character portrait if we have one
+                                  if (lc.PortraitLocation != null)
+                                  {
+                                      tb.AddInlineImage(lc.PortraitLocation);
+                                  }
+
+                                  tb.AddText(text);
+                                  tb.AddArgument("character", character);
+                                  tb.SetToastScenario(ToastScenario.Alarm);
+                                  tb.SetToastDuration(ToastDuration.Long);
+                                  Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                  tb.AddAudio(woopUri);
+                                  tb.Show();
                                 }
 
-                                tb.AddText(text);
-                                tb.AddArgument("character", character);
-                                tb.SetToastScenario(ToastScenario.Alarm);
-                                tb.SetToastDuration(ToastDuration.Long);
-                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                                tb.AddAudio(woopUri);
-                                tb.Show();
-                            }), DispatcherPriority.Normal, null);
+                                catch
+                                {
+                                    // sometimes caused by this : 
+                                    // https://github.com/CommunityToolkit/WindowsCommunityToolkit/issues/4858
+                                }
+
+                          }), DispatcherPriority.Normal, null);
+
                         }
                     }
 
@@ -1266,24 +1277,33 @@ namespace SMT
                         {
                             Application.Current.Dispatcher.Invoke((Action)(() =>
                             {
-                                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                                ToastContentBuilder tb = new ToastContentBuilder();
-                                tb.AddText("SMT Alert");
-                                tb.AddText("Character : " + character + "(" + lc.Location + ")");
-
-                                // add the character portrait if we have one
-                                if (lc.PortraitLocation != null)
+                                try
                                 {
-                                    tb.AddInlineImage(lc.PortraitLocation);
+                                    // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                                    ToastContentBuilder tb = new ToastContentBuilder();
+                                    tb.AddText("SMT Alert");
+                                    tb.AddText("Character : " + character + "(" + lc.Location + ")");
+
+                                    // add the character portrait if we have one
+                                    if (lc.PortraitLocation != null)
+                                    {
+                                        tb.AddInlineImage(lc.PortraitLocation);
+                                    }
+
+                                    tb.AddText(text);
+                                    tb.AddArgument("character", character);
+                                    tb.SetToastScenario(ToastScenario.Alarm);
+                                    tb.SetToastDuration(ToastDuration.Long);
+                                    Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+                                    tb.AddAudio(woopUri);
+                                    tb.Show();
+                                }
+                                catch
+                                {
+                                    // sometimes caused by this : 
+                                    // https://github.com/CommunityToolkit/WindowsCommunityToolkit/issues/4858
                                 }
 
-                                tb.AddText(text);
-                                tb.AddArgument("character", character);
-                                tb.SetToastScenario(ToastScenario.Alarm);
-                                tb.SetToastDuration(ToastDuration.Long);
-                                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                                tb.AddAudio(woopUri);
-                                tb.Show();
                             }), DispatcherPriority.Normal, null);
                         }
                     }

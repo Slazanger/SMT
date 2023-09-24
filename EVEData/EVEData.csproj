@@ -13,8 +13,8 @@
 
   <ItemGroup>
     <PackageReference Include="DecimalMath.DecimalEx" Version="1.0.2" />
-    <PackageReference Include="ESI.NET" Version="2023.4.15" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.48" /> 
+    <PackageReference Include="ESI.NET" Version="2023.7.15" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.53" /> 
   </ItemGroup>
 	<ItemGroup>
 	  <None Update="data\JumpRangeCache.dat">

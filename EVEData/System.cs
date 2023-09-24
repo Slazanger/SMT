@@ -204,19 +204,19 @@ namespace SMT.EVEData
         /// Gets or sets the name of the alliance holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public long SOVAllianceIHUB { get; set; }
+        public int SOVAllianceIHUB { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the alliance holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public long SOVAllianceTCU { get; set; }
+        public int SOVAllianceTCU { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the corporation holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public long SOVCorp { get; set; }
+        public int SOVCorp { get; set; }
 
         [XmlIgnoreAttribute]
         public float TCUOccupancyLevel { get; set; }

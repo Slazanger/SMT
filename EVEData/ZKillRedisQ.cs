@@ -99,9 +99,9 @@ namespace SMT.EVEData
             {
                 ZKBDataSimple zs = new ZKBDataSimple();
                 zs.KillID = long.Parse(z.Package.KillId.ToString());
-                zs.VictimAllianceID = long.Parse(z.Package.Killmail.Victim.AllianceId.ToString());
-                zs.VictimCharacterID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
-                zs.VictimCorpID = long.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
+                zs.VictimAllianceID = int.Parse(z.Package.Killmail.Victim.AllianceId.ToString());
+                zs.VictimCharacterID = int.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
+                zs.VictimCorpID = int.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
                 zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId);
                 if (zs.SystemName == string.Empty)
                 {
@@ -141,7 +141,7 @@ namespace SMT.EVEData
         {
             bool updatedKillList = false;
 
-            List<long> AllianceIDs = new List<long>();
+            List<int> AllianceIDs = new List<int>();
 
             for (int i = KillStream.Count - 1; i >= 0; i--)
             {
@@ -211,7 +211,7 @@ namespace SMT.EVEData
             /// <summary>
             /// Gets or sets the Victims Alliance ID
             /// </summary>
-            public long VictimAllianceID { get; set; }
+            public int VictimAllianceID { get; set; }
 
             /// <summary>
             /// Gets or sets the Victims Alliance Name
@@ -232,12 +232,12 @@ namespace SMT.EVEData
             /// <summary>
             /// Gets or sets the character ID of the victim
             /// </summary>
-            public long VictimCharacterID { get; set; }
+            public int VictimCharacterID { get; set; }
 
             /// <summary>
             /// Gets or sets the Victim's corp ID
             /// </summary>
-            public long VictimCorpID { get; set; }
+            public int VictimCorpID { get; set; }
 
             public override string ToString()
             {
