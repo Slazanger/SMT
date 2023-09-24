@@ -429,6 +429,8 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Warzone - Amarr vs Minmatar", "", "Faction War", 50, 120, true));
             Regions.Add(new MapRegion("Warzone - Caldari vs Gallente", "", "Faction War", 50, 190, true));
 
+            Regions.Add(new MapRegion("Yasna Zakh", "", string.Empty, 50, 260));
+
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
@@ -706,6 +708,9 @@ namespace SMT.EVEData
 
                     constMap[constID] = constName;
                 }
+
+                // TEMP : Manually add 
+                constMap["20010000"] = "Duzna Kah";
 
                 foreach (System s in Systems)
                 {
@@ -1195,6 +1200,29 @@ namespace SMT.EVEData
             {
                 throw new Exception("Data Creation Error");
             }
+
+
+            // Now add the joveGate Systems
+            string eveStaticDataJoveGates = sourceFolder + @"\data\JoveGates.csv";
+            if (File.Exists(eveStaticDataJoveGates))
+            {
+                StreamReader file = new StreamReader(eveStaticDataJoveGates);
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    System s = GetEveSystem(line);
+                    if (s != null)
+                    {
+                        s.HasJoveGate = true;
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Data Creation Error");
+            }
+
+
 
             // now generate the 2d universe view coordinates
 

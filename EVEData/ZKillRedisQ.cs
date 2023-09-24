@@ -94,6 +94,16 @@ namespace SMT.EVEData
                 return;
             }
 
+            // todo : investigate issues beyond a ban.. the 429 should be handled with the null
+            if (strContent == "Error")
+            {
+                
+                Thread.Sleep(5000);
+
+                e.Result = 0;
+                return;
+            }
+
             ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
             if (z != null && z.Package != null)
             {
