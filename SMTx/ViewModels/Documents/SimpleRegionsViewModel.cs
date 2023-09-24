@@ -4,5 +4,6 @@ namespace SMTx.ViewModels.Documents
 {
     public class SimpleRegionsViewModel : Document
     {
+        
     }
 }

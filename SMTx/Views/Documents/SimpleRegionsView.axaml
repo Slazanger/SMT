@@ -3,14 +3,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:SMTx.ViewModels.Documents"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1600" d:DesignHeight="900"
 			 x:DataType="vm:SimpleRegionsViewModel"
              x:Class="SMTx.Views.Documents.SimpleRegionsView">
-	<Grid Focusable="True">
-		<StackPanel>
-			<TextBlock Text="{Binding Id}"/>
-			<TextBlock Text="{Binding Title}"/>
-			<TextBlock Text="{Binding Context}"/>
-		</StackPanel>
-	</Grid>
+
+    <Viewbox Stretch="Uniform" x:Name="MainRegionsViewBox">
+        <Canvas Focusable="True" x:Name="MainRegionsViewGrid" Width="2100" Height="1600" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+
+        </Canvas>
+	</Viewbox>
 </UserControl>
