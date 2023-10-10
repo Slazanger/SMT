@@ -338,6 +338,11 @@ namespace SMT.EVEData
         public List<string> IntelIgnoreFilters { get; set; }
 
         /// <summary>
+        /// Gets or sets the current list of alerting intel market for intel (eg "pilot538 Maken")
+        /// </summary>
+        public List<string> IntelAlertFilters { get; set; }
+
+        /// <summary>
         /// Gets or sets the Name to System dictionary
         /// </summary>
         private Dictionary<string, System> NameToSystem { get; }
@@ -1849,6 +1854,7 @@ namespace SMT.EVEData
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelChannels.txt"), IntelFilters);
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelClearFilters.txt"), IntelClearFilters);
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelIgnoreFilters.txt"), IntelIgnoreFilters);
+            File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelAlertFilters.txt"), IntelAlertFilters);
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "CynoBeacons.txt"), beaconsToSave);
         }
 
@@ -1925,6 +1931,28 @@ namespace SMT.EVEData
             {
                 // default
                 IntelIgnoreFilters.Add("Status");
+            }
+
+            IntelAlertFilters = new List<string>();
+            string intelAlertFileFilter = Path.Combine(SaveDataRootFolder, "IntelAlertFilters.txt");
+
+            if (File.Exists(intelAlertFileFilter))
+            {
+                StreamReader file = new StreamReader(intelAlertFileFilter);
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    line = line.Trim();
+                    if (!string.IsNullOrEmpty(line))
+                    {
+                        IntelAlertFilters.Add(line);
+                    }
+                }
+            }
+            else
+            {
+                // default, alert on nothing
+                IntelAlertFilters.Add("");
             }
 
             intelFileReadPos = new Dictionary<string, int>();
