@@ -23,7 +23,7 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "Status ? Best not to ask..";
+        public const string SMT_TITLE = "pilot538 BETA";
 
         /// <summary>
         /// SMT Version
