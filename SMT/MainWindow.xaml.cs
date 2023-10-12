@@ -167,6 +167,7 @@ namespace SMT
             EVEManager.UpdateESIUniverseData();
             EVEManager.InitNavigation();
 
+
             EVEManager.UpdateMetaliminalStorms();
 
             EVEManager.LocalCharacterUpdateEvent += LocalCharacters_CollectionChanged;

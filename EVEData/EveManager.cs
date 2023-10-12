@@ -1628,6 +1628,9 @@ namespace SMT.EVEData
             }
             jumpRangeCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, List<string>>>(JRC);
             Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges, jumpRangeCache);
+
+            InitZarzakhConnections();
+
         }
 
         /// <summary>
@@ -2398,6 +2401,7 @@ namespace SMT.EVEData
             LoadCharacters();
 
             InitTheraConnections();
+
             InitMetaliminalStorms();
             InitFactionWarfareInfo();
             InitPOI();
@@ -2467,6 +2471,24 @@ namespace SMT.EVEData
             TheraConnections = new List<TheraConnection>();
             UpdateTheraConnections();
         }
+
+        /// <summary>
+        /// Initialise the Zarzakh Connection Data 
+        /// </summary>
+        private void InitZarzakhConnections()
+        {
+            List<string> zcon = new List<string>();
+            foreach (System s in Systems)
+            {
+                if (s.HasJoveGate)
+                {
+                    zcon.Add(s.Name);
+                }
+            }
+
+            Navigation.UpdateZarzakhConnections(zcon);
+        }
+
 
         private void InitMetaliminalStorms()
         {

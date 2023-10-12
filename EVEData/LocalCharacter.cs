@@ -47,6 +47,8 @@ namespace SMT.EVEData
 
         private bool m_UseTheraRouting;
 
+        private bool m_UseZarzakhRouting;
+
         private bool m_isOnline;
 
         private bool m_ObservatoryDecloakWarningEnabled;
@@ -359,6 +361,27 @@ namespace SMT.EVEData
                 OnPropertyChanged("UseTheraRouting");
             }
         }
+
+        public bool UseZarzakhRouting
+        {
+            get
+            {
+                return m_UseZarzakhRouting;
+            }
+            set
+            {
+                if (m_UseZarzakhRouting == value)
+                {
+                    return;
+                }
+
+                m_UseZarzakhRouting = value;
+                routeNeedsUpdate = true;
+                esiRouteNeedsUpdate = true;
+                OnPropertyChanged("UseZarzakhRouting");
+            }
+        }
+
 
         public int DangerZoneRange { get; set; }
 
@@ -739,7 +762,7 @@ namespace SMT.EVEData
                     start = end;
                     end = Waypoints[i];
 
-                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, UseTheraRouting, NavigationMode);
+                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, UseTheraRouting, UseZarzakhRouting, NavigationMode);
 
                     if (sysList != null)
                     {
@@ -766,7 +789,12 @@ namespace SMT.EVEData
                     foreach (Navigation.RoutePoint rp in ActiveRoute)
                     {
                         // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                        if (rp.GateToTake == Navigation.GateType.Ansiblex || rp.GateToTake == Navigation.GateType.Thera || Waypoints.Contains(rp.SystemName))
+                        if (
+                                rp.GateToTake == Navigation.GateType.Ansiblex || 
+                                rp.GateToTake == Navigation.GateType.Thera || 
+                                rp.GateToTake == Navigation.GateType.Zarzakh|| 
+                                Waypoints.Contains(rp.SystemName)
+                            )
                         {
                             long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
 
