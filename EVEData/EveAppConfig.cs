@@ -23,12 +23,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "Status ? Best not to ask..";
+        public const string SMT_TITLE = "Zarzakh.. just a super highway";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_124";
+        public const string SMT_VERSION = "SMT_125";
 
         /// <summary>
         /// Folder to store all of the data from
