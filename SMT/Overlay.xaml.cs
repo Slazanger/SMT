@@ -192,6 +192,7 @@ namespace SMT
         private Brush npcKillDeltaDataBrush;
         private Brush outOfRegionSysOutlineBrush;
         private Brush intelUrgentOutlineBrush;
+        private Brush intelClearedOutlineBrush;
         private Brush intelStaleOutlineBrush;
         private Brush intelHistoryOutlineBrush;
         private Brush sysFillBrush;
@@ -285,6 +286,9 @@ namespace SMT
 
             intelUrgentOutlineBrush = new SolidColorBrush(Colors.Red);
             intelUrgentOutlineBrush.Opacity = 1f;
+
+            intelClearedOutlineBrush = new SolidColorBrush(mw.MapConf.ActiveColourScheme.IntelClearOverlayColour);
+            intelClearedOutlineBrush.Opacity = 1f;
 
             intelStaleOutlineBrush = new SolidColorBrush(Colors.Yellow);
             intelStaleOutlineBrush.Opacity = 1f;
@@ -605,7 +609,6 @@ namespace SMT
                     if (systemData[systemName].intelData == null || systemData[systemName].intelData != intelDataEntry.data)
                     {
                         systemData[systemName].intelData = intelDataEntry.data;
-                        UpdateSystemTooltip(systemData[systemName]);
                     }
                 }
 
@@ -617,12 +620,12 @@ namespace SMT
                     switch (intelAgeInSeconds)
                     {
                         case float age when age < intelUrgentPeriod:
-                            intelShape.Stroke = intelUrgentOutlineBrush;
+                            intelShape.Stroke = intelDataEntry.data.ClearNotification ? intelClearedOutlineBrush : intelUrgentOutlineBrush;
                             intelShape.Fill = intelFillBrush;
                             break;
 
                         case float age when age < intelUrgentPeriod + intelStalePeriod:
-                            intelShape.Stroke = intelStaleOutlineBrush;
+                            intelShape.Stroke = intelDataEntry.data.ClearNotification ? intelClearedOutlineBrush : intelStaleOutlineBrush;
                             intelShape.Fill = transparentBrush;
                             break;
 
@@ -733,12 +736,31 @@ namespace SMT
         }
 
         /// <summary>
+        /// Handles refreshing the tooltip data only when the tooltip is opening
+        /// to avoid unnecessary overhead.
+        /// </summary>
+        /// <param name="sender">The element for which the tooltip is opening.</param>
+        /// <param name="e"></param>
+        public void UpdateSystemTooltipOnOpeningTooltip(object sender, RoutedEventArgs e)
+        {
+            OverlaySystemData tooltipSystemData = systemData.FirstOrDefault(x => x.Value.systemCanvasElement == (Shape)sender).Value;
+            if (tooltipSystemData != null)
+            {
+                UpdateSystemTooltip(tooltipSystemData);
+            }            
+        }
+
+        /// <summary>
         /// Updates the tooltip content of a specific system.
         /// </summary>
         /// <param name="systemData"></param>
         public void UpdateSystemTooltip(OverlaySystemData systemData)
         {
-            if (systemData.systemCanvasElement.ToolTip == null) systemData.systemCanvasElement.ToolTip = new ToolTip();
+            if (systemData.systemCanvasElement.ToolTip == null)
+            {
+                systemData.systemCanvasElement.ToolTip = new ToolTip();
+                ToolTipService.SetInitialShowDelay(systemData.systemCanvasElement, 0);
+            }
 
             // Todo: NPC Kills == 0, delta == 0, jumps, hunter/gatherer
             string toolTipText = $"{systemData.system.Name} ({systemData.system.TrueSec.ToString("n2")})";
@@ -748,9 +770,7 @@ namespace SMT
 
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Content = toolTipText;
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Background = toolTipBackgroundBrush;
-            ((ToolTip)systemData.systemCanvasElement.ToolTip).Foreground = toolTipForegroundBrush;
-
-            ToolTipService.SetInitialShowDelay(systemData.systemCanvasElement, 0);
+            ((ToolTip)systemData.systemCanvasElement.ToolTip).Foreground = toolTipForegroundBrush;            
         }
 
         /// <summary>
@@ -1063,7 +1083,8 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode ? 3 : 5;
             }
 
-            UpdateSystemTooltip(systemData[sysData.system.Name]);
+            UpdateSystemTooltip(systemData[sysData.system.Name]); // Tooltip needs to be populated for ToolTipOpening event to occur.
+            systemData[sysData.system.Name].systemCanvasElement.ToolTipOpening += UpdateSystemTooltipOnOpeningTooltip;
 
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
