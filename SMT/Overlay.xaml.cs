@@ -37,9 +37,13 @@ namespace SMT
         public Vector2 canvasCoordinate;
 
         public int rattingDelta;
+
         public Shape systemCanvasElement;
         public Shape npcKillCanvasElement;
         public Shape npcKillDeltaCanvasElement;
+        public Path jumpBridgePath;
+        public string jumpBridgeTarget = "";
+
         public EVEData.IntelData intelData;
 
         public int overlayTier = 0;
@@ -69,6 +73,13 @@ namespace SMT
             if (!keepSystem && systemCanvasElement != null && canvas.Children.Contains(systemCanvasElement)) canvas.Children.Remove(systemCanvasElement);
             if (npcKillCanvasElement != null && canvas.Children.Contains(npcKillCanvasElement)) canvas.Children.Remove(npcKillCanvasElement);
             if (npcKillDeltaCanvasElement != null && canvas.Children.Contains(npcKillDeltaCanvasElement)) canvas.Children.Remove(npcKillDeltaCanvasElement);
+            CleanUpJumpBridges(canvas);
+        }
+
+        public void CleanUpJumpBridges(Canvas canvas)
+        {
+            if (jumpBridgePath != null && canvas.Children.Contains(jumpBridgePath)) canvas.Children.Remove(jumpBridgePath);
+            jumpBridgePath = null;
         }
     }
 
@@ -183,7 +194,9 @@ namespace SMT
         private Dictionary<string, OverlaySystemData> systemData = new Dictionary<string, OverlaySystemData>();
         private List<(EVEData.IntelData data, List<Ellipse> ellipse)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
         private List<Line> jumpLines = new List<Line>();
+        private List<OverlaySystemData> bridgeSystems = new List<OverlaySystemData>();
         private List<Line> routeLines = new List<Line>();
+        private Ellipse jumpBridgeTargetHighlight = null;
 
         private Brush sysOutlineBrush;
         private Brush sysTheraOutlineBrush;
@@ -199,6 +212,7 @@ namespace SMT
         private Brush outOfRegionSysFillBrush;
         private Brush intelFillBrush;
         private Brush jumpLineBrush;
+        private Brush bridgeLineBrush;
         private Brush routeLineBrush;
         private Brush transparentBrush;
 
@@ -233,6 +247,9 @@ namespace SMT
         private bool showNPCKillDeltaData = true;
         private bool showCharName = true;
         private bool showCharLocation = true;
+        private bool showJumpBridges = true;
+
+        private DoubleCollection dashStroke = new DoubleCollection(new List<double> { 2, 2 });
 
         private DoubleAnimation dashAnimation;
 
@@ -305,6 +322,9 @@ namespace SMT
             jumpLineBrush = new SolidColorBrush(Colors.White);
             jumpLineBrush.Opacity = 0.5f;
 
+            bridgeLineBrush = new SolidColorBrush(mw.MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+            bridgeLineBrush.Opacity = 0.75f;
+
             routeLineBrush = new SolidColorBrush(Colors.Yellow);
             routeLineBrush.Opacity = 0.5f;
 
@@ -330,6 +350,7 @@ namespace SMT
             intelStalePeriod = mainWindow.MapConf.IntelStaleTime;
             intelHistoryPeriod = mainWindow.MapConf.IntelHistoricTime;
             overlayDepth = mainWindow.MapConf.OverlayRange + 1;
+            showJumpBridges = mainWindow.MapConf.OverlayShowJumpBridges;
 
             // Initialize value animation to be used by dashed lines
             dashAnimation = new DoubleAnimation();
@@ -766,9 +787,17 @@ namespace SMT
             string toolTipText = $"{systemData.system.Name} ({systemData.system.TrueSec.ToString("n2")})";
             if (!gathererMode) toolTipText += $"\nNPC Kills: {systemData.system.NPCKillsLastHour}\nDelta: {systemData.system.NPCKillsDeltaLastHour}";
             if (systemData.intelData != null) toolTipText += $"\nReported: {systemData.intelData.RawIntelString}";
+            var jumpBridges = mainWindow.EVEManager.JumpBridges.Where(t => t.From == systemData.system.Name || t.To == systemData.system.Name);
+            if (jumpBridges.Any()) {
+                foreach ( var jumpBridge in jumpBridges )
+                {
+                    toolTipText += $"\nBridge: {jumpBridge.From} - {jumpBridge.To}";
+                }
+            }
             // Todo: Add Thera
 
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Content = toolTipText;
+            ((ToolTip)systemData.systemCanvasElement.ToolTip).Opacity = 0.75;
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Background = toolTipBackgroundBrush;
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Foreground = toolTipForegroundBrush;            
         }
@@ -803,7 +832,7 @@ namespace SMT
 
             List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
-            // for Gathere mode collect the preset depth of systems
+            // If gatherer mode or not set to full region, collect systems in range.
             if (gathererMode || (!gathererMode && !hunterModeShowFullRegion))
             {
                 // Add the players location to the hierarchie.
@@ -864,7 +893,6 @@ namespace SMT
                     hierarchie.Add(currentDepth);
                 }
             }
-            // for hunter mode, take the entire region map
             else
             {
                 List<OverlaySystemData> hunterSystems = new List<OverlaySystemData>();
@@ -908,8 +936,159 @@ namespace SMT
                 DrawSystemsToOverlay(i, hierarchie[i], hierarchie.Count);
             }
 
+            // Add the jump bridges, if enabled
+            if (showJumpBridges) DrawJumpBridgesToOverlay(systemsInList);
+
             // Add the system connections.
             DrawJumpsToOverlay(systemsInList);
+        }
+
+
+        /// <summary>
+        /// If systems at the end of jump bridges are not on the map or not in the region
+        /// this method gives an offscreen coordinate to draw a line anyway.
+        /// </summary>
+        /// <param name="originSystem"></param>
+        /// <param name="targetSystem"></param>
+        /// <returns></returns>
+        private Vector2 OffMapConnection (string originSystem, string targetSystem)
+        {
+            Vector2 originSystemPosition;
+            Vector2 targetSystemPosition;
+
+            var originRegion = mainWindow.EVEManager.GetRegion(mainWindow.EVEManager.GetEveSystem(originSystem).Region);
+            var targetRegion = mainWindow.EVEManager.GetRegion(mainWindow.EVEManager.GetEveSystem(targetSystem).Region);
+
+            if ( originRegion == targetRegion )
+            {
+                originSystemPosition = mainWindow.EVEManager.GetRegion(mainWindow.EVEManager.GetEveSystem(originSystem).Region).MapSystems[originSystem].Layout;
+                targetSystemPosition = mainWindow.EVEManager.GetRegion(mainWindow.EVEManager.GetEveSystem(targetSystem).Region).MapSystems[targetSystem].Layout;
+            } 
+            else
+            {
+                originSystemPosition = new Vector2((float)originRegion.UniverseViewX, (float)originRegion.UniverseViewY);
+                targetSystemPosition = new Vector2((float)targetRegion.UniverseViewX, (float)targetRegion.UniverseViewY);
+            }               
+
+            Vector2 offMapDirection = Vector2.Normalize(targetSystemPosition - originSystemPosition);
+
+            Vector2 result = systemData[originSystem].canvasCoordinate + (offMapDirection * 2f * Math.Max(canvasData.dimensions.X, canvasData.dimensions.Y) );
+
+            return result;
+        }
+
+        /// <summary>
+        /// This draws the jump bridge connections to the overlay. Out of region connections go off screen.
+        /// </summary>
+        /// <param name="systemsInList"></param>
+        private void DrawJumpBridgesToOverlay(List<string> systemsInList)
+        {
+            List<string> alreadyConnected = new List<string>();
+
+            foreach (OverlaySystemData overlaySystemData in bridgeSystems)
+            {
+                overlaySystemData.CleanUpJumpBridges(overlay_Canvas);
+            }
+            bridgeSystems.Clear();
+
+            foreach (var jumpBridge in mainWindow.EVEManager.JumpBridges)
+            {
+                // Only draw a line if neither directions of the bridge have been drawn before.
+                if ( !alreadyConnected.Contains($"{jumpBridge.To} {jumpBridge.From}") && !alreadyConnected.Contains($"{jumpBridge.From} {jumpBridge.To}" )) {
+
+                    // Only draw a line if at least one system is visible.
+                    if ( systemData.ContainsKey(jumpBridge.From) || systemData.ContainsKey(jumpBridge.To))
+                    {
+                        Vector2 fromCoordinate;
+                        Vector2 toCoordinate;
+                        OverlaySystemData visibleSystemData = null;
+                        string otherEndSystemName = "";
+
+                        if (systemData.ContainsKey(jumpBridge.From))
+                        {
+                            fromCoordinate = systemData[jumpBridge.From].canvasCoordinate;
+                            visibleSystemData = systemData[jumpBridge.From];
+                            otherEndSystemName = jumpBridge.To;
+                        }                     
+                        else
+                        {
+                            fromCoordinate = OffMapConnection(jumpBridge.To, jumpBridge.From);                            
+                        }
+                        
+                        if (systemData.ContainsKey(jumpBridge.To))
+                        {
+                            toCoordinate = systemData[jumpBridge.To].canvasCoordinate;
+                            visibleSystemData = systemData[jumpBridge.To];
+                            otherEndSystemName = jumpBridge.From;
+                        }                 
+                        else
+                        {
+                            toCoordinate = OffMapConnection(jumpBridge.From, jumpBridge.To);
+                        }
+
+                        if (visibleSystemData == null) continue;
+
+                        ArcSegment connectionArc = new ArcSegment();
+                        PathGeometry pathGeometry = new PathGeometry();
+                        PathFigure pathFigure = new PathFigure();
+                        
+
+                        Vector2f fromVector = new Vector2f(fromCoordinate.X + (CalculatedOverlaySystemSize(jumpBridge.From) / 2f),
+                            fromCoordinate.Y + (CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
+                        Vector2f toVector = new Vector2f(toCoordinate.X + (CalculatedOverlaySystemSize(jumpBridge.To) / 2f),
+                            toCoordinate.Y + (CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
+
+                        Vector2f bridgeConnection = toVector == fromVector ? new Vector2f(0, 0) : Vector2f.Normalize(toVector - fromVector);
+
+                        Vector2f fromCorrected = fromVector + (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
+                        Vector2f toCorrected = toVector - (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
+                        
+
+                        pathFigure.StartPoint = new Point(fromCorrected.x, fromCorrected.y);
+                        pathFigure.Segments.Add(
+                                new ArcSegment(
+                                    new Point(toCorrected.x, toCorrected.y),
+                                    new Size(20,100),
+                                    MathF.Atan2(bridgeConnection.x, bridgeConnection.y) * 57.295779513f * -1f,
+                                    false,
+                                    SweepDirection.Clockwise,
+                                    true
+                                )
+                            );
+
+                        pathGeometry.Figures.Add(pathFigure);
+                        Path path;
+
+                        if (visibleSystemData.jumpBridgePath != null) path = visibleSystemData.jumpBridgePath;
+                        else path = new Path();
+
+                        path.Data = pathGeometry;
+                        path.Fill = Brushes.Transparent;
+                        path.Stroke = bridgeLineBrush;
+                        path.StrokeDashArray = dashStroke;
+                        path.StrokeThickness = gathererMode ? 2 : 1;
+
+                        visibleSystemData.jumpBridgePath = path;
+                        visibleSystemData.jumpBridgeTarget = otherEndSystemName;
+                        bridgeSystems.Add(visibleSystemData);                        
+
+                        if ( systemData.ContainsKey(otherEndSystemName))
+                        {
+                            systemData[otherEndSystemName].jumpBridgePath = path;
+                            systemData[otherEndSystemName].jumpBridgeTarget = visibleSystemData.system.Name;
+                            bridgeSystems.Add(systemData[otherEndSystemName]);
+                        }
+
+                        if (!overlay_Canvas.Children.Contains(path))
+                        {
+                            overlay_Canvas.Children.Add(path);
+                        }
+                        Canvas.SetZIndex(path, 25);
+                    }
+
+                    alreadyConnected.Add($"{jumpBridge.From} {jumpBridge.To}");
+                }
+            }
         }
 
         /// <summary>
@@ -1038,9 +1217,33 @@ namespace SMT
 
             if (systemData[sysData.system.Name].systemCanvasElement == null)
             {
-                systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
+                if (mainWindow.EVEManager.JumpBridges.Any(t => t.From == sysData.system.Name))
+                {
+                    systemData[sysData.system.Name].systemCanvasElement = new Rectangle();
+                }
+                else
+                {
+                    systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
+                }
+            } else
+            {
+                if (mainWindow.EVEManager.JumpBridges.Any(t => t.From == sysData.system.Name || t.To == sysData.system.Name)) {
+                    if (systemData[sysData.system.Name].systemCanvasElement.GetType() == typeof(Ellipse))
+                    {
+                        systemData[sysData.system.Name].CleanUpCanvas(overlay_Canvas);
+                        systemData[sysData.system.Name].systemCanvasElement = new Rectangle();
+                    }
+                } 
+                else
+                {
+                    if (systemData[sysData.system.Name].systemCanvasElement.GetType() == typeof(Rectangle))
+                    {
+                        systemData[sysData.system.Name].CleanUpCanvas(overlay_Canvas);
+                        systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
+                    }
+                }                
             }
-
+           
             systemData[sysData.system.Name].systemCanvasElement.Width = CalculatedOverlaySystemSize(sysData.system.Name);
             systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name);
             systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode ? 2 : 1;
@@ -1086,6 +1289,9 @@ namespace SMT
             UpdateSystemTooltip(systemData[sysData.system.Name]); // Tooltip needs to be populated for ToolTipOpening event to occur.
             systemData[sysData.system.Name].systemCanvasElement.ToolTipOpening += UpdateSystemTooltipOnOpeningTooltip;
 
+            systemData[sysData.system.Name].systemCanvasElement.ToolTipOpening += StartSystemHighlight;
+            systemData[sysData.system.Name].systemCanvasElement.ToolTipClosing += StopSystemHighlight;
+
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
 
@@ -1099,10 +1305,81 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement.Name = "system";
                 overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemCanvasElement);
             }
-
-            //            if (!gathererMode) DrawNPCKillsToOverlay(sysData);
         }
 
+        /// <summary>
+        /// When highlighting a system is starting this is called.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
+        public void StartSystemHighlight(object sender, RoutedEventArgs eventArgs)
+        {
+            if (jumpBridgeTargetHighlight != null)
+            {
+                overlay_Canvas.Children.Remove(jumpBridgeTargetHighlight);
+                jumpBridgeTargetHighlight = null;
+            }
+
+            OverlaySystemData highlightSystemData = systemData.FirstOrDefault(x => x.Value.systemCanvasElement == (Shape)sender).Value;
+            if (highlightSystemData != null)
+            {
+                if (highlightSystemData.jumpBridgePath != null)
+                {
+                    highlightSystemData.jumpBridgePath.StrokeThickness = gathererMode ? 6 : 3;
+                    highlightSystemData.jumpBridgePath.Stroke = Brushes.Yellow;
+
+                    if ( systemData.ContainsKey(highlightSystemData.jumpBridgeTarget) )
+                    {
+                        double systemWidth = systemData[highlightSystemData.jumpBridgeTarget].systemCanvasElement.Width;
+                        double systemHeight = systemData[highlightSystemData.jumpBridgeTarget].systemCanvasElement.Height;
+                        double highlightMargin = gathererMode ? 6 : 10;
+                        double highlightMarginPositionOffset = ((systemWidth + highlightMargin) / 2) - (systemWidth / 2);
+
+                        jumpBridgeTargetHighlight = new Ellipse();
+                        jumpBridgeTargetHighlight.Width = systemWidth + highlightMargin;
+                        jumpBridgeTargetHighlight.Height = systemHeight + highlightMargin;
+                        jumpBridgeTargetHighlight.Fill = Brushes.Transparent;
+                        jumpBridgeTargetHighlight.Stroke = Brushes.Yellow;
+                        jumpBridgeTargetHighlight.StrokeThickness = 4;
+
+                        Canvas.SetLeft(jumpBridgeTargetHighlight, systemData[highlightSystemData.jumpBridgeTarget].canvasCoordinate.X - highlightMarginPositionOffset );
+                        Canvas.SetTop(jumpBridgeTargetHighlight, systemData[highlightSystemData.jumpBridgeTarget].canvasCoordinate.Y - highlightMarginPositionOffset );
+                        Canvas.SetZIndex(jumpBridgeTargetHighlight, 110);
+
+                        overlay_Canvas.Children.Add(jumpBridgeTargetHighlight);
+                    }                    
+                }               
+            }
+        }
+
+        /// <summary>
+        /// When highlighting a system ends, this is called.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
+        public void StopSystemHighlight(object sender, RoutedEventArgs eventArgs)
+        {
+            OverlaySystemData highlightSystemData = systemData.FirstOrDefault(x => x.Value.systemCanvasElement == (Shape)sender).Value;
+            if (highlightSystemData != null)
+            {
+                if (highlightSystemData.jumpBridgePath != null)
+                {
+                    highlightSystemData.jumpBridgePath.StrokeThickness = gathererMode ? 2 : 1;
+                    highlightSystemData.jumpBridgePath.Stroke = bridgeLineBrush;                    
+                }                    
+            }
+
+            if (jumpBridgeTargetHighlight != null)
+            {
+                overlay_Canvas.Children.Remove(jumpBridgeTargetHighlight);
+                jumpBridgeTargetHighlight = null;
+            }
+        }
+
+        /// <summary>
+        /// Add a circle to represent the amount of npc kills to the canvas.
+        /// </summary>
+        /// <param name="sysData"></param>
         public void DrawNPCKillsToOverlay(OverlaySystemData sysData)
         {
             if (!systemData.ContainsKey(sysData.system.Name)) return;
@@ -1247,6 +1524,13 @@ namespace SMT
             if (e.PropertyName == "OverlayHunterModeShowFullRegion")
             {
                 hunterModeShowFullRegion = mainWindow.MapConf.OverlayHunterModeShowFullRegion;
+                RefreshCurrentView();
+            }
+
+            if (e.PropertyName == "OverlayShowJumpBridges")
+            {
+                showJumpBridges = mainWindow.MapConf.OverlayShowJumpBridges;
+                ClearView();
                 RefreshCurrentView();
             }
         }

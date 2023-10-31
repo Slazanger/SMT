@@ -106,6 +106,7 @@ namespace SMT
         private bool m_overlayShowNPCKills = true;
         private bool m_overlayShowNPCKillDelta = true;
         private bool m_overlayShowRoute = true;
+        private bool m_overlayShowJumpBridges = true;
 
         public MapConfig()
         {
@@ -1139,6 +1140,22 @@ namespace SMT
         }
 
         [Category("Overlay")]
+        [DisplayName("Overlay Show JumpBridges")]
+        public bool OverlayShowJumpBridges
+        {
+            get
+            {
+                return m_overlayShowJumpBridges;
+            }
+            set
+            {
+                m_overlayShowJumpBridges = value;
+
+                OnPropertyChanged("OverlayShowJumpBridges");
+            }
+        }
+
+        [Category("Overlay")]
         [DisplayName("Overlay Intel Fresh Time")]
         public float IntelFreshTime
         {
@@ -1313,6 +1330,7 @@ namespace SMT
             OverlayShowNPCKills = true;
             OverlayShowNPCKillDelta = true;
             OverlayShowRoute = true;
+            OverlayShowJumpBridges = true;
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;
