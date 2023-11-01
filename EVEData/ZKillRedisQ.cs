@@ -97,8 +97,7 @@ namespace SMT.EVEData
             // todo : investigate issues beyond a ban.. the 429 should be handled with the null
             if (strContent == "Error")
             {
-                
-                Thread.Sleep(5000);
+                Thread.Sleep(500000);
 
                 e.Result = 0;
                 return;
