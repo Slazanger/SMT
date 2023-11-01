@@ -188,15 +188,16 @@
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit">
       <Version>5.0.103</Version>
     </PackageReference>
-    <PackageReference Include="ESI.NET" Version="2023.7.15" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
       <Version>7.1.3</Version>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="WPFThemes.DarkBlend">
       <Version>1.0.8</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ESI.NET\ESI.NET\ESI.NET.csproj" />
     <ProjectReference Include="..\EVEData\EVEData.csproj" />
   </ItemGroup>
 </Project>
