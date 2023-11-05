@@ -99,5 +99,43 @@ namespace SMT
                 }
             }
         }
+
+        private void MoveUpBtn_OnClick(object sender, RoutedEventArgs e)
+        {
+            EVEData.LocalCharacter lc = characterInfoGrid.DataContext as EVEData.LocalCharacter;
+            if (lc != null)
+            {
+                MainWindow mw = Owner as MainWindow;
+
+                int Index = mw.EVEManager.LocalCharacters.IndexOf(lc);
+                if (Index > 0)
+                {
+                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index -1];
+                    mw.EVEManager.LocalCharacters[Index - 1] = lc;
+                    mw.EVEManager.LocalCharacters[Index] = swap;
+
+                    characterLV.Items.Refresh();
+                }
+            }
+        }
+
+        private void MoveDownBtn_OnClick(object sender, RoutedEventArgs e)
+        {
+            EVEData.LocalCharacter lc = characterInfoGrid.DataContext as EVEData.LocalCharacter;
+            if (lc != null)
+            {
+                MainWindow mw = Owner as MainWindow;
+
+                int Index = mw.EVEManager.LocalCharacters.IndexOf(lc);
+                if (Index >= 0 && Index < mw.EVEManager.LocalCharacters.Count -1 )
+                {
+                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index+1];
+                    mw.EVEManager.LocalCharacters[Index + 1] = lc;
+                    mw.EVEManager.LocalCharacters[Index] = swap;
+
+                    characterLV.Items.Refresh();
+                }
+            }
+        }
     }
 }
