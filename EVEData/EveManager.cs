@@ -429,6 +429,8 @@ namespace SMT.EVEData
             Regions.Add(new MapRegion("Warzone - Amarr vs Minmatar", "", "Faction War", 50, 120, true));
             Regions.Add(new MapRegion("Warzone - Caldari vs Gallente", "", "Faction War", 50, 190, true));
 
+            Regions.Add(new MapRegion("Yasna Zakh", "", string.Empty, 50, 260));
+
             SystemIDToName = new SerializableDictionary<long, string>();
 
             Systems = new List<System>();
@@ -706,6 +708,9 @@ namespace SMT.EVEData
 
                     constMap[constID] = constName;
                 }
+
+                // TEMP : Manually add 
+                constMap["20010000"] = "Duzna Kah";
 
                 foreach (System s in Systems)
                 {
@@ -1196,6 +1201,29 @@ namespace SMT.EVEData
                 throw new Exception("Data Creation Error");
             }
 
+
+            // Now add the joveGate Systems
+            string eveStaticDataJoveGates = sourceFolder + @"\data\JoveGates.csv";
+            if (File.Exists(eveStaticDataJoveGates))
+            {
+                StreamReader file = new StreamReader(eveStaticDataJoveGates);
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    System s = GetEveSystem(line);
+                    if (s != null)
+                    {
+                        s.HasJoveGate = true;
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Data Creation Error");
+            }
+
+
+
             // now generate the 2d universe view coordinates
 
             double RenderSize = 5000;
@@ -1600,6 +1628,9 @@ namespace SMT.EVEData
             }
             jumpRangeCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, List<string>>>(JRC);
             Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges, jumpRangeCache);
+
+            InitZarzakhConnections();
+
         }
 
         /// <summary>
@@ -2370,6 +2401,7 @@ namespace SMT.EVEData
             LoadCharacters();
 
             InitTheraConnections();
+
             InitMetaliminalStorms();
             InitFactionWarfareInfo();
             InitPOI();
@@ -2439,6 +2471,24 @@ namespace SMT.EVEData
             TheraConnections = new List<TheraConnection>();
             UpdateTheraConnections();
         }
+
+        /// <summary>
+        /// Initialise the Zarzakh Connection Data 
+        /// </summary>
+        private void InitZarzakhConnections()
+        {
+            List<string> zcon = new List<string>();
+            foreach (System s in Systems)
+            {
+                if (s.HasJoveGate)
+                {
+                    zcon.Add(s.Name);
+                }
+            }
+
+            Navigation.UpdateZarzakhConnections(zcon);
+        }
+
 
         private void InitMetaliminalStorms()
         {

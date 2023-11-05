@@ -128,6 +128,7 @@
                     </StackPanel>
                     <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="Use Ansiblex Gates" Margin="4" />
                     <CheckBox IsChecked="{Binding UseTheraRouting}"  HorizontalAlignment="Left" Content="Use Thera" Margin="4" />
+                    <CheckBox IsChecked="{Binding UseZarzakhRouting}"  HorizontalAlignment="Left" Content="Use Zarzakh" Margin="4" />
                 </StackPanel>
             </GroupBox>
 
@@ -148,7 +149,11 @@
                 </StackPanel>
             </GroupBox>
 
-            <Button Content="Delete" Grid.Column="1" Grid.Row="9" Width="100" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click" />
+            <StackPanel Grid.Column="1" Grid.Row="9" Orientation="Horizontal"  HorizontalAlignment="Right">
+                <Button Content="↓" Width="20" VerticalAlignment="Center"  Margin="4,0" x:Name="moveDownBtn" Click="MoveDownBtn_OnClick" />
+                <Button Content="↑" Width="20" VerticalAlignment="Center"  Margin="4,0" x:Name="moveUpBtn" Click="MoveUpBtn_OnClick" />
+                <Button Content="Delete" Width="100" VerticalAlignment="Center"   Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click" />
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

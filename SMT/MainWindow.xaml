@@ -275,6 +275,7 @@
 
                                                     <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionUC}" Margin="2" />
                                                     <CheckBox Content="Use Thera" IsChecked="{Binding ActiveCharacter.UseTheraRouting, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="Use Zarzakh" IsChecked="{Binding ActiveCharacter.UseZarzakhRouting, ElementName=RegionUC}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="WayPoints">
@@ -304,6 +305,11 @@
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Ansiblex">
                                                                         <Setter Property="Background" Value="blue" />
                                                                     </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Zarzakh">
+                                                                        <Setter Property="Background" Value="Purple" />
+                                                                    </DataTrigger>
+
 
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
                                                                         <Setter Property="Background" Value="yellow" />

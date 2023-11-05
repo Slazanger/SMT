@@ -5,10 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
-        Title="Auth.." Height="120" Width="250" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closed="Window_Closed">
+        Title="Auth.." Height="120" Width="270" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closed="Window_Closed">
     <Grid>
         <StackPanel Background="#FF232223">
-            <Label>logon using the browser that opened...</Label>
+            <Label Height="23">logon using the browser that opened..</Label>
+            <Label Height="23">Close this window when you've added everyone</Label>
         </StackPanel>
     </Grid>
 </Window>
+    

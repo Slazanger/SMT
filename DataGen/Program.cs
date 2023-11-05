@@ -81,6 +81,33 @@ namespace DataGen
                     outputFile.WriteLine(svgStr);
                 }
             }
+
+
+            // write a region map : 
+            {
+                SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(2100, 1600);
+
+
+                foreach (MapRegion mr in EM.Regions)
+                {
+                    SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)mr.UniverseViewX, (float)mr.UniverseViewY, 5, 5);
+                    sre["Type"] = "region";
+                    sre["Name"] = mr.Name;
+
+                    SvgNet.Elements.SvgTextElement srtText = new(mr.Name, (float)mr.UniverseViewX, (float)mr.UniverseViewY);
+
+                    svgRootElement.AddChild(sre);
+                    svgRootElement.AddChild(srtText);
+                }
+
+                string svgStr = svgRootElement.WriteSVGString(false);
+                string filePath = $"{outputFolder}/data/SourceMaps/exported/region_layout.svg";
+                using (StreamWriter outputFile = new StreamWriter(filePath))
+                {
+                    outputFile.WriteLine(svgStr);
+                }
+
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ namespace SMT
             new Task(StartServer).Start();
         }
 
+        private bool serverDone = false; 
         private void StartServer()
         {
             // create the http Server
@@ -33,32 +34,32 @@ namespace SMT
             {
                 listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);
                 listener.Start();
-                Console.WriteLine("Listening...");
 
-                // Note: The GetContext method blocks while waiting for a request.
-                HttpListenerContext context = listener.GetContext();
-                HttpListenerRequest request = context.Request;
-
-                EVEData.EveManager.Instance.HandleEveAuthSMTUri(request.Url, challengeCode);
-
-                // Obtain a response object.
-                HttpListenerResponse response = context.Response;
-                // Construct a response.
-                string responseString = "<HTML><BODY>SMT Character Added, please close</BODY></HTML>";
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-                // Get a response stream and write the response to it.
-                response.ContentLength64 = buffer.Length;
-                System.IO.Stream output = response.OutputStream;
-                output.Write(buffer, 0, buffer.Length);
-                // You must close the output stream.
-                output.Close();
-                listener.Stop();
-
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                while (!serverDone)
                 {
-                    // now close the window
-                    Close();
-                }), DispatcherPriority.Normal, null);
+                    Console.WriteLine("Listening...");
+
+
+
+                    // Note: The GetContext method blocks while waiting for a request.
+                    HttpListenerContext context = listener.GetContext();
+                    HttpListenerRequest request = context.Request;
+
+                    EVEData.EveManager.Instance.HandleEveAuthSMTUri(request.Url, challengeCode);
+
+                    // Obtain a response object.
+                    HttpListenerResponse response = context.Response;
+                    // Construct a response.
+                    //                    string responseString = $"<HTML><BODY>SMT Character Added.. close logon window when done or click <a href=\"{esiLogonURL}\"> here </a> to add another character</BODY></HTML>";
+                    string responseString = $"<HTML><HEAD title=\"SMT Auth\"><meta http-equiv=\"refresh\" content=\"1;url={esiLogonURL}\"></HEAD><BODY>SMT Character Added..</HTML>";
+
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+                    // Get a response stream and write the response to it.
+                    response.ContentLength64 = buffer.Length;
+                    System.IO.Stream output = response.OutputStream;
+                    output.Write(buffer, 0, buffer.Length);
+
+                }
             }
             catch
             {
@@ -69,6 +70,8 @@ namespace SMT
         {
             try
             {
+                serverDone = true;
+
                 if (listener != null && listener.IsListening)
                 {
                     listener.Stop();

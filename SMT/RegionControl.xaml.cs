@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -1811,7 +1812,7 @@ namespace SMT
 
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
             {
-                foreach (EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream)
+                foreach (EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
                 {
                     if (ZKBBaseFeed.Keys.Contains(zs.SystemName))
                     {
@@ -3129,6 +3130,39 @@ namespace SMT
 
                         MainCanvas.Children.Add(jbLine);
                     }
+                }
+            }
+
+            bool showZakLinks = true;
+            if (showZakLinks && Region.IsSystemOnMap("Zarzakh"))
+            {
+                MapSystem zarSystem = Region.MapSystems["Zarzakh"];
+
+                foreach (MapSystem ms in Region.MapSystems.Values)
+                {
+                    if (ms.Name == "Zarzakh" || !ms.ActualSystem.HasJoveGate)
+                    {
+                        continue;
+                    }
+
+                    Line zarLink = new Line();
+
+                    zarLink.X1 = zarSystem.Layout.X;
+                    zarLink.Y1 = zarSystem.Layout.Y;
+
+                    zarLink.X2 = ms.Layout.X;
+                    zarLink.Y2 = ms.Layout.Y;
+
+                    zarLink.StrokeThickness = 1.2;
+
+                    DoubleCollection dashes = new DoubleCollection();
+
+                    dashes.Add(1.0);
+                    dashes.Add(1.0);
+                    zarLink.StrokeDashArray = dashes;
+                    zarLink.Stroke = ConstellationGateBrush;
+                    MainCanvas.Children.Add(zarLink);
+
                 }
             }
 

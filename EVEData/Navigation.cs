@@ -17,10 +17,12 @@ namespace SMT.EVEData
             Ansiblex,
             JumpTo,
             Thera,
+            Zarzakh,
         }
 
         private static Dictionary<string, MapNode> MapNodes { get; set; }
         private static List<string> TheraLinks { get; set; }
+        private static List<string> ZarzakhLinks { get; set; }
 
         public static void ClearJumpBridges()
         {
@@ -38,6 +40,14 @@ namespace SMT.EVEData
             }
         }
 
+        public static void ClearZarzakhConnections()
+        {
+            foreach (MapNode mn in MapNodes.Values)
+            {
+                mn.ZarzakhConnection = null;
+            }
+        }
+
         public static void UpdateTheraConnections(List<string> theraSystems)
         {
             ClearTheraConnections();
@@ -45,6 +55,16 @@ namespace SMT.EVEData
             foreach (string ts in theraSystems)
             {
                 MapNodes[ts].TheraConnections = theraSystems;
+            }
+        }
+
+        public static void UpdateZarzakhConnections(List<string> zazahkSystems)
+        {
+            ClearZarzakhConnections();
+
+            foreach (string ts in zazahkSystems)
+            {
+                MapNodes[ts].ZarzakhConnection = zazahkSystems;
             }
         }
 
@@ -165,6 +185,12 @@ namespace SMT.EVEData
                         continue;
                     }
 
+                    // cant jump into Zarzakh
+                    if (sysb.Name == "Zarzakh")
+                    {
+                        continue;
+                    }
+
                     decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysa.Name, sysb.Name);
                     if (Distance < maxRange && Distance > 0)
                     {
@@ -186,6 +212,7 @@ namespace SMT.EVEData
             MapNodes = new Dictionary<string, MapNode>();
 
             TheraLinks = new List<string>();
+            ZarzakhLinks = new List<string>();
 
             // build up the nav structures
             foreach (System sys in eveSystems)
@@ -235,7 +262,7 @@ namespace SMT.EVEData
             }
         }
 
-        public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, RoutingMode routingMode)
+        public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, bool UseZarzakh, RoutingMode routingMode)
         {
             if (!(MapNodes.ContainsKey(From)) || !(MapNodes.ContainsKey(To)) || From == "" || To == "")
 
@@ -349,6 +376,27 @@ namespace SMT.EVEData
                     }
                 }
 
+                if (UseZarzakh && CurrentNode.ZarzakhConnection != null)
+                {
+                    foreach (string ZarzakhConnection in CurrentNode.ZarzakhConnection)
+                    {
+                        MapNode CMN = MapNodes[ZarzakhConnection];
+
+                        if (CMN.Visited)
+                            continue;
+
+                        if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
+                        {
+                            CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
+                            CMN.NearestToStart = CurrentNode;
+                            if (!OpenList.Contains(CMN))
+                            {
+                                OpenList.Add(CMN);
+                            }
+                        }
+                    }
+                }
+
                 /* Todo :  Additional error checking
                 if (UseThera && !string.IsNullOrEmptyCurrent(Node.TheraInSig))
                 {
@@ -404,6 +452,11 @@ namespace SMT.EVEData
                         if (UseThera && mn.TheraConnections != null && mn.TheraConnections.Contains(Route[i + 1]))
                         {
                             RP.GateToTake = GateType.Thera;
+                        }
+
+                        if(UseZarzakh && mn.ZarzakhConnection != null && mn.ZarzakhConnection.Contains(Route[i + 1]))
+                        {
+                            RP.GateToTake = GateType.Zarzakh;
                         }
                     }
                     ActualRoute.Add(RP);
@@ -558,6 +611,17 @@ namespace SMT.EVEData
             }
         }
 
+        public static void UpdateZarzakhInfo(List<string> zarzakhList)
+        {
+            ZarzakhLinks.Clear();
+
+            foreach (string zc in zarzakhList)
+            {
+                ZarzakhLinks.Add(zc);
+            }
+        }
+
+
         private struct JumpLink
         {
             public decimal RangeLY;
@@ -585,6 +649,11 @@ namespace SMT.EVEData
                     s += " (Thera)";
                 }
 
+                if (GateToTake == GateType.Zarzakh)
+                {
+                    s += " (Zarzakh)";
+                }
+
                 if (GateToTake == GateType.JumpTo && LY > 0.0m)
                 {
                     s += " (Jump To, Range " + LY.ToString("0.##") + " )";
@@ -600,6 +669,7 @@ namespace SMT.EVEData
             public double F;
             public string JBConnection;
             public List<string> TheraConnections;
+            public List<string> ZarzakhConnection;
             public double MinCostToStart;
             public MapNode NearestToStart;
             public string TheraInSig;
