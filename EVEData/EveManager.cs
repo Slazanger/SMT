@@ -1728,7 +1728,7 @@ namespace SMT.EVEData
             }
 
             // strip out any ID's we already know..
-            List<long> UnknownIDs = new List<long>();
+            List<int> UnknownIDs = new List<int>();
             foreach (int l in IDs)
             {
                 if (!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l))
@@ -1781,7 +1781,7 @@ namespace SMT.EVEData
             }
 
             // strip out any ID's we already know..
-            List<long> UnknownIDs = new List<long>();
+            List<int> UnknownIDs = new List<int>();
             foreach (int l in IDs)
             {
                 if (!CharacterIDToName.ContainsKey(l))

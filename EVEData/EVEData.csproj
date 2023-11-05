@@ -13,13 +13,9 @@
 
   <ItemGroup>
     <PackageReference Include="DecimalMath.DecimalEx" Version="1.0.2" />
+    <PackageReference Include="ESI.NET" Version="2023.11.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.53" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" /> 
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ESI.NET\ESI.NET\ESI.NET.csproj" />
   </ItemGroup>
 	<ItemGroup>
 	  <None Update="data\JumpRangeCache.dat">
