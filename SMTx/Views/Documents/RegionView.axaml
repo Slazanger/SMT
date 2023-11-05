@@ -6,11 +6,8 @@
 			 xmlns:vm="using:SMTx.ViewModels.Documents"
              x:Class="SMTx.Views.Documents.RegionView"
 			 x:DataType="vm:RegionViewModel">
-	<Grid Focusable="True">
-		<StackPanel>
-			<TextBlock Text="{Binding Id}"/>
-			<TextBlock Text="{Binding Title}"/>
-			<TextBlock Text="{Binding Context}"/>
-		</StackPanel>
-	</Grid>
+    <Viewbox Stretch="Uniform" x:Name="MainRegionsViewBox">
+        <Canvas Focusable="True" x:Name="RegionViewGrid" Width="1050" Height="800" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+        </Canvas>
+    </Viewbox>
 </UserControl>
