@@ -35,6 +35,11 @@ public class App : Application
     }
 
 
+    private void ShutDownEVEManager()
+    {
+        EVEManager.ShutDown();
+    }
+
 
     public override void Initialize()
     {
@@ -61,6 +66,7 @@ public class App : Application
 
                 mainWindow.Closing += (_, _) =>
                 {
+                    ShutDownEVEManager();
                     mainWindowViewModel.CloseLayout();
                 };
 
@@ -68,6 +74,7 @@ public class App : Application
 
                 desktopLifetime.Exit += (_, _) =>
                 {
+
                     mainWindowViewModel.CloseLayout();
                 };
                     
