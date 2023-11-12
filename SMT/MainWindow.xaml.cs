@@ -90,7 +90,8 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = Path.Combine(EveAppConfig.VersionStorage, "MapConfig.dat");
+            string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion +  ".dat");
+
 
             if (File.Exists(mapConfigFileName))
             {
@@ -560,7 +561,8 @@ namespace SMT
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
                 // Save the Map Colours
-                string mapConfigFileName = Path.Combine(EveAppConfig.VersionStorage, "MapConfig.dat");
+                string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion + ".dat");
+
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
