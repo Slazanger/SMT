@@ -11,7 +11,7 @@ namespace EVEDataUtils
             {
                 XmlSerializer xms = new XmlSerializer(typeof(T));
 
-                FileStream fs = new FileStream(filename, FileMode.Open);
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
                 XmlReader xmlr = XmlReader.Create(fs);
 
                 return (T)xms.Deserialize(xmlr);
