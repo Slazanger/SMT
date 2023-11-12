@@ -576,6 +576,7 @@ namespace SMT
                 MapConf.ToolBox_ShowSystemADM = RegionUC.ShowSystemADM;
                 MapConf.ToolBox_ShowSystemSecurity = RegionUC.ShowSystemSecurity;
                 MapConf.ToolBox_ShowSystemTimers = RegionUC.ShowSystemTimers;
+                MapConf.ToolBox_ESIOverlayScale = RegionUC.ESIOverlayScale;
 
                 // now serialise the class to disk
                 XmlSerializer xms = new XmlSerializer(typeof(MapConfig));

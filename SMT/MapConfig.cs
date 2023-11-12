@@ -214,6 +214,11 @@ namespace SMT
         public bool ToolBox_ShowSystemTimers { get; set; }
 
         [Browsable(false)]
+        public double ToolBox_ESIOverlayScale { get; set; }
+
+
+
+        [Browsable(false)]
         public bool Debug_EnableMapEdit { get; set; }
 
         public bool DisableJumpBridgesPathAnimation

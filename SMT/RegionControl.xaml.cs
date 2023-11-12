@@ -680,6 +680,7 @@ namespace SMT
             ShowSystemADM = MapConf.ToolBox_ShowSystemADM;
             ShowSystemSecurity = MapConf.ToolBox_ShowSystemSecurity;
             ShowSystemTimers = MapConf.ToolBox_ShowSystemTimers;
+            ESIOverlayScale = MapConf.ToolBox_ESIOverlayScale;
 
             SelectRegion(MapConf.DefaultRegion);
 
