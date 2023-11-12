@@ -49,6 +49,8 @@ namespace SMT
 
         private System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
 
+        private readonly string WindowLayoutVersion = "01";
+
         /// <summary>
         /// Main Window
         /// </summary>
@@ -69,7 +71,7 @@ namespace SMT
             Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
 
             // Load the Dock Manager Layout file
-            string dockManagerLayoutName = Path.Combine(EveAppConfig.VersionStorage, "Layout.dat");
+            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_"+ WindowLayoutVersion + ".dat");
             if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
@@ -540,8 +542,7 @@ namespace SMT
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             // save off the dockmanager layout
-
-            string dockManagerLayoutName = Path.Combine(EveAppConfig.VersionStorage, "Layout.dat");
+            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
 
             try
             {
