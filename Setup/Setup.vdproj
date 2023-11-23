@@ -43,6 +43,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -59,6 +67,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -178,7 +202,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SMT"
         "ProductCode" = "8:{9087B7F8-A371-4334-BA6B-1CD99831D96E}"
-        "PackageCode" = "8:{8BB5CD8A-9BE8-496E-975F-6962CF735228}"
+        "PackageCode" = "8:{E865E813-8F18-468B-83FE-0CB22016554A}"
         "UpgradeCode" = "8:{52AA6C1E-3097-4771-BEFB-9E08D74573C1}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
@@ -192,7 +216,7 @@
         "Title" = "8:SMT - Slazanger's Map Tool"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Slazanger"
-        "Keywords" = "8:"
+        "Keywords" = "8:SMT"
         "ARPCOMMENTS" = "8:Slazanger's Map Tool (SMT)"
         "ARPURLINFOABOUT" = "8:"
         "ARPPRODUCTICON" = "8:"
