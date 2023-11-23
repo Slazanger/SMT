@@ -14,6 +14,9 @@ namespace SMT.EVEData
         public string VerString = "ABC123";
         private BackgroundWorker backgroundWorker;
 
+
+        private string QueueID;
+
         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
         /// </summary>
@@ -42,6 +45,9 @@ namespace SMT.EVEData
         public void Initialise()
         {
             KillStream = new List<ZKBDataSimple>();
+
+            // set the queue id which is now required
+            QueueID = "SMT_" + EVEDataUtils.Misc.RandomString(10);
 
             backgroundWorker = new BackgroundWorker();
             backgroundWorker.WorkerSupportsCancellation = true;
@@ -73,7 +79,7 @@ namespace SMT.EVEData
 
         private void zkb_DoWork(object sender, DoWorkEventArgs e)
         {
-            string redistURL = @"https://redisq.zkillboard.com/listen.php";
+            string redistURL = $"https://redisq.zkillboard.com/listen.php?queueID={QueueID}";
             string strContent = string.Empty;
             try
             {
