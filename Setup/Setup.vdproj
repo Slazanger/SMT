@@ -50,6 +50,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -201,15 +209,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SMT"
-        "ProductCode" = "8:{9087B7F8-A371-4334-BA6B-1CD99831D96E}"
-        "PackageCode" = "8:{E865E813-8F18-468B-83FE-0CB22016554A}"
+        "ProductCode" = "8:{074A60E2-35DC-43F2-BCBD-DA3C639F36DE}"
+        "PackageCode" = "8:{CD075D8F-6139-4B34-960E-10F3C006CBCB}"
         "UpgradeCode" = "8:{52AA6C1E-3097-4771-BEFB-9E08D74573C1}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.27"
+        "ProductVersion" = "8:1.28"
         "Manufacturer" = "8:Slazanger"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/Slazanger/SMT"
