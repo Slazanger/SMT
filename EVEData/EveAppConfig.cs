@@ -23,12 +23,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "All your (validated) tokens are belong to us";
+        public const string SMT_TITLE = "Winter Nexus Time";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_128";
+        public const string SMT_VERSION = "SMT_129";
 
         /// <summary>
         /// Folder to store all of the data from
