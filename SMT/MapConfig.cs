@@ -109,6 +109,7 @@ namespace SMT
         private bool m_overlayShowNPCKillDelta = true;
         private bool m_overlayShowRoute = true;
         private bool m_overlayShowJumpBridges = true;
+        private bool m_overlayShowSystemNames = false;
 
         public MapConfig()
         {
@@ -1163,6 +1164,22 @@ namespace SMT
         }
 
         [Category("Overlay")]
+        [DisplayName("Overlay Show System Names")]
+        public bool OverlayShowSystemNames
+        {
+            get
+            {
+                return m_overlayShowSystemNames;
+            }
+            set
+            {
+                m_overlayShowSystemNames = value;
+
+                OnPropertyChanged("OverlayShowSystemNames");
+            }
+        }
+
+        [Category("Overlay")]
         [DisplayName("Overlay Intel Fresh Time")]
         public float IntelFreshTime
         {
@@ -1338,6 +1355,7 @@ namespace SMT
             OverlayShowNPCKillDelta = true;
             OverlayShowRoute = true;
             OverlayShowJumpBridges = true;
+            OverlayShowSystemNames = false;
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;
