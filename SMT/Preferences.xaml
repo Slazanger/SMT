@@ -316,6 +316,7 @@
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharName}" Content="Show name of the active character" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharLocation}" Content="Show location of the active character" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowJumpBridges}" Content="Show JumpBridges" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowSystemNames}" Content="Show Individual System Names" />
                                         <Label Content="Hunter Mode Information" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKills}" Content="Show NPC kills" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
