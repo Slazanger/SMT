@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SvgNet" Version="3.3.5" />
+    <PackageReference Include="SvgNet" Version="3.3.6" />
   </ItemGroup>
 
   <ItemGroup>
