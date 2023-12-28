@@ -4,10 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 xmlns:vm="using:SMTx.ViewModels.Documents"
+             xmlns:paz="using:Avalonia.Controls.PanAndZoom"
              x:Class="SMTx.Views.Documents.RegionView"
 			 x:DataType="vm:RegionViewModel">
     <Viewbox Stretch="Uniform" x:Name="MainRegionsViewBox">
-        <Canvas Focusable="True" x:Name="RegionViewGrid" Width="1050" Height="800" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-        </Canvas>
+        <paz:ZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.2"
+                        Background="SlateBlue" ClipToBounds="True" Focusable="True"
+                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+
+            <Canvas Focusable="True" x:Name="RegionViewGrid" Width="1050" Height="800" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+            </Canvas>
+        </paz:ZoomBorder>
     </Viewbox>
 </UserControl>
