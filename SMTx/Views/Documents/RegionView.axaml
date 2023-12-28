@@ -7,13 +7,48 @@
              xmlns:paz="using:Avalonia.Controls.PanAndZoom"
              x:Class="SMTx.Views.Documents.RegionView"
 			 x:DataType="vm:RegionViewModel">
-    <Viewbox Stretch="Uniform" x:Name="MainRegionsViewBox">
-        <paz:ZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.2"
-                        Background="SlateBlue" ClipToBounds="True" Focusable="True"
-                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+	<Grid x:Name="MainRegionsViewBox" ColumnDefinitions="10,32,*">
 
-            <Canvas Focusable="True" x:Name="RegionViewGrid" Width="1050" Height="800" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-            </Canvas>
-        </paz:ZoomBorder>
-    </Viewbox>
+		<paz:ZoomBorder
+                Name="ZoomBorder"
+                Stretch="None"
+                ZoomSpeed="1.2"
+                Background="SlateBlue"
+                ClipToBounds="True"
+                Focusable="True"
+                Grid.ColumnSpan="3"
+                MaxZoomX="2" MaxZoomY="2"
+                MinZoomX="0.1" MinZoomY="0.1"
+                SizeChanged="ZoomBorder_OnSizeChanged">
+
+			<Canvas Focusable="True" x:Name="RegionViewGrid" Width="1050" Height="800"
+					HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+		</paz:ZoomBorder>
+
+
+
+
+            <StackPanel Grid.Column="1" Grid.ColumnSpan="1" Background="Gray" Margin="0" Spacing="3"  Height="200" VerticalAlignment="Top" HorizontalAlignment="Center" Width="34">
+                <Slider Orientation="Vertical" x:Name="SldZoom"
+                        Height="130" Width="30"
+                        Value="{Binding #ZoomBorder.ZoomX}"
+                        Minimum="0.1" Maximum="2.0"
+                        Padding="0"
+                        ValueChanged="SldZoom_OnValueChanged"
+                        >
+                    <Slider.Resources>
+                        <x:Double x:Key="SliderVerticalThumbWidth">10</x:Double>
+                        <x:Double x:Key="SliderVerticalThumbHeight">10</x:Double>
+                        <Thickness x:Key="SliderTopHeaderMargin">0,0,0,0</Thickness>
+
+
+
+                    </Slider.Resources>
+                </Slider>
+
+                <Button Content="⌻" x:Name="BtnOrigSize" Click="BtnOrigSize_OnClick" Width="30" Height="30" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                <Button Content="⌼" x:Name="BtnFill" Click="BtnFill_OnClick" Width="30" Height="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+	</Grid>
 </UserControl>

@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Controls.Shapes;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using csDelaunay;
 using StructureHunter;
@@ -54,8 +56,13 @@ namespace SMTx.Views.Documents
             staticRegionItems = new List<object>();
             dynamicRegionItems = new List<object>();
 
+
             SetupBrushes();
             AddSystems();
+
+
+            ZoomBorder.Fill(false);
+
         }
 
 
@@ -201,5 +208,37 @@ namespace SMTx.Views.Documents
             }
 
         }
+
+        #region Zoom Controls
+
+        private void SldZoom_OnValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            double zoomTo = SldZoom.Value;
+            double zoomCentreX = ZoomBorder.DesiredSize.Width / 2;
+            double zoomCentreY = ZoomBorder.DesiredSize.Height / 2;
+
+
+            ZoomBorder.Zoom(zoomTo, zoomCentreX, zoomCentreY, true);
+        }
+
+        // Resize back to 1:1 scale
+        private void BtnOrigSize_OnClick(object sender, RoutedEventArgs e)
+        {
+            ZoomBorder.None(true);
+        }
+
+        // resize to fill the space
+        private void BtnFill_OnClick(object sender, RoutedEventArgs e)
+        {
+            ZoomBorder.Uniform(true);
+        }
+
+        private void ZoomBorder_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ZoomBorder.Uniform(true);
+        }
+
+        #endregion
+
     }
 }
