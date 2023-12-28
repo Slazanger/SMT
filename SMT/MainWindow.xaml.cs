@@ -49,6 +49,8 @@ namespace SMT
 
         private System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
 
+        private readonly string WindowLayoutVersion = "01";
+
         /// <summary>
         /// Main Window
         /// </summary>
@@ -69,7 +71,7 @@ namespace SMT
             Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
 
             // Load the Dock Manager Layout file
-            string dockManagerLayoutName = Path.Combine(EveAppConfig.VersionStorage, "Layout.dat");
+            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_"+ WindowLayoutVersion + ".dat");
             if (File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
@@ -90,7 +92,8 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = Path.Combine(EveAppConfig.VersionStorage, "MapConfig.dat");
+            string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion +  ".dat");
+
 
             if (File.Exists(mapConfigFileName))
             {
@@ -539,8 +542,7 @@ namespace SMT
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             // save off the dockmanager layout
-
-            string dockManagerLayoutName = Path.Combine(EveAppConfig.VersionStorage, "Layout.dat");
+            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
 
             try
             {
@@ -560,7 +562,8 @@ namespace SMT
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
                 // Save the Map Colours
-                string mapConfigFileName = Path.Combine(EveAppConfig.VersionStorage, "MapConfig.dat");
+                string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion + ".dat");
+
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -573,6 +576,7 @@ namespace SMT
                 MapConf.ToolBox_ShowSystemADM = RegionUC.ShowSystemADM;
                 MapConf.ToolBox_ShowSystemSecurity = RegionUC.ShowSystemSecurity;
                 MapConf.ToolBox_ShowSystemTimers = RegionUC.ShowSystemTimers;
+                MapConf.ToolBox_ESIOverlayScale = RegionUC.ESIOverlayScale;
 
                 // now serialise the class to disk
                 XmlSerializer xms = new XmlSerializer(typeof(MapConfig));

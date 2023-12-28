@@ -364,6 +364,10 @@ namespace SMT.EVEData
                         if (CMN.Visited)
                             continue;
 
+                        // dont jump back to the system we came from 
+                        if (CurrentNode.Name == theraConnection)
+                            continue;
+
                         if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
                         {
                             CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
@@ -383,6 +387,10 @@ namespace SMT.EVEData
                         MapNode CMN = MapNodes[ZarzakhConnection];
 
                         if (CMN.Visited)
+                            continue;
+
+                        // don't jump back to the system we just came from
+                        if (CurrentNode.Name == ZarzakhConnection)
                             continue;
 
                         if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)

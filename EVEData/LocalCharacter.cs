@@ -666,7 +666,7 @@ namespace SMT.EVEData
                 {
                     ssoErrorCount++;
 
-                    Thread.Sleep(10000);
+                    Thread.Sleep(20000);
 
                     if (ssoErrorCount > 50)
                     {

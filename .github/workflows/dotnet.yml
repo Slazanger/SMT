@@ -23,5 +23,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: msbuild SMT.sln
+    - name: Publish
+      run: msbuild SMT.sln /p:Configuration=Release /p:Platform="x64" /p:PublishProfile=FolderProfile.pubxml
     - name: Test
       run: dotnet test --no-build --verbosity normal

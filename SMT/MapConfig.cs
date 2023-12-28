@@ -7,6 +7,8 @@ namespace SMT
 {
     public class MapConfig : INotifyPropertyChanged
     {
+        public static readonly string SaveVersion = "01";
+
         [Browsable(false)]
         public MapColours ActiveColourScheme;
 
@@ -210,6 +212,11 @@ namespace SMT
 
         [Browsable(false)]
         public bool ToolBox_ShowSystemTimers { get; set; }
+
+        [Browsable(false)]
+        public double ToolBox_ESIOverlayScale { get; set; }
+
+
 
         [Browsable(false)]
         public bool Debug_EnableMapEdit { get; set; }
