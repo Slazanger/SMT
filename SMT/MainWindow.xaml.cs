@@ -40,8 +40,6 @@ namespace SMT
 
         private List<InfoItem> InfoLayer;
 
-        private List<string> playerAlertNames;
-
         private Dictionary<string, long> CharacterNameIDCache;
         private Dictionary<long, string> CharacterIDNameCache;
 
