@@ -15,7 +15,7 @@
 
     <Grid Background="{DynamicResource ButtonBorder}" Height="Auto" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
         <DockPanel HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-            <TabControl x:Name="tabControl" DockPanel.Dock="Top">
+            <TabControl x:Name="tabControl" DockPanel.Dock="Top" Height="487">
                 <TabItem Header="General">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -194,7 +194,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <GroupBox Margin="4" Height="auto">
+                            <GroupBox Margin="4" Height="453">
 
                                 <StackPanel Orientation="Vertical">
                                     <Label>Channel Filters</Label>
@@ -203,6 +203,8 @@
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelClearFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                     <Label>Ignore Filters</Label>
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelIgnoreFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
+                                    <Label Content="Alert Filters"/>
+                                    <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelAlertFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
