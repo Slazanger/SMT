@@ -15,6 +15,7 @@ using ESI.NET;
 using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
 using EVEDataUtils;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -558,6 +559,7 @@ namespace SMT.EVEData
                             s.Region = "Pochven";
                         }
                     }
+
                 }
             }
             else
@@ -3003,9 +3005,9 @@ namespace SMT.EVEData
                 TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
                 TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
 
-                DateTime NextCharacterUpdate = DateTime.Now;
-                DateTime NextLowFreqUpdate = DateTime.Now;
-                DateTime NextSOVCampaignUpdate = DateTime.Now;
+                DateTime NextCharacterUpdate = DateTime.MinValue;
+                DateTime NextLowFreqUpdate = DateTime.MinValue;
+                DateTime NextSOVCampaignUpdate = DateTime.MinValue;
 
                 // loop forever
                 while (BackgroundThreadShouldTerminate == false)
@@ -3057,13 +3059,21 @@ namespace SMT.EVEData
                     }
                 }
 
-                string url = @"http://evemaps.dotlan.net/js/" + mr.DotLanRef + ".js";
+                DateTime currentTime = DateTime.UtcNow;
+                long unixTime = ((DateTimeOffset)currentTime).ToUnixTimeSeconds();
+
+
+                string url = @"http://evemaps.dotlan.net/js/" + mr.DotLanRef + ".js?" + unixTime;
                 string strContent = string.Empty;
+                string refUrl = @"https://evemaps.dotlan.net/map/" + mr.DotLanRef;
 
                 try
                 {
                     HttpClient hc = new HttpClient();
-                    hc.DefaultRequestHeaders.Add("User-Agent", EveAppConfig.SMT_VERSION);
+                    hc.DefaultRequestHeaders.Add("User-Agent", @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
+                    hc.DefaultRequestHeaders.Add("Language", "en-GB,en;q=0.9,en-US;q=0.8");
+                    hc.DefaultRequestHeaders.Add("Referer", refUrl);
+
                     var response = await hc.GetAsync(url);
                     response.EnsureSuccessStatusCode();
                     strContent = await response.Content.ReadAsStringAsync();
@@ -3086,6 +3096,9 @@ namespace SMT.EVEData
                 catch
                 {
                 }
+                // delay each request to not overwhelm
+                int delay = new Random().Next(100, 500); 
+                Thread.Sleep(delay);
             }
         }
 
