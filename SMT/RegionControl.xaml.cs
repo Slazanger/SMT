@@ -1224,7 +1224,7 @@ namespace SMT
 
                     Canvas.SetLeft(WarninghighlightSystemCircle, mss.Layout.X - warningCircleSizeOffset);
                     Canvas.SetTop(WarninghighlightSystemCircle, mss.Layout.Y - warningCircleSizeOffset);
-                    Canvas.SetZIndex(WarninghighlightSystemCircle, 24);
+                    Canvas.SetZIndex(WarninghighlightSystemCircle, 15);
                     MainCanvas.Children.Add(WarninghighlightSystemCircle);
                     DynamicMapElements.Add(WarninghighlightSystemCircle);
                 }
