@@ -158,8 +158,16 @@ namespace SMT
             IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
             idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
 
+            IntelData idthree = new IntelData("[00:00] blah... > blah", "System");
+            idthree.IntelString = "Intel Alert Filters : " + String.Join(", ", EVEManager.IntelAlertFilters);
+
+            IntelData idfour = new IntelData("[00:00] blah... > blah", "System");
+            idfour.IntelString = "Intel Alert Filters Count: " + EVEManager.IntelAlertFilters.Count();
+
             IntelCache.Add(id);
             IntelCache.Add(idtwo);
+            IntelCache.Add(idthree);
+            IntelCache.Add(idfour);
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -1167,7 +1175,7 @@ namespace SMT
                 return;
             }
 
-            if (MapConf.PlayIntelSound || MapConf.FlashWindow)
+            if (MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnPlayer)
             {
                 if (MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
@@ -1193,6 +1201,18 @@ namespace SMT
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+                if (MapConf.PlayIntelSoundOnPlayer)
+                {
+                    // Check if the intel contains a player we should alert on
+                    foreach (string alertName in EVEManager.IntelAlertFilters)
+                    {
+                        if (id.RawIntelString.Contains(alertName))
+                        {
+                            playSound = playSound || MapConf.PlayIntelSoundOnPlayer;
+                            break;
                         }
                     }
                 }
