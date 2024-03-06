@@ -1175,7 +1175,7 @@ namespace SMT
                 return;
             }
 
-            if (MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnPlayer)
+            if (MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
             {
                 if (MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
@@ -1204,22 +1204,18 @@ namespace SMT
                         }
                     }
                 }
-                if (MapConf.PlayIntelSoundOnPlayer)
+
+                if (MapConf.PlayIntelSoundOnAlert)
                 {
-                    // Check if the intel contains a player we should alert on
+                    // Check if the intel contains a text we should explicitly alert on
                     foreach (string alertName in EVEManager.IntelAlertFilters)
                     {
                         if (id.RawIntelString.Contains(alertName))
                         {
-                            playSound = playSound || MapConf.PlayIntelSoundOnPlayer;
+                            playSound = playSound || MapConf.PlayIntelSoundOnAlert;
                             break;
                         }
                     }
-                }
-                else
-                {
-                    playSound = MapConf.PlayIntelSound;
-                    flashWindow = MapConf.FlashWindow;
                 }
             }
 

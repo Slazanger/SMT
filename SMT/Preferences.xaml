@@ -152,7 +152,7 @@
                                 <StackPanel>
 
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnPlayer}" Margin="0,2">Warning Sound on Player</CheckBox>
+                                    <CheckBox IsChecked="{Binding PlayIntelSoundOnAlert}" Margin="0,2" Content="Warning Sound on Alert"/>
                                     <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window" />
                                     <StackPanel Orientation="Vertical" Margin="0,2">
                                         <Label Content="Warning Sound Volume" />

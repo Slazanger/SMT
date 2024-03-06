@@ -477,8 +477,8 @@ namespace SMT
         }
 
         [Category("Intel")]
-        [DisplayName("Warning on Player")]
-        public bool PlayIntelSoundOnPlayer { get; set; }
+        [DisplayName("Warning on Alert Text")]
+        public bool PlayIntelSoundOnAlert { get; set; }
 
         [Category("Intel")]
         [DisplayName("Warning On Unknown")]
