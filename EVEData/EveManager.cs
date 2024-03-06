@@ -2134,7 +2134,9 @@ namespace SMT.EVEData
             UpdateIncursionsFromESI();
 
             UpdateSovStructureUpdate();
-            UpdateDotlanKillDeltaInfo();
+
+            // TEMP Disabled
+            //UpdateDotlanKillDeltaInfo();
         }
 
         /// <summary>
