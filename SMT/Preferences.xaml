@@ -197,13 +197,13 @@
                             <GroupBox Margin="4" Height="453">
 
                                 <StackPanel Orientation="Vertical">
-                                    <Label>Channel Filters</Label>
+                                    <Label Content="Channels to monitor (Partial text match, one per line)"/>
                                     <TextBox Width="271" Height="100" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                    <Label>Clear Filters</Label>
+                                    <Label Content="Clear Filters (will change alert to warning)"/>
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelClearFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                    <Label>Ignore Filters</Label>
+                                    <Label Content="Ignore Filters (Text to ignore)"/>
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelIgnoreFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                    <Label Content="Alert Filters"/>
+                                    <Label Content="Alert Filters (Text to always alert)"/>
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelAlertFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                 </StackPanel>
                             </GroupBox>
