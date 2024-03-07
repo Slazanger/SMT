@@ -2,8 +2,11 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
+using System;
 using System.Data;
 using System.Globalization;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -62,6 +65,18 @@ namespace SMT.EVEData
         private string VersionStr;
 
         private bool WatcherThreadShouldTerminate;
+
+        private TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
+        private TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
+        private TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
+
+        private DateTime NextCharacterUpdate = DateTime.MinValue;
+        private DateTime NextLowFreqUpdate = DateTime.MinValue;
+        private DateTime NextSOVCampaignUpdate = DateTime.MinValue;
+        private DateTime NextDotlanUpdate = DateTime.MinValue;
+        private DateTime LastDotlanUpdate = DateTime.MinValue;
+        private string LastDotlanETAG = "";
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
@@ -2136,7 +2151,7 @@ namespace SMT.EVEData
             UpdateSovStructureUpdate();
 
             // TEMP Disabled
-            //UpdateDotlanKillDeltaInfo();
+            //();
         }
 
         /// <summary>
@@ -3031,13 +3046,7 @@ namespace SMT.EVEData
             {
                 Thread.CurrentThread.IsBackground = false;
 
-                TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(1);
-                TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
-                TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
 
-                DateTime NextCharacterUpdate = DateTime.MinValue;
-                DateTime NextLowFreqUpdate = DateTime.MinValue;
-                DateTime NextSOVCampaignUpdate = DateTime.MinValue;
 
                 // loop forever
                 while (BackgroundThreadShouldTerminate == false)
@@ -3071,6 +3080,11 @@ namespace SMT.EVEData
                         UpdateTheraConnections();
                     }
 
+                    if ((NextDotlanUpdate - DateTime.Now).Minutes < 0)
+                    {
+                        UpdateDotlanKillDeltaInfo();
+                    }
+
                     Thread.Sleep(100);
                 }
             }).Start();
@@ -3078,57 +3092,78 @@ namespace SMT.EVEData
 
         private async void UpdateDotlanKillDeltaInfo()
         {
-            foreach (MapRegion mr in Regions)
+            // set the update for 20 minutes from now initially which will be pushed further once we have the last-modified
+            // however if the request fails we still push out the request..
+            NextDotlanUpdate = DateTime.Now + TimeSpan.FromMinutes(20);
+
+
+            try
             {
-                // clear the data set
-                foreach (MapSystem ms in mr.MapSystems.Values)
+                string dotlanNPCDeltaAPIurl = "https://evemaps.dotlan.net/ajax/npcdelta";
+
+                HttpClient hc = new HttpClient();
+                string versionNum = VersionStr.Split("_")[1];
+                string userAgent = $"Mozilla/5.0 (Slazanger's Map Tool https://github.com/Slazanger/SMT/ version {versionNum} )";
+                hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
+                hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
+
+                // set the etag if we have one
+                if (LastDotlanETAG != "")
                 {
-                    if (!ms.OutOfRegion)
-                    {
-                        ms.ActualSystem.NPCKillsDeltaLastHour = 0;
-                    }
+                    hc.DefaultRequestHeaders.IfNoneMatch.Add(new EntityTagHeaderValue(LastDotlanETAG));
                 }
 
-                DateTime currentTime = DateTime.UtcNow;
-                long unixTime = ((DateTimeOffset)currentTime).ToUnixTimeSeconds();
+
+                var response = await hc.GetAsync(dotlanNPCDeltaAPIurl);
 
 
-                string url = @"http://evemaps.dotlan.net/js/" + mr.DotLanRef + ".js?" + unixTime;
-                string strContent = string.Empty;
-                string refUrl = @"https://evemaps.dotlan.net/map/" + mr.DotLanRef;
-
-                try
+                // update the next request to the last modified + 1hr + random offset
+                if (response.Content.Headers.LastModified.HasValue)
                 {
-                    HttpClient hc = new HttpClient();
-                    hc.DefaultRequestHeaders.Add("User-Agent", @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
-                    hc.DefaultRequestHeaders.Add("Language", "en-GB,en;q=0.9,en-US;q=0.8");
-                    hc.DefaultRequestHeaders.Add("Referer", refUrl);
+                    Random rndUpdateOffset = new Random();
+                    NextDotlanUpdate = response.Content.Headers.LastModified.Value.DateTime + TimeSpan.FromMinutes(60) + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300));
+                }
 
-                    var response = await hc.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
+                // update the values for the next request;
+                LastDotlanUpdate = DateTime.Now;
+                if (response.Headers.ETag != null)
+                {
+                    LastDotlanETAG = response.Headers.ETag.Tag;
+                }
+
+
+
+                if (response.StatusCode == HttpStatusCode.NotModified)
+                {
+                    // we shouldn't hit this; the first request should update the request beyond the last-modified expiring
+                    // LastDotlanUpdate = DateTime.Now;
+                }
+                else
+                {
+                    // read the data
+                    string strContent = string.Empty;
                     strContent = await response.Content.ReadAsStringAsync();
 
-                    // this string is a javascript variable; so if we strip off the comment and variable we can parse it as raw json
-                    int substrpos = strContent.IndexOf("{");
-                    string json = strContent.Substring(substrpos - 1);
 
-                    var systemData = Dotlan.SystemData.FromJson(json);
+                    // parse the json response into kvp string/strings (system id)/(delta)
+                    Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(strContent);
 
-                    foreach (KeyValuePair<string, Dotlan.SystemData> kvp in systemData)
+                    foreach (var kvp in killdDeltadata)
                     {
-                        System s = GetEveSystemFromID(long.Parse(kvp.Key));
-                        if (s != null && kvp.Value.Nd.HasValue)
+                        Console.WriteLine($"Key: {kvp.Key}, Value: {kvp.Value}");
+                        int systemId = int.Parse(kvp.Key);
+                        int killDelta = int.Parse(kvp.Value);
+
+                        System s = GetEveSystemFromID(systemId);
+                        if (s != null)
                         {
-                            s.NPCKillsDeltaLastHour = (int)kvp.Value.Nd.Value;
+                            s.NPCKillsDeltaLastHour = killDelta;
                         }
                     }
                 }
-                catch
-                {
-                }
-                // delay each request to not overwhelm
-                int delay = new Random().Next(100, 500); 
-                Thread.Sleep(delay);
+            }
+            catch (Exception e)
+            {
             }
         }
 
