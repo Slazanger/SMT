@@ -83,6 +83,6 @@ namespace SMT.EVEData
         /// <summary>
         /// To String
         /// </summary>
-        public override string ToString() => Signature + " " + Type + " " + Name;
+        public override string ToString() => Signature + "\t" + "Cosmic Signature" + "\t" + Type + "\t" + Name + "\t\t";
     }
 }

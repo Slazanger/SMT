@@ -40,82 +40,63 @@ namespace SMT.EVEData
         /// Update the AnomData from the string (usually the clipboard)
         /// </summary>
         /// <param name="pastedText">raw Anom strings</param>
-        public void UpdateFromPaste(string pastedText)
+        public HashSet<string> UpdateFromPaste(string pastedText)
         {
-            bool validPaste = false;
-            List<string> itemsToKeep = new List<string>();
+            HashSet<string> signaturesPresent = new HashSet<string>();
+
             string[] pastelines = pastedText.Split('\n');
             foreach (string line in pastelines)
             {
                 // split on tabs
                 string[] words = line.Split('\t');
-                if (words.Length == 6)
+
+                if (words.Length != 6)
+                    continue;
+
+                // only care about "Cosmic Signature"
+                if (!CosmicSignatureTags.Contains(words[1]))
+                    continue;
+
+                string sigID = words[0];
+                string sigType = words[2];
+                string sigName = words[3];
+
+                if (string.IsNullOrEmpty(sigType))
+                    sigType = "Unknown";
+
+                signaturesPresent.Add(sigID);
+
+                if (Anoms.ContainsKey(sigID))
                 {
-                    // only care about "Cosmic Signature"
-                    if (CosmicSignatureTags.Contains(words[1]))
-                    {
-                        validPaste = true;
+                    // update an existing signature
+                    Anom an = Anoms[sigID];
 
-                        string sigID = words[0];
-                        string sigType = words[2];
-                        string sigName = words[3];
+                    if (an.Type == "Unknown")
+                        an.Type = sigType;
 
-                        if (string.IsNullOrEmpty(sigType))
-                        {
-                            sigType = "Unknown";
-                        }
+                    if (!string.IsNullOrEmpty(sigName))
+                        an.Name = sigName;
+                }
+                else
+                {
+                    // add a new signature
+                    Anom an = new Anom();
+                    an.Signature = sigID;
+                    an.Type = sigType;
 
-                        itemsToKeep.Add(sigID);
+                    if (!string.IsNullOrEmpty(sigName))
+                        an.Name = sigName;
 
-                        // valid sig
-                        if (Anoms.ContainsKey(sigID))
-                        {
-                            // updating an existing one
-                            Anom an = Anoms[sigID];
-                            if (an.Type == "Unknown")
-                            {
-                                an.Type = sigType;
-                            }
-
-                            if (!string.IsNullOrEmpty(sigName))
-                            {
-                                an.Name = sigName;
-                            }
-                        }
-                        else
-                        {
-                            Anom an = new Anom();
-                            an.Signature = sigID;
-                            an.Type = sigType;
-
-                            if (!string.IsNullOrEmpty(sigName))
-                            {
-                                an.Name = sigName;
-                            }
-
-                            Anoms.Add(sigID, an);
-                        }
-                    }
+                    Anoms.Add(sigID, an);
                 }
             }
 
-            // if we had a valid paste dump any items we didnt reference, brute force scan and remove.. come back to this later..
-            if (validPaste)
-            {
-                List<string> toRemove = new List<string>();
-                foreach (string an in Anoms.Keys.ToList())
-                {
-                    if (!itemsToKeep.Contains(an))
-                    {
-                        toRemove.Add(an);
-                    }
-                }
+            // find existing signatures that are missing from the paste
+            var signaturesMissing = Anoms.Where(kvp => !signaturesPresent.Contains(kvp.Value.Signature))
+                .Select(kvp => kvp.Key)
+                .ToHashSet();
 
-                foreach (string s in toRemove)
-                {
-                    Anoms.Remove(s);
-                }
-            }
+            return signaturesMissing;
         }
     }
 }
