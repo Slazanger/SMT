@@ -40,6 +40,7 @@ namespace SMT.EVEData
         /// Update the AnomData from the string (usually the clipboard)
         /// </summary>
         /// <param name="pastedText">raw Anom strings</param>
+        /// <returns>HashSet of anom IDs present in the dictionary but missing from the pasted text</returns>
         public HashSet<string> UpdateFromPaste(string pastedText)
         {
             HashSet<string> signaturesPresent = new HashSet<string>();
