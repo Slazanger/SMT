@@ -23,12 +23,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "its not 1.69, but feel inspired until then";
+        public const string SMT_TITLE = "what is Upwell Upto ?";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_131";
+        public const string SMT_VERSION = "SMT_132";
 
         /// <summary>
         /// Folder to store all of the data from

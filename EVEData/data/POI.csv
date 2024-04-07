@@ -1,4 +1,11 @@
-Location,Type,Desc,Long Desc
+New :
+
+Updated Anom Panel (thanks to https://github.com/pstarn )
+Re-enabled the npc kill delta
+Added POI for upwell research event in Auviken
+Other :
+
+Added Jove Observatory to 0M-24XLocation,Type,Desc,Long Desc
 Jita,Market Hub,Jita IV - Moon 4 - Caldari Navy Assembly Plant,The center of trade in New Eden
 Amarr,Market Hub,Amarr VIII (Oris) - Emperor Family Academy,The second largest trade hub
 Rens,Market Hub,Rens VI - Moon 8 - Brutor Tribe Treasury,Minmatar Trade Hub
@@ -28,4 +35,4 @@ Turnur,Jove,Ancient Jove Stargate,Unknown Ancient Gate
 G-0Q86,Jove,Ancient Jove Stargate,Unknown Ancient Gate
 H-PA29,Jove,Ancient Jove Stargate,Unknown Ancient Gate
 Alsavoinon,Jove,Ancient Jove Stargate,Unknown Ancient Gate
-Auviken,POI,Upwell Consortium unknown research
+Auviken,POI,Upwell Consortium unknown research, Unknown research event
