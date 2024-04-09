@@ -3121,7 +3121,7 @@ namespace SMT.EVEData
                 if (response.Content.Headers.LastModified.HasValue)
                 {
                     Random rndUpdateOffset = new Random();
-                    NextDotlanUpdate = response.Content.Headers.LastModified.Value.DateTime + TimeSpan.FromMinutes(60) + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300));
+                    NextDotlanUpdate = response.Content.Headers.LastModified.Value.DateTime.ToLocalTime() + TimeSpan.FromMinutes(60) + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300));
                 }
 
                 // update the values for the next request;
