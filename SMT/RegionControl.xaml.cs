@@ -3475,14 +3475,15 @@ namespace SMT
                 cm.DataContext = selectedSys;
 
                 MenuItem setDesto = cm.Items[2] as MenuItem;
-                MenuItem addWaypoint = cm.Items[3] as MenuItem;
-                MenuItem clearRoute = cm.Items[4] as MenuItem;
+                MenuItem addWaypoint = cm.Items[4] as MenuItem;
+                MenuItem clearRoute = cm.Items[6] as MenuItem;
 
-                MenuItem characters = cm.Items[5] as MenuItem;
+                MenuItem characters = cm.Items[7] as MenuItem;
                 characters.Items.Clear();
 
                 setDesto.IsEnabled = false;
                 addWaypoint.IsEnabled = false;
+                clearRoute.IsEnabled = false;
 
                 characters.IsEnabled = false;
                 characters.Visibility = Visibility.Collapsed;
@@ -3941,12 +3942,27 @@ namespace SMT
             }
         }
 
-        /// <summary>
-        /// Ckear Route  Clicked
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
+        private void SysContexMenuItemAddWaypointAll_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+            foreach (LocalCharacter lc in EM.LocalCharacters)
+            {
+                if (lc.IsOnline && lc.ESILinked)
+                {
+                    lc.AddDestination(eveSys.ActualSystem.ID, false);
+                }
+            }
+        }
+
+
+
+
+/// <summary>
+/// Ckear Route  Clicked
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
         {
             if (ActiveCharacter != null)
             {
@@ -4009,6 +4025,19 @@ namespace SMT
             }
         }
 
+        private void SysContexMenuItemSetDestinationAll_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+            foreach(LocalCharacter lc in EM.LocalCharacters) 
+            {
+                if (lc.IsOnline && lc.ESILinked)
+                {
+                    lc.AddDestination(eveSys.ActualSystem.ID, true);
+                }
+            }
+        }
+
+
         private void SysContexMenuItemShowInUniverse_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
@@ -4016,6 +4045,8 @@ namespace SMT
             RoutedEventArgs newEventArgs = new RoutedEventArgs(UniverseSystemSelectEvent, eveSys.Name);
             RaiseEvent(newEventArgs);
         }
+
+
 
         /// <summary>
         /// ZKillboard Clicked
