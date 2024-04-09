@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using SMT.EVEData;
 
 namespace SMT
 {
@@ -569,8 +570,8 @@ namespace SMT
             cm.IsOpen = true;
 
             MenuItem setDesto = cm.Items[2] as MenuItem;
-            MenuItem addWaypoint = cm.Items[3] as MenuItem;
-            MenuItem clearRoute = cm.Items[4] as MenuItem;
+            MenuItem addWaypoint = cm.Items[4] as MenuItem;
+            MenuItem clearRoute = cm.Items[6] as MenuItem;
 
             if (ActiveCharacter != null && ActiveCharacter.ESILinked)
             {
@@ -580,7 +581,7 @@ namespace SMT
             }
 
             // update SOV
-            MenuItem SovHeader = cm.Items[7] as MenuItem;
+            MenuItem SovHeader = cm.Items[9] as MenuItem;
             SovHeader.Items.Clear();
             SovHeader.IsEnabled = false;
 
@@ -1406,6 +1407,21 @@ namespace SMT
             }
         }
 
+        private void SysContexMenuItemSetDestinationAll_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+
+            foreach (LocalCharacter lc in EM.LocalCharacters)
+            {
+                if (lc.IsOnline && lc.ESILinked)
+                {
+                    lc.AddDestination(eveSys.ID, true);
+                }
+            }
+
+        }
+
+
         private void SysContexMenuItemAddWaypoint_Click(object sender, RoutedEventArgs e)
         {
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
@@ -1414,6 +1430,22 @@ namespace SMT
                 ActiveCharacter.AddDestination(eveSys.ID, false);
             }
         }
+
+        private void SysContexMenuItemAddWaypointAll_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            foreach (LocalCharacter lc in EM.LocalCharacters)
+            {
+                if (lc.IsOnline && lc.ESILinked)
+                {
+                    lc.AddDestination(eveSys.ID, false);
+                }
+            }
+        }
+
+
+
+
 
         private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
         {

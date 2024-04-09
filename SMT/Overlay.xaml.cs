@@ -9,11 +9,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic.Logging;
 using SMT.EVEData;
+using Windows.Devices.Geolocation;
 using static SMT.EVEData.Navigation;
 
 namespace SMT
@@ -39,6 +42,7 @@ namespace SMT
         public int rattingDelta;
 
         public Shape systemCanvasElement;
+        public TextBlock systemNameElement;
         public Shape npcKillCanvasElement;
         public Shape npcKillDeltaCanvasElement;
         public Path jumpBridgePath;
@@ -71,6 +75,7 @@ namespace SMT
         public void CleanUpCanvas(Canvas canvas, bool keepSystem = false)
         {
             if (!keepSystem && systemCanvasElement != null && canvas.Children.Contains(systemCanvasElement)) canvas.Children.Remove(systemCanvasElement);
+            if (!keepSystem && systemNameElement != null && canvas.Children.Contains(systemNameElement)) canvas.Children.Remove(systemNameElement);
             if (npcKillCanvasElement != null && canvas.Children.Contains(npcKillCanvasElement)) canvas.Children.Remove(npcKillCanvasElement);
             if (npcKillDeltaCanvasElement != null && canvas.Children.Contains(npcKillDeltaCanvasElement)) canvas.Children.Remove(npcKillDeltaCanvasElement);
             CleanUpJumpBridges(canvas);
@@ -104,8 +109,10 @@ namespace SMT
         public Vector2 currentOriginCoordinates;
 
         public float mapBorderMargin;
+        public float mapBorderBottomAdd;
         public float mapScalingX;
         public float mapScalingY;
+        public bool mapBorderBottomExtension = false;
 
         public float mapScalingMin
         { get { return Math.Min(mapScalingY, mapScalingX); } }
@@ -120,6 +127,7 @@ namespace SMT
             currentOriginCoordinates = Vector2.Zero;
 
             mapBorderMargin = 20f;
+            mapBorderBottomAdd = 10f;
             mapScalingX = 1f;
             mapScalingY = 1f;
         }
@@ -163,7 +171,7 @@ namespace SMT
         private void ComputeScaling()
         {
             mapScalingX = (dimensions.X - (mapBorderMargin * 2f)) / unscaledMapDimensions.X;
-            mapScalingY = (dimensions.Y - (mapBorderMargin * 2f)) / unscaledMapDimensions.Y;
+            mapScalingY = (dimensions.Y - (mapBorderMargin * 2f) - (mapBorderBottomExtension ? mapBorderBottomAdd : 0)) / unscaledMapDimensions.Y;
         }
 
         /// <summary>
@@ -177,7 +185,7 @@ namespace SMT
             float emptySpaceOffsetX = (borderedDimensions.X - scaledMapDimensions.X) * 0.5f;
             float emptySpaceOffsetY = (borderedDimensions.Y - scaledMapDimensions.Y) * 0.5f;
             float canvasX = emptySpaceOffsetX + mapBorderMargin + (((coordinate.X - unscaledMapExtendsMin.X) * mapScalingMin) / borderedDimensions.X) * borderedDimensions.X;
-            float canvasY = emptySpaceOffsetY + mapBorderMargin + (((coordinate.Y - unscaledMapExtendsMin.Y) * mapScalingMin) / borderedDimensions.Y) * borderedDimensions.Y;
+            float canvasY = emptySpaceOffsetY + mapBorderMargin - (mapBorderBottomExtension ? (mapBorderBottomAdd * 0.5f) : 0 ) + (((coordinate.Y - unscaledMapExtendsMin.Y) * mapScalingMin) / borderedDimensions.Y) * borderedDimensions.Y;
             return new Vector2(canvasX, canvasY);
         }
     }
@@ -195,7 +203,7 @@ namespace SMT
         private List<(EVEData.IntelData data, List<Ellipse> ellipse)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
         private List<Line> jumpLines = new List<Line>();
         private List<OverlaySystemData> bridgeSystems = new List<OverlaySystemData>();
-        private List<Line> routeLines = new List<Line>();
+        private List<Shape> routeLines = new List<Shape>();
         private Ellipse jumpBridgeTargetHighlight = null;
 
         private Brush sysOutlineBrush;
@@ -248,6 +256,7 @@ namespace SMT
         private bool showCharName = true;
         private bool showCharLocation = true;
         private bool showJumpBridges = true;
+        private bool showSystemNames = false;
 
         private DoubleCollection dashStroke = new DoubleCollection(new List<double> { 2, 2 });
 
@@ -320,13 +329,13 @@ namespace SMT
             intelFillBrush.Opacity = 0.25f;
 
             jumpLineBrush = new SolidColorBrush(Colors.White);
-            jumpLineBrush.Opacity = 0.5f;
+            jumpLineBrush.Opacity = 0.75f;
 
             bridgeLineBrush = new SolidColorBrush(mw.MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
             bridgeLineBrush.Opacity = 0.75f;
 
             routeLineBrush = new SolidColorBrush(Colors.Yellow);
-            routeLineBrush.Opacity = 0.5f;
+            routeLineBrush.Opacity = 0.75f;
 
             transparentBrush = new SolidColorBrush(Colors.White);
             transparentBrush.Opacity = 0f;
@@ -351,6 +360,7 @@ namespace SMT
             intelHistoryPeriod = mainWindow.MapConf.IntelHistoricTime;
             overlayDepth = mainWindow.MapConf.OverlayRange + 1;
             showJumpBridges = mainWindow.MapConf.OverlayShowJumpBridges;
+            showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
 
             // Initialize value animation to be used by dashed lines
             dashAnimation = new DoubleAnimation();
@@ -413,6 +423,7 @@ namespace SMT
         private void RefreshCurrentView()
         {
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
+            canvasData.mapBorderBottomExtension = showSystemNames;
             UpdatePlayerInformationText();
             UpdateSystemList();
             UpdateIntelDataCoordinates();
@@ -683,19 +694,32 @@ namespace SMT
                     RoutePoint segmentStart = routePoints[i - 1];
                     RoutePoint segmentEnd = routePoints[i];
 
-                    routeLines.Add(new Line());
+                    if ( systemData.ContainsKey(segmentStart.SystemName) && segmentStart.GateToTake == GateType.Ansiblex )
+                    {
+                        Path jumpBridgePath = new Path();
+                        jumpBridgePath.Data = GenerateJumpBridgePathGeometry(segmentStart.SystemName, segmentEnd.SystemName);
 
-                    if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
+                        routeLines.Add(jumpBridgePath);
 
-                    Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
-                    Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
+                        routeLines[i - 1].Stroke = jumpLineBrush;
+                    }
+                    else
+                    {
+                        routeLines.Add(new Line());
 
-                    routeLines[i - 1].X1 = segmentStartCanvasCoordinate.X;
-                    routeLines[i - 1].Y1 = segmentStartCanvasCoordinate.Y;
-                    routeLines[i - 1].X2 = segmentEndCanvasCoordinate.X;
-                    routeLines[i - 1].Y2 = segmentEndCanvasCoordinate.Y;
+                        if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
 
-                    routeLines[i - 1].Stroke = routeLineBrush;
+                        Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
+                        Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
+
+                        ((Line)routeLines[i - 1]).X1 = segmentStartCanvasCoordinate.X;
+                        ((Line)routeLines[i - 1]).Y1 = segmentStartCanvasCoordinate.Y;
+                        ((Line)routeLines[i - 1]).X2 = segmentEndCanvasCoordinate.X;
+                        ((Line)routeLines[i - 1]).Y2 = segmentEndCanvasCoordinate.Y;
+
+                        routeLines[i - 1].Stroke = routeLineBrush;
+                    }                    
+                    
                     routeLines[i - 1].StrokeThickness = 4;
                     routeLines[i - 1].StrokeDashArray = new DoubleCollection(new List<double> { 1.0, 1.0 });
                     routeLines[i - 1].BeginAnimation(Shape.StrokeDashOffsetProperty, dashAnimation);
@@ -999,64 +1023,25 @@ namespace SMT
                     // Only draw a line if at least one system is visible.
                     if ( systemData.ContainsKey(jumpBridge.From) || systemData.ContainsKey(jumpBridge.To))
                     {
-                        Vector2 fromCoordinate;
-                        Vector2 toCoordinate;
                         OverlaySystemData visibleSystemData = null;
                         string otherEndSystemName = "";
 
                         if (systemData.ContainsKey(jumpBridge.From))
                         {
-                            fromCoordinate = systemData[jumpBridge.From].canvasCoordinate;
                             visibleSystemData = systemData[jumpBridge.From];
                             otherEndSystemName = jumpBridge.To;
                         }                     
-                        else
-                        {
-                            fromCoordinate = OffMapConnection(jumpBridge.To, jumpBridge.From);                            
-                        }
                         
                         if (systemData.ContainsKey(jumpBridge.To))
                         {
-                            toCoordinate = systemData[jumpBridge.To].canvasCoordinate;
                             visibleSystemData = systemData[jumpBridge.To];
                             otherEndSystemName = jumpBridge.From;
                         }                 
-                        else
-                        {
-                            toCoordinate = OffMapConnection(jumpBridge.From, jumpBridge.To);
-                        }
 
                         if (visibleSystemData == null) continue;
 
-                        ArcSegment connectionArc = new ArcSegment();
-                        PathGeometry pathGeometry = new PathGeometry();
-                        PathFigure pathFigure = new PathFigure();
-                        
+                        PathGeometry pathGeometry = GenerateJumpBridgePathGeometry(jumpBridge.From, jumpBridge.To);
 
-                        Vector2f fromVector = new Vector2f(fromCoordinate.X + (CalculatedOverlaySystemSize(jumpBridge.From) / 2f),
-                            fromCoordinate.Y + (CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
-                        Vector2f toVector = new Vector2f(toCoordinate.X + (CalculatedOverlaySystemSize(jumpBridge.To) / 2f),
-                            toCoordinate.Y + (CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
-
-                        Vector2f bridgeConnection = toVector == fromVector ? new Vector2f(0, 0) : Vector2f.Normalize(toVector - fromVector);
-
-                        Vector2f fromCorrected = fromVector + (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
-                        Vector2f toCorrected = toVector - (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
-                        
-
-                        pathFigure.StartPoint = new Point(fromCorrected.x, fromCorrected.y);
-                        pathFigure.Segments.Add(
-                                new ArcSegment(
-                                    new Point(toCorrected.x, toCorrected.y),
-                                    new Size(20,100),
-                                    MathF.Atan2(bridgeConnection.x, bridgeConnection.y) * 57.295779513f * -1f,
-                                    false,
-                                    SweepDirection.Clockwise,
-                                    true
-                                )
-                            );
-
-                        pathGeometry.Figures.Add(pathFigure);
                         Path path;
 
                         if (visibleSystemData.jumpBridgePath != null) path = visibleSystemData.jumpBridgePath;
@@ -1089,6 +1074,63 @@ namespace SMT
                     alreadyConnected.Add($"{jumpBridge.From} {jumpBridge.To}");
                 }
             }
+        }
+
+        private PathGeometry GenerateJumpBridgePathGeometry(string fromSystemName, string toSystemName)
+        {
+            ArcSegment connectionArc = new ArcSegment();
+            PathGeometry pathGeometry = new PathGeometry();
+            PathFigure pathFigure = new PathFigure();
+
+            Vector2 fromCoordinate;
+            Vector2 toCoordinate;
+            string otherEndSystemName = "";
+
+            if (systemData.ContainsKey(fromSystemName))
+            {
+                fromCoordinate = systemData[fromSystemName].canvasCoordinate;
+                otherEndSystemName = toSystemName;
+            }
+            else
+            {
+                fromCoordinate = OffMapConnection(toSystemName, fromSystemName);
+            }
+
+            if (systemData.ContainsKey(toSystemName))
+            {
+                toCoordinate = systemData[toSystemName].canvasCoordinate;
+                otherEndSystemName = fromSystemName;
+            }
+            else
+            {
+                toCoordinate = OffMapConnection(fromSystemName, toSystemName);
+            }
+
+            Vector2f fromVector = new Vector2f(fromCoordinate.X + (CalculatedOverlaySystemSize(fromSystemName) / 2f),
+                fromCoordinate.Y + (CalculatedOverlaySystemSize(fromSystemName) / 2f));
+            Vector2f toVector = new Vector2f(toCoordinate.X + (CalculatedOverlaySystemSize(toSystemName) / 2f),
+                toCoordinate.Y + (CalculatedOverlaySystemSize(toSystemName) / 2f));
+
+            Vector2f bridgeConnection = toVector == fromVector ? new Vector2f(0, 0) : Vector2f.Normalize(toVector - fromVector);
+
+            Vector2f fromCorrected = fromVector + (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
+            Vector2f toCorrected = toVector - (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
+
+            pathFigure.StartPoint = new Point(fromCorrected.x, fromCorrected.y);
+            pathFigure.Segments.Add(
+                    new ArcSegment(
+                        new Point(toCorrected.x, toCorrected.y),
+                        new Size(20, 100),
+                        MathF.Atan2(bridgeConnection.x, bridgeConnection.y) * 57.295779513f * -1f,
+                        false,
+                        SweepDirection.Clockwise,
+                        true
+                    )
+                );
+
+            pathGeometry.Figures.Add(pathFigure);
+
+            return pathGeometry;
         }
 
         /// <summary>
@@ -1181,7 +1223,7 @@ namespace SMT
         private void DrawSystemsToOverlay(int depth, List<OverlaySystemData> systems, int maxDepth)
         {
             // Fetch data and determine the sizes for rows and columns.
-            double rowHeight = canvasData.dimensions.Y / maxDepth;
+            double rowHeight = (canvasData.dimensions.Y - (canvasData.mapBorderBottomExtension ? canvasData.mapBorderBottomAdd : 0)) / maxDepth;
             double columnWidth = canvasData.dimensions.X / systems.Count;
 
             // In each depth the width of the columns is divided equally by the number of systems.
@@ -1292,8 +1334,50 @@ namespace SMT
             systemData[sysData.system.Name].systemCanvasElement.ToolTipOpening += StartSystemHighlight;
             systemData[sysData.system.Name].systemCanvasElement.ToolTipClosing += StopSystemHighlight;
 
+            if ( !gathererMode )
+            {
+                ContextMenu systemContextMenu = new ContextMenu();
+
+                MenuItem setRouteTarget = new MenuItem();
+                setRouteTarget.Header = "Set Destination";
+                setRouteTarget.Click += SetDestination_Click;
+                setRouteTarget.DataContext = sysData.system.Name;
+                systemContextMenu.Items.Add(setRouteTarget);
+
+                MenuItem addRouteWaypoint = new MenuItem();
+                addRouteWaypoint.Header = "Add Waypoint";
+                addRouteWaypoint.DataContext = sysData.system.Name;
+                addRouteWaypoint.Click += AddWaypoint_Click;
+                systemContextMenu.Items.Add(addRouteWaypoint);
+
+                systemData[sysData.system.Name].systemCanvasElement.ContextMenu = systemContextMenu;
+            }            
+
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
+
+            if (showSystemNames)
+            {
+                if (systemData[sysData.system.Name].systemNameElement == null)
+                {
+                    systemData[sysData.system.Name].systemNameElement = new TextBlock();
+                }
+
+                systemData[sysData.system.Name].systemNameElement.Width = 40;
+                systemData[sysData.system.Name].systemNameElement.Text = sysData.system.Name;
+                systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
+                systemData[sysData.system.Name].systemNameElement.FontSize = 10;
+                systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
+
+                Canvas.SetLeft(systemData[sysData.system.Name].systemNameElement, leftCoord - (systemData[sysData.system.Name].systemNameElement.Width * 0.5f) + (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5f));
+                Canvas.SetTop(systemData[sysData.system.Name].systemNameElement, topCoord + systemData[sysData.system.Name].systemCanvasElement.Height + 2);
+                Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 99);
+
+                if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemNameElement))
+                {
+                    overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemNameElement);
+                }
+            }
 
             systemData[sysData.system.Name].canvasCoordinate = new Vector2((float)leftCoord, (float)topCoord);
 
@@ -1304,7 +1388,25 @@ namespace SMT
             {
                 systemData[sysData.system.Name].systemCanvasElement.Name = "system";
                 overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemCanvasElement);
-            }
+            }            
+        }
+
+        private void AddWaypoint_Click(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            string senderDataContext = senderElement.DataContext as string;
+
+            EVEData.System system = mainWindow.EVEManager.GetEveSystem(senderDataContext);
+            mainWindow.ActiveCharacter.AddDestination(system.ID, false);
+        }
+
+        private void SetDestination_Click(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            string senderDataContext = senderElement.DataContext as string;
+
+            EVEData.System system = mainWindow.EVEManager.GetEveSystem(senderDataContext);
+            mainWindow.ActiveCharacter.AddDestination(system.ID, true);
         }
 
         /// <summary>
@@ -1530,6 +1632,13 @@ namespace SMT
             if (e.PropertyName == "OverlayShowJumpBridges")
             {
                 showJumpBridges = mainWindow.MapConf.OverlayShowJumpBridges;
+                ClearView();
+                RefreshCurrentView();
+            }
+
+            if (e.PropertyName == "OverlayShowSystemNames")
+            {
+                showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
                 ClearView();
                 RefreshCurrentView();
             }

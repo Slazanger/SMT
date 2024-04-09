@@ -36,6 +36,7 @@ namespace SMT
         private PreferencesWindow preferencesWindow;
 
         private int uiRefreshCounter = 0;
+        private int anomRefreshCounter = 0;
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
         private List<InfoItem> InfoLayer;
@@ -158,8 +159,16 @@ namespace SMT
             IntelData idtwo = new IntelData("[00:00] blah.... > blah", "System");
             idtwo.IntelString = "Intel Filters : " + String.Join(",", EVEManager.IntelFilters);
 
+            IntelData idthree = new IntelData("[00:00] blah... > blah", "System");
+            idthree.IntelString = "Intel Alert Filters : " + String.Join(", ", EVEManager.IntelAlertFilters);
+
+            IntelData idfour = new IntelData("[00:00] blah... > blah", "System");
+            idfour.IntelString = "Intel Alert Filters Count: " + EVEManager.IntelAlertFilters.Count();
+
             IntelCache.Add(id);
             IntelCache.Add(idtwo);
+            IntelCache.Add(idthree);
+            IntelCache.Add(idfour);
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
@@ -167,7 +176,6 @@ namespace SMT
 
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
-            EVEManager.UpdateESIUniverseData();
             EVEManager.InitNavigation();
 
 
@@ -695,6 +703,14 @@ namespace SMT
             {
                 UpdateCharacterSelectionBasedOnActiveWindow();
             }
+
+            // refresh the anomalies datagrid every 60 seconds to update the "since" column
+            anomRefreshCounter++;
+            if (anomRefreshCounter == 60)
+            {
+                anomRefreshCounter = 0;
+                AnomSigList.Items.Refresh();
+            }
         }
 
         #region RegionsView Control
@@ -1168,7 +1184,7 @@ namespace SMT
                 return;
             }
 
-            if (MapConf.PlayIntelSound || MapConf.FlashWindow)
+            if (MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
             {
                 if (MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
@@ -1197,10 +1213,18 @@ namespace SMT
                         }
                     }
                 }
-                else
+
+                if (MapConf.PlayIntelSoundOnAlert)
                 {
-                    playSound = MapConf.PlayIntelSound;
-                    flashWindow = MapConf.FlashWindow;
+                    // Check if the intel contains a text we should explicitly alert on
+                    foreach (string alertName in EVEManager.IntelAlertFilters)
+                    {
+                        if (id.RawIntelString.Contains(alertName))
+                        {
+                            playSound = playSound || MapConf.PlayIntelSoundOnAlert;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -1960,6 +1984,40 @@ namespace SMT
         #region Anoms
 
         /// <summary>
+        /// The anomalies grid is clicked
+        /// </summary>
+        private void AnomSigList_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // set focus to enable the grid to receive the PreviewKeyDown events
+            AnomSigList.Focus();
+        }
+
+        /// <summary>
+        /// Keys pressed while the anomalies grid is in focus
+        /// </summary>
+        private void AnomSigList_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // handle paste operation
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
+            {
+                updateAnomListFromClipboard();
+                e.Handled = true;
+            }
+            // handle copy operation
+            else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C)
+            {
+                copyAnomListToClipboard();
+                e.Handled = true;
+            }
+            // handle delete
+            else if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.Delete)
+            {
+                deleteSelectedAnoms();
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
         /// Clear system Anoms button clicked
         /// </summary>
         private void btnClearAnomList_Click(object sender, RoutedEventArgs e)
@@ -1975,23 +2033,99 @@ namespace SMT
         }
 
         /// <summary>
+        /// Delete selected Anoms button clicked
+        /// </summary>
+        private void btnDeleteSelectedAnoms_Click(object sender, RoutedEventArgs e)
+        {
+            deleteSelectedAnoms();
+        }
+
+        /// <summary>
         /// Update Anoms clicked
         /// </summary>
         private void btnUpdateAnomList_Click(object sender, RoutedEventArgs e)
         {
-            string pasteData = Clipboard.GetText();
-            if (!string.IsNullOrEmpty(pasteData))
-            {
-                EVEData.AnomData ad = ANOMManager.ActiveSystem;
+            updateAnomListFromClipboard();
+        }
 
-                if (ad != null)
+        private void updateAnomListFromClipboard()
+        {
+            EVEData.AnomData ad = ANOMManager.ActiveSystem;
+            string pasteData = Clipboard.GetText();
+
+            if (ad == null || string.IsNullOrEmpty(pasteData))
+                return;
+
+            HashSet<string> missingSignatures = ad.UpdateFromPaste(pasteData);
+
+            // Clear current selection
+            AnomSigList.SelectedItems.Clear();
+
+            foreach (var item in AnomSigList.Items)
+            {
+                var anom = item as Anom;
+                if (anom != null && missingSignatures.Contains(anom.Signature))
+                    AnomSigList.SelectedItems.Add(item);
+            }
+
+            if (AnomSigList.SelectedItems.Count > 0)
+                AnomSigList.ScrollIntoView(AnomSigList.SelectedItems[0]);
+
+            AnomSigList.Items.Refresh();
+            AnomSigList.UpdateLayout();
+            CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
+        }
+
+        private void copyAnomListToClipboard()
+        {
+            EVEData.AnomData ad = ANOMManager.ActiveSystem;
+            if (ad == null)
+                return;
+
+            var str = string.Empty;
+            if (AnomSigList.SelectedItems.Count > 0)
+            {
+                // copy the selected items to clipboard
+                foreach (var entry in AnomSigList.SelectedItems)
                 {
-                    ad.UpdateFromPaste(pasteData);
-                    AnomSigList.Items.Refresh();
-                    AnomSigList.UpdateLayout();
-                    CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
+                    var anom = entry as Anom;
+                    str += anom.ToString() + "\n";
                 }
             }
+            else
+            {
+                // copy the entire list
+                foreach (var entry in ad.Anoms)
+                {
+                    var anom = entry.Value;
+                    str += anom.ToString() + "\n";
+                }
+            }
+
+            Clipboard.SetText(str);
+        }
+
+        private void deleteSelectedAnoms()
+        {
+            EVEData.AnomData ad = ANOMManager.ActiveSystem;
+            if (ad == null || AnomSigList.SelectedItems.Count == 0)
+                return;
+
+            var selectedSignatures = AnomSigList.SelectedItems.Cast<Anom>()
+                .Select(anom => anom.Signature)
+                .ToHashSet();
+
+            var keysToRemove = ad.Anoms
+                .Where(kvp => selectedSignatures.Contains(kvp.Value.Signature))
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            foreach (var key in keysToRemove)
+                ad.Anoms.Remove(key);
+
+            AnomSigList.Items.Refresh();
+            AnomSigList.UpdateLayout();
+            CollectionViewSource.GetDefaultView(AnomSigList.ItemsSource).Refresh();
         }
 
         #endregion Anoms
@@ -2503,6 +2637,43 @@ namespace SMT
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Convert time elapsed to simple human format
+    /// </summary>
+    public class TimeSinceConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is not DateTime timeFound)
+                return "Unknown";
+
+            var now = DateTime.Now;
+            var elapsed = now - timeFound;
+
+            if (elapsed.TotalDays >= 1.0 && elapsed.TotalDays < 2.0)
+                return $"{(int)elapsed.TotalDays} day";
+            else if (elapsed.TotalDays >= 2.0)
+                return $"{(int)elapsed.TotalDays} days";
+
+            if (elapsed.TotalHours >= 1.0 && elapsed.TotalHours < 2.0)
+                return $"{(int)elapsed.TotalHours} hour";
+            else if (elapsed.TotalHours >= 2.0)
+                return $"{(int)elapsed.TotalHours} hours";
+
+            if (elapsed.TotalMinutes < 1.0)
+                return "Now";
+            else if (elapsed.TotalMinutes < 2.0)
+                return $"{(int)elapsed.TotalMinutes} minute";
+            else
+                return $"{(int)elapsed.TotalMinutes} minutes";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 

@@ -20,6 +20,7 @@
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
         <local:ZKBForegroundConverter x:Key="zkbBGFConverter" />
         <local:TimeSpanConverter x:Key="timeSpanConverter" />
+        <local:TimeSinceConverter x:Key="TimeSinceConverter" />
 
         <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -59,7 +60,6 @@
                 </MenuItem>
 
                 <MenuItem Header="Data"  Height="Auto">
-                    <MenuItem Header="Force ESI Update" Click="ForceESIUpdate_MenuItem_Click" />
                     <MenuItem Header="Clear Old Eve logs" Click="ClearOldEVELogs_Click" />
                 </MenuItem>
 
@@ -114,43 +114,68 @@
                         <xcadl:LayoutAnchorGroup>
 
                             <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" x:Name="avlpAnoms">
-                                <Grid x:Name="MainAnomGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <Grid x:Name="MainAnomGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="60" />
+                                        <RowDefinition Height="auto" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition Height="26" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
                                     </Grid.RowDefinitions>
                                     <StackPanel Grid.Row="0">
-                                        <Button x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" />
                                         <Label Content="{Binding ANOMManager.ActiveSystem.SystemName}" FontSize="18" FontWeight="Bold" />
                                     </StackPanel>
-
-                                    <DataGrid x:Name="AnomSigList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding ANOMManager.ActiveSystem.Anoms.Values}" HeadersVisibility="Column">
-
+                                    <DataGrid Grid.Row="1" x:Name="AnomSigList" Focusable="True" AreRowDetailsFrozen="True" AutoGenerateColumns="False" ItemsSource="{Binding ANOMManager.ActiveSystem.Anoms.Values}" HeadersVisibility="Column" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0, 0, 0, 8" PreviewMouseDown="AnomSigList_PreviewMouseDown" PreviewKeyDown="AnomSigList_PreviewKeyDown">
+                                        <DataGrid.Resources>
+                                            <SolidColorBrush x:Key="SelectedBackgroundColor" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
+                                            <SolidColorBrush x:Key="SelectedForegroundColor" Color="{DynamicResource {x:Static SystemColors.HighlightTextColorKey}}" />
+                                        </DataGrid.Resources>
                                         <DataGrid.CellStyle>
                                             <Style TargetType="{x:Type DataGridCell}">
-
+                                                <Setter Property="BorderThickness" Value="0" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Type}" Value="Unknown">
-                                                        <Setter Property="Background" Value="Red" />
+                                                        <Setter Property="Foreground" Value="Red" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding State}" Value="State2">
-                                                        <Setter Property="Background" Value="Green" />
+                                                    <DataTrigger Binding="{Binding Type}" Value="Wormhole">
+                                                        <Setter Property="Foreground" Value="DeepSkyBlue" />
                                                     </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Relic Site">
+                                                        <Setter Property="Foreground" Value="Gold" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Data Site">
+                                                        <Setter Property="Foreground" Value="LightBlue" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Combat Site">
+                                                        <Setter Property="Foreground" Value="Tomato" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Gas Site">
+                                                        <Setter Property="Foreground" Value="LightGreen" />
+                                                    </DataTrigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource SelectedBackgroundColor}" />
+                                                        <Setter Property="Foreground" Value="{StaticResource SelectedForegroundColor}" />
+                                                    </Trigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </DataGrid.CellStyle>
-
+                                        <DataGrid.RowStyle>
+                                            <Style TargetType="DataGridRow">
+                                                <Setter Property="BorderThickness" Value="0" />
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                        </DataGrid.RowStyle>
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" Width="*" />
-
-                                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
+                                            <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" Width="60" />
+                                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="75" />
                                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                                            <DataGridTextColumn Header="Since" Binding="{Binding TimeFound, Converter={StaticResource TimeSinceConverter}}" Width="Auto" />
                                         </DataGrid.Columns>
                                     </DataGrid>
-                                    <StackPanel Grid.Row="2">
-                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" />
-                                    </StackPanel>
+                                    <UniformGrid Grid.Row="2" Columns="2" Margin="8,0,8,8">
+                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" Margin="0,0,4,0" Height="32"/>
+                                        <Button x:Name="btnDeleteSelectedAnoms" Content="Delete Selected" Click="btnDeleteSelectedAnoms_Click" Margin="4,0,0,0" Height="32" />
+                                    </UniformGrid>
+                                    <Button Grid.Row="3" x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" Margin="8,0,8,8" Height="32" />
                                 </Grid>
                             </xcadl:LayoutAnchorable>
 
