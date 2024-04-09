@@ -570,8 +570,8 @@ namespace SMT
             cm.IsOpen = true;
 
             MenuItem setDesto = cm.Items[2] as MenuItem;
-            MenuItem addWaypoint = cm.Items[5] as MenuItem;
-            MenuItem clearRoute = cm.Items[7] as MenuItem;
+            MenuItem addWaypoint = cm.Items[4] as MenuItem;
+            MenuItem clearRoute = cm.Items[6] as MenuItem;
 
             if (ActiveCharacter != null && ActiveCharacter.ESILinked)
             {
