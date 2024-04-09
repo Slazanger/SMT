@@ -223,7 +223,11 @@ namespace SMTx.Views.Documents
 
         private void ZoomBorder_OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            ZoomBorder.Uniform(true);
+            // ignore focus changes / tab changes
+            if (e.PreviousSize.Width != 0 && e.PreviousSize.Height != 0)
+            {
+                ZoomBorder.Uniform(true);
+            }
         }
 
         #endregion
