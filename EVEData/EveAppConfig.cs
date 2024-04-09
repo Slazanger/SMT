@@ -28,7 +28,7 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_132";
+        public const string SMT_VERSION = "SMT_133";
 
         /// <summary>
         /// Folder to store all of the data from
