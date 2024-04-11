@@ -119,6 +119,12 @@ namespace SMT
                 MapConf.SetDefaultColours();
             }
 
+
+            if (MapConf.AlwaysOnTop)
+            {
+                this.Topmost = true;
+            }
+
             // Create the main EVE manager
 
             CapitalRoute = new JumpRoute();
