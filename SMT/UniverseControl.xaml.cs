@@ -606,7 +606,7 @@ namespace SMT
             }
 
             // update stats
-            MenuItem StatsHeader = cm.Items[8] as MenuItem;
+            MenuItem StatsHeader = cm.Items[10] as MenuItem;
             StatsHeader.Items.Clear();
             StatsHeader.IsEnabled = false;
 
