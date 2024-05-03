@@ -19,7 +19,11 @@
                 Grid.ColumnSpan="3"
                 MaxZoomX="2" MaxZoomY="2"
                 MinZoomX="0.2" MinZoomY="0.2"
-                SizeChanged="ZoomBorder_OnSizeChanged">
+				MaxOffsetX="2500" MaxOffsetY="2500"
+				MinOffsetX="-2500" MinOffsetY="-2500"
+				EnableConstrains="False"
+                SizeChanged="ZoomBorder_OnSizeChanged"
+				ZoomChanged="ZoomBorder_ZoomChanged">
 
 			<Canvas Focusable="True" x:Name="UniverseViewGrid" Width="5000" Height="5000"
 					HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
