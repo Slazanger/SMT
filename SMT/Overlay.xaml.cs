@@ -1338,17 +1338,27 @@ namespace SMT
             {
                 ContextMenu systemContextMenu = new ContextMenu();
 
-                MenuItem setRouteTarget = new MenuItem();
-                setRouteTarget.Header = "Set Destination";
-                setRouteTarget.Click += SetDestination_Click;
-                setRouteTarget.DataContext = sysData.system.Name;
-                systemContextMenu.Items.Add(setRouteTarget);
+                if (mainWindow.ActiveCharacter.ESILinked)
+                {
+                    MenuItem setRouteTarget = new MenuItem();
+                    setRouteTarget.Header = "Set Destination";
+                    setRouteTarget.Click += SetDestination_Click;
+                    setRouteTarget.DataContext = sysData.system.Name;
+                    systemContextMenu.Items.Add(setRouteTarget);
 
-                MenuItem addRouteWaypoint = new MenuItem();
-                addRouteWaypoint.Header = "Add Waypoint";
-                addRouteWaypoint.DataContext = sysData.system.Name;
-                addRouteWaypoint.Click += AddWaypoint_Click;
-                systemContextMenu.Items.Add(addRouteWaypoint);
+                    MenuItem addRouteWaypoint = new MenuItem();
+                    addRouteWaypoint.Header = "Add Waypoint";
+                    addRouteWaypoint.DataContext = sysData.system.Name;
+                    addRouteWaypoint.Click += AddWaypoint_Click;
+                    systemContextMenu.Items.Add(addRouteWaypoint);
+                }
+                else
+                {
+                    MenuItem esiNote = new MenuItem();
+                    esiNote.Header = "ESI auth required to set route.";
+                    esiNote.IsEnabled = false;
+                    systemContextMenu.Items.Add(esiNote);
+                }
 
                 systemData[sysData.system.Name].systemCanvasElement.ContextMenu = systemContextMenu;
             }            
