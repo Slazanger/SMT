@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using Windows.Services;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic.Logging;
 using SMT.EVEData;
-using Windows.Devices.Geolocation;
 using static SMT.EVEData.Navigation;
 
 namespace SMT
@@ -119,7 +119,7 @@ namespace SMT
 
         public OverlayCanvasData()
         {
-            dimensions = Vector2.Zero;
+            dimensions = Vector2.One * 100f;
 
             unscaledMapExtendsMax = new Vector2(float.MinValue, float.MinValue);
             unscaledMapExtendsMin = new Vector2(float.MaxValue, float.MaxValue);
@@ -139,8 +139,8 @@ namespace SMT
         /// <param name="height"></param>
         public void SetDimensions(double width, double height)
         {
-            dimensions.X = (float)width;
-            dimensions.Y = (float)height;
+            dimensions.X = Math.Max((float)width, 100f);
+            dimensions.Y = Math.Max((float)height, 100f);
         }
 
         /// <summary>
@@ -162,6 +162,19 @@ namespace SMT
             unscaledMapExtendsMax.Y = Math.Max(unscaledMapExtendsMax.Y, offsetCoordinates.Y);
             unscaledMapExtendsMin.X = Math.Min(unscaledMapExtendsMin.X, offsetCoordinates.X);
             unscaledMapExtendsMin.Y = Math.Min(unscaledMapExtendsMin.Y, offsetCoordinates.Y);
+            
+            if (unscaledMapExtendsMax.X - unscaledMapExtendsMin.X < mapBorderMargin * 3f)
+            {
+                unscaledMapExtendsMax.X += mapBorderMargin * 1.5f;
+                unscaledMapExtendsMin.X -= mapBorderMargin * 1.5f;
+            }
+            
+            if (unscaledMapExtendsMax.Y - unscaledMapExtendsMin.Y < mapBorderMargin * 3f)
+            {
+                unscaledMapExtendsMax.Y += mapBorderMargin * 1.5f;
+                unscaledMapExtendsMin.Y -= mapBorderMargin * 1.5f;
+            }
+            
             ComputeScaling();
         }
 
@@ -230,6 +243,7 @@ namespace SMT
         private PeriodicTimer dataUpdateTimer, characterUpdateTimer;
 
         private int overlayDepth = 8;
+        private Dictionary<LocalCharacter, OverlaySystemData> currentPlayersSystemData = new ();
         private OverlaySystemData currentPlayerSystemData;
         private OverlayCanvasData canvasData = new OverlayCanvasData();
 
@@ -240,6 +254,7 @@ namespace SMT
         private float overlaySystemSizeGatherer = 20f;
         private float overlaySystemSizeHunter = 5f;
         private float overlayCurrentSystemSizeHunterModifier = 3f;
+        private float overlayAdditionalCharacterSystemSizeHunterModifier = 2f;
 
         private float overlayIntelOversize = 10f;
         private float CalculatedOverlayIntelOversize { get => overlayIntelOversize; }
@@ -257,12 +272,16 @@ namespace SMT
         private bool showCharLocation = true;
         private bool showJumpBridges = true;
         private bool showSystemNames = false;
+        private bool showAllCharacterNames = false;
+        private bool individualCharacterWindows = false;
 
         private DoubleCollection dashStroke = new DoubleCollection(new List<double> { 2, 2 });
 
         private DoubleAnimation dashAnimation;
 
         private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
+
+        public LocalCharacter OverlayCharacter = null;
 
         public Overlay(MainWindow mw)
         {
@@ -346,6 +365,11 @@ namespace SMT
             mainWindow = mw;
             if (mainWindow == null) return;
 
+            if (mainWindow.ActiveCharacter != null)
+            {
+                OverlayCharacter = mw.ActiveCharacter;
+            }
+
             // Set up some events
             mainWindow.OnSelectedCharChangedEventHandler += SelectedCharChanged;
             mainWindow.MapConf.PropertyChanged += OverlayConf_PropertyChanged;
@@ -361,6 +385,8 @@ namespace SMT
             overlayDepth = mainWindow.MapConf.OverlayRange + 1;
             showJumpBridges = mainWindow.MapConf.OverlayShowJumpBridges;
             showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
+            showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
+            individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
 
             // Initialize value animation to be used by dashed lines
             dashAnimation = new DoubleAnimation();
@@ -399,8 +425,13 @@ namespace SMT
             if (gathererMode)
                 return overlaySystemSizeGatherer;
 
-            if (systemName == currentPlayerSystemData?.system?.Name)
+            if (systemName == currentPlayersSystemData[OverlayCharacter]?.system?.Name)
                 return overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier;
+
+            if (currentPlayersSystemData.Any(s => s.Value.system.Name == systemName))
+            {
+                return overlaySystemSizeHunter * overlayAdditionalCharacterSystemSizeHunterModifier;
+            }
 
             return overlaySystemSizeHunter;
         }
@@ -462,21 +493,91 @@ namespace SMT
         /// </summary>
         private void LoadOverlayWindowPosition()
         {
-            WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, Properties.Settings.Default.OverlayWindow_placement);
+            string currentPlacementString = Properties.Settings.Default.OverlayWindow_placement;
+            string currentCharacterName = OverlayCharacter == null ? "_" : OverlayCharacter.Name;
+            string currentPlacement = "";
+            if (currentPlacementString.Contains("|ID|"))
+            {
+                string[] currentPlacementStringParts = currentPlacementString.Split("|CHAR|");
+                foreach (string currentCharacterPlacementString in currentPlacementStringParts)
+                {
+                    string[] currentCharacterPlacementStringParts = currentCharacterPlacementString.Split("|ID|");
+                    if (currentCharacterPlacementStringParts[0] == currentCharacterName)
+                    {
+                        currentPlacement = currentCharacterPlacementStringParts[1];
+                        break;
+                    }
+                    
+                }
+            }
+            else
+            {
+                currentPlacement = currentPlacementString;
+            }
+
+            if (currentPlacement != "")
+            {
+                WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, currentPlacement);   
+            }
         }
 
+        private void CleanupAndUpdateOverlayWindowPosition(string characterName)
+        {
+            string currentPlacementString = Properties.Settings.Default.OverlayWindow_placement;
+            string[] currentCharacterPlacements = currentPlacementString.Split("|CHAR|");
+            List<string> validCharacterPlacements = new List<string>();
+
+            string actualWindowPlacement = (OverlayCharacter == null ? "_" : OverlayCharacter.Name) + "|ID|" + WindowPlacement.GetPlacement(new WindowInteropHelper(this).Handle);
+            bool overlayCharInlist = false;
+            
+            foreach (string placementString in currentCharacterPlacements)
+            {
+                string[] placementStringParts = placementString.Split("|ID|");
+                if (mainWindow.EVEManager.LocalCharacters.Any(c => c.Name == placementStringParts[0]) || placementStringParts[0] == "_")
+                {
+                    if (placementStringParts[0] == characterName)
+                    {
+                        validCharacterPlacements.Add(actualWindowPlacement);
+                        overlayCharInlist = true;
+                    }
+                    else
+                    {
+                        validCharacterPlacements.Add(placementString);   
+                    }
+                }
+            }
+
+            if (!overlayCharInlist)
+            {
+                validCharacterPlacements.Add(actualWindowPlacement);
+            }
+            
+            Properties.Settings.Default.OverlayWindow_placement = String.Join("|CHAR|", validCharacterPlacements);
+            Properties.Settings.Default.Save();
+        }
+        
         /// <summary>
         /// Stores the position and size values to the preferences.
         /// </summary>
         private void StoreOverlayWindowPosition()
         {
-            Properties.Settings.Default.OverlayWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(this).Handle);
-            Properties.Settings.Default.Save();
+            CleanupAndUpdateOverlayWindowPosition(OverlayCharacter == null ? "_" : OverlayCharacter.Name);
         }
 
         private void Overlay_Closing(object sender, CancelEventArgs e)
         {
             StoreOverlayWindowPosition();
+        }
+
+        private void UpdateCharacterData()
+        {
+            if (OverlayCharacter != null)
+            {
+                if (mainWindow.EVEManager.LocalCharacters.Any(c => c == OverlayCharacter))
+                {
+                    OverlayCharacter = mainWindow.EVEManager.LocalCharacters.First(c => c == OverlayCharacter);
+                }
+            }
         }
 
         /// <summary>
@@ -488,19 +589,34 @@ namespace SMT
         private async Task CharacterLocationUpdateLoop()
         {
             characterUpdateTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(250));
+            UpdateCharacterData();
 
             while (await characterUpdateTimer.WaitForNextTickAsync())
             {
                 // If the location differs from the last known location, trigger a change.
-                if (mainWindow.ActiveCharacter != null)
+                if (OverlayCharacter != null)
                 {
-                    if (currentPlayerSystemData.system == null)
+                    if (currentPlayersSystemData[OverlayCharacter].system == null)
                     {
                         RefreshCurrentView();
                     }
-                    else if (mainWindow.ActiveCharacter.Location != currentPlayerSystemData.system.Name || routeLines.Count > 0 && (routeLines.Count != mainWindow.ActiveCharacter.ActiveRoute.Count - 1))
+                    else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name || routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
                     {
                         RefreshCurrentView();
+                    }
+                    else
+                    {
+                        foreach (LocalCharacter additionalCharacter in mainWindow.EVEManager.LocalCharacters)
+                        {
+                            if (additionalCharacter != OverlayCharacter)
+                            {
+                                if (additionalCharacter.Location != currentPlayersSystemData[additionalCharacter].system.Name)
+                                {
+                                    RefreshCurrentView();
+                                    break;
+                                }
+                            }
+                        }   
                     }
                 }
             }
@@ -676,6 +792,8 @@ namespace SMT
         /// </summary>
         private void UpdateRouteData()
         {
+            UpdateCharacterData();
+            
             // clear all
             while (routeLines.Count > 0)
             {
@@ -683,9 +801,9 @@ namespace SMT
                 routeLines.Remove(routeLines[^1]);
             }
 
-            if (!gathererMode && mainWindow.MapConf.OverlayShowRoute && mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Waypoints.Count > 0)
+            if (!gathererMode && mainWindow.MapConf.OverlayShowRoute && OverlayCharacter != null && OverlayCharacter.Waypoints.Count > 0)
             {
-                List<RoutePoint> routePoints = mainWindow.ActiveCharacter.ActiveRoute.ToList();
+                List<RoutePoint> routePoints = OverlayCharacter.ActiveRoute.ToList();
 
                 if (routePoints.Count < 2) return;
 
@@ -839,12 +957,19 @@ namespace SMT
             List<string> systemsInList = new List<string>();
 
             // If there is no main window or no selected character, abort.
-            if (mainWindow == null || mainWindow.ActiveCharacter == null) return;
+            if (mainWindow == null || OverlayCharacter == null) return;
+            UpdateCharacterData();
 
             // Gather data
-            string currentLocation = mainWindow.ActiveCharacter.Location;
+            currentPlayersSystemData.Clear();
+            string currentLocation = OverlayCharacter.Location;
             EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
-            currentPlayerSystemData = new OverlaySystemData(currentSystem);
+            currentPlayersSystemData.Add(OverlayCharacter, new OverlaySystemData(currentSystem));
+            foreach (LocalCharacter additionalChar in mainWindow.EVEManager.LocalCharacters)
+            {
+                if (!currentPlayersSystemData.ContainsKey(additionalChar))
+                    currentPlayersSystemData.Add(additionalChar, new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(additionalChar.Location)));
+            }
 
             // Bail out if the system does not exist. I.e. wormhole systems.
             if (currentSystem == null)
@@ -860,18 +985,19 @@ namespace SMT
             if (gathererMode || (!gathererMode && !hunterModeShowFullRegion))
             {
                 // Add the players location to the hierarchie.
-                hierarchie.Add(new List<OverlaySystemData>() { currentPlayerSystemData });
-                if (!systemData.ContainsKey(currentPlayerSystemData.system.Name))
+                hierarchie.Add(new List<OverlaySystemData>() { currentPlayersSystemData[OverlayCharacter] });
+                if (!systemData.ContainsKey(currentPlayersSystemData[OverlayCharacter].system.Name))
                 {
-                    systemData.Add(currentPlayerSystemData.system.Name, currentPlayerSystemData);
+                    systemData.Add(currentPlayersSystemData[OverlayCharacter].system.Name, currentPlayersSystemData[OverlayCharacter]);
                 }
+                canvasData.UpdateUnscaledExtends(mainWindow.EVEManager.GetRegion(currentPlayersSystemData[OverlayCharacter].system.Region).MapSystems[currentPlayersSystemData[OverlayCharacter].system.Name].Layout);
 
                 // Track which systems are already in the list to avoid doubles.
                 systemsInList.Add(currentSystem.Name);
 
-                currentPlayerSystemData.mapSystemCoordinate = mainWindow.EVEManager.GetRegion(currentSystem.Region).MapSystems[currentSystem.Name].Layout;
-                canvasData.currentOriginCoordinates = currentPlayerSystemData.mapSystemCoordinate;
-                systemData[currentPlayerSystemData.system.Name].mapSystemCoordinate = currentPlayerSystemData.mapSystemCoordinate;
+                currentPlayersSystemData[OverlayCharacter].mapSystemCoordinate = mainWindow.EVEManager.GetRegion(currentSystem.Region).MapSystems[currentSystem.Name].Layout;
+                canvasData.currentOriginCoordinates = currentPlayersSystemData[OverlayCharacter].mapSystemCoordinate;
+                systemData[currentPlayersSystemData[OverlayCharacter].system.Name].mapSystemCoordinate = currentPlayersSystemData[OverlayCharacter].mapSystemCoordinate;
 
                 for (int i = 1; i < overlayDepth; i++)
                 {
@@ -888,7 +1014,7 @@ namespace SMT
                             string sourceRegion = previousDepthSystem.system.Region;
                             string targetRegion = jumpSystem.Region;
 
-                            if (gathererMode == true || targetRegion == currentPlayerSystemData.system.Region || sourceRegion == currentPlayerSystemData.system.Region || (regionMirrorVectors.ContainsKey(targetRegion) && gathererModeIncludesAdjacentRegions))
+                            if (gathererMode == true || targetRegion == currentPlayersSystemData[OverlayCharacter].system.Region || sourceRegion == currentPlayersSystemData[OverlayCharacter].system.Region || (regionMirrorVectors.ContainsKey(targetRegion) && gathererModeIncludesAdjacentRegions))
                             {
                                 // Only add the system if it was not yet added.
                                 if (!systemsInList.Contains(jump))
@@ -1290,7 +1416,7 @@ namespace SMT
             systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name);
             systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode ? 2 : 1;
 
-            if (sysData.system.Name == currentPlayerSystemData.system.Name)
+            if (sysData.system.Name == currentPlayersSystemData[OverlayCharacter].system.Name)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = sysLocationOutlineBrush;
             }
@@ -1316,7 +1442,7 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement.Fill = securityColorFill;
             }
 
-            if (!gathererMode && sysData.system.Region != currentPlayerSystemData.system.Region)
+            if (!gathererMode && sysData.system.Region != currentPlayersSystemData[OverlayCharacter].system.Region)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = outOfRegionSysOutlineBrush;
                 systemData[sysData.system.Name].systemCanvasElement.Fill = outOfRegionSysFillBrush;
@@ -1338,7 +1464,7 @@ namespace SMT
             {
                 ContextMenu systemContextMenu = new ContextMenu();
 
-                if (mainWindow.ActiveCharacter.ESILinked)
+                if (OverlayCharacter.ESILinked)
                 {
                     MenuItem setRouteTarget = new MenuItem();
                     setRouteTarget.Header = "Set Destination";
@@ -1366,15 +1492,35 @@ namespace SMT
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
 
-            if (showSystemNames)
+            if (showSystemNames || showAllCharacterNames )
             {
                 if (systemData[sysData.system.Name].systemNameElement == null)
                 {
                     systemData[sysData.system.Name].systemNameElement = new TextBlock();
                 }
+                systemData[sysData.system.Name].systemNameElement.Inlines.Clear();
+                systemData[sysData.system.Name].systemNameElement.Width = 80;
 
-                systemData[sysData.system.Name].systemNameElement.Width = 40;
-                systemData[sysData.system.Name].systemNameElement.Text = sysData.system.Name;
+                bool firstEntry = false;
+                if (showSystemNames)
+                {
+                    systemData[sysData.system.Name].systemNameElement.Inlines.Add( new Run(sysData.system.Name));
+                    firstEntry = true;
+                }
+
+                foreach (KeyValuePair<LocalCharacter, OverlaySystemData> localCharacterEntry in currentPlayersSystemData)
+                {
+                    if (localCharacterEntry.Value.system != null && sysData.system.Name == localCharacterEntry.Value.system.Name)
+                    {
+                        if (firstEntry)
+                        {
+                            systemData[sysData.system.Name].systemNameElement.Inlines.Add(new LineBreak());   
+                        }
+                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($"{localCharacterEntry.Key.Name}")) ;
+                        firstEntry = true;
+                    }
+                }
+                
                 systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
                 systemData[sysData.system.Name].systemNameElement.FontSize = 10;
                 systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
@@ -1407,7 +1553,7 @@ namespace SMT
             string senderDataContext = senderElement.DataContext as string;
 
             EVEData.System system = mainWindow.EVEManager.GetEveSystem(senderDataContext);
-            mainWindow.ActiveCharacter.AddDestination(system.ID, false);
+            mainWindow.EVEManager.LocalCharacters.First(c => c == OverlayCharacter).AddDestination(system.ID, false);
         }
 
         private void SetDestination_Click(object sender, RoutedEventArgs e)
@@ -1416,7 +1562,7 @@ namespace SMT
             string senderDataContext = senderElement.DataContext as string;
 
             EVEData.System system = mainWindow.EVEManager.GetEveSystem(senderDataContext);
-            mainWindow.ActiveCharacter.AddDestination(system.ID, true);
+            mainWindow.EVEManager.LocalCharacters.First(c => c == OverlayCharacter).AddDestination(system.ID, true);
         }
 
         /// <summary>
@@ -1652,6 +1798,19 @@ namespace SMT
                 ClearView();
                 RefreshCurrentView();
             }
+            
+            if (e.PropertyName == "OverlayShowAllCharacterNames")
+            {
+                showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
+                ClearView();
+                RefreshCurrentView();
+            }
+            
+            if (e.PropertyName == "OverlayIndividualCharacterWindows")
+            {
+                individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
+                Close();
+            }
         }
 
         /// <summary>
@@ -1661,6 +1820,7 @@ namespace SMT
         /// <param name="e"></param>
         public void SelectedCharChanged(object sender, EventArgs e)
         {
+            if (!individualCharacterWindows) OverlayCharacter = mainWindow.ActiveCharacter;
             RefreshCurrentView();
         }
 
@@ -1670,17 +1830,19 @@ namespace SMT
         /// </summary>
         public void UpdatePlayerInformationText()
         {
-            if (mainWindow.ActiveCharacter != null)
+            
+            LocalCharacter currentCharacter = mainWindow.EVEManager.LocalCharacters.FirstOrDefault(c => c == OverlayCharacter);
+            if (currentCharacter != null)
             {
                 string displayText = "";
                 if (showCharName)
                 {
-                    displayText = mainWindow.ActiveCharacter.Name;
+                    displayText = OverlayCharacter.Name;
                 }
 
                 if (showCharLocation)
                 {
-                    displayText += (displayText.IsNullOrEmpty() ? "" : "\n") + mainWindow.ActiveCharacter.Location;
+                    displayText += (displayText.IsNullOrEmpty() ? "" : "\n") + currentCharacter.Location;
                 }
 
                 overlay_CharNameTextblock.Text = displayText;

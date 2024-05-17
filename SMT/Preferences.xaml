@@ -307,6 +307,7 @@
                                         <xctk:IntegerUpDown Value="{Binding Path=IntelHistoricTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
                                         <Label Content="Finally, Intel is historic for x seconds" />
                                     </StackPanel>
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayIndividualCharacterWindows}" Content="Open individual windows for each character." />
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -325,6 +326,7 @@
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="Show the current route" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayHunterModeShowFullRegion}" Content="Show the full region in hunter mode" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowAllCharacterNames}" Content="Show the names of all characters on the map" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
