@@ -110,6 +110,8 @@ namespace SMT
         private bool m_overlayShowRoute = true;
         private bool m_overlayShowJumpBridges = true;
         private bool m_overlayShowSystemNames = false;
+        private bool m_overlayShowAllCharacterNames = false;
+        private bool m_overlayIndividualCharacterWindows = false;
 
         public MapConfig()
         {
@@ -1166,6 +1168,22 @@ namespace SMT
                 OnPropertyChanged("OverlayShowJumpBridges");
             }
         }
+        
+        [Category("Overlay")]
+        [DisplayName("Overlay Individual Character Windows")]
+        public bool OverlayIndividualCharacterWindows
+        {
+            get
+            {
+                return m_overlayIndividualCharacterWindows;
+            }
+            set
+            {
+                m_overlayIndividualCharacterWindows = value;
+
+                OnPropertyChanged("OverlayIndividualCharacterWindows");
+            }
+        }
 
         [Category("Overlay")]
         [DisplayName("Overlay Show System Names")]
@@ -1180,6 +1198,22 @@ namespace SMT
                 m_overlayShowSystemNames = value;
 
                 OnPropertyChanged("OverlayShowSystemNames");
+            }
+        }
+        
+        [Category("Overlay")]
+        [DisplayName("Overlay Show All Character Names")]
+        public bool OverlayShowAllCharacterNames
+        {
+            get
+            {
+                return m_overlayShowAllCharacterNames;
+            }
+            set
+            {
+                m_overlayShowAllCharacterNames = value;
+
+                OnPropertyChanged("OverlayShowAllCharacterNames");
             }
         }
 
@@ -1360,6 +1394,7 @@ namespace SMT
             OverlayShowRoute = true;
             OverlayShowJumpBridges = true;
             OverlayShowSystemNames = false;
+            OverlayShowAllCharacterNames = false;
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;

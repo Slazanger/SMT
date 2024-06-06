@@ -30,7 +30,7 @@ namespace SMT
     {
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
-        private Overlay overlayWindow;
+        private List<Overlay> overlayWindows;
 
         private MediaPlayer mediaPlayer;
         private PreferencesWindow preferencesWindow;
@@ -2475,19 +2475,32 @@ namespace SMT
 
         private void OverlayWindow_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (overlayWindow != null)
+            if (overlayWindows == null) overlayWindows = new List<Overlay>();
+
+            if (MapConf.OverlayIndividualCharacterWindows)
             {
-                return;
+                if (activeCharacter == null || overlayWindows.Any(w => w.OverlayCharacter == activeCharacter))
+                {
+                    return;
+                }  
+            }
+            else
+            {
+                if (overlayWindows.Count > 0)
+                {
+                    return;
+                }
             }
 
-            overlayWindow = new Overlay(this);
-            overlayWindow.Closing += OnOverlayWindowClosing;
-            overlayWindow.Show();
+            Overlay newOverlayWindow = new Overlay(this);
+            newOverlayWindow.Closing += OnOverlayWindowClosing;
+            newOverlayWindow.Show();
+            overlayWindows.Add(newOverlayWindow);
         }
 
         public void OnOverlayWindowClosing(object sender, CancelEventArgs e)
         {
-            overlayWindow = null;
+            overlayWindows.Remove((Overlay)sender);
         }
     }
 
