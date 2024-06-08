@@ -1316,16 +1316,7 @@ namespace SMT
                 }
 
                 infoColour = dataColor;
-                long SystemAlliance = 0;
-
-                if (MapConf.SOVBasedITCU)
-                {
-                    SystemAlliance = sys.ActualSystem.SOVAllianceTCU;
-                }
-                else
-                {
-                    SystemAlliance = sys.ActualSystem.SOVAllianceIHUB;
-                }
+                long SystemAlliance = sys.ActualSystem.SOVAllianceID;
 
                 //
                 Coalition SystemCoalition = null;
@@ -1416,27 +1407,6 @@ namespace SMT
                     }
                 }
 
-                if (ShowSystemTimers && MapConf.ShowTCUVunerabilities)
-                {
-                    DateTime now = DateTime.Now;
-
-                    if (now > sys.ActualSystem.TCUVunerabliltyStart && now < sys.ActualSystem.TCUVunerabliltyEnd)
-                    {
-                        infoValue = (int)sys.ActualSystem.TCUOccupancyLevel;
-                        infoSize = 30;
-                        infoColour = infoVulnerable;
-                    }
-                    else if (now.AddMinutes(MapConf.UpcomingSovMinutes) > sys.ActualSystem.TCUVunerabliltyStart)
-                    {
-                        infoValue = (int)sys.ActualSystem.TCUOccupancyLevel;
-                        infoSize = 27;
-                        infoColour = infoVulnerableSoon;
-                    }
-                    else
-                    {
-                        infoValue = -1;
-                    }
-                }
 
                 if (infoValue > 0)
                 {
@@ -1485,7 +1455,7 @@ namespace SMT
                     DynamicMapElements.Add(infoCircle);
                 }
 
-                if ((sys.ActualSystem.SOVAllianceTCU != 0 || sys.ActualSystem.SOVAllianceIHUB != 0) && ShowStandings)
+                if ( sys.ActualSystem.SOVAllianceID != 0 && ShowStandings)
                 {
                     bool addToMap = true;
                     Brush br = null;
@@ -1493,41 +1463,25 @@ namespace SMT
                     if (ActiveCharacter != null && ActiveCharacter.ESILinked)
                     {
                         float Standing = 0.0f;
-                        float StandingTCU = 0.0f;
-                        float StandingIHUB = 0.0f;
 
-                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceTCU)
+
+
+                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceID)
                         {
-                            StandingTCU = 10.0f;
-                        }
-                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceIHUB)
-                        {
-                            StandingIHUB = 10.0f;
+                            Standing = 10.0f;
                         }
 
                         if (sys.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
                         {
-                            StandingTCU = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
-                            StandingIHUB = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
                         }
 
-                        if (sys.ActualSystem.SOVAllianceTCU != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceTCU))
+                        if (sys.ActualSystem.SOVAllianceID != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceID))
                         {
-                            StandingTCU = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceTCU];
-                        }
-                        if (sys.ActualSystem.SOVAllianceIHUB != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceIHUB))
-                        {
-                            StandingIHUB = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceIHUB];
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceID];
                         }
 
-                        if (MapConf.SOVBasedITCU)
-                        {
-                            Standing = StandingTCU;
-                        }
-                        else
-                        {
-                            Standing = StandingIHUB;
-                        }
+ 
 
                         if (Standing == 0.0f)
                         {
@@ -1555,89 +1509,7 @@ namespace SMT
                         {
                             br = StandingVGoodBrush;
                         }
-
-                        if (MapConf.SOVShowConflicts && sys.ActualSystem.SOVAllianceTCU != sys.ActualSystem.SOVAllianceIHUB)
-                        {
-                            addToMap = true;
-
-                            Brush b1 = Brushes.Transparent;
-                            Brush b2 = Brushes.Transparent;
-
-                            switch (StandingTCU)
-                            {
-                                case -10.0f:
-                                    b1 = StandingVBadBrush;
-                                    break;
-
-                                case -5.0f:
-                                    b1 = StandingBadBrush;
-                                    break;
-
-                                case 5.0f:
-                                    b1 = StandingGoodBrush;
-                                    break;
-
-                                case 10.0f:
-                                    b1 = StandingVGoodBrush;
-                                    break;
-                            }
-
-                            switch (StandingIHUB)
-                            {
-                                case -10.0f:
-                                    b2 = StandingVBadBrush;
-                                    break;
-
-                                case -5.0f:
-                                    b2 = StandingBadBrush;
-                                    break;
-
-                                case 5.0f:
-                                    b2 = StandingGoodBrush;
-                                    break;
-
-                                case 10.0f:
-                                    b2 = StandingVGoodBrush;
-                                    break;
-                            }
-
-                            if (StandingIHUB < 0 && StandingTCU > 0 || StandingIHUB > 0 && StandingTCU < 0)
-                            {
-                                LinearGradientBrush lgb = new LinearGradientBrush();
-                                lgb.StartPoint = new Point(0, 0);
-                                lgb.EndPoint = new Point(1, 1);
-                                lgb.GradientStops.Add(new GradientStop(Colors.Yellow, 0.0));
-                                lgb.GradientStops.Add(new GradientStop(Colors.Red, 1));
-
-                                br = lgb;
-                            }
-                            else
-                            {
-                                // Create a DrawingBrush
-                                DrawingBrush myBrush = new DrawingBrush();
-                                // Create a Geometry with white background
-                                GeometryDrawing backgroundSquare = new GeometryDrawing(b1, null, new RectangleGeometry(new Rect(0, 0, 8, 8)));
-                                // Create a GeometryGroup that will be added to Geometry
-                                GeometryGroup gGroup = new GeometryGroup();
-                                gGroup.Children.Add(new RectangleGeometry(new Rect(0, 0, 4, 4)));
-                                gGroup.Children.Add(new RectangleGeometry(new Rect(4, 4, 4, 4)));
-                                // Create a GeomertyDrawing
-                                GeometryDrawing checkers = new GeometryDrawing(b2, null, gGroup);
-                                DrawingGroup checkersDrawingGroup = new DrawingGroup();
-                                checkersDrawingGroup.Children.Add(backgroundSquare);
-                                checkersDrawingGroup.Children.Add(checkers);
-                                myBrush.Drawing = checkersDrawingGroup;
-                                // Set Viewport and TimeMode
-                                myBrush.Viewport = new Rect(0, 0, 8, 8);
-                                myBrush.Viewbox = new Rect(0, 0, 8, 8);
-                                myBrush.TileMode = TileMode.Tile;
-                                myBrush.ViewboxUnits = BrushMappingMode.Absolute;
-                                myBrush.ViewportUnits = BrushMappingMode.Absolute;
-
-                                br = myBrush;
-                            }
-                        }
-                    }
+                     }
                     else
                     {
                         // enabled but not linked
@@ -2340,40 +2212,22 @@ namespace SMT
 
                 Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
 
-                if (MapConf.SOVBasedITCU)
+ 
+                if (mapSystem.ActualSystem.SOVAllianceID != 0)
                 {
-                    if (mapSystem.ActualSystem.SOVAllianceTCU != 0)
+                    foreach (Coalition c in EM.Coalitions)
                     {
-                        foreach (Coalition c in EM.Coalitions)
+                        foreach (long l in c.MemberAlliances)
                         {
-                            foreach (long l in c.MemberAlliances)
+                            if (l == mapSystem.ActualSystem.SOVAllianceID)
                             {
-                                if (l == mapSystem.ActualSystem.SOVAllianceTCU)
-                                {
-                                    SystemCoalition = c;
-                                    break;
-                                }
+                                SystemCoalition = c;
+                                break;
                             }
                         }
                     }
                 }
-                else
-                {
-                    if (mapSystem.ActualSystem.SOVAllianceIHUB != 0)
-                    {
-                        foreach (Coalition c in EM.Coalitions)
-                        {
-                            foreach (long l in c.MemberAlliances)
-                            {
-                                if (l == mapSystem.ActualSystem.SOVAllianceIHUB)
-                                {
-                                    SystemCoalition = c;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+
 
                 string SystemSubText = string.Empty;
 
@@ -2777,7 +2631,7 @@ namespace SMT
 
                 EVEData.System es = EM.GetEveSystem(SelectedSystem);
 
-                if (es != null && (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)) && mapSystem.ActualSystem.ConstellationID == es.ConstellationID)
+                if (es != null && ShowSystemTimers && MapConf.ShowIhubVunerabilities && mapSystem.ActualSystem.ConstellationID == es.ConstellationID)
                 {
                     {
                         Polygon poly = new Polygon();
@@ -2799,16 +2653,7 @@ namespace SMT
                     }
                 }
 
-                int SystemAlliance = 0;
-
-                if (MapConf.SOVBasedITCU)
-                {
-                    SystemAlliance = mapSystem.ActualSystem.SOVAllianceTCU;
-                }
-                else
-                {
-                    SystemAlliance = mapSystem.ActualSystem.SOVAllianceIHUB;
-                }
+                int SystemAlliance = mapSystem.ActualSystem.SOVAllianceID;
 
                 if (ShowSovOwner && SelectedAlliance != 0 && SystemAlliance == SelectedAlliance)
                 {
@@ -3442,7 +3287,7 @@ namespace SMT
                 if (e.ClickCount == 1)
                 {
                     bool redraw = false;
-                    if (showJumpDistance || (ShowSystemTimers && (MapConf.ShowIhubVunerabilities || MapConf.ShowTCUVunerabilities)))
+                    if (showJumpDistance || (ShowSystemTimers && MapConf.ShowIhubVunerabilities ))
                     {
                         redraw = true;
                     }

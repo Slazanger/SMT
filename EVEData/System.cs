@@ -20,8 +20,7 @@ namespace SMT.EVEData
             Jumps = new List<string>();
             SHStructures = new List<StructureHunter.Structures>();
 
-            SOVAllianceTCU = 0;
-            SOVAllianceIHUB = 0;
+            SOVAllianceID = 0;
             HasJumpBeacon = false;
         }
 
@@ -48,8 +47,7 @@ namespace SMT.EVEData
             JumpsLastHour = 0;
             ActiveIncursion = false;
 
-            SOVAllianceTCU = 0;
-            SOVAllianceIHUB = 0;
+            SOVAllianceID = 0;
 
             Jumps = new List<string>();
             SHStructures = new List<StructureHunter.Structures>();
@@ -206,13 +204,7 @@ namespace SMT.EVEData
         /// Gets or sets the name of the alliance holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public int SOVAllianceIHUB { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the alliance holding sov in this system
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public int SOVAllianceTCU { get; set; }
+        public int SOVAllianceID { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the corporation holding sov in this system
