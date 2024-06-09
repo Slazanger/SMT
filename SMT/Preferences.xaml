@@ -221,11 +221,7 @@
                             <GroupBox Header="General" Margin="4" Height="auto">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=ShowCoalition}" Margin="0,2">Show SOV as Coalitions</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=SOVShowConflicts}" Margin="0,2">Highlight SOV conflict areas</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=SOVBasedITCU}" Margin="0,2">Show SOV based on TCU</CheckBox>
-
                                     <CheckBox IsChecked="{Binding Path=ShowIhubVunerabilities}" Margin="0,2">Show IHub Timer</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=ShowTCUVunerabilities}" Margin="0,2">Show TCU Timer</CheckBox>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <xctk:IntegerUpDown Value="{Binding Path=UpcomingSovMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="360" Background="Transparent"  Foreground="White" />
@@ -307,6 +303,7 @@
                                         <xctk:IntegerUpDown Value="{Binding Path=IntelHistoricTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
                                         <Label Content="Finally, Intel is historic for x seconds" />
                                     </StackPanel>
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayIndividualCharacterWindows}" Content="Open individual windows for each character." />
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -325,6 +322,7 @@
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="Show the current route" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayHunterModeShowFullRegion}" Content="Show the full region in hunter mode" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowAllCharacterNames}" Content="Show the names of all characters on the map" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>

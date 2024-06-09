@@ -54,7 +54,6 @@ namespace SMT
 
         private bool m_ShowRegionStandings;
         private bool m_ShowSimpleSecurityView;
-        private bool m_ShowTCUVunerabilities;
 
         private bool m_ShowToolBox = true;
 
@@ -69,9 +68,6 @@ namespace SMT
 
         private bool m_ShowZKillData;
 
-        private bool m_SOVBasedonTCU;
-
-        private bool m_SOVShowConflicts;
         private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
         private double m_UniverseDataScale = 1.0f;
 
@@ -110,6 +106,8 @@ namespace SMT
         private bool m_overlayShowRoute = true;
         private bool m_overlayShowJumpBridges = true;
         private bool m_overlayShowSystemNames = false;
+        private bool m_overlayShowAllCharacterNames = false;
+        private bool m_overlayIndividualCharacterWindows = false;
 
         public MapConfig()
         {
@@ -627,10 +625,8 @@ namespace SMT
             set
             {
                 m_ShowIhubVunerabilities = value;
-                m_ShowTCUVunerabilities = !m_ShowIhubVunerabilities;
 
                 OnPropertyChanged("ShowIhubVunerabilities");
-                OnPropertyChanged("ShowTCUVunerabilities");
             }
         }
 
@@ -722,24 +718,6 @@ namespace SMT
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
 
-        [Category("SOV")]
-        [DisplayName("Show TCU Timers")]
-        public bool ShowTCUVunerabilities
-        {
-            get
-            {
-                return m_ShowTCUVunerabilities;
-            }
-
-            set
-            {
-                m_ShowTCUVunerabilities = value;
-                m_ShowIhubVunerabilities = !m_ShowTCUVunerabilities;
-
-                OnPropertyChanged("ShowIhubVunerabilities");
-                OnPropertyChanged("ShowTCUVunerabilities");
-            }
-        }
 
         [Category("General")]
         [DisplayName("Show Toolbox")]
@@ -872,35 +850,8 @@ namespace SMT
             }
         }
 
-        [Category("SOV")]
-        [DisplayName("Show Sov Based on TCU")]
-        public bool SOVBasedITCU
-        {
-            get
-            {
-                return m_SOVBasedonTCU;
-            }
-            set
-            {
-                m_SOVBasedonTCU = value;
-                OnPropertyChanged("SOVBasedITCU");
-            }
-        }
-
-        [Category("SOV")]
-        [DisplayName("Show Sov Conflicts")]
-        public bool SOVShowConflicts
-        {
-            get
-            {
-                return m_SOVShowConflicts;
-            }
-            set
-            {
-                m_SOVShowConflicts = value;
-                OnPropertyChanged("SOVShowConflicts");
-            }
-        }
+ 
+ 
 
         public bool SyncActiveCharacterBasedOnActiveEVEClient
         {
@@ -1166,6 +1117,22 @@ namespace SMT
                 OnPropertyChanged("OverlayShowJumpBridges");
             }
         }
+        
+        [Category("Overlay")]
+        [DisplayName("Overlay Individual Character Windows")]
+        public bool OverlayIndividualCharacterWindows
+        {
+            get
+            {
+                return m_overlayIndividualCharacterWindows;
+            }
+            set
+            {
+                m_overlayIndividualCharacterWindows = value;
+
+                OnPropertyChanged("OverlayIndividualCharacterWindows");
+            }
+        }
 
         [Category("Overlay")]
         [DisplayName("Overlay Show System Names")]
@@ -1180,6 +1147,22 @@ namespace SMT
                 m_overlayShowSystemNames = value;
 
                 OnPropertyChanged("OverlayShowSystemNames");
+            }
+        }
+        
+        [Category("Overlay")]
+        [DisplayName("Overlay Show All Character Names")]
+        public bool OverlayShowAllCharacterNames
+        {
+            get
+            {
+                return m_overlayShowAllCharacterNames;
+            }
+            set
+            {
+                m_overlayShowAllCharacterNames = value;
+
+                OnPropertyChanged("OverlayShowAllCharacterNames");
             }
         }
 
@@ -1333,8 +1316,6 @@ namespace SMT
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
             ShowActiveIncursions = true;
-            SOVShowConflicts = true;
-            SOVBasedITCU = true;
             UseESIForCharacterPositions = true;
             ShowCharacterNamesOnMap = true;
             ShowOfflineCharactersOnMap = true;
@@ -1360,6 +1341,7 @@ namespace SMT
             OverlayShowRoute = true;
             OverlayShowJumpBridges = true;
             OverlayShowSystemNames = false;
+            OverlayShowAllCharacterNames = false;
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;

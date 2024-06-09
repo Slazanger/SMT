@@ -585,28 +585,19 @@ namespace SMT
             SovHeader.Items.Clear();
             SovHeader.IsEnabled = false;
 
-            if (sys.SOVAllianceIHUB != 0)
+            if (sys.SOVAllianceID != 0)
             {
                 MenuItem mi = new MenuItem();
-                mi.Header = "IHUB: " + EM.GetAllianceTicker(sys.SOVAllianceIHUB);
-                mi.DataContext = sys.SOVAllianceIHUB;
+                mi.Header = "IHUB: " + EM.GetAllianceTicker(sys.SOVAllianceID);
+                mi.DataContext = sys.SOVAllianceID;
                 mi.Click += VHSystems_SOV_Clicked;
                 SovHeader.IsEnabled = true;
                 SovHeader.Items.Add(mi);
             }
 
-            if (sys.SOVAllianceTCU != 0)
-            {
-                MenuItem mi = new MenuItem();
-                mi.DataContext = sys.SOVAllianceTCU;
-                mi.Header = "TCU : " + EM.GetAllianceTicker(sys.SOVAllianceTCU);
-                mi.Click += VHSystems_SOV_Clicked;
-                SovHeader.IsEnabled = true;
-                SovHeader.Items.Add(mi);
-            }
 
             // update stats
-            MenuItem StatsHeader = cm.Items[8] as MenuItem;
+            MenuItem StatsHeader = cm.Items[10] as MenuItem;
             StatsHeader.Items.Clear();
             StatsHeader.IsEnabled = false;
 

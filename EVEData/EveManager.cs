@@ -2169,14 +2169,9 @@ namespace SMT.EVEData
 
             foreach (KeyValuePair<string, MapSystem> kvp in r.MapSystems)
             {
-                if (kvp.Value.ActualSystem.SOVAllianceTCU != 0 && !AllianceIDToName.ContainsKey(kvp.Value.ActualSystem.SOVAllianceTCU) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceTCU))
+                if (kvp.Value.ActualSystem.SOVAllianceID != 0 && !AllianceIDToName.ContainsKey(kvp.Value.ActualSystem.SOVAllianceID) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceID))
                 {
-                    IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceTCU);
-                }
-
-                if (kvp.Value.ActualSystem.SOVAllianceIHUB != 0 && !AllianceIDToName.ContainsKey(kvp.Value.ActualSystem.SOVAllianceIHUB) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceIHUB))
-                {
-                    IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceIHUB);
+                    IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceID);
                 }
             }
 
@@ -3406,7 +3401,7 @@ namespace SMT.EVEData
                             {
                                 if (obj["alliance_id"] != null)
                                 {
-                                    es.SOVAllianceTCU = int.Parse(obj["alliance_id"].ToString());
+                                    es.SOVAllianceID = int.Parse(obj["alliance_id"].ToString());
                                 }
                             }
                         }
@@ -3430,12 +3425,17 @@ namespace SMT.EVEData
                         EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
                         if (es != null)
                         {
+                            // structures : 
+                            // Old TCU  : 32226
+                            // Old iHub :  32458
+
+                            es.SOVAllianceID = ss.AllianceId;
+
                             if (ss.TypeId == 32226)
                             {
                                 es.TCUVunerabliltyStart = ss.VulnerableStartTime;
                                 es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
                                 es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
-                                es.SOVAllianceTCU = ss.AllianceId;
                             }
 
                             if (ss.TypeId == 32458)
@@ -3443,7 +3443,6 @@ namespace SMT.EVEData
                                 es.IHubVunerabliltyStart = ss.VulnerableStartTime;
                                 es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
                                 es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
-                                es.SOVAllianceIHUB = ss.AllianceId;
                             }
                         }
                     }
