@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using Windows.Services;
 using Microsoft.IdentityModel.Tokens;
 using SMT.EVEData;
 using static SMT.EVEData.Navigation;
@@ -39,6 +42,7 @@ namespace SMT
         public int rattingDelta;
 
         public Shape systemCanvasElement;
+        public TextBlock systemNameElement;
         public Shape npcKillCanvasElement;
         public Shape npcKillDeltaCanvasElement;
         public Path jumpBridgePath;
@@ -71,6 +75,7 @@ namespace SMT
         public void CleanUpCanvas(Canvas canvas, bool keepSystem = false)
         {
             if (!keepSystem && systemCanvasElement != null && canvas.Children.Contains(systemCanvasElement)) canvas.Children.Remove(systemCanvasElement);
+            if (!keepSystem && systemNameElement != null && canvas.Children.Contains(systemNameElement)) canvas.Children.Remove(systemNameElement);
             if (npcKillCanvasElement != null && canvas.Children.Contains(npcKillCanvasElement)) canvas.Children.Remove(npcKillCanvasElement);
             if (npcKillDeltaCanvasElement != null && canvas.Children.Contains(npcKillDeltaCanvasElement)) canvas.Children.Remove(npcKillDeltaCanvasElement);
             CleanUpJumpBridges(canvas);
@@ -104,15 +109,17 @@ namespace SMT
         public Vector2 currentOriginCoordinates;
 
         public float mapBorderMargin;
+        public float mapBorderBottomAdd;
         public float mapScalingX;
         public float mapScalingY;
+        public bool mapBorderBottomExtension = false;
 
         public float mapScalingMin
         { get { return Math.Min(mapScalingY, mapScalingX); } }
 
         public OverlayCanvasData()
         {
-            dimensions = Vector2.Zero;
+            dimensions = Vector2.One * 100f;
 
             unscaledMapExtendsMax = new Vector2(float.MinValue, float.MinValue);
             unscaledMapExtendsMin = new Vector2(float.MaxValue, float.MaxValue);
@@ -120,6 +127,7 @@ namespace SMT
             currentOriginCoordinates = Vector2.Zero;
 
             mapBorderMargin = 20f;
+            mapBorderBottomAdd = 10f;
             mapScalingX = 1f;
             mapScalingY = 1f;
         }
@@ -131,8 +139,8 @@ namespace SMT
         /// <param name="height"></param>
         public void SetDimensions(double width, double height)
         {
-            dimensions.X = (float)width;
-            dimensions.Y = (float)height;
+            dimensions.X = Math.Max((float)width, 100f);
+            dimensions.Y = Math.Max((float)height, 100f);
         }
 
         /// <summary>
@@ -154,6 +162,19 @@ namespace SMT
             unscaledMapExtendsMax.Y = Math.Max(unscaledMapExtendsMax.Y, offsetCoordinates.Y);
             unscaledMapExtendsMin.X = Math.Min(unscaledMapExtendsMin.X, offsetCoordinates.X);
             unscaledMapExtendsMin.Y = Math.Min(unscaledMapExtendsMin.Y, offsetCoordinates.Y);
+            
+            if (unscaledMapExtendsMax.X - unscaledMapExtendsMin.X < mapBorderMargin * 3f)
+            {
+                unscaledMapExtendsMax.X += mapBorderMargin * 1.5f;
+                unscaledMapExtendsMin.X -= mapBorderMargin * 1.5f;
+            }
+            
+            if (unscaledMapExtendsMax.Y - unscaledMapExtendsMin.Y < mapBorderMargin * 3f)
+            {
+                unscaledMapExtendsMax.Y += mapBorderMargin * 1.5f;
+                unscaledMapExtendsMin.Y -= mapBorderMargin * 1.5f;
+            }
+            
             ComputeScaling();
         }
 
@@ -163,7 +184,7 @@ namespace SMT
         private void ComputeScaling()
         {
             mapScalingX = (dimensions.X - (mapBorderMargin * 2f)) / unscaledMapDimensions.X;
-            mapScalingY = (dimensions.Y - (mapBorderMargin * 2f)) / unscaledMapDimensions.Y;
+            mapScalingY = (dimensions.Y - (mapBorderMargin * 2f) - (mapBorderBottomExtension ? mapBorderBottomAdd : 0)) / unscaledMapDimensions.Y;
         }
 
         /// <summary>
@@ -177,7 +198,7 @@ namespace SMT
             float emptySpaceOffsetX = (borderedDimensions.X - scaledMapDimensions.X) * 0.5f;
             float emptySpaceOffsetY = (borderedDimensions.Y - scaledMapDimensions.Y) * 0.5f;
             float canvasX = emptySpaceOffsetX + mapBorderMargin + (((coordinate.X - unscaledMapExtendsMin.X) * mapScalingMin) / borderedDimensions.X) * borderedDimensions.X;
-            float canvasY = emptySpaceOffsetY + mapBorderMargin + (((coordinate.Y - unscaledMapExtendsMin.Y) * mapScalingMin) / borderedDimensions.Y) * borderedDimensions.Y;
+            float canvasY = emptySpaceOffsetY + mapBorderMargin - (mapBorderBottomExtension ? (mapBorderBottomAdd * 0.5f) : 0 ) + (((coordinate.Y - unscaledMapExtendsMin.Y) * mapScalingMin) / borderedDimensions.Y) * borderedDimensions.Y;
             return new Vector2(canvasX, canvasY);
         }
     }
@@ -195,7 +216,7 @@ namespace SMT
         private List<(EVEData.IntelData data, List<Ellipse> ellipse)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
         private List<Line> jumpLines = new List<Line>();
         private List<OverlaySystemData> bridgeSystems = new List<OverlaySystemData>();
-        private List<Line> routeLines = new List<Line>();
+        private List<Shape> routeLines = new List<Shape>();
         private Ellipse jumpBridgeTargetHighlight = null;
 
         private Brush sysOutlineBrush;
@@ -222,6 +243,7 @@ namespace SMT
         private PeriodicTimer dataUpdateTimer, characterUpdateTimer;
 
         private int overlayDepth = 8;
+        private Dictionary<LocalCharacter, OverlaySystemData> currentPlayersSystemData = new ();
         private OverlaySystemData currentPlayerSystemData;
         private OverlayCanvasData canvasData = new OverlayCanvasData();
 
@@ -232,6 +254,7 @@ namespace SMT
         private float overlaySystemSizeGatherer = 20f;
         private float overlaySystemSizeHunter = 5f;
         private float overlayCurrentSystemSizeHunterModifier = 3f;
+        private float overlayAdditionalCharacterSystemSizeHunterModifier = 2f;
 
         private float overlayIntelOversize = 10f;
         private float CalculatedOverlayIntelOversize { get => overlayIntelOversize; }
@@ -248,12 +271,17 @@ namespace SMT
         private bool showCharName = true;
         private bool showCharLocation = true;
         private bool showJumpBridges = true;
+        private bool showSystemNames = false;
+        private bool showAllCharacterNames = false;
+        private bool individualCharacterWindows = false;
 
         private DoubleCollection dashStroke = new DoubleCollection(new List<double> { 2, 2 });
 
         private DoubleAnimation dashAnimation;
 
         private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
+
+        public LocalCharacter OverlayCharacter = null;
 
         public Overlay(MainWindow mw)
         {
@@ -320,13 +348,13 @@ namespace SMT
             intelFillBrush.Opacity = 0.25f;
 
             jumpLineBrush = new SolidColorBrush(Colors.White);
-            jumpLineBrush.Opacity = 0.5f;
+            jumpLineBrush.Opacity = 0.75f;
 
             bridgeLineBrush = new SolidColorBrush(mw.MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
             bridgeLineBrush.Opacity = 0.75f;
 
             routeLineBrush = new SolidColorBrush(Colors.Yellow);
-            routeLineBrush.Opacity = 0.5f;
+            routeLineBrush.Opacity = 0.75f;
 
             transparentBrush = new SolidColorBrush(Colors.White);
             transparentBrush.Opacity = 0f;
@@ -336,6 +364,11 @@ namespace SMT
 
             mainWindow = mw;
             if (mainWindow == null) return;
+
+            if (mainWindow.ActiveCharacter != null)
+            {
+                OverlayCharacter = mw.ActiveCharacter;
+            }
 
             // Set up some events
             mainWindow.OnSelectedCharChangedEventHandler += SelectedCharChanged;
@@ -351,6 +384,9 @@ namespace SMT
             intelHistoryPeriod = mainWindow.MapConf.IntelHistoricTime;
             overlayDepth = mainWindow.MapConf.OverlayRange + 1;
             showJumpBridges = mainWindow.MapConf.OverlayShowJumpBridges;
+            showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
+            showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
+            individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
 
             // Initialize value animation to be used by dashed lines
             dashAnimation = new DoubleAnimation();
@@ -389,8 +425,13 @@ namespace SMT
             if (gathererMode)
                 return overlaySystemSizeGatherer;
 
-            if (systemName == currentPlayerSystemData?.system?.Name)
+            if (systemName == currentPlayersSystemData[OverlayCharacter]?.system?.Name)
                 return overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier;
+
+            if (currentPlayersSystemData.Any(s => s.Value.system.Name == systemName))
+            {
+                return overlaySystemSizeHunter * overlayAdditionalCharacterSystemSizeHunterModifier;
+            }
 
             return overlaySystemSizeHunter;
         }
@@ -413,6 +454,7 @@ namespace SMT
         private void RefreshCurrentView()
         {
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
+            canvasData.mapBorderBottomExtension = showSystemNames;
             UpdatePlayerInformationText();
             UpdateSystemList();
             UpdateIntelDataCoordinates();
@@ -451,21 +493,91 @@ namespace SMT
         /// </summary>
         private void LoadOverlayWindowPosition()
         {
-            WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, Properties.Settings.Default.OverlayWindow_placement);
+            string currentPlacementString = Properties.Settings.Default.OverlayWindow_placement;
+            string currentCharacterName = OverlayCharacter == null ? "_" : OverlayCharacter.Name;
+            string currentPlacement = "";
+            if (currentPlacementString.Contains("|ID|"))
+            {
+                string[] currentPlacementStringParts = currentPlacementString.Split("|CHAR|");
+                foreach (string currentCharacterPlacementString in currentPlacementStringParts)
+                {
+                    string[] currentCharacterPlacementStringParts = currentCharacterPlacementString.Split("|ID|");
+                    if (currentCharacterPlacementStringParts[0] == currentCharacterName)
+                    {
+                        currentPlacement = currentCharacterPlacementStringParts[1];
+                        break;
+                    }
+                    
+                }
+            }
+            else
+            {
+                currentPlacement = currentPlacementString;
+            }
+
+            if (currentPlacement != "")
+            {
+                WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, currentPlacement);   
+            }
         }
 
+        private void CleanupAndUpdateOverlayWindowPosition(string characterName)
+        {
+            string currentPlacementString = Properties.Settings.Default.OverlayWindow_placement;
+            string[] currentCharacterPlacements = currentPlacementString.Split("|CHAR|");
+            List<string> validCharacterPlacements = new List<string>();
+
+            string actualWindowPlacement = (OverlayCharacter == null ? "_" : OverlayCharacter.Name) + "|ID|" + WindowPlacement.GetPlacement(new WindowInteropHelper(this).Handle);
+            bool overlayCharInlist = false;
+            
+            foreach (string placementString in currentCharacterPlacements)
+            {
+                string[] placementStringParts = placementString.Split("|ID|");
+                if (mainWindow.EVEManager.LocalCharacters.Any(c => c.Name == placementStringParts[0]) || placementStringParts[0] == "_")
+                {
+                    if (placementStringParts[0] == characterName)
+                    {
+                        validCharacterPlacements.Add(actualWindowPlacement);
+                        overlayCharInlist = true;
+                    }
+                    else
+                    {
+                        validCharacterPlacements.Add(placementString);   
+                    }
+                }
+            }
+
+            if (!overlayCharInlist)
+            {
+                validCharacterPlacements.Add(actualWindowPlacement);
+            }
+            
+            Properties.Settings.Default.OverlayWindow_placement = String.Join("|CHAR|", validCharacterPlacements);
+            Properties.Settings.Default.Save();
+        }
+        
         /// <summary>
         /// Stores the position and size values to the preferences.
         /// </summary>
         private void StoreOverlayWindowPosition()
         {
-            Properties.Settings.Default.OverlayWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(this).Handle);
-            Properties.Settings.Default.Save();
+            CleanupAndUpdateOverlayWindowPosition(OverlayCharacter == null ? "_" : OverlayCharacter.Name);
         }
 
         private void Overlay_Closing(object sender, CancelEventArgs e)
         {
             StoreOverlayWindowPosition();
+        }
+
+        private void UpdateCharacterData()
+        {
+            if (OverlayCharacter != null)
+            {
+                if (mainWindow.EVEManager.LocalCharacters.Any(c => c == OverlayCharacter))
+                {
+                    OverlayCharacter = mainWindow.EVEManager.LocalCharacters.First(c => c == OverlayCharacter);
+                }
+            }
         }
 
         /// <summary>
@@ -477,19 +589,34 @@ namespace SMT
         private async Task CharacterLocationUpdateLoop()
         {
             characterUpdateTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(250));
+            UpdateCharacterData();
 
             while (await characterUpdateTimer.WaitForNextTickAsync())
             {
                 // If the location differs from the last known location, trigger a change.
-                if (mainWindow.ActiveCharacter != null)
+                if (OverlayCharacter != null)
                 {
-                    if (currentPlayerSystemData.system == null)
+                    if (currentPlayersSystemData[OverlayCharacter].system == null)
                     {
                         RefreshCurrentView();
                     }
-                    else if (mainWindow.ActiveCharacter.Location != currentPlayerSystemData.system.Name || routeLines.Count > 0 && (routeLines.Count != mainWindow.ActiveCharacter.ActiveRoute.Count - 1))
+                    else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name || routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
                     {
                         RefreshCurrentView();
+                    }
+                    else
+                    {
+                        foreach (LocalCharacter additionalCharacter in mainWindow.EVEManager.LocalCharacters)
+                        {
+                            if (additionalCharacter != OverlayCharacter)
+                            {
+                                if (additionalCharacter.Location != currentPlayersSystemData[additionalCharacter].system.Name)
+                                {
+                                    RefreshCurrentView();
+                                    break;
+                                }
+                            }
+                        }   
                     }
                 }
             }
@@ -665,6 +792,8 @@ namespace SMT
         /// </summary>
         private void UpdateRouteData()
         {
+            UpdateCharacterData();
+            
             // clear all
             while (routeLines.Count > 0)
             {
@@ -672,9 +801,9 @@ namespace SMT
                 routeLines.Remove(routeLines[^1]);
             }
 
-            if (!gathererMode && mainWindow.MapConf.OverlayShowRoute && mainWindow.ActiveCharacter != null && mainWindow.ActiveCharacter.Waypoints.Count > 0)
+            if (!gathererMode && mainWindow.MapConf.OverlayShowRoute && OverlayCharacter != null && OverlayCharacter.Waypoints.Count > 0)
             {
-                List<RoutePoint> routePoints = mainWindow.ActiveCharacter.ActiveRoute.ToList();
+                List<RoutePoint> routePoints = OverlayCharacter.ActiveRoute.ToList();
 
                 if (routePoints.Count < 2) return;
 
@@ -683,19 +812,32 @@ namespace SMT
                     RoutePoint segmentStart = routePoints[i - 1];
                     RoutePoint segmentEnd = routePoints[i];
 
-                    routeLines.Add(new Line());
+                    if ( systemData.ContainsKey(segmentStart.SystemName) && segmentStart.GateToTake == GateType.Ansiblex )
+                    {
+                        Path jumpBridgePath = new Path();
+                        jumpBridgePath.Data = GenerateJumpBridgePathGeometry(segmentStart.SystemName, segmentEnd.SystemName);
 
-                    if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
+                        routeLines.Add(jumpBridgePath);
 
-                    Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
-                    Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
+                        routeLines[i - 1].Stroke = jumpLineBrush;
+                    }
+                    else
+                    {
+                        routeLines.Add(new Line());
 
-                    routeLines[i - 1].X1 = segmentStartCanvasCoordinate.X;
-                    routeLines[i - 1].Y1 = segmentStartCanvasCoordinate.Y;
-                    routeLines[i - 1].X2 = segmentEndCanvasCoordinate.X;
-                    routeLines[i - 1].Y2 = segmentEndCanvasCoordinate.Y;
+                        if (!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
 
-                    routeLines[i - 1].Stroke = routeLineBrush;
+                        Vector2 segmentStartCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentStart.SystemName].mapSystemCoordinate);
+                        Vector2 segmentEndCanvasCoordinate = canvasData.CoordinateToCanvas(systemData[segmentEnd.SystemName].mapSystemCoordinate);
+
+                        ((Line)routeLines[i - 1]).X1 = segmentStartCanvasCoordinate.X;
+                        ((Line)routeLines[i - 1]).Y1 = segmentStartCanvasCoordinate.Y;
+                        ((Line)routeLines[i - 1]).X2 = segmentEndCanvasCoordinate.X;
+                        ((Line)routeLines[i - 1]).Y2 = segmentEndCanvasCoordinate.Y;
+
+                        routeLines[i - 1].Stroke = routeLineBrush;
+                    }                    
+                    
                     routeLines[i - 1].StrokeThickness = 4;
                     routeLines[i - 1].StrokeDashArray = new DoubleCollection(new List<double> { 1.0, 1.0 });
                     routeLines[i - 1].BeginAnimation(Shape.StrokeDashOffsetProperty, dashAnimation);
@@ -815,12 +957,19 @@ namespace SMT
             List<string> systemsInList = new List<string>();
 
             // If there is no main window or no selected character, abort.
-            if (mainWindow == null || mainWindow.ActiveCharacter == null) return;
+            if (mainWindow == null || OverlayCharacter == null) return;
+            UpdateCharacterData();
 
             // Gather data
-            string currentLocation = mainWindow.ActiveCharacter.Location;
+            currentPlayersSystemData.Clear();
+            string currentLocation = OverlayCharacter.Location;
             EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
-            currentPlayerSystemData = new OverlaySystemData(currentSystem);
+            currentPlayersSystemData.Add(OverlayCharacter, new OverlaySystemData(currentSystem));
+            foreach (LocalCharacter additionalChar in mainWindow.EVEManager.LocalCharacters)
+            {
+                if (!currentPlayersSystemData.ContainsKey(additionalChar))
+                    currentPlayersSystemData.Add(additionalChar, new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(additionalChar.Location)));
+            }
 
             // Bail out if the system does not exist. I.e. wormhole systems.
             if (currentSystem == null)
@@ -836,18 +985,19 @@ namespace SMT
             if (gathererMode || (!gathererMode && !hunterModeShowFullRegion))
             {
                 // Add the players location to the hierarchie.
-                hierarchie.Add(new List<OverlaySystemData>() { currentPlayerSystemData });
-                if (!systemData.ContainsKey(currentPlayerSystemData.system.Name))
+                hierarchie.Add(new List<OverlaySystemData>() { currentPlayersSystemData[OverlayCharacter] });
+                if (!systemData.ContainsKey(currentPlayersSystemData[OverlayCharacter].system.Name))
                 {
-                    systemData.Add(currentPlayerSystemData.system.Name, currentPlayerSystemData);
+                    systemData.Add(currentPlayersSystemData[OverlayCharacter].system.Name, currentPlayersSystemData[OverlayCharacter]);
                 }
+                canvasData.UpdateUnscaledExtends(mainWindow.EVEManager.GetRegion(currentPlayersSystemData[OverlayCharacter].system.Region).MapSystems[currentPlayersSystemData[OverlayCharacter].system.Name].Layout);
 
                 // Track which systems are already in the list to avoid doubles.
                 systemsInList.Add(currentSystem.Name);
 
-                currentPlayerSystemData.mapSystemCoordinate = mainWindow.EVEManager.GetRegion(currentSystem.Region).MapSystems[currentSystem.Name].Layout;
-                canvasData.currentOriginCoordinates = currentPlayerSystemData.mapSystemCoordinate;
-                systemData[currentPlayerSystemData.system.Name].mapSystemCoordinate = currentPlayerSystemData.mapSystemCoordinate;
+                currentPlayersSystemData[OverlayCharacter].mapSystemCoordinate = mainWindow.EVEManager.GetRegion(currentSystem.Region).MapSystems[currentSystem.Name].Layout;
+                canvasData.currentOriginCoordinates = currentPlayersSystemData[OverlayCharacter].mapSystemCoordinate;
+                systemData[currentPlayersSystemData[OverlayCharacter].system.Name].mapSystemCoordinate = currentPlayersSystemData[OverlayCharacter].mapSystemCoordinate;
 
                 for (int i = 1; i < overlayDepth; i++)
                 {
@@ -864,7 +1014,7 @@ namespace SMT
                             string sourceRegion = previousDepthSystem.system.Region;
                             string targetRegion = jumpSystem.Region;
 
-                            if (gathererMode == true || targetRegion == currentPlayerSystemData.system.Region || sourceRegion == currentPlayerSystemData.system.Region || (regionMirrorVectors.ContainsKey(targetRegion) && gathererModeIncludesAdjacentRegions))
+                            if (gathererMode == true || targetRegion == currentPlayersSystemData[OverlayCharacter].system.Region || sourceRegion == currentPlayersSystemData[OverlayCharacter].system.Region || (regionMirrorVectors.ContainsKey(targetRegion) && gathererModeIncludesAdjacentRegions))
                             {
                                 // Only add the system if it was not yet added.
                                 if (!systemsInList.Contains(jump))
@@ -999,64 +1149,25 @@ namespace SMT
                     // Only draw a line if at least one system is visible.
                     if ( systemData.ContainsKey(jumpBridge.From) || systemData.ContainsKey(jumpBridge.To))
                     {
-                        Vector2 fromCoordinate;
-                        Vector2 toCoordinate;
                         OverlaySystemData visibleSystemData = null;
                         string otherEndSystemName = "";
 
                         if (systemData.ContainsKey(jumpBridge.From))
                         {
-                            fromCoordinate = systemData[jumpBridge.From].canvasCoordinate;
                             visibleSystemData = systemData[jumpBridge.From];
                             otherEndSystemName = jumpBridge.To;
                         }                     
-                        else
-                        {
-                            fromCoordinate = OffMapConnection(jumpBridge.To, jumpBridge.From);                            
-                        }
                         
                         if (systemData.ContainsKey(jumpBridge.To))
                         {
-                            toCoordinate = systemData[jumpBridge.To].canvasCoordinate;
                             visibleSystemData = systemData[jumpBridge.To];
                             otherEndSystemName = jumpBridge.From;
                         }                 
-                        else
-                        {
-                            toCoordinate = OffMapConnection(jumpBridge.From, jumpBridge.To);
-                        }
 
                         if (visibleSystemData == null) continue;
 
-                        ArcSegment connectionArc = new ArcSegment();
-                        PathGeometry pathGeometry = new PathGeometry();
-                        PathFigure pathFigure = new PathFigure();
-                        
+                        PathGeometry pathGeometry = GenerateJumpBridgePathGeometry(jumpBridge.From, jumpBridge.To);
 
-                        Vector2f fromVector = new Vector2f(fromCoordinate.X + (CalculatedOverlaySystemSize(jumpBridge.From) / 2f),
-                            fromCoordinate.Y + (CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
-                        Vector2f toVector = new Vector2f(toCoordinate.X + (CalculatedOverlaySystemSize(jumpBridge.To) / 2f),
-                            toCoordinate.Y + (CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
-
-                        Vector2f bridgeConnection = toVector == fromVector ? new Vector2f(0, 0) : Vector2f.Normalize(toVector - fromVector);
-
-                        Vector2f fromCorrected = fromVector + (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
-                        Vector2f toCorrected = toVector - (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
-                        
-
-                        pathFigure.StartPoint = new Point(fromCorrected.x, fromCorrected.y);
-                        pathFigure.Segments.Add(
-                                new ArcSegment(
-                                    new Point(toCorrected.x, toCorrected.y),
-                                    new Size(20,100),
-                                    MathF.Atan2(bridgeConnection.x, bridgeConnection.y) * 57.295779513f * -1f,
-                                    false,
-                                    SweepDirection.Clockwise,
-                                    true
-                                )
-                            );
-
-                        pathGeometry.Figures.Add(pathFigure);
                         Path path;
 
                         if (visibleSystemData.jumpBridgePath != null) path = visibleSystemData.jumpBridgePath;
@@ -1089,6 +1200,63 @@ namespace SMT
                     alreadyConnected.Add($"{jumpBridge.From} {jumpBridge.To}");
                 }
             }
+        }
+
+        private PathGeometry GenerateJumpBridgePathGeometry(string fromSystemName, string toSystemName)
+        {
+            ArcSegment connectionArc = new ArcSegment();
+            PathGeometry pathGeometry = new PathGeometry();
+            PathFigure pathFigure = new PathFigure();
+
+            Vector2 fromCoordinate;
+            Vector2 toCoordinate;
+            string otherEndSystemName = "";
+
+            if (systemData.ContainsKey(fromSystemName))
+            {
+                fromCoordinate = systemData[fromSystemName].canvasCoordinate;
+                otherEndSystemName = toSystemName;
+            }
+            else
+            {
+                fromCoordinate = OffMapConnection(toSystemName, fromSystemName);
+            }
+
+            if (systemData.ContainsKey(toSystemName))
+            {
+                toCoordinate = systemData[toSystemName].canvasCoordinate;
+                otherEndSystemName = fromSystemName;
+            }
+            else
+            {
+                toCoordinate = OffMapConnection(fromSystemName, toSystemName);
+            }
+
+            Vector2f fromVector = new Vector2f(fromCoordinate.X + (CalculatedOverlaySystemSize(fromSystemName) / 2f),
+                fromCoordinate.Y + (CalculatedOverlaySystemSize(fromSystemName) / 2f));
+            Vector2f toVector = new Vector2f(toCoordinate.X + (CalculatedOverlaySystemSize(toSystemName) / 2f),
+                toCoordinate.Y + (CalculatedOverlaySystemSize(toSystemName) / 2f));
+
+            Vector2f bridgeConnection = toVector == fromVector ? new Vector2f(0, 0) : Vector2f.Normalize(toVector - fromVector);
+
+            Vector2f fromCorrected = fromVector + (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.From) / 2f));
+            Vector2f toCorrected = toVector - (bridgeConnection);// * (int)(CalculatedOverlaySystemSize(jumpBridge.To) / 2f));
+
+            pathFigure.StartPoint = new Point(fromCorrected.x, fromCorrected.y);
+            pathFigure.Segments.Add(
+                    new ArcSegment(
+                        new Point(toCorrected.x, toCorrected.y),
+                        new Size(20, 100),
+                        MathF.Atan2(bridgeConnection.x, bridgeConnection.y) * 57.295779513f * -1f,
+                        false,
+                        SweepDirection.Clockwise,
+                        true
+                    )
+                );
+
+            pathGeometry.Figures.Add(pathFigure);
+
+            return pathGeometry;
         }
 
         /// <summary>
@@ -1181,7 +1349,7 @@ namespace SMT
         private void DrawSystemsToOverlay(int depth, List<OverlaySystemData> systems, int maxDepth)
         {
             // Fetch data and determine the sizes for rows and columns.
-            double rowHeight = canvasData.dimensions.Y / maxDepth;
+            double rowHeight = (canvasData.dimensions.Y - (canvasData.mapBorderBottomExtension ? canvasData.mapBorderBottomAdd : 0)) / maxDepth;
             double columnWidth = canvasData.dimensions.X / systems.Count;
 
             // In each depth the width of the columns is divided equally by the number of systems.
@@ -1248,7 +1416,7 @@ namespace SMT
             systemData[sysData.system.Name].systemCanvasElement.Height = CalculatedOverlaySystemSize(sysData.system.Name);
             systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode ? 2 : 1;
 
-            if (sysData.system.Name == currentPlayerSystemData.system.Name)
+            if (sysData.system.Name == currentPlayersSystemData[OverlayCharacter].system.Name)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = sysLocationOutlineBrush;
             }
@@ -1274,7 +1442,7 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement.Fill = securityColorFill;
             }
 
-            if (!gathererMode && sysData.system.Region != currentPlayerSystemData.system.Region)
+            if (!gathererMode && sysData.system.Region != currentPlayersSystemData[OverlayCharacter].system.Region)
             {
                 systemData[sysData.system.Name].systemCanvasElement.Stroke = outOfRegionSysOutlineBrush;
                 systemData[sysData.system.Name].systemCanvasElement.Fill = outOfRegionSysFillBrush;
@@ -1292,8 +1460,80 @@ namespace SMT
             systemData[sysData.system.Name].systemCanvasElement.ToolTipOpening += StartSystemHighlight;
             systemData[sysData.system.Name].systemCanvasElement.ToolTipClosing += StopSystemHighlight;
 
+            if ( !gathererMode )
+            {
+                ContextMenu systemContextMenu = new ContextMenu();
+
+                if (OverlayCharacter.ESILinked)
+                {
+                    MenuItem setRouteTarget = new MenuItem();
+                    setRouteTarget.Header = "Set Destination";
+                    setRouteTarget.Click += SetDestination_Click;
+                    setRouteTarget.DataContext = sysData.system.Name;
+                    systemContextMenu.Items.Add(setRouteTarget);
+
+                    MenuItem addRouteWaypoint = new MenuItem();
+                    addRouteWaypoint.Header = "Add Waypoint";
+                    addRouteWaypoint.DataContext = sysData.system.Name;
+                    addRouteWaypoint.Click += AddWaypoint_Click;
+                    systemContextMenu.Items.Add(addRouteWaypoint);
+                }
+                else
+                {
+                    MenuItem esiNote = new MenuItem();
+                    esiNote.Header = "ESI auth required to set route.";
+                    esiNote.IsEnabled = false;
+                    systemContextMenu.Items.Add(esiNote);
+                }
+
+                systemData[sysData.system.Name].systemCanvasElement.ContextMenu = systemContextMenu;
+            }            
+
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
+
+            if (showSystemNames || showAllCharacterNames )
+            {
+                if (systemData[sysData.system.Name].systemNameElement == null)
+                {
+                    systemData[sysData.system.Name].systemNameElement = new TextBlock();
+                }
+                systemData[sysData.system.Name].systemNameElement.Inlines.Clear();
+                systemData[sysData.system.Name].systemNameElement.Width = 80;
+
+                bool firstEntry = false;
+                if (showSystemNames)
+                {
+                    systemData[sysData.system.Name].systemNameElement.Inlines.Add( new Run(sysData.system.Name));
+                    firstEntry = true;
+                }
+
+                foreach (KeyValuePair<LocalCharacter, OverlaySystemData> localCharacterEntry in currentPlayersSystemData)
+                {
+                    if (localCharacterEntry.Value.system != null && sysData.system.Name == localCharacterEntry.Value.system.Name)
+                    {
+                        if (firstEntry)
+                        {
+                            systemData[sysData.system.Name].systemNameElement.Inlines.Add(new LineBreak());   
+                        }
+                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($"{localCharacterEntry.Key.Name}")) ;
+                        firstEntry = true;
+                    }
+                }
+                
+                systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
+                systemData[sysData.system.Name].systemNameElement.FontSize = 10;
+                systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
+
+                Canvas.SetLeft(systemData[sysData.system.Name].systemNameElement, leftCoord - (systemData[sysData.system.Name].systemNameElement.Width * 0.5f) + (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5f));
+                Canvas.SetTop(systemData[sysData.system.Name].systemNameElement, topCoord + systemData[sysData.system.Name].systemCanvasElement.Height + 2);
+                Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 99);
+
+                if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemNameElement))
+                {
+                    overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemNameElement);
+                }
+            }
 
             systemData[sysData.system.Name].canvasCoordinate = new Vector2((float)leftCoord, (float)topCoord);
 
@@ -1304,7 +1544,25 @@ namespace SMT
             {
                 systemData[sysData.system.Name].systemCanvasElement.Name = "system";
                 overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemCanvasElement);
-            }
+            }            
+        }
+
+        private void AddWaypoint_Click(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            string senderDataContext = senderElement.DataContext as string;
+
+            EVEData.System system = mainWindow.EVEManager.GetEveSystem(senderDataContext);
+            mainWindow.EVEManager.LocalCharacters.First(c => c == OverlayCharacter).AddDestination(system.ID, false);
+        }
+
+        private void SetDestination_Click(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            string senderDataContext = senderElement.DataContext as string;
+
+            EVEData.System system = mainWindow.EVEManager.GetEveSystem(senderDataContext);
+            mainWindow.EVEManager.LocalCharacters.First(c => c == OverlayCharacter).AddDestination(system.ID, true);
         }
 
         /// <summary>
@@ -1533,6 +1791,26 @@ namespace SMT
                 ClearView();
                 RefreshCurrentView();
             }
+
+            if (e.PropertyName == "OverlayShowSystemNames")
+            {
+                showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
+                ClearView();
+                RefreshCurrentView();
+            }
+            
+            if (e.PropertyName == "OverlayShowAllCharacterNames")
+            {
+                showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
+                ClearView();
+                RefreshCurrentView();
+            }
+            
+            if (e.PropertyName == "OverlayIndividualCharacterWindows")
+            {
+                individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
+                Close();
+            }
         }
 
         /// <summary>
@@ -1542,6 +1820,7 @@ namespace SMT
         /// <param name="e"></param>
         public void SelectedCharChanged(object sender, EventArgs e)
         {
+            if (!individualCharacterWindows) OverlayCharacter = mainWindow.ActiveCharacter;
             RefreshCurrentView();
         }
 
@@ -1551,17 +1830,19 @@ namespace SMT
         /// </summary>
         public void UpdatePlayerInformationText()
         {
-            if (mainWindow.ActiveCharacter != null)
+            
+            LocalCharacter currentCharacter = mainWindow.EVEManager.LocalCharacters.FirstOrDefault(c => c == OverlayCharacter);
+            if (currentCharacter != null)
             {
                 string displayText = "";
                 if (showCharName)
                 {
-                    displayText = mainWindow.ActiveCharacter.Name;
+                    displayText = OverlayCharacter.Name;
                 }
 
                 if (showCharLocation)
                 {
-                    displayText += (displayText.IsNullOrEmpty() ? "" : "\n") + mainWindow.ActiveCharacter.Location;
+                    displayText += (displayText.IsNullOrEmpty() ? "" : "\n") + currentCharacter.Location;
                 }
 
                 overlay_CharNameTextblock.Text = displayText;

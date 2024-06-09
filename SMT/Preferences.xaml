@@ -15,7 +15,7 @@
 
     <Grid Background="{DynamicResource ButtonBorder}" Height="Auto" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
         <DockPanel HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-            <TabControl x:Name="tabControl" DockPanel.Dock="Top">
+            <TabControl x:Name="tabControl" DockPanel.Dock="Top" Height="487">
                 <TabItem Header="General">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -152,6 +152,7 @@
                                 <StackPanel>
 
                                     <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
+                                    <CheckBox IsChecked="{Binding PlayIntelSoundOnAlert}" Margin="0,2" Content="Warning Sound on Alert"/>
                                     <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window" />
                                     <StackPanel Orientation="Vertical" Margin="0,2">
                                         <Label Content="Warning Sound Volume" />
@@ -193,15 +194,17 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <GroupBox Margin="4" Height="auto">
+                            <GroupBox Margin="4" Height="453">
 
                                 <StackPanel Orientation="Vertical">
-                                    <Label>Channel Filters</Label>
+                                    <Label Content="Channels to monitor (Partial text match, one per line)"/>
                                     <TextBox Width="271" Height="100" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                    <Label>Clear Filters</Label>
+                                    <Label Content="Clear Filters (will change alert to warning)"/>
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelClearFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                    <Label>Ignore Filters</Label>
+                                    <Label Content="Ignore Filters (Text to ignore)"/>
                                     <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelIgnoreFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
+                                    <Label Content="Alert Filters (Text to always alert)"/>
+                                    <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelAlertFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -218,11 +221,7 @@
                             <GroupBox Header="General" Margin="4" Height="auto">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=ShowCoalition}" Margin="0,2">Show SOV as Coalitions</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=SOVShowConflicts}" Margin="0,2">Highlight SOV conflict areas</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=SOVBasedITCU}" Margin="0,2">Show SOV based on TCU</CheckBox>
-
                                     <CheckBox IsChecked="{Binding Path=ShowIhubVunerabilities}" Margin="0,2">Show IHub Timer</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=ShowTCUVunerabilities}" Margin="0,2">Show TCU Timer</CheckBox>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <xctk:IntegerUpDown Value="{Binding Path=UpcomingSovMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="360" Background="Transparent"  Foreground="White" />
@@ -304,6 +303,7 @@
                                         <xctk:IntegerUpDown Value="{Binding Path=IntelHistoricTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
                                         <Label Content="Finally, Intel is historic for x seconds" />
                                     </StackPanel>
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayIndividualCharacterWindows}" Content="Open individual windows for each character." />
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -316,11 +316,13 @@
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharName}" Content="Show name of the active character" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharLocation}" Content="Show location of the active character" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowJumpBridges}" Content="Show JumpBridges" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowSystemNames}" Content="Show Individual System Names" />
                                         <Label Content="Hunter Mode Information" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKills}" Content="Show NPC kills" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="Show the current route" />
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayHunterModeShowFullRegion}" Content="Show the full region in hunter mode" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowAllCharacterNames}" Content="Show the names of all characters on the map" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>

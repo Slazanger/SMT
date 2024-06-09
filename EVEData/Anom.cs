@@ -81,8 +81,8 @@ namespace SMT.EVEData
         public string Type { get; set; }
 
         /// <summary>
-        /// To String
+        /// Convert to string, keeping the in-game format so that the string can be imported back into SMT
         /// </summary>
-        public override string ToString() => Signature + " " + Type + " " + Name;
+        public override string ToString() => Signature + "\t" + "Cosmic Signature" + "\t" + Type + "\t" + Name + "\t\t";
     }
 }

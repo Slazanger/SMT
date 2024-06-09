@@ -382,30 +382,16 @@ namespace SMT
 
                         numSystems++;
 
-                        if (MapConf.SOVBasedITCU)
+                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceID)
                         {
-                            if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceTCU)
-                            {
-                                averageStanding += 10.0f;
-                            }
-
-                            if (s.ActualSystem.SOVAllianceTCU != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceTCU))
-                            {
-                                averageStanding += ActiveCharacter.Standings[s.ActualSystem.SOVAllianceTCU];
-                            }
+                            averageStanding += 10.0f;
                         }
-                        else
+
+                        if (s.ActualSystem.SOVAllianceID != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceID))
                         {
-                            if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceIHUB)
-                            {
-                                averageStanding += 10.0f;
-                            }
-
-                            if (s.ActualSystem.SOVAllianceTCU != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceIHUB))
-                            {
-                                averageStanding += ActiveCharacter.Standings[s.ActualSystem.SOVAllianceIHUB];
-                            }
+                            averageStanding += ActiveCharacter.Standings[s.ActualSystem.SOVAllianceID];
                         }
+
 
                         if (s.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
                         {
