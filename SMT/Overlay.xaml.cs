@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NHotkey.Wpf;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -16,8 +17,33 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Windows.Services;
 using Microsoft.IdentityModel.Tokens;
+using NHotkey;
 using SMT.EVEData;
 using static SMT.EVEData.Navigation;
+
+public static class WindowsServices
+{
+  const int WS_EX_TRANSPARENT = 0x00000020;
+  const int GWL_EXSTYLE = (-20);
+
+  [DllImport("user32.dll")]
+  static extern int GetWindowLong(IntPtr hwnd, int index);
+
+  [DllImport("user32.dll")]
+  static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
+  public static void SetWindowExTransparent(IntPtr hwnd)
+  {
+      var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+    SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TRANSPARENT);
+  }
+  
+  public static void SetWindowExNotTransparent(IntPtr hwnd)
+  {
+      var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+      SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle & ~WS_EX_TRANSPARENT);
+  }
+}
 
 namespace SMT
 {
@@ -377,6 +403,9 @@ namespace SMT
             Closing += Overlay_Closing;
             // We can only redraw stuff when the canvas is actually resized, otherwise dimensions will be wrong!
             overlay_Canvas.SizeChanged += OnCanvasSizeChanged;
+            
+            // Set up hotkeys
+            HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OnClickTroughToggle);
 
             // Update settings
             intelUrgentPeriod = mainWindow.MapConf.IntelFreshTime;
@@ -403,9 +432,33 @@ namespace SMT
             // mw.EVEManager.IntelAddedEvent += OnIntelAdded;
 
             // Start the magic
+            ToggleClickTrough(mainWindow.OverlayWindowsAreClickTrough);
             RefreshCurrentView();
             _ = CharacterLocationUpdateLoop();
             _ = DataOverlayUpdateLoop();
+        }
+
+        private void OnClickTroughToggle(object sender, HotkeyEventArgs e)
+        {
+            mainWindow.OverlayWindow_ToggleClickTrough();
+        }
+
+        public void ToggleClickTrough(bool isClickTrough)
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            
+            if (isClickTrough)
+            {
+                WindowsServices.SetWindowExTransparent(hwnd);
+                overlay_ButtonRow.Height = new GridLength(0);
+                this.ResizeMode = ResizeMode.NoResize;
+            }
+            else
+            {
+                WindowsServices.SetWindowExNotTransparent(hwnd);
+                overlay_ButtonRow.Height = new GridLength(20);
+                this.ResizeMode = ResizeMode.CanResizeWithGrip;
+            }
         }
 
         protected override void OnSourceInitialized(EventArgs e)
