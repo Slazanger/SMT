@@ -54,7 +54,6 @@ namespace SMT
 
         private bool m_ShowRegionStandings;
         private bool m_ShowSimpleSecurityView;
-        private bool m_ShowTCUVunerabilities;
 
         private bool m_ShowToolBox = true;
 
@@ -69,9 +68,6 @@ namespace SMT
 
         private bool m_ShowZKillData;
 
-        private bool m_SOVBasedonTCU;
-
-        private bool m_SOVShowConflicts;
         private bool m_SyncActiveCharacterBasedOnActiveEVEClient;
         private double m_UniverseDataScale = 1.0f;
 
@@ -629,10 +625,8 @@ namespace SMT
             set
             {
                 m_ShowIhubVunerabilities = value;
-                m_ShowTCUVunerabilities = !m_ShowIhubVunerabilities;
 
                 OnPropertyChanged("ShowIhubVunerabilities");
-                OnPropertyChanged("ShowTCUVunerabilities");
             }
         }
 
@@ -724,24 +718,6 @@ namespace SMT
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
 
-        [Category("SOV")]
-        [DisplayName("Show TCU Timers")]
-        public bool ShowTCUVunerabilities
-        {
-            get
-            {
-                return m_ShowTCUVunerabilities;
-            }
-
-            set
-            {
-                m_ShowTCUVunerabilities = value;
-                m_ShowIhubVunerabilities = !m_ShowTCUVunerabilities;
-
-                OnPropertyChanged("ShowIhubVunerabilities");
-                OnPropertyChanged("ShowTCUVunerabilities");
-            }
-        }
 
         [Category("General")]
         [DisplayName("Show Toolbox")]
@@ -874,35 +850,8 @@ namespace SMT
             }
         }
 
-        [Category("SOV")]
-        [DisplayName("Show Sov Based on TCU")]
-        public bool SOVBasedITCU
-        {
-            get
-            {
-                return m_SOVBasedonTCU;
-            }
-            set
-            {
-                m_SOVBasedonTCU = value;
-                OnPropertyChanged("SOVBasedITCU");
-            }
-        }
-
-        [Category("SOV")]
-        [DisplayName("Show Sov Conflicts")]
-        public bool SOVShowConflicts
-        {
-            get
-            {
-                return m_SOVShowConflicts;
-            }
-            set
-            {
-                m_SOVShowConflicts = value;
-                OnPropertyChanged("SOVShowConflicts");
-            }
-        }
+ 
+ 
 
         public bool SyncActiveCharacterBasedOnActiveEVEClient
         {
@@ -1367,8 +1316,6 @@ namespace SMT
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
             ShowActiveIncursions = true;
-            SOVShowConflicts = true;
-            SOVBasedITCU = true;
             UseESIForCharacterPositions = true;
             ShowCharacterNamesOnMap = true;
             ShowOfflineCharactersOnMap = true;
