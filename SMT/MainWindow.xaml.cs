@@ -30,7 +30,12 @@ namespace SMT
     {
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
-        private List<Overlay> overlayWindows;
+        private List<Overlay> overlayWindows = new();
+        private bool overlayWindowsAreClickTrough = false;
+        public bool OverlayWindowsAreClickTrough
+        {
+            get => overlayWindowsAreClickTrough; 
+        }
 
         private MediaPlayer mediaPlayer;
         private PreferencesWindow preferencesWindow;
@@ -2496,6 +2501,20 @@ namespace SMT
             newOverlayWindow.Closing += OnOverlayWindowClosing;
             newOverlayWindow.Show();
             overlayWindows.Add(newOverlayWindow);
+        }
+
+        private void OverlayClickTroughToggle_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            OverlayWindow_ToggleClickTrough();
+        }
+        
+        public void OverlayWindow_ToggleClickTrough()
+        {
+            overlayWindowsAreClickTrough = !overlayWindowsAreClickTrough;
+            foreach (Overlay overlayWindow in overlayWindows)
+            {
+                overlayWindow.ToggleClickTrough(overlayWindowsAreClickTrough);
+            }
         }
 
         public void OnOverlayWindowClosing(object sender, CancelEventArgs e)

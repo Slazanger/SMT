@@ -66,6 +66,7 @@
                 <MenuItem Header="View" Height="Auto">
                     <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
                     <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
+                    <MenuItem x:Name="miToggleOverlayClickTrough" Header="Toggle Overlay ClickTrough (Shift + Ctrl + Alt + T)" Click="OverlayClickTroughToggle_MenuItem_Click"/>
                 </MenuItem>
             </Menu>
 
