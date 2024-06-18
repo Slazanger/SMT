@@ -15,6 +15,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Windows.Services;
 using Microsoft.IdentityModel.Tokens;
 using NHotkey;
@@ -266,8 +267,6 @@ namespace SMT
         private Brush toolTipBackgroundBrush;
         private Brush toolTipForegroundBrush;
 
-        private PeriodicTimer dataUpdateTimer, characterUpdateTimer;
-
         private int overlayDepth = 8;
         private Dictionary<LocalCharacter, OverlaySystemData> currentPlayersSystemData = new ();
         private OverlaySystemData currentPlayerSystemData;
@@ -300,6 +299,9 @@ namespace SMT
         private bool showSystemNames = false;
         private bool showAllCharacterNames = false;
         private bool individualCharacterWindows = false;
+
+        private DispatcherTimer locationUpdateTimer = new DispatcherTimer();
+        private DispatcherTimer dataUpdateTimer = new DispatcherTimer();
 
         private DoubleCollection dashStroke = new DoubleCollection(new List<double> { 2, 2 });
 
@@ -434,8 +436,15 @@ namespace SMT
             // Start the magic
             ToggleClickTrough(mainWindow.OverlayWindowsAreClickTrough);
             RefreshCurrentView();
-            _ = CharacterLocationUpdateLoop();
-            _ = DataOverlayUpdateLoop();
+
+            locationUpdateTimer.Interval = TimeSpan.FromMilliseconds(250);
+            locationUpdateTimer.Tick += UpdatePlayerLocations;
+            
+            dataUpdateTimer.Interval = TimeSpan.FromSeconds(1);
+            dataUpdateTimer.Tick += UpdateDataOverlay;
+            
+            locationUpdateTimer.Start();
+            dataUpdateTimer.Start();
         }
 
         private void OnClickTroughToggle(object sender, HotkeyEventArgs e)
@@ -633,68 +642,45 @@ namespace SMT
             }
         }
 
-        /// <summary>
-        /// Starts a timer that will periodically check for changes in the
-        /// players location to update the map.
-        /// </summary>
-        /// <returns></returns>
-        /// TODO: Make intervall a global setting.
-        private async Task CharacterLocationUpdateLoop()
+        private void UpdatePlayerLocations(object sender, EventArgs e)
         {
-            characterUpdateTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(250));
-            UpdateCharacterData();
-
-            while (await characterUpdateTimer.WaitForNextTickAsync())
+            if (OverlayCharacter != null)
             {
-                // If the location differs from the last known location, trigger a change.
-                if (OverlayCharacter != null)
+                if (currentPlayersSystemData[OverlayCharacter].system == null)
                 {
-                    if (currentPlayersSystemData[OverlayCharacter].system == null)
+                    RefreshCurrentView();
+                }
+                else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name || routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
+                {
+                    RefreshCurrentView();
+                }
+                else
+                {
+                    foreach (LocalCharacter additionalCharacter in mainWindow.EVEManager.LocalCharacters)
                     {
-                        RefreshCurrentView();
-                    }
-                    else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name || routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
-                    {
-                        RefreshCurrentView();
-                    }
-                    else
-                    {
-                        foreach (LocalCharacter additionalCharacter in mainWindow.EVEManager.LocalCharacters)
+                        if (additionalCharacter != OverlayCharacter)
                         {
-                            if (additionalCharacter != OverlayCharacter)
+                            if (additionalCharacter.Location != currentPlayersSystemData[additionalCharacter].system.Name)
                             {
-                                if (additionalCharacter.Location != currentPlayersSystemData[additionalCharacter].system.Name)
-                                {
-                                    RefreshCurrentView();
-                                    break;
-                                }
+                                RefreshCurrentView();
+                                break;
                             }
-                        }   
-                    }
+                        }
+                    }   
                 }
             }
         }
 
-        /// <summary>
-        /// Starts a timer that will periodically update the additional information displayed.
-        /// </summary>
-        /// <returns></returns>
-        /// TODO: Make intervall a global setting.
-        private async Task DataOverlayUpdateLoop()
+        private void UpdateDataOverlay(object sender, EventArgs e)
         {
-            dataUpdateTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-
-            while (await dataUpdateTimer.WaitForNextTickAsync())
+            try
             {
-                try
-                {
-                    UpdateIntelData();
-                    if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData();
-                    UpdateRouteData();
-                }
-                catch (Exception)
-                {
-                }
+                UpdateIntelData();
+                if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData();
+                UpdateRouteData();
+            }
+            catch (Exception)
+            {
             }
         }
 
@@ -1577,10 +1563,11 @@ namespace SMT
                 systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
                 systemData[sysData.system.Name].systemNameElement.FontSize = 10;
                 systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
+                systemData[sysData.system.Name].systemNameElement.IsHitTestVisible = false;
 
                 Canvas.SetLeft(systemData[sysData.system.Name].systemNameElement, leftCoord - (systemData[sysData.system.Name].systemNameElement.Width * 0.5f) + (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5f));
                 Canvas.SetTop(systemData[sysData.system.Name].systemNameElement, topCoord + systemData[sysData.system.Name].systemCanvasElement.Height + 2);
-                Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 99);
+                Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 125);
 
                 if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemNameElement))
                 {
