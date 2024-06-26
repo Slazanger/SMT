@@ -38,6 +38,11 @@ namespace SMT.EVEData
         private bool BackgroundThreadShouldTerminate;
 
         /// <summary>
+        /// Is it a local file.
+        /// </summary>
+        private Dictionary<string, bool> isLocalFile;
+
+        /// <summary>
         /// Read position map for the intel files
         /// </summary>
         private Dictionary<string, int> intelFileReadPos;
@@ -1976,6 +1981,7 @@ namespace SMT.EVEData
             }
 
             intelFileReadPos = new Dictionary<string, int>();
+            isLocalFile = new Dictionary<string, bool>();
 
             if (string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
@@ -2087,6 +2093,12 @@ namespace SMT.EVEData
 
                         // local files
                         if (file.Name.Contains("Local_"))
+                        {
+                            readFile = true;
+                        }
+
+                        // local files, again.
+                        if (isLocalFile.ContainsKey(file.FullName))
                         {
                             readFile = true;
                         }
@@ -2593,235 +2605,225 @@ namespace SMT.EVEData
             string[] channelParts = e.Name.Split("_");
             string channelName = string.Join("_", channelParts, 0, channelParts.Length - 3);
 
-            bool processFile = false;
             bool localChat = false;
 
-            // check if the changed file path contains the name of a channel we're looking for
-            foreach (string intelFilterStr in IntelFilters)
+            try
             {
-                if (changedFile.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
+                Encoding fe = Misc.GetEncoding(changedFile);
+                FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                StreamReader file = new StreamReader(ifs, fe);
+
+                int fileReadFrom = 0;
+
+                // have we seen this file before
+                if (intelFileReadPos.ContainsKey(changedFile))
                 {
-                    processFile = true;
-                    break;
+                    fileReadFrom = intelFileReadPos[changedFile];
+                    localChat = isLocalFile[changedFile];
                 }
-            }
-
-            if (changedFile.Contains("Local_"))
-            {
-                localChat = true;
-                processFile = true;
-            }
-
-            if (processFile)
-            {
-                try
+                else
                 {
-                    Encoding fe = Misc.GetEncoding(changedFile);
-                    FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    string system = string.Empty;
+                    string characterName = string.Empty;
 
-                    StreamReader file = new StreamReader(ifs, fe);
-
-                    int fileReadFrom = 0;
-
-                    // have we seen this file before
-                    if (intelFileReadPos.ContainsKey(changedFile))
+                    // read the iniital block
+                    while (!file.EndOfStream)
                     {
-                        fileReadFrom = intelFileReadPos[changedFile];
-                    }
-                    else
-                    {
-                        if (localChat)
-                        {
-                            string system = string.Empty;
-                            string characterName = string.Empty;
-
-                            // read the iniital block
-                            while (!file.EndOfStream)
-                            {
-                                string l = file.ReadLine();
-                                fileReadFrom++;
-
-                                // explicitly skip just "local"
-                                if (l.Contains("Channel Name:    Local"))
-                                {
-                                    // now can read the next line
-                                    l = file.ReadLine(); // should be the "Listener : <CharName>"
-                                    fileReadFrom++;
-
-                                    characterName = l.Split(':')[1].Trim();
-
-                                    bool addChar = true;
-                                    foreach (EVEData.LocalCharacter c in LocalCharacters)
-                                    {
-                                        if (characterName == c.Name)
-                                        {
-                                            c.Location = system;
-                                            c.LocalChatFile = changedFile;
-
-                                            System s = GetEveSystem(system);
-                                            if (s != null)
-                                            {
-                                                c.Region = s.Region;
-                                            }
-                                            else
-                                            {
-                                                c.Region = "";
-                                            }
-
-                                            addChar = false;
-                                        }
-                                    }
-
-                                    if (addChar)
-                                    {
-                                        LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        if (LocalCharacterUpdateEvent != null)
-                                        {
-                                            LocalCharacterUpdateEvent();
-                                        }
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-
-                        while (file.ReadLine() != null)
-                        {
-                            fileReadFrom++;
-                        }
-
-                        fileReadFrom--;
-                        file.BaseStream.Seek(0, SeekOrigin.Begin);
-                    }
-
-                    for (int i = 0; i < fileReadFrom; i++)
-                    {
-                        file.ReadLine();
-                    }
-
-                    string line = file.ReadLine();
-
-                    while (line != null)
-                    {                    // trim any items off the front
-                        if (line.Contains('[') && line.Contains(']'))
-                        {
-                            line = line.Substring(line.IndexOf("["));
-                        }
-
-                        if (line == "")
-                        {
-                            line = file.ReadLine();
-                            continue;
-                        }
-
+                        string l = file.ReadLine();
                         fileReadFrom++;
 
-                        if (localChat)
+                        // explicitly skip just "local"
+                        if (l.Contains("Channel ID:      local"))
                         {
-                            if (line.StartsWith("[") && line.Contains("EVE System > Channel changed to Local"))
-                            {
-                                string system = line.Split(':').Last().Trim();
+                            localChat = true;
 
-                                foreach (EVEData.LocalCharacter c in LocalCharacters)
+                            // now can read the next line
+                            l = file.ReadLine(); // should be the "Channel Name: <ChannelName>"
+                            l = file.ReadLine(); // should be the "Listener : <CharName>"
+                            fileReadFrom++;
+
+                            characterName = l.Split(':')[1].Trim();
+
+                            bool addChar = true;
+                            foreach (EVEData.LocalCharacter c in LocalCharacters)
+                            {
+                                if (characterName == c.Name)
                                 {
-                                    if (c.LocalChatFile == changedFile)
+                                    c.Location = system;
+                                    c.LocalChatFile = changedFile;
+
+                                    System s = GetEveSystem(system);
+                                    if (s != null)
                                     {
-                                        c.Location = system;
+                                        c.Region = s.Region;
                                     }
+                                    else
+                                    {
+                                        c.Region = "";
+                                    }
+
+                                    addChar = false;
                                 }
                             }
-                        }
-                        else
-                        {
-                            // check if it is in the intel list already (ie if you have multiple clients running)
-                            bool addToIntel = true;
 
-                            int start = line.IndexOf('>') + 1;
-                            string newIntelString = line.Substring(start);
-
-                            if (newIntelString != null)
+                            if (addChar)
                             {
-                                foreach (EVEData.IntelData idl in IntelDataList)
+                                LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
+                                if (LocalCharacterUpdateEvent != null)
                                 {
-                                    if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
-                                    {
-                                        addToIntel = false;
-                                        break;
-                                    }
+                                    LocalCharacterUpdateEvent();
                                 }
+                            }
+
+                            break;
+                        }
+                    }
+
+                    while (file.ReadLine() != null)
+                    {
+                        fileReadFrom++;
+                    }
+
+                    fileReadFrom--;
+                    file.BaseStream.Seek(0, SeekOrigin.Begin);
+                }
+
+                for (int i = 0; i < fileReadFrom; i++)
+                {
+                    file.ReadLine();
+                }
+
+                string line = file.ReadLine();
+
+                while (line != null)
+                {                    // trim any items off the front
+                    if (line.Contains('[') && line.Contains(']'))
+                    {
+                        line = line.Substring(line.IndexOf("["));
+                    }
+
+                    if (line == "")
+                    {
+                        line = file.ReadLine();
+                        continue;
+                    }
+
+                    fileReadFrom++;
+
+                    if (localChat)
+                    {
+                        if (line.StartsWith("[") && line.Contains("] EVE") && line.EndsWith("*"))
+                        {
+                            string system = string.Empty;
+
+                            // Compatible with Chinese punctuation marks
+                            if (line.Contains("："))
+                            {
+                                system = line.Split('：').Last().Trim();
+                                system = system.Replace("*", "");   // Remove localized
                             }
                             else
                             {
-                                addToIntel = false;
+                                system = line.Split(':').Last().Trim();
                             }
 
-                            if (line.Contains("Channel MOTD:"))
+                            foreach (EVEData.LocalCharacter c in LocalCharacters)
                             {
-                                addToIntel = false;
+                                if (c.LocalChatFile == changedFile)
+                                {
+                                    c.Location = system;
+                                }
                             }
+                        }
+                    }
+                    else
+                    {
+                        // check if it is in the intel list already (ie if you have multiple clients running)
+                        bool addToIntel = true;
 
-                            foreach (String ignoreMarker in IntelIgnoreFilters)
+                        int start = line.IndexOf('>') + 1;
+                        string newIntelString = line.Substring(start);
+
+                        if (newIntelString != null)
+                        {
+                            foreach (EVEData.IntelData idl in IntelDataList)
                             {
-                                if (line.IndexOf(ignoreMarker, StringComparison.OrdinalIgnoreCase) != -1)
+                                if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
                                 {
                                     addToIntel = false;
                                     break;
                                 }
                             }
+                        }
+                        else
+                        {
+                            addToIntel = false;
+                        }
 
+                        if (line.Contains("Channel MOTD:"))
+                        {
+                            addToIntel = false;
+                        }
 
-                            if (addToIntel)
+                        foreach (String ignoreMarker in IntelIgnoreFilters)
+                        {
+                            if (line.IndexOf(ignoreMarker, StringComparison.OrdinalIgnoreCase) != -1)
                             {
-                                EVEData.IntelData id = new EVEData.IntelData(line, channelName);
-
-
-                                foreach (string s in id.IntelString.Split(' '))
-                                {
-                                    if (s == "" || s.Length < 3)
-                                    {
-                                        continue;
-                                    }
-
-                                    foreach (String clearMarker in IntelClearFilters)
-                                    {
-                                        if (clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            id.ClearNotification = true;
-                                        }
-                                    }
-
-                                    foreach (System sys in Systems)
-                                    {
-                                        if (sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            id.Systems.Add(sys.Name);
-                                        }
-                                    }
-                                }
-
-                                IntelDataList.Enqueue(id);
-
-                                if (IntelUpdatedEvent != null)
-                                {
-                                    IntelUpdatedEvent(IntelDataList);
-                                }
-
+                                addToIntel = false;
+                                break;
                             }
                         }
 
-                        line = file.ReadLine();
+
+                        if (addToIntel)
+                        {
+                            EVEData.IntelData id = new EVEData.IntelData(line, channelName);
+
+
+                            foreach (string s in id.IntelString.Split(' '))
+                            {
+                                if (s == "" || s.Length < 3)
+                                {
+                                    continue;
+                                }
+
+                                foreach (String clearMarker in IntelClearFilters)
+                                {
+                                    if (clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                    {
+                                        id.ClearNotification = true;
+                                    }
+                                }
+
+                                foreach (System sys in Systems)
+                                {
+                                    if (sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                                    {
+                                        id.Systems.Add(sys.Name);
+                                    }
+                                }
+                            }
+
+                            IntelDataList.Enqueue(id);
+
+                            if (IntelUpdatedEvent != null)
+                            {
+                                IntelUpdatedEvent(IntelDataList);
+                            }
+
+                        }
                     }
 
-                    ifs.Close();
+                    line = file.ReadLine();
+                }
 
-                    intelFileReadPos[changedFile] = fileReadFrom;
-                }
-                catch
-                {
-                }
+                ifs.Close();
+
+                intelFileReadPos[changedFile] = fileReadFrom;
+                isLocalFile[changedFile] = localChat;
             }
-            else
+            catch
             {
             }
         }
