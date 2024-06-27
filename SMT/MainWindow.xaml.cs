@@ -138,6 +138,10 @@ namespace SMT
             EVEData.EveManager.Instance = EVEManager;
             EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
 
+            EVEManager.EnableHTTPProxy = MapConf.EnableHTTPProxy;
+            EVEManager.HTTPProxyServer = MapConf.HTTPProxyServer;
+            EVEManager.HTTPProxyPort = MapConf.HTTPProxyPort;
+
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
 
             // if we want to re-build the data as we've changed the format, recreate it all from scratch

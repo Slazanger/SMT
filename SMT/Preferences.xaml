@@ -349,14 +349,28 @@
                 <TabItem Header="Debug">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="100*" />
+                            <ColumnDefinition Width="202*"/>
+                            <ColumnDefinition Width="303*" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0">
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,302,0">
                             <GroupBox Header="General" Margin="4" Height="auto">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Path=Debug_EnableMapEdit}" Margin="0,2">Enable Universe Map Edits</CheckBox>
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Header="Network" Margin="4,4,4,4">
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding Path=EnableHTTPProxy}" Margin="0,2" Content="Enable HTTP Proxy?"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Server" Width="50"/>
+                                        <TextBox TextWrapping="Wrap"  Text="{Binding Path=HTTPProxyServer}" Width="120" Height="20" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Port" Width="50"/>
+                                        <TextBox TextWrapping="Wrap"  Text="{Binding Path=HTTPProxyPort}" Width="120" Height="20" />
+                                    </StackPanel>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>

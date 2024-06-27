@@ -193,6 +193,10 @@ namespace SMT.EVEData
 
         public string EVELogFolder { get; set; }
 
+        public bool EnableHTTPProxy { get; set; }
+        public string HTTPProxyServer { get; set; }
+        public string HTTPProxyPort { get; set; }
+
         /// <summary>
         /// Sov Campaign Updated Event Handler
         /// </summary>
@@ -2081,6 +2085,7 @@ namespace SMT.EVEData
                     FileInfo[] files = di.GetFiles("*.txt");
                     foreach (FileInfo file in files)
                     {
+                        /*
                         bool readFile = false;
                         foreach (string intelFilterStr in IntelFilters)
                         {
@@ -2108,6 +2113,10 @@ namespace SMT.EVEData
                         {
                             readFile = true;
                         }
+                        */
+
+                        // Local chat files cannot be confirmed by file name here, so all files are triggered by default.
+                        bool readFile = true;
 
                         // only read files from the last day
                         if (file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
@@ -2456,7 +2465,26 @@ namespace SMT.EVEData
                 UserAgent = "SMT-map-app",
             });
 
-            ESIClient = new ESI.NET.EsiClient(config);
+            HttpClientHandler handler = new HttpClientHandler
+            {
+                // Switch to All which adds brotli encoding for .net core due to https://github.com/ccpgames/sso-issues/issues/81
+#if NET
+                AutomaticDecompression = DecompressionMethods.All
+#else
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+#endif
+
+            };
+
+            if (EnableHTTPProxy == true)
+            {
+                handler.Proxy = new WebProxy($"http://{HTTPProxyServer}:{HTTPProxyPort}");
+            }
+
+            HttpClient client = new HttpClient(handler);
+
+
+            ESIClient = new ESI.NET.EsiClient(config, client);
             ESIScopes = new List<string>
             {
                 "publicData",
@@ -2606,6 +2634,16 @@ namespace SMT.EVEData
             string channelName = string.Join("_", channelParts, 0, channelParts.Length - 3);
 
             bool localChat = false;
+            bool intelChat = false;
+
+            foreach (string intelFilterStr in IntelFilters)
+            {
+                if (changedFile.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
+                {
+                    intelChat = true;
+                    break;
+                }
+            }
 
             try
             {
@@ -2762,6 +2800,11 @@ namespace SMT.EVEData
                         }
 
                         if (line.Contains("Channel MOTD:"))
+                        {
+                            addToIntel = false;
+                        }
+
+                        if (intelChat == false)
                         {
                             addToIntel = false;
                         }

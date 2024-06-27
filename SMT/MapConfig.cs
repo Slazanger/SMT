@@ -109,6 +109,11 @@ namespace SMT
         private bool m_overlayShowAllCharacterNames = false;
         private bool m_overlayIndividualCharacterWindows = false;
 
+        private bool m_EnableHTTPProxy;
+        private string m_HTTPProxyServer;
+        private string m_HTTPProxyPort;
+
+
         public MapConfig()
         {
             SetDefaults();
@@ -219,6 +224,22 @@ namespace SMT
 
         [Browsable(false)]
         public bool Debug_EnableMapEdit { get; set; }
+
+
+        [Browsable(false)]
+        public bool EnableHTTPProxy
+        {
+            get => m_EnableHTTPProxy;
+            set
+            {
+                m_EnableHTTPProxy = value;
+                OnPropertyChanged("EnableHTTPProxy");
+            }
+        }
+
+        public string HTTPProxyServer { get; set; }
+        public string HTTPProxyPort { get; set; }
+
 
         public bool DisableJumpBridgesPathAnimation
         {
