@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Windows.Services;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic.Logging;
 using NHotkey;
 using SMT.EVEData;
 using static SMT.EVEData.Navigation;
@@ -487,10 +488,12 @@ namespace SMT
             if (gathererMode)
                 return overlaySystemSizeGatherer;
 
-            if (systemName == currentPlayersSystemData[OverlayCharacter]?.system?.Name)
+            if (OverlayCharacter != null && 
+                currentPlayersSystemData[OverlayCharacter].system != null && 
+                systemName == currentPlayersSystemData[OverlayCharacter]?.system?.Name)
                 return overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier;
 
-            if (currentPlayersSystemData.Any(s => s.Value.system.Name == systemName))
+            if (currentPlayersSystemData.Where(s => s.Value.system != null).Any(s => s.Value.system.Name == systemName))
             {
                 return overlaySystemSizeHunter * overlayAdditionalCharacterSystemSizeHunterModifier;
             }
@@ -642,37 +645,81 @@ namespace SMT
             }
         }
 
+        /// <summary>
+        /// Check if all chars in the internal list are still registered
+        /// with the main window. Clean up or close if not.
+        /// </summary>
+        private void ValidateCharacters()
+        {
+            // It is ok to have the overlay character be null.
+            if (OverlayCharacter == null)
+            {
+                return;
+            }
+            
+            if (!mainWindow.EVEManager.LocalCharacters.Contains(OverlayCharacter))
+            {
+                Close();
+            }
+
+            List<LocalCharacter> pruneCharacters = new();
+            foreach (KeyValuePair<LocalCharacter, OverlaySystemData> characterPair in currentPlayersSystemData)
+            {
+                if (!mainWindow.EVEManager.LocalCharacters.Contains(characterPair.Key))
+                {
+                    pruneCharacters.Add(characterPair.Key);
+                }
+            }
+
+            foreach (LocalCharacter pruneCharacter in pruneCharacters)
+            {
+                currentPlayersSystemData.Remove(pruneCharacter);
+            }
+        }
+        
         private void UpdatePlayerLocations(object sender, EventArgs e)
         {
-            if (OverlayCharacter != null)
+            ValidateCharacters();
+            
+            try
             {
-                if (currentPlayersSystemData[OverlayCharacter].system == null)
+                if (OverlayCharacter != null)
                 {
-                    RefreshCurrentView();
-                }
-                else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name || routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
-                {
-                    RefreshCurrentView();
-                }
-                else
-                {
-                    foreach (LocalCharacter additionalCharacter in mainWindow.EVEManager.LocalCharacters)
+                    if (currentPlayersSystemData[OverlayCharacter].system == null)
                     {
-                        if (additionalCharacter != OverlayCharacter)
+                        RefreshCurrentView();
+                    }
+                    else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name ||
+                             routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
+                    {
+                        RefreshCurrentView();
+                    }
+                    else
+                    {
+                        foreach (LocalCharacter additionalCharacter in mainWindow.EVEManager.LocalCharacters)
                         {
-                            if (additionalCharacter.Location != currentPlayersSystemData[additionalCharacter].system.Name)
+                            if (additionalCharacter != OverlayCharacter)
                             {
-                                RefreshCurrentView();
-                                break;
+                                if (additionalCharacter.Location !=
+                                    currentPlayersSystemData[additionalCharacter].system.Name)
+                                {
+                                    RefreshCurrentView();
+                                    break;
+                                }
                             }
                         }
-                    }   
+                    }
                 }
+            }
+            catch (Exception)
+            {
             }
         }
 
         private void UpdateDataOverlay(object sender, EventArgs e)
         {
+            ValidateCharacters();
+            
             try
             {
                 UpdateIntelData();
@@ -1002,14 +1049,16 @@ namespace SMT
             // Gather data
             currentPlayersSystemData.Clear();
             string currentLocation = OverlayCharacter.Location;
-            EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
-            currentPlayersSystemData.Add(OverlayCharacter, new OverlaySystemData(currentSystem));
-            foreach (LocalCharacter additionalChar in mainWindow.EVEManager.LocalCharacters)
-            {
-                if (!currentPlayersSystemData.ContainsKey(additionalChar))
-                    currentPlayersSystemData.Add(additionalChar, new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(additionalChar.Location)));
-            }
 
+            // Bail out if the system name is empty or null. May happen during update.
+            if (String.IsNullOrEmpty(currentLocation))
+            {
+                ClearView();
+                return;
+            }
+            
+            EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
+            
             // Bail out if the system does not exist. I.e. wormhole systems.
             if (currentSystem == null)
             {
@@ -1017,6 +1066,15 @@ namespace SMT
                 ClearView();
                 return;
             }
+            
+            currentPlayersSystemData.Add(OverlayCharacter, new OverlaySystemData(currentSystem));
+            foreach (LocalCharacter additionalChar in mainWindow.EVEManager.LocalCharacters)
+            {
+                if (!currentPlayersSystemData.ContainsKey(additionalChar))
+                    currentPlayersSystemData.Add(additionalChar, new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(additionalChar.Location)));
+            }
+
+            
 
             List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
