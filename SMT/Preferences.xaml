@@ -304,6 +304,15 @@
                                         <Label Content="Finally, Intel is historic for x seconds" />
                                     </StackPanel>
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayIndividualCharacterWindows}" Content="Open individual windows for each character." />
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <Label Content="Char names on overlay: " />
+                                        <ComboBox SelectedValuePath="Content" SelectedValue="{Binding Path=OverlayAdditionalCharacterNamesDisplay}" Width="150">
+                                            <ComboBoxItem Content="All"></ComboBoxItem>
+                                            <ComboBoxItem Content="Overlay Character"></ComboBoxItem>
+                                            <ComboBoxItem Content="None"></ComboBoxItem>
+                                            <ComboBoxItem Content="Number"></ComboBoxItem>
+                                        </ComboBox>
+                                    </StackPanel>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
