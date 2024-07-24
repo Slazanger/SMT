@@ -15,22 +15,11 @@ namespace SMT.EVEData
         /// <summary>
         /// Initializes a new instance of the <see cref="System" /> class.
         /// </summary>
-        public System()
-        {
-            Jumps = new List<string>();
-            SHStructures = new List<StructureHunter.Structures>();
-
-            SOVAllianceID = 0;
-            HasJumpBeacon = false;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="System" /> class.
-        /// </summary>
         /// <param name="name">Name of the System</param>
         /// <param name="id">ID of the system</param>
         /// <param name="region">Region this system is in</param>
         /// <param name="station">Does this system contain an NPC station</param>
+        /// <param name="iceBelt">Does this system has an ice belt</param>
         public System(string name, long id, string region, bool station, bool iceBelt)
         {
             Name = name;
@@ -38,19 +27,6 @@ namespace SMT.EVEData
             Region = region;
             HasNPCStation = station;
             HasIceBelt = iceBelt;
-
-            // default the ESI stats
-            NPCKillsLastHour = 0;
-            NPCKillsDeltaLastHour = 0;
-            PodKillsLastHour = 0;
-            ShipKillsLastHour = 0;
-            JumpsLastHour = 0;
-            ActiveIncursion = false;
-
-            SOVAllianceID = 0;
-
-            Jumps = new List<string>();
-            SHStructures = new List<StructureHunter.Structures>();
         }
 
         public enum EdenComTrigStatus
@@ -67,7 +43,7 @@ namespace SMT.EVEData
         /// Gets or sets the an incursion is active in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public bool ActiveIncursion { get; set; }
+        public bool ActiveIncursion { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the X coordinate in real space for this system
@@ -120,7 +96,7 @@ namespace SMT.EVEData
         public bool FactionWarSystem { get; set; }
 
         [XmlIgnoreAttribute]
-        public bool HasJumpBeacon { get; set; }
+        public bool HasJumpBeacon { get; set; } = false;
 
         /// <summary>
         /// Gets or sets if this system has an NPC Station
@@ -144,13 +120,13 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the list of Jumps from this system
         /// </summary>
-        public List<string> Jumps { get; set; }
+        public List<string> Jumps { get; set; } = new();
 
         /// <summary>
         /// Gets or sets the number of pods killed in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public int JumpsLastHour { get; set; }
+        public int JumpsLastHour { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the Name of the system
@@ -161,13 +137,13 @@ namespace SMT.EVEData
         /// Gets or sets the delta of NPC Kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public int NPCKillsDeltaLastHour { get; set; }
+        public int NPCKillsDeltaLastHour { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the number of NPC Kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public int NPCKillsLastHour { get; set; }
+        public int NPCKillsLastHour { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the Faction of the system if owned by an NPC Corp
@@ -179,7 +155,7 @@ namespace SMT.EVEData
         /// Gets or sets the number of pod kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public int PodKillsLastHour { get; set; }
+        public int PodKillsLastHour { get; set; } = 0;
 
         public double RadiusAU { get; set; }
 
@@ -192,19 +168,19 @@ namespace SMT.EVEData
         /// Gets or sets the number of player ships killed in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
-        public int ShipKillsLastHour { get; set; }
+        public int ShipKillsLastHour { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the an incursion is active in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public List<StructureHunter.Structures> SHStructures { get; set; }
+        public List<StructureHunter.Structures> SHStructures { get; set; } = new();
 
         /// <summary>
         /// Gets or sets the name of the alliance holding sov in this system
         /// </summary>
         [XmlIgnoreAttribute]
-        public int SOVAllianceID { get; set; }
+        public int SOVAllianceID { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the name of the corporation holding sov in this system
