@@ -202,14 +202,11 @@ namespace SMT.EVEData
         /// </summary>
         public double TrueSec { get; set; }
 
-        public string SecType
-        {
-            get
-            {
-                if (TrueSec >= 0.45)
-                {
-                    return "High Sec";
-                }
+        public string SecType => String.Join((TrueSec switch {
+            double s when s >= 0.45 => "High",
+            double s when s > 0.0 && s < 0.45 => "Low",
+            _ => "Null"
+        }), " Sec");
 
         public override string ToString() => $"{Name} ({Region})";
     }
