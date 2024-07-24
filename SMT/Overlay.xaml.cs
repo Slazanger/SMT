@@ -300,6 +300,7 @@ namespace SMT
         private bool showSystemNames = false;
         private bool showAllCharacterNames = false;
         private bool individualCharacterWindows = false;
+        private string additionalCharacterNamesDisplay = "All";
 
         private DispatcherTimer locationUpdateTimer = new DispatcherTimer();
         private DispatcherTimer dataUpdateTimer = new DispatcherTimer();
@@ -419,6 +420,7 @@ namespace SMT
             showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
             showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
             individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
+            additionalCharacterNamesDisplay = mainWindow.MapConf.OverlayAdditionalCharacterNamesDisplay;
 
             // Initialize value animation to be used by dashed lines
             dashAnimation = new DoubleAnimation();
@@ -1589,48 +1591,79 @@ namespace SMT
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
 
-            if (showSystemNames || showAllCharacterNames )
+            // Show system and char names.
+            if (systemData[sysData.system.Name].systemNameElement == null)
             {
-                if (systemData[sysData.system.Name].systemNameElement == null)
-                {
-                    systemData[sysData.system.Name].systemNameElement = new TextBlock();
-                }
-                systemData[sysData.system.Name].systemNameElement.Inlines.Clear();
-                systemData[sysData.system.Name].systemNameElement.Width = 80;
+                systemData[sysData.system.Name].systemNameElement = new TextBlock();
+            }
+            systemData[sysData.system.Name].systemNameElement.Inlines.Clear();
+            systemData[sysData.system.Name].systemNameElement.Width = 80;
 
-                bool firstEntry = false;
-                if (showSystemNames)
-                {
-                    systemData[sysData.system.Name].systemNameElement.Inlines.Add( new Run(sysData.system.Name));
-                    firstEntry = true;
-                }
+            bool firstEntry = false;
 
-                foreach (KeyValuePair<LocalCharacter, OverlaySystemData> localCharacterEntry in currentPlayersSystemData)
+            if (showSystemNames)
+            {
+                systemData[sysData.system.Name].systemNameElement.Inlines.Add( new Run(sysData.system.Name));
+                firstEntry = true;
+            }
+
+            List<string> charsInSystem = new();
+            
+            foreach (KeyValuePair<LocalCharacter, OverlaySystemData> localCharacterEntry in currentPlayersSystemData)
+            {
+                if (localCharacterEntry.Value.system != null && sysData.system.Name == localCharacterEntry.Value.system.Name)
                 {
-                    if (localCharacterEntry.Value.system != null && sysData.system.Name == localCharacterEntry.Value.system.Name)
+                    charsInSystem.Add(localCharacterEntry.Key.Name);
+                }
+            }
+
+            switch (additionalCharacterNamesDisplay)
+            {
+                case "Overlay Character":
+                    if (charsInSystem.Contains(OverlayCharacter.Name))
+                    {
+                        if (firstEntry)
+                        {
+                            systemData[sysData.system.Name].systemNameElement.Inlines.Add(new LineBreak());
+                        }
+
+                        systemData[sysData.system.Name].systemNameElement.Inlines
+                            .Add(new Run($"{OverlayCharacter.Name}"));
+                    }
+                    break;
+                case "All":
+                    foreach (string charName in charsInSystem)
                     {
                         if (firstEntry)
                         {
                             systemData[sysData.system.Name].systemNameElement.Inlines.Add(new LineBreak());   
                         }
-                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($"{localCharacterEntry.Key.Name}")) ;
+                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($"{charName}")) ;
                         firstEntry = true;
                     }
-                }
-                
-                systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
-                systemData[sysData.system.Name].systemNameElement.FontSize = 10;
-                systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
-                systemData[sysData.system.Name].systemNameElement.IsHitTestVisible = false;
+                    break;
+                case "None":
+                    break;
+                case "Number":
+                    if (charsInSystem.Count > 0)
+                    {
+                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($" ({charsInSystem.Count})"));   
+                    }
+                    break;
+            }
+            
+            systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
+            systemData[sysData.system.Name].systemNameElement.FontSize = 10;
+            systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
+            systemData[sysData.system.Name].systemNameElement.IsHitTestVisible = false;
 
-                Canvas.SetLeft(systemData[sysData.system.Name].systemNameElement, leftCoord - (systemData[sysData.system.Name].systemNameElement.Width * 0.5f) + (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5f));
-                Canvas.SetTop(systemData[sysData.system.Name].systemNameElement, topCoord + systemData[sysData.system.Name].systemCanvasElement.Height + 2);
-                Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 125);
+            Canvas.SetLeft(systemData[sysData.system.Name].systemNameElement, leftCoord - (systemData[sysData.system.Name].systemNameElement.Width * 0.5f) + (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5f));
+            Canvas.SetTop(systemData[sysData.system.Name].systemNameElement, topCoord + systemData[sysData.system.Name].systemCanvasElement.Height + 2);
+            Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 125);
 
-                if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemNameElement))
-                {
-                    overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemNameElement);
-                }
+            if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemNameElement))
+            {
+                overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemNameElement);
             }
 
             systemData[sysData.system.Name].canvasCoordinate = new Vector2((float)leftCoord, (float)topCoord);
@@ -1908,6 +1941,13 @@ namespace SMT
             {
                 individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
                 Close();
+            }
+
+            if (e.PropertyName == "OverlayAdditionalCharacterNamesDisplay")
+            {
+                additionalCharacterNamesDisplay = mainWindow.MapConf.OverlayAdditionalCharacterNamesDisplay;
+                ClearView();
+                RefreshCurrentView();
             }
         }
 
