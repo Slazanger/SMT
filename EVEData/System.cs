@@ -211,18 +211,6 @@ namespace SMT.EVEData
                     return "High Sec";
                 }
 
-                if (TrueSec > 0.0 && TrueSec < 0.45)
-                {
-                    return "Low Sec";
-                }
-
-                return "Null Sec";
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"{Name} ({Region})";
-        }
+        public override string ToString() => $"{Name} ({Region})";
     }
 }
