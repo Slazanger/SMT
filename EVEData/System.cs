@@ -204,7 +204,7 @@ namespace SMT.EVEData
 
         public string SecType => String.Join((TrueSec switch {
             >= 0.45 => "High",
-            > 0.05 and < 0.45 => "Low",
+            > 0.0 and < 0.45 => "Low",
             _ => "Null"
         }), " Sec");
 
