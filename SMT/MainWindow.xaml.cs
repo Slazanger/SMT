@@ -905,13 +905,13 @@ namespace SMT
             }
 
             preferencesWindow = new PreferencesWindow();
+            preferencesWindow.Closed += PreferencesWindow_Closed;
             preferencesWindow.Owner = this;
             preferencesWindow.DataContext = MapConf;
             preferencesWindow.MapConf = MapConf;
             preferencesWindow.EM = EVEManager;
             preferencesWindow.Init();
             preferencesWindow.ShowDialog();
-            preferencesWindow.Closed += PreferencesWindow_Closed;
         }
 
         private void PreferencesWindow_Closed(object sender, EventArgs e)
