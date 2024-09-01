@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using SMT.EVEData;
 
 namespace SMT
 {
@@ -217,7 +218,8 @@ namespace SMT
                 header.Padding = new Thickness(1);
                 RegionTheraInfoSP.Children.Add(header);
 
-                foreach (EVEData.TheraConnection tc in EVEData.EveManager.Instance.TheraConnections)
+                List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
+                foreach (EVEData.TheraConnection tc in currentTheraConnections)
                 {
                     if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
                     {
@@ -247,10 +249,12 @@ namespace SMT
             Brush theraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceRegion);
             Brush characterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
 
+            List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
+
             foreach (EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
             {
                 bool addTheraConnection = false;
-                foreach (EVEData.TheraConnection tc in EVEData.EveManager.Instance.TheraConnections)
+                foreach (EVEData.TheraConnection tc in currentTheraConnections)
                 {
                     if (string.Compare(tc.Region, mr.Name, true) == 0)
                     {
