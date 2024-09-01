@@ -22,18 +22,18 @@
 	<TrimmableAssembly Include="Avalonia.Themes.Default" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="11.0.0.3" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+    <PackageReference Include="Avalonia" Version="11.2.0-beta1" />
+    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="11.1.0.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.0-beta1" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
-    <PackageReference Include="Dock.Avalonia" Version="11.0.10" />
-    <PackageReference Include="Dock.Model" Version="11.0.10" />
-    <PackageReference Include="Dock.Model.Avalonia" Version="11.0.10" />
-    <PackageReference Include="Dock.Model.Mvvm" Version="11.0.10" />
-    <PackageReference Include="Dock.Serializer" Version="11.0.10" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.0-beta1" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0-beta1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0-beta1" />
+    <PackageReference Include="Dock.Avalonia" Version="11.1.0.1" />
+    <PackageReference Include="Dock.Model" Version="11.1.0.1" />
+    <PackageReference Include="Dock.Model.Avalonia" Version="11.1.0.1" />
+    <PackageReference Include="Dock.Model.Mvvm" Version="11.1.0.1" />
+    <PackageReference Include="Dock.Serializer" Version="11.1.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EVEData\EVEData.csproj" />

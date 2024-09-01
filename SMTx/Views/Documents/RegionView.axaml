@@ -9,23 +9,25 @@
 			 x:DataType="vm:RegionViewModel">
 	<Grid ColumnDefinitions="10,50,*">
 
-		<paz:ZoomBorder
+            <paz:ZoomBorder
                 Name="ZoomBorder"
                 Stretch="None"
-                ZoomSpeed="1.2"
-                Background="SlateBlue"
-                ClipToBounds="True"
+                ZoomSpeed="1.5"
+                EnableConstrains="False"
+                Background="SlateBlue" 
+                ClipToBounds="True" 
                 Focusable="True"
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Stretch"
                 Grid.ColumnSpan="3"
                 MaxZoomX="2" MaxZoomY="2"
                 MinZoomX="0.2" MinZoomY="0.2"
-				MaxOffsetX="200" MaxOffsetY="200"
-				MinOffsetX="-200" MinOffsetY="-200"
                 SizeChanged="ZoomBorder_OnSizeChanged">
 
-			<Canvas Focusable="True" x:Name="RegionViewGrid" Width="1050" Height="800"
-					HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-		</paz:ZoomBorder>
+                <Canvas Focusable="True" x:Name="RegionViewGrid" Width="1050" Height="800"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            </paz:ZoomBorder>
+
 
 
 
