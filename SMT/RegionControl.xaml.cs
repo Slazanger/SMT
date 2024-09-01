@@ -438,7 +438,9 @@ namespace SMT
         {
             Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
 
-            foreach (TheraConnection tc in EM.TheraConnections)
+            List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
+
+            foreach (TheraConnection tc in currentTheraConnections)
             {
                 if (Region.IsSystemOnMap(tc.System))
                 {
@@ -3693,8 +3695,9 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(sov);
                 }
 
+                List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
                 // update Thera Info
-                foreach (EVEData.TheraConnection tc in EM.TheraConnections)
+                foreach (EVEData.TheraConnection tc in currentTheraConnections)
                 {
                     if (selectedSys.Name == tc.System)
                     {

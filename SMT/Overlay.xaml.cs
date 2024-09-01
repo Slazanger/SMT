@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NHotkey.Wpf;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -14,10 +15,37 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Windows.Services;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic.Logging;
+using NHotkey;
 using SMT.EVEData;
 using static SMT.EVEData.Navigation;
+
+public static class WindowsServices
+{
+  const int WS_EX_TRANSPARENT = 0x00000020;
+  const int GWL_EXSTYLE = (-20);
+
+  [DllImport("user32.dll")]
+  static extern int GetWindowLong(IntPtr hwnd, int index);
+
+  [DllImport("user32.dll")]
+  static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
+  public static void SetWindowExTransparent(IntPtr hwnd)
+  {
+      var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+    SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TRANSPARENT);
+  }
+  
+  public static void SetWindowExNotTransparent(IntPtr hwnd)
+  {
+      var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+      SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle & ~WS_EX_TRANSPARENT);
+  }
+}
 
 namespace SMT
 {
@@ -240,8 +268,6 @@ namespace SMT
         private Brush toolTipBackgroundBrush;
         private Brush toolTipForegroundBrush;
 
-        private PeriodicTimer dataUpdateTimer, characterUpdateTimer;
-
         private int overlayDepth = 8;
         private Dictionary<LocalCharacter, OverlaySystemData> currentPlayersSystemData = new ();
         private OverlaySystemData currentPlayerSystemData;
@@ -274,6 +300,10 @@ namespace SMT
         private bool showSystemNames = false;
         private bool showAllCharacterNames = false;
         private bool individualCharacterWindows = false;
+        private string additionalCharacterNamesDisplay = "All";
+
+        private DispatcherTimer locationUpdateTimer = new DispatcherTimer();
+        private DispatcherTimer dataUpdateTimer = new DispatcherTimer();
 
         private DoubleCollection dashStroke = new DoubleCollection(new List<double> { 2, 2 });
 
@@ -377,6 +407,9 @@ namespace SMT
             Closing += Overlay_Closing;
             // We can only redraw stuff when the canvas is actually resized, otherwise dimensions will be wrong!
             overlay_Canvas.SizeChanged += OnCanvasSizeChanged;
+            
+            // Set up hotkeys
+            HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OnClickTroughToggle);
 
             // Update settings
             intelUrgentPeriod = mainWindow.MapConf.IntelFreshTime;
@@ -387,6 +420,7 @@ namespace SMT
             showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
             showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
             individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
+            additionalCharacterNamesDisplay = mainWindow.MapConf.OverlayAdditionalCharacterNamesDisplay;
 
             // Initialize value animation to be used by dashed lines
             dashAnimation = new DoubleAnimation();
@@ -403,9 +437,40 @@ namespace SMT
             // mw.EVEManager.IntelAddedEvent += OnIntelAdded;
 
             // Start the magic
+            ToggleClickTrough(mainWindow.OverlayWindowsAreClickTrough);
             RefreshCurrentView();
-            _ = CharacterLocationUpdateLoop();
-            _ = DataOverlayUpdateLoop();
+
+            locationUpdateTimer.Interval = TimeSpan.FromMilliseconds(250);
+            locationUpdateTimer.Tick += UpdatePlayerLocations;
+            
+            dataUpdateTimer.Interval = TimeSpan.FromSeconds(1);
+            dataUpdateTimer.Tick += UpdateDataOverlay;
+            
+            locationUpdateTimer.Start();
+            dataUpdateTimer.Start();
+        }
+
+        private void OnClickTroughToggle(object sender, HotkeyEventArgs e)
+        {
+            mainWindow.OverlayWindow_ToggleClickTrough();
+        }
+
+        public void ToggleClickTrough(bool isClickTrough)
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            
+            if (isClickTrough)
+            {
+                WindowsServices.SetWindowExTransparent(hwnd);
+                overlay_ButtonRow.Height = new GridLength(0);
+                this.ResizeMode = ResizeMode.NoResize;
+            }
+            else
+            {
+                WindowsServices.SetWindowExNotTransparent(hwnd);
+                overlay_ButtonRow.Height = new GridLength(20);
+                this.ResizeMode = ResizeMode.CanResizeWithGrip;
+            }
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -425,10 +490,12 @@ namespace SMT
             if (gathererMode)
                 return overlaySystemSizeGatherer;
 
-            if (systemName == currentPlayersSystemData[OverlayCharacter]?.system?.Name)
+            if (OverlayCharacter != null && 
+                currentPlayersSystemData[OverlayCharacter].system != null && 
+                systemName == currentPlayersSystemData[OverlayCharacter]?.system?.Name)
                 return overlaySystemSizeHunter * overlayCurrentSystemSizeHunterModifier;
 
-            if (currentPlayersSystemData.Any(s => s.Value.system.Name == systemName))
+            if (currentPlayersSystemData.Where(s => s.Value.system != null).Any(s => s.Value.system.Name == systemName))
             {
                 return overlaySystemSizeHunter * overlayAdditionalCharacterSystemSizeHunterModifier;
             }
@@ -581,26 +648,51 @@ namespace SMT
         }
 
         /// <summary>
-        /// Starts a timer that will periodically check for changes in the
-        /// players location to update the map.
+        /// Check if all chars in the internal list are still registered
+        /// with the main window. Clean up or close if not.
         /// </summary>
-        /// <returns></returns>
-        /// TODO: Make intervall a global setting.
-        private async Task CharacterLocationUpdateLoop()
+        private void ValidateCharacters()
         {
-            characterUpdateTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(250));
-            UpdateCharacterData();
-
-            while (await characterUpdateTimer.WaitForNextTickAsync())
+            // It is ok to have the overlay character be null.
+            if (OverlayCharacter == null)
             {
-                // If the location differs from the last known location, trigger a change.
+                return;
+            }
+            
+            if (!mainWindow.EVEManager.LocalCharacters.Contains(OverlayCharacter))
+            {
+                Close();
+            }
+
+            List<LocalCharacter> pruneCharacters = new();
+            foreach (KeyValuePair<LocalCharacter, OverlaySystemData> characterPair in currentPlayersSystemData)
+            {
+                if (!mainWindow.EVEManager.LocalCharacters.Contains(characterPair.Key))
+                {
+                    pruneCharacters.Add(characterPair.Key);
+                }
+            }
+
+            foreach (LocalCharacter pruneCharacter in pruneCharacters)
+            {
+                currentPlayersSystemData.Remove(pruneCharacter);
+            }
+        }
+        
+        private void UpdatePlayerLocations(object sender, EventArgs e)
+        {
+            ValidateCharacters();
+            
+            try
+            {
                 if (OverlayCharacter != null)
                 {
                     if (currentPlayersSystemData[OverlayCharacter].system == null)
                     {
                         RefreshCurrentView();
                     }
-                    else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name || routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
+                    else if (OverlayCharacter.Location != currentPlayersSystemData[OverlayCharacter].system.Name ||
+                             routeLines.Count > 0 && (routeLines.Count != OverlayCharacter.ActiveRoute.Count - 1))
                     {
                         RefreshCurrentView();
                     }
@@ -610,38 +702,34 @@ namespace SMT
                         {
                             if (additionalCharacter != OverlayCharacter)
                             {
-                                if (additionalCharacter.Location != currentPlayersSystemData[additionalCharacter].system.Name)
+                                if (additionalCharacter.Location !=
+                                    currentPlayersSystemData[additionalCharacter].system.Name)
                                 {
                                     RefreshCurrentView();
                                     break;
                                 }
                             }
-                        }   
+                        }
                     }
                 }
             }
+            catch (Exception)
+            {
+            }
         }
 
-        /// <summary>
-        /// Starts a timer that will periodically update the additional information displayed.
-        /// </summary>
-        /// <returns></returns>
-        /// TODO: Make intervall a global setting.
-        private async Task DataOverlayUpdateLoop()
+        private void UpdateDataOverlay(object sender, EventArgs e)
         {
-            dataUpdateTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-
-            while (await dataUpdateTimer.WaitForNextTickAsync())
+            ValidateCharacters();
+            
+            try
             {
-                try
-                {
-                    UpdateIntelData();
-                    if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData();
-                    UpdateRouteData();
-                }
-                catch (Exception)
-                {
-                }
+                UpdateIntelData();
+                if (!gathererMode && (showNPCKillData || showNPCKillDeltaData)) UpdateNPCKillData();
+                UpdateRouteData();
+            }
+            catch (Exception)
+            {
             }
         }
 
@@ -963,14 +1051,16 @@ namespace SMT
             // Gather data
             currentPlayersSystemData.Clear();
             string currentLocation = OverlayCharacter.Location;
-            EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
-            currentPlayersSystemData.Add(OverlayCharacter, new OverlaySystemData(currentSystem));
-            foreach (LocalCharacter additionalChar in mainWindow.EVEManager.LocalCharacters)
-            {
-                if (!currentPlayersSystemData.ContainsKey(additionalChar))
-                    currentPlayersSystemData.Add(additionalChar, new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(additionalChar.Location)));
-            }
 
+            // Bail out if the system name is empty or null. May happen during update.
+            if (String.IsNullOrEmpty(currentLocation))
+            {
+                ClearView();
+                return;
+            }
+            
+            EVEData.System currentSystem = mainWindow.EVEManager.GetEveSystem(currentLocation);
+            
             // Bail out if the system does not exist. I.e. wormhole systems.
             if (currentSystem == null)
             {
@@ -978,6 +1068,15 @@ namespace SMT
                 ClearView();
                 return;
             }
+            
+            currentPlayersSystemData.Add(OverlayCharacter, new OverlaySystemData(currentSystem));
+            foreach (LocalCharacter additionalChar in mainWindow.EVEManager.LocalCharacters)
+            {
+                if (!currentPlayersSystemData.ContainsKey(additionalChar))
+                    currentPlayersSystemData.Add(additionalChar, new OverlaySystemData(mainWindow.EVEManager.GetEveSystem(additionalChar.Location)));
+            }
+
+            
 
             List<List<OverlaySystemData>> hierarchie = new List<List<OverlaySystemData>>();
 
@@ -1492,47 +1591,79 @@ namespace SMT
             double leftCoord = left - (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5);
             double topCoord = top - (systemData[sysData.system.Name].systemCanvasElement.Height * 0.5);
 
-            if (showSystemNames || showAllCharacterNames )
+            // Show system and char names.
+            if (systemData[sysData.system.Name].systemNameElement == null)
             {
-                if (systemData[sysData.system.Name].systemNameElement == null)
-                {
-                    systemData[sysData.system.Name].systemNameElement = new TextBlock();
-                }
-                systemData[sysData.system.Name].systemNameElement.Inlines.Clear();
-                systemData[sysData.system.Name].systemNameElement.Width = 80;
+                systemData[sysData.system.Name].systemNameElement = new TextBlock();
+            }
+            systemData[sysData.system.Name].systemNameElement.Inlines.Clear();
+            systemData[sysData.system.Name].systemNameElement.Width = 80;
 
-                bool firstEntry = false;
-                if (showSystemNames)
-                {
-                    systemData[sysData.system.Name].systemNameElement.Inlines.Add( new Run(sysData.system.Name));
-                    firstEntry = true;
-                }
+            bool firstEntry = false;
 
-                foreach (KeyValuePair<LocalCharacter, OverlaySystemData> localCharacterEntry in currentPlayersSystemData)
+            if (showSystemNames)
+            {
+                systemData[sysData.system.Name].systemNameElement.Inlines.Add( new Run(sysData.system.Name));
+                firstEntry = true;
+            }
+
+            List<string> charsInSystem = new();
+            
+            foreach (KeyValuePair<LocalCharacter, OverlaySystemData> localCharacterEntry in currentPlayersSystemData)
+            {
+                if (localCharacterEntry.Value.system != null && sysData.system.Name == localCharacterEntry.Value.system.Name)
                 {
-                    if (localCharacterEntry.Value.system != null && sysData.system.Name == localCharacterEntry.Value.system.Name)
+                    charsInSystem.Add(localCharacterEntry.Key.Name);
+                }
+            }
+
+            switch (additionalCharacterNamesDisplay)
+            {
+                case "Overlay Character":
+                    if (charsInSystem.Contains(OverlayCharacter.Name))
+                    {
+                        if (firstEntry)
+                        {
+                            systemData[sysData.system.Name].systemNameElement.Inlines.Add(new LineBreak());
+                        }
+
+                        systemData[sysData.system.Name].systemNameElement.Inlines
+                            .Add(new Run($"{OverlayCharacter.Name}"));
+                    }
+                    break;
+                case "All":
+                    foreach (string charName in charsInSystem)
                     {
                         if (firstEntry)
                         {
                             systemData[sysData.system.Name].systemNameElement.Inlines.Add(new LineBreak());   
                         }
-                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($"{localCharacterEntry.Key.Name}")) ;
+                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($"{charName}")) ;
                         firstEntry = true;
                     }
-                }
-                
-                systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
-                systemData[sysData.system.Name].systemNameElement.FontSize = 10;
-                systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
+                    break;
+                case "None":
+                    break;
+                case "Number":
+                    if (charsInSystem.Count > 0)
+                    {
+                        systemData[sysData.system.Name].systemNameElement.Inlines.Add(new Run($" ({charsInSystem.Count})"));   
+                    }
+                    break;
+            }
+            
+            systemData[sysData.system.Name].systemNameElement.Foreground = Brushes.White;
+            systemData[sysData.system.Name].systemNameElement.FontSize = 10;
+            systemData[sysData.system.Name].systemNameElement.TextAlignment = TextAlignment.Center;
+            systemData[sysData.system.Name].systemNameElement.IsHitTestVisible = false;
 
-                Canvas.SetLeft(systemData[sysData.system.Name].systemNameElement, leftCoord - (systemData[sysData.system.Name].systemNameElement.Width * 0.5f) + (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5f));
-                Canvas.SetTop(systemData[sysData.system.Name].systemNameElement, topCoord + systemData[sysData.system.Name].systemCanvasElement.Height + 2);
-                Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 99);
+            Canvas.SetLeft(systemData[sysData.system.Name].systemNameElement, leftCoord - (systemData[sysData.system.Name].systemNameElement.Width * 0.5f) + (systemData[sysData.system.Name].systemCanvasElement.Width * 0.5f));
+            Canvas.SetTop(systemData[sysData.system.Name].systemNameElement, topCoord + systemData[sysData.system.Name].systemCanvasElement.Height + 2);
+            Canvas.SetZIndex(systemData[sysData.system.Name].systemNameElement, 125);
 
-                if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemNameElement))
-                {
-                    overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemNameElement);
-                }
+            if (!overlay_Canvas.Children.Contains(systemData[sysData.system.Name].systemNameElement))
+            {
+                overlay_Canvas.Children.Add(systemData[sysData.system.Name].systemNameElement);
             }
 
             systemData[sysData.system.Name].canvasCoordinate = new Vector2((float)leftCoord, (float)topCoord);
@@ -1810,6 +1941,13 @@ namespace SMT
             {
                 individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
                 Close();
+            }
+
+            if (e.PropertyName == "OverlayAdditionalCharacterNamesDisplay")
+            {
+                additionalCharacterNamesDisplay = mainWindow.MapConf.OverlayAdditionalCharacterNamesDisplay;
+                ClearView();
+                RefreshCurrentView();
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Serialization;
 
@@ -108,6 +109,7 @@ namespace SMT
         private bool m_overlayShowSystemNames = false;
         private bool m_overlayShowAllCharacterNames = false;
         private bool m_overlayIndividualCharacterWindows = false;
+        private string m_overlayAdditionalCharacterNamesDisplay = "All";
 
         public MapConfig()
         {
@@ -1133,6 +1135,22 @@ namespace SMT
                 OnPropertyChanged("OverlayIndividualCharacterWindows");
             }
         }
+        
+        [Category("Overlay")]
+        [DisplayName("Overlay Additional Character Names Display")]
+        public string OverlayAdditionalCharacterNamesDisplay
+        {
+            get
+            {
+                return m_overlayAdditionalCharacterNamesDisplay;
+            }
+            set
+            {
+                m_overlayAdditionalCharacterNamesDisplay = value;
+
+                OnPropertyChanged("OverlayAdditionalCharacterNamesDisplay");
+            }
+        }
 
         [Category("Overlay")]
         [DisplayName("Overlay Show System Names")]
@@ -1342,6 +1360,7 @@ namespace SMT
             OverlayShowJumpBridges = true;
             OverlayShowSystemNames = false;
             OverlayShowAllCharacterNames = false;
+            OverlayAdditionalCharacterNamesDisplay = "All";
 
             IntelFreshTime = 30;
             IntelStaleTime = 120;

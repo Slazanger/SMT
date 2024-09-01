@@ -89,6 +89,11 @@
                     "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
                     "ProductCode" = "8:.NETFramework,Version=v4.7.2"
                     }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.6.0.x64"
+                    {
+                    "Name" = "8:.NET Desktop Runtime 6.0.31 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.DesktopRuntime.6.0.x64"
+                    }
                 }
             }
         }
@@ -209,15 +214,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SMT"
-        "ProductCode" = "8:{B48944A4-78B9-420A-B355-9168A3F48759}"
-        "PackageCode" = "8:{06854EA7-8E3B-4F56-816D-C6EA3E253EFD}"
+        "ProductCode" = "8:{CE2ED2F4-F151-4891-B58F-C8DD18FD8AE0}"
+        "PackageCode" = "8:{4CA3FED8-78E1-42C9-AAD0-418177C5FBD9}"
         "UpgradeCode" = "8:{52AA6C1E-3097-4771-BEFB-9E08D74573C1}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.33.1"
+        "ProductVersion" = "8:1.34"
         "Manufacturer" = "8:Slazanger"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/Slazanger/SMT"
@@ -759,7 +764,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_444761C9B53049BABB41019646AB3D8A"
             {
-            "SourcePath" = "8:..\\SMT\\obj\\x64\\Release\\net6.0-windows10.0.17763.0\\win-x64\\apphost.exe"
+            "SourcePath" = "8:..\\SMT\\obj\\x64\\Release\\net6.0-windows10.0.17763.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_74E17667B5464705BCB596FA2F98C437"
