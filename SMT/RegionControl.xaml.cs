@@ -33,8 +33,9 @@ namespace SMT
         private const double SYSTEM_SHAPE_OOR_OFFSET = SYSTEM_SHAPE_OOR_SIZE / 2;
 
         private const int SYSTEM_TEXT_WIDTH = 100;
-        private const double SYSTEM_TEXT_X_OFFSET = -SYSTEM_TEXT_WIDTH / 2;
-        private const double SYSTEM_TEXT_Y_OFFSET = 8;
+        private const int SYSTEM_TEXT_HEIGHT = 50;
+        private const double SYSTEM_TEXT_X_OFFSET = SYSTEM_TEXT_WIDTH / 2;
+        private const double SYSTEM_TEXT_Y_OFFSET = -SYSTEM_TEXT_HEIGHT / 2;
 
         private const int SYSTEM_Z_INDEX = 22;
 
@@ -2536,12 +2537,54 @@ namespace SMT
                 sysText.Padding = border;
                 sysText.Margin = border;
                 sysText.IsHitTestVisible = false;
-                sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                sysText.VerticalContentAlignment = VerticalAlignment.Center;
                 sysText.Width = SYSTEM_TEXT_WIDTH;
+                sysText.Height = SYSTEM_TEXT_HEIGHT;
 
-                Canvas.SetLeft(sysText, mapSystem.Layout.X + SYSTEM_TEXT_X_OFFSET);
-                Canvas.SetTop(sysText, mapSystem.Layout.Y + sysTextOffset);
+
+
+
+                switch (mapSystem.TextPos)
+                {
+                    case MapSystem.TextPosition.Top:
+                    {
+                        int topLeft = (int)mapSystem.Layout.X - (int)(SYSTEM_TEXT_X_OFFSET);
+                        Canvas.SetLeft(sysText, topLeft);
+                        Canvas.SetTop(sysText, mapSystem.Layout.Y - (SYSTEM_SHAPE_OFFSET + SYSTEM_TEXT_HEIGHT + 1));
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Bottom;
+                    }
+                    break;
+
+                    case MapSystem.TextPosition.Bottom:
+                    {
+                        int topLeft = (int)mapSystem.Layout.X - (int)(SYSTEM_TEXT_X_OFFSET);
+                        Canvas.SetLeft(sysText, topLeft);
+                        Canvas.SetTop(sysText, mapSystem.Layout.Y + (SYSTEM_SHAPE_OFFSET + 1));
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Top;
+                    }
+                    break;
+                    
+                    case MapSystem.TextPosition.Left:
+                    {
+                        Canvas.SetLeft(sysText, mapSystem.Layout.X - (SYSTEM_SHAPE_OFFSET + SYSTEM_TEXT_WIDTH + 3));
+                        Canvas.SetTop(sysText, mapSystem.Layout.Y + SYSTEM_TEXT_Y_OFFSET);
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Right;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                    }
+                    break;
+                    
+                    case MapSystem.TextPosition.Right:
+                    {
+                        Canvas.SetLeft(sysText, mapSystem.Layout.X + SYSTEM_SHAPE_OFFSET + 3);
+                        Canvas.SetTop(sysText, mapSystem.Layout.Y + SYSTEM_TEXT_Y_OFFSET);
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Left;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                    }
+                    break;
+                }
+
+
                 Canvas.SetZIndex(sysText, SYSTEM_Z_INDEX);
 
                 MainCanvas.Children.Add(sysText);

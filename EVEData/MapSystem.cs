@@ -14,8 +14,15 @@ namespace SMT.EVEData
     /// </summary>
     public class MapSystem
     {
+        public enum TextPosition
+        {
+            Top, Left, Right, Bottom
+        }
+
+
+
         /// <summary>
-        ///  Gets or sets the actual actual eve system
+        ///  Gets or sets the  actual eve system
         /// </summary>
         [XmlIgnoreAttribute]
         public System ActualSystem { get; set; }
@@ -34,6 +41,11 @@ namespace SMT.EVEData
         /// Gets or sets the Name of the system
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 
+        /// </summary>
+        public TextPosition TextPos { get; set; } = TextPosition.Bottom;
 
         /// <summary>
         /// Gets or sets if this system is considered out of region for layout purposes
