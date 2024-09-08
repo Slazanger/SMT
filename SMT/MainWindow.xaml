@@ -329,7 +329,7 @@
                                                                         <Setter Property="Background" Value="#292" />
                                                                     </DataTrigger>
 
-                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Thera">
+                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Turnur">
                                                                         <Setter Property="Background" Value="DarkRed" />
                                                                     </DataTrigger>
 

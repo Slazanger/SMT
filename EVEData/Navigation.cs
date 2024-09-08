@@ -524,7 +524,7 @@ namespace SMT.EVEData
                             RP.GateToTake = GateType.Zarzakh;
                         }
 
-                        if (UseTurnur && mn.TurnurConnections != null && mn.TurnurConnections.Contains(Route[i + 1]))
+                        if (UseTurnur && mn.TurnurConnections != null && mn.TurnurConnections.Contains(Route[i + 1]) && mn.Name == "Turnur")
                         {
                             RP.GateToTake = GateType.Turnur;
                         }
