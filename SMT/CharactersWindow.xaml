@@ -48,7 +48,7 @@
                 <ColumnDefinition Width="50*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="180" />
+                <RowDefinition Height="125" />
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
@@ -57,14 +57,14 @@
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
                 <RowDefinition Height="25" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25" />
             </Grid.RowDefinitions>
 
-            <Image Source="{Binding PortraitLocation}" Width="170" Height="170" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10" />
+            <Image Source="{Binding PortraitLocation}" Width="120" Height="120" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10" />
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="-40,30" Grid.RowSpan="2">
-                <TextBlock Text="{Binding Name}" FontSize="24" Foreground="White" />
+                <TextBlock Text="{Binding Name}" FontSize="24" Foreground="White"  />
 
                 <TextBlock FontSize="14" Foreground="LightGray">
                                     <Run Text="{Binding CorporationName, FallbackValue='????'}" />
@@ -120,7 +120,7 @@
                 </TextBlock>
             </StackPanel>
 
-            <GroupBox Header="Navigation Options" Grid.Row="1" Grid.RowSpan="8" BorderBrush="DarkGray" Margin="5">
+            <GroupBox Header="Navigation Options" Grid.Row="1" Grid.RowSpan="10" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4">
                     <StackPanel Orientation="Horizontal" Margin="4">
                         <Label Content="Autopilot" />
@@ -142,14 +142,16 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Notifications"  Grid.Column="1" Grid.Row="5" Grid.RowSpan="4" BorderBrush="DarkGray" Margin="5">
+            <GroupBox Header="Notifications"  Grid.Column="1" Grid.Row="5" Grid.RowSpan="6" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4">
                     <CheckBox IsChecked="{Binding ObservatoryDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Mobile Observatory Decloak" Margin="4" />
+                    <CheckBox IsChecked="{Binding GateDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Gate Decloak" Margin="4" />
+                    <CheckBox IsChecked="{Binding DecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Other Decloak" Margin="4" />
                     <CheckBox IsChecked="{Binding CombatWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Combat" Margin="4" />
                 </StackPanel>
             </GroupBox>
 
-            <StackPanel Grid.Column="1" Grid.Row="9" Orientation="Horizontal"  HorizontalAlignment="Right">
+            <StackPanel Grid.Column="1" Grid.Row="11" Orientation="Horizontal"  HorizontalAlignment="Right">
                 <Button Content="↓" Width="20" VerticalAlignment="Center"  Margin="4,0" x:Name="moveDownBtn" Click="MoveDownBtn_OnClick" />
                 <Button Content="↑" Width="20" VerticalAlignment="Center"  Margin="4,0" x:Name="moveUpBtn" Click="MoveUpBtn_OnClick" />
                 <Button Content="Delete" Width="100" VerticalAlignment="Center"   Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click" />

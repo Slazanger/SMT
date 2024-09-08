@@ -1261,7 +1261,20 @@ namespace SMT
             {
                 if (lc.Name == character)
                 {
-                    if (lc.ObservatoryDecloakWarningEnabled)
+                    bool triggerAlert = lc.DecloakWarningEnabled;
+
+                    if (text.Contains("Mobile Observatory"))
+                    {
+                        triggerAlert = lc.ObservatoryDecloakWarningEnabled;
+                    }
+
+                    if (text.Contains("Stargate"))
+                    {
+                        triggerAlert = lc.GateDecloakWarningEnabled;
+                    }
+
+
+                    if (triggerAlert)
                     {
                         if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
                         {

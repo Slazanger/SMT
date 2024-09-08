@@ -53,6 +53,11 @@ namespace SMT.EVEData
 
         private bool m_ObservatoryDecloakWarningEnabled;
 
+        private bool m_GateDecloakWarningEnabled;
+
+        private bool m_DecloakWarningEnabled;
+
+
         private bool m_CombatWarningEnabled;
 
         private bool routeNeedsUpdate = false;
@@ -108,6 +113,8 @@ namespace SMT.EVEData
             IsOnline = true;
             CombatWarningEnabled = true;
             ObservatoryDecloakWarningEnabled = true;
+            DecloakWarningEnabled = true;
+            GateDecloakWarningEnabled = true;
         }
 
         /// <summary>
@@ -126,6 +133,8 @@ namespace SMT.EVEData
 
             CombatWarningEnabled = false;
             ObservatoryDecloakWarningEnabled = true;
+            DecloakWarningEnabled = true;
+            GateDecloakWarningEnabled = true;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -215,6 +224,35 @@ namespace SMT.EVEData
                 OnPropertyChanged("ObservatoryDecloakWarningEnabled");
             }
         }
+
+        public bool GateDecloakWarningEnabled
+        {
+            get
+            {
+                return m_GateDecloakWarningEnabled;
+            }
+            set
+            {
+                m_GateDecloakWarningEnabled = value;
+                OnPropertyChanged("GateDecloakWarningEnabled");
+            }
+        }
+
+        public bool DecloakWarningEnabled
+        {
+            get
+            {
+                return m_DecloakWarningEnabled;
+            }
+            set
+            {
+                m_DecloakWarningEnabled = value;
+                OnPropertyChanged("DecloakWarningEnabled");
+            }
+        }
+
+
+
 
         public bool CombatWarningEnabled
         {
