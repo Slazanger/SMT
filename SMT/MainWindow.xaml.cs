@@ -19,6 +19,8 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using NHotkey;
+using NHotkey.Wpf;
 using SMT.EVEData;
 
 namespace SMT
@@ -2546,6 +2548,15 @@ namespace SMT
                     return;
                 }
             }
+            
+            // Set up hotkeys
+            try
+            {
+                HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OverlayWindows_ToggleClicktrough_HotkeyTrigger);
+            }
+            catch (NHotkey.HotkeyAlreadyRegisteredException exception)
+            {
+            }
 
             Overlay newOverlayWindow = new Overlay(this);
             newOverlayWindow.Closing += OnOverlayWindowClosing;
@@ -2554,6 +2565,11 @@ namespace SMT
         }
 
         private void OverlayClickTroughToggle_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            OverlayWindow_ToggleClickTrough();
+        }
+        
+        private void OverlayWindows_ToggleClicktrough_HotkeyTrigger(object sender, HotkeyEventArgs eventArgs)
         {
             OverlayWindow_ToggleClickTrough();
         }
@@ -2570,6 +2586,17 @@ namespace SMT
         public void OnOverlayWindowClosing(object sender, CancelEventArgs e)
         {
             overlayWindows.Remove((Overlay)sender);
+
+            if (overlayWindows.Count < 1)
+            {
+                try
+                {
+                    HotkeyManager.Current.Remove("Toggle click trough overlay windows.");
+                }
+                catch
+                {
+                }
+            }
         }
     }
 
