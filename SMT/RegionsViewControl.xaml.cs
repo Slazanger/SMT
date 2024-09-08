@@ -197,7 +197,7 @@ namespace SMT
             }
         }
 
-        private void RegionThera_ShapeMouseOverHandler(object sender, MouseEventArgs e)
+        private void WHLinkInfo_ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
             Shape obj = sender as Shape;
 
@@ -205,38 +205,98 @@ namespace SMT
 
             if (obj.IsMouseOver)
             {
-                RegionTheraInfo.PlacementTarget = obj;
-                RegionTheraInfo.VerticalOffset = 5;
-                RegionTheraInfo.HorizontalOffset = 15;
+                WHLinkInfo.PlacementTarget = obj;
+                WHLinkInfo.VerticalOffset = 5;
+                WHLinkInfo.HorizontalOffset = 15;
 
-                RegionTheraInfoSP.Children.Clear();
+                WHLinkInfoSp.Children.Clear();
 
-                Label header = new Label();
-                header.Content = "Thera Connections";
-                header.FontWeight = FontWeights.Bold;
-                header.Margin = new Thickness(1);
-                header.Padding = new Thickness(1);
-                RegionTheraInfoSP.Children.Add(header);
 
+                // check for Thera 
                 List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
+                bool TheraInRegion = false;
+
                 foreach (EVEData.TheraConnection tc in currentTheraConnections)
                 {
                     if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
                     {
-                        Label l = new Label();
-                        l.Content = $"    {tc.System}";
-                        l.Margin = new Thickness(1);
-                        l.Padding = new Thickness(1);
-
-                        RegionTheraInfoSP.Children.Add(l);
+                        TheraInRegion = true;
+                        break;
                     }
                 }
 
-                RegionTheraInfo.IsOpen = true;
+
+                if (TheraInRegion)
+                {
+                    Label header = new Label();
+                    header.Content = "Thera Connections";
+                    header.FontWeight = FontWeights.Bold;
+                    header.Margin = new Thickness(1);
+                    header.Padding = new Thickness(1);
+                    WHLinkInfoSp.Children.Add(header);
+
+                    foreach (EVEData.TheraConnection tc in currentTheraConnections)
+                    {
+                        if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                        {
+                            Label l = new Label();
+                            l.Content = $"    {tc.System}";
+                            l.Margin = new Thickness(1);
+                            l.Padding = new Thickness(1);
+
+                            WHLinkInfoSp.Children.Add(l);
+                        }
+                    }
+                }
+
+                // check for Turnur 
+                List<TurnurConnection> currentTurnurConnections = EVEData.EveManager.Instance.TurnurConnections.ToList();
+                bool TurnurInRegion = false;
+
+                foreach (EVEData.TurnurConnection tc in currentTurnurConnections)
+                {
+                    if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                    {
+                        TurnurInRegion = true;
+                        break;
+                    }
+                }
+
+
+                if (TurnurInRegion)
+                {
+                    Label header = new Label();
+                    header.Content = "Turnur Connections";
+                    header.FontWeight = FontWeights.Bold;
+                    header.Margin = new Thickness(1);
+                    header.Padding = new Thickness(1);
+                    WHLinkInfoSp.Children.Add(header);
+
+                    foreach (EVEData.TurnurConnection tc in currentTurnurConnections)
+                    {
+                        if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                        {
+                            Label l = new Label();
+                            l.Content = $"    {tc.System}";
+                            l.Margin = new Thickness(1);
+                            l.Padding = new Thickness(1);
+
+                            WHLinkInfoSp.Children.Add(l);
+                        }
+                    }
+                }
+
+
+
+
+                WHLinkInfo.IsOpen = true;
+
+
+
             }
             else
             {
-                RegionTheraInfo.IsOpen = false;
+                WHLinkInfo.IsOpen = false;
             }
         }
 
@@ -275,8 +335,8 @@ namespace SMT
                     theraShape.Fill = theraBrush;
 
                     theraShape.DataContext = mr;
-                    theraShape.MouseEnter += RegionThera_ShapeMouseOverHandler;
-                    theraShape.MouseLeave += RegionThera_ShapeMouseOverHandler;
+                    theraShape.MouseEnter += WHLinkInfo_ShapeMouseOverHandler;
+                    theraShape.MouseLeave += WHLinkInfo_ShapeMouseOverHandler;
 
                     Canvas.SetLeft(theraShape, mr.UniverseViewX + 56);
                     Canvas.SetTop(theraShape, mr.UniverseViewY + 6);

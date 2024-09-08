@@ -128,6 +128,7 @@
                     </StackPanel>
                     <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="Use Ansiblex Gates" Margin="4" />
                     <CheckBox IsChecked="{Binding UseTheraRouting}"  HorizontalAlignment="Left" Content="Use Thera" Margin="4" />
+                    <CheckBox IsChecked="{Binding UseTurnurRouting}"  HorizontalAlignment="Left" Content="Use Turnur" Margin="4" />
                     <CheckBox IsChecked="{Binding UseZarzakhRouting}"  HorizontalAlignment="Left" Content="Use Zarzakh" Margin="4" />
                 </StackPanel>
             </GroupBox>

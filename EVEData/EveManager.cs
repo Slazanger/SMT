@@ -208,6 +208,18 @@ namespace SMT.EVEData
         /// </summary>
         public event TheraUpdatedHandler TheraUpdateEvent;
 
+
+        /// <summary>
+        /// Turnur Connections Updated Event Handler
+        /// </summary>
+        public delegate void TurnurUpdatedHandler();
+
+        /// <summary>
+        /// Turnur Updated Added Events
+        /// </summary>
+        public event TurnurUpdatedHandler TurnurUpdateEvent;
+
+
         /// <summary>
         /// Storms Updated Event Handler
         /// </summary>
@@ -326,6 +338,12 @@ namespace SMT.EVEData
         /// Gets or sets the current list of thera connections
         /// </summary>
         public List<TheraConnection> TheraConnections { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current list of Turnur connections
+        /// </summary>
+        public List<TurnurConnection> TurnurConnections { get; set; }
+
 
         public bool UseESIForCharacterPositions { get; set; }
 
@@ -2354,6 +2372,89 @@ namespace SMT.EVEData
             }
         }
 
+        /// <summary>
+        /// Update the current Turnur Connections from EVE-Scout
+        /// </summary>
+        public async void UpdateTurnurConnections()
+        {
+            string turnurApiURL = "https://api.eve-scout.com/v2/public/signatures?system_name=Turnur";
+            string strContent = string.Empty;
+
+            try
+            {
+                HttpClient hc = new HttpClient();
+                var response = await hc.GetAsync(turnurApiURL);
+                response.EnsureSuccessStatusCode();
+                strContent = await response.Content.ReadAsStringAsync();
+
+                JsonTextReader jsr = new JsonTextReader(new StringReader(strContent));
+
+                TurnurConnections.Clear();
+
+                /*
+                    new format
+                    
+                    "id": "46",
+                    "created_at": "2023-12-02T11:24:49.000Z",
+                    "created_by_id": 93027866,
+                    "created_by_name": "Das d'Alembert",
+                    "updated_at": "2023-12-02T11:27:01.000Z",
+                    "updated_by_id": 93027866,
+                    "updated_by_name": "Das d'Alembert",
+                    "completed_at": "2023-12-02T11:27:01.000Z",
+                    "completed_by_id": 93027866,
+                    "completed_by_name": "Das d'Alembert",
+                    "completed": true,
+                    "wh_exits_outward": true,
+                    "wh_type": "Q063",
+                    "max_ship_size": "medium",
+                    "expires_at": "2023-12-03T04:24:49.000Z",
+                    "remaining_hours": 14,
+                    "signature_type": "wormhole",
+                    "out_system_id": 31000005,
+                    "out_system_name": "Thera",
+                    "out_signature": "HMM-222",
+                    "in_system_id": 30001715,
+                    "in_system_class": "hs",
+                    "in_system_name": "Moutid",
+                    "in_region_id": 10000020,
+                    "in_region_name": "Tash-Murkon",
+                    "in_signature": "LPI-677"
+                 */
+
+                while (jsr.Read())
+                {
+                    if (jsr.TokenType == JsonToken.StartObject)
+                    {
+                        JObject obj = JObject.Load(jsr);
+                        string inSignatureId = obj["in_signature"].ToString();
+                        string outSignatureId = obj["out_signature"].ToString();
+                        long solarSystemId = long.Parse(obj["in_system_id"].ToString());
+                        string wormHoleEOL = obj["expires_at"].ToString();
+                        string type = obj["signature_type"].ToString();
+
+                        if (type != null && type == "wormhole" && solarSystemId != 0 && wormHoleEOL != null && SystemIDToName.ContainsKey(solarSystemId))
+                        {
+                            System turnurConnectionSystem = GetEveSystemFromID(solarSystemId);
+
+                            TurnurConnection tc = new TurnurConnection(turnurConnectionSystem.Name, turnurConnectionSystem.Region, inSignatureId, outSignatureId, wormHoleEOL);
+                            TurnurConnections.Add(tc);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return;
+            }
+
+            if (TurnurUpdateEvent != null)
+            {
+                TurnurUpdateEvent();
+            }
+        }
+
+
         public void UpdateMetaliminalStorms()
         {
             MetaliminalStorms.Clear();
@@ -2567,6 +2668,7 @@ namespace SMT.EVEData
             LoadCharacters();
 
             InitTheraConnections();
+            InitTurnurConnections();
 
             InitMetaliminalStorms();
             InitFactionWarfareInfo();
@@ -2637,6 +2739,17 @@ namespace SMT.EVEData
             TheraConnections = new List<TheraConnection>();
             UpdateTheraConnections();
         }
+
+        /// <summary>
+        /// Initialise the Turnur Connection Data from EVE-Scout
+        /// </summary>
+        private void InitTurnurConnections()
+        {
+            TurnurConnections = new List<TurnurConnection>();
+            UpdateTurnurConnections();
+        }
+
+
 
         /// <summary>
         /// Initialise the Zarzakh Connection Data 
@@ -3167,6 +3280,7 @@ namespace SMT.EVEData
                         UpdateESIUniverseData();
                         UpdateServerInfo();
                         UpdateTheraConnections();
+                        UpdateTurnurConnections();
                     }
 
                     if ((NextDotlanUpdate - DateTime.Now).Minutes < 0)

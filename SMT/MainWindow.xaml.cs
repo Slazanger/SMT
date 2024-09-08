@@ -202,6 +202,9 @@ namespace SMT
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             EVEManager.TheraUpdateEvent += TheraConnections_CollectionChanged;
 
+            TurnurConnectionsList.ItemsSource = EVEManager.TurnurConnections;
+            EVEManager.TurnurUpdateEvent += TurnurConnections_CollectionChanged;
+
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
             MetaliminalStormList.ItemsSource = EVEManager.MetaliminalStorms;
             EVEManager.StormsUpdateEvent += Storms_CollectionChanged;
@@ -435,6 +438,15 @@ namespace SMT
                 CollectionViewSource.GetDefaultView(TheraConnectionsList.ItemsSource).Refresh();
             }), DispatcherPriority.Normal);
         }
+
+        private void TurnurConnections_CollectionChanged()
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(TurnurConnectionsList.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
+        }
+        
 
         protected override void OnSourceInitialized(EventArgs e)
         {
@@ -1429,7 +1441,7 @@ namespace SMT
 
         #endregion intel
 
-        #region Thera
+        #region Thera / Turnur
 
         /// <summary>
         /// Update Thera Button Clicked
@@ -1457,7 +1469,32 @@ namespace SMT
             }
         }
 
-        #endregion Thera
+        private void btn_UpdateTurnur_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.UpdateTurnurConnections();
+        }
+
+        private void TurnurConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    EVEData.TurnurConnection tc = dgr.Item as EVEData.TurnurConnection;
+
+                    if (tc != null)
+                    {
+                        RegionUC.SelectSystem(tc.System, true);
+                    }
+                }
+            }
+        }
+
+
+
+        #endregion Thera / Turnur
 
         #region Route
 

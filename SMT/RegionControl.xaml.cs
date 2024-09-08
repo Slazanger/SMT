@@ -435,9 +435,9 @@ namespace SMT
             }
         }
 
-        public void AddTheraSystemsToMap()
+        public void AddWHLinksSystemsToMap()
         {
-            Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+            Brush WHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
 
             List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
 
@@ -457,15 +457,45 @@ namespace SMT
                         TheraShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
                     }
 
-                    TheraShape.Stroke = TheraBrush;
+                    TheraShape.Stroke = WHLinkBrush;
                     TheraShape.StrokeThickness = 1.5;
                     TheraShape.StrokeLineJoin = PenLineJoin.Round;
-                    TheraShape.Fill = TheraBrush;
+                    TheraShape.Fill = WHLinkBrush;
 
                     Canvas.SetLeft(TheraShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(TheraShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX - 3);
                     MainCanvas.Children.Add(TheraShape);
+                }
+            }
+
+            List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
+
+            foreach (TurnurConnection tc in currentTurnurConnections)
+            {
+                if (Region.IsSystemOnMap(tc.System))
+                {
+                    MapSystem ms = Region.MapSystems[tc.System];
+
+                    Shape TurnurShape;
+                    if (ms.ActualSystem.HasNPCStation)
+                    {
+                        TurnurShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+                    else
+                    {
+                        TurnurShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+
+                    TurnurShape.Stroke = WHLinkBrush;
+                    TurnurShape.StrokeThickness = 1.5;
+                    TurnurShape.StrokeLineJoin = PenLineJoin.Round;
+                    TurnurShape.Fill = WHLinkBrush;
+
+                    Canvas.SetLeft(TurnurShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(TurnurShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetZIndex(TurnurShape, SYSTEM_Z_INDEX - 3);
+                    MainCanvas.Children.Add(TurnurShape);
                 }
             }
         }
@@ -777,7 +807,7 @@ namespace SMT
                 AddRouteToMap();
             }
 
-            AddTheraSystemsToMap();
+            AddWHLinksSystemsToMap();
             AddStormsToMap();
             AddSovConflictsToMap();
             AddTrigInvasionSytemsToMap();
@@ -3727,6 +3757,30 @@ namespace SMT
                         tl.Padding = one;
                         tl.Margin = one;
                         tl.Content = $"Thera\t: out {tc.OutSignatureID}";
+                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        SystemInfoPopupSP.Children.Add(tl);
+                    }
+                }
+                List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
+
+                // update Turnur Info
+                foreach (EVEData.TurnurConnection tc in currentTurnurConnections)
+                {
+                    if (selectedSys.Name == tc.System)
+                    {
+                        SystemInfoPopupSP.Children.Add(new Separator());
+
+                        Label tl = new Label();
+                        tl.Padding = one;
+                        tl.Margin = one;
+                        tl.Content = $"Turnur\t: in {tc.InSignatureID}";
+                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        SystemInfoPopupSP.Children.Add(tl);
+
+                        tl = new Label();
+                        tl.Padding = one;
+                        tl.Margin = one;
+                        tl.Content = $"Turnur\t: out {tc.OutSignatureID}";
                         tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
                     }
