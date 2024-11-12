@@ -1057,23 +1057,23 @@ namespace SMT.EVEData
             // calculate the optimal text offset
             foreach (MapRegion rr in Regions)
             {
-                foreach (MapSystem ms in rr.MapSystems.Values.ToList())
+                foreach (MapSystem msA in rr.MapSystems.Values.ToList())
                 {
-
-
                     bool TopClear = true;
                     bool BottomClear = true;
                     bool LeftClear = true;
                     bool RightClear = true;
+                    float MaxDistance = 60.0f;
 
-                    foreach (string sj in ms.ActualSystem.Jumps)
+
+                    foreach (string sj in msA.ActualSystem.Jumps)
                     {
-                        if (rr.IsSystemOnMap(sj))
+                        if(rr.IsSystemOnMap(sj))
                         {
-                            MapSystem msj = rr.MapSystems[sj];
 
-                            Vector2 v1 = ms.Layout;
-                            Vector2 v2 = msj.Layout;
+                            // if its within range
+                            Vector2 v1 = msA.Layout;
+                            Vector2 v2 = rr.MapSystems[sj].Layout;
 
                             // calculate the azimuth between them
                             float deltaX = v2.X - v1.X;
@@ -1096,7 +1096,7 @@ namespace SMT.EVEData
                             // 180 to the left
                             // 270 above
 
-                            if (angleInDegrees > 205 && angleInDegrees < 335 )
+                            if (angleInDegrees > 205 && angleInDegrees < 335)
                             {
                                 TopClear = false;
                             }
@@ -1115,37 +1115,95 @@ namespace SMT.EVEData
                             {
                                 LeftClear = false;
                             }
+                        }
+                    }
 
 
+
+                    foreach (MapSystem msB in rr.MapSystems.Values.ToList())
+                    {
+                        if (msA.Name == msB.Name)
+                        {
+                            continue;
+                        }
+
+                        // if its within range
+                        Vector2 v1 = msA.Layout;
+                        Vector2 v2 = msB.Layout;
+
+                        Vector2 vDifference = v1 - v2;
+
+                        if (vDifference.Length() < MaxDistance)
+                        {
+                            // calculate the azimuth between them
+                            float deltaX = v2.X - v1.X;
+                            float deltaY = v2.Y - v1.Y;
+
+                            // Calculate the angle in radians
+                            double angleInRadians = Math.Atan2(deltaY, deltaX);
+
+                            // Convert the angle to degrees
+                            double angleInDegrees = angleInRadians * (180.0 / Math.PI);
+
+                            // Ensure the angle is between 0 and 360 degrees
+                            if (angleInDegrees < 0)
+                            {
+                                angleInDegrees += 360;
+                            }
+
+                            // 0 to the right
+                            // 90 below
+                            // 180 to the left
+                            // 270 above
+
+                            if (angleInDegrees > 205 && angleInDegrees < 335)
+                            {
+                                TopClear = false;
+                            }
+
+                            if (angleInDegrees > 25 && angleInDegrees < 155)
+                            {
+                                BottomClear = false;
+                            }
+
+                            if (angleInDegrees > 295 || angleInDegrees < 65)
+                            {
+                                RightClear = false;
+                            }
+
+                            if (angleInDegrees > 115 && angleInDegrees < 245)
+                            {
+                                LeftClear = false;
+                            }
                         }
                     }
 
                     // default
-                    ms.TextPos = MapSystem.TextPosition.Bottom;
+                    msA.TextPos = MapSystem.TextPosition.Bottom;
 
                     if (LeftClear)
                     {
-                        ms.TextPos = MapSystem.TextPosition.Left;
+                        msA.TextPos = MapSystem.TextPosition.Left;
                     }
 
                     if (RightClear)
                     {
-                        ms.TextPos = MapSystem.TextPosition.Right;
+                        msA.TextPos = MapSystem.TextPosition.Right;
                     }
 
                     if (TopClear)
                     {
-                        ms.TextPos = MapSystem.TextPosition.Top;
+                        msA.TextPos = MapSystem.TextPosition.Top;
                     }
 
                     if (BottomClear)
                     {
-                        ms.TextPos = MapSystem.TextPosition.Bottom;
+                        msA.TextPos = MapSystem.TextPosition.Bottom;
                     }
-
-
-
                 }
+
+
+
             }
 
             // collect the system points to generate them from
