@@ -4693,7 +4693,7 @@
       <string>46363</string>
     </key>
     <value>
-      <string>Guristas Forward Operating Base</string>
+      <string>Guristas Pirates Stronghold</string>
     </value>
   </item>
   <item>
@@ -4701,335 +4701,7 @@
       <string>46364</string>
     </key>
     <value>
-      <string>Blood Raider Forward Operating Base</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47035</string>
-    </key>
-    <value>
-      <string>Standup Templar I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47036</string>
-    </key>
-    <value>
-      <string>Standup Gram I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47037</string>
-    </key>
-    <value>
-      <string>Standup Siren I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47038</string>
-    </key>
-    <value>
-      <string>Standup Mantis I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47039</string>
-    </key>
-    <value>
-      <string>Standup Gungnir I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47116</string>
-    </key>
-    <value>
-      <string>Standup Malleus I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47117</string>
-    </key>
-    <value>
-      <string>Standup Cyclops I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47118</string>
-    </key>
-    <value>
-      <string>Standup Tyrfing I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47119</string>
-    </key>
-    <value>
-      <string>Standup Malleus II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47120</string>
-    </key>
-    <value>
-      <string>Standup Mantis II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47121</string>
-    </key>
-    <value>
-      <string>Standup Cyclops II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47122</string>
-    </key>
-    <value>
-      <string>Standup Tyrfing II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47123</string>
-    </key>
-    <value>
-      <string>Standup Shadow</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47124</string>
-    </key>
-    <value>
-      <string>Standup Ametat I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47125</string>
-    </key>
-    <value>
-      <string>Standup Termite I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47126</string>
-    </key>
-    <value>
-      <string>Standup Antaeus I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47127</string>
-    </key>
-    <value>
-      <string>Standup Ametat II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47128</string>
-    </key>
-    <value>
-      <string>Standup Termite II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47129</string>
-    </key>
-    <value>
-      <string>Standup Antaeus II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47130</string>
-    </key>
-    <value>
-      <string>Standup Gungnir II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47131</string>
-    </key>
-    <value>
-      <string>Standup Cenobite I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47132</string>
-    </key>
-    <value>
-      <string>Standup Scarab I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47133</string>
-    </key>
-    <value>
-      <string>Standup Dromi I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47134</string>
-    </key>
-    <value>
-      <string>Standup Cenobite II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47135</string>
-    </key>
-    <value>
-      <string>Standup Scarab II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47136</string>
-    </key>
-    <value>
-      <string>Standup Siren II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47137</string>
-    </key>
-    <value>
-      <string>Standup Dromi II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47138</string>
-    </key>
-    <value>
-      <string>Standup Dragonfly I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47139</string>
-    </key>
-    <value>
-      <string>Standup Firbolg I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47140</string>
-    </key>
-    <value>
-      <string>Standup Einherji I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47141</string>
-    </key>
-    <value>
-      <string>Standup Templar II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47142</string>
-    </key>
-    <value>
-      <string>Standup Dragonfly II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47143</string>
-    </key>
-    <value>
-      <string>Standup Firbolg II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47144</string>
-    </key>
-    <value>
-      <string>Standup Einherji II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47145</string>
-    </key>
-    <value>
-      <string>Standup Equite I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47146</string>
-    </key>
-    <value>
-      <string>Standup Locust I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47147</string>
-    </key>
-    <value>
-      <string>Standup Satyr I</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47148</string>
-    </key>
-    <value>
-      <string>Standup Equite II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47149</string>
-    </key>
-    <value>
-      <string>Standup Locust II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47150</string>
-    </key>
-    <value>
-      <string>Standup Satyr II</string>
-    </value>
-  </item>
-  <item>
-    <key>
-      <string>47151</string>
-    </key>
-    <value>
-      <string>Standup Gram II</string>
+      <string>Blood Raiders Stronghold</string>
     </value>
   </item>
   <item>
@@ -5277,7 +4949,7 @@
       <string>71116</string>
     </key>
     <value>
-      <string>Amarr Forward Operating Base</string>
+      <string>Amarr Empire Stronghold</string>
     </value>
   </item>
   <item>
@@ -5285,7 +4957,7 @@
       <string>71117</string>
     </key>
     <value>
-      <string>Caldari Forward Operating Base</string>
+      <string>Caldari State Stronghold</string>
     </value>
   </item>
   <item>
@@ -5293,7 +4965,7 @@
       <string>71118</string>
     </key>
     <value>
-      <string>Gallente Forward Operating Base</string>
+      <string>Gallente Federation Stronghold</string>
     </value>
   </item>
   <item>
@@ -5301,7 +4973,7 @@
       <string>71119</string>
     </key>
     <value>
-      <string>Minmatar Forward Operating Base</string>
+      <string>Minmatar Republic Stronghold</string>
     </value>
   </item>
   <item>
@@ -5366,6 +5038,326 @@
     </key>
     <value>
       <string>Imicus Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73787</string>
+    </key>
+    <value>
+      <string>Naglfar Fleet Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73789</string>
+    </key>
+    <value>
+      <string>Coercer Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73790</string>
+    </key>
+    <value>
+      <string>Revelation Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73792</string>
+    </key>
+    <value>
+      <string>Moros Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73793</string>
+    </key>
+    <value>
+      <string>Phoenix Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73794</string>
+    </key>
+    <value>
+      <string>Thrasher Fleet Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73795</string>
+    </key>
+    <value>
+      <string>Cormorant Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>73796</string>
+    </key>
+    <value>
+      <string>Catalyst Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>74141</string>
+    </key>
+    <value>
+      <string>Geri</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>74316</string>
+    </key>
+    <value>
+      <string>Bestla</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>77114</string>
+    </key>
+    <value>
+      <string>Metamorphosis</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>77726</string>
+    </key>
+    <value>
+      <string>Cybele</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>78333</string>
+    </key>
+    <value>
+      <string>Mekubal</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>78366</string>
+    </key>
+    <value>
+      <string>Alligator</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>78367</string>
+    </key>
+    <value>
+      <string>Mamba</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>78369</string>
+    </key>
+    <value>
+      <string>Khizriel</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>78414</string>
+    </key>
+    <value>
+      <string>Shapash</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>78576</string>
+    </key>
+    <value>
+      <string>Azariel</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>81008</string>
+    </key>
+    <value>
+      <string>Squall</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>81040</string>
+    </key>
+    <value>
+      <string>Avalanche</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>81046</string>
+    </key>
+    <value>
+      <string>Deluge</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>81047</string>
+    </key>
+    <value>
+      <string>Torrent</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>81951</string>
+    </key>
+    <value>
+      <string>Consortium Mobile Tractor Unit</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83579</string>
+    </key>
+    <value>
+      <string>Imperial Navy Templar</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83582</string>
+    </key>
+    <value>
+      <string>Caldari Navy Dragonfly</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83583</string>
+    </key>
+    <value>
+      <string>Federation Navy Firbolg</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83584</string>
+    </key>
+    <value>
+      <string>Republic Fleet Einherji</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83585</string>
+    </key>
+    <value>
+      <string>Imperial Navy Equite</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83586</string>
+    </key>
+    <value>
+      <string>Caldari Navy Locust</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83587</string>
+    </key>
+    <value>
+      <string>Federation Navy Satyr</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83589</string>
+    </key>
+    <value>
+      <string>Republic Fleet Gram</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83591</string>
+    </key>
+    <value>
+      <string>Imperial Navy Cenobite</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83592</string>
+    </key>
+    <value>
+      <string>Caldari Navy Scarab</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83593</string>
+    </key>
+    <value>
+      <string>Federation Navy Siren</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>83594</string>
+    </key>
+    <value>
+      <string>Republic Fleet Dromi</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>85062</string>
+    </key>
+    <value>
+      <string>Sidewinder</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>85086</string>
+    </key>
+    <value>
+      <string>Cenotaph</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>85087</string>
+    </key>
+    <value>
+      <string>Tholos</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>85229</string>
+    </key>
+    <value>
+      <string>Cobra</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>85236</string>
+    </key>
+    <value>
+      <string>Python</string>
     </value>
   </item>
 </dictionary>

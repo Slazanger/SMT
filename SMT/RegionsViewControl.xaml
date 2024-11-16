@@ -10,8 +10,8 @@
         <Popup x:Name="RegionCharacterInfo" IsOpen="False" AllowsTransparency="True">
             <StackPanel x:Name="RegionCharacterInfoSP" Background="#FF232223" />
         </Popup>
-        <Popup x:Name="RegionTheraInfo" IsOpen="False" AllowsTransparency="True">
-            <StackPanel x:Name="RegionTheraInfoSP" Background="#FF232223" />
+        <Popup x:Name="WHLinkInfo" IsOpen="False" AllowsTransparency="True">
+            <StackPanel x:Name="WHLinkInfoSp" Background="#FF232223" />
         </Popup>
 
         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">

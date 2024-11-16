@@ -1,5 +1,4 @@
-﻿using NHotkey.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -19,7 +18,6 @@ using System.Windows.Threading;
 using Windows.Services;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic.Logging;
-using NHotkey;
 using SMT.EVEData;
 using static SMT.EVEData.Navigation;
 
@@ -407,9 +405,6 @@ namespace SMT
             Closing += Overlay_Closing;
             // We can only redraw stuff when the canvas is actually resized, otherwise dimensions will be wrong!
             overlay_Canvas.SizeChanged += OnCanvasSizeChanged;
-            
-            // Set up hotkeys
-            HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OnClickTroughToggle);
 
             // Update settings
             intelUrgentPeriod = mainWindow.MapConf.IntelFreshTime;
@@ -448,11 +443,6 @@ namespace SMT
             
             locationUpdateTimer.Start();
             dataUpdateTimer.Start();
-        }
-
-        private void OnClickTroughToggle(object sender, HotkeyEventArgs e)
-        {
-            mainWindow.OverlayWindow_ToggleClickTrough();
         }
 
         public void ToggleClickTrough(bool isClickTrough)

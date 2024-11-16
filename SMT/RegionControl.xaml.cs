@@ -33,8 +33,9 @@ namespace SMT
         private const double SYSTEM_SHAPE_OOR_OFFSET = SYSTEM_SHAPE_OOR_SIZE / 2;
 
         private const int SYSTEM_TEXT_WIDTH = 100;
-        private const double SYSTEM_TEXT_X_OFFSET = -SYSTEM_TEXT_WIDTH / 2;
-        private const double SYSTEM_TEXT_Y_OFFSET = 8;
+        private const int SYSTEM_TEXT_HEIGHT = 50;
+        private const double SYSTEM_TEXT_X_OFFSET = SYSTEM_TEXT_WIDTH / 2;
+        private const double SYSTEM_TEXT_Y_OFFSET = SYSTEM_TEXT_HEIGHT / 2;
 
         private const int SYSTEM_Z_INDEX = 22;
 
@@ -434,9 +435,9 @@ namespace SMT
             }
         }
 
-        public void AddTheraSystemsToMap()
+        public void AddWHLinksSystemsToMap()
         {
-            Brush TheraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+            Brush WHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
 
             List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
 
@@ -456,15 +457,45 @@ namespace SMT
                         TheraShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
                     }
 
-                    TheraShape.Stroke = TheraBrush;
+                    TheraShape.Stroke = WHLinkBrush;
                     TheraShape.StrokeThickness = 1.5;
                     TheraShape.StrokeLineJoin = PenLineJoin.Round;
-                    TheraShape.Fill = TheraBrush;
+                    TheraShape.Fill = WHLinkBrush;
 
                     Canvas.SetLeft(TheraShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(TheraShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX - 3);
                     MainCanvas.Children.Add(TheraShape);
+                }
+            }
+
+            List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
+
+            foreach (TurnurConnection tc in currentTurnurConnections)
+            {
+                if (Region.IsSystemOnMap(tc.System))
+                {
+                    MapSystem ms = Region.MapSystems[tc.System];
+
+                    Shape TurnurShape;
+                    if (ms.ActualSystem.HasNPCStation)
+                    {
+                        TurnurShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+                    else
+                    {
+                        TurnurShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+
+                    TurnurShape.Stroke = WHLinkBrush;
+                    TurnurShape.StrokeThickness = 1.5;
+                    TurnurShape.StrokeLineJoin = PenLineJoin.Round;
+                    TurnurShape.Fill = WHLinkBrush;
+
+                    Canvas.SetLeft(TurnurShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(TurnurShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetZIndex(TurnurShape, SYSTEM_Z_INDEX - 3);
+                    MainCanvas.Children.Add(TurnurShape);
                 }
             }
         }
@@ -712,9 +743,6 @@ namespace SMT
 
             if (FullRedraw)
             {
-                // reset the background
-                //MainCanvasGrid.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
-
                 Color c1 = MapConf.ActiveColourScheme.MapBackgroundColour;
                 Color c2 = MapConf.ActiveColourScheme.MapBackgroundColour;
                 c1.R = (byte)(0.9 * c1.R);
@@ -731,10 +759,6 @@ namespace SMT
                 lgb.GradientStops.Add(new GradientStop(c1, 1.0));
 
                 MainCanvasGrid.Background = lgb;
-
-                //                MainCanvas.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
-                MainCanvasGrid.Background = lgb;
-                //MainZoomControl.Background = new SolidColorBrush(MapConf.ActiveColourScheme.MapBackgroundColour);
                 MainZoomControl.Background = lgb;
 
                 MainCanvas.Children.Clear();
@@ -769,13 +793,6 @@ namespace SMT
                 }
                 DynamicMapElementsCharacters.Clear();
 
-                /*
-                                foreach (UIElement uie in DynamicMapElementsJBHighlight)
-                                {
-                                    MainCanvas.Children.Remove(uie);
-                                }
-                                DynamicMapElementsJBHighlight.Clear();
-                */
             }
 
             AddFWDataToMap();
@@ -790,7 +807,7 @@ namespace SMT
                 AddRouteToMap();
             }
 
-            AddTheraSystemsToMap();
+            AddWHLinksSystemsToMap();
             AddStormsToMap();
             AddSovConflictsToMap();
             AddTrigInvasionSytemsToMap();
@@ -2512,6 +2529,18 @@ namespace SMT
                     MainCanvas.Children.Add(sovADM);
                 }
 
+
+                Grid sysTextGrid = new Grid
+                {
+                    Width = SYSTEM_TEXT_WIDTH,
+                    Height = SYSTEM_TEXT_HEIGHT,
+                };
+
+                StackPanel sp = new StackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                };
+
                 Label sysText = new Label();
                 sysText.Content = mapSystem.Name;
 
@@ -2521,7 +2550,6 @@ namespace SMT
                 }
 
                 sysText.Foreground = SysInRegionTextBrush;
-
                 double sysTextOffset = SYSTEM_TEXT_Y_OFFSET;
 
                 if (mapSystem.OutOfRegion)
@@ -2536,15 +2564,87 @@ namespace SMT
                 sysText.Padding = border;
                 sysText.Margin = border;
                 sysText.IsHitTestVisible = false;
-                sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                sysText.VerticalContentAlignment = VerticalAlignment.Center;
-                sysText.Width = SYSTEM_TEXT_WIDTH;
 
-                Canvas.SetLeft(sysText, mapSystem.Layout.X + SYSTEM_TEXT_X_OFFSET);
-                Canvas.SetTop(sysText, mapSystem.Layout.Y + sysTextOffset);
+                sp.Children.Add(sysText);
+
+
+                switch (mapSystem.TextPos)
+                {
+                    case MapSystem.TextPosition.Top:
+                    {
+                        double spLeft = mapSystem.Layout.X - (SYSTEM_TEXT_X_OFFSET);
+                        double spTop  = mapSystem.Layout.Y - (SYSTEM_SHAPE_OFFSET + SYSTEM_TEXT_HEIGHT + 1);
+                        Canvas.SetLeft(sysTextGrid, spLeft);
+                        Canvas.SetTop(sysTextGrid, spTop);
+
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                        sp.VerticalAlignment = VerticalAlignment.Bottom;
+                        sp.HorizontalAlignment = HorizontalAlignment.Center;
+
+                        sysTextGrid.Children.Add(sp);
+                    }
+                    break;
+
+                    case MapSystem.TextPosition.Bottom:
+                    {
+
+                        double spLeft = mapSystem.Layout.X - (SYSTEM_TEXT_X_OFFSET);
+                        double spTop  = mapSystem.Layout.Y + (SYSTEM_SHAPE_OFFSET + 1);
+                        Canvas.SetLeft(sysTextGrid, spLeft);
+                        Canvas.SetTop(sysTextGrid, spTop);
+
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                        
+                        sp.VerticalAlignment = VerticalAlignment.Top;
+                        sp.HorizontalAlignment = HorizontalAlignment.Center;
+
+                        sysTextGrid.Children.Add(sp);
+
+                    }
+                    break;
+                    
+                    case MapSystem.TextPosition.Left:
+                    {
+                        double spLeft = mapSystem.Layout.X - (SYSTEM_SHAPE_OFFSET + SYSTEM_TEXT_WIDTH + 3);
+                        double spTop  = mapSystem.Layout.Y - (SYSTEM_TEXT_Y_OFFSET);
+                        Canvas.SetLeft(sysTextGrid, spLeft);
+                        Canvas.SetTop(sysTextGrid, spTop);
+
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Right;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                        sp.VerticalAlignment = VerticalAlignment.Center;
+                        sp.HorizontalAlignment = HorizontalAlignment.Right;
+                        sysTextGrid.Children.Add(sp);
+
+
+                    }
+                    break;
+                    
+                    case MapSystem.TextPosition.Right:
+                    {
+                        double spLeft = mapSystem.Layout.X + SYSTEM_SHAPE_OFFSET + 3;
+                        double spTop  = mapSystem.Layout.Y - SYSTEM_TEXT_Y_OFFSET;
+                        Canvas.SetLeft(sysTextGrid, spLeft);
+                        Canvas.SetTop(sysTextGrid, spTop);
+                        sp.VerticalAlignment = VerticalAlignment.Center;
+                        sp.HorizontalAlignment = HorizontalAlignment.Left;
+                        
+                        sysText.HorizontalContentAlignment = HorizontalAlignment.Left;
+                        sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                        sysTextGrid.Children.Add(sp);
+
+
+                    }
+                    break;
+                }
+
+
+                Canvas.SetZIndex(sysTextGrid, SYSTEM_Z_INDEX);
                 Canvas.SetZIndex(sysText, SYSTEM_Z_INDEX);
 
-                MainCanvas.Children.Add(sysText);
+                MainCanvas.Children.Add(sysTextGrid);
 
                 // generate the list of links
                 foreach (string jumpTo in mapSystem.ActualSystem.Jumps)
@@ -2733,7 +2833,29 @@ namespace SMT
                     sysSubText.Text = SystemSubText;
                     sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
 
-                    sysSubText.TextAlignment = TextAlignment.Center;
+
+                    switch (mapSystem.TextPos)
+                    {
+                        case MapSystem.TextPosition.Left:
+                            sysSubText.TextAlignment = TextAlignment.Right;
+                            break;
+
+                        case MapSystem.TextPosition.Right:
+                            sysSubText.TextAlignment = TextAlignment.Left;
+                            break;
+
+                        case MapSystem.TextPosition.Top:
+                            sysSubText.TextAlignment = TextAlignment.Center;
+                            break;
+
+                        case MapSystem.TextPosition.Bottom:
+                            sysSubText.TextAlignment = TextAlignment.Center;
+                            break;
+
+
+                    }
+
+
                     sysSubText.IsHitTestVisible = false;
 
                     if (MapConf.ActiveColourScheme.SystemSubTextSize > 0)
@@ -2751,93 +2873,14 @@ namespace SMT
                         sysSubText.Foreground = SysInRegionTextBrush;
                     }
 
-                    Canvas.SetLeft(sysSubText, mapSystem.Layout.X + SYSTEM_REGION_TEXT_X_OFFSET);
-                    Canvas.SetTop(sysSubText, mapSystem.Layout.Y + regionMarkerOffset);
-                    Canvas.SetZIndex(sysSubText, SYSTEM_Z_INDEX);
+                    sp.Children.Add(sysSubText);
 
-                    MainCanvas.Children.Add(sysSubText);
                 }
             }
 
             // now add the links
             foreach (GateHelper gh in systemLinks)
             {
-                /*
-                 Sys links as curves
-
-                double smoothness = 0.02;
-
-                PathFigure pf = new PathFigure();
-                pf.StartPoint = new Point(gh.from.Layout.X, gh.from.Layout.Y);
-
-                BezierSegment bs = new BezierSegment();
-                bs.IsSmoothJoin = true;
-
-                if (Math.Abs(gh.to.Layout.X - gh.from.Layout.X) < Math.Abs(gh.to.Layout.Y - gh.from.Layout.Y))
-                {
-                    bs.Point1 = new Point
-                    {
-                        X = gh.from.Layout.X + ((smoothness * (gh.to.Layout.X - gh.from.Layout.X))),
-                        Y = gh.from.Layout.Y
-                    };
-
-                    bs.Point2 = new Point
-                    {
-                        X = gh.from.Layout.X + ((1 - smoothness) * (gh.to.Layout.X - gh.from.Layout.X)),
-                        Y = gh.from.Layout.Y
-                    };
-                }
-                else
-                {
-                    bs.Point1 = new Point
-                    {
-                        X = gh.from.Layout.X,
-                        Y = gh.from.Layout.Y + ((smoothness * (gh.to.Layout.Y - gh.from.Layout.Y))),
-                    };
-
-                    bs.Point2 = new Point
-                    {
-                        X = gh.from.Layout.X ,
-                        Y = gh.from.Layout.Y + ((1 - smoothness) * (gh.to.Layout.Y - gh.from.Layout.Y)),
-                    };
-                }
-
-                bs.Point3 = new Point
-                {
-                    X = gh.to.Layout.X,
-                    Y = gh.to.Layout.Y
-                };
-
-                PathSegmentCollection psc = new PathSegmentCollection();
-                psc.Add(bs);
-                pf.Segments = psc;
-
-                PathFigureCollection pfc = new PathFigureCollection();
-                pfc.Add(pf);
-
-                PathGeometry pg = new PathGeometry(pfc);
-
-                Path p = new Path();
-                p.Data = pg;
-                p.Stroke = NormalGateBrush;
-
-                if (gh.from.ActualSystem.ConstellationID != gh.to.ActualSystem.ConstellationID)
-                {
-                    p.Stroke = ConstellationGateBrush;
-                }
-
-                if (gh.from.ActualSystem.Region != gh.to.ActualSystem.Region)
-                {
-                    p.Stroke = RegionGateBrush;
-                }
-
-                p.StrokeThickness = 1.2;
-                p.Visibility = Visibility.Visible;
-
-                Canvas.SetZIndex(p, SYSTEM_LINK_INDEX);
-                MainCanvas.Children.Add(p);
-
-                */
 
                 Line sysLink = new Line();
 
@@ -3714,6 +3757,30 @@ namespace SMT
                         tl.Padding = one;
                         tl.Margin = one;
                         tl.Content = $"Thera\t: out {tc.OutSignatureID}";
+                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        SystemInfoPopupSP.Children.Add(tl);
+                    }
+                }
+                List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
+
+                // update Turnur Info
+                foreach (EVEData.TurnurConnection tc in currentTurnurConnections)
+                {
+                    if (selectedSys.Name == tc.System)
+                    {
+                        SystemInfoPopupSP.Children.Add(new Separator());
+
+                        Label tl = new Label();
+                        tl.Padding = one;
+                        tl.Margin = one;
+                        tl.Content = $"Turnur\t: in {tc.InSignatureID}";
+                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        SystemInfoPopupSP.Children.Add(tl);
+
+                        tl = new Label();
+                        tl.Padding = one;
+                        tl.Margin = one;
+                        tl.Content = $"Turnur\t: out {tc.OutSignatureID}";
                         tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                         SystemInfoPopupSP.Children.Add(tl);
                     }

@@ -49,9 +49,16 @@ namespace SMT.EVEData
 
         private bool m_UseZarzakhRouting;
 
+        private bool m_UseTurnurRouting;
+
         private bool m_isOnline;
 
         private bool m_ObservatoryDecloakWarningEnabled;
+
+        private bool m_GateDecloakWarningEnabled;
+
+        private bool m_DecloakWarningEnabled;
+
 
         private bool m_CombatWarningEnabled;
 
@@ -108,6 +115,8 @@ namespace SMT.EVEData
             IsOnline = true;
             CombatWarningEnabled = true;
             ObservatoryDecloakWarningEnabled = true;
+            DecloakWarningEnabled = true;
+            GateDecloakWarningEnabled = true;
         }
 
         /// <summary>
@@ -126,6 +135,8 @@ namespace SMT.EVEData
 
             CombatWarningEnabled = false;
             ObservatoryDecloakWarningEnabled = true;
+            DecloakWarningEnabled = true;
+            GateDecloakWarningEnabled = true;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -215,6 +226,35 @@ namespace SMT.EVEData
                 OnPropertyChanged("ObservatoryDecloakWarningEnabled");
             }
         }
+
+        public bool GateDecloakWarningEnabled
+        {
+            get
+            {
+                return m_GateDecloakWarningEnabled;
+            }
+            set
+            {
+                m_GateDecloakWarningEnabled = value;
+                OnPropertyChanged("GateDecloakWarningEnabled");
+            }
+        }
+
+        public bool DecloakWarningEnabled
+        {
+            get
+            {
+                return m_DecloakWarningEnabled;
+            }
+            set
+            {
+                m_DecloakWarningEnabled = value;
+                OnPropertyChanged("DecloakWarningEnabled");
+            }
+        }
+
+
+
 
         public bool CombatWarningEnabled
         {
@@ -379,6 +419,26 @@ namespace SMT.EVEData
                 routeNeedsUpdate = true;
                 esiRouteNeedsUpdate = true;
                 OnPropertyChanged("UseZarzakhRouting");
+            }
+        }
+
+        public bool UseTurnurRouting
+        {
+            get
+            {
+                return m_UseTurnurRouting;
+            }
+            set
+            {
+                if (m_UseTurnurRouting == value)
+                {
+                    return;
+                }
+
+                m_UseTurnurRouting = value;
+                routeNeedsUpdate = true;
+                esiRouteNeedsUpdate = true;
+                OnPropertyChanged("UseTurnurRouting");
             }
         }
 
@@ -740,11 +800,20 @@ namespace SMT.EVEData
 
                 // grab the simple list of thera connections
                 List<string> currentActiveTheraConnections = new List<string>();
-                foreach (TheraConnection tc in EveManager.Instance.TheraConnections)
+                foreach (TheraConnection tc in EveManager.Instance.TheraConnections.ToList())
                 {
                     currentActiveTheraConnections.Add(tc.System);
                 }
                 Navigation.UpdateTheraConnections(currentActiveTheraConnections);
+
+                // grab the simple list of turnur connections
+                List<string> currentActiveTurnurConnections = new List<string>();
+                foreach (TurnurConnection tc in EveManager.Instance.TurnurConnections.ToList())
+                {
+                    currentActiveTurnurConnections.Add(tc.System);
+                }
+                Navigation.UpdateTurnurConnections(currentActiveTurnurConnections);
+
 
                 lock (ActiveRouteLock)
                 {
@@ -762,7 +831,7 @@ namespace SMT.EVEData
                     start = end;
                     end = Waypoints[i];
 
-                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, UseTheraRouting, UseZarzakhRouting, NavigationMode);
+                    List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, UseTheraRouting, UseZarzakhRouting, UseTurnurRouting, NavigationMode);
 
                     if (sysList != null)
                     {
@@ -791,7 +860,8 @@ namespace SMT.EVEData
                         // explicitly add interim waypoints for ansiblex gates or actual waypoints
                         if (
                                 rp.GateToTake == Navigation.GateType.Ansiblex || 
-                                rp.GateToTake == Navigation.GateType.Thera || 
+                                rp.GateToTake == Navigation.GateType.Thera ||
+                                rp.GateToTake == Navigation.GateType.Turnur ||
                                 rp.GateToTake == Navigation.GateType.Zarzakh|| 
                                 Waypoints.Contains(rp.SystemName)
                             )

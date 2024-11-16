@@ -19,6 +19,8 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using NHotkey;
+using NHotkey.Wpf;
 using SMT.EVEData;
 
 namespace SMT
@@ -201,6 +203,9 @@ namespace SMT
 
             TheraConnectionsList.ItemsSource = EVEManager.TheraConnections;
             EVEManager.TheraUpdateEvent += TheraConnections_CollectionChanged;
+
+            TurnurConnectionsList.ItemsSource = EVEManager.TurnurConnections;
+            EVEManager.TurnurUpdateEvent += TurnurConnections_CollectionChanged;
 
             JumpBridgeList.ItemsSource = EVEManager.JumpBridges;
             MetaliminalStormList.ItemsSource = EVEManager.MetaliminalStorms;
@@ -435,6 +440,15 @@ namespace SMT
                 CollectionViewSource.GetDefaultView(TheraConnectionsList.ItemsSource).Refresh();
             }), DispatcherPriority.Normal);
         }
+
+        private void TurnurConnections_CollectionChanged()
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                CollectionViewSource.GetDefaultView(TurnurConnectionsList.ItemsSource).Refresh();
+            }), DispatcherPriority.Normal);
+        }
+        
 
         protected override void OnSourceInitialized(EventArgs e)
         {
@@ -1261,7 +1275,20 @@ namespace SMT
             {
                 if (lc.Name == character)
                 {
-                    if (lc.ObservatoryDecloakWarningEnabled)
+                    bool triggerAlert = lc.DecloakWarningEnabled;
+
+                    if (text.Contains("Mobile Observatory"))
+                    {
+                        triggerAlert = lc.ObservatoryDecloakWarningEnabled;
+                    }
+
+                    if (text.Contains("Stargate"))
+                    {
+                        triggerAlert = lc.GateDecloakWarningEnabled;
+                    }
+
+
+                    if (triggerAlert)
                     {
                         if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
                         {
@@ -1416,7 +1443,7 @@ namespace SMT
 
         #endregion intel
 
-        #region Thera
+        #region Thera / Turnur
 
         /// <summary>
         /// Update Thera Button Clicked
@@ -1444,7 +1471,32 @@ namespace SMT
             }
         }
 
-        #endregion Thera
+        private void btn_UpdateTurnur_Click(object sender, RoutedEventArgs e)
+        {
+            EVEManager.UpdateTurnurConnections();
+        }
+
+        private void TurnurConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                DataGrid grid = sender as DataGrid;
+                if (grid != null && grid.SelectedItems != null && grid.SelectedItems.Count == 1)
+                {
+                    DataGridRow dgr = grid.ItemContainerGenerator.ContainerFromItem(grid.SelectedItem) as DataGridRow;
+                    EVEData.TurnurConnection tc = dgr.Item as EVEData.TurnurConnection;
+
+                    if (tc != null)
+                    {
+                        RegionUC.SelectSystem(tc.System, true);
+                    }
+                }
+            }
+        }
+
+
+
+        #endregion Thera / Turnur
 
         #region Route
 
@@ -2496,6 +2548,15 @@ namespace SMT
                     return;
                 }
             }
+            
+            // Set up hotkeys
+            try
+            {
+                HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OverlayWindows_ToggleClicktrough_HotkeyTrigger);
+            }
+            catch (NHotkey.HotkeyAlreadyRegisteredException exception)
+            {
+            }
 
             Overlay newOverlayWindow = new Overlay(this);
             newOverlayWindow.Closing += OnOverlayWindowClosing;
@@ -2504,6 +2565,11 @@ namespace SMT
         }
 
         private void OverlayClickTroughToggle_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            OverlayWindow_ToggleClickTrough();
+        }
+        
+        private void OverlayWindows_ToggleClicktrough_HotkeyTrigger(object sender, HotkeyEventArgs eventArgs)
         {
             OverlayWindow_ToggleClickTrough();
         }
@@ -2520,6 +2586,17 @@ namespace SMT
         public void OnOverlayWindowClosing(object sender, CancelEventArgs e)
         {
             overlayWindows.Remove((Overlay)sender);
+
+            if (overlayWindows.Count < 1)
+            {
+                try
+                {
+                    HotkeyManager.Current.Remove("Toggle click trough overlay windows.");
+                }
+                catch
+                {
+                }
+            }
         }
     }
 

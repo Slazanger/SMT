@@ -35,7 +35,7 @@
                 </TextBlock>
                 <TextBlock Text="{Binding IntelTime, FallbackValue=TIME, StringFormat=HH:mm}" Foreground="Yellow" Padding="0,0,5,0" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
                 <TextBlock Text="{Binding IntelString, FallbackValue=Intel Data}" Foreground="White" TextWrapping="WrapWithOverflow" TextBlock.FontSize="{Binding MapConf.IntelTextSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Top" />
-             </DockPanel>
+            </DockPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="gameLogDataDataTemplate">
@@ -220,7 +220,7 @@
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" IsReadOnly="True" />
                                                 <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" IsReadOnly="True" />
                                                 <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" IsReadOnly="True" />
-                                          </DataGrid.Columns>
+                                            </DataGrid.Columns>
                                         </DataGrid>
                                         <CheckBox Content="Show Characters On Map" IsChecked="{Binding MapConf.ShowCharacterNamesOnMap}" Margin="3" />
                                         <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
@@ -301,6 +301,7 @@
 
                                                     <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionUC}" Margin="2" />
                                                     <CheckBox Content="Use Thera" IsChecked="{Binding ActiveCharacter.UseTheraRouting, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="Use Turnur" IsChecked="{Binding ActiveCharacter.UseTurnurRouting, ElementName=RegionUC}" Margin="2" />
                                                     <CheckBox Content="Use Zarzakh" IsChecked="{Binding ActiveCharacter.UseZarzakhRouting, ElementName=RegionUC}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
@@ -327,6 +328,11 @@
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Thera">
                                                                         <Setter Property="Background" Value="#292" />
                                                                     </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding GateToTake}" Value="Turnur">
+                                                                        <Setter Property="Background" Value="DarkRed" />
+                                                                    </DataTrigger>
+
 
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Ansiblex">
                                                                         <Setter Property="Background" Value="blue" />
@@ -377,7 +383,7 @@
                                                                     </MultiDataTrigger>
 
                                                                     <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
-                                                                            <Setter Property="Background" Value="blue" />
+                                                                        <Setter Property="Background" Value="blue" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -543,34 +549,65 @@
                                 </Grid>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Thera" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <ScrollViewer>
-                                    <StackPanel>
+                            <xcadl:LayoutAnchorable Title="WH Connections" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                                <TabControl>
+                                    <TabItem Header="Thera">
+                                        <ScrollViewer>
+                                            <StackPanel>
+                                                <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
+                                                    <DataGrid.CellStyle>
+                                                        <Style TargetType="{x:Type DataGridCell}">
 
-                                        <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
-                                            <DataGrid.CellStyle>
-                                                <Style TargetType="{x:Type DataGridCell}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
+                                                                    <Setter Property="Background" Value="Red" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </DataGrid.CellStyle>
 
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
-                                                            <Setter Property="Background" Value="Red" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </DataGrid.CellStyle>
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
+                                                        <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
+                                                        <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*" />
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
 
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
-                                                <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
-                                                <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*" />
-                                                <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
-                                                <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*" />
-                                            </DataGrid.Columns>
-                                        </DataGrid>
+                                                <Button x:Name="btn_UpdateThera" Click="btn_UpdateThera_Click"  Content="Update Connections" />
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </TabItem>
+                                    <TabItem Header="Turnur">
+                                        <ScrollViewer>
+                                            <StackPanel>
+                                                <DataGrid  x:Name="TurnurConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TurnurConnectionsList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
+                                                    <DataGrid.CellStyle>
+                                                        <Style TargetType="{x:Type DataGridCell}">
 
-                                        <Button x:Name="btn_UpdateThera" Click="btn_UpdateThera_Click"  Content="Update Connections" />
-                                    </StackPanel>
-                                </ScrollViewer>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
+                                                                    <Setter Property="Background" Value="Red" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </DataGrid.CellStyle>
+
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
+                                                        <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
+                                                        <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*" />
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+
+                                                <Button x:Name="btn_UpdateTurnur" Click="btn_UpdateTurnur_Click"  Content="Update Connections" />
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </TabItem>
+                                </TabControl>
                             </xcadl:LayoutAnchorable>
 
                             <xcadl:LayoutAnchorable Title="Storms" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="StormContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">

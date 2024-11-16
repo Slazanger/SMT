@@ -18,11 +18,15 @@ namespace SMT.EVEData
             JumpTo,
             Thera,
             Zarzakh,
+            Turnur,
         }
 
         private static Dictionary<string, MapNode> MapNodes { get; set; }
         private static List<string> TheraLinks { get; set; }
         private static List<string> ZarzakhLinks { get; set; }
+
+        private static List<string> TurnurLinks { get; set; }
+
 
         public static void ClearJumpBridges()
         {
@@ -44,7 +48,15 @@ namespace SMT.EVEData
         {
             foreach (MapNode mn in MapNodes.Values)
             {
-                mn.ZarzakhConnection = null;
+                mn.ZarzakhConnections = null;
+            }
+        }
+
+        public static void ClearTurnurConnections()
+        {
+            foreach (MapNode mn in MapNodes.Values)
+            {
+                mn.TurnurConnections = null;
             }
         }
 
@@ -64,7 +76,22 @@ namespace SMT.EVEData
 
             foreach (string ts in zazahkSystems)
             {
-                MapNodes[ts].ZarzakhConnection = zazahkSystems;
+                MapNodes[ts].ZarzakhConnections = zazahkSystems;
+            }
+        }
+
+        public static void UpdateTurnurConnections(List<string> turnurSystems)
+        {
+            ClearTurnurConnections();
+
+            MapNodes["Turnur"].TurnurConnections = turnurSystems;
+
+            List<string> toTurnurConnections = new List<string>();
+            toTurnurConnections.Add("Turnur");
+
+            foreach (string ts in turnurSystems)
+            {
+                MapNodes[ts].TurnurConnections = toTurnurConnections;
             }
         }
 
@@ -213,6 +240,9 @@ namespace SMT.EVEData
 
             TheraLinks = new List<string>();
             ZarzakhLinks = new List<string>();
+            TurnurLinks = new List<string>();
+
+
 
             // build up the nav structures
             foreach (System sys in eveSystems)
@@ -262,7 +292,7 @@ namespace SMT.EVEData
             }
         }
 
-        public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, bool UseZarzakh, RoutingMode routingMode)
+        public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, bool UseZarzakh, bool UseTurnur, RoutingMode routingMode)
         {
             if (!(MapNodes.ContainsKey(From)) || !(MapNodes.ContainsKey(To)) || From == "" || To == "")
 
@@ -380,9 +410,36 @@ namespace SMT.EVEData
                     }
                 }
 
-                if (UseZarzakh && CurrentNode.ZarzakhConnection != null)
+                if (UseTurnur && CurrentNode.TurnurConnections != null)
                 {
-                    foreach (string ZarzakhConnection in CurrentNode.ZarzakhConnection)
+                    foreach (string turnurConnection in CurrentNode.TurnurConnections)
+                    {
+                        MapNode CMN = MapNodes[turnurConnection];
+
+                        if (CMN.Visited)
+                            continue;
+
+                        // dont jump back to the system we came from 
+                        if (CurrentNode.Name == turnurConnection)
+                            continue;
+
+                        if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
+                        {
+                            CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
+                            CMN.NearestToStart = CurrentNode;
+                            if (!OpenList.Contains(CMN))
+                            {
+                                OpenList.Add(CMN);
+                            }
+                        }
+                    }
+                }
+
+
+
+                if (UseZarzakh && CurrentNode.ZarzakhConnections != null)
+                {
+                    foreach (string ZarzakhConnection in CurrentNode.ZarzakhConnections)
                     {
                         MapNode CMN = MapNodes[ZarzakhConnection];
 
@@ -462,9 +519,14 @@ namespace SMT.EVEData
                             RP.GateToTake = GateType.Thera;
                         }
 
-                        if(UseZarzakh && mn.ZarzakhConnection != null && mn.ZarzakhConnection.Contains(Route[i + 1]))
+                        if(UseZarzakh && mn.ZarzakhConnections != null && mn.ZarzakhConnections.Contains(Route[i + 1]))
                         {
                             RP.GateToTake = GateType.Zarzakh;
+                        }
+
+                        if (UseTurnur && mn.TurnurConnections != null && mn.TurnurConnections.Contains(Route[i + 1]) && mn.Name == "Turnur")
+                        {
+                            RP.GateToTake = GateType.Turnur;
                         }
                     }
                     ActualRoute.Add(RP);
@@ -600,34 +662,7 @@ namespace SMT.EVEData
             }
         }
 
-        public static void UpdateTheraInfo(List<TheraConnection> theraList)
-        {
-            TheraLinks.Clear();
-            foreach (MapNode mapNode in MapNodes.Values)
-            {
-                mapNode.TheraInSig = string.Empty;
-                mapNode.TheraOutSig = string.Empty;
-            }
 
-            foreach (TheraConnection tc in theraList)
-            {
-                MapNode mn = MapNodes[tc.System];
-                mn.TheraInSig = tc.InSignatureID;
-                mn.TheraOutSig = tc.OutSignatureID;
-
-                TheraLinks.Add(tc.System);
-            }
-        }
-
-        public static void UpdateZarzakhInfo(List<string> zarzakhList)
-        {
-            ZarzakhLinks.Clear();
-
-            foreach (string zc in zarzakhList)
-            {
-                ZarzakhLinks.Add(zc);
-            }
-        }
 
 
         private struct JumpLink
@@ -677,7 +712,9 @@ namespace SMT.EVEData
             public double F;
             public string JBConnection;
             public List<string> TheraConnections;
-            public List<string> ZarzakhConnection;
+            public List<string> ZarzakhConnections;
+            public List<string> TurnurConnections;
+
             public double MinCostToStart;
             public MapNode NearestToStart;
             public string TheraInSig;
