@@ -22,6 +22,7 @@ using Microsoft.Win32;
 using NHotkey;
 using NHotkey.Wpf;
 using SMT.EVEData;
+using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT
 {
@@ -322,7 +323,20 @@ namespace SMT
 
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
             zKBFeedview.Refresh();
-            zKBFeedview.Filter = ZKBFeedFilter;
+
+
+            // Define your existing filter logic
+            Predicate<object> initialFilter = item => ZKBFeedFilter(item);
+
+            // Apply the both filters
+            zKBFeedview.Filter = item =>
+            {
+                var filteredItems = EVEManager.ZKillFeed.KillStream.Where(initialFilter.Invoke).Take(30).ToList();
+                return filteredItems.Contains((ZKBDataSimple)item);
+            };
+
+
+
 
             EVEManager.ZKillFeed.KillsAddedEvent += OnZKillsAdded;
 
@@ -2007,6 +2021,9 @@ namespace SMT
 
         private bool ZKBFeedFilter(object item)
         {
+            // Define the new filter logic to show only the last 50 items Predicate<object> newFilter = item => allItems.IndexOf((YourItemType)item) >= Math.Max(0, allItems.Count - 50);
+
+
             if (zkbFilterByRegion == false)
             {
                 return true;
