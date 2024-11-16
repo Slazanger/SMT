@@ -228,65 +228,6 @@
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Jump Bridges" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpBridgesContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
-                                <Grid x:Name="JumpBridgeGrid">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="30" />
-                                        <RowDefinition Height="25" />
-                                        <RowDefinition Height="25" />
-                                        <RowDefinition Height="25" />
-                                        <RowDefinition Height="25" />
-                                        <RowDefinition Height="30" />
-                                        <RowDefinition Height="25" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2" IsEnabled="false">
-                                        <Label Content="Gate SearchFilter : " />
-                                        <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
-                                    </StackPanel>
-                                    <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" Grid.Row="1" IsEnabled="false" />
-                                    <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" Grid.Row="2" />
-                                    <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" Grid.Row="3" />
-                                    <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" Grid.Row="4" />
-                                    <Label Content="Ansiblex Gates" Margin="0" Grid.Row="5" FontWeight="Bold" FontSize="18" />
-                                    <Label x:Name="AnsiblexSummaryLbl" Grid.Row="6" Content="" FontStyle="Italic" FontSize="12" />
-
-                                    <DataGrid x:Name="JumpBridgeList" Margin="2" Grid.Row="7" AutoGenerateColumns="False" AreRowDetailsFrozen="True" IsReadOnly="True" SelectionUnit="FullRow" SelectedItem="{Binding SelectedItemProperty, Mode=TwoWay}">
-
-                                        <DataGrid.CellStyle>
-                                            <Style TargetType="{x:Type DataGridCell}">
-
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding FromID}" Value="0">
-                                                        <Setter Property="Background" Value="#222" />
-                                                    </DataTrigger>
-
-                                                    <DataTrigger Binding="{Binding ToID}" Value="0">
-                                                        <Setter Property="Background" Value="#222" />
-                                                    </DataTrigger>
-
-                                                    <DataTrigger Binding="{Binding Disabled}" Value="True">
-                                                        <Setter Property="Background" Value="Red" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </DataGrid.CellStyle>
-
-                                        <DataGrid.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Delete" Click="DeleteJumpGateMenuItem_Click" />
-                                                <MenuItem Header="Enable/Disable" Click="EnableDisableJumpGateMenuItem_Click" />
-                                            </ContextMenu>
-                                        </DataGrid.ContextMenu>
-
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="From" Binding="{Binding From}" Width="*" />
-                                            <DataGridTextColumn Header="To" Binding="{Binding To}" Width="*" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </Grid>
-                            </xcadl:LayoutAnchorable>
-
                             <xcadl:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid x:Name="MainRouteGrid">
                                     <ScrollViewer Background="{DynamicResource ButtonBackground}">
