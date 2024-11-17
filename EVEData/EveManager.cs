@@ -2056,94 +2056,32 @@ namespace SMT.EVEData
             IntelDataList = new FixedQueue<IntelData>();
             IntelDataList.SetSizeLimit(250);
 
-            IntelFilters = new List<string>();
 
-            string intelFileFilter = Path.Combine(SaveDataRootFolder, "IntelChannels.txt");
-
-            if (File.Exists(intelFileFilter))
-            {
-                StreamReader file = new StreamReader(intelFileFilter);
-                string line;
-                while ((line = file.ReadLine()) != null)
-                {
-                    line = line.Trim();
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        IntelFilters.Add(line);
-                    }
-                }
-            }
-            else
-            {
-                IntelFilters.Add("Int");
-            }
-
-            IntelClearFilters = new List<string>();
-            string intelClearFileFilter = Path.Combine(SaveDataRootFolder, "IntelClearFilters.txt");
-
-            if (File.Exists(intelClearFileFilter))
-            {
-                StreamReader file = new StreamReader(intelClearFileFilter);
-                string line;
-                while ((line = file.ReadLine()) != null)
-                {
-                    line = line.Trim();
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        IntelClearFilters.Add(line);
-                    }
-                }
-            }
-            else
+            IntelFilters = InitFromFileOrDefault(SaveDataRootFolder, "IntelChannels.txt", static (data) =>
             {
                 // default
-                IntelClearFilters.Add("Clr");
-                IntelClearFilters.Add("Clear");
-            }
+                data.Add("Int");
+            });
 
-            IntelIgnoreFilters = new List<string>();
-            string intelIgnoreFileFilter = Path.Combine(SaveDataRootFolder, "IntelIgnoreFilters.txt");
-
-            if (File.Exists(intelIgnoreFileFilter))
-            {
-                StreamReader file = new StreamReader(intelIgnoreFileFilter);
-                string line;
-                while ((line = file.ReadLine()) != null)
-                {
-                    line = line.Trim();
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        IntelIgnoreFilters.Add(line);
-                    }
-                }
-            }
-            else
+            IntelClearFilters = InitFromFileOrDefault(SaveDataRootFolder, "IntelClearFilters.txt", static (data) =>
             {
                 // default
-                IntelIgnoreFilters.Add("Status");
-            }
+                data.Add("Clr");
+                data.Add("Clear");
+            });
 
-            IntelAlertFilters = new List<string>();
-            string intelAlertFileFilter = Path.Combine(SaveDataRootFolder, "IntelAlertFilters.txt");
-
-            if (File.Exists(intelAlertFileFilter))
+            IntelIgnoreFilters = InitFromFileOrDefault(SaveDataRootFolder, "IntelIgnoreFilters.txt", static (data) =>
             {
-                StreamReader file = new StreamReader(intelAlertFileFilter);
-                string line;
-                while ((line = file.ReadLine()) != null)
-                {
-                    line = line.Trim();
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        IntelAlertFilters.Add(line);
-                    }
-                }
-            }
-            else
+                // default
+                data.Add("Status");
+            });
+
+            IntelAlertFilters = InitFromFileOrDefault(SaveDataRootFolder, "IntelAlertFilters.txt", static (data) =>
             {
                 // default, alert on nothing
-                IntelAlertFilters.Add("");
-            }
+                data.Add("");
+            });
+
 
             intelFileReadPos = new Dictionary<string, int>();
 
@@ -2164,6 +2102,44 @@ namespace SMT.EVEData
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
                 };
                 intelFileWatcher.Changed += IntelFileWatcher_Changed;
+            }
+
+
+            static List<string> InitFromFileOrDefault(string rootFolder, string fileName, Action<List<string>> defaultInit)
+            {
+                string filePath = Path.Combine(rootFolder, fileName);
+
+                var res = ReadByLineFileData(filePath);
+                if (res == null)
+                {
+                    res = new List<string>();
+                    defaultInit(res);
+                }
+
+                return res;
+            }
+            
+            static List<string>? ReadByLineFileData(string filePath)
+            {
+                List<string> fileData = null;
+
+                if (File.Exists(filePath))
+                {
+                    fileData = new List<string>();
+
+                    StreamReader file = new StreamReader(filePath);
+                    string line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        line = line.Trim();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            fileData.Add(line);
+                        }
+                    }
+                }
+
+                return fileData;
             }
         }
 
