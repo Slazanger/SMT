@@ -7,6 +7,9 @@ using Avalonia.Media;
 using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using System;
+using Avalonia.Controls.PanAndZoom;
+using System.Diagnostics;
 
 namespace SMTx.Views.Documents
 {
@@ -38,6 +41,8 @@ namespace SMTx.Views.Documents
         private Brush RegionLinkStroke;
         private Brush ConstellationLinkStroke;
         private Brush BackgroundFill;
+
+        private List<Shape> canvasObjects = new List<Shape>();
 
         private struct GateHelper
         {
@@ -81,9 +86,32 @@ namespace SMTx.Views.Documents
             // cache all system links
             List<GateHelper> systemLinks = new List<GateHelper>();
 
-
-
             SMT.EVEData.MapRegion mr = SMT.EVEData.EveManager.Instance.GetRegion("Delve");
+
+            // absolute coodinate variables
+            double minX, maxX, minY, maxY, absWidth, absHeight;
+            minX = maxX = minY = maxY = absWidth = absHeight = 0;
+
+            // offsets
+            double xOffset, yOffset;
+
+            // Iterate all systems (points) in the region data to find the min and max coordinate offsets
+            foreach (SMT.EVEData.System s in SMT.EVEData.EveManager.Instance.Systems)
+            {
+                minX = Math.Min(minX, s.UniverseX);
+                maxX = Math.Max(maxX, s.UniverseX);
+                minY = Math.Min(minY, s.UniverseY);
+                maxY = Math.Max(maxY, s.UniverseY);
+            }
+            // Calculate absolute width and height
+            absWidth = maxX - minX;
+            absHeight = maxY - minY;
+            // Calculate an offset for each object on the canvas to normalize
+            xOffset = (SystemTextWidth / 2d) - minX;
+            yOffset = (SystemShapeSize / 2d) - minY;
+
+            UniverseViewGrid.Width = absWidth + SystemTextWidth;
+            UniverseViewGrid.Height = absHeight + SystemShapeSize + SystemShapeTextYOffset;
 
             // Add all of the systems
             foreach (SMT.EVEData.System s in SMT.EVEData.EveManager.Instance.Systems)
@@ -119,9 +147,10 @@ namespace SMTx.Views.Documents
 
                 }
 
-                Canvas.SetLeft(sys, s.UniverseX - SystemShapeOffset);
-                Canvas.SetTop(sys, s.UniverseY - SystemShapeOffset);
+                Canvas.SetLeft(sys, s.UniverseX - SystemShapeOffset + xOffset);
+                Canvas.SetTop(sys, s.UniverseY - SystemShapeOffset + yOffset);
                 UniverseViewGrid.Children.Add(sys);
+                canvasObjects.Add(sys);
 
                 // System Name
                 TextBlock systemName = new TextBlock
@@ -140,10 +169,12 @@ namespace SMTx.Views.Documents
                     VerticalAlignment = VerticalAlignment.Top,
                 };
 
-                Canvas.SetLeft(systemName, s.UniverseX - SystemTextWidthOffset);
-                Canvas.SetTop(systemName, s.UniverseY + SystemShapeTextYOffset);
+                Canvas.SetLeft(systemName, s.UniverseX - SystemTextWidthOffset + xOffset);
+                Canvas.SetTop(systemName, s.UniverseY + SystemShapeTextYOffset + yOffset);
                 UniverseViewGrid.Children.Add(systemName);
 
+                // TODO put the text block into a collection along with the canvas objects.
+                // canvasObjects.Add(systemName);
 
 
                 // generate the list of links
@@ -175,8 +206,8 @@ namespace SMTx.Views.Documents
             foreach (GateHelper gh in systemLinks)
             {
                 Line sysLink = new Line();
-                sysLink.StartPoint = new Point(gh.from.UniverseX, gh.from.UniverseY);
-                sysLink.EndPoint = new Point(gh.to.UniverseX, gh.to.UniverseY);
+                sysLink.StartPoint = new Point(gh.from.UniverseX + xOffset, gh.from.UniverseY + yOffset);
+                sysLink.EndPoint = new Point(gh.to.UniverseX + xOffset, gh.to.UniverseY + yOffset);
                 sysLink.Stroke = LinkStroke;
 
                 if (gh.from.ConstellationID != gh.to.ConstellationID)
@@ -192,6 +223,7 @@ namespace SMTx.Views.Documents
                 sysLink.StrokeThickness = 1.2;
                 sysLink.ZIndex = SystemLinkZIndex;
                 UniverseViewGrid.Children.Add(sysLink);
+                canvasObjects.Add(sysLink);
             }
         }
 
@@ -202,9 +234,11 @@ namespace SMTx.Views.Documents
         private void SldZoom_OnValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             double zoomTo = SldZoom.Value;
-            double zoomCentreX = ZoomBorder.DesiredSize.Width / 2;
-            double zoomCentreY = ZoomBorder.DesiredSize.Height / 2;
 
+            var desiredSize = ZoomBorder.DesiredSize;
+
+            double zoomCentreX = ZoomBorder.Bounds.Width / 2.0;
+            double zoomCentreY = ZoomBorder.Bounds.Height / 2.0;
 
             ZoomBorder.Zoom(zoomTo, zoomCentreX, zoomCentreY, true);
         }
@@ -227,6 +261,52 @@ namespace SMTx.Views.Documents
             if (e.PreviousSize.Width != 0 && e.PreviousSize.Height != 0)
             {
                 ZoomBorder.Uniform(true);
+            }
+        }
+
+        private void ZoomBorder_ZoomChanged(object sender, ZoomChangedEventArgs e)
+        {
+            Debug.WriteLine($"[ZoomChanged] {e.ZoomX} {e.ZoomY} {e.OffsetX} {e.OffsetY}");
+            double normalizedX = e.OffsetX / e.ZoomX;
+            double normalizedY = e.OffsetY / e.ZoomY;
+            Debug.WriteLine($"[Normalized X] {normalizedX} [Normalized Y] {normalizedY}");
+            if (sender is ZoomBorder zoomBorder)
+            {
+                double maxBaseOffsetX = zoomBorder.Bounds.Width;
+                double maxBaseOffsetY = zoomBorder.Bounds.Height;
+
+                Point originVector = new Point(UniverseViewGrid.Bounds.Left, UniverseViewGrid.Bounds.Top);
+                Point boundsVector = new Point(UniverseViewGrid.Bounds.Right, UniverseViewGrid.Bounds.Bottom);
+
+                Avalonia.Matrix zoomMatrix = Avalonia.Matrix.CreateScale(e.ZoomX, e.ZoomY);
+
+                /*
+                double newFromX = zoomBorder.Matrix.Transform(originVector).X;
+                double newFromY = zoomBorder.Matrix.Transform(originVector).Y;
+                double newToX = zoomBorder.Matrix.Transform(boundsVector).X;
+                double newToY = zoomBorder.Matrix.Transform(boundsVector).Y;
+                */
+
+                double newFromX = zoomMatrix.Transform(originVector).X;
+                double newFromY = zoomMatrix.Transform(originVector).Y;
+                double newToX = zoomMatrix.Transform(boundsVector).X;
+                double newToY = zoomMatrix.Transform(boundsVector).Y;
+
+                if (Math.Round(zoomBorder.MinOffsetX) != Math.Round(newFromX))
+                    zoomBorder.MinOffsetX = newFromX;
+                if (Math.Round(zoomBorder.MinOffsetY) != Math.Round(newFromY))
+                    zoomBorder.MinOffsetY = newFromY;
+                if (Math.Round(zoomBorder.MaxOffsetX) != Math.Round(newToX))
+                    zoomBorder.MaxOffsetX = newToX;
+                if (Math.Round(zoomBorder.MaxOffsetY) != Math.Round(newToY))
+                    zoomBorder.MaxOffsetY = newToY;
+
+                /*
+                foreach (Shape sys in canvasObjects)
+                {
+                    // TODO iterate and clip objects based on their bounds
+                }
+                */
             }
         }
 

@@ -7,6 +7,7 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace SMTx.ViewModels;
 
@@ -68,5 +69,9 @@ public class MainWindowViewModel : ObservableObject
 
     public void QuitApp()
     {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopAppLifetime)
+            desktopAppLifetime.Shutdown();
+        else if (Application.Current?.ApplicationLifetime is IControlledApplicationLifetime controlledAppLifetime)
+            controlledAppLifetime.Shutdown();
     }
 }
