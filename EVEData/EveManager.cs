@@ -3230,7 +3230,11 @@ namespace SMT.EVEData
                                 }
                             }
 
-                            if (line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") || line.Contains("Your cloak deactivates due to proximity to"))
+                            if (
+                                line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") || 
+                                line.Contains("Your cloak deactivates due to proximity to") ||
+                                line.Contains("Your cloak deactivates due to a pulse from a Dazh Liminality Locus")                                
+                                )
                             {
                                 if (ShipDecloakedEvent != null)
                                 {
