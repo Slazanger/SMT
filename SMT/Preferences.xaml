@@ -132,12 +132,12 @@
                                 <GroupBox Header="Ansiblex Gates" Margin="4" Height="auto">
                                     <StackPanel>
 
-                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2" IsEnabled="false">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2" IsEnabled="true">
                                             <Label Content="Gate SearchFilter : " />
                                             <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
                                         </StackPanel>
 
-                                        <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" IsEnabled="false" />
+                                        <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" IsEnabled="true" />
                                         <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" />
                                         <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" />
                                         <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" />
