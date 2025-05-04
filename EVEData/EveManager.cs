@@ -2704,14 +2704,14 @@ namespace SMT.EVEData
                 "esi-location.read_location.v1",
                 "esi-search.search_structures.v1",
                 "esi-clones.read_clones.v1",
-                "esi-universe.read_structures.v1",
-                "esi-fleets.read_fleet.v1",
                 "esi-ui.write_waypoint.v1",
                 "esi-characters.read_standings.v1",
                 "esi-location.read_online.v1",
                 "esi-characters.read_fatigue.v1",
                 "esi-corporations.read_contacts.v1",
-                "esi-alliances.read_contacts.v1"
+                "esi-alliances.read_contacts.v1",
+                "esi-universe.read_structures.v1",
+                "esi-fleets.read_fleet.v1"
             };
 
             foreach (MapRegion rr in Regions)
@@ -3230,7 +3230,11 @@ namespace SMT.EVEData
                                 }
                             }
 
-                            if (line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") || line.Contains("Your cloak deactivates due to proximity to"))
+                            if (
+                                line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") || 
+                                line.Contains("Your cloak deactivates due to proximity to") ||
+                                line.Contains("Your cloak deactivates due to a pulse from a Dazh Liminality Locus")                                
+                                )
                             {
                                 if (ShipDecloakedEvent != null)
                                 {
