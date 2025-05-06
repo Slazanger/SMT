@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Data;
 //using System.Windows.Forms;
 using System.Windows.Media;
+using NAudio.Wave;
 using SMT.EVEData;
 using MessageBox = System.Windows.MessageBox;
 
@@ -23,7 +24,8 @@ namespace SMT
 
         public List<string> CynoBeaconSystems { get; set; }
 
-        private MediaPlayer mediaPlayer;
+        private WaveOutEvent waveOutEvent;
+        private AudioFileReader audioFileReader;
 
         private bool isInitialLoad = true; // Flag to track initial load of preferences window
 
@@ -33,9 +35,11 @@ namespace SMT
 
             syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
 
-            mediaPlayer = new MediaPlayer();
-            Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-            mediaPlayer.Open(woopUri);
+
+            waveOutEvent = new WaveOutEvent();
+            audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+            waveOutEvent.Init(audioFileReader);
+
 
             JumpBridgeList.ItemsSource = EveManager.Instance.JumpBridges;
         }
@@ -120,10 +124,12 @@ namespace SMT
                 isInitialLoad = false;
                 return; // Skip sound playback on initial load
             }
-            mediaPlayer.Stop();
-            mediaPlayer.Volume = MapConf.IntelSoundVolume;
-            mediaPlayer.Position = new TimeSpan(0, 0, 0);
-            mediaPlayer.Play();
+
+            waveOutEvent.Stop();
+            waveOutEvent.Volume = MapConf.IntelSoundVolume;
+            audioFileReader.Position = 0; // Reset position to the beginning
+            waveOutEvent.Play(); // Play the sound  
+
         }
 
         private void SetLogLocation_Click(object sender, RoutedEventArgs e)

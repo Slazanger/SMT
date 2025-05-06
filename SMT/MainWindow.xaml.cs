@@ -19,6 +19,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using NAudio.Wave;
 using NHotkey;
 using NHotkey.Wpf;
 using SMT.EVEData;
@@ -40,7 +41,6 @@ namespace SMT
             get => overlayWindowsAreClickTrough; 
         }
 
-        private MediaPlayer mediaPlayer;
         private PreferencesWindow preferencesWindow;
 
         private int uiRefreshCounter = 0;
@@ -60,6 +60,10 @@ namespace SMT
 
         private readonly string WindowLayoutVersion = "02";
 
+
+        private WaveOutEvent waveOutEvent;
+        private AudioFileReader audioFileReader;
+
         /// <summary>
         /// Main Window
         /// </summary>
@@ -68,9 +72,17 @@ namespace SMT
             AppWindow = this;
             DataContext = this;
 
-            mediaPlayer = new MediaPlayer();
+
+            this.FontFamily =  new FontFamily(new Uri("pack://application:,,,/External/AtkinsonHyperlegible/"), "./#Atkinson Hyperlegible");
+
+
+
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-            mediaPlayer.Open(woopUri);
+
+            waveOutEvent = new WaveOutEvent();
+            audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+            waveOutEvent.Init(audioFileReader);
+
 
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
@@ -1277,10 +1289,10 @@ namespace SMT
             {
                 if (playSound || (!MapConf.PlaySoundOnlyInDangerZone && MapConf.PlayIntelSound))
                 {
-                    mediaPlayer.Stop();
-                    mediaPlayer.Volume = MapConf.IntelSoundVolume;
-                    mediaPlayer.Position = new TimeSpan(0, 0, 0);
-                    mediaPlayer.Play();
+                    waveOutEvent.Stop();
+                    waveOutEvent.Volume = MapConf.IntelSoundVolume;
+                    audioFileReader.Position = 0;
+                    waveOutEvent.Play();
                 }
                 if (flashWindow || (!MapConf.FlashWindowOnlyInDangerZone && MapConf.FlashWindow))
                 {
