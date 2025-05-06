@@ -37,7 +37,30 @@ namespace SMT
         private const double SYSTEM_TEXT_X_OFFSET = SYSTEM_TEXT_WIDTH / 2;
         private const double SYSTEM_TEXT_Y_OFFSET = SYSTEM_TEXT_HEIGHT / 2;
 
-        private const int SYSTEM_Z_INDEX = 22;
+
+
+        // depth order of data
+        private const int ZINDEX_POI = 113;
+        private const int ZINDEX_SOV_FIGHT_LOGO = 105;
+        private const int ZINDEX_CYNOBEACON = 105;
+        private const int ZINDEX_TEXT = 101;       
+        private const int ZINDEX_SYSTEM = 100;
+        private const int ZINDEX_SYSTEM_OUTLINE = 99;
+        private const int ZINDEX_SOV_FIGHT_SHAPE = 97;
+        private const int ZINDEX_THERA = 97;
+        private const int ZINDEX_TURNER = 97;
+        private const int ZINDEX_STORM = 95;
+        private const int ZINDEX_TRIG = 97;
+        private const int ZINDEX_RANGEMARKER = 105;
+        private const int ZINDEX_SYSICON = 100;
+        private const int ZINDEX_ADM = 99;
+        private const int ZINDEX_POLY = 98;
+        private const int ZINDEX_JOVE = 98;
+
+
+        private const int THERA_Z_INDEX = 22;
+
+
 
         private readonly Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
         private Dictionary<string, EVEData.EveManager.JumpShip> activeJumpSpheres;
@@ -412,7 +435,7 @@ namespace SMT
 
                     Canvas.SetLeft(SovFightLogo, ms.Layout.X - SYSTEM_SHAPE_OFFSET + 5);
                     Canvas.SetTop(SovFightLogo, ms.Layout.Y - SYSTEM_SHAPE_OFFSET + 5);
-                    Canvas.SetZIndex(SovFightLogo, SYSTEM_Z_INDEX + 5);
+                    Canvas.SetZIndex(SovFightLogo, ZINDEX_SOV_FIGHT_LOGO);
                     MainCanvas.Children.Add(SovFightLogo);
                     DynamicMapElements.Add(SovFightLogo);
 
@@ -427,7 +450,7 @@ namespace SMT
 
                         Canvas.SetLeft(activeSovFightShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 9));
                         Canvas.SetTop(activeSovFightShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 9));
-                        Canvas.SetZIndex(activeSovFightShape, SYSTEM_Z_INDEX - 3);
+                        Canvas.SetZIndex(activeSovFightShape, ZINDEX_SOV_FIGHT_SHAPE);
                         MainCanvas.Children.Add(activeSovFightShape);
                         DynamicMapElements.Add(activeSovFightShape);
                     }
@@ -464,7 +487,7 @@ namespace SMT
 
                     Canvas.SetLeft(TheraShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(TheraShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
-                    Canvas.SetZIndex(TheraShape, SYSTEM_Z_INDEX - 3);
+                    Canvas.SetZIndex(TheraShape, ZINDEX_THERA);
                     MainCanvas.Children.Add(TheraShape);
                 }
             }
@@ -494,7 +517,7 @@ namespace SMT
 
                     Canvas.SetLeft(TurnurShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(TurnurShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
-                    Canvas.SetZIndex(TurnurShape, SYSTEM_Z_INDEX - 3);
+                    Canvas.SetZIndex(TurnurShape, ZINDEX_TURNER);
                     MainCanvas.Children.Add(TurnurShape);
                 }
             }
@@ -524,7 +547,7 @@ namespace SMT
 
                     Canvas.SetLeft(poiLbl, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(poiLbl, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
-                    Canvas.SetZIndex(poiLbl, SYSTEM_Z_INDEX + 13);
+                    Canvas.SetZIndex(poiLbl, ZINDEX_POI);
                     MainCanvas.Children.Add(poiLbl);
                     DynamicMapElements.Add(poiLbl);
                 }
@@ -581,7 +604,7 @@ namespace SMT
 
                     Canvas.SetLeft(stormCloud, ms.Layout.X - SYSTEM_SHAPE_OFFSET - 15);
                     Canvas.SetTop(stormCloud, ms.Layout.Y - SYSTEM_SHAPE_OFFSET - 11);
-                    Canvas.SetZIndex(stormCloud, SYSTEM_Z_INDEX + 5);
+                    Canvas.SetZIndex(stormCloud, ZINDEX_STORM);
                     MainCanvas.Children.Add(stormCloud);
                     DynamicMapElements.Add(stormCloud);
 
@@ -605,7 +628,7 @@ namespace SMT
 
                             Canvas.SetLeft(strongStormCloud, mss.Layout.X - SYSTEM_SHAPE_OFFSET - 15);
                             Canvas.SetTop(strongStormCloud, mss.Layout.Y - SYSTEM_SHAPE_OFFSET - 11);
-                            Canvas.SetZIndex(strongStormCloud, SYSTEM_Z_INDEX + 5);
+                            Canvas.SetZIndex(strongStormCloud, ZINDEX_STORM);
                             MainCanvas.Children.Add(strongStormCloud);
                             DynamicMapElements.Add(strongStormCloud);
                         }
@@ -631,7 +654,7 @@ namespace SMT
 
                             Canvas.SetLeft(weakStormCloud, msw.Layout.X - SYSTEM_SHAPE_OFFSET - 10);
                             Canvas.SetTop(weakStormCloud, msw.Layout.Y - SYSTEM_SHAPE_OFFSET - 6);
-                            Canvas.SetZIndex(weakStormCloud, SYSTEM_Z_INDEX + 5);
+                            Canvas.SetZIndex(weakStormCloud, ZINDEX_STORM);
                             MainCanvas.Children.Add(weakStormCloud);
                             DynamicMapElements.Add(weakStormCloud);
                         }
@@ -672,7 +695,7 @@ namespace SMT
                     TrigShape.StrokeLineJoin = PenLineJoin.Round;
                     TrigShape.Fill = trigBrush;
 
-                    Canvas.SetZIndex(TrigShape, SYSTEM_Z_INDEX - 3);
+                    Canvas.SetZIndex(TrigShape, ZINDEX_TRIG);
 
                     MainCanvas.Children.Add(TrigShape);
                     DynamicMapElements.Add(TrigShape);
@@ -1674,7 +1697,7 @@ namespace SMT
 
                             Canvas.SetLeft(InRangeMarker, sys.Layout.X - halfShapeSize);
                             Canvas.SetTop(InRangeMarker, sys.Layout.Y - halfShapeSize);
-                            Canvas.SetZIndex(InRangeMarker, SYSTEM_Z_INDEX - 4);
+                            Canvas.SetZIndex(InRangeMarker, ZINDEX_RANGEMARKER);
 
                             MainCanvas.Children.Add(InRangeMarker);
                             DynamicMapElements.Add(InRangeMarker);
@@ -2405,7 +2428,7 @@ namespace SMT
 
                     Canvas.SetLeft(systemShape, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 1);
                     Canvas.SetTop(systemShape, mapSystem.Layout.Y - SYSTEM_SHAPE_OFFSET + 1);
-                    Canvas.SetZIndex(systemShape, SYSTEM_Z_INDEX);
+                    Canvas.SetZIndex(systemShape, ZINDEX_SYSTEM);
                     MainCanvas.Children.Add(systemShape);
                 }
 
@@ -2434,7 +2457,7 @@ namespace SMT
 
                     Canvas.SetLeft(sysIcons, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 11);
                     Canvas.SetTop(sysIcons, mapSystem.Layout.Y - SYSTEM_SHAPE_OFFSET - 9);
-                    Canvas.SetZIndex(sysIcons, SYSTEM_Z_INDEX + 5);
+                    Canvas.SetZIndex(sysIcons, ZINDEX_SYSICON);
                     MainCanvas.Children.Add(sysIcons);
                 }
 
@@ -2506,7 +2529,7 @@ namespace SMT
 
                     Canvas.SetLeft(SystemOutline, mapSystem.Layout.X - shapeOffset);
                     Canvas.SetTop(SystemOutline, mapSystem.Layout.Y - shapeOffset);
-                    Canvas.SetZIndex(SystemOutline, SYSTEM_Z_INDEX - 1);
+                    Canvas.SetZIndex(SystemOutline, ZINDEX_SYSTEM_OUTLINE);
                     MainCanvas.Children.Add(SystemOutline);
                 }
 
@@ -2525,7 +2548,7 @@ namespace SMT
 
                     Canvas.SetLeft(sovADM, mapSystem.Layout.X - (shapeOffset + 1));
                     Canvas.SetTop(sovADM, mapSystem.Layout.Y - (shapeOffset + 1));
-                    Canvas.SetZIndex(sovADM, SYSTEM_Z_INDEX - 1);
+                    Canvas.SetZIndex(sovADM, ZINDEX_ADM);
                     MainCanvas.Children.Add(sovADM);
                 }
 
@@ -2641,8 +2664,8 @@ namespace SMT
                 }
 
 
-                Canvas.SetZIndex(sysTextGrid, SYSTEM_Z_INDEX);
-                Canvas.SetZIndex(sysText, SYSTEM_Z_INDEX);
+                Canvas.SetZIndex(sysTextGrid, ZINDEX_SYSTEM);
+                Canvas.SetZIndex(sysText, ZINDEX_SYSTEM);
 
                 MainCanvas.Children.Add(sysTextGrid);
 
@@ -2707,7 +2730,7 @@ namespace SMT
 
                     Canvas.SetLeft(CynoBeaconLogo, mapSystem.Layout.X + 7);
                     Canvas.SetTop(CynoBeaconLogo, mapSystem.Layout.Y - 12);
-                    Canvas.SetZIndex(CynoBeaconLogo, SYSTEM_Z_INDEX + 5);
+                    Canvas.SetZIndex(CynoBeaconLogo, ZINDEX_CYNOBEACON);
                     MainCanvas.Children.Add(CynoBeaconLogo);
                 }
 
@@ -2727,7 +2750,7 @@ namespace SMT
 
                     Canvas.SetLeft(JoveLogo, mapSystem.Layout.X - (JoveLogo.Width / 2));
                     Canvas.SetTop(JoveLogo, mapSystem.Layout.Y - (JoveLogo.Height / 2));
-                    Canvas.SetZIndex(JoveLogo, SYSTEM_Z_INDEX + 5);
+                    Canvas.SetZIndex(JoveLogo, ZINDEX_JOVE);
                     MainCanvas.Children.Add(JoveLogo);
                 }
 
@@ -2773,7 +2796,7 @@ namespace SMT
                     poly.StrokeThickness = 1;
                     poly.StrokeDashCap = PenLineCap.Round;
                     poly.StrokeLineJoin = PenLineJoin.Round;
-                    Canvas.SetZIndex(poly, SYSTEM_Z_INDEX - 2);
+                    Canvas.SetZIndex(poly, ZINDEX_POLY);
                     MainCanvas.Children.Add(poly);
                 }
 
@@ -2966,7 +2989,7 @@ namespace SMT
 
                             Canvas.SetLeft(jbOutofRegionText, from.Layout.X - 20);
                             Canvas.SetTop(jbOutofRegionText, from.Layout.Y - 60);
-                            Canvas.SetZIndex(jbOutofRegionText, SYSTEM_Z_INDEX);
+                            Canvas.SetZIndex(jbOutofRegionText, ZINDEX_SYSTEM);
 
                             MainCanvas.Children.Add(jbOutofRegionText);
                         }
