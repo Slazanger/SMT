@@ -329,7 +329,9 @@ namespace SMT
             // Apply the both filters
             zKBFeedview.Filter = item =>
             {
-                var filteredItems = EVEManager.ZKillFeed.KillStream.Where(initialFilter.Invoke).Take(30).ToList();
+                // copy the list before checking
+                var listToFilter = EVEManager.ZKillFeed.KillStream.ToList();
+                var filteredItems = listToFilter.Where(initialFilter.Invoke).Take(30).ToList();
                 return filteredItems.Contains((ZKBDataSimple)item);
             };
 
