@@ -60,6 +60,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="External\AtkinsonHyperlegible\AtkinsonHyperlegible-Bold.ttf" />
+    <None Remove="External\AtkinsonHyperlegible\AtkinsonHyperlegible-BoldItalic.ttf" />
+    <None Remove="External\AtkinsonHyperlegible\AtkinsonHyperlegible-Italic.ttf" />
+    <None Remove="External\AtkinsonHyperlegible\AtkinsonHyperlegible-Regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -67,6 +73,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="External\AtkinsonHyperlegible\AtkinsonHyperlegible-Bold.ttf" />
+    <Resource Include="External\AtkinsonHyperlegible\AtkinsonHyperlegible-BoldItalic.ttf" />
+    <Resource Include="External\AtkinsonHyperlegible\AtkinsonHyperlegible-Italic.ttf" />
+    <Resource Include="External\AtkinsonHyperlegible\AtkinsonHyperlegible-Regular.ttf" />
     <Resource Include="smt_bomb_icon.ico" />
     <None Update="app.manifest">
       <SubType>Designer</SubType>

@@ -8,7 +8,7 @@ namespace SMT
 {
     public class MapConfig : INotifyPropertyChanged
     {
-        public static readonly string SaveVersion = "01";
+        public static readonly string SaveVersion = "02";
 
         [Browsable(false)]
         public MapColours ActiveColourScheme;

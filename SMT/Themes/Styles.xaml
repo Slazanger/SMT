@@ -124,21 +124,21 @@
 
     <!--FontStyle-->
     <Style TargetType="{x:Type TextBlock}">
-        <Setter Property="FontFamily" Value="Calibri light" />
+        <!--<Setter Property="FontFamily" Value="Calibri light" /> -->
         <!--<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />-->
     </Style>
     <Style TargetType="{x:Type Control}">
-        <Setter Property="FontFamily" Value="Calibri light" />
+        <!--<Setter Property="FontFamily" Value="Calibri light" /> -->
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
     </Style>
     <Style TargetType="{x:Type Window}">
-        <Setter Property="FontFamily" Value="Calibri light" />
+        <!--<Setter Property="FontFamily" Value="Calibri light" /> -->
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
         <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}" />
     </Style>
     <!-- Necessary for Blend designer for UserControls -->
     <Style TargetType="{x:Type UserControl}">
-        <Setter Property="FontFamily" Value="Calibri light" />
+        <!--<Setter Property="FontFamily" Value="Calibri light" /> -->
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
     </Style>
 
@@ -1390,7 +1390,7 @@
     </Style>
     <Style TargetType="{x:Type Expander}">
         <Setter Property="Foreground" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}" />
-        <Setter Property="FontFamily" Value="Calibri light" />
+        <!--<Setter Property="FontFamily" Value="Calibri light" /> -->
         <Setter Property="Padding" Value="2" />
         <Setter Property="Background" Value="{StaticResource Expander.Background}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />

@@ -138,7 +138,7 @@
                     <Grid Canvas.Left="0" Canvas.Top="0" Width="167" HorizontalAlignment="Center">
 
                         <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0">
-                            <Label x:Name="RegionNameLabel" Content="Region" FontSize="16" Grid.Column="1" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" FontFamily="Ebrima" />
+                            <Label x:Name="RegionNameLabel" Content="Region" FontSize="16" Grid.Column="1" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576"  />
 
                             <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
 
