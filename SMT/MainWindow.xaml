@@ -626,6 +626,7 @@
                                                     <Style TargetType="{x:Type DataGridRow}">
                                                         <Setter Property="Background" Value="{Binding Converter={StaticResource zkbBGConverter}}" />
                                                         <Setter Property="Foreground" Value="{Binding Converter={StaticResource zkbBGFConverter}}" />
+                                                        <Setter Property="FontSize" Value="10"/>
                                                     </Style>
                                                 </DataGrid.RowStyle>
 
