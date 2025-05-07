@@ -298,6 +298,8 @@ namespace SMT
             RegionUC.RegionChanged += RegionUC_RegionChanged;
             RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
 
+            RegionUC.SystemHoverEvent += RegionUC_SystemHoverEvent; ;
+
             UniverseUC.MapConf = MapConf;
             UniverseUC.CapitalRoute = CapitalRoute;
             UniverseUC.Init();
@@ -415,6 +417,40 @@ namespace SMT
             CheckGitHubVersion();
 
             RegionUC.SelectRegion(MapConf.DefaultRegion);
+        }
+
+        private void RegionUC_SystemHoverEvent(string system)
+        {
+            RawIntelBox.SelectedItem = null;
+
+            // iterate over all of the RawIntelBox ui items 
+            for (int i = 0; i <RawIntelBox.Items.Count; i++)
+            {
+                IntelData id = RawIntelBox.Items[i] as IntelData;
+                if (id != null)
+                {
+                    if (system != string.Empty && id.Systems.Contains(system))
+                    {
+                        // highlight the item
+                        ListViewItem lvi = RawIntelBox.ItemContainerGenerator.ContainerFromItem(id) as ListViewItem;
+                        if (lvi != null)
+                        {
+                            lvi.Background = Brushes.DarkRed;
+                        }
+                    }
+                    else
+                    {
+                        // remove the highlight
+                        ListViewItem lvi = RawIntelBox.ItemContainerGenerator.ContainerFromItem(id) as ListViewItem;
+                        if (lvi != null)
+                        {
+                            lvi.Background = Brushes.Transparent;
+                        }
+                    }
+                }
+            }
+
+
         }
 
         private void OnGamelogUpdated(List<EVEData.GameLogData> gll)
@@ -1430,10 +1466,6 @@ namespace SMT
         private void OnZKillsAdded()
         {
             manualZKillFilterRefreshRequired = true;
-
-            if (Application.Current != null)
-            {
-            }
         }
 
         private void RawIntelBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

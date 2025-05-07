@@ -40,6 +40,7 @@ namespace SMT
 
 
         // depth order of data
+        private const int ZINDEX_CHARACTERS = 140;
         private const int ZINDEX_POI = 113;
         private const int ZINDEX_SOV_FIGHT_LOGO = 105;
         private const int ZINDEX_CYNOBEACON = 105;
@@ -151,6 +152,22 @@ namespace SMT
 
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
+
+
+
+        // events
+
+        /// <summary>
+        /// Intel Updated Event Handler
+        /// </summary>
+        public delegate void SystemHover(string system );
+
+        /// <summary>
+        /// Intel Updated Event
+        /// </summary>
+        public event SystemHover SystemHoverEvent;
+
+
 
         /// <summary>
         /// Constructor
@@ -1114,7 +1131,7 @@ namespace SMT
 
                     Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
                     Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
-                    Canvas.SetZIndex(charText, 40);
+                    Canvas.SetZIndex(charText, ZINDEX_CHARACTERS);
                     MainCanvas.Children.Add(charText);
                     DynamicMapElements.Add(charText);
                 }
@@ -1165,7 +1182,7 @@ namespace SMT
 
                             Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
                             Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
-                            Canvas.SetZIndex(charText, 40);
+                            Canvas.SetZIndex(charText, ZINDEX_CHARACTERS);
                             MainCanvas.Children.Add(charText);
                             DynamicMapElements.Add(charText);
 
@@ -1188,7 +1205,7 @@ namespace SMT
 
                     Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
                     Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
-                    Canvas.SetZIndex(charText, 40);
+                    Canvas.SetZIndex(charText, ZINDEX_CHARACTERS);
                     MainCanvas.Children.Add(charText);
                     DynamicMapElements.Add(charText);
 
@@ -1218,7 +1235,7 @@ namespace SMT
 
                 Canvas.SetLeft(highlightSystemCircle, ms.Layout.X - circleOffset);
                 Canvas.SetTop(highlightSystemCircle, ms.Layout.Y - circleOffset);
-                Canvas.SetZIndex(highlightSystemCircle, 25);
+                Canvas.SetZIndex(highlightSystemCircle, ZINDEX_CHARACTERS-1);
 
                 MainCanvas.Children.Add(highlightSystemCircle);
                 DynamicMapElements.Add(highlightSystemCircle);
@@ -3851,6 +3868,14 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(trigInfo);
                 }
 
+                // trigger the hover event 
+
+                if (SystemHoverEvent != null)
+                {
+                    SystemHoverEvent(selectedSys.Name);
+                }
+
+
                 SystemInfoPopup.IsOpen = true;
             }
             else
@@ -3860,6 +3885,13 @@ namespace SMT
                 foreach (UIElement uie in DynamicMapElementsJBHighlight)
                 {
                     MainCanvas.Children.Remove(uie);
+                }
+
+                // trigger the hover event 
+
+                if (SystemHoverEvent != null)
+                {
+                    SystemHoverEvent(string.Empty);
                 }
 
                 DynamicMapElementsJBHighlight.Clear();
@@ -3895,12 +3927,12 @@ namespace SMT
 
 
 
-/// <summary>
-/// Ckear Route  Clicked
-/// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
-private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Ckear Route  Clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
         {
             if (ActiveCharacter != null)
             {
