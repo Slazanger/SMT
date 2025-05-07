@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Data;
 //using System.Windows.Forms;
 using System.Windows.Media;
+using NAudio.Utils;
 using NAudio.Wave;
 using SMT.EVEData;
 using MessageBox = System.Windows.MessageBox;
@@ -125,10 +126,13 @@ namespace SMT
                 return; // Skip sound playback on initial load
             }
 
-            waveOutEvent.Stop();
             waveOutEvent.Volume = MapConf.IntelSoundVolume;
-            audioFileReader.Position = 0; // Reset position to the beginning
-            waveOutEvent.Play(); // Play the sound  
+
+            if (waveOutEvent.PlaybackState != PlaybackState.Playing )
+            {
+                audioFileReader.Position = 0; // Reset position to the beginning
+                waveOutEvent.Play(); // Play the sound  
+            }
 
         }
 
