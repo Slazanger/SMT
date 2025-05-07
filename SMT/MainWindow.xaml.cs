@@ -47,6 +47,8 @@ namespace SMT
         private int anomRefreshCounter = 0;
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
+        private bool manualZKillFilterRefreshRequired = true;
+
         private List<InfoItem> InfoLayer;
 
         private Dictionary<string, long> CharacterNameIDCache;
@@ -332,7 +334,7 @@ namespace SMT
             ZKBFeed.ItemsSource = EVEManager.ZKillFeed.KillStream;
 
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
-            zKBFeedview.Refresh();
+            manualZKillFilterRefreshRequired = true;
 
 
             // Define your existing filter logic
@@ -755,6 +757,19 @@ namespace SMT
                 UpdateCharacterSelectionBasedOnActiveWindow();
             }
 
+            if(manualZKillFilterRefreshRequired)
+            {
+
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+                }), DispatcherPriority.Normal);
+
+
+                manualZKillFilterRefreshRequired = false;
+            }
+
+
             // refresh the anomalies datagrid every 60 seconds to update the "since" column
             anomRefreshCounter++;
             if (anomRefreshCounter == 60)
@@ -831,7 +846,7 @@ namespace SMT
 
         public void OnCharacterSelectionChanged()
         {
-            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+            manualZKillFilterRefreshRequired = true;
         }
 
         private void RegionUC_RegionChanged(object sender, PropertyChangedEventArgs e)
@@ -841,7 +856,7 @@ namespace SMT
                 RegionLayoutDoc.Title = RegionUC.Region.Name;
             }
 
-            CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+            manualZKillFilterRefreshRequired = true;
         }
 
         private void RegionUC_UniverseSystemSelect(object sender, RoutedEventArgs e)
@@ -1414,12 +1429,10 @@ namespace SMT
 
         private void OnZKillsAdded()
         {
+            manualZKillFilterRefreshRequired = true;
+
             if (Application.Current != null)
             {
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
-                }), DispatcherPriority.Normal, null);
             }
         }
 
@@ -1785,13 +1798,7 @@ namespace SMT
 
             if (ZKBFeed != null)
             {
-                try
-                {
-                    CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
-                }
-                catch
-                {
-                }
+                manualZKillFilterRefreshRequired = true;
             }
         }
 
