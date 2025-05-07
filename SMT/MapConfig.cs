@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using ESI.NET.Logic;
 
 namespace SMT
 {
@@ -19,11 +20,12 @@ namespace SMT
         private bool m_MinimizeToTray;
         private bool m_CloseToTray;
 
-        private bool m_FlashWindow;
+        private bool m_FlashWindow = true;
         private bool m_FlashWindowOnlyInDangerZone;
 
-        private bool m_PlayIntelSound;
-        private bool m_PlaySoundOnlyInDangerZone;
+        private bool m_PlayIntelSound = true;
+        private bool m_PlayIntelSoundOnAlert = true;
+        private bool m_PlaySoundOnlyInDangerZone = false;
 
         private string m_DefaultRegion;
 
@@ -80,9 +82,9 @@ namespace SMT
 
         private int m_ZkillExpireTimeMinutes;
 
-        private bool m_drawRoute;
+        private bool m_drawRoute = true;
 
-        private bool m_followOnZoom;
+        private bool m_followOnZoom = true;
 
         private string m_CustomEveLogFolderLocation;
 
@@ -478,7 +480,19 @@ namespace SMT
 
         [Category("Intel")]
         [DisplayName("Warning on Alert Text")]
-        public bool PlayIntelSoundOnAlert { get; set; }
+        public bool PlayIntelSoundOnAlert 
+        {
+            get
+            {
+                return m_PlayIntelSoundOnAlert;
+            }
+            set
+            {
+                m_PlayIntelSoundOnAlert = value;
+                OnPropertyChanged("PlayIntelSoundOnAlert");
+            }
+
+        }
 
         [Category("Intel")]
         [DisplayName("Warning On Unknown")]
