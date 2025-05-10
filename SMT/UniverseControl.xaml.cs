@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using SMT.EVEData;
+using Brush = System.Windows.Media.Brush;
+using Color = System.Windows.Media.Color;
+using FontFamily = System.Windows.Media.FontFamily;
+using Pen = System.Windows.Media.Pen;
+using Point = System.Windows.Point;
 
 namespace SMT
 {
@@ -62,7 +70,7 @@ namespace SMT
             private void VisualHost_MouseButtonUp(object sender, MouseButtonEventArgs e)
             {
                 // Retreive the coordinates of the mouse button event.
-                Point pt = e.GetPosition((UIElement)sender);
+                System.Windows.Point pt = e.GetPosition((UIElement)sender);
 
                 if (HitTestEnabled)
                 {
@@ -294,9 +302,12 @@ namespace SMT
         private VisualHost VHDataSpheres;
         private VisualHost VHRoute;
         private VisualHost VHRegionShapes;
+        private VisualHost VHRWHShapes;
 
         private VisualHost VHCharacters;
         private VisualHost VHZKB;
+
+        private Typeface MainTF;
 
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
@@ -319,11 +330,14 @@ namespace SMT
             VHRegionNames = new VisualHost();
             VHRangeSpheres = new VisualHost();
             VHDataSpheres = new VisualHost();
+            VHRWHShapes = new VisualHost();
             VHRangeHighlights = new VisualHost();
             VHCharacters = new VisualHost();
             VHZKB = new VisualHost();
             VHRoute = new VisualHost();
             VHRegionShapes = new VisualHost();
+
+            MainTF = new Typeface(new FontFamily(new Uri("pack://application:,,,/External/AtkinsonHyperlegible/"), "./#Atkinson Hyperlegible"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
 
             UniverseMainCanvas.Children.Add(VHRegionShapes);
 
@@ -331,7 +345,7 @@ namespace SMT
             UniverseMainCanvas.Children.Add(VHDataSpheres);
             UniverseMainCanvas.Children.Add(VHZKB);
             UniverseMainCanvas.Children.Add(VHRangeHighlights);
-
+            UniverseMainCanvas.Children.Add(VHRWHShapes);  
             UniverseMainCanvas.Children.Add(VHLinks);
             UniverseMainCanvas.Children.Add(VHRoute);
             UniverseMainCanvas.Children.Add(VHNames);
@@ -664,6 +678,35 @@ namespace SMT
                 StatsHeader.IsEnabled = true;
                 StatsHeader.Items.Add(mi);
             }
+
+
+            TheraConnection tc = EM.TheraConnections.Where(theraSystem => theraSystem.System == sys.Name).FirstOrDefault();
+            if (tc != null)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Thera : In Sig : " + tc.InSignatureID;
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+
+                mi = new MenuItem();
+                mi.Header = "Thera : Out Sig : " + tc.OutSignatureID;
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
+
+            TurnurConnection tuc = EM.TurnurConnections.Where(turnerSystem => turnerSystem.System == sys.Name).FirstOrDefault();
+            if (tuc != null)
+            {
+                MenuItem mi = new MenuItem();
+                mi.Header = "Turnur : In Sig : " + tuc.InSignatureID;
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+
+                mi = new MenuItem();
+                mi.Header = "Turnur : Out Sig : " + tuc.OutSignatureID;
+                StatsHeader.IsEnabled = true;
+                StatsHeader.Items.Add(mi);
+            }
         }
 
         private void VHSystems_SOV_Clicked(object sender, RoutedEventArgs e)
@@ -700,6 +743,8 @@ namespace SMT
         private Brush DataColourBrush;
         private Brush BackgroundColourBrush;
         private Brush RegionShapeColourBrush;
+        private Brush WHTheraColourBrush;
+        private Brush WHTurnurColourBrush;
 
         /// <summary>
         /// Redraw the map
@@ -740,6 +785,9 @@ namespace SMT
 
                 RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
 
+                WHTheraColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+                WHTurnurColourBrush = new SolidColorBrush(Colors.OrangeRed);
+
                 SystemColourBrush.Freeze();
                 SystemColourHiSecBrush.Freeze();
                 SystemColourLowSecBrush.Freeze();
@@ -756,6 +804,8 @@ namespace SMT
                 BackgroundColourBrush.Freeze();
                 RegionTextZoomedOutColourBrush.Freeze();
                 RegionShapeColourBrush.Freeze();
+                WHTheraColourBrush.Freeze();
+                WHTurnurColourBrush.Freeze();
             }
 
             SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
@@ -771,7 +821,7 @@ namespace SMT
 
             System.Windows.FontStyle fontStyle = FontStyles.Normal;
             FontWeight fontWeight = FontWeights.Medium;
-            Typeface tf = new Typeface("Verdana");
+
 
             if (FullRedraw)
             {
@@ -897,7 +947,7 @@ namespace SMT
                     FormattedText ft = new FormattedText(sys.Name,
                              ci,
                              FlowDirection.LeftToRight,
-                             tf,
+                             MainTF,
                              SystemTextSize, SystemTextColourBrush, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                     ft.TextAlignment = TextAlignment.Center;
                     // Draw a formatted text string into the DrawingContext.
@@ -1008,9 +1058,16 @@ namespace SMT
                         drawingContext.DrawEllipse(dataBrush, dataPen, new Point(X, Z), DataScale, DataScale);
                     }
 
+
+
+
+
                     drawingContext.Close();
                     VHDataSpheres.AddChild(dataDV);
                 }
+
+
+
             }
 
             if (FastUpdate)
@@ -1018,6 +1075,7 @@ namespace SMT
                 VHCharacters.ClearAllChildren();
                 VHZKB.ClearAllChildren();
                 VHRoute.ClearAllChildren();
+                VHRWHShapes.ClearAllChildren();
 
                 float characterNametextXOffset = 3;
                 float characterNametextYOffset = -16;
@@ -1075,7 +1133,7 @@ namespace SMT
                                 new FormattedText(name,
                                     CultureInfo.GetCultureInfo("en-us"),
                                     FlowDirection.LeftToRight,
-                                    tf,
+                                    MainTF,
                                     CharacterTextSize, CharacterNameBrush, VisualTreeHelper.GetDpi(this).PixelsPerDip),
                                 new Point(X + characterNametextXOffset, Z + characterNametextYOffset + charTextOffset));
 
@@ -1130,6 +1188,87 @@ namespace SMT
                         VHZKB.AddChild(zkbVisual, "ZKBData");
                     }
                 }
+
+                // thera / turnur 
+
+
+                Pen whPen = new Pen(WHTheraColourBrush, 1.0);
+                List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
+
+
+
+                foreach (TheraConnection tc in currentTheraConnections)
+                {
+                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
+                    // Retrieve the DrawingContext in order to create new drawing content.
+                    DrawingContext drawingContext = dataDV.RenderOpen();
+
+
+                    EVEData.System sys = EM.GetEveSystem(tc.System);
+
+
+                    double X = sys.UniverseX;
+
+                    // need to invert Z
+                    double Z = sys.UniverseY;
+
+                    drawingContext.DrawEllipse(WHTheraColourBrush, whPen, new Point(X, Z), 5, 5);
+
+
+                    drawingContext.Close();
+                    VHRWHShapes.AddChild(dataDV);
+
+                }
+
+                List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
+
+                
+                foreach (TurnurConnection tc in currentTurnurConnections)
+                {
+                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
+                    // Retrieve the DrawingContext in order to create new drawing content.
+                    DrawingContext drawingContext = dataDV.RenderOpen();
+
+
+                    EVEData.System sys = EM.GetEveSystem(tc.System);
+
+
+                    double X = sys.UniverseX;
+
+                    // need to invert Z
+                    double Z = sys.UniverseY;
+
+                    drawingContext.DrawEllipse(WHTurnurColourBrush, whPen, new Point(X, Z), 5, 5);
+
+
+                    drawingContext.Close();
+                    VHRWHShapes.AddChild(dataDV);
+                }
+
+                // add turnur itself
+                {
+                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
+                    // Retrieve the DrawingContext in order to create new drawing content.
+                    DrawingContext drawingContext = dataDV.RenderOpen();
+
+
+                    EVEData.System sys = EM.GetEveSystem("Turnur");
+
+
+                    double X = sys.UniverseX;
+
+                    // need to invert Z
+                    double Z = sys.UniverseY;
+
+                    drawingContext.DrawEllipse(WHTurnurColourBrush, whPen, new Point(X, Z), 5, 5);
+
+
+                    drawingContext.Close();
+                    VHRWHShapes.AddChild(dataDV);
+                }
+
+
+
 
                 if (CapitalRoute != null && CapitalRoute.CurrentRoute.Count > 1)
                 {
@@ -1244,7 +1383,6 @@ namespace SMT
             VHRegionNames.ClearAllChildren();
 
             double RegionTextSize = 50;
-            Typeface tf = new Typeface("Verdana");
 
             Brush rtb = RegionTextColourBrush;
             if (ZoomedOut)
@@ -1270,7 +1408,7 @@ namespace SMT
                 System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
-                FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, tf, RegionTextSize, rtb, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, MainTF, RegionTextSize, rtb, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                 ft.TextAlignment = TextAlignment.Center;
                 drawingContext.DrawText(ft, new Point(X, Z));
 
