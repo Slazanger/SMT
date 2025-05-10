@@ -795,11 +795,17 @@ namespace SMT
 
             if(manualZKillFilterRefreshRequired)
             {
-
-                Application.Current.Dispatcher.Invoke((Action)(() =>
+                try
                 {
-                    CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
-                }), DispatcherPriority.Normal);
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
+                    }), DispatcherPriority.Normal);
+                }
+                catch
+                {
+                    // ignore the error
+                }
 
 
                 manualZKillFilterRefreshRequired = false;
