@@ -52,7 +52,7 @@ namespace SMT
         private const int ZINDEX_TURNER = 97;
         private const int ZINDEX_STORM = 95;
         private const int ZINDEX_TRIG = 97;
-        private const int ZINDEX_RANGEMARKER = 105;
+        private const int ZINDEX_RANGEMARKER = 96;
         private const int ZINDEX_SYSICON = 100;
         private const int ZINDEX_ADM = 99;
         private const int ZINDEX_POLY = 98;
