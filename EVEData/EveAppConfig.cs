@@ -23,12 +23,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "Legion [a large group of soldiers who form a part of an army]";
+        public const string SMT_TITLE = "Now with both 0 and O";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_137";
+        public const string SMT_VERSION = "SMT_138";
 
         /// <summary>
         /// Folder to store all of the data from
