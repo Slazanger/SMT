@@ -1192,7 +1192,7 @@ namespace SMT
                 // thera / turnur 
 
 
-                Pen whPen = new Pen(WHTheraColourBrush, 1.0);
+                Pen theraPen = new Pen(WHTheraColourBrush, 1.0);
                 List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
 
 
@@ -1212,7 +1212,7 @@ namespace SMT
                     // need to invert Z
                     double Z = sys.UniverseY;
 
-                    drawingContext.DrawEllipse(WHTheraColourBrush, whPen, new Point(X, Z), 5, 5);
+                    drawingContext.DrawEllipse(WHTheraColourBrush, theraPen, new Point(X, Z), 5, 5);
 
 
                     drawingContext.Close();
@@ -1220,6 +1220,8 @@ namespace SMT
 
                 }
 
+
+                Pen turnurPen = new Pen(WHTurnurColourBrush, 1.0);
                 List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
 
                 
@@ -1238,7 +1240,7 @@ namespace SMT
                     // need to invert Z
                     double Z = sys.UniverseY;
 
-                    drawingContext.DrawEllipse(WHTurnurColourBrush, whPen, new Point(X, Z), 5, 5);
+                    drawingContext.DrawEllipse(WHTurnurColourBrush, turnurPen, new Point(X, Z), 5, 5);
 
 
                     drawingContext.Close();
@@ -1260,7 +1262,7 @@ namespace SMT
                     // need to invert Z
                     double Z = sys.UniverseY;
 
-                    drawingContext.DrawEllipse(WHTurnurColourBrush, whPen, new Point(X, Z), 5, 5);
+                    drawingContext.DrawEllipse(WHTurnurColourBrush, turnurPen, new Point(X, Z), 5, 5);
 
 
                     drawingContext.Close();
