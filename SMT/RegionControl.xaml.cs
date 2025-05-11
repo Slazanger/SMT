@@ -54,12 +54,9 @@ namespace SMT
         private const int ZINDEX_SYSICON = 100;
         private const int ZINDEX_ADM = 99;
         private const int ZINDEX_POLY = 98;
-        private const int ZINDEX_JOVE = 98;
-
+        private const int ZINDEX_JOVE = 105;
 
         private const int THERA_Z_INDEX = 22;
-
-
 
         private readonly Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
         private Dictionary<string, EVEData.EveManager.JumpShip> activeJumpSpheres;
