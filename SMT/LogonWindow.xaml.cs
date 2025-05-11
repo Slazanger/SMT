@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace SMT
 {
@@ -19,7 +18,8 @@ namespace SMT
             new Task(StartServer).Start();
         }
 
-        private bool serverDone = false; 
+        private bool serverDone = false;
+
         private void StartServer()
         {
             // create the http Server
@@ -39,8 +39,6 @@ namespace SMT
                 {
                     Console.WriteLine("Listening...");
 
-
-
                     // Note: The GetContext method blocks while waiting for a request.
                     HttpListenerContext context = listener.GetContext();
                     HttpListenerRequest request = context.Request;
@@ -58,7 +56,6 @@ namespace SMT
                     response.ContentLength64 = buffer.Length;
                     System.IO.Stream output = response.OutputStream;
                     output.Write(buffer, 0, buffer.Length);
-
                 }
             }
             catch

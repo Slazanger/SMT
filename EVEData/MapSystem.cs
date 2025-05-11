@@ -19,8 +19,6 @@ namespace SMT.EVEData
             Top, Left, Right, Bottom
         }
 
-
-
         /// <summary>
         ///  Gets or sets the  actual eve system
         /// </summary>
@@ -43,7 +41,7 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the 
+        /// Gets or sets the
         /// </summary>
         public TextPosition TextPos { get; set; } = TextPosition.Bottom;
 

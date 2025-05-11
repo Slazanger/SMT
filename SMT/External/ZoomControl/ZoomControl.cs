@@ -204,7 +204,7 @@ namespace SMT.ZoomControl
             }
             set
             {
-                if (AllowPan)
+                if(AllowPan)
                     SetValue(ModifierModeProperty, value);
             }
         }
@@ -245,7 +245,7 @@ namespace SMT.ZoomControl
             }
             set
             {
-                if (Math.Abs(value - (double)GetValue(ZoomProperty)) < double.Epsilon)
+                if(Math.Abs(value - (double)GetValue(ZoomProperty)) < double.Epsilon)
                     return;
                 BeginAnimation(ZoomProperty, null);
                 SetValue(ZoomProperty, value);
@@ -306,7 +306,7 @@ namespace SMT.ZoomControl
             set
             {
                 _presenter = value;
-                if (_presenter == null)
+                if(_presenter == null)
                     return;
 
                 //add the ScaleTransform to the presenter
@@ -326,16 +326,16 @@ namespace SMT.ZoomControl
 
             //get the presenter, and initialize
             Presenter = GetTemplateChild(PART_Presenter) as ZoomContentPresenter;
-            if (Presenter != null)
+            if(Presenter != null)
             {
                 Presenter.SizeChanged += (s, a) =>
                 {
-                    if (Mode == ZoomControlModes.Fill)
+                    if(Mode == ZoomControlModes.Fill)
                         DoZoomToFill();
                 };
                 Presenter.ContentSizeChanged += (s, a) =>
                 {
-                    if (Mode == ZoomControlModes.Fill)
+                    if(Mode == ZoomControlModes.Fill)
                         DoZoomToFill();
                 };
             }
@@ -375,7 +375,7 @@ namespace SMT.ZoomControl
         {
             var zc = (ZoomControl)d;
             var mode = (ZoomControlModes)e.NewValue;
-            switch (mode)
+            switch(mode)
             {
                 case ZoomControlModes.Fill:
                     zc.DoZoomToFill();
@@ -402,10 +402,10 @@ namespace SMT.ZoomControl
         private static void TranslateX_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var zc = (ZoomControl)d;
-            if (zc._translateTransform == null)
+            if(zc._translateTransform == null)
                 return;
             zc._translateTransform.X = (double)e.NewValue;
-            if (!zc._isZooming)
+            if(!zc._isZooming)
                 zc.Mode = ZoomControlModes.Custom;
         }
 
@@ -418,10 +418,10 @@ namespace SMT.ZoomControl
         private static void TranslateY_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var zc = (ZoomControl)d;
-            if (zc._translateTransform == null)
+            if(zc._translateTransform == null)
                 return;
             zc._translateTransform.Y = (double)e.NewValue;
-            if (!zc._isZooming)
+            if(!zc._isZooming)
                 zc.Mode = ZoomControlModes.Custom;
         }
 
@@ -429,13 +429,13 @@ namespace SMT.ZoomControl
         {
             var zc = (ZoomControl)d;
 
-            if (zc._scaleTransform == null)
+            if(zc._scaleTransform == null)
                 return;
 
             var zoom = (double)e.NewValue;
             zc._scaleTransform.ScaleX = zoom;
             zc._scaleTransform.ScaleY = zoom;
-            if (!zc._isZooming)
+            if(!zc._isZooming)
             {
                 var delta = (double)e.NewValue / (double)e.OldValue;
                 zc.TranslateX *= delta;
@@ -481,7 +481,7 @@ namespace SMT.ZoomControl
 
         private void DoZoomToFill()
         {
-            if (_presenter == null)
+            if(_presenter == null)
                 return;
 
             var deltaZoom = Math.Min(
@@ -497,7 +497,7 @@ namespace SMT.ZoomControl
 
         private void DoZoomToOriginal()
         {
-            if (_presenter == null)
+            if(_presenter == null)
                 return;
 
             //var initialTranslate = GetInitialTranslate();
@@ -557,7 +557,7 @@ namespace SMT.ZoomControl
 
         private double GetCoercedTranslateX(double baseValue, double zoom)
         {
-            if (_presenter == null)
+            if(_presenter == null)
                 return 0.0;
 
             return GetCoercedTranslate(baseValue, zoom,
@@ -568,7 +568,7 @@ namespace SMT.ZoomControl
 
         private double GetCoercedTranslateY(double baseValue, double zoom)
         {
-            if (_presenter == null)
+            if(_presenter == null)
                 return 0.0;
 
             return GetCoercedTranslate(baseValue, zoom,
@@ -579,7 +579,7 @@ namespace SMT.ZoomControl
 
         private Vector GetInitialTranslate()
         {
-            if (_presenter == null)
+            if(_presenter == null)
                 return new Vector(0.0, 0.0);
 
             var w = _presenter.ContentSize.Width - _presenter.DesiredSize.Width;
@@ -593,23 +593,23 @@ namespace SMT.ZoomControl
         private void OnMouseDown(MouseButtonEventArgs e, bool isPreview)
         {
             // ignore right mouse
-            if (e.RightButton == MouseButtonState.Pressed)
+            if(e.RightButton == MouseButtonState.Pressed)
             {
                 return;
             }
 
-            if (ModifierMode != ZoomViewModifierMode.None)
+            if(ModifierMode != ZoomViewModifierMode.None)
                 return;
 
-            switch (Keyboard.Modifiers)
+            switch(Keyboard.Modifiers)
             {
                 case ModifierKeys.None:
-                    if (!isPreview)
+                    if(!isPreview)
                         ModifierMode = ZoomViewModifierMode.Pan;
                     break;
 
                 case ModifierKeys.Alt:
-                    if (AllowAltZoomBox)
+                    if(AllowAltZoomBox)
                         ModifierMode = ZoomViewModifierMode.ZoomBox;
                     break;
 
@@ -627,7 +627,7 @@ namespace SMT.ZoomControl
                     return;
             }
 
-            if (ModifierMode == ZoomViewModifierMode.None)
+            if(ModifierMode == ZoomViewModifierMode.None)
                 return;
 
             _mouseDownPos = e.GetPosition(this);
@@ -638,22 +638,22 @@ namespace SMT.ZoomControl
 
         private void StartAnimation(DependencyProperty dp, double toValue, Duration duration)
         {
-            if (double.IsNaN(toValue) || double.IsInfinity(toValue))
+            if(double.IsNaN(toValue) || double.IsInfinity(toValue))
             {
-                if (dp == ZoomProperty)
+                if(dp == ZoomProperty)
                 {
                     _isZooming = false;
                 }
                 return;
             }
             var animation = new DoubleAnimation(toValue, duration);
-            if (dp == ZoomProperty)
+            if(dp == ZoomProperty)
             {
                 _zoomAnimCount++;
                 animation.Completed += (s, args) =>
                 {
                     _zoomAnimCount--;
-                    if (_zoomAnimCount > 0)
+                    if(_zoomAnimCount > 0)
                         return;
                     var zoom = Zoom;
                     BeginAnimation(ZoomProperty, null);
@@ -671,7 +671,7 @@ namespace SMT.ZoomControl
 
         private void ZoomControl_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            switch (ModifierMode)
+            switch(ModifierMode)
             {
                 case ZoomViewModifierMode.None:
                     return;
@@ -703,11 +703,11 @@ namespace SMT.ZoomControl
 
         private void ZoomControl_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (!AllowScrolling)
+            if(!AllowScrolling)
                 return;
 
             var handle = (Keyboard.Modifiers & ModifierKeys.Control) > 0 && ModifierMode == ZoomViewModifierMode.None;
-            if (!handle)
+            if(!handle)
                 return;
 
             e.Handled = true;
@@ -728,7 +728,7 @@ namespace SMT.ZoomControl
 
         private void ZoomControl_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            switch (ModifierMode)
+            switch(ModifierMode)
             {
                 case ZoomViewModifierMode.None:
                     return;

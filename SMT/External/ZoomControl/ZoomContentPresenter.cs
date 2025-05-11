@@ -24,11 +24,11 @@ namespace SMT.ZoomControl
             }
             private set
             {
-                if (value == _contentSize)
+                if(value == _contentSize)
                     return;
 
                 _contentSize = value;
-                if (ContentSizeChanged != null)
+                if(ContentSizeChanged != null)
                     ContentSizeChanged(this, _contentSize);
             }
         }
@@ -38,7 +38,7 @@ namespace SMT.ZoomControl
             var child = VisualChildrenCount > 0
                 ? VisualTreeHelper.GetChild(this, 0) as UIElement
                 : null;
-            if (child == null)
+            if(child == null)
                 return arrangeBounds;
 
             //set the ContentSize

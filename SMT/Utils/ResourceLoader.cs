@@ -16,12 +16,12 @@ namespace SMT.ResourceUsage
         /// <returns></returns>
         public static BitmapImage LoadBitmapFromResource(string pathInApplication, Assembly assembly = null)
         {
-            if (assembly == null)
+            if(assembly == null)
             {
                 assembly = Assembly.GetCallingAssembly();
             }
 
-            if (pathInApplication[0] == '/')
+            if(pathInApplication[0] == '/')
             {
                 pathInApplication = pathInApplication.Substring(1);
             }

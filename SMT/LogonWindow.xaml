@@ -1,9 +1,8 @@
 ﻿<Window x:Class="SMT.LogonWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
         Title="Auth.." Height="120" Width="270" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closed="Window_Closed">
     <Grid>
@@ -13,4 +12,3 @@
         </StackPanel>
     </Grid>
 </Window>
-    

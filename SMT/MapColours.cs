@@ -281,59 +281,59 @@ namespace SMT
 
             Color secCol = (Color)ColorConverter.ConvertFromString("#FF8D3264");
 
-            if (GradeTrueSec && secStatus < 0.0)
+            if(GradeTrueSec && secStatus < 0.0)
             {
                 secCol.R = (byte)(28 + (1.0 - (secStatus / -1.0)) * 113);
                 secCol.G = (byte)(10 + (1.0 - (secStatus / -1.0)) * 40);
                 secCol.B = (byte)(20 + (1.0 - (secStatus / -1.0)) * 80);
             }
 
-            if (secStatus > 0.05)
+            if(secStatus > 0.05)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF722020");
             }
 
-            if (secStatus > 0.15)
+            if(secStatus > 0.15)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFBC1117");
             }
 
-            if (secStatus > 0.25)
+            if(secStatus > 0.25)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFCE440F");
             }
 
-            if (secStatus > 0.35)
+            if(secStatus > 0.35)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFDC6D07");
             }
 
-            if (secStatus > 0.45)
+            if(secStatus > 0.45)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FFF3FD82");
             }
 
-            if (secStatus > 0.55)
+            if(secStatus > 0.55)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF71E554");
             }
 
-            if (secStatus > 0.65)
+            if(secStatus > 0.65)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF60D9A3");
             }
 
-            if (secStatus > 0.75)
+            if(secStatus > 0.75)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF4ECEF8");
             }
 
-            if (secStatus > 0.85)
+            if(secStatus > 0.85)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF3A9AEB");
             }
 
-            if (secStatus > 0.95)
+            if(secStatus > 0.95)
             {
                 secCol = (Color)ColorConverter.ConvertFromString("#FF2C74E0");
             }

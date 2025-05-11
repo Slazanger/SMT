@@ -59,7 +59,6 @@ namespace SMT.EVEData
 
         private bool m_DecloakWarningEnabled;
 
-
         private bool m_CombatWarningEnabled;
 
         private bool routeNeedsUpdate = false;
@@ -253,9 +252,6 @@ namespace SMT.EVEData
             }
         }
 
-
-
-
         public bool CombatWarningEnabled
         {
             get
@@ -441,7 +437,6 @@ namespace SMT.EVEData
                 OnPropertyChanged("UseTurnurRouting");
             }
         }
-
 
         public int DangerZoneRange { get; set; }
 
@@ -814,7 +809,6 @@ namespace SMT.EVEData
                 }
                 Navigation.UpdateTurnurConnections(currentActiveTurnurConnections);
 
-
                 lock (ActiveRouteLock)
                 {
                     if (Location == Waypoints[0])
@@ -859,10 +853,10 @@ namespace SMT.EVEData
                     {
                         // explicitly add interim waypoints for ansiblex gates or actual waypoints
                         if (
-                                rp.GateToTake == Navigation.GateType.Ansiblex || 
+                                rp.GateToTake == Navigation.GateType.Ansiblex ||
                                 rp.GateToTake == Navigation.GateType.Thera ||
                                 rp.GateToTake == Navigation.GateType.Turnur ||
-                                rp.GateToTake == Navigation.GateType.Zarzakh|| 
+                                rp.GateToTake == Navigation.GateType.Zarzakh ||
                                 Waypoints.Contains(rp.SystemName)
                             )
                         {

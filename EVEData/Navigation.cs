@@ -27,7 +27,6 @@ namespace SMT.EVEData
 
         private static List<string> TurnurLinks { get; set; }
 
-
         public static void ClearJumpBridges()
         {
             foreach (MapNode mn in MapNodes.Values)
@@ -242,8 +241,6 @@ namespace SMT.EVEData
             ZarzakhLinks = new List<string>();
             TurnurLinks = new List<string>();
 
-
-
             // build up the nav structures
             foreach (System sys in eveSystems)
             {
@@ -394,7 +391,7 @@ namespace SMT.EVEData
                         if (CMN.Visited)
                             continue;
 
-                        // dont jump back to the system we came from 
+                        // dont jump back to the system we came from
                         if (CurrentNode.Name == theraConnection)
                             continue;
 
@@ -419,7 +416,7 @@ namespace SMT.EVEData
                         if (CMN.Visited)
                             continue;
 
-                        // dont jump back to the system we came from 
+                        // dont jump back to the system we came from
                         if (CurrentNode.Name == turnurConnection)
                             continue;
 
@@ -434,8 +431,6 @@ namespace SMT.EVEData
                         }
                     }
                 }
-
-
 
                 if (UseZarzakh && CurrentNode.ZarzakhConnections != null)
                 {
@@ -519,7 +514,7 @@ namespace SMT.EVEData
                             RP.GateToTake = GateType.Thera;
                         }
 
-                        if(UseZarzakh && mn.ZarzakhConnections != null && mn.ZarzakhConnections.Contains(Route[i + 1]))
+                        if (UseZarzakh && mn.ZarzakhConnections != null && mn.ZarzakhConnections.Contains(Route[i + 1]))
                         {
                             RP.GateToTake = GateType.Zarzakh;
                         }
@@ -661,9 +656,6 @@ namespace SMT.EVEData
                 MapNodes[jb.To].JBConnection = jb.From;
             }
         }
-
-
-
 
         private struct JumpLink
         {

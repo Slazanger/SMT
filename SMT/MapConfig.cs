@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using ESI.NET.Logic;
 
 namespace SMT
 {
@@ -145,7 +143,7 @@ namespace SMT
             }
             set
             {
-                if (!value)
+                if(!value)
                 {
                     CloseToTray = false;
                 }
@@ -218,8 +216,6 @@ namespace SMT
 
         [Browsable(false)]
         public double ToolBox_ESIOverlayScale { get; set; }
-
-
 
         [Browsable(false)]
         public bool Debug_EnableMapEdit { get; set; }
@@ -320,7 +316,7 @@ namespace SMT
             }
             set
             {
-                if (value >= 30)
+                if(value >= 30)
                 {
                     m_MaxESIOverlayValue = value;
                 }
@@ -343,7 +339,7 @@ namespace SMT
             set
             {
                 // clamp to 1 miniumum
-                if (value > 0)
+                if(value > 0)
                 {
                     m_FleetMaxMembersPerSystem = value;
                 }
@@ -396,7 +392,7 @@ namespace SMT
             }
             set
             {
-                if (value > 20)
+                if(value > 20)
                 {
                     m_IntelTextSize = 20;
                 }
@@ -405,7 +401,7 @@ namespace SMT
                     m_IntelTextSize = value;
                 }
 
-                if (value < 8)
+                if(value < 8)
                 {
                     m_IntelTextSize = 8;
                 }
@@ -448,7 +444,7 @@ namespace SMT
             set
             {
                 // clamp to 30s miniumum
-                if (value > 30)
+                if(value > 30)
                 {
                     m_MaxIntelSeconds = value;
                 }
@@ -469,7 +465,7 @@ namespace SMT
             }
             set
             {
-                if (!value)
+                if(!value)
                 {
                     PlaySoundOnlyInDangerZone = false;
                 }
@@ -480,7 +476,7 @@ namespace SMT
 
         [Category("Intel")]
         [DisplayName("Warning on Alert Text")]
-        public bool PlayIntelSoundOnAlert 
+        public bool PlayIntelSoundOnAlert
         {
             get
             {
@@ -491,7 +487,6 @@ namespace SMT
                 m_PlayIntelSoundOnAlert = value;
                 OnPropertyChanged("PlayIntelSoundOnAlert");
             }
-
         }
 
         [Category("Intel")]
@@ -508,7 +503,7 @@ namespace SMT
             }
             set
             {
-                if (!value)
+                if(!value)
                 {
                     FlashWindowOnlyInDangerZone = false;
                 }
@@ -704,7 +699,7 @@ namespace SMT
             {
                 m_ShowRegionStandings = value;
 
-                if (m_ShowRegionStandings)
+                if(m_ShowRegionStandings)
                 {
                     ShowUniverseRats = false;
                     ShowUniversePods = false;
@@ -733,7 +728,6 @@ namespace SMT
         [Category("General")]
         [DisplayName("System Popup")]
         public bool ShowSystemPopup { get; set; }
-
 
         [Category("General")]
         [DisplayName("Show Toolbox")]
@@ -792,7 +786,7 @@ namespace SMT
             {
                 m_ShowUniverseKills = value;
 
-                if (m_ShowUniverseKills)
+                if(m_ShowUniverseKills)
                 {
                     ShowRegionStandings = false;
                     ShowUniverseRats = false;
@@ -816,7 +810,7 @@ namespace SMT
             set
             {
                 m_ShowUniversePods = value;
-                if (ShowUniversePods)
+                if(ShowUniversePods)
                 {
                     ShowRegionStandings = false;
                     ShowUniverseRats = false;
@@ -840,7 +834,7 @@ namespace SMT
             set
             {
                 m_ShowUniverseRats = value;
-                if (m_ShowUniverseRats)
+                if(m_ShowUniverseRats)
                 {
                     ShowRegionStandings = false;
                     ShowUniversePods = false;
@@ -865,9 +859,6 @@ namespace SMT
                 OnPropertyChanged("ShowZKillData");
             }
         }
-
- 
- 
 
         public bool SyncActiveCharacterBasedOnActiveEVEClient
         {
@@ -896,7 +887,7 @@ namespace SMT
             {
                 m_UniverseDataScale = value;
 
-                if (m_UniverseDataScale < 0.01)
+                if(m_UniverseDataScale < 0.01)
                 {
                     m_UniverseDataScale = 0.01;
                 }
@@ -949,7 +940,7 @@ namespace SMT
             set
             {
                 m_UpcomingSovMinutes = value;
-                if (m_UpcomingSovMinutes < 5)
+                if(m_UpcomingSovMinutes < 5)
                 {
                     m_UpcomingSovMinutes = 5;
                 }
@@ -1133,7 +1124,7 @@ namespace SMT
                 OnPropertyChanged("OverlayShowJumpBridges");
             }
         }
-        
+
         [Category("Overlay")]
         [DisplayName("Overlay Individual Character Windows")]
         public bool OverlayIndividualCharacterWindows
@@ -1149,7 +1140,7 @@ namespace SMT
                 OnPropertyChanged("OverlayIndividualCharacterWindows");
             }
         }
-        
+
         [Category("Overlay")]
         [DisplayName("Overlay Additional Character Names Display")]
         public string OverlayAdditionalCharacterNamesDisplay
@@ -1181,7 +1172,7 @@ namespace SMT
                 OnPropertyChanged("OverlayShowSystemNames");
             }
         }
-        
+
         [Category("Overlay")]
         [DisplayName("Overlay Show All Character Names")]
         public bool OverlayShowAllCharacterNames
@@ -1256,7 +1247,7 @@ namespace SMT
             set
             {
                 m_ZkillExpireTimeMinutes = value;
-                if (m_ZkillExpireTimeMinutes < 5)
+                if(m_ZkillExpireTimeMinutes < 5)
                 {
                     m_UpcomingSovMinutes = 5;
                 }
@@ -1384,7 +1375,7 @@ namespace SMT
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(name));
             }

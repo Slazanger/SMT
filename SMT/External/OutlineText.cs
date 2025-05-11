@@ -251,7 +251,7 @@ namespace SMT
 
         private void EnsureFormattedText()
         {
-            if (_FormattedText != null)
+            if(_FormattedText != null)
             {
                 return;
             }
@@ -270,7 +270,7 @@ namespace SMT
 
         private void UpdateFormattedText()
         {
-            if (_FormattedText == null)
+            if(_FormattedText == null)
             {
                 return;
             }
@@ -289,7 +289,7 @@ namespace SMT
 
         private void EnsureGeometry()
         {
-            if (_TextGeometry != null)
+            if(_TextGeometry != null)
             {
                 return;
             }

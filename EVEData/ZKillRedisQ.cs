@@ -14,7 +14,6 @@ namespace SMT.EVEData
         public string VerString = "ABC123";
         private BackgroundWorker backgroundWorker;
 
-
         private string QueueID;
 
         /// <summary>
@@ -68,7 +67,7 @@ namespace SMT.EVEData
 
         private void Dp_Tick(object sender, EventArgs e)
         {
-            if (!backgroundWorker.IsBusy && !PauseUpdate)
+            if(!backgroundWorker.IsBusy && !PauseUpdate)
             {
                 backgroundWorker.RunWorkerAsync();
             }
@@ -85,7 +84,7 @@ namespace SMT.EVEData
             {
                 HttpClient hc = new HttpClient();
                 var response = hc.GetAsync(redistURL).Result;
-                if (response.IsSuccessStatusCode)
+                if(response.IsSuccessStatusCode)
                 {
                     strContent = response.Content.ReadAsStringAsync().Result;
                 }
@@ -101,7 +100,7 @@ namespace SMT.EVEData
             }
 
             // todo : investigate issues beyond a ban.. the 429 should be handled with the null
-            if (strContent == "Error")
+            if(strContent == "Error")
             {
                 Thread.Sleep(500000);
 
@@ -110,7 +109,7 @@ namespace SMT.EVEData
             }
 
             ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
-            if (z != null && z.Package != null)
+            if(z != null && z.Package != null)
             {
                 ZKBDataSimple zs = new ZKBDataSimple();
                 zs.KillID = long.Parse(z.Package.KillId.ToString());
@@ -118,14 +117,14 @@ namespace SMT.EVEData
                 zs.VictimCharacterID = int.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
                 zs.VictimCorpID = int.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
                 zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId);
-                if (zs.SystemName == string.Empty)
+                if(zs.SystemName == string.Empty)
                 {
                     zs.SystemName = z.Package.Killmail.SolarSystemId.ToString();
                 }
 
                 zs.KillTime = z.Package.Killmail.KillmailTime.ToLocalTime();
                 string shipID = z.Package.Killmail.Victim.ShipTypeId.ToString();
-                if (EveManager.Instance.ShipTypes.ContainsKey(shipID))
+                if(EveManager.Instance.ShipTypes.ContainsKey(shipID))
                 {
                     zs.ShipType = EveManager.Instance.ShipTypes[shipID];
                 }
@@ -138,7 +137,7 @@ namespace SMT.EVEData
 
                 KillStream.Insert(0, zs);
 
-                if (KillsAddedEvent != null)
+                if(KillsAddedEvent != null)
                 {
                     KillsAddedEvent();
                 }
@@ -158,11 +157,11 @@ namespace SMT.EVEData
 
             List<int> AllianceIDs = new List<int>();
 
-            for (int i = KillStream.Count - 1; i >= 0; i--)
+            for(int i = KillStream.Count - 1; i >= 0; i--)
             {
-                if (KillStream[i].VictimAllianceName == string.Empty)
+                if(KillStream[i].VictimAllianceName == string.Empty)
                 {
-                    if (!EveManager.Instance.AllianceIDToTicker.ContainsKey(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
+                    if(!EveManager.Instance.AllianceIDToTicker.ContainsKey(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
                     {
                         AllianceIDs.Add(KillStream[i].VictimAllianceID);
                     }
@@ -172,22 +171,22 @@ namespace SMT.EVEData
                     }
                 }
 
-                if (KillStream[i].KillTime + TimeSpan.FromMinutes(KillExpireTimeMinutes) < DateTimeOffset.Now)
+                if(KillStream[i].KillTime + TimeSpan.FromMinutes(KillExpireTimeMinutes) < DateTimeOffset.Now)
                 {
                     KillStream.RemoveAt(i);
 
                     updatedKillList = true;
                 }
             }
-            if (AllianceIDs.Count > 0)
+            if(AllianceIDs.Count > 0)
             {
                 EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
             }
 
-            if (updatedKillList)
+            if(updatedKillList)
             {
                 // kills are coming in so fast that this is redundant
-                if (KillsAddedEvent != null)
+                if(KillsAddedEvent != null)
                 {
                     KillsAddedEvent();
                 }
@@ -257,7 +256,7 @@ namespace SMT.EVEData
             public override string ToString()
             {
                 string allianceTicker = EVEData.EveManager.Instance.GetAllianceTicker(VictimAllianceID);
-                if (allianceTicker == string.Empty)
+                if(allianceTicker == string.Empty)
                 {
                     allianceTicker = VictimAllianceID.ToString();
                 }
@@ -268,7 +267,7 @@ namespace SMT.EVEData
             protected void OnPropertyChanged(string name)
             {
                 PropertyChangedEventHandler handler = PropertyChanged;
-                if (handler != null)
+                if(handler != null)
                 {
                     handler(this, new PropertyChangedEventArgs(name));
                 }

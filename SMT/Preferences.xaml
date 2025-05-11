@@ -1,10 +1,10 @@
 ﻿<Window x:Class="SMT.PreferencesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SMT"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
         Name="PrefsWindow"
         Title="Preferences" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
@@ -14,8 +14,8 @@
     </Window.Resources>
 
     <Grid Background="{DynamicResource ButtonBorder}" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-        <DockPanel >
-            <TabControl x:Name="tabControl" DockPanel.Dock="Top"  >
+        <DockPanel>
+            <TabControl x:Name="tabControl" DockPanel.Dock="Top">
                 <TabItem Header="General">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
@@ -25,7 +25,7 @@
 
                         <StackPanel Grid.Column="0" Grid.ColumnSpan="1">
                             <StackPanel>
-                                <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                                <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                     <GroupBox Margin="4" Height="Auto">
                                         <StackPanel>
                                             <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="Always on top" />
@@ -41,7 +41,7 @@
                                         </StackPanel>
                                     </GroupBox>
                                 </Border>
-                                <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                                <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                     <GroupBox Header="Logs (changing these requires a restart)" Margin="4" Height="125">
                                         <StackPanel>
                                             <Label Content="Current Log Folder : " />
@@ -56,7 +56,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Header="Performance" Margin="4" Height="Auto">
                                     <StackPanel>
                                         <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3">Disable jump bridges path animation</CheckBox>
@@ -73,7 +73,6 @@
                                 </GroupBox>
                             </Border>
                         </StackPanel>
-                        
                     </Grid>
                 </TabItem>
                 <TabItem Header="Region" HorizontalAlignment="Left">
@@ -119,7 +118,7 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
- 
+
                 <TabItem Header="Nav Structures">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
@@ -128,7 +127,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" Grid.ColumnSpan="1" Margin="1">
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Header="Ansiblex Gates" Margin="4" Height="auto">
                                     <StackPanel>
 
@@ -176,19 +175,13 @@
                                                 <DataGridTextColumn Header="To" Binding="{Binding To}" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
-
-
-
-
-                                        
                                     </StackPanel>
                                 </GroupBox>
-
                             </Border>
                         </StackPanel>
 
                         <StackPanel Grid.Column="1" Grid.ColumnSpan="1" Margin="1">
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Header="Cyno Beacons" Margin="4" Height="auto">
                                     <StackPanel>
                                         <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons" />
@@ -197,7 +190,6 @@
                                 </GroupBox>
                             </Border>
                         </StackPanel>
-
                     </Grid>
                 </TabItem>
 
@@ -205,20 +197,20 @@
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="50*"/>
+                            <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" Grid.ColumnSpan="1" Margin="1">
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Header="General" Margin="4">
                                     <StackPanel>
 
                                         <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
-                                        <CheckBox IsChecked="{Binding PlayIntelSoundOnAlert}" Margin="0,2" Content="Warning Sound on Alert"/>
+                                        <CheckBox IsChecked="{Binding PlayIntelSoundOnAlert}" Margin="0,2" Content="Warning Sound on Alert" />
                                         <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window" />
                                         <StackPanel Orientation="Vertical" Margin="2">
                                             <Label Content="Warning Sound Volume" />
-                                            <Slider x:Name="intelVolumeSlider" Value="{Binding Path=IntelSoundVolume}" Minimum="0" Maximum="1" TickFrequency="0.1" TickPlacement="BottomRight" IsMoveToPointEnabled="True"  />
+                                            <Slider x:Name="intelVolumeSlider" Value="{Binding Path=IntelSoundVolume}" Minimum="0" Maximum="1" TickFrequency="0.1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -238,7 +230,7 @@
                                     </StackPanel>
                                 </GroupBox>
                             </Border>
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Header="DangerZone" Margin="4">
                                     <StackPanel>
                                         <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
@@ -258,18 +250,18 @@
                             </Border>
                         </StackPanel>
 
-                        <StackPanel Grid.Column="1" Grid.ColumnSpan="2" >
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
-                                <GroupBox Margin="4" >
+                        <StackPanel Grid.Column="1" Grid.ColumnSpan="2">
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
+                                <GroupBox Margin="4">
 
                                     <StackPanel Orientation="Vertical">
-                                        <Label Content="Channels to monitor (Partial text match, one per line)"/>
+                                        <Label Content="Channels to monitor (Partial text match, one per line)" />
                                         <TextBox Width="271" Height="100" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                        <Label Content="Clear Filters (will change alert to warning)"/>
+                                        <Label Content="Clear Filters (will change alert to warning)" />
                                         <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelClearFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                        <Label Content="Ignore Filters (Text to ignore)"/>
+                                        <Label Content="Ignore Filters (Text to ignore)" />
                                         <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelIgnoreFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                        <Label Content="Alert Filters (Text to always alert)"/>
+                                        <Label Content="Alert Filters (Text to always alert)" />
                                         <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelAlertFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                     </StackPanel>
                                 </GroupBox>
@@ -277,29 +269,28 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
- 
+
                 <TabItem Header="Misc">
-                    <Grid Height="500" Width="600" >
+                    <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
                             <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" >
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
-                                
+                        <StackPanel Grid.Column="0">
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
 
-                            <GroupBox Header="Fleet" Margin="4" Height="auto" >
-                                <StackPanel>
-                                    <CheckBox IsChecked="{Binding Path=FleetShowOnMap}" Margin="0,2">Show Fleet Members</CheckBox>
-                                    <CheckBox IsChecked="{Binding Path=FleetShowShipType}" Margin="0,2">Show Fleet Member Ship Type</CheckBox>
+                                <GroupBox Header="Fleet" Margin="4" Height="auto">
+                                    <StackPanel>
+                                        <CheckBox IsChecked="{Binding Path=FleetShowOnMap}" Margin="0,2">Show Fleet Members</CheckBox>
+                                        <CheckBox IsChecked="{Binding Path=FleetShowShipType}" Margin="0,2">Show Fleet Member Ship Type</CheckBox>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <xctk:IntegerUpDown Value="{Binding Path=FleetMaxMembersPerSystem}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="1" Maximum="30" Background="Transparent"  Foreground="White" />
-                                        <Label Content="Max Fleet Members Display" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                                            <xctk:IntegerUpDown Value="{Binding Path=FleetMaxMembersPerSystem}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="1" Maximum="30" Background="Transparent"  Foreground="White" />
+                                            <Label Content="Max Fleet Members Display" />
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </GroupBox>
+                                </GroupBox>
                             </Border>
 
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
@@ -332,9 +323,8 @@
                                     </StackPanel>
                                 </GroupBox>
                             </Border>
-
                         </StackPanel>
-                        <StackPanel Grid.Column="1" >
+                        <StackPanel Grid.Column="1">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Header="Beacons" Margin="4" Height="auto">
                                     <StackPanel>
@@ -353,7 +343,7 @@
                             <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
-                        <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                        <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                             <StackPanel Grid.Column="0">
                                 <GroupBox Header="General" Margin="4">
                                     <StackPanel>
@@ -402,7 +392,7 @@
                             </StackPanel>
                         </Border>
                         <StackPanel Grid.Column="1">
-                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2" >
+                            <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Margin="4" Height="auto">
                                     <StackPanel>
 
@@ -442,7 +432,6 @@
                         </ScrollViewer>
                     </Grid>
                 </TabItem>
-
             </TabControl>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,2">
                 <Button Content="Default" Margin="3,0" Width="55" Click="Prefs_Default_Click" />

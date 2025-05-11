@@ -46,36 +46,36 @@ namespace SMT.EVEData
             HashSet<string> signaturesPresent = new HashSet<string>();
 
             string[] pastelines = pastedText.Split('\n');
-            foreach (string line in pastelines)
+            foreach(string line in pastelines)
             {
                 // split on tabs
                 string[] words = line.Split('\t');
 
-                if (words.Length != 6)
+                if(words.Length != 6)
                     continue;
 
                 // only care about "Cosmic Signature"
-                if (!CosmicSignatureTags.Contains(words[1]))
+                if(!CosmicSignatureTags.Contains(words[1]))
                     continue;
 
                 string sigID = words[0];
                 string sigType = words[2];
                 string sigName = words[3];
 
-                if (string.IsNullOrEmpty(sigType))
+                if(string.IsNullOrEmpty(sigType))
                     sigType = "Unknown";
 
                 signaturesPresent.Add(sigID);
 
-                if (Anoms.ContainsKey(sigID))
+                if(Anoms.ContainsKey(sigID))
                 {
                     // update an existing signature
                     Anom an = Anoms[sigID];
 
-                    if (an.Type == "Unknown")
+                    if(an.Type == "Unknown")
                         an.Type = sigType;
 
-                    if (!string.IsNullOrEmpty(sigName))
+                    if(!string.IsNullOrEmpty(sigName))
                         an.Name = sigName;
                 }
                 else
@@ -85,7 +85,7 @@ namespace SMT.EVEData
                     an.Signature = sigID;
                     an.Type = sigType;
 
-                    if (!string.IsNullOrEmpty(sigName))
+                    if(!string.IsNullOrEmpty(sigName))
                         an.Name = sigName;
 
                     Anoms.Add(sigID, an);

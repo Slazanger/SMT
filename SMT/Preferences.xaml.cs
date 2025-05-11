@@ -6,9 +6,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Data;
+
 //using System.Windows.Forms;
-using System.Windows.Media;
-using NAudio.Utils;
 using NAudio.Wave;
 using SMT.EVEData;
 using MessageBox = System.Windows.MessageBox;
@@ -36,11 +35,9 @@ namespace SMT
 
             syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
 
-
             waveOutEvent = new WaveOutEvent();
             audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
             waveOutEvent.Init(audioFileReader);
-
 
             JumpBridgeList.ItemsSource = EveManager.Instance.JumpBridges;
         }
@@ -48,9 +45,9 @@ namespace SMT
         public void Init()
         {
             CynoBeaconSystems = new List<string>();
-            foreach (EVEData.System s in EM.Systems)
+            foreach(EVEData.System s in EM.Systems)
             {
-                if (s.HasJumpBeacon)
+                if(s.HasJumpBeacon)
                 {
                     CynoBeaconSystems.Add(s.Name);
                 }
@@ -59,15 +56,15 @@ namespace SMT
 
         private void Prefs_OK_Click(object sender, RoutedEventArgs e)
         {
-            foreach (EVEData.System s in EM.Systems)
+            foreach(EVEData.System s in EM.Systems)
             {
                 s.HasJumpBeacon = false;
             }
 
-            foreach (string sys in CynoBeaconSystems)
+            foreach(string sys in CynoBeaconSystems)
             {
                 EVEData.System es = EM.GetEveSystem(sys);
-                if (es != null)
+                if(es != null)
                 {
                     es.HasJumpBeacon = true;
                 }
@@ -78,7 +75,7 @@ namespace SMT
 
         private void Prefs_Default_Click(object sender, RoutedEventArgs e)
         {
-            if (MapConf != null)
+            if(MapConf != null)
             {
                 MapConf.SetDefaults();
             }
@@ -120,7 +117,7 @@ namespace SMT
 
         private void IntelVolumeChanged_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (isInitialLoad)
+            if(isInitialLoad)
             {
                 isInitialLoad = false;
                 return; // Skip sound playback on initial load
@@ -128,18 +125,17 @@ namespace SMT
 
             waveOutEvent.Volume = MapConf.IntelSoundVolume;
 
-            if (waveOutEvent.PlaybackState != PlaybackState.Playing )
+            if(waveOutEvent.PlaybackState != PlaybackState.Playing)
             {
                 audioFileReader.Position = 0; // Reset position to the beginning
-                waveOutEvent.Play(); // Play the sound  
+                waveOutEvent.Play(); // Play the sound
             }
-
         }
 
         private void SetLogLocation_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 MapConf.CustomEveLogFolderLocation = dialog.SelectedPath;
             }
@@ -162,7 +158,7 @@ namespace SMT
 
         private void DeleteJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (JumpBridgeList.SelectedIndex == -1)
+            if(JumpBridgeList.SelectedIndex == -1)
             {
                 return;
             }
@@ -180,7 +176,7 @@ namespace SMT
 
         private void EnableDisableJumpGateMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (JumpBridgeList.SelectedIndex == -1)
+            if(JumpBridgeList.SelectedIndex == -1)
             {
                 return;
             }
@@ -200,20 +196,20 @@ namespace SMT
         {
             string ExportText = "";
 
-            foreach (EVEData.MapRegion mr in EveManager.Instance.Regions)
+            foreach(EVEData.MapRegion mr in EveManager.Instance.Regions)
             {
                 ExportText += "# " + mr.Name + "\n";
 
-                foreach (EVEData.JumpBridge jb in EveManager.Instance.JumpBridges)
+                foreach(EVEData.JumpBridge jb in EveManager.Instance.JumpBridges)
                 {
                     EVEData.System es = EveManager.Instance.GetEveSystem(jb.From);
-                    if (es.Region == mr.Name)
+                    if(es.Region == mr.Name)
                     {
                         ExportText += $"{jb.FromID} {jb.From} --> {jb.To}\n";
                     }
 
                     es = EveManager.Instance.GetEveSystem(jb.To);
-                    if (es.Region == mr.Name)
+                    if(es.Region == mr.Name)
                     {
                         ExportText += $"{jb.ToID} {jb.To} --> {jb.From}\n";
                     }
@@ -224,7 +220,7 @@ namespace SMT
 
             System.Windows.Forms.SaveFileDialog saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             saveFileDialog.Filter = "Text file (*.txt)|*.txt";
-            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if(saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 try
                 {
@@ -242,34 +238,34 @@ namespace SMT
             ImportPasteJumpGatesBtn.IsEnabled = false;
             ExportJumpGatesBtn.IsEnabled = false;
 
-            foreach (EVEData.LocalCharacter c in EveManager.Instance.LocalCharacters)
+            foreach(EVEData.LocalCharacter c in EveManager.Instance.LocalCharacters)
             {
-                if (c.ESILinked)
+                if(c.ESILinked)
                 {
                     // This should never be set due to https://developers.eveonline.com/blog/article/the-esi-api-is-a-shared-resource-do-not-abuse-it
-                    if (c.DeepSearchEnabled && GateSearchFilter.Text == " » ")
+                    if(c.DeepSearchEnabled && GateSearchFilter.Text == " » ")
                     {
                         string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
                         string basesearch = " » ";
 
-                        foreach (char cc in chars)
+                        foreach(char cc in chars)
                         {
                             string search = basesearch + cc;
                             List<EVEData.JumpBridge> jbl = await c.FindJumpGates(search);
 
-                            foreach (EVEData.JumpBridge jb in jbl)
+                            foreach(EVEData.JumpBridge jb in jbl)
                             {
                                 bool found = false;
 
-                                foreach (EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
+                                foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
                                 {
-                                    if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
+                                    if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
                                     {
                                         found = true;
                                     }
                                 }
 
-                                if (!found)
+                                if(!found)
                                 {
                                     EveManager.Instance.JumpBridges.Add(jb);
                                 }
@@ -278,24 +274,24 @@ namespace SMT
                             Thread.Sleep(100);
                         }
 
-                        foreach (char cc in chars)
+                        foreach(char cc in chars)
                         {
                             string search = cc + basesearch;
                             List<EVEData.JumpBridge> jbl = await c.FindJumpGates(search);
 
-                            foreach (EVEData.JumpBridge jb in jbl)
+                            foreach(EVEData.JumpBridge jb in jbl)
                             {
                                 bool found = false;
 
-                                foreach (EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
+                                foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
                                 {
-                                    if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
+                                    if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
                                     {
                                         found = true;
                                     }
                                 }
 
-                                if (!found)
+                                if(!found)
                                 {
                                     EveManager.Instance.JumpBridges.Add(jb);
                                 }
@@ -308,19 +304,19 @@ namespace SMT
                     {
                         List<EVEData.JumpBridge> jbl = await c.FindJumpGates(GateSearchFilter.Text);
 
-                        foreach (EVEData.JumpBridge jb in jbl)
+                        foreach(EVEData.JumpBridge jb in jbl)
                         {
                             bool found = false;
 
-                            foreach (EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
+                            foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
                             {
-                                if ((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
+                                if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
                                 {
                                     found = true;
                                 }
                             }
 
-                            if (!found)
+                            if(!found)
                             {
                                 EveManager.Instance.JumpBridges.Add(jb);
                             }
@@ -343,7 +339,7 @@ namespace SMT
 
         private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (!Clipboard.ContainsText(TextDataFormat.Text))
+            if(!Clipboard.ContainsText(TextDataFormat.Text))
             {
                 return;
             }
@@ -355,7 +351,7 @@ namespace SMT
             );
             MatchCollection matches = rx.Matches(jbText);
 
-            foreach (Match match in matches)
+            foreach(Match match in matches)
             {
                 // from eve chat
                 // 1 = id
@@ -368,14 +364,14 @@ namespace SMT
                 // 6 = to
                 GroupCollection groups = match.Groups;
                 long IDFrom = 0;
-                if (groups[1].Value != "" && groups[2].Value != "" && groups[3].Value != "")
+                if(groups[1].Value != "" && groups[2].Value != "" && groups[3].Value != "")
                 {
                     long.TryParse(groups[1].Value, out IDFrom);
                     string from = groups[2].Value;
                     string to = groups[3].Value;
                     EveManager.Instance.AddUpdateJumpBridge(from, to, IDFrom);
                 }
-                else if (groups[4].Value != "" && groups[5].Value != "" && groups[6].Value != "")
+                else if(groups[4].Value != "" && groups[5].Value != "" && groups[6].Value != "")
                 {
                     long.TryParse(groups[4].Value, out IDFrom);
                     string from = groups[5].Value.Trim();
@@ -396,15 +392,15 @@ namespace SMT
             int MissingInfo = 0;
             int Disabled = 0;
 
-            foreach (EVEData.JumpBridge jb in EveManager.Instance.JumpBridges)
+            foreach(EVEData.JumpBridge jb in EveManager.Instance.JumpBridges)
             {
                 JBCount++;
 
-                if (jb.FromID == 0 || jb.ToID == 0)
+                if(jb.FromID == 0 || jb.ToID == 0)
                 {
                     MissingInfo++;
                 }
-                if (jb.Disabled)
+                if(jb.Disabled)
                 {
                     Disabled++;
                 }
@@ -437,9 +433,9 @@ namespace SMT
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool boolValue)
+            if(value is bool boolValue)
             {
-                if (boolValue)
+                if(boolValue)
                 {
                     return "True";
                 }

@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using SMT.EVEData;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
@@ -72,7 +70,7 @@ namespace SMT
                 // Retreive the coordinates of the mouse button event.
                 System.Windows.Point pt = e.GetPosition((UIElement)sender);
 
-                if (HitTestEnabled)
+                if(HitTestEnabled)
                 {
                     // Initiate the hit test by setting up a hit test result callback method.
                     VisualTreeHelper.HitTest(this, null, HitTestCheck, new PointHitTestParameters(pt));
@@ -85,7 +83,7 @@ namespace SMT
             // Provide a required override for the GetVisualChild method.
             protected override Visual GetVisualChild(int index)
             {
-                if (index < 0 || index >= Children.Count)
+                if(index < 0 || index >= Children.Count)
                 {
                     throw new ArgumentOutOfRangeException();
                 }
@@ -96,12 +94,12 @@ namespace SMT
             public HitTestResultBehavior HitTestCheck(HitTestResult result)
             {
                 System.Windows.Media.DrawingVisual dv = null;
-                if (result.VisualHit.GetType() == typeof(System.Windows.Media.DrawingVisual))
+                if(result.VisualHit.GetType() == typeof(System.Windows.Media.DrawingVisual))
                 {
                     dv = (System.Windows.Media.DrawingVisual)result.VisualHit;
                 }
 
-                if (dv != null && DataContextData.ContainsKey(dv))
+                if(dv != null && DataContextData.ContainsKey(dv))
                 {
                     RoutedEventArgs newEventArgs = new RoutedEventArgs(MouseClickedEvent, DataContextData[dv]);
                     RaiseEvent(newEventArgs);
@@ -191,7 +189,7 @@ namespace SMT
             {
                 m_ShowNPCKills = value;
 
-                if (m_ShowNPCKills)
+                if(m_ShowNPCKills)
                 {
                     ShowPodKills = false;
                     ShowShipKills = false;
@@ -212,7 +210,7 @@ namespace SMT
             set
             {
                 m_ShowPodKills = value;
-                if (m_ShowPodKills)
+                if(m_ShowPodKills)
                 {
                     ShowNPCKills = false;
                     ShowShipKills = false;
@@ -233,7 +231,7 @@ namespace SMT
             set
             {
                 m_ShowShipKills = value;
-                if (m_ShowShipKills)
+                if(m_ShowShipKills)
                 {
                     ShowNPCKills = false;
                     ShowPodKills = false;
@@ -254,7 +252,7 @@ namespace SMT
             set
             {
                 m_ShowShipJumps = value;
-                if (m_ShowShipJumps)
+                if(m_ShowShipJumps)
                 {
                     ShowNPCKills = false;
                     ShowPodKills = false;
@@ -271,7 +269,7 @@ namespace SMT
         {
             ActiveCharacter = lc;
 
-            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 CentreMapOnActiveCharacter();
             }
@@ -345,7 +343,7 @@ namespace SMT
             UniverseMainCanvas.Children.Add(VHDataSpheres);
             UniverseMainCanvas.Children.Add(VHZKB);
             UniverseMainCanvas.Children.Add(VHRangeHighlights);
-            UniverseMainCanvas.Children.Add(VHRWHShapes);  
+            UniverseMainCanvas.Children.Add(VHRWHShapes);
             UniverseMainCanvas.Children.Add(VHLinks);
             UniverseMainCanvas.Children.Add(VHRoute);
             UniverseMainCanvas.Children.Add(VHNames);
@@ -361,23 +359,23 @@ namespace SMT
 
             DataContext = this;
 
-            foreach (EVEData.System sys in EM.Systems)
+            foreach(EVEData.System sys in EM.Systems)
             {
-                foreach (string jumpTo in sys.Jumps)
+                foreach(string jumpTo in sys.Jumps)
                 {
                     EVEData.System to = EM.GetEveSystem(jumpTo);
 
                     bool NeedsAdd = true;
-                    foreach (GateHelper gh in universeSysLinksCache)
+                    foreach(GateHelper gh in universeSysLinksCache)
                     {
-                        if (((gh.from == sys) || (gh.to == sys)) && ((gh.from == to) || (gh.to == to)))
+                        if(((gh.from == sys) || (gh.to == sys)) && ((gh.from == to) || (gh.to == to)))
                         {
                             NeedsAdd = false;
                             break;
                         }
                     }
 
-                    if (NeedsAdd)
+                    if(NeedsAdd)
                     {
                         GateHelper g = new GateHelper();
                         g.from = sys;
@@ -395,7 +393,7 @@ namespace SMT
 
         public List<Point> ConvexHull(List<Point> points)
         {
-            if (points.Count < 3)
+            if(points.Count < 3)
             {
                 throw new ArgumentException("At least 3 points reqired", "points");
             }
@@ -411,9 +409,9 @@ namespace SMT
                 hull.Add(vPointOnHull);
                 vEndpoint = points[0];
 
-                for (int i = 1; i < points.Count; i++)
+                for(int i = 1; i < points.Count; i++)
                 {
-                    if ((vPointOnHull == vEndpoint)
+                    if((vPointOnHull == vEndpoint)
                         || (Orientation(vPointOnHull, vEndpoint, points[i]) == -1))
                     {
                         vEndpoint = points[i];
@@ -422,7 +420,7 @@ namespace SMT
 
                 vPointOnHull = vEndpoint;
             }
-            while (vEndpoint != hull[0]);
+            while(vEndpoint != hull[0]);
 
             return hull;
         }
@@ -433,9 +431,9 @@ namespace SMT
             // Determinant
             int Orin = (int)((p2.X - p1.X) * (p.Y - p1.Y) - (p.X - p1.X) * (p2.Y - p1.Y));
 
-            if (Orin > 0)
+            if(Orin > 0)
                 return -1; //          (* Orientation is to the left-hand side  *)
-            if (Orin < 0)
+            if(Orin < 0)
                 return 1; // (* Orientation is to the right-hand side *)
 
             return 0; //  (* Orientation is neutral aka collinear  *)
@@ -451,22 +449,22 @@ namespace SMT
             MenuItem mi = sender as MenuItem;
             double LY = double.Parse(mi.DataContext as string);
 
-            if (LY == -1.0)
+            if(LY == -1.0)
             {
                 activeJumpSpheres.Clear();
                 return;
             }
 
-            foreach (KeyValuePair<string, decimal> kvp in activeJumpSpheres)
+            foreach(KeyValuePair<string, decimal> kvp in activeJumpSpheres)
             {
-                if (kvp.Key == sys.Name)
+                if(kvp.Key == sys.Name)
                 {
                     activeJumpSpheres.Remove(kvp);
                     break;
                 }
             }
 
-            if (LY > 0)
+            if(LY > 0)
             {
                 activeJumpSpheres.Add(new KeyValuePair<string, decimal>(sys.Name, (decimal)LY));
             }
@@ -484,7 +482,7 @@ namespace SMT
             System.Windows.Media.DrawingVisual rangeCircleDV = new System.Windows.Media.DrawingVisual();
             DrawingContext drawingContext = rangeCircleDV.RenderOpen();
 
-            foreach (KeyValuePair<string, decimal> kvp in activeJumpSpheres)
+            foreach(KeyValuePair<string, decimal> kvp in activeJumpSpheres)
             {
                 EVEData.System ssys = EM.GetEveSystem(kvp.Key);
 
@@ -501,18 +499,18 @@ namespace SMT
             VHRangeSpheres.AddChild(rangeCircleDV);
             drawingContext.Close();
 
-            foreach (EVEData.System es in EM.Systems)
+            foreach(EVEData.System es in EM.Systems)
             {
                 bool inRange = false;
                 bool overlap = false;
 
-                foreach (KeyValuePair<string, decimal> kvp in activeJumpSpheres)
+                foreach(KeyValuePair<string, decimal> kvp in activeJumpSpheres)
                 {
                     decimal Distance = EM.GetRangeBetweenSystems(kvp.Key, es.Name);
 
-                    if (Distance < kvp.Value && Distance > 0.0m && es.TrueSec <= 0.45 && es.Region != "Pochven")
+                    if(Distance < kvp.Value && Distance > 0.0m && es.TrueSec <= 0.45 && es.Region != "Pochven")
                     {
-                        if (inRange == true)
+                        if(inRange == true)
                         {
                             overlap = true;
                         }
@@ -520,7 +518,7 @@ namespace SMT
                     }
                 }
 
-                if (inRange)
+                if(inRange)
                 {
                     double irX = es.UniverseX;
                     double irZ = es.UniverseY;
@@ -528,7 +526,7 @@ namespace SMT
 
                     // Retrieve the DrawingContext from the DrawingVisual.
                     DrawingContext dcR = rangeSquareDV.RenderOpen();
-                    if (overlap)
+                    if(overlap)
                     {
                         dcR.DrawRectangle(sysRangeCol, new Pen(rangeOverlapCol, 1), new Rect(irX - 3, irZ - 3, 6, 6));
                     }
@@ -552,13 +550,13 @@ namespace SMT
             bool FastUpdate = true;
             bool DataRedraw = false;
 
-            if (uiRefreshTimer_interval == 4)
+            if(uiRefreshTimer_interval == 4)
             {
                 uiRefreshTimer_interval = 0;
                 DataRedraw = false;
             }
 
-            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 CentreMapOnActiveCharacter();
             }
@@ -569,7 +567,7 @@ namespace SMT
         {
             EVEData.System sys = (EVEData.System)e.OriginalSource;
 
-            if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            if(Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 currentDebugSystem = sys;
             }
@@ -587,7 +585,7 @@ namespace SMT
             MenuItem addWaypoint = cm.Items[4] as MenuItem;
             MenuItem clearRoute = cm.Items[6] as MenuItem;
 
-            if (ActiveCharacter != null && ActiveCharacter.ESILinked)
+            if(ActiveCharacter != null && ActiveCharacter.ESILinked)
             {
                 setDesto.IsEnabled = true;
                 addWaypoint.IsEnabled = true;
@@ -599,7 +597,7 @@ namespace SMT
             SovHeader.Items.Clear();
             SovHeader.IsEnabled = false;
 
-            if (sys.SOVAllianceID != 0)
+            if(sys.SOVAllianceID != 0)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "IHUB: " + EM.GetAllianceTicker(sys.SOVAllianceID);
@@ -609,13 +607,12 @@ namespace SMT
                 SovHeader.Items.Add(mi);
             }
 
-
             // update stats
             MenuItem StatsHeader = cm.Items[10] as MenuItem;
             StatsHeader.Items.Clear();
             StatsHeader.IsEnabled = false;
 
-            if (sys.HasNPCStation)
+            if(sys.HasNPCStation)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "NPC Station(s)";
@@ -623,7 +620,7 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-            if (sys.HasIceBelt)
+            if(sys.HasIceBelt)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Ice Belts";
@@ -631,7 +628,7 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-            if (sys.HasJoveObservatory)
+            if(sys.HasJoveObservatory)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Jove Observatory";
@@ -639,7 +636,7 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-            if (sys.JumpsLastHour > 0)
+            if(sys.JumpsLastHour > 0)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Jumps : " + sys.JumpsLastHour;
@@ -647,7 +644,7 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-            if (sys.ShipKillsLastHour > 0)
+            if(sys.ShipKillsLastHour > 0)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Ship Kills : " + sys.ShipKillsLastHour;
@@ -655,7 +652,7 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-            if (sys.PodKillsLastHour > 0)
+            if(sys.PodKillsLastHour > 0)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Pod Kills : " + sys.PodKillsLastHour;
@@ -663,7 +660,7 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-            if (sys.NPCKillsLastHour > 0)
+            if(sys.NPCKillsLastHour > 0)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "NPC Kills : " + sys.NPCKillsLastHour + " (Delta: " + sys.NPCKillsDeltaLastHour + ")";
@@ -671,7 +668,7 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-            if (sys.RadiusAU > 0)
+            if(sys.RadiusAU > 0)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Radius : " + sys.RadiusAU.ToString("#.##") + " (AU)";
@@ -679,9 +676,8 @@ namespace SMT
                 StatsHeader.Items.Add(mi);
             }
 
-
             TheraConnection tc = EM.TheraConnections.Where(theraSystem => theraSystem.System == sys.Name).FirstOrDefault();
-            if (tc != null)
+            if(tc != null)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Thera : In Sig : " + tc.InSignatureID;
@@ -695,7 +691,7 @@ namespace SMT
             }
 
             TurnurConnection tuc = EM.TurnurConnections.Where(turnerSystem => turnerSystem.System == sys.Name).FirstOrDefault();
-            if (tuc != null)
+            if(tuc != null)
             {
                 MenuItem mi = new MenuItem();
                 mi.Header = "Turnur : In Sig : " + tuc.InSignatureID;
@@ -714,7 +710,7 @@ namespace SMT
             MenuItem mi = sender as MenuItem;
             long ID = (long)mi.DataContext;
 
-            if (ID != 0)
+            if(ID != 0)
             {
                 string uRL = string.Format("https://evewho.com/alliance/{0}", ID);
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
@@ -759,7 +755,7 @@ namespace SMT
             double CharacterTextSize = 6;
 
             // recreate the brushes on a full draw
-            if (FullRedraw)
+            if(FullRedraw)
             {
                 SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemColour);
                 SystemColourHiSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(1.0, false));
@@ -822,8 +818,7 @@ namespace SMT
             System.Windows.FontStyle fontStyle = FontStyles.Normal;
             FontWeight fontWeight = FontWeights.Medium;
 
-
-            if (FullRedraw)
+            if(FullRedraw)
             {
                 VHSystems.ClearAllChildren();
                 VHLinks.ClearAllChildren();
@@ -842,7 +837,7 @@ namespace SMT
                 System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
 
-                foreach (GateHelper gh in universeSysLinksCache)
+                foreach(GateHelper gh in universeSysLinksCache)
                 {
                     double X1 = gh.from.UniverseX;
                     double Y1 = gh.from.UniverseY;
@@ -851,17 +846,17 @@ namespace SMT
                     double Y2 = gh.to.UniverseY;
                     Pen p = GatePen;
 
-                    if (gh.from.ConstellationID != gh.to.ConstellationID)
+                    if(gh.from.ConstellationID != gh.to.ConstellationID)
                     {
                         p = ConstGatePen;
                     }
 
-                    if (gh.from.Region != gh.to.Region)
+                    if(gh.from.Region != gh.to.Region)
                     {
                         p = RegionGatePen;
                     }
 
-                    if (gh.from.Region == "Pochven")
+                    if(gh.from.Region == "Pochven")
                     {
                         p = PochvenGatePen;
                     }
@@ -873,7 +868,7 @@ namespace SMT
                 //gatesDrawingVisual.CacheMode = new BitmapCache(3);
                 VHLinks.AddChild(gatesDrawingVisual, "link");
 
-                if (ShowJumpBridges)
+                if(ShowJumpBridges)
                 {
                     Pen p = new Pen(JumpBridgeColourBrush, 0.6);
                     p.DashStyle = DashStyles.Dot;
@@ -882,7 +877,7 @@ namespace SMT
                     DrawingContext drawingContext;
                     drawingContext = jbDrawingVisual.RenderOpen();
 
-                    foreach (EVEData.JumpBridge jb in EM.JumpBridges)
+                    foreach(EVEData.JumpBridge jb in EM.JumpBridges)
                     {
                         EVEData.System from = EM.GetEveSystem(jb.From);
                         EVEData.System to = EM.GetEveSystem(jb.To);
@@ -905,7 +900,7 @@ namespace SMT
 
                 CultureInfo ci = CultureInfo.GetCultureInfo("en-us");
 
-                foreach (EVEData.System sys in EM.Systems)
+                foreach(EVEData.System sys in EM.Systems)
                 {
                     System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
                     DrawingContext systemTextDrawingContext = SystemTextVisual.RenderOpen();
@@ -922,16 +917,16 @@ namespace SMT
                     Rect rect = new Rect(X - 2, Z - 2, 4, 4);
 
                     Brush sysbrush = SystemColourNullSecBrush;
-                    if (sys.TrueSec >= 0.45)
+                    if(sys.TrueSec >= 0.45)
                     {
                         sysbrush = SystemColourHiSecBrush;
                     }
-                    else if (sys.TrueSec > 0.0)
+                    else if(sys.TrueSec > 0.0)
                     {
                         sysbrush = SystemColourLowSecBrush;
                     }
 
-                    if (sys.HasNPCStation)
+                    if(sys.HasNPCStation)
                     {
                         drawingContext.DrawRectangle(sysbrush, SysOutlinePen, rect);
                     }
@@ -970,7 +965,7 @@ namespace SMT
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = dataDV.RenderOpen();
 
-                    foreach (EVEData.System sys in EM.Systems)
+                    foreach(EVEData.System sys in EM.Systems)
                     {
                         double X = sys.UniverseX;
 
@@ -988,7 +983,7 @@ namespace SMT
                 }
             }
 
-            if (DataRedraw)
+            if(DataRedraw)
             {
                 Brush dataBrush = DataColourBrush;
 
@@ -997,7 +992,7 @@ namespace SMT
 
                 Pen dataPen = new Pen(dataBrush, 1);
 
-                foreach (EVEData.System sys in EM.Systems)
+                foreach(EVEData.System sys in EM.Systems)
                 {
                     System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
 
@@ -1011,13 +1006,13 @@ namespace SMT
 
                     double DataScale = 0;
 
-                    if (ShowNPCKills)
+                    if(ShowNPCKills)
                     {
                         DataScale = sys.NPCKillsLastHour * ESIOverlayScale * 0.05f;
 
-                        if (MapConf.ShowRattingDataAsDelta)
+                        if(MapConf.ShowRattingDataAsDelta)
                         {
-                            if (!MapConf.ShowNegativeRattingDelta)
+                            if(!MapConf.ShowNegativeRattingDelta)
                             {
                                 DataScale = Math.Max(0, sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f; ;
                             }
@@ -1025,7 +1020,7 @@ namespace SMT
                             {
                                 DataScale = Math.Abs(sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f;
 
-                                if (sys.NPCKillsDeltaLastHour > 0)
+                                if(sys.NPCKillsDeltaLastHour > 0)
                                 {
                                     dataBrush = PositiveDeltaColor;
                                 }
@@ -1037,40 +1032,33 @@ namespace SMT
                         }
                     }
 
-                    if (ShowPodKills)
+                    if(ShowPodKills)
                     {
                         DataScale = sys.PodKillsLastHour * ESIOverlayScale * 2f;
                     }
 
-                    if (ShowShipKills)
+                    if(ShowShipKills)
                     {
                         DataScale = sys.ShipKillsLastHour * ESIOverlayScale * 1f;
                     }
 
-                    if (ShowShipJumps)
+                    if(ShowShipJumps)
                     {
                         DataScale = sys.JumpsLastHour * ESIOverlayScale * 0.1f;
                     }
 
-                    if (DataScale > 3)
+                    if(DataScale > 3)
                     {
                         // Create a rectangle and draw it in the DrawingContext.
                         drawingContext.DrawEllipse(dataBrush, dataPen, new Point(X, Z), DataScale, DataScale);
                     }
 
-
-
-
-
                     drawingContext.Close();
                     VHDataSpheres.AddChild(dataDV);
                 }
-
-
-
             }
 
-            if (FastUpdate)
+            if(FastUpdate)
             {
                 VHCharacters.ClearAllChildren();
                 VHZKB.ClearAllChildren();
@@ -1086,18 +1074,18 @@ namespace SMT
                 Brush RouteBrush = new SolidColorBrush(Colors.Orange);
                 Brush RouteAltBrush = new SolidColorBrush(Colors.DarkRed);
 
-                if (MapConf.ShowCharacterNamesOnMap)
+                if(MapConf.ShowCharacterNamesOnMap)
                 {
                     Pen p = new Pen(CharacterNameSysHighlightBrush, 1.0);
 
                     Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
 
                     // add the characters
-                    foreach (EVEData.LocalCharacter lc in EM.LocalCharacters)
+                    foreach(EVEData.LocalCharacter lc in EM.LocalCharacters)
                     {
-                        if (!string.IsNullOrEmpty(lc.Location))
+                        if(!string.IsNullOrEmpty(lc.Location))
                         {
-                            if (!MapCharacters.ContainsKey(lc.Location))
+                            if(!MapCharacters.ContainsKey(lc.Location))
                             {
                                 MapCharacters.Add(lc.Location, new List<string>());
                             }
@@ -1105,10 +1093,10 @@ namespace SMT
                         }
                     }
 
-                    foreach (KeyValuePair<string, List<string>> kvp in MapCharacters)
+                    foreach(KeyValuePair<string, List<string>> kvp in MapCharacters)
                     {
                         EVEData.System sys = EM.GetEveSystem(kvp.Key);
-                        if (sys == null)
+                        if(sys == null)
                         {
                             continue;
                         }
@@ -1126,7 +1114,7 @@ namespace SMT
                         // draw a circle around the system
                         dc.DrawEllipse(CharacterNameSysHighlightBrush, p, new Point(X, Z), 6, 6);
 
-                        foreach (string name in kvp.Value)
+                        foreach(string name in kvp.Value)
                         {
                             // Draw a formatted text string into the DrawingContext.
                             dc.DrawText(
@@ -1148,9 +1136,9 @@ namespace SMT
                 // now add the zkill data
                 Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
                 {
-                    foreach (EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
+                    foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
                     {
-                        if (ZKBBaseFeed.ContainsKey(zs.SystemName))
+                        if(ZKBBaseFeed.ContainsKey(zs.SystemName))
                         {
                             ZKBBaseFeed[zs.SystemName]++;
                         }
@@ -1162,7 +1150,7 @@ namespace SMT
 
                     Pen zkbPen = new Pen(ZKBBrush, 1.0);
 
-                    foreach (KeyValuePair<string, int> kvp in ZKBBaseFeed)
+                    foreach(KeyValuePair<string, int> kvp in ZKBBaseFeed)
                     {
                         // Create an instance of a DrawingVisual.
                         System.Windows.Media.DrawingVisual zkbVisual = new System.Windows.Media.DrawingVisual();
@@ -1173,7 +1161,7 @@ namespace SMT
                         double zkbVal = 5 + ((double)kvp.Value * ESIOverlayScale * 2);
 
                         EVEData.System sys = EM.GetEveSystem(kvp.Key);
-                        if (sys == null)
+                        if(sys == null)
                         {
                             // probably a WH
                             continue;
@@ -1189,23 +1177,18 @@ namespace SMT
                     }
                 }
 
-                // thera / turnur 
-
+                // thera / turnur
 
                 Pen theraPen = new Pen(WHTheraColourBrush, 1.0);
                 List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
 
-
-
-                foreach (TheraConnection tc in currentTheraConnections)
+                foreach(TheraConnection tc in currentTheraConnections)
                 {
                     System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = dataDV.RenderOpen();
 
-
                     EVEData.System sys = EM.GetEveSystem(tc.System);
-
 
                     double X = sys.UniverseX;
 
@@ -1214,26 +1197,20 @@ namespace SMT
 
                     drawingContext.DrawEllipse(WHTheraColourBrush, theraPen, new Point(X, Z), 5, 5);
 
-
                     drawingContext.Close();
                     VHRWHShapes.AddChild(dataDV);
-
                 }
-
 
                 Pen turnurPen = new Pen(WHTurnurColourBrush, 1.0);
                 List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
 
-                
-                foreach (TurnurConnection tc in currentTurnurConnections)
+                foreach(TurnurConnection tc in currentTurnurConnections)
                 {
                     System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = dataDV.RenderOpen();
 
-
                     EVEData.System sys = EM.GetEveSystem(tc.System);
-
 
                     double X = sys.UniverseX;
 
@@ -1241,7 +1218,6 @@ namespace SMT
                     double Z = sys.UniverseY;
 
                     drawingContext.DrawEllipse(WHTurnurColourBrush, turnurPen, new Point(X, Z), 5, 5);
-
 
                     drawingContext.Close();
                     VHRWHShapes.AddChild(dataDV);
@@ -1253,9 +1229,7 @@ namespace SMT
                     // Retrieve the DrawingContext in order to create new drawing content.
                     DrawingContext drawingContext = dataDV.RenderOpen();
 
-
                     EVEData.System sys = EM.GetEveSystem("Turnur");
-
 
                     double X = sys.UniverseX;
 
@@ -1264,15 +1238,11 @@ namespace SMT
 
                     drawingContext.DrawEllipse(WHTurnurColourBrush, turnurPen, new Point(X, Z), 5, 5);
 
-
                     drawingContext.Close();
                     VHRWHShapes.AddChild(dataDV);
                 }
 
-
-
-
-                if (CapitalRoute != null && CapitalRoute.CurrentRoute.Count > 1)
+                if(CapitalRoute != null && CapitalRoute.CurrentRoute.Count > 1)
                 {
                     Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
                     dashedRoutePen.DashStyle = DashStyles.Dot;
@@ -1285,14 +1255,14 @@ namespace SMT
                     DrawingContext drawingContext = routeVisual.RenderOpen();
 
                     // add the lines
-                    for (int i = 1; i < CapitalRoute.CurrentRoute.Count; i++)
+                    for(int i = 1; i < CapitalRoute.CurrentRoute.Count; i++)
                     {
                         Pen linePen = dashedRoutePen;
 
                         EVEData.System sysA = EM.GetEveSystem(CapitalRoute.CurrentRoute[i - 1].SystemName);
                         EVEData.System sysB = EM.GetEveSystem(CapitalRoute.CurrentRoute[i].SystemName);
 
-                        if (sysA != null && sysB != null)
+                        if(sysA != null && sysB != null)
                         {
                             double X1 = sysA.UniverseX;
                             double Y1 = sysA.UniverseY;
@@ -1300,7 +1270,7 @@ namespace SMT
                             double X2 = sysB.UniverseX;
                             double Y2 = sysB.UniverseY;
 
-                            if (i == 1)
+                            if(i == 1)
                             {
                                 drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X1, Y1), 6, 6);
                             }
@@ -1313,20 +1283,20 @@ namespace SMT
 
                     // add the alternates
                     List<string> alts = new List<string>();
-                    foreach (List<string> sss in CapitalRoute.AlternateMids.Values)
+                    foreach(List<string> sss in CapitalRoute.AlternateMids.Values)
                     {
-                        foreach (string s in sss)
+                        foreach(string s in sss)
                         {
-                            if (!alts.Contains(s))
+                            if(!alts.Contains(s))
                             {
                                 alts.Add(s);
                             }
                         }
                     }
-                    foreach (string s in alts)
+                    foreach(string s in alts)
                     {
                         EVEData.System sys = EM.GetEveSystem(s);
-                        if (s != null)
+                        if(s != null)
                         {
                             double X = sys.UniverseX;
                             double Y = sys.UniverseY;
@@ -1344,7 +1314,7 @@ namespace SMT
 
         private void MainZoomControl_ZoomChanged(object sender, RoutedEventArgs e)
         {
-            if (MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystemsText)
+            if(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystemsText)
             {
                 VHNames.Visibility = Visibility.Hidden;
                 VHRangeHighlights.Visibility = Visibility.Hidden;
@@ -1355,7 +1325,7 @@ namespace SMT
                 VHRangeHighlights.Visibility = Visibility.Visible;
             }
 
-            if (MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems)
+            if(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems)
             {
                 VHSystems.Visibility = Visibility.Hidden;
                 ReCreateRegionMarkers(true);
@@ -1375,7 +1345,7 @@ namespace SMT
 
         private void ReCreateRegionMarkers(bool ZoomedOut)
         {
-            if (RegionZoomed == ZoomedOut)
+            if(RegionZoomed == ZoomedOut)
             {
                 return;
             }
@@ -1387,7 +1357,7 @@ namespace SMT
             double RegionTextSize = 50;
 
             Brush rtb = RegionTextColourBrush;
-            if (ZoomedOut)
+            if(ZoomedOut)
             {
                 UniverseMainCanvas.Children.Add(VHRegionNames);
                 rtb = RegionTextZoomedOutColourBrush;
@@ -1397,9 +1367,9 @@ namespace SMT
                 UniverseMainCanvas.Children.Insert(0, VHRegionNames);
             }
 
-            foreach (EVEData.MapRegion mr in EM.Regions)
+            foreach(EVEData.MapRegion mr in EM.Regions)
             {
-                if (mr.MetaRegion || mr.Name == "Pochven")
+                if(mr.MetaRegion || mr.Name == "Pochven")
                 {
                     continue;
                 }
@@ -1424,7 +1394,7 @@ namespace SMT
         {
             EVEData.System sd = EM.GetEveSystem(SystemName);
 
-            if (sd != null)
+            if(sd != null)
             {
                 // actual
                 double X1 = sd.UniverseX;
@@ -1439,7 +1409,7 @@ namespace SMT
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(name));
             }
@@ -1449,7 +1419,7 @@ namespace SMT
         {
             EVEData.System sd = GlobalSystemDropDownAC.SelectedItem as EVEData.System;
 
-            if (sd != null)
+            if(sd != null)
             {
                 FollowCharacterChk.IsChecked = false;
                 ShowSystem(sd.Name);
@@ -1499,14 +1469,14 @@ namespace SMT
 
         private void CentreMapOnActiveCharacter()
         {
-            if (ActiveCharacter == null || string.IsNullOrEmpty(ActiveCharacter.Location))
+            if(ActiveCharacter == null || string.IsNullOrEmpty(ActiveCharacter.Location))
             {
                 return;
             }
 
             EVEData.System s = EM.GetEveSystem(ActiveCharacter.Location);
 
-            if (s != null)
+            if(s != null)
             {
                 // actual
                 double X1 = s.UniverseX;
@@ -1518,7 +1488,7 @@ namespace SMT
 
         private void MainZoomControl_ContentDragFinished(object sender, RoutedEventArgs e)
         {
-            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 FollowCharacterChk.IsChecked = false;
             }
@@ -1532,7 +1502,7 @@ namespace SMT
         private void SysContexMenuItemSetDestination_Click(object sender, RoutedEventArgs e)
         {
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
-            if (ActiveCharacter != null)
+            if(ActiveCharacter != null)
             {
                 ActiveCharacter.AddDestination(eveSys.ID, true);
             }
@@ -1542,21 +1512,19 @@ namespace SMT
         {
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
 
-            foreach (LocalCharacter lc in EM.LocalCharacters)
+            foreach(LocalCharacter lc in EM.LocalCharacters)
             {
-                if (lc.IsOnline && lc.ESILinked)
+                if(lc.IsOnline && lc.ESILinked)
                 {
                     lc.AddDestination(eveSys.ID, true);
                 }
             }
-
         }
-
 
         private void SysContexMenuItemAddWaypoint_Click(object sender, RoutedEventArgs e)
         {
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
-            if (ActiveCharacter != null)
+            if(ActiveCharacter != null)
             {
                 ActiveCharacter.AddDestination(eveSys.ID, false);
             }
@@ -1565,22 +1533,18 @@ namespace SMT
         private void SysContexMenuItemAddWaypointAll_Click(object sender, RoutedEventArgs e)
         {
             EVEData.System eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
-            foreach (LocalCharacter lc in EM.LocalCharacters)
+            foreach(LocalCharacter lc in EM.LocalCharacters)
             {
-                if (lc.IsOnline && lc.ESILinked)
+                if(lc.IsOnline && lc.ESILinked)
                 {
                     lc.AddDestination(eveSys.ID, false);
                 }
             }
         }
 
-
-
-
-
         private void SysContexMenuItemClearRoute_Click(object sender, RoutedEventArgs e)
         {
-            if (ActiveCharacter != null)
+            if(ActiveCharacter != null)
             {
                 ActiveCharacter.ClearAllWaypoints();
             }
@@ -1590,16 +1554,16 @@ namespace SMT
 
         private void UniverseMainCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MapConf.Debug_EnableMapEdit == false)
+            if(MapConf.Debug_EnableMapEdit == false)
             {
                 return;
             }
 
-            if (e.ChangedButton == MouseButton.Left)
+            if(e.ChangedButton == MouseButton.Left)
             {
                 Point p = Mouse.GetPosition(UniverseMainCanvas);
 
-                if (currentDebugSystem != null)
+                if(currentDebugSystem != null)
                 {
                     currentDebugSystem.UniverseX = p.X;
                     currentDebugSystem.UniverseY = p.Y;

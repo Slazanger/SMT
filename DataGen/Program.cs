@@ -26,13 +26,13 @@ namespace DataGen
 
         private static void WriteDebugSVGs(string outputFolder)
         {
-            foreach (MapRegion mr in EM.Regions)
+            foreach(MapRegion mr in EM.Regions)
             {
                 SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(1050, 800);
 
                 Dictionary<string, SvgNet.Elements.SvgRectElement> systemElementMap = new Dictionary<string, SvgNet.Elements.SvgRectElement>();
 
-                foreach (MapSystem s in mr.MapSystems.Values)
+                foreach(MapSystem s in mr.MapSystems.Values)
                 {
                     SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.Layout.X, (float)s.Layout.Y, 5, 5);
                     sre["Type"] = "system";
@@ -50,12 +50,12 @@ namespace DataGen
 
                 // add all the lines
 
-                foreach (MapSystem s in mr.MapSystems.Values)
+                foreach(MapSystem s in mr.MapSystems.Values)
                 {
                     SvgNet.Elements.SvgRectElement from = systemElementMap[s.Name];
-                    foreach (string jumpSys in s.ActualSystem.Jumps)
+                    foreach(string jumpSys in s.ActualSystem.Jumps)
                     {
-                        if (!mr.MapSystems.ContainsKey(jumpSys))
+                        if(!mr.MapSystems.ContainsKey(jumpSys))
                         {
                             continue;
                         }
@@ -76,19 +76,17 @@ namespace DataGen
 
                 string svgStr = svgRootElement.WriteSVGString(false);
                 string filePath = $"{outputFolder}/data/SourceMaps/exported/{mr.DotLanRef}_layout.svg";
-                using (StreamWriter outputFile = new StreamWriter(filePath))
+                using(StreamWriter outputFile = new StreamWriter(filePath))
                 {
                     outputFile.WriteLine(svgStr);
                 }
             }
 
-
-            // write a region map : 
+            // write a region map :
             {
                 SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(2100, 1600);
 
-
-                foreach (MapRegion mr in EM.Regions)
+                foreach(MapRegion mr in EM.Regions)
                 {
                     SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)mr.UniverseViewX, (float)mr.UniverseViewY, 5, 5);
                     sre["Type"] = "region";
@@ -102,11 +100,10 @@ namespace DataGen
 
                 string svgStr = svgRootElement.WriteSVGString(false);
                 string filePath = $"{outputFolder}/data/SourceMaps/exported/region_layout.svg";
-                using (StreamWriter outputFile = new StreamWriter(filePath))
+                using(StreamWriter outputFile = new StreamWriter(filePath))
                 {
                     outputFile.WriteLine(svgStr);
                 }
-
             }
         }
     }

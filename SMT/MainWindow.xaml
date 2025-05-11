@@ -66,7 +66,7 @@
                 <MenuItem Header="View" Height="Auto">
                     <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
                     <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
-                    <MenuItem x:Name="miToggleOverlayClickTrough" Header="Toggle Overlay ClickTrough (Shift + Ctrl + Alt + T)" Click="OverlayClickTroughToggle_MenuItem_Click"/>
+                    <MenuItem x:Name="miToggleOverlayClickTrough" Header="Toggle Overlay ClickTrough (Shift + Ctrl + Alt + T)" Click="OverlayClickTroughToggle_MenuItem_Click" />
                 </MenuItem>
             </Menu>
 
@@ -173,7 +173,7 @@
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <UniformGrid Grid.Row="2" Columns="2" Margin="8,0,8,8">
-                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" Margin="0,0,4,0" Height="32"/>
+                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" Margin="0,0,4,0" Height="32" />
                                         <Button x:Name="btnDeleteSelectedAnoms" Content="Delete Selected" Click="btnDeleteSelectedAnoms_Click" Margin="4,0,0,0" Height="32" />
                                     </UniformGrid>
                                     <Button Grid.Row="3" x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" Margin="8,0,8,8" Height="32" />
@@ -274,7 +274,6 @@
                                                                         <Setter Property="Background" Value="DarkRed" />
                                                                     </DataTrigger>
 
-
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Ansiblex">
                                                                         <Setter Property="Background" Value="blue" />
                                                                     </DataTrigger>
@@ -282,7 +281,6 @@
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Zarzakh">
                                                                         <Setter Property="Background" Value="Purple" />
                                                                     </DataTrigger>
-
 
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
                                                                         <Setter Property="Background" Value="yellow" />
@@ -626,7 +624,7 @@
                                                     <Style TargetType="{x:Type DataGridRow}">
                                                         <Setter Property="Background" Value="{Binding Converter={StaticResource zkbBGConverter}}" />
                                                         <Setter Property="Foreground" Value="{Binding Converter={StaticResource zkbBGFConverter}}" />
-                                                        <Setter Property="FontSize" Value="10"/>
+                                                        <Setter Property="FontSize" Value="10" />
                                                     </Style>
                                                 </DataGrid.RowStyle>
 

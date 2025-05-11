@@ -2,8 +2,6 @@
 // EVE App Config
 //-----------------------------------------------------------------------
 
-using System.IO;
-
 namespace SMT.EVEData
 {
     public class EveAppConfig
@@ -39,7 +37,6 @@ namespace SMT.EVEData
         /// Folder to store all of the data from
         /// </summary>
         public static readonly string VersionStorage = Path.Combine(StorageRoot, $"{SMT_VERSION}");
-
 
         #endregion Fields
     }

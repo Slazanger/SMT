@@ -22,7 +22,7 @@ namespace Utils
             // Obtain the length of the text
             var intLength = GetWindowTextLength(handle) + 1;
             var stringBuilder = new StringBuilder(intLength);
-            if (GetWindowText(handle, stringBuilder, intLength) > 0)
+            if(GetWindowText(handle, stringBuilder, intLength) > 0)
             {
                 strTitle = stringBuilder.ToString();
             }

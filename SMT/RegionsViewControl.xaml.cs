@@ -211,8 +211,7 @@ namespace SMT
 
                 WHLinkInfoSp.Children.Clear();
 
-
-                // check for Thera 
+                // check for Thera
                 List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
                 bool TheraInRegion = false;
 
@@ -224,7 +223,6 @@ namespace SMT
                         break;
                     }
                 }
-
 
                 if (TheraInRegion)
                 {
@@ -249,7 +247,7 @@ namespace SMT
                     }
                 }
 
-                // check for Turnur 
+                // check for Turnur
                 List<TurnurConnection> currentTurnurConnections = EVEData.EveManager.Instance.TurnurConnections.ToList();
                 bool TurnurInRegion = false;
 
@@ -261,7 +259,6 @@ namespace SMT
                         break;
                     }
                 }
-
 
                 if (TurnurInRegion)
                 {
@@ -286,13 +283,7 @@ namespace SMT
                     }
                 }
 
-
-
-
                 WHLinkInfo.IsOpen = true;
-
-
-
             }
             else
             {
@@ -455,7 +446,6 @@ namespace SMT
                         {
                             averageStanding += ActiveCharacter.Standings[s.ActualSystem.SOVAllianceID];
                         }
-
 
                         if (s.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
                         {

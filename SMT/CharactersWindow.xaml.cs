@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
-using SMT.EVEData;
 using System.Windows.Threading;
 
 namespace SMT
@@ -28,7 +26,6 @@ namespace SMT
             {
                 characterLV.Items.Refresh();
             }), DispatcherPriority.Normal);
-
         }
 
         private void characterLV_Selected(object sender, RoutedEventArgs e)
@@ -110,7 +107,7 @@ namespace SMT
                 int Index = mw.EVEManager.LocalCharacters.IndexOf(lc);
                 if (Index > 0)
                 {
-                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index -1];
+                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index - 1];
                     mw.EVEManager.LocalCharacters[Index - 1] = lc;
                     mw.EVEManager.LocalCharacters[Index] = swap;
 
@@ -127,9 +124,9 @@ namespace SMT
                 MainWindow mw = Owner as MainWindow;
 
                 int Index = mw.EVEManager.LocalCharacters.IndexOf(lc);
-                if (Index >= 0 && Index < mw.EVEManager.LocalCharacters.Count -1 )
+                if (Index >= 0 && Index < mw.EVEManager.LocalCharacters.Count - 1)
                 {
-                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index+1];
+                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index + 1];
                     mw.EVEManager.LocalCharacters[Index + 1] = lc;
                     mw.EVEManager.LocalCharacters[Index] = swap;
 
