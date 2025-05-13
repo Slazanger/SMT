@@ -7,7 +7,7 @@ namespace SMT
 {
     public class MapConfig : INotifyPropertyChanged
     {
-        public static readonly string SaveVersion = "02";
+        public static readonly string SaveVersion = "03";
 
         [Browsable(false)]
         public MapColours ActiveColourScheme;
@@ -1316,6 +1316,8 @@ namespace SMT
 
                 TheraEntranceRegion = Colors.YellowGreen,
                 TheraEntranceSystem = Colors.YellowGreen,
+                ThurnurEntranceRegion = Colors.OrangeRed,
+                ThurnurEntranceSystem = Colors.OrangeRed,
 
                 ZKillDataOverlay = Colors.Purple
             };

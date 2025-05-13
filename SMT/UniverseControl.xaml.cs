@@ -782,7 +782,7 @@ namespace SMT
                 RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
 
                 WHTheraColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
-                WHTurnurColourBrush = new SolidColorBrush(Colors.OrangeRed);
+                WHTurnurColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
 
                 SystemColourBrush.Freeze();
                 SystemColourHiSecBrush.Freeze();

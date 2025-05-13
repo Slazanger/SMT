@@ -468,7 +468,8 @@ namespace SMT
 
         public void AddWHLinksSystemsToMap()
         {
-            Brush WHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+            Brush TheraWHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+            Brush TurnurWHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
 
             List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
 
@@ -488,10 +489,10 @@ namespace SMT
                         TheraShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
                     }
 
-                    TheraShape.Stroke = WHLinkBrush;
+                    TheraShape.Stroke = TheraWHLinkBrush;
                     TheraShape.StrokeThickness = 1.5;
                     TheraShape.StrokeLineJoin = PenLineJoin.Round;
-                    TheraShape.Fill = WHLinkBrush;
+                    TheraShape.Fill = TheraWHLinkBrush;
 
                     Canvas.SetLeft(TheraShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(TheraShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
@@ -518,10 +519,10 @@ namespace SMT
                         TurnurShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
                     }
 
-                    TurnurShape.Stroke = WHLinkBrush;
+                    TurnurShape.Stroke = TurnurWHLinkBrush;
                     TurnurShape.StrokeThickness = 1.5;
                     TurnurShape.StrokeLineJoin = PenLineJoin.Round;
-                    TurnurShape.Fill = WHLinkBrush;
+                    TurnurShape.Fill = TurnurWHLinkBrush;
 
                     Canvas.SetLeft(TurnurShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetTop(TurnurShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));

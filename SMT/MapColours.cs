@@ -168,13 +168,21 @@ namespace SMT
         [DisplayName("Name Subtext Size")]
         public int SystemSubTextSize { get; set; }
 
-        [Category("Thera")]
+        [Category("Wormholes")]
         [DisplayName("Thera Entrance (Region)")]
         public Color TheraEntranceRegion { get; set; }
 
-        [Category("Thera")]
+        [Category("Wormholes")]
         [DisplayName("Thera Entrance (System)")]
         public Color TheraEntranceSystem { get; set; }
+
+        [Category("Wormholes")]
+        [DisplayName("Turnur Entrance (System)")]
+        public Color ThurnurEntranceSystem { get; set; }
+
+        [Category("Wormholes")]
+        [DisplayName("Turnur Entrance (System)")]
+        public Color ThurnurEntranceRegion { get; set; }
 
         [Browsable(false)]
         public bool UserEditable { get; set; }
