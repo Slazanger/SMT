@@ -4013,7 +4013,7 @@
       <string>35841</string>
     </key>
     <value>
-      <string>Ansiblex Jump Gate</string>
+      <string>Ansiblex Jump Bridge</string>
     </value>
   </item>
   <item>
@@ -5358,6 +5358,22 @@
     </key>
     <value>
       <string>Python</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>87381</string>
+    </key>
+    <value>
+      <string>Sarathiel</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>88001</string>
+    </key>
+    <value>
+      <string>Babaroga</string>
     </value>
   </item>
 </dictionary>
