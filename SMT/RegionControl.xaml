@@ -89,8 +89,8 @@
 
             <StackPanel x:Name="BridgeInfoStackPanel" HorizontalAlignment="Left" Margin="20,0,0,20" VerticalAlignment="Bottom"  Panel.ZIndex="50" />
 
-            <Ellipse x:Name="helpIcon" Width="20" Height="20" Fill="Black" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="20" />
-            <Label Content="?" Width="18" Height="26" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="0,17,20,0" IsHitTestVisible="false" FontSize="14" FontWeight="Bold" x:Name="HelpQM" />
+            <Ellipse x:Name="helpIcon" Width="30" Height="30" Fill="Black" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="20" />
+            <Label Content="?" Width="38" Height="36" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="2" Margin="0,15,8,0" IsHitTestVisible="false" FontSize="22" FontWeight="Bold" x:Name="HelpQM" />
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="top" Margin="0,46,20,0" x:Name="HelpList" Visibility="Hidden" Width="175" Panel.ZIndex="111" Grid.Column="2">
                 <Grid>
                     <Grid.RowDefinitions>
