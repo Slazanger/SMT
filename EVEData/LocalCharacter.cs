@@ -65,6 +65,8 @@ namespace SMT.EVEData
 
         private int ssoErrorCount = 0;
 
+        private int m_activeRouteLength = 0;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
         /// </summary>
@@ -145,6 +147,19 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public List<Navigation.RoutePoint> ActiveRoute { get; set; }
+
+        public int ActiveRouteLength
+        {
+            get
+            {
+                return m_activeRouteLength;
+            }
+            set
+            {
+                m_activeRouteLength = value;
+                OnPropertyChanged("ActiveRouteLength");
+            }
+        }
 
         public bool DangerZoneActive { get; set; }
         public bool DeepSearchEnabled { get; set; }
@@ -474,6 +489,7 @@ namespace SMT.EVEData
                 {
                     Waypoints.Clear();
                     ActiveRoute.Clear();
+                    ActiveRouteLength = 0;
                 }
             }
 
@@ -488,6 +504,7 @@ namespace SMT.EVEData
             lock (ActiveRouteLock)
             {
                 ActiveRoute.Clear();
+                ActiveRouteLength = 0;
                 Waypoints.Clear();
             }
             routeNeedsUpdate = true;
@@ -838,6 +855,8 @@ namespace SMT.EVEData
                         }
                     }
                 }
+
+                ActiveRouteLength = ActiveRoute.Count;
             }
 
             if (esiRouteNeedsUpdate && !esiRouteUpdating)

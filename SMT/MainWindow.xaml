@@ -339,7 +339,7 @@
 
                                                     <StackPanel Orientation="Horizontal" Margin="2">
                                                         <Label Content="Total number of jumps : " />
-                                                        <Label Content="{Binding ActiveCharacter.ActiveRoute.Count, ElementName=RegionUC}" />
+                                                        <Label Content="{Binding ActiveCharacter.ActiveRouteLength, ElementName=RegionUC}" />
                                                     </StackPanel>
                                                     <Button x:Name="CopyRouteBtn" Click="CopyRouteBtn_Click" Content="Copy Route" Margin="2" />
                                                 </StackPanel>
