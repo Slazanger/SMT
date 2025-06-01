@@ -31,7 +31,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Folder to store all of the data from
         /// </summary>
-        public static readonly string StorageRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SMT");
+        public static readonly string StorageRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMT");
 
         /// <summary>
         /// Folder to store all of the data from

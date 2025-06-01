@@ -73,6 +73,56 @@ namespace SMT.EVEData
         private DateTime LastDotlanUpdate = DateTime.MinValue;
         private string LastDotlanETAG = "";
 
+
+        /// <summary>
+        /// Migrates old settings from previous versions of the application
+        /// </summary>
+        private void MigrateOldSettings()
+        {
+            try
+            {
+                // if we have a storageroot folder; we have already migrated settings
+                if(Directory.Exists(EveAppConfig.StorageRoot))
+                {
+                    return;
+                }
+
+                string oldSettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SMT");
+
+                // prior to 1.39 all settings were stored in the My Documents\SMT\ folder
+                if(Directory.Exists(oldSettingsFolder))
+                {
+                    // move the old settings folder to the new location
+                    string newSettingsFolder = EveAppConfig.StorageRoot;
+                    if(!Directory.Exists(newSettingsFolder))
+                    {
+                        Directory.CreateDirectory(newSettingsFolder);
+                    }
+                    // move the old settings to the new location
+                    foreach(string file in Directory.GetFiles(oldSettingsFolder))
+                    {
+                        string fileName = Path.GetFileName(file);
+                        string destFile = Path.Combine(newSettingsFolder, fileName);
+                        if(!File.Exists(destFile))
+                        {
+                            File.Move(file, destFile);
+                        }
+                    }
+                    // delete the old settings folder
+                    Directory.Delete(oldSettingsFolder, true);
+                }
+
+            }
+            catch
+            {
+                // if we fail to migrate the settings, we just ignore it
+                // this is a one time migration so we don't need to worry about it again
+            }
+
+
+        }
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
@@ -80,6 +130,10 @@ namespace SMT.EVEData
         {
             LocalCharacters = new List<LocalCharacter>();
             VersionStr = version;
+
+
+            MigrateOldSettings();
+
 
             string SaveDataRoot = EveAppConfig.StorageRoot;
             if(!Directory.Exists(SaveDataRoot))
