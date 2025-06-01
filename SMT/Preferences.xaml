@@ -434,6 +434,7 @@
                 </TabItem>
             </TabControl>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,2">
+                <Button Content="Open Folder" Margin="3,0" Width="75" Click="Prefs_OpenFolder_Click" />
                 <Button Content="Default" Margin="3,0" Width="55" Click="Prefs_Default_Click" />
                 <Button Content="OK" Margin="3,0" Width="55" Click="Prefs_OK_Click" />
             </StackPanel>

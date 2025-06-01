@@ -81,6 +81,22 @@ namespace SMT
             }
         }
 
+
+        private void Prefs_OpenFolder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("explorer.exe", EVEData.EveAppConfig.StorageRoot);
+            }
+            catch(Exception ex)
+            {
+                //MessageBox.Show("Error opening folder: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        
+
+
         private void syncESIPositionChk_Checked(object sender, RoutedEventArgs e)
         {
             EveManager.Instance.UseESIForCharacterPositions = (bool)syncESIPositionChk.IsChecked;
