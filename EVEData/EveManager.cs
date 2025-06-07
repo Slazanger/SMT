@@ -2723,7 +2723,7 @@ namespace SMT.EVEData
                 ClientId = EveAppConfig.ClientID,
                 SecretKey = "Unneeded",
                 CallbackUrl = EveAppConfig.CallbackURL,
-                UserAgent = "SMT-map-app",
+                UserAgent = "SMT-map-app : " + EveAppConfig.SMT_VERSION,
             });
 
             ESIClient = new ESI.NET.EsiClient(config);
