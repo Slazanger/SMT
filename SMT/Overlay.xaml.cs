@@ -682,7 +682,7 @@ namespace SMT
                     {
                         foreach(LocalCharacter additionalCharacter in mainWindow.EVEManager.LocalCharacters)
                         {
-                            if(additionalCharacter != OverlayCharacter)
+                            if(additionalCharacter != OverlayCharacter && currentPlayersSystemData[additionalCharacter].system != null)
                             {
                                 if(additionalCharacter.Location !=
                                     currentPlayersSystemData[additionalCharacter].system.Name)
