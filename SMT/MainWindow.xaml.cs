@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -1327,10 +1328,19 @@ namespace SMT
             {
                 if(playSound || (!MapConf.PlaySoundOnlyInDangerZone && MapConf.PlayIntelSound))
                 {
-                    waveOutEvent.Stop();
-                    waveOutEvent.Volume = MapConf.IntelSoundVolume;
-                    audioFileReader.Position = 0;
-                    waveOutEvent.Play();
+                    try
+                    {
+                        waveOutEvent.Stop();
+                        waveOutEvent.Volume = MapConf.IntelSoundVolume;
+                        audioFileReader.Position = 0;
+                        waveOutEvent.Play();
+                    }
+                    catch(Exception ex)
+                    {
+                        // if the sound fails to play
+                        // seen this after wake up from sleep
+                        Debug.WriteLine("Failed to play intel sound: " + ex.Message);
+                    }
                 }
                 if(flashWindow || (!MapConf.FlashWindowOnlyInDangerZone && MapConf.FlashWindow))
                 {

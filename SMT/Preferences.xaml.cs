@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -143,8 +144,15 @@ namespace SMT
 
             if(waveOutEvent.PlaybackState != PlaybackState.Playing)
             {
-                audioFileReader.Position = 0; // Reset position to the beginning
-                waveOutEvent.Play(); // Play the sound
+                try
+                {
+                    audioFileReader.Position = 0; // Reset position to the beginning
+                    waveOutEvent.Play(); // Play the sound
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine("Error playing sound: " + ex.Message);
+                }
             }
         }
 
