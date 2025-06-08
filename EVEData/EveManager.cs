@@ -1953,7 +1953,7 @@ namespace SMT.EVEData
             List<int> UnknownIDs = new List<int>();
             foreach(int l in IDs)
             {
-                if(!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l))
+                if((!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l)) && !UnknownIDs.Contains(l))
                 {
                     UnknownIDs.Add(l);
                 }
