@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using ESI.NET;
 
 namespace SMT.EVEData
@@ -12,7 +13,7 @@ namespace SMT.EVEData
                 return true;
             }
 
-            Console.WriteLine("ESI Error : " + esiR.Message + " Error Limit Remaining : " + esiR.ErrorLimitRemain);
+            Debug.WriteLine("ESI Error : " + esiR.Message + " Error Limit Remaining : " + esiR.ErrorLimitRemain);
             return false;
         }
     }
