@@ -78,7 +78,7 @@ namespace SMT.EVEData
 
         private void zkb_DoWork(object sender, DoWorkEventArgs e)
         {
-            string redistURL = $"https://zkillredisq.stream/listen.php?queueID={QueueID}";
+            string redistURL = $"https://zkillredisq.stream/listen.php?queueID=SMT_{QueueID}";
             string strContent = string.Empty;
             try
             {
