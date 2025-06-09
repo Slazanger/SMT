@@ -7,7 +7,7 @@ namespace SMT.EVEData
 {
     //jumpclones
 
-    public class LocalCharacter : Character, INotifyPropertyChanged
+    public class LocalCharacter : Character, INotifyPropertyChanged 
     {
         public static readonly string SaveVersion = "03";
 
@@ -666,6 +666,7 @@ namespace SMT.EVEData
             return toStr;
         }
 
+
         /// <summary>
         /// Update the Character info
         /// </summary>
@@ -680,7 +681,8 @@ namespace SMT.EVEData
                     await UpdateInfoFromESI().ConfigureAwait(false);
                 }
 
-                if (EveManager.Instance.UseESIForCharacterPositions)
+                // if we're forcing ESI for our location OR we havent had one yet (due to timeout errors with the location endpoint)
+                if (EveManager.Instance.UseESIForCharacterPositions || string.IsNullOrEmpty(Location))
                 {
                     await UpdatePositionFromESI().ConfigureAwait(false);
                 }
@@ -721,7 +723,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Refresh the ESI access token
         /// </summary>
-        private async Task RefreshAccessToken()
+        public async Task RefreshAccessToken()
         {
             if (String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
             {
@@ -1188,6 +1190,7 @@ namespace SMT.EVEData
                         while (page < maxPageCount);
                     }
 
+                    /*
                     // personal contacts
                     {
                         page = 0;
@@ -1228,6 +1231,7 @@ namespace SMT.EVEData
                         }
                         while (page < maxPageCount);
                     }
+                    */
                 }
 
                 // get the character portrait
@@ -1342,7 +1346,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Update the characters position from ESI (will override the position read from any log files
         /// </summary>
-        private async Task UpdatePositionFromESI()
+        public async Task UpdatePositionFromESI()
         {
             if (ID == 0 || !ESILinked || ESIAuthData == null)
             {

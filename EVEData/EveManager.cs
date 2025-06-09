@@ -3332,6 +3332,27 @@ namespace SMT.EVEData
             {
                 Thread.CurrentThread.IsBackground = false;
 
+
+                // split the intial requests into 3 for a better initialisation
+
+                foreach(LocalCharacter c in LocalCharacters)
+                {
+                    await c.RefreshAccessToken().ConfigureAwait(true);
+                }
+
+                foreach(LocalCharacter c in LocalCharacters)
+                {
+                    await c.UpdatePositionFromESI().ConfigureAwait(true);
+                }
+
+                foreach(LocalCharacter c in LocalCharacters)
+                {
+                    await c.UpdateInfoFromESI().ConfigureAwait(true);
+                }
+
+
+
+
                 // loop forever
                 while(BackgroundThreadShouldTerminate == false)
                 {
