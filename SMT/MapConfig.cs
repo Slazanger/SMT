@@ -7,7 +7,7 @@ namespace SMT
 {
     public class MapConfig : INotifyPropertyChanged
     {
-        public static readonly string SaveVersion = "03";
+        public static readonly string SaveVersion = "04";
 
         [Browsable(false)]
         public MapColours ActiveColourScheme;
@@ -1341,7 +1341,7 @@ namespace SMT
             ShowTrueSec = true;
             JumpRangeInAsOutline = true;
             ShowActiveIncursions = true;
-            UseESIForCharacterPositions = true;
+            UseESIForCharacterPositions = false;
             ShowCharacterNamesOnMap = true;
             ShowOfflineCharactersOnMap = true;
             ShowIhubVunerabilities = true;
@@ -1372,6 +1372,12 @@ namespace SMT
             IntelFreshTime = 30;
             IntelStaleTime = 120;
             IntelHistoricTime = 600;
+
+            ToolBox_ShowJumpBridges = true;
+            ToolBox_ShowSovOwner = true;
+
+            
+
         }
 
         protected void OnPropertyChanged(string name)
