@@ -1345,6 +1345,8 @@ namespace SMT
             ShowCharacterNamesOnMap = true;
             ShowOfflineCharactersOnMap = true;
             ShowIhubVunerabilities = true;
+            PlayIntelSoundOnUnknown = true;
+
 
             ShowJoveObservatories = true;
             ShowCynoBeacons = true;

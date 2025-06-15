@@ -1280,16 +1280,17 @@ namespace SMT
                 return;
             }
 
+            if(MapConf.PlayIntelSoundOnUnknown && id.Systems.Count == 0)
+            {
+                playSound = true;
+                flashWindow = true;
+            }
+
+
             if(MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
             {
                 if(MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
-                    if(MapConf.PlayIntelSoundOnUnknown && id.Systems.Count == 0)
-                    {
-                        playSound = true;
-                        flashWindow = true;
-                    }
-
                     foreach(string s in id.Systems)
                     {
                         foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)

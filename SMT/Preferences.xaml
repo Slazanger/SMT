@@ -208,6 +208,8 @@
                                         <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
                                         <CheckBox IsChecked="{Binding PlayIntelSoundOnAlert}" Margin="0,2" Content="Warning Sound on Alert" />
                                         <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window" />
+                                        <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2">Warning on Unknown</CheckBox>
+
                                         <StackPanel Orientation="Vertical" Margin="2">
                                             <Label Content="Warning Sound Volume" />
                                             <Slider x:Name="intelVolumeSlider" Value="{Binding Path=IntelSoundVolume}" Minimum="0" Maximum="1" TickFrequency="0.1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
@@ -244,7 +246,6 @@
                                                 <Binding Path="FlashWindow" Converter="{StaticResource NegateBooleanConverter}" />
                                             </CheckBox.IsEnabled>
                                         </CheckBox>
-                                        <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2">Warning on Unknown</CheckBox>
                                     </StackPanel>
                                 </GroupBox>
                             </Border>
