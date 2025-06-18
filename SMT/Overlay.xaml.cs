@@ -292,7 +292,6 @@ namespace SMT
         private bool showCharLocation = true;
         private bool showJumpBridges = true;
         private bool showSystemNames = false;
-        private bool showAllCharacterNames = false;
         private bool individualCharacterWindows = false;
         private string additionalCharacterNamesDisplay = "All";
 
@@ -409,7 +408,6 @@ namespace SMT
             overlayDepth = mainWindow.MapConf.OverlayRange + 1;
             showJumpBridges = mainWindow.MapConf.OverlayShowJumpBridges;
             showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
-            showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
             individualCharacterWindows = mainWindow.MapConf.OverlayIndividualCharacterWindows;
             additionalCharacterNamesDisplay = mainWindow.MapConf.OverlayAdditionalCharacterNamesDisplay;
 
@@ -1911,13 +1909,6 @@ namespace SMT
             if(e.PropertyName == "OverlayShowSystemNames")
             {
                 showSystemNames = mainWindow.MapConf.OverlayShowSystemNames;
-                ClearView();
-                RefreshCurrentView();
-            }
-
-            if(e.PropertyName == "OverlayShowAllCharacterNames")
-            {
-                showAllCharacterNames = mainWindow.MapConf.OverlayShowAllCharacterNames;
                 ClearView();
                 RefreshCurrentView();
             }

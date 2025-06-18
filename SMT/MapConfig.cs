@@ -107,7 +107,6 @@ namespace SMT
         private bool m_overlayShowRoute = true;
         private bool m_overlayShowJumpBridges = true;
         private bool m_overlayShowSystemNames = false;
-        private bool m_overlayShowAllCharacterNames = false;
         private bool m_overlayIndividualCharacterWindows = false;
         private string m_overlayAdditionalCharacterNamesDisplay = "All";
 
@@ -1174,22 +1173,6 @@ namespace SMT
         }
 
         [Category("Overlay")]
-        [DisplayName("Overlay Show All Character Names")]
-        public bool OverlayShowAllCharacterNames
-        {
-            get
-            {
-                return m_overlayShowAllCharacterNames;
-            }
-            set
-            {
-                m_overlayShowAllCharacterNames = value;
-
-                OnPropertyChanged("OverlayShowAllCharacterNames");
-            }
-        }
-
-        [Category("Overlay")]
         [DisplayName("Overlay Intel Fresh Time")]
         public float IntelFreshTime
         {
@@ -1368,7 +1351,6 @@ namespace SMT
             OverlayShowRoute = true;
             OverlayShowJumpBridges = true;
             OverlayShowSystemNames = false;
-            OverlayShowAllCharacterNames = false;
             OverlayAdditionalCharacterNamesDisplay = "All";
 
             IntelFreshTime = 30;
