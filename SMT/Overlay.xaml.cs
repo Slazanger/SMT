@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.IdentityModel.Tokens;
 using SMT.EVEData;
+using SMT.Helpers;
 using static SMT.EVEData.Navigation;
 
 public static class WindowsServices
@@ -94,19 +95,51 @@ namespace SMT
         {
         }
 
-        public void CleanUpCanvas(Canvas canvas, bool keepSystem = false)
+        public List<UIElement> CleanUpCanvas(Canvas canvas, bool keepSystem = false)
         {
+            List<UIElement> removedElements = new();
+
+            if (!keepSystem)
+            {
+                removedElements.Add(systemCanvasElement);
+                removedElements.Add(systemNameElement);
+            }
+            
+            removedElements.Add(npcKillCanvasElement);
+            removedElements.Add(npcKillDeltaCanvasElement);
+
+            foreach (UIElement element in removedElements)
+            {
+                if (canvas.Children.Contains(element))
+                {
+                    canvas.Children.Remove(element);
+                }
+            }
+            
+            /*
             if(!keepSystem && systemCanvasElement != null && canvas.Children.Contains(systemCanvasElement)) canvas.Children.Remove(systemCanvasElement);
             if(!keepSystem && systemNameElement != null && canvas.Children.Contains(systemNameElement)) canvas.Children.Remove(systemNameElement);
             if(npcKillCanvasElement != null && canvas.Children.Contains(npcKillCanvasElement)) canvas.Children.Remove(npcKillCanvasElement);
             if(npcKillDeltaCanvasElement != null && canvas.Children.Contains(npcKillDeltaCanvasElement)) canvas.Children.Remove(npcKillDeltaCanvasElement);
-            CleanUpJumpBridges(canvas);
+            */
+            
+            removedElements.AddRange(CleanUpJumpBridges(canvas));
+            
+            return removedElements.Where(e => e != null).ToList();
         }
 
-        public void CleanUpJumpBridges(Canvas canvas)
+        public List<UIElement> CleanUpJumpBridges(Canvas canvas)
         {
-            if(jumpBridgePath != null && canvas.Children.Contains(jumpBridgePath)) canvas.Children.Remove(jumpBridgePath);
+            List<UIElement> removedElements = new();
+
+            if (jumpBridgePath != null && canvas.Children.Contains(jumpBridgePath))
+            {
+                removedElements.Add(jumpBridgePath);
+                canvas.Children.Remove(jumpBridgePath);
+            }
             jumpBridgePath = null;
+            
+            return removedElements.Where(e => e != null).ToList();
         }
     }
 
@@ -305,6 +338,12 @@ namespace SMT
         private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
 
         public LocalCharacter OverlayCharacter = null;
+        
+        private ElementPool<Ellipse> _ellipseElementPool = new();
+        private ElementPool<Rectangle> _rectangleElementPool = new();
+        private ElementPool<Line> _lineElementPool = new();
+        private ElementPool<Path> _pathElementPool = new();
+        private ElementPool<TextBlock> _textBlockElementPool = new();
 
         public Overlay(MainWindow mw)
         {
@@ -460,6 +499,43 @@ namespace SMT
             LoadOverlayWindowPosition();
         }
 
+        private void ReleaseWithTypeCheck(List<UIElement> elements)
+        {
+            elements.ForEach(e => ReleaseWithTypeCheck(e));
+        }
+
+        private void ReleaseWithTypeCheck(UIElement element)
+        {
+            switch (element)
+            {
+                case Ellipse e:
+                    _ellipseElementPool.Release(overlay_Canvas, e);
+                    break;
+                case Rectangle r:
+                    _rectangleElementPool.Release(overlay_Canvas, r);
+                    break;
+                case Path p:
+                    _pathElementPool.Release(overlay_Canvas, p);
+                    break;
+                case Line l:
+                    _lineElementPool.Release(overlay_Canvas, l);
+                    break;
+                case TextBlock t:
+                    _textBlockElementPool.Release(overlay_Canvas, t);
+                    break;
+                default:
+                    if (overlay_Canvas.Children.Contains(element))
+                    {
+                        overlay_Canvas.Children.Remove(element);   
+                    }
+                    break;
+            }
+                
+                    
+
+
+        }
+
         /// <summary>
         /// Calculates the actual size for the canvas element that represents a system.
         /// Takes into account if it is the current system the player is in.
@@ -519,19 +595,19 @@ namespace SMT
             UpdatePlayerInformationText();
             foreach(var sD in systemData)
             {
-                sD.Value.CleanUpCanvas(overlay_Canvas);
+                ReleaseWithTypeCheck(sD.Value.CleanUpCanvas(overlay_Canvas));
             }
             systemData.Clear();
 
             foreach(var line in jumpLines)
             {
-                overlay_Canvas.Children.Remove(line);
+                _lineElementPool.Release(overlay_Canvas, line);
             }
             jumpLines.Clear();
 
             foreach(var line in routeLines)
             {
-                overlay_Canvas.Children.Remove(line);
+                ReleaseWithTypeCheck(line);
             }
             routeLines.Clear();
         }
@@ -776,13 +852,10 @@ namespace SMT
                     }
                 }
                 if(skipIntel) continue;
-
+                
                 foreach(var deleteEntry in deleteList)
                 {
-                    foreach(Ellipse intelShape in deleteEntry.ellipse)
-                    {
-                        overlay_Canvas.Children.Remove(intelShape);
-                    }
+                    overlay_Canvas.ReleaseChildren(deleteEntry.ellipse, _ellipseElementPool);
                     intelData.Remove(deleteEntry);
                 }
 
@@ -796,17 +869,14 @@ namespace SMT
                 if((DateTime.Now - intelDataEntry.data.IntelTime).TotalSeconds > intelLifetime)
                 {
                     // If the intel data is past its lifetime, delete the shapes from the canvas.
-                    foreach(Ellipse intelShape in intelDataEntry.ellipse)
-                    {
-                        overlay_Canvas.Children.Remove(intelShape);
-                    }
+                    overlay_Canvas.ReleaseChildren(intelDataEntry.ellipse, _ellipseElementPool);
                 }
             }
 
             // Remove all expired entries.
             intelData.RemoveAll(d => (DateTime.Now - d.data.IntelTime).TotalSeconds > intelLifetime);
 
-            // Loop over all remaining, therfore current, entries.
+            // Loop over all remaining, therefore current, entries.
             foreach(var intelDataEntry in intelData)
             {
                 // If there are no shapes, add them.
@@ -882,7 +952,7 @@ namespace SMT
 
                     if(systemData.ContainsKey(segmentStart.SystemName) && segmentStart.GateToTake == GateType.Ansiblex)
                     {
-                        Path jumpBridgePath = new Path();
+                        Path jumpBridgePath = _pathElementPool.Get();
                         jumpBridgePath.Data = GenerateJumpBridgePathGeometry(segmentStart.SystemName, segmentEnd.SystemName);
 
                         routeLines.Add(jumpBridgePath);
@@ -891,7 +961,7 @@ namespace SMT
                     }
                     else
                     {
-                        routeLines.Add(new Line());
+                        routeLines.Add(_lineElementPool.Get());
 
                         if(!systemData.ContainsKey(segmentStart.SystemName) || !systemData.ContainsKey(segmentEnd.SystemName)) continue;
 
@@ -1154,7 +1224,7 @@ namespace SMT
             foreach(string sysName in deleteSystems)
             {
                 // Clean up the canvas
-                systemData[sysName].CleanUpCanvas(overlay_Canvas);
+                ReleaseWithTypeCheck(systemData[sysName].CleanUpCanvas(overlay_Canvas));
                 systemData.Remove(sysName);
             }
 
@@ -1214,7 +1284,7 @@ namespace SMT
 
             foreach(OverlaySystemData overlaySystemData in bridgeSystems)
             {
-                overlaySystemData.CleanUpJumpBridges(overlay_Canvas);
+                ReleaseWithTypeCheck(overlaySystemData.CleanUpJumpBridges(overlay_Canvas));
             }
             bridgeSystems.Clear();
 
@@ -1248,7 +1318,7 @@ namespace SMT
                         Path path;
 
                         if(visibleSystemData.jumpBridgePath != null) path = visibleSystemData.jumpBridgePath;
-                        else path = new Path();
+                        else path = _pathElementPool.Get();
 
                         path.Data = pathGeometry;
                         path.Fill = Brushes.Transparent;
@@ -1373,7 +1443,7 @@ namespace SMT
 
                         if(currentJumpIndex + 1 > jumpLines.Count)
                         {
-                            connectionLine = new Line();
+                            connectionLine = _lineElementPool.Get();
                             jumpLines.Add(connectionLine);
                             currentJumpIndex++;
                         }
@@ -1464,11 +1534,11 @@ namespace SMT
             {
                 if(mainWindow.EVEManager.JumpBridges.Any(t => t.From == sysData.system.Name))
                 {
-                    systemData[sysData.system.Name].systemCanvasElement = new Rectangle();
+                    systemData[sysData.system.Name].systemCanvasElement = _rectangleElementPool.Get();
                 }
                 else
                 {
-                    systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
+                    systemData[sysData.system.Name].systemCanvasElement = _ellipseElementPool.Get();
                 }
             }
             else
@@ -1477,16 +1547,16 @@ namespace SMT
                 {
                     if(systemData[sysData.system.Name].systemCanvasElement.GetType() == typeof(Ellipse))
                     {
-                        systemData[sysData.system.Name].CleanUpCanvas(overlay_Canvas);
-                        systemData[sysData.system.Name].systemCanvasElement = new Rectangle();
+                        ReleaseWithTypeCheck(systemData[sysData.system.Name].CleanUpCanvas(overlay_Canvas));
+                        systemData[sysData.system.Name].systemCanvasElement = _rectangleElementPool.Get();
                     }
                 }
                 else
                 {
                     if(systemData[sysData.system.Name].systemCanvasElement.GetType() == typeof(Rectangle))
                     {
-                        systemData[sysData.system.Name].CleanUpCanvas(overlay_Canvas);
-                        systemData[sysData.system.Name].systemCanvasElement = new Ellipse();
+                        ReleaseWithTypeCheck(systemData[sysData.system.Name].CleanUpCanvas(overlay_Canvas));
+                        systemData[sysData.system.Name].systemCanvasElement = _ellipseElementPool.Get();
                     }
                 }
             }
@@ -1574,7 +1644,7 @@ namespace SMT
             // Show system and char names.
             if(systemData[sysData.system.Name].systemNameElement == null)
             {
-                systemData[sysData.system.Name].systemNameElement = new TextBlock();
+                systemData[sysData.system.Name].systemNameElement = _textBlockElementPool.Get();
             }
             systemData[sysData.system.Name].systemNameElement.Inlines.Clear();
             systemData[sysData.system.Name].systemNameElement.Width = 80;
@@ -1688,7 +1758,7 @@ namespace SMT
         {
             if(jumpBridgeTargetHighlight != null)
             {
-                overlay_Canvas.Children.Remove(jumpBridgeTargetHighlight);
+                _ellipseElementPool.Release(overlay_Canvas, jumpBridgeTargetHighlight);
                 jumpBridgeTargetHighlight = null;
             }
 
@@ -1707,7 +1777,7 @@ namespace SMT
                         double highlightMargin = gathererMode ? 6 : 10;
                         double highlightMarginPositionOffset = ((systemWidth + highlightMargin) / 2) - (systemWidth / 2);
 
-                        jumpBridgeTargetHighlight = new Ellipse();
+                        jumpBridgeTargetHighlight = _ellipseElementPool.Get();
                         jumpBridgeTargetHighlight.Width = systemWidth + highlightMargin;
                         jumpBridgeTargetHighlight.Height = systemHeight + highlightMargin;
                         jumpBridgeTargetHighlight.Fill = Brushes.Transparent;
@@ -1766,7 +1836,7 @@ namespace SMT
             {
                 if(systemData[sysData.system.Name].npcKillCanvasElement == null)
                 {
-                    systemData[sysData.system.Name].npcKillCanvasElement = new Ellipse();
+                    systemData[sysData.system.Name].npcKillCanvasElement = _ellipseElementPool.Get();
                 }
 
                 float killDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillData, 0f, Math.Abs(npcKillData)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
@@ -1807,7 +1877,7 @@ namespace SMT
 
                 if(systemData[sysData.system.Name].npcKillDeltaCanvasElement == null)
                 {
-                    systemData[sysData.system.Name].npcKillDeltaCanvasElement = new Ellipse();
+                    systemData[sysData.system.Name].npcKillDeltaCanvasElement = _ellipseElementPool.Get();
                 }
 
                 float killDeltaDataCalculatedSize = Math.Clamp((Math.Clamp(npcKillDelta, 0f, Math.Abs(npcKillDelta)) / npcKillDeltaMaxEqualsKills), 0f, 1f) * npcKillDeltaMaxSize;
@@ -2032,7 +2102,7 @@ namespace SMT
             {
                 foreach(KeyValuePair<string, OverlaySystemData> sysData in systemData)
                 {
-                    sysData.Value.CleanUpCanvas(overlay_Canvas, true);
+                    ReleaseWithTypeCheck(sysData.Value.CleanUpCanvas(overlay_Canvas, true));
                 }
             }
 
@@ -2047,7 +2117,7 @@ namespace SMT
 
             foreach(KeyValuePair<string, OverlaySystemData> sysData in systemData)
             {
-                sysData.Value.CleanUpCanvas(overlay_Canvas, true);
+                ReleaseWithTypeCheck(sysData.Value.CleanUpCanvas(overlay_Canvas, true));
             }
 
             RefreshButtonStates();
@@ -2062,7 +2132,7 @@ namespace SMT
         /// TODO: Make shape settings global parameters.
         private Ellipse DrawIntelToOverlay(string intelSystem)
         {
-            Ellipse intelShape = new Ellipse();
+            Ellipse intelShape = _ellipseElementPool.Get();
             Vector2f intelSystemCoordinateVector;
 
             // Only draw a visible element if the system is currently visible on the map.
