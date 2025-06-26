@@ -2535,7 +2535,7 @@ namespace SMT
                 {
                     Label sovADM = new Label();
                     sovADM.Content = "1.0";
-                    sovADM.FontSize = 8;
+                    sovADM.FontSize = 7;
                     sovADM.IsHitTestVisible = false;
                     sovADM.Content = $"{mapSystem.ActualSystem.IHubOccupancyLevel:f1}";
                     sovADM.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -2543,6 +2543,7 @@ namespace SMT
                     sovADM.Width = shapeSize + 2;
                     sovADM.Height = shapeSize + 2;
                     sovADM.Foreground = DarkTextColourBrush;
+                    sovADM.FontWeight = FontWeights.Bold;
 
                     Canvas.SetLeft(sovADM, mapSystem.Layout.X - (shapeOffset + 1));
                     Canvas.SetTop(sovADM, mapSystem.Layout.Y - (shapeOffset + 1));
