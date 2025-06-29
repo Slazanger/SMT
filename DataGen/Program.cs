@@ -34,7 +34,7 @@ namespace DataGen
 
                 foreach(MapSystem s in mr.MapSystems.Values)
                 {
-                    SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.Layout.X, (float)s.Layout.Y, 5, 5);
+                    SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.Layout.X -5 , (float)s.Layout.Y -5, 10, 10);
                     sre["Type"] = "system";
                     sre["Name"] = s.Name;
                     sre["ID"] = s.ActualSystem.ID;

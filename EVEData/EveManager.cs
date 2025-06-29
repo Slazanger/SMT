@@ -548,9 +548,15 @@ namespace SMT.EVEData
                     float x = float.Parse(xn.Attributes["x"].Value);
                     float y = float.Parse(xn.Attributes["y"].Value);
 
-                    float RoundVal = 10.0f;
+                    /*
+                    float RoundVal = 2.0f;
                     x = (float)Math.Round(x / RoundVal, 0) * RoundVal;
                     y = (float)Math.Round(y / RoundVal, 0) * RoundVal;
+                    */
+                    x = (float)Math.Round(x, 0);
+                    y = (float)Math.Round(y, 0);
+
+
 
                     string name;
                     string region;
@@ -1096,6 +1102,18 @@ namespace SMT.EVEData
                 }
             }
 
+            // default to text below
+            foreach(MapRegion rr in Regions)
+            {
+                foreach(MapSystem msA in rr.MapSystems.Values.ToList())
+                {
+                    msA.TextPos = MapSystem.TextPosition.Bottom;
+                }
+            }
+
+
+            /*DISABLED FOR NOW
+
             // calculate the optimal text offset
             foreach(MapRegion rr in Regions)
             {
@@ -1106,6 +1124,8 @@ namespace SMT.EVEData
                     bool LeftClear = true;
                     bool RightClear = true;
                     float MaxDistance = 60.0f;
+
+                    
 
                     foreach(string sj in msA.ActualSystem.Jumps)
                     {
@@ -1240,6 +1260,9 @@ namespace SMT.EVEData
                     }
                 }
             }
+
+
+            */
 
             // collect the system points to generate them from
             List<Vector2f> regionpoints = new List<Vector2f>();
