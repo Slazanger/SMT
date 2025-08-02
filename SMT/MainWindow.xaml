@@ -553,7 +553,7 @@
                                 <ScrollViewer>
                                     <StackPanel>
 
-                                        <DataGrid  x:Name="MetaliminalStormList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="AliceBlue">
+                                        <DataGrid  x:Name="MetaliminalStormList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="AliceBlue" MouseDoubleClick="MetaliminalStormList_MouseDoubleClick">
 
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />

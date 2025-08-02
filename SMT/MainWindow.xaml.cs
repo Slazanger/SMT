@@ -2379,6 +2379,24 @@ namespace SMT
                 }
             }
         }
+
+        private void MetaliminalStormList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if(MetaliminalStormList.SelectedIndex != -1)
+            {
+                EVEData.Storm selectedStorm = MetaliminalStormList.SelectedItem as EVEData.Storm;
+                if(selectedStorm != null)
+                {
+                    // Select the system in the map
+                    RegionUC.SelectSystem(selectedStorm.System, true);
+                    // If the region doc is not selected, select it
+                    if(RegionLayoutDoc != null && !RegionLayoutDoc.IsSelected)
+                    {
+                        RegionLayoutDoc.IsSelected = true;
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>
