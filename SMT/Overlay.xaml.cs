@@ -2025,7 +2025,7 @@ namespace SMT
 
                 if(showCharLocation)
                 {
-                    displayText += (displayText.IsNullOrEmpty() ? "" : "\n") + currentCharacter.Location;
+                    displayText += (string.IsNullOrEmpty(displayText) ? "" : "\n") + currentCharacter.Location;
                 }
 
                 overlay_CharNameTextblock.Text = displayText;
