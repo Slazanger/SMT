@@ -1,0 +1,4 @@
+[submodule "External/ESI.NET"]
+	path = External/ESI.NET
+	url = https://github.com/Slazanger/ESI.NET
+	branch = SMT
