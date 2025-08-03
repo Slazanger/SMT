@@ -18,8 +18,6 @@ namespace SMT.EVEData
         public System()
         {
             Jumps = new List<string>();
-            SHStructures = new List<StructureHunter.Structures>();
-
             SOVAllianceID = 0;
             HasJumpBeacon = false;
         }
@@ -50,7 +48,6 @@ namespace SMT.EVEData
             SOVAllianceID = 0;
 
             Jumps = new List<string>();
-            SHStructures = new List<StructureHunter.Structures>();
         }
 
         public enum EdenComTrigStatus
@@ -193,12 +190,6 @@ namespace SMT.EVEData
         /// </summary>
         [XmlIgnoreAttribute]
         public int ShipKillsLastHour { get; set; }
-
-        /// <summary>
-        /// Gets or sets the an incursion is active in this system
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public List<StructureHunter.Structures> SHStructures { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the alliance holding sov in this system

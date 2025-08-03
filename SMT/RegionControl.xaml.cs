@@ -2222,158 +2222,17 @@ namespace SMT
                 systemShape.StrokeThickness = 1.5;
 
                 bool needsOutline = true;
-                bool drawKeep = false;
-                bool drawFort = false;
-                bool drawAstra = false;
                 bool drawNPCStation = mapSystem.ActualSystem.HasNPCStation;
 
-                foreach(StructureHunter.Structures sh in mapSystem.ActualSystem.SHStructures)
-                {
-                    switch(sh.TypeId)
-                    {
-                        case 35834: // Keepstar
-                            drawKeep = true;
-                            break;
-
-                        case 35833: // fortizar
-                        case 47512: // faction fortizar
-                        case 47513: // faction fortizar
-                        case 47514: // faction fortizar
-                        case 47515: // faction fortizar
-                        case 47516: // faction fortizar
-                        case 35827: // Sotiyo
-                            drawFort = true;
-                            break;
-
-                        default:
-                            drawAstra = true;
-                            break;
-                    }
-                }
-
-                if(ActiveCharacter != null && ActiveCharacter.ESILinked && ActiveCharacter.DockableStructures != null && ActiveCharacter.DockableStructures.Keys.Contains(mapSystem.Name))
-                {
-                    foreach(StructureIDs.StructureIdData sid in ActiveCharacter.DockableStructures[mapSystem.Name])
-                    {
-                        switch(sid.TypeId)
-                        {
-                            case 35834: // Keepstar
-                                drawKeep = true;
-                                break;
-
-                            case 35833: // fortizar
-                            case 47512: // faction fortizar
-                            case 47513: // faction fortizar
-                            case 47514: // faction fortizar
-                            case 47515: // faction fortizar
-                            case 47516: // faction fortizar
-                            case 35827: // Sotiyo
-                                drawFort = true;
-                                break;
-
-                            default:
-                                drawAstra = true;
-                                break;
-                        }
-                    }
-                }
-
-                if(drawKeep)
-                {
-                    drawFort = false;
-                    drawAstra = false;
-                    drawNPCStation = false;
-
-                    needsOutline = false;
-                }
-
-                if(drawFort)
-                {
-                    drawAstra = false;
-                    drawNPCStation = false;
-                }
-
                 if(drawNPCStation)
                 {
-                    drawAstra = false;
-                }
-
-                List<Point> shapePoints = null;
-
-                if(drawKeep)
-                {
-                    shapePoints = SystemIcon_Keepstar;
-                    systemShape.StrokeThickness = 1.5;
-                }
-
-                if(drawFort)
-                {
-                    shapePoints = SystemIcon_Fortizar;
-                    systemShape.StrokeThickness = 1;
-                }
-                if(drawAstra)
-                {
-                    shapePoints = SystemIcon_Astrahaus;
-                    systemShape.StrokeThickness = 1;
-                }
-
-                if(drawNPCStation)
-                {
-                    //                       shapePoints = SystemIcon_NPCStation;
-                    //                        systemShape.StrokeThickness = 1.5;
-                    //                        needsOutline = false;
                     needsOutline = true;
                 }
 
                 // override
                 if(ShowSystemADM)
                 {
-                    shapePoints = null;
                     needsOutline = true;
-                }
-
-                if(shapePoints != null)
-                {
-                    foreach(Point p in shapePoints)
-                    {
-                        systemShape.Points.Add(p);
-                    }
-
-                    systemShape.Stroke = SysOutlineBrush;
-                    systemShape.StrokeLineJoin = PenLineJoin.Round;
-
-                    if(mapSystem.OutOfRegion)
-                    {
-                        systemShape.Fill = SysOutRegionDarkBrush;
-                    }
-                    else
-                    {
-                        systemShape.Fill = SysInRegionDarkBrush;
-                    }
-
-                    // override with sec status colours
-                    if(ShowSystemSecurity)
-                    {
-                        systemShape.Fill = securityColorFill;
-                    }
-
-                    if(!needsOutline)
-                    {
-                        // add the hover over and click handlers
-                        systemShape.DataContext = mapSystem;
-                        systemShape.MouseDown += ShapeMouseDownHandler;
-                        systemShape.MouseEnter += ShapeMouseOverHandler;
-                        systemShape.MouseLeave += ShapeMouseOverHandler;
-                    }
-                    else
-                    {
-                        systemShape.IsHitTestVisible = false;
-                    }
-
-                    Canvas.SetLeft(systemShape, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 1);
-                    Canvas.SetTop(systemShape, mapSystem.Layout.Y - SYSTEM_SHAPE_OFFSET + 1);
-                    Canvas.SetZIndex(systemShape, ZINDEX_SYSTEM);
-                    MainCanvas.Children.Add(systemShape);
                 }
 
                 if(mapSystem.ActualSystem.HasIceBelt || mapSystem.ActualSystem.HasBlueA0Star)

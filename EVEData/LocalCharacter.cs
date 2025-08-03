@@ -109,8 +109,6 @@ namespace SMT.EVEData
 
             DangerZoneRange = 5;
 
-            DockableStructures = new Dictionary<string, List<StructureIDs.StructureIdData>>();
-
             UseAnsiblexGates = true;
 
             IsOnline = true;
@@ -163,12 +161,6 @@ namespace SMT.EVEData
 
         public bool DangerZoneActive { get; set; }
         public bool DeepSearchEnabled { get; set; }
-
-        /// <summary>
-        /// Gets or sets the character structure dictionary
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public Dictionary<string, List<StructureIDs.StructureIdData>> DockableStructures { get; set; }
 
         /// <summary>
         /// Gets or sets the ESI access token
