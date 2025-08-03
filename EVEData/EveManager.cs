@@ -164,7 +164,6 @@ namespace SMT.EVEData
             IDToSystem = new Dictionary<long, System>();
 
             ServerInfo = new EVEData.Server();
-            Coalitions = new List<Coalition>();
         }
 
         /// <summary>
@@ -309,8 +308,6 @@ namespace SMT.EVEData
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
         public SerializableDictionary<int, string> CharacterIDToName { get; set; }
-
-        public List<Coalition> Coalitions { get; set; }
 
         public ESI.NET.EsiClient ESIClient { get; set; }
 
@@ -2787,9 +2784,6 @@ namespace SMT.EVEData
             ActiveSovCampaigns = new List<SOVCampaign>();
 
             InitZKillFeed();
-
-            // Removed as the api site is down
-            //UpdateCoalitionInfo();
 
             StartBackgroundThread();
         }

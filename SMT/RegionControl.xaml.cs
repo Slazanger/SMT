@@ -1366,23 +1366,6 @@ namespace SMT
                 infoColour = dataColor;
                 long SystemAlliance = sys.ActualSystem.SOVAllianceID;
 
-                //
-                Coalition SystemCoalition = null;
-                if(SystemAlliance != 0)
-                {
-                    foreach(Coalition c in EM.Coalitions)
-                    {
-                        foreach(long l in c.MemberAlliances)
-                        {
-                            if(l == SystemAlliance)
-                            {
-                                SystemCoalition = c;
-                                break;
-                            }
-                        }
-                    }
-                }
-
                 int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
                 int podKillsLastHour = sys.ActualSystem.PodKillsLastHour;
                 int shipKillsLastHour = sys.ActualSystem.ShipKillsLastHour;
@@ -1581,28 +1564,6 @@ namespace SMT
                         // save the dynamic map elements
                         DynamicMapElements.Add(poly);
                     }
-                }
-
-                if(SystemAlliance != 0 && MapConf.ShowCoalition && SystemCoalition != null && ShowSovOwner)
-                {
-                    Polygon poly = new Polygon();
-                    poly.Fill = new SolidColorBrush(Color.FromArgb(SystemCoalition.CoalitionColor.A, SystemCoalition.CoalitionColor.R, SystemCoalition.CoalitionColor.G, SystemCoalition.CoalitionColor.B));
-                    poly.SnapsToDevicePixels = true;
-                    poly.Stroke = poly.Fill;
-                    poly.StrokeThickness = 0.4;
-                    poly.StrokeDashCap = PenLineCap.Round;
-                    poly.StrokeLineJoin = PenLineJoin.Round;
-
-                    foreach(Vector2 p in sys.CellPoints)
-                    {
-                        System.Windows.Point wp = new Point(p.X, p.Y);
-                        poly.Points.Add(wp);
-                    }
-
-                    MainCanvas.Children.Add(poly);
-
-                    // save the dynamic map elements
-                    DynamicMapElements.Add(poly);
                 }
 
                 if(activeJumpSpheres.Count > 0 || currentJumpCharacter != null)
@@ -2222,8 +2183,6 @@ namespace SMT
             {
                 EVEData.MapSystem mapSystem = kvp.Value;
 
-                Coalition SystemCoalition = null;
-
                 bool isSystemOOR = mapSystem.OutOfRegion;
 
                 if(Region.MetaRegion)
@@ -2254,20 +2213,7 @@ namespace SMT
 
                 Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
 
-                if(mapSystem.ActualSystem.SOVAllianceID != 0)
-                {
-                    foreach(Coalition c in EM.Coalitions)
-                    {
-                        foreach(long l in c.MemberAlliances)
-                        {
-                            if(l == mapSystem.ActualSystem.SOVAllianceID)
-                            {
-                                SystemCoalition = c;
-                                break;
-                            }
-                        }
-                    }
-                }
+
 
                 string SystemSubText = string.Empty;
 
@@ -2819,14 +2765,7 @@ namespace SMT
                 {
                     string allianceName = EM.GetAllianceName(SystemAlliance);
                     string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
-                    string coalitionName = string.Empty;
-
                     string content = allianceTicker;
-
-                    if(MapConf.ShowCoalition && SystemCoalition != null)
-                    {
-                        content = SystemCoalition.Name + " (" + allianceTicker + ")";
-                    }
 
                     if(SystemSubText != string.Empty)
                     {

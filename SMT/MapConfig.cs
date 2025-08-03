@@ -42,7 +42,6 @@ namespace SMT
         private bool m_showCompactCharactersOnMap = false;
         private bool m_showOfflineCharactersOnMap = true;
         private bool m_ShowCharacterNamesOnMap = true;
-        private bool m_ShowCoalition;
 
         private bool m_ShowDangerZone;
 
@@ -585,22 +584,6 @@ namespace SMT
             {
                 m_showOfflineCharactersOnMap = value;
                 OnPropertyChanged("ShowOfflineCharactersOnMap");
-            }
-        }
-
-        [Category("SOV")]
-        [DisplayName("Show Coalition")]
-        public bool ShowCoalition
-        {
-            get
-            {
-                return m_ShowCoalition;
-            }
-
-            set
-            {
-                m_ShowCoalition = value;
-                OnPropertyChanged("ShowCoalition");
             }
         }
 

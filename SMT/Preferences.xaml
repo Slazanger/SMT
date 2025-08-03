@@ -314,7 +314,6 @@
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Header="SOV" Margin="4" Height="auto">
                                     <StackPanel>
-                                        <CheckBox IsChecked="{Binding Path=ShowCoalition}" Margin="0,2">Show SOV as Coalitions</CheckBox>
                                         <CheckBox IsChecked="{Binding Path=ShowIhubVunerabilities}" Margin="0,2">Show IHub Timer</CheckBox>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
