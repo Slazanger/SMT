@@ -2741,7 +2741,7 @@ namespace SMT.EVEData
         {
             IOptions<EsiConfig> config = Options.Create(new EsiConfig()
             {
-                EsiUrl = "https://esi.evetech.net/",
+                EsiUrl = "https://esi.evetech.net",
                 DataSource = DataSource.Tranquility,
                 ClientId = EveAppConfig.ClientID,
                 SecretKey = "Unneeded",
