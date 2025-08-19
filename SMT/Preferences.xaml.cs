@@ -25,7 +25,7 @@ namespace SMT
 
         public List<string> CynoBeaconSystems { get; set; }
 
-        private WaveOutEvent waveOutEvent;
+        private IWavePlayer waveOutEvent;
         private AudioFileReader audioFileReader;
 
         private bool isInitialLoad = true; // Flag to track initial load of preferences window
@@ -36,9 +36,20 @@ namespace SMT
 
             syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
 
-            waveOutEvent = new WaveOutEvent();
+            waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
+
             audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-            waveOutEvent.Init(audioFileReader);
+
+            try
+            {
+                waveOutEvent.Init(audioFileReader);
+            }
+            catch
+            {
+                // wave output fails on some devices; try falling back to dsound
+                waveOutEvent = new DirectSoundOut();
+                waveOutEvent.Init(audioFileReader);
+            }
 
             JumpBridgeList.ItemsSource = EveManager.Instance.JumpBridges;
         }

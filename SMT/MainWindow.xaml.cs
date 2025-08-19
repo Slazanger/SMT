@@ -62,7 +62,7 @@ namespace SMT
 
         private readonly string WindowLayoutVersion = "02";
 
-        private WaveOutEvent waveOutEvent;
+        private IWavePlayer waveOutEvent;
         private AudioFileReader audioFileReader;
 
         /// <summary>
@@ -77,9 +77,22 @@ namespace SMT
 
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
 
-            waveOutEvent = new WaveOutEvent();
+
+            waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
+
             audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-            waveOutEvent.Init(audioFileReader);
+
+            try
+            {
+                waveOutEvent.Init(audioFileReader);
+            }
+            catch
+            {
+                // wave output fails on some devices; try falling back to dsound
+                waveOutEvent = new DirectSoundOut();
+                waveOutEvent.Init(audioFileReader);
+            }
+
 
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
