@@ -24,7 +24,7 @@ namespace SMT
         private const int SYSTEM_LINK_INDEX = 19;
         private const double SYSTEM_REGION_TEXT_WIDTH = 100;
         private const double SYSTEM_REGION_TEXT_X_OFFSET = -SYSTEM_REGION_TEXT_WIDTH / 2;
-        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 6;
+        private const double SYSTEM_REGION_TEXT_Y_OFFSET = SYSTEM_TEXT_Y_OFFSET + SYSTEM_TEXT_TEXT_SIZE + 3;
         private const double SYSTEM_SHAPE_OFFSET = SYSTEM_SHAPE_SIZE / 2;
         private const double SYSTEM_SHAPE_SIZE = 18;
         private const double SYSTEM_TEXT_TEXT_SIZE = 6;
@@ -2370,6 +2370,7 @@ namespace SMT
                 Label sysText = new Label();
                 sysText.Content = mapSystem.Name;
 
+
                 if(MapConf.ActiveColourScheme.SystemTextSize > 0)
                 {
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
@@ -2414,7 +2415,7 @@ namespace SMT
                     case MapSystem.TextPosition.Bottom:
                         {
                             double spLeft = mapSystem.Layout.X - (SYSTEM_TEXT_X_OFFSET);
-                            double spTop = mapSystem.Layout.Y + (SYSTEM_SHAPE_OFFSET + 1);
+                            double spTop = mapSystem.Layout.Y + (SYSTEM_SHAPE_OFFSET) - 1;
                             Canvas.SetLeft(sysTextGrid, spLeft);
                             Canvas.SetTop(sysTextGrid, spTop);
 
@@ -2640,9 +2641,12 @@ namespace SMT
 
                 if(!string.IsNullOrEmpty(SystemSubText))
                 {
+
                     TextBlock sysSubText = new TextBlock();
                     sysSubText.Text = SystemSubText;
                     sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
+                    sysSubText.Padding = new Thickness(0);
+                    sysSubText.Margin = new Thickness(0);
 
                     switch(mapSystem.TextPos)
                     {
