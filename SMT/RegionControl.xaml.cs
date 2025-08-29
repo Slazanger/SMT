@@ -3716,19 +3716,27 @@ namespace SMT
             {
                 if(eveSys != null)
                 {
-                    bool CopyWithMeta = true;
-                    if(CopyWithMeta)
-                    {
-                        Clipboard.SetText($"<url=showinfo:5//{eveSys.ActualSystem.ID}>{eveSys.Name}</url>");
-                    }
-                    else
-                    {
-                        Clipboard.SetText(eveSys.Name);
-                    }
+                    Clipboard.SetText(eveSys.Name);
                 }
             }
             catch { }
         }
+
+        private void SysContexMenuItemCopyEncoded_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+            try
+            {
+                if(eveSys != null)
+                {
+                    Clipboard.SetText($"<url=showinfo:5//{eveSys.ActualSystem.ID}>{eveSys.Name}</url>");
+                }
+            }
+            catch { }
+        }
+
+
 
         /// <summary>
         /// Dotlan Clicked
