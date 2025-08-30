@@ -66,6 +66,7 @@ namespace SMT
         // Store the Dynamic Map elements so they can seperately be cleared
         private List<System.Windows.UIElement> DynamicMapElements;
 
+        private List<System.Windows.UIElement> DynamicMapElementsSysLinkHighlight;
         private List<System.Windows.UIElement> DynamicMapElementsCharacters;
         private List<System.Windows.UIElement> DynamicMapElementsJBHighlight;
         private List<System.Windows.UIElement> DynamicMapElementsRangeMarkers;
@@ -104,8 +105,9 @@ namespace SMT
 
         // Constant Colours
         private Brush StandingVBadBrush = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
-
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
+
+
 
         private List<Point> SystemIcon_Astrahaus = new List<Point>
         {
@@ -730,6 +732,7 @@ namespace SMT
             DynamicMapElementsRouteHighlight = new List<UIElement>();
             DynamicMapElementsCharacters = new List<UIElement>();
             DynamicMapElementsJBHighlight = new List<UIElement>();
+            DynamicMapElementsSysLinkHighlight = new List<UIElement>();
 
             ActiveCharacter = null;
 
@@ -2711,7 +2714,7 @@ namespace SMT
                     sysLink.Stroke = RegionGateBrush;
                 }
 
-                sysLink.StrokeThickness = 1.2;
+                sysLink.StrokeThickness = 2;
                 sysLink.Visibility = Visibility.Visible;
 
                 Canvas.SetZIndex(sysLink, SYSTEM_LINK_INDEX);
@@ -2793,7 +2796,7 @@ namespace SMT
                         jbLine.X2 = endPoint.X;
                         jbLine.Y2 = endPoint.Y;
 
-                        jbLine.StrokeThickness = 1;
+                        jbLine.StrokeThickness = 2;
 
                         DoubleCollection dashes = new DoubleCollection();
 
@@ -3469,6 +3472,9 @@ namespace SMT
                         }
                     }
 
+
+
+
                     if(AddJBHighlight)
                     {
                         Line jbHighlight = new Line();
@@ -3515,6 +3521,54 @@ namespace SMT
                         Canvas.SetZIndex(jbhighlightEndPointCircle, 19);
 
                         MainCanvas.Children.Add(jbhighlightEndPointCircle);
+                    }
+                }
+
+                bool addAdditionalHighlights = true;
+                if(addAdditionalHighlights)
+                {
+                    Brush NormalGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+                    Brush ConstellationGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+                    Brush RegionGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionGateColour);
+
+                    foreach(string connection in selectedSys.ActualSystem.Jumps)
+                    {
+
+
+                        if(Region.MapSystems.ContainsKey(connection))
+                        {
+                            MapSystem s1 = Region.MapSystems[connection];
+
+                            Line sysLink = new Line();
+                            sysLink.Stroke = NormalGateBrush;
+
+                            if(selectedSys.ActualSystem.ConstellationID != s1.ActualSystem.ConstellationID)
+                            {
+                                sysLink.Stroke = ConstellationGateBrush;
+                            }
+
+                            if(selectedSys.ActualSystem.Region != s1.ActualSystem.Region)
+                            {
+                                sysLink.Stroke = RegionGateBrush;
+                            }
+
+
+
+                            sysLink.X1 = selectedSys.Layout.X;
+                            sysLink.Y1 = selectedSys.Layout.Y;
+
+                            sysLink.X2 = s1.Layout.X;
+                            sysLink.Y2 = s1.Layout.Y;
+
+
+                            sysLink.StrokeThickness = 4;
+
+                            DynamicMapElementsSysLinkHighlight.Add(sysLink);
+                            Canvas.SetZIndex(sysLink, 19);
+                            MainCanvas.Children.Add(sysLink);
+                        }
+
+
                     }
                 }
 
@@ -3648,6 +3702,11 @@ namespace SMT
             {
                 SystemInfoPopup.IsOpen = false;
 
+                foreach(UIElement uie in DynamicMapElementsSysLinkHighlight)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+
                 foreach(UIElement uie in DynamicMapElementsJBHighlight)
                 {
                     MainCanvas.Children.Remove(uie);
@@ -3661,6 +3720,7 @@ namespace SMT
                 }
 
                 DynamicMapElementsJBHighlight.Clear();
+                DynamicMapElementsSysLinkHighlight.Clear();
             }
         }
 
