@@ -134,7 +134,7 @@
 
             <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="170" Height="93" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" CornerRadius="4" Panel.ZIndex="111"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}" Grid.ColumnSpan="3">
                 <Canvas x:Name="ToolBoxCanvas">
-                    <Label x:Name="RegionNameLabel" Content="Region" FontSize="46" HorizontalAlignment="Center" VerticalAlignment="Top"  Foreground="#14767576" Canvas.Left="-470" Width="465" Height="82" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+                    <Label x:Name="RegionNameLabel" Content="Region" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Top"  Foreground="#14767576" Canvas.Left="-845" Width="840" Height="98" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" IsHitTestVisible="False"/>
                     <Grid Canvas.Left="0" Canvas.Top="0" Width="167" HorizontalAlignment="Center">
 
                         <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="4">

@@ -7,7 +7,7 @@ namespace SMT
 {
     public class MapConfig : INotifyPropertyChanged
     {
-        public static readonly string SaveVersion = "04";
+        public static readonly string SaveVersion = "05";
 
         [Browsable(false)]
         public MapColours ActiveColourScheme;
@@ -81,7 +81,9 @@ namespace SMT
 
         private bool m_drawRoute = true;
 
-        private bool m_followOnZoom = true;
+        private bool m_followOnZoom = false;
+
+        private bool m_ResetZoomOnRegionChange = true;
 
         private string m_CustomEveLogFolderLocation;
 
@@ -279,6 +281,20 @@ namespace SMT
                 OnPropertyChanged("FollowOnZoom");
             }
         }
+
+        public bool ResetZoomOnRegionChange
+        {
+            get
+            {
+                return m_ResetZoomOnRegionChange;
+            }
+            set
+            {
+                m_ResetZoomOnRegionChange = value;
+                OnPropertyChanged("ResetZoomOnRegionChange");
+            }
+        }
+
 
         public bool LimitESIDataToRegion
         {

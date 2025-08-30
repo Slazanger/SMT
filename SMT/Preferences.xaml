@@ -112,6 +112,7 @@
 
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=FollowOnZoom}" Content="Follow Selected System when Zoomed" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ResetZoomOnRegionChange}" Content="Reset the zoom level on region change" />
                                     <CheckBox Margin="0,3" IsChecked="{Binding Path=ClampMaxESIOverlayValue}" Content="Clamp overlay Data to Maximum" />
                                 </StackPanel>
                             </GroupBox>

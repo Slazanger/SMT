@@ -896,6 +896,9 @@ namespace SMT
                 ReDrawMap(true);
             }), DispatcherPriority.Normal);
 
+            // reset the zoom / export 
+            MainZoomControl.ZoomToFill();
+
             // select the item in the dropdown
             RegionSelectCB.SelectedItem = Region;
 
