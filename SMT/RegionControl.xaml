@@ -128,16 +128,17 @@
             </Border>
 
             <Border BorderThickness="4" BorderBrush="Black" CornerRadius="3" Grid.ColumnSpan="3" />
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,140" x:Name="AllianceNameList" Visibility="Visible" Width="170" Panel.ZIndex="111" Grid.ColumnSpan="3">
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,105" x:Name="AllianceNameList" Visibility="Visible" Width="170" Panel.ZIndex="111" Grid.Column="2">
                 <StackPanel x:Name="AllianceNameListStackPanel" VerticalAlignment="Bottom" />
             </Border>
 
-            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="170" Height="123" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" CornerRadius="4" Panel.ZIndex="111"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}" Grid.ColumnSpan="3">
+            <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="170" Height="93" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" CornerRadius="4" Panel.ZIndex="111"  Visibility="{Binding Path=MapConf.ShowToolBox, Converter={StaticResource BoolToVis}}" Grid.ColumnSpan="3">
                 <Canvas x:Name="ToolBoxCanvas">
+                    <Label x:Name="RegionNameLabel" Content="Region" FontSize="46" HorizontalAlignment="Center" VerticalAlignment="Top"  Foreground="#14767576" Canvas.Left="-470" Width="465" Height="82" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
                     <Grid Canvas.Left="0" Canvas.Top="0" Width="167" HorizontalAlignment="Center">
 
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0">
-                            <Label x:Name="RegionNameLabel" Content="Region" FontSize="16" Grid.Column="1" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="#FF767576" />
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="4">
+
 
                             <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
 

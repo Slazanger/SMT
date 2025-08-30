@@ -28,7 +28,7 @@ namespace SMT
         private const double SYSTEM_SHAPE_OFFSET = SYSTEM_SHAPE_SIZE / 2;
         private const double SYSTEM_SHAPE_SIZE = 18;
         private const double SYSTEM_TEXT_TEXT_SIZE = 6;
-        private const double SYSTEM_SHAPE_OOR_SIZE = 10;
+        private const double SYSTEM_SHAPE_OOR_SIZE = 14;
         private const double SYSTEM_SHAPE_OOR_OFFSET = SYSTEM_SHAPE_OOR_SIZE / 2;
 
         private const int SYSTEM_TEXT_WIDTH = 100;
