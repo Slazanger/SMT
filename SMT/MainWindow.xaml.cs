@@ -121,6 +121,7 @@ namespace SMT
             // Due to bugs in the Dock manager patch up the content id's for the 2 main views
             RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
+            UniverseSkiaLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullSkiaUniverseViewID");
 
             // load any custom map settings off disk
             string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion + ".dat");
@@ -310,6 +311,11 @@ namespace SMT
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
 
+            UniverseUCSkia.MapConf = MapConf;
+            UniverseUCSkia.CapitalRoute = CapitalRoute;
+            UniverseUCSkia.Init();
+            UniverseUCSkia.RequestRegionSystem -= UniverseUC_RequestRegionSystem;
+
             RegionsViewUC.MapConf = MapConf;
             RegionsViewUC.Init();
             RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
@@ -396,6 +402,9 @@ namespace SMT
 
                                 UniverseUC.FollowCharacter = true;
                                 UniverseUC.UpdateActiveCharacter(lc);
+
+                                UniverseUCSkia.FollowCharacter = true;
+                                UniverseUCSkia.UpdateActiveCharacter(lc);
                             });
 
                             break;
@@ -562,6 +571,8 @@ namespace SMT
         private AvalonDock.Layout.LayoutDocument RegionLayoutDoc { get; set; }
 
         private AvalonDock.Layout.LayoutDocument UniverseLayoutDoc { get; set; }
+
+        private AvalonDock.Layout.LayoutDocument UniverseSkiaLayoutDoc { get; set; }
 
         private void ActiveSovCampaigns_CollectionChanged()
         {
@@ -905,6 +916,12 @@ namespace SMT
             {
                 UniverseLayoutDoc.IsSelected = true;
             }
+
+            UniverseUCSkia.ShowSystem(sysName);
+            if(UniverseSkiaLayoutDoc != null)
+            {
+                UniverseSkiaLayoutDoc.IsSelected = true;
+            }
         }
 
         #endregion Region Control
@@ -1010,6 +1027,7 @@ namespace SMT
         {
             RegionUC.ReDrawMap(true);
             UniverseUC.ReDrawMap(true, true, false);
+            UniverseUCSkia.ReDrawMap(true, true, false);
 
             // recalculate the route if required
             if(ActiveCharacter != null && ActiveCharacter.Waypoints.Count > 0)
@@ -1119,6 +1137,9 @@ namespace SMT
 
                         UniverseUC.FollowCharacter = true;
                         UniverseUC.UpdateActiveCharacter(lc);
+
+                        UniverseUCSkia.FollowCharacter = true;
+                        UniverseUCSkia.UpdateActiveCharacter(lc);
                     }
                 }
             }
@@ -1153,6 +1174,7 @@ namespace SMT
             RegionUC.ActiveCharacter = null;
             RegionUC.UpdateActiveCharacter();
             UniverseUC.ActiveCharacter = null;
+            UniverseUCSkia.ActiveCharacter = null;
             OnCharacterSelectionChanged();
 
             EVEManager.RemoveCharacter(lc);
@@ -1167,6 +1189,7 @@ namespace SMT
                 FleetMembersList.ItemsSource = null;
                 RegionUC.UpdateActiveCharacter();
                 UniverseUC.UpdateActiveCharacter(null);
+                UniverseUCSkia.UpdateActiveCharacter(null);
             }
             else
             {
@@ -1184,6 +1207,7 @@ namespace SMT
                 RegionsViewUC.ActiveCharacter = lc;
                 RegionUC.UpdateActiveCharacter(lc);
                 UniverseUC.UpdateActiveCharacter(lc);
+                UniverseUCSkia.UpdateActiveCharacter(lc);
             }
 
             OnCharacterSelectionChanged();
@@ -1212,6 +1236,7 @@ namespace SMT
 
                         RegionUC.UpdateActiveCharacter(lc);
                         UniverseUC.UpdateActiveCharacter(lc);
+                        UniverseUCSkia.UpdateActiveCharacter(lc);
 
                         break;
                     }
@@ -2181,6 +2206,7 @@ namespace SMT
             // Due to bugs in the Dock manager patch up the content id's for the 2 main views
             RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
+            UniverseSkiaLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullSkiaUniverseViewID");
 
             dockManager.UpdateLayout();
         }
@@ -2237,6 +2263,8 @@ namespace SMT
                 string sel = rp.SystemName;
 
                 UniverseUC.ShowSystem(sel);
+                UniverseUCSkia.ShowSystem(sel);
+
 
                 lblAlternateMids.Content = sel;
                 if(CapitalRoute.AlternateMids.ContainsKey(sel))

@@ -692,6 +692,10 @@
                         <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverseViewID" Title="Universe">
                             <local:UniverseControl x:Name="UniverseUC" />
                         </xcadl:LayoutDocument>
+
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullSkiaUniverseViewID" Title="Universe">
+                            <local:SkiaSharpUniverseControl x:Name="UniverseUCSkia" />
+                        </xcadl:LayoutDocument>
                     </xcadl:LayoutDocumentPane>
                 </xcadl:LayoutPanel>
             </xcadl:LayoutRoot>

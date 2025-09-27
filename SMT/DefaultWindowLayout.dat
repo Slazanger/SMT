@@ -15,6 +15,7 @@
       <LayoutDocument Title="Regions" IsSelected="True" IsLastFocusedDocument="True" ContentId="UniverseContentID" CanClose="False" LastActivationTimeStamp="11/16/2024 21:11:42" />
       <LayoutDocument Title="Region" ContentId="MapRegionContentID" CanClose="False" />
       <LayoutDocument Title="Universe" ContentId="FullUniverseViewID" CanClose="False" />
+		<LayoutDocument Title="UniverseTest" ContentId="FullSkiaUniverseViewID" CanClose="False" />
     </LayoutDocumentPane>
   </RootPanel>
   <TopSide />

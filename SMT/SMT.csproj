@@ -212,6 +212,12 @@
     <PackageReference Include="WPFThemes.DarkBlend">
       <Version>1.0.8</Version>
     </PackageReference>
+    <PackageReference Include="SkiaSharp">
+      <Version>2.88.8</Version>
+    </PackageReference>
+    <PackageReference Include="SkiaSharp.Views.WPF">
+      <Version>2.88.8</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EVEData\EVEData.csproj" />

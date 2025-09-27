@@ -125,6 +125,7 @@ namespace SMT
             ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
             MainWindow.AppWindow.RegionUC.ReDrawMap(true);
             MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
+            MainWindow.AppWindow.UniverseUCSkia.ReDrawMap(true, true, true);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -141,6 +142,7 @@ namespace SMT
         {
             MainWindow.AppWindow.RegionUC.ReDrawMap(true);
             MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
+            MainWindow.AppWindow.UniverseUCSkia.ReDrawMap(true, true, true);
         }
 
         private void IntelVolumeChanged_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

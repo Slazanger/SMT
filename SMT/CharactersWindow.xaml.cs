@@ -88,6 +88,7 @@ namespace SMT
                     mw.RegionUC.ActiveCharacter = null;
                     mw.RegionUC.UpdateActiveCharacter();
                     mw.UniverseUC.ActiveCharacter = null;
+                    mw.UniverseUCSkia.ActiveCharacter = null;
                     mw.OnCharacterSelectionChanged();
                     mw.EVEManager.RemoveCharacter(lc);
 
