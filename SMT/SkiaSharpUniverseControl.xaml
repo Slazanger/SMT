@@ -4,7 +4,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
-             xmlns:zc="clr-namespace:SMT.ZoomControl"
              xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -82,13 +81,73 @@
             <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Auto Follow Active Character" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
         </StackPanel>
 
-        <zc:ZoomControl x:Name="MainZoomControl" MinZoom="0.5" MaxZoom="10" Margin="0" ZoomChanged="MainZoomControl_ZoomChanged" Grid.Row="1" Zoom="1.2" ContentDragFinished="MainZoomControl_ContentDragFinished">
+        <Grid Grid.Row="1">
             <skia:SKElement x:Name="UniverseCanvas" 
-                           Width="5000" Height="5000" 
                            PaintSurface="UniverseCanvas_PaintSurface" 
                            MouseDown="UniverseCanvas_MouseDown"
-                           MouseRightButtonDown="UniverseCanvas_MouseRightButtonDown" />
-        </zc:ZoomControl>
+                           MouseRightButtonDown="UniverseCanvas_MouseRightButtonDown"
+                           MouseMove="UniverseCanvas_MouseMove"
+                           MouseUp="UniverseCanvas_MouseUp"
+                           MouseWheel="UniverseCanvas_MouseWheel"
+                           MouseLeave="UniverseCanvas_MouseLeave" 
+                           Focusable="True" />
+
+            <!-- Zoom Controls Panel -->
+            <Border Padding="5"
+                    CornerRadius="5"
+                    Background="#664B4B4B"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="10"
+                    ToolTipService.InitialShowDelay="0">
+                <Border.ToolTip>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock><Run FontWeight="Bold">Mouse wheel:</Run> Zoom In / Out</TextBlock>
+                        <TextBlock><Run FontWeight="Bold">Left Click + Drag:</Run> Pan</TextBlock>
+                        <TextBlock><Run FontWeight="Bold">Right Click:</Run> System menu</TextBlock>
+                    </StackPanel>
+                </Border.ToolTip>
+                <StackPanel Orientation="Vertical">
+                    <Slider Name="ZoomSlider"
+                            Height="130"
+                            Minimum="0.5"
+                            Maximum="10.0"
+                            Value="{Binding Zoom, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                            HorizontalAlignment="Center"
+                            Ticks="0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0"
+                            AutoToolTipPlacement="BottomRight"
+                            AutoToolTipPrecision="1"
+                            TickPlacement="BottomRight"
+                            TickFrequency="0.5"
+                            LargeChange="1"
+                            SmallChange="0.1"
+                            Orientation="Vertical"
+                            IsMoveToPointEnabled="True" />
+                    <TextBlock Text="{Binding Zoom, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='{}{0:F2}x'}"
+                               HorizontalAlignment="Center"
+                               FontWeight="Bold"
+                               Foreground="White" />
+                    <Button Name="ZoomToFitBtn" 
+                            Content="Fit" 
+                            Click="ZoomToFitBtn_Click"
+                            Width="40" 
+                            Height="25" 
+                            Margin="2" 
+                            Background="#FF747474" 
+                            BorderBrush="Black" 
+                            Foreground="White" />
+                    <Button Name="Zoom100Btn" 
+                            Content="1:1" 
+                            Click="Zoom100Btn_Click"
+                            Width="40" 
+                            Height="25" 
+                            Margin="2" 
+                            Background="#FF747474" 
+                            BorderBrush="Black" 
+                            Foreground="White" />
+                </StackPanel>
+            </Border>
+        </Grid>
 
         <Border BorderThickness="2" BorderBrush="Black" Background="#FF232223" Width="145" Height="70" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" CornerRadius="4" Panel.ZIndex="111" Grid.Row="1">
             <Canvas x:Name="ToolBoxCanvas">

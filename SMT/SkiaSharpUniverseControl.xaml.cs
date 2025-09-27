@@ -59,6 +59,15 @@ namespace SMT
         {
             InitializeComponent();
             DataContext = this;
+            
+            // Handle canvas size changes
+            UniverseCanvas.SizeChanged += UniverseCanvas_SizeChanged;
+        }
+
+        private void UniverseCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateTransformMatrix();
+            UniverseCanvas.InvalidateVisual();
         }
 
         private struct GateHelper
@@ -211,6 +220,52 @@ namespace SMT
         private bool needsDataRedraw = true;
         private bool needsFastUpdate = true;
 
+        // Pan and Zoom state
+        private SKMatrix transformMatrix = SKMatrix.Identity;
+        private float currentZoom = 1.2f;
+        private SKPoint panOffset = new SKPoint(0, 0);
+        private bool isPanning = false;
+        private Point mouseDownPos;
+        private SKPoint startPanOffset;
+        private const float MinZoom = 0.5f;
+        private const float MaxZoom = 10.0f;
+
+        // Properties for compatibility with original API
+        public double Zoom
+        {
+            get { return currentZoom; }
+            set
+            {
+                float newZoom = Math.Max(MinZoom, Math.Min(MaxZoom, (float)value));
+                if (newZoom != currentZoom)
+                {
+                    float oldZoom = currentZoom;
+                    currentZoom = newZoom;
+                    
+                    // Scale pan offset like ZoomControl does when zoom changes via property
+                    // (but not during mouse wheel zooming which handles positioning differently)
+                    if (oldZoom != 0 && !isMouseWheelZooming)
+                    {
+                        float zoomDelta = currentZoom / oldZoom;
+                        panOffset.X *= zoomDelta;
+                        panOffset.Y *= zoomDelta;
+                    }
+                    
+                    UpdateTransformMatrix();
+                    HandleZoomLevelChange(); // This will call InvalidateVisual if needed
+                    OnPropertyChanged("Zoom");
+                }
+            }
+        }
+
+        // Track which visibility mode we're in to avoid unnecessary redraws
+        private bool isSystemsVisible = true;
+        private bool isSystemNamesVisible = true;
+        private bool isRegionMarkersZoomedOut = false;
+        
+        // Flag to prevent pan offset scaling during mouse wheel zoom
+        private bool isMouseWheelZooming = false;
+
         // SkiaSharp paints and fonts
         private SKPaint SystemPaint;
         private SKPaint SystemHiSecPaint;
@@ -285,6 +340,9 @@ namespace SMT
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.ItemsSource = globalSystemList;
 
+            // Make sure layer visibility is properly initialized
+            HandleZoomLevelChange();
+
             ReDrawMap(true);
         }
 
@@ -313,6 +371,74 @@ namespace SMT
 
             // Create font - matching original WPF SystemTextSize
             MainFont = new SKFont(SKTypeface.FromFamilyName("Atkinson Hyperlegible") ?? SKTypeface.Default, 5);
+            
+            // Initialize transform matrix
+            UpdateTransformMatrix();
+            
+            // Initialize layer visibility based on default zoom
+            HandleZoomLevelChange();
+        }
+
+        private void HandleZoomLevelChange()
+        {
+            if (MapConf == null) return;
+
+            bool layerChanged = false;
+
+            // Check system names visibility threshold
+            bool shouldShowSystemNames = currentZoom >= MapConf.UniverseMaxZoomDisplaySystemsText;
+            if (shouldShowSystemNames != isSystemNamesVisible)
+            {
+                isSystemNamesVisible = shouldShowSystemNames;
+                layerChanged = true;
+            }
+
+            // Check systems vs region shapes visibility threshold  
+            bool shouldShowSystems = currentZoom >= MapConf.UniverseMaxZoomDisplaySystems;
+            bool shouldShowRegionMarkersZoomedOut = currentZoom < MapConf.UniverseMaxZoomDisplaySystems;
+
+            if (shouldShowSystems != isSystemsVisible || shouldShowRegionMarkersZoomedOut != isRegionMarkersZoomedOut)
+            {
+                isSystemsVisible = shouldShowSystems;
+                isRegionMarkersZoomedOut = shouldShowRegionMarkersZoomedOut;
+                layerChanged = true;
+            }
+
+            // Only trigger a redraw if layer visibility actually changed
+            if (layerChanged)
+            {
+                UniverseCanvas.InvalidateVisual();
+            }
+        }
+
+        private void UpdateTransformMatrix()
+        {
+            transformMatrix = SKMatrix.Identity;
+            
+            // Create a transform that maps from our 5000x5000 coordinate space to screen space
+            var canvasWidth = (float)UniverseCanvas.ActualWidth;
+            var canvasHeight = (float)UniverseCanvas.ActualHeight;
+            
+            if (canvasWidth > 0 && canvasHeight > 0)
+            {
+                // Scale to fit the canvas while maintaining aspect ratio
+                float baseScale = Math.Min(canvasWidth / 5000f, canvasHeight / 5000f);
+                
+                // Apply base coordinate system transform
+                transformMatrix = transformMatrix.PostConcat(SKMatrix.CreateScale(baseScale, baseScale));
+                
+                // Apply user zoom (around origin)
+                transformMatrix = transformMatrix.PostConcat(SKMatrix.CreateScale(currentZoom, currentZoom));
+                
+                // Center the coordinate system (independent of pan)
+                float totalScale = baseScale * currentZoom;
+                float centerOffsetX = (canvasWidth - 5000f * totalScale) / 2f;
+                float centerOffsetY = (canvasHeight - 5000f * totalScale) / 2f;
+                transformMatrix = transformMatrix.PostConcat(SKMatrix.CreateTranslation(centerOffsetX, centerOffsetY));
+                
+                // Apply user pan translation SEPARATELY (pure screen space translation)
+                transformMatrix = transformMatrix.PostConcat(SKMatrix.CreateTranslation(panOffset.X, panOffset.Y));
+            }
         }
 
         private void UpdatePaintsFromColorScheme()
@@ -433,20 +559,27 @@ namespace SMT
             uiRefreshTimer_interval++;
 
             bool FullRedraw = false;
-            bool FastUpdate = true;
+            bool FastUpdate = false; // Only update dynamic elements when needed
             bool DataRedraw = false;
 
             if (uiRefreshTimer_interval == 4)
             {
                 uiRefreshTimer_interval = 0;
-                DataRedraw = false;
+                DataRedraw = true; // Refresh data overlays every 20 seconds
+                FastUpdate = true; // Refresh dynamic elements too
             }
 
             if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 CentreMapOnActiveCharacter();
+                FastUpdate = true; // Update dynamic elements when following character
             }
-            ReDrawMap(FullRedraw, DataRedraw, FastUpdate);
+
+            // Only redraw if there's actually something to update
+            if (FullRedraw || DataRedraw || FastUpdate)
+            {
+                ReDrawMap(FullRedraw, DataRedraw, FastUpdate);
+            }
         }
 
         private void SkiaSharpUniverseControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -464,8 +597,11 @@ namespace SMT
             needsDataRedraw = needsDataRedraw || DataRedraw;
             needsFastUpdate = needsFastUpdate || FastUpdate;
 
-            // Invalidate the SkiaSharp canvas to trigger a redraw
-            UniverseCanvas.InvalidateVisual();
+            // Only invalidate if we actually have something to redraw
+            if (needsFullRedraw || needsDataRedraw || needsFastUpdate)
+            {
+                UniverseCanvas.InvalidateVisual();
+            }
         }
 
         private void UniverseCanvas_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
@@ -478,13 +614,13 @@ namespace SMT
 
             if (EM == null) return;
 
-            // Scale the canvas to match the 5000x5000 coordinate space used in WPF Canvas
-            // The SKElement size is set to 5000x5000 in XAML, but we need to ensure proper scaling
-            var scaleX = info.Width / 5000f;
-            var scaleY = info.Height / 5000f;
-            canvas.Scale(scaleX, scaleY);
+            // Save the canvas state
+            var saveCount = canvas.Save();
 
-            // Update paints from color scheme if needed
+            // Apply the transformation matrix (pan and zoom)
+            canvas.SetMatrix(transformMatrix);
+
+            // Update paints from color scheme if needed (only when full redraw is needed)
             if (needsFullRedraw)
             {
                 UpdatePaintsFromColorScheme();
@@ -492,23 +628,22 @@ namespace SMT
                 clickableItems.Clear();
             }
 
-            if (needsFullRedraw)
-            {
-                DrawStaticElements(canvas);
-                needsFullRedraw = false;
-            }
+            // Always draw the basic static elements (systems, gates, region shapes, etc.)
+            DrawStaticElements(canvas);
+            
+            // Always draw data overlays 
+            DrawDataElements(canvas);
+            
+            // Always draw dynamic elements (characters, routes, etc.)
+            DrawDynamicElements(canvas);
 
-            if (needsDataRedraw)
-            {
-                DrawDataElements(canvas);
-                needsDataRedraw = false;
-            }
+            // Reset flags after drawing
+            needsFullRedraw = false;
+            needsDataRedraw = false;  
+            needsFastUpdate = false;
 
-            if (needsFastUpdate)
-            {
-                DrawDynamicElements(canvas);
-                needsFastUpdate = false;
-            }
+            // Restore the canvas state
+            canvas.RestoreToCount(saveCount);
         }
 
         private void DrawStaticElements(SKCanvas canvas)
@@ -518,73 +653,83 @@ namespace SMT
             double textXOffset = 0;
             double textYOffset = 3;
 
-            // Draw region shapes (background blobs)
-            if (MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems)
+            // Draw region shapes (background blobs) when zoomed out
+            if (!isSystemsVisible)
             {
                 DrawRegionShapes(canvas);
             }
 
-            // Draw gates/links between systems
-            DrawSystemLinks(canvas);
-
-            // Draw jump bridges
-            if (ShowJumpBridges)
+            // Draw gates/links between systems only when systems are visible
+            if (isSystemsVisible)
             {
-                DrawJumpBridges(canvas);
+                DrawSystemLinks(canvas);
+                
+                // Draw jump bridges
+                if (ShowJumpBridges)
+                {
+                    DrawJumpBridges(canvas);
+                }
             }
 
-            // Draw systems
+            // Always populate hit testing data, but only draw systems when visible  
             foreach (EVEData.System sys in EM.Systems)
             {
                 double X = sys.UniverseX;
                 double Z = sys.UniverseY;
 
-                // Determine system color based on security status
-                SKPaint sysPaint = SystemNullSecPaint;
-                if (sys.TrueSec >= 0.45)
-                {
-                    sysPaint = SystemHiSecPaint;
-                }
-                else if (sys.TrueSec > 0.0)
-                {
-                    sysPaint = SystemLowSecPaint;
-                }
-
-                // Draw system shape using original WPF sizes
-                if (sys.HasNPCStation)
-                {
-                    canvas.DrawRect((float)(X - 2), (float)(Z - 2), 4, 4, sysPaint);
-                    canvas.DrawRect((float)(X - 2), (float)(Z - 2), 4, 4, SystemOutlinePaint);
-                }
-                else
-                {
-                    canvas.DrawCircle((float)X, (float)Z, 2, sysPaint);
-                    canvas.DrawCircle((float)X, (float)Z, 2, SystemOutlinePaint);
-                }
-
-                // Add to renderable systems for hit testing
+                // Always add to renderable systems for hit testing
                 renderableSystems.Add(new RenderableSystem
                 {
                     System = sys,
                     Bounds = new SKRect((float)(X - 3), (float)(Z - 3), (float)(X + 3), (float)(Z + 3))
                 });
 
-                // Draw system name if zoomed in enough
-                if (MainZoomControl.Zoom >= MapConf.UniverseMaxZoomDisplaySystemsText)
+                // Only draw systems when they should be visible
+                if (isSystemsVisible)
                 {
-                    // Update the text size to match the local SystemTextSize variable
-                    SystemTextPaint.TextSize = (float)SystemTextSize;
-                    var textBounds = new SKRect();
-                    SystemTextPaint.MeasureText(sys.Name, ref textBounds);
-                    canvas.DrawText(sys.Name, (float)(X + textXOffset - textBounds.Width / 2), (float)(Z + textYOffset), SystemTextPaint);
+                    // Determine system color based on security status
+                    SKPaint sysPaint = SystemNullSecPaint;
+                    if (sys.TrueSec >= 0.45)
+                    {
+                        sysPaint = SystemHiSecPaint;
+                    }
+                    else if (sys.TrueSec > 0.0)
+                    {
+                        sysPaint = SystemLowSecPaint;
+                    }
+
+                    // Draw system shape using original WPF sizes
+                    if (sys.HasNPCStation)
+                    {
+                        canvas.DrawRect((float)(X - 2), (float)(Z - 2), 4, 4, sysPaint);
+                        canvas.DrawRect((float)(X - 2), (float)(Z - 2), 4, 4, SystemOutlinePaint);
+                    }
+                    else
+                    {
+                        canvas.DrawCircle((float)X, (float)Z, 2, sysPaint);
+                        canvas.DrawCircle((float)X, (float)Z, 2, SystemOutlinePaint);
+                    }
+
+                    // Draw system name if system names should be visible
+                    if (isSystemNamesVisible)
+                    {
+                        // Update the text size to match the local SystemTextSize variable
+                        SystemTextPaint.TextSize = (float)SystemTextSize;
+                        var textBounds = new SKRect();
+                        SystemTextPaint.MeasureText(sys.Name, ref textBounds);
+                        canvas.DrawText(sys.Name, (float)(X + textXOffset - textBounds.Width / 2), (float)(Z + textYOffset), SystemTextPaint);
+                    }
                 }
             }
 
             // Draw region names
-            DrawRegionNames(canvas, MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems);
+            DrawRegionNames(canvas, isRegionMarkersZoomedOut);
 
-            // Draw jump ranges
-            DrawJumpRanges(canvas);
+            // Draw jump ranges only when systems are visible
+            if (isSystemsVisible)
+            {
+                DrawJumpRanges(canvas);
+            }
         }
 
         private void DrawRegionShapes(SKCanvas canvas)
@@ -746,6 +891,9 @@ namespace SMT
 
         private void DrawDataElements(SKCanvas canvas)
         {
+            // Data elements are only visible when systems are visible
+            if (!isSystemsVisible) return;
+
             var positiveDeltaColor = new SKPaint { Color = SKColors.Green, Style = SKPaintStyle.Fill };
             var negativeDeltaColor = new SKPaint { Color = SKColors.Red, Style = SKPaintStyle.Fill };
 
@@ -865,6 +1013,9 @@ namespace SMT
 
         private void DrawZKillData(SKCanvas canvas)
         {
+            // ZKill data is only visible when systems are visible
+            if (!isSystemsVisible) return;
+            
             var zkbBrush = new SKPaint { Color = ToSKColor(MapConf.ActiveColourScheme.ZKillDataOverlay), Style = SKPaintStyle.Fill };
 
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
@@ -994,11 +1145,7 @@ namespace SMT
             }
         }
 
-        private void MainZoomControl_ZoomChanged(object sender, RoutedEventArgs e)
-        {
-            needsFullRedraw = true;
-            UniverseCanvas.InvalidateVisual();
-        }
+        // Zoom changed handling is now done directly in the Zoom property setter and mouse wheel handler
 
         public void ShowSystem(string SystemName)
         {
@@ -1006,12 +1153,55 @@ namespace SMT
 
             if (sd != null)
             {
-                // actual
-                double X1 = sd.UniverseX;
-                double Y1 = sd.UniverseY;
-
-                MainZoomControl.Show(X1, Y1, 3.0);
+                Show(sd.UniverseX, sd.UniverseY, 3.0);
             }
+        }
+
+        public void Show(double x, double y, double zoom)
+        {
+            // Set zoom level
+            currentZoom = (float)zoom;
+            
+            // Calculate pan offset to center the point
+            // We need to work in screen coordinates
+            var canvasWidth = (float)UniverseCanvas.ActualWidth;
+            var canvasHeight = (float)UniverseCanvas.ActualHeight;
+            
+            if (canvasWidth > 0 && canvasHeight > 0)
+            {
+                // Reset pan to zero first
+                panOffset = new SKPoint(0, 0);
+                UpdateTransformMatrix();
+                
+                // Transform the world coordinates to screen coordinates
+                SKPoint screenPoint = transformMatrix.MapPoint((float)x, (float)y);
+                
+                // Calculate offset needed to center this point
+                panOffset.X = (canvasWidth / 2f) - screenPoint.X;
+                panOffset.Y = (canvasHeight / 2f) - screenPoint.Y;
+                
+                UpdateTransformMatrix();
+                // Just call InvalidateVisual directly for pan operations, no layer change
+                UniverseCanvas.InvalidateVisual();
+            }
+        }
+
+        public void ZoomToFit()
+        {
+            // Reset to fit the entire 5000x5000 coordinate space
+            panOffset = new SKPoint(0, 0);
+            Zoom = 1.0; // Use property to ensure proper scaling behavior
+        }
+
+        private void ZoomToFitBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ZoomToFit();
+        }
+
+        private void Zoom100Btn_Click(object sender, RoutedEventArgs e)
+        {
+            // Set zoom to 1:1 scale
+            Zoom = 1.0;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -1088,19 +1278,101 @@ namespace SMT
 
             if (s != null)
             {
-                // actual
-                double X1 = s.UniverseX;
-                double Y1 = s.UniverseY;
-
-                MainZoomControl.Show(X1, Y1, MainZoomControl.Zoom);
+                // Use the Show method but keep current zoom level
+                Show(s.UniverseX, s.UniverseY, currentZoom);
             }
         }
 
-        private void MainZoomControl_ContentDragFinished(object sender, RoutedEventArgs e)
+        private void UniverseCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+            if (isPanning)
             {
-                FollowCharacterChk.IsChecked = false;
+                Point currentMousePosition = e.GetPosition(UniverseCanvas);
+                
+                // Calculate pan offset exactly like ZoomControl does:
+                // translate = _startTranslate + (e.GetPosition(this) - _mouseDownPos);
+                Vector mouseDelta = currentMousePosition - mouseDownPos;
+                panOffset.X = startPanOffset.X + (float)mouseDelta.X;
+                panOffset.Y = startPanOffset.Y + (float)mouseDelta.Y;
+                
+                UpdateTransformMatrix();
+                
+                // Directly invalidate for smooth panning without using the flag system
+                UniverseCanvas.InvalidateVisual();
+            }
+        }
+
+        private void UniverseCanvas_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && isPanning)
+            {
+                isPanning = false;
+                UniverseCanvas.ReleaseMouseCapture();
+                
+                // Stop character following when user manually pans
+                if (FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
+                {
+                    FollowCharacterChk.IsChecked = false;
+                }
+            }
+        }
+
+        private void UniverseCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            Point mousePos = e.GetPosition(UniverseCanvas);
+            
+            // Calculate zoom factor
+            float zoomFactor = e.Delta > 0 ? 1.1f : 0.9f;
+            float newZoom = currentZoom * zoomFactor;
+            
+            // Clamp zoom levels
+            newZoom = Math.Max(MinZoom, Math.Min(MaxZoom, newZoom));
+            
+            if (newZoom != currentZoom)
+            {
+                // Set flag to prevent pan offset scaling in Zoom property
+                isMouseWheelZooming = true;
+                
+                try
+                {
+                    // Store mouse position in world coordinates before zoom
+                    SKMatrix inverse;
+                    if (transformMatrix.TryInvert(out inverse))
+                    {
+                        SKPoint worldMousePos = inverse.MapPoint((float)mousePos.X, (float)mousePos.Y);
+                        
+                        // Apply zoom change directly to avoid pan scaling
+                        currentZoom = newZoom;
+                        UpdateTransformMatrix();
+                        
+                        // Find where the world point is now in screen coordinates
+                        SKPoint newScreenPos = transformMatrix.MapPoint(worldMousePos.X, worldMousePos.Y);
+                        
+                        // Adjust pan to keep the world point under the mouse cursor
+                        panOffset.X += (float)mousePos.X - newScreenPos.X;
+                        panOffset.Y += (float)mousePos.Y - newScreenPos.Y;
+                        
+                        // Update the transform with the corrected pan
+                        UpdateTransformMatrix();
+                        HandleZoomLevelChange(); // This will call InvalidateVisual if needed
+                        OnPropertyChanged("Zoom");
+                    }
+                }
+                finally
+                {
+                    isMouseWheelZooming = false;
+                }
+            }
+            
+            e.Handled = true;
+        }
+
+        private void UniverseCanvas_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (isPanning)
+            {
+                isPanning = false;
+                UniverseCanvas.ReleaseMouseCapture();
             }
         }
 
@@ -1164,22 +1436,32 @@ namespace SMT
 
         private void UniverseCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MapConf.Debug_EnableMapEdit == false)
-            {
-                return;
-            }
-
             if (e.ChangedButton == MouseButton.Left)
             {
                 Point p = e.GetPosition(UniverseCanvas);
 
-                if (currentDebugSystem != null)
+                // Debug functionality - if enabled and debug system is selected
+                if (MapConf.Debug_EnableMapEdit && currentDebugSystem != null)
                 {
-                    currentDebugSystem.UniverseX = p.X;
-                    currentDebugSystem.UniverseY = p.Y;
-                    currentDebugSystem.CustomUniverseLayout = true;
-                    currentDebugSystem = null;
-                    ReDrawMap(true, true, false);
+                    // Transform screen coordinates to world coordinates for debug positioning
+                    SKMatrix inverse;
+                    if (transformMatrix.TryInvert(out inverse))
+                    {
+                        SKPoint worldPoint = inverse.MapPoint((float)p.X, (float)p.Y);
+                        currentDebugSystem.UniverseX = worldPoint.X;
+                        currentDebugSystem.UniverseY = worldPoint.Y;
+                        currentDebugSystem.CustomUniverseLayout = true;
+                        currentDebugSystem = null;
+                        ReDrawMap(true, true, false);
+                    }
+                }
+                else
+                {
+                    // Start panning
+                    isPanning = true;
+                    mouseDownPos = p;
+                    startPanOffset = panOffset;
+                    UniverseCanvas.CaptureMouse();
                 }
             }
         }
@@ -1188,12 +1470,21 @@ namespace SMT
         {
             Point mousePos = e.GetPosition(UniverseCanvas);
             
+            // Transform screen coordinates to world coordinates for hit testing
+            SKMatrix inverse;
+            if (!transformMatrix.TryInvert(out inverse))
+            {
+                return; // Can't perform hit testing without valid inverse
+            }
+            
+            SKPoint worldPoint = inverse.MapPoint((float)mousePos.X, (float)mousePos.Y);
+            
             // Find the system under the mouse cursor
             EVEData.System clickedSystem = null;
             
             foreach (var renderSys in renderableSystems)
             {
-                if (renderSys.Bounds.Contains((float)mousePos.X, (float)mousePos.Y))
+                if (renderSys.Bounds.Contains(worldPoint.X, worldPoint.Y))
                 {
                     clickedSystem = renderSys.System;
                     break;
