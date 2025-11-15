@@ -1923,6 +1923,14 @@ namespace SMT.EVEData
                 }
             }
 
+            // load SOV upgrades
+            string sovUpgradesFile = Path.Combine(SaveDataRootFolder, "SOVUpgrades.xml");
+            if(File.Exists(sovUpgradesFile))
+            {
+                SOVUpgradeStorage sovStorage = SOVUpgradeStorage.LoadFromFile(sovUpgradesFile);
+                sovStorage.LoadToSystems(Systems);
+            }
+
             Init();
         }
 
@@ -2096,6 +2104,11 @@ namespace SMT.EVEData
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelIgnoreFilters.txt"), IntelIgnoreFilters);
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "IntelAlertFilters.txt"), IntelAlertFilters);
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "CynoBeacons.txt"), beaconsToSave);
+
+            // save SOV upgrades
+            SOVUpgradeStorage sovStorage = new SOVUpgradeStorage();
+            sovStorage.SaveFromSystems(Systems);
+            SOVUpgradeStorage.SaveToFile(sovStorage, Path.Combine(SaveDataRootFolder, "SOVUpgrades.xml"));
         }
 
         /// <summary>

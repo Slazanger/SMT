@@ -3602,6 +3602,38 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(sov);
                 }
 
+                // update SOV Upgrades Info
+                if(selectedSys.ActualSystem.SOVUpgrades != null && selectedSys.ActualSystem.SOVUpgrades.Count > 0)
+                {
+                    SystemInfoPopupSP.Children.Add(new Separator());
+
+                    Label sovUpgradeHeader = new Label();
+                    sovUpgradeHeader.Padding = one;
+                    sovUpgradeHeader.Margin = one;
+                    sovUpgradeHeader.Content = $"SOV Upgrades ({selectedSys.ActualSystem.SOVUpgrades.Count}):";
+                    sovUpgradeHeader.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    sovUpgradeHeader.FontWeight = FontWeights.Bold;
+                    SystemInfoPopupSP.Children.Add(sovUpgradeHeader);
+
+                    // Group upgrades by category
+                    var upgradesByCategory = selectedSys.ActualSystem.SOVUpgrades
+                        .GroupBy(u => u.Category)
+                        .OrderBy(g => g.Key);
+
+                    foreach(var categoryGroup in upgradesByCategory)
+                    {
+                        foreach(var upgrade in categoryGroup)
+                        {
+                            Label upgradeLabel = new Label();
+                            upgradeLabel.Padding = new Thickness(15, 1, 1, 1);
+                            upgradeLabel.Margin = one;
+                            upgradeLabel.Content = $"• {upgrade.DisplayName} ({upgrade.Category})";
+                            upgradeLabel.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                            SystemInfoPopupSP.Children.Add(upgradeLabel);
+                        }
+                    }
+                }
+
                 List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
                 // update Thera Info
                 foreach(EVEData.TheraConnection tc in currentTheraConnections)
@@ -3771,6 +3803,28 @@ namespace SMT
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void SysContexMenuItemManageSOVUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;
+
+            try
+            {
+                if(eveSys != null && eveSys.ActualSystem != null)
+                {
+                    SOVUpgradeWindow upgradeWindow = new SOVUpgradeWindow(eveSys.ActualSystem);
+                    upgradeWindow.Owner = Window.GetWindow(this);
+                    upgradeWindow.ShowDialog();
+
+                    // Refresh the system info popup if it's currently showing this system
+                    ReDrawMap(true);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"Error opening SOV upgrade window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void SysContexMenuItemCopy_Click(object sender, RoutedEventArgs e)
         {
             EVEData.MapSystem eveSys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.MapSystem;

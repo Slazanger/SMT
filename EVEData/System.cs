@@ -20,6 +20,7 @@ namespace SMT.EVEData
             Jumps = new List<string>();
             SOVAllianceID = 0;
             HasJumpBeacon = false;
+            SOVUpgrades = new List<SOVUpgrade>();
         }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace SMT.EVEData
             SOVAllianceID = 0;
 
             Jumps = new List<string>();
+            SOVUpgrades = new List<SOVUpgrade>();
         }
 
         public enum EdenComTrigStatus
@@ -211,6 +213,12 @@ namespace SMT.EVEData
 
         [XmlIgnoreAttribute]
         public DateTime TCUVunerabliltyStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of SOV upgrades installed in this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public List<SOVUpgrade> SOVUpgrades { get; set; }
 
         /// <summary>
         /// Gets or sets the Systems True Security Value

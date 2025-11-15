@@ -46,6 +46,8 @@
                 <MenuItem Header="JF/Rorq     (10.0LY)" DataContext="10" Click="SetJumpRange_Click" />
             </MenuItem>
 
+            <MenuItem Header="Manage SOV Upgrades" Click="SysContexMenuItemManageSOVUpgrades_Click" />
+
             <Separator />
             <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
             <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
