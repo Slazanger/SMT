@@ -5376,4 +5376,44 @@
       <string>Babaroga</string>
     </value>
   </item>
+  <item>
+    <key>
+      <string>89240</string>
+    </key>
+    <value>
+      <string>Pioneer</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>89649</string>
+    </key>
+    <value>
+      <string>Outrider</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>89648</string>
+    </key>
+    <value>
+      <string>Venture Consortium Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>89647</string>
+    </key>
+    <value>
+      <string>Pioneer Consortium Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>89607</string>
+    </key>
+    <value>
+      <string>Odysseus</string>
+    </value>
+  </item>
 </dictionary>
