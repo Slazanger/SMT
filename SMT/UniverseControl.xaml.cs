@@ -935,7 +935,7 @@ namespace SMT
 
                 // region shapes
                 {
-                    Pen RegionShapePen = new Pen(RegionShapeColourBrush, 1.0);
+                    Pen RegionShapePen = BrushCache.GetPen(RegionShapeColourBrush, 1.0);
                     System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
 
                     // Retrieve the DrawingContext in order to create new drawing content.
@@ -1220,10 +1220,9 @@ namespace SMT
 
                 if(CapitalRoute != null && CapitalRoute.CurrentRoute.Count > 1)
                 {
-                    Pen dashedRoutePen = new Pen(jumpRouteColour, 2);
-                    dashedRoutePen.DashStyle = DashStyles.Dot;
-                    Pen outlinePen = new Pen(activeRouteColour, 2);
-                    Pen outlineAltPen = new Pen(RouteAltBrush, 2);
+                    Pen dashedRoutePen = BrushCache.GetDashedPen(jumpRouteColour.Color, 2, 1.0, 1.0);
+                    Pen outlinePen = BrushCache.GetPen(activeRouteColour, 2);
+                    Pen outlineAltPen = BrushCache.GetPen(RouteAltBrush, 2);
 
                     System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
 
