@@ -320,6 +320,9 @@ namespace SMT
             universeSysLinksCache = new List<GateHelper>();
             activeJumpSpheres = new List<KeyValuePair<string, decimal>>();
 
+            // Initialize selective redraw manager
+            redrawManager = new SelectiveRedrawManager();
+
             VHSystems = new VisualHost();
             VHSystems.HitTestEnabled = true;
             VHSystems.MouseClicked += VHSystems_MouseClicked;
@@ -715,7 +718,11 @@ namespace SMT
 
         private void UniverseControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            ReDrawMap(false, true, true);
+            // Use selective redraw instead of full redraw for better performance
+            redrawManager?.RequestRedrawForProperty(e.PropertyName);
+            
+            // Process pending redraws on next UI cycle
+            Dispatcher.BeginInvoke(new Action(() => ProcessPendingRedraws()));
         }
 
         private Brush SystemColourBrush;
@@ -737,6 +744,10 @@ namespace SMT
         private Brush RegionShapeColourBrush;
         private Brush WHTheraColourBrush;
         private Brush WHTurnurColourBrush;
+        private Brush CharacterNameSysHighlightBrush;
+
+        // Selective redraw manager for optimized rendering
+        private SelectiveRedrawManager redrawManager;
 
         /// <summary>
         /// Redraw the map
@@ -779,6 +790,7 @@ namespace SMT
 
                 WHTheraColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
                 WHTurnurColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
+                CharacterNameSysHighlightBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
             }
 
             SolidColorBrush PositiveDeltaColor = BrushCache.CommonBrushes.Green;
@@ -1001,12 +1013,11 @@ namespace SMT
 
                 float characterNametextXOffset = 3;
                 float characterNametextYOffset = -16;
-                Brush CharacterNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
-                Brush CharacterOfflineNameBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
-                Brush CharacterNameSysHighlightBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
-                Brush ZKBBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
-                Brush RouteBrush = new SolidColorBrush(Colors.Orange);
-                Brush RouteAltBrush = new SolidColorBrush(Colors.DarkRed);
+                Brush CharacterNameBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+                Brush CharacterOfflineNameBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
+                Brush ZKBBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
+                Brush RouteBrush = BrushCache.CommonBrushes.Orange;
+                Brush RouteAltBrush = BrushCache.GetSolidBrush(Colors.DarkRed);
 
                 if(MapConf.ShowCharacterNamesOnMap)
                 {
@@ -1503,5 +1514,373 @@ namespace SMT
                 }
             }
         }
+
+        #region Selective Redraw System
+
+        /// <summary>
+        /// Processes all pending redraws using selective rendering for optimal performance
+        /// </summary>
+        private void ProcessPendingRedraws()
+        {
+            if (redrawManager == null) return;
+
+            var pendingRedraws = redrawManager.GetPendingRedraws();
+            if (pendingRedraws == RedrawType.None) return;
+
+            // Optimize the redraw operations
+            pendingRedraws = SelectiveRedrawManager.OptimizeRedrawType(pendingRedraws);
+
+            System.Diagnostics.Debug.WriteLine($"Universe: {SelectiveRedrawManager.GetRedrawDescription(pendingRedraws)}");
+
+            // Handle full redraw if needed
+            if ((pendingRedraws & RedrawType.FullRedraw) == RedrawType.FullRedraw)
+            {
+                ReDrawMap(true, true, true);
+                return;
+            }
+
+            // Update brushes if color scheme changed
+            if ((pendingRedraws & RedrawType.ColorScheme) != 0)
+            {
+                UpdateBrushes();
+                // Color scheme affects multiple layers, so redraw relevant parts
+                pendingRedraws |= RedrawType.SystemShapes | RedrawType.SystemText | RedrawType.Background | RedrawType.Connections;
+            }
+
+            // Process individual layer updates
+            if ((pendingRedraws & RedrawType.SystemData) != 0)
+            {
+                UpdateSystemDataLayer();
+            }
+
+            if ((pendingRedraws & RedrawType.Characters) != 0)
+            {
+                UpdateCharactersLayer();
+            }
+
+            if ((pendingRedraws & RedrawType.ZKillData) != 0)
+            {
+                UpdateZKillDataLayer();
+            }
+
+            if ((pendingRedraws & RedrawType.Connections) != 0)
+            {
+                UpdateConnectionsLayer();
+            }
+
+            if ((pendingRedraws & RedrawType.Routes) != 0)
+            {
+                UpdateRoutesLayer();
+            }
+
+            // System shapes and text usually require full redraw for now (optimization opportunity)
+            if ((pendingRedraws & (RedrawType.SystemShapes | RedrawType.SystemText | RedrawType.Background)) != 0)
+            {
+                ReDrawMap(true, false, false);
+            }
+        }
+
+        /// <summary>
+        /// Updates brushes when color scheme changes
+        /// </summary>
+        private void UpdateBrushes()
+        {
+            SystemColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseSystemColour);
+            SystemColourHiSecBrush = BrushCache.GetSolidBrush(MapColours.GetSecStatusColour(1.0, false));
+            SystemColourLowSecBrush = BrushCache.GetSolidBrush(MapColours.GetSecStatusColour(0.4, false));
+            SystemColourNullSecBrush = BrushCache.GetSolidBrush(MapColours.GetSecStatusColour(-0.5, true));
+            SystemColourOutlineBrush = BrushCache.CommonBrushes.Black;
+
+            ConstellationColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseConstellationGateColour);
+            SystemTextColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseSystemTextColour);
+            RegionTextColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
+            RegionTextZoomedOutColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.RegionMarkerTextColourFull);
+            GateColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseGateColour);
+            RegionGateColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseRegionGateColour);
+            PochvenGateColourBrush = BrushCache.GetSolidBrush(Colors.DimGray);
+            JumpBridgeColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+            DataColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
+            BackgroundColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseMapBackgroundColour);
+
+            Color RegionShapeFillCol = MapConf.ActiveColourScheme.UniverseMapBackgroundColour;
+            RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.8);
+            RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.8);
+            RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.8);
+            RegionShapeColourBrush = BrushCache.GetSolidBrush(RegionShapeFillCol);
+
+            WHTheraColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+            WHTurnurColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
+            CharacterNameSysHighlightBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+        }
+
+        /// <summary>
+        /// Updates only the system data layer (kills, jumps, etc.)
+        /// </summary>
+        private void UpdateSystemDataLayer()
+        {
+            if (!ShowNPCKills && !ShowPodKills && !ShowShipKills && !ShowShipJumps)
+            {
+                VHDataSpheres.ClearAllChildren();
+                return;
+            }
+
+            Brush dataBrush = DataColourBrush;
+            SolidColorBrush PositiveDeltaColor = BrushCache.CommonBrushes.Green;
+            SolidColorBrush NegativeDeltaColor = BrushCache.CommonBrushes.Red;
+
+            // Create system render data with pre-calculated values
+            var systemRenderData = EM.Systems
+                .Select(sys => new SystemDataRenderInfo(sys, ESIOverlayScale, 
+                    ShowNPCKills, ShowPodKills, ShowShipKills, ShowShipJumps,
+                    MapConf.ShowRattingDataAsDelta, MapConf.ShowNegativeRattingDelta,
+                    DataColourBrush, PositiveDeltaColor, NegativeDeltaColor))
+                .Where(info => info.DataScale > 3) // Only render systems with sufficient data
+                .ToList();
+
+            // Use batched rendering for optimal performance
+            BatchedRenderer.AddBatchedVisualsToHost(
+                systemRenderData,
+                (dc, info) =>
+                {
+                    var pen = BrushCache.GetPen(info.DataBrush, 1);
+                    dc.DrawEllipse(info.DataBrush, pen, 
+                        new Point(info.X, info.Z), info.DataScale, info.DataScale);
+                },
+                VHDataSpheres,
+                batchSize: BatchedRenderer.GetOptimalBatchSize(systemRenderData.Count),
+                enableBitmapCaching: false
+            );
+        }
+
+        /// <summary>
+        /// Updates only the characters layer
+        /// </summary>
+        private void UpdateCharactersLayer()
+        {
+            VHCharacters.ClearAllChildren();
+
+            if (!MapConf.ShowCharacterNamesOnMap) return;
+
+            float characterNametextXOffset = 3;
+            float characterNametextYOffset = -3;
+            double CharacterTextSize = 6;
+            
+            Pen p = BrushCache.GetPen(CharacterNameSysHighlightBrush, 1.0);
+            Brush CharacterNameBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+
+            Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
+
+            // Collect character data
+            foreach(EVEData.LocalCharacter lc in EM.LocalCharacters)
+            {
+                if(!string.IsNullOrEmpty(lc.Location))
+                {
+                    if(!MapCharacters.ContainsKey(lc.Location))
+                    {
+                        MapCharacters.Add(lc.Location, new List<string>());
+                    }
+                    MapCharacters[lc.Location].Add(lc.Name);
+                }
+            }
+
+            // Create character render data
+            var characterRenderData = MapCharacters
+                .Select(kvp => new
+                {
+                    System = EM.GetEveSystem(kvp.Key),
+                    Characters = kvp.Value,
+                    X = EM.GetEveSystem(kvp.Key)?.UniverseX ?? 0,
+                    Z = EM.GetEveSystem(kvp.Key)?.UniverseY ?? 0
+                })
+                .Where(data => data.System != null)
+                .ToList();
+
+            // Use batched rendering for character data
+            BatchedRenderer.AddBatchedVisualsToHost(
+                characterRenderData,
+                (dc, data) =>
+                {
+                    // Draw highlight circle around the system
+                    dc.DrawEllipse(CharacterNameSysHighlightBrush, p, new Point(data.X, data.Z), 6, 6);
+
+                    // Draw character names
+                    double charTextOffset = 0;
+                    foreach(string name in data.Characters)
+                    {
+                        var formattedText = new FormattedText(name,
+                            CultureInfo.GetCultureInfo("en-us"),
+                            FlowDirection.LeftToRight,
+                            MainTF,
+                            CharacterTextSize, 
+                            CharacterNameBrush, 
+                            VisualTreeHelper.GetDpi(this).PixelsPerDip);
+
+                        dc.DrawText(formattedText,
+                            new Point(data.X + characterNametextXOffset, data.Z + characterNametextYOffset + charTextOffset));
+
+                        charTextOffset -= (CharacterTextSize + 2);
+                    }
+                },
+                VHCharacters,
+                batchSize: BatchedRenderer.GetOptimalBatchSize(characterRenderData.Count),
+                enableBitmapCaching: false
+            );
+        }
+
+        /// <summary>
+        /// Updates only the ZKill data layer
+        /// </summary>
+        private void UpdateZKillDataLayer()
+        {
+            VHZKB.ClearAllChildren();
+
+            Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
+            foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
+            {
+                if(ZKBBaseFeed.ContainsKey(zs.SystemName))
+                {
+                    ZKBBaseFeed[zs.SystemName]++;
+                }
+                else
+                {
+                    ZKBBaseFeed[zs.SystemName] = 1;
+                }
+            }
+
+            Brush ZKBBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
+            Pen zkbPen = BrushCache.GetPen(ZKBBrush, 1.0);
+
+            // Create ZKB render data with pre-calculated values
+            var zkbRenderData = ZKBBaseFeed
+                .Select(kvp => new
+                {
+                    System = EM.GetEveSystem(kvp.Key),
+                    ZkbValue = 5 + ((double)kvp.Value * ESIOverlayScale * 2),
+                    Count = kvp.Value
+                })
+                .Where(data => data.System != null) // Filter out WH systems
+                .ToList();
+
+            // Use batched rendering for ZKill data
+            BatchedRenderer.AddBatchedVisualsToHost(
+                zkbRenderData,
+                (dc, data) =>
+                {
+                    dc.DrawEllipse(ZKBBrush, zkbPen, 
+                        new Point(data.System.UniverseX, data.System.UniverseY), 
+                        data.ZkbValue, data.ZkbValue);
+                },
+                VHZKB,
+                batchSize: BatchedRenderer.GetOptimalBatchSize(zkbRenderData.Count),
+                enableBitmapCaching: false
+            );
+        }
+
+        /// <summary>
+        /// Updates only the connections layer (wormholes, jump bridges, gates)
+        /// </summary>
+        private void UpdateConnectionsLayer()
+        {
+            VHRWHShapes.ClearAllChildren();
+
+            // Wormhole connections
+            Pen theraPen = BrushCache.GetPen(WHTheraColourBrush, 1.0);
+            Pen turnurPen = BrushCache.GetPen(WHTurnurColourBrush, 1.0);
+            
+            List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
+            List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
+
+            // Create combined wormhole connection render data
+            var allConnections = new List<WormholeConnectionRenderInfo>();
+            
+            // Add Thera connections
+            allConnections.AddRange(currentTheraConnections
+                .Where(tc => EM.GetEveSystem(tc.System) != null)
+                .Select(tc => new WormholeConnectionRenderInfo(
+                    EM.GetEveSystem(tc.System), 
+                    WHTheraColourBrush, 
+                    theraPen)));
+            
+            // Add Turnur connections
+            allConnections.AddRange(currentTurnurConnections
+                .Where(tc => EM.GetEveSystem(tc.System) != null)
+                .Select(tc => new WormholeConnectionRenderInfo(
+                    EM.GetEveSystem(tc.System), 
+                    WHTurnurColourBrush, 
+                    turnurPen)));
+
+            // Use batched rendering for all wormhole connections
+            BatchedRenderer.AddBatchedVisualsToHost(
+                allConnections,
+                (dc, connection) =>
+                {
+                    dc.DrawEllipse(connection.Brush, connection.Pen, 
+                        new Point(connection.System.UniverseX, connection.System.UniverseY), 5, 5);
+                },
+                VHRWHShapes,
+                batchSize: BatchedRenderer.GetOptimalBatchSize(allConnections.Count),
+                enableBitmapCaching: false
+            );
+        }
+
+        /// <summary>
+        /// Updates only the routes layer
+        /// </summary>
+        private void UpdateRoutesLayer()
+        {
+            VHRoute.ClearAllChildren();
+
+            if (CapitalRoute?.CurrentRoute == null || CapitalRoute.CurrentRoute.Count == 0) return;
+
+            SolidColorBrush jumpRouteColour = BrushCache.CommonBrushes.Orange;
+            SolidColorBrush activeRouteColour = BrushCache.CommonBrushes.Yellow;
+            Brush RouteAltBrush = BrushCache.GetSolidBrush(Colors.DarkRed);
+            Brush RouteBrush = BrushCache.CommonBrushes.Orange;
+
+            Pen dashedRoutePen = BrushCache.GetDashedPen(jumpRouteColour.Color, 2, 1.0, 1.0);
+            Pen outlinePen = BrushCache.GetPen(activeRouteColour, 2);
+            Pen outlineAltPen = BrushCache.GetPen(RouteAltBrush, 2);
+
+            System.Windows.Media.DrawingVisual routeVisual = new System.Windows.Media.DrawingVisual();
+            DrawingContext drawingContext = routeVisual.RenderOpen();
+
+            // Add the lines
+            for(int i = 1; i < CapitalRoute.CurrentRoute.Count; i++)
+            {
+                Pen linePen = dashedRoutePen;
+
+                EVEData.System sysA = EM.GetEveSystem(CapitalRoute.CurrentRoute[i - 1].SystemName);
+                EVEData.System sysB = EM.GetEveSystem(CapitalRoute.CurrentRoute[i].SystemName);
+
+                if(sysA != null && sysB != null)
+                {
+                    double X1 = sysA.UniverseX;
+                    double Y1 = sysA.UniverseY;
+                    double X2 = sysB.UniverseX;
+                    double Y2 = sysB.UniverseY;
+
+                    if(i == 1)
+                    {
+                        drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X1, Y1), 6, 6);
+                    }
+                    drawingContext.DrawEllipse(RouteBrush, linePen, new Point(X2, Y2), 6, 6);
+                    drawingContext.DrawLine(linePen, new Point(X1, Y1), new Point(X2, Y2));
+                }
+            }
+
+            drawingContext.Close();
+            VHRoute.AddChild(routeVisual);
+        }
+
+        /// <summary>
+        /// Requests a selective redraw for external callers
+        /// </summary>
+        public void RequestRedraw(RedrawType redrawType)
+        {
+            redrawManager?.RequestRedraw(redrawType);
+            Dispatcher.BeginInvoke(new Action(() => ProcessPendingRedraws()));
+        }
+
+        #endregion
     }
 }

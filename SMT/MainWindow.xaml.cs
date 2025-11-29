@@ -847,39 +847,53 @@ namespace SMT
                 {
                     this.Topmost = false;
                 }
+                return; // No need to redraw for this property
             }
 
             if(e.PropertyName == "ShowZKillData")
             {
                 EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
+                // Use selective redraw for ZKill data only
+                UniverseUC?.RequestRedraw(RedrawType.ZKillData);
+            }
+            else
+            {
+                // Use property-based selective redraw for Universe control
+                UniverseUC?.RequestRedraw(GetUniverseRedrawTypeForProperty(e.PropertyName));
             }
 
+            // Region control still uses full redraw for now (optimization opportunity)
             RegionUC.ReDrawMap(true);
 
-            if(e.PropertyName == "ShowRegionStandings")
+            // Handle region view updates
+            if(e.PropertyName == "ShowRegionStandings" || 
+               e.PropertyName == "ShowUniverseRats" ||
+               e.PropertyName == "ShowUniversePods" ||
+               e.PropertyName == "ShowUniverseKills" ||
+               e.PropertyName == "UniverseDataScale")
             {
                 RegionsViewUC.Redraw(true);
             }
+        }
 
-            if(e.PropertyName == "ShowUniverseRats")
+        /// <summary>
+        /// Maps property names to Universe redraw types for selective rendering
+        /// </summary>
+        private RedrawType GetUniverseRedrawTypeForProperty(string propertyName)
+        {
+            return propertyName switch
             {
-                RegionsViewUC.Redraw(true);
-            }
-
-            if(e.PropertyName == "ShowUniversePods")
-            {
-                RegionsViewUC.Redraw(true);
-            }
-
-            if(e.PropertyName == "ShowUniverseKills")
-            {
-                RegionsViewUC.Redraw(true);
-            }
-
-            if(e.PropertyName == "UniverseDataScale")
-            {
-                RegionsViewUC.Redraw(true);
-            }
+                "ActiveColourScheme" => RedrawType.ColorScheme,
+                "ShowNPCKills" or "ShowPodKills" or "ShowShipKills" or "ShowShipJumps" 
+                    or "ShowRattingDataAsDelta" or "ShowNegativeRattingDelta" or "ESIOverlayScale" => RedrawType.SystemData,
+                "ShowCharacterNamesOnMap" or "ShowCharacterLocationsOnMap" => RedrawType.Characters,
+                "ShowZKillData" => RedrawType.ZKillData,
+                "ShowJumpBridges" or "ShowTheraConnections" or "ShowTurnurConnections" => RedrawType.Connections,
+                "DrawRoute" or "ShowJumpDistance" => RedrawType.Routes,
+                "ShowSystemSecurity" or "ShowSystemADM" or "ShowTrueSec" or "ShowSimpleSecurityView" => RedrawType.SystemShapes,
+                "ShowSystemNames" or "ShowSystemTimers" => RedrawType.SystemText,
+                _ => RedrawType.FullRedraw // Unknown property, safer to do full redraw
+            };
         }
 
         public void OnCharacterSelectionChanged()
