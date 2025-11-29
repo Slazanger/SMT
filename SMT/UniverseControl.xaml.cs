@@ -963,75 +963,33 @@ namespace SMT
             {
                 Brush dataBrush = DataColourBrush;
 
-                // update the data
+                // update the data using batched rendering
                 VHDataSpheres.ClearAllChildren();
 
                 Pen dataPen = BrushCache.GetPen(dataBrush, 1);
 
-                foreach(EVEData.System sys in EM.Systems)
-                {
-                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
+                // Create system render data with pre-calculated values
+                var systemRenderData = EM.Systems
+                    .Select(sys => new SystemDataRenderInfo(sys, ESIOverlayScale, 
+                        ShowNPCKills, ShowPodKills, ShowShipKills, ShowShipJumps,
+                        MapConf.ShowRattingDataAsDelta, MapConf.ShowNegativeRattingDelta,
+                        DataColourBrush, PositiveDeltaColor, NegativeDeltaColor))
+                    .Where(info => info.DataScale > 3) // Only render systems with sufficient data
+                    .ToList();
 
-                    // Retrieve the DrawingContext in order to create new drawing content.
-                    DrawingContext drawingContext = dataDV.RenderOpen();
-
-                    double X = sys.UniverseX;
-
-                    // need to invert Z
-                    double Z = sys.UniverseY;
-
-                    double DataScale = 0;
-
-                    if(ShowNPCKills)
+                // Use batched rendering for optimal performance
+                BatchedRenderer.AddBatchedVisualsToHost(
+                    systemRenderData,
+                    (dc, info) =>
                     {
-                        DataScale = sys.NPCKillsLastHour * ESIOverlayScale * 0.05f;
-
-                        if(MapConf.ShowRattingDataAsDelta)
-                        {
-                            if(!MapConf.ShowNegativeRattingDelta)
-                            {
-                                DataScale = Math.Max(0, sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f; ;
-                            }
-                            else
-                            {
-                                DataScale = Math.Abs(sys.NPCKillsDeltaLastHour) * ESIOverlayScale * 0.05f;
-
-                                if(sys.NPCKillsDeltaLastHour > 0)
-                                {
-                                    dataBrush = PositiveDeltaColor;
-                                }
-                                else
-                                {
-                                    dataBrush = NegativeDeltaColor;
-                                }
-                            }
-                        }
-                    }
-
-                    if(ShowPodKills)
-                    {
-                        DataScale = sys.PodKillsLastHour * ESIOverlayScale * 2f;
-                    }
-
-                    if(ShowShipKills)
-                    {
-                        DataScale = sys.ShipKillsLastHour * ESIOverlayScale * 1f;
-                    }
-
-                    if(ShowShipJumps)
-                    {
-                        DataScale = sys.JumpsLastHour * ESIOverlayScale * 0.1f;
-                    }
-
-                    if(DataScale > 3)
-                    {
-                        // Create a rectangle and draw it in the DrawingContext.
-                        drawingContext.DrawEllipse(dataBrush, dataPen, new Point(X, Z), DataScale, DataScale);
-                    }
-
-                    drawingContext.Close();
-                    VHDataSpheres.AddChild(dataDV);
-                }
+                        var pen = BrushCache.GetPen(info.DataBrush, 1);
+                        dc.DrawEllipse(info.DataBrush, pen, 
+                            new Point(info.X, info.Z), info.DataScale, info.DataScale);
+                    },
+                    VHDataSpheres,
+                    batchSize: BatchedRenderer.GetOptimalBatchSize(systemRenderData.Count),
+                    enableBitmapCaching: false  // Disable bitmap caching to maintain visual quality
+                );
             }
 
             if(FastUpdate)
@@ -1052,7 +1010,7 @@ namespace SMT
 
                 if(MapConf.ShowCharacterNamesOnMap)
                 {
-                    Pen p = new Pen(CharacterNameSysHighlightBrush, 1.0);
+                    Pen p = BrushCache.GetPen(CharacterNameSysHighlightBrush, 1.0);
 
                     Dictionary<string, List<string>> MapCharacters = new Dictionary<string, List<string>>();
 
@@ -1069,44 +1027,48 @@ namespace SMT
                         }
                     }
 
-                    foreach(KeyValuePair<string, List<string>> kvp in MapCharacters)
-                    {
-                        EVEData.System sys = EM.GetEveSystem(kvp.Key);
-                        if(sys == null)
+                    // Create character render data
+                    var characterRenderData = MapCharacters
+                        .Select(kvp => new
                         {
-                            continue;
-                        }
-                        double X = sys.UniverseX;                        // need to invert Z
-                        double Z = sys.UniverseY;
+                            System = EM.GetEveSystem(kvp.Key),
+                            Characters = kvp.Value,
+                            X = EM.GetEveSystem(kvp.Key)?.UniverseX ?? 0,
+                            Z = EM.GetEveSystem(kvp.Key)?.UniverseY ?? 0
+                        })
+                        .Where(data => data.System != null)
+                        .ToList();
 
-                        double charTextOffset = 0;
-
-                        // Create an instance of a DrawingVisual.
-                        System.Windows.Media.DrawingVisual nameTextVisual = new System.Windows.Media.DrawingVisual();
-
-                        // Retrieve the DrawingContext from the DrawingVisual.
-                        DrawingContext dc = nameTextVisual.RenderOpen();
-
-                        // draw a circle around the system
-                        dc.DrawEllipse(CharacterNameSysHighlightBrush, p, new Point(X, Z), 6, 6);
-
-                        foreach(string name in kvp.Value)
+                    // Use batched rendering for character data
+                    BatchedRenderer.AddBatchedVisualsToHost(
+                        characterRenderData,
+                        (dc, data) =>
                         {
-                            // Draw a formatted text string into the DrawingContext.
-                            dc.DrawText(
-                                new FormattedText(name,
+                            // Draw highlight circle around the system
+                            dc.DrawEllipse(CharacterNameSysHighlightBrush, p, new Point(data.X, data.Z), 6, 6);
+
+                            // Draw character names
+                            double charTextOffset = 0;
+                            foreach(string name in data.Characters)
+                            {
+                                var formattedText = new FormattedText(name,
                                     CultureInfo.GetCultureInfo("en-us"),
                                     FlowDirection.LeftToRight,
                                     MainTF,
-                                    CharacterTextSize, CharacterNameBrush, VisualTreeHelper.GetDpi(this).PixelsPerDip),
-                                new Point(X + characterNametextXOffset, Z + characterNametextYOffset + charTextOffset));
+                                    CharacterTextSize, 
+                                    CharacterNameBrush, 
+                                    VisualTreeHelper.GetDpi(this).PixelsPerDip);
 
-                            charTextOffset -= (CharacterTextSize + 2);
-                        }
+                                dc.DrawText(formattedText,
+                                    new Point(data.X + characterNametextXOffset, data.Z + characterNametextYOffset + charTextOffset));
 
-                        dc.Close();
-                        VHCharacters.AddChild(nameTextVisual);
-                    }
+                                charTextOffset -= (CharacterTextSize + 2);
+                            }
+                        },
+                        VHCharacters,
+                        batchSize: BatchedRenderer.GetOptimalBatchSize(characterRenderData.Count),
+                        enableBitmapCaching: false  // Disable bitmap caching for text rendering to maintain quality
+                    );
                 }
 
                 // now add the zkill data
@@ -1124,80 +1086,73 @@ namespace SMT
                         }
                     }
 
-                    Pen zkbPen = new Pen(ZKBBrush, 1.0);
+                    Pen zkbPen = BrushCache.GetPen(ZKBBrush, 1.0);
 
-                    foreach(KeyValuePair<string, int> kvp in ZKBBaseFeed)
-                    {
-                        // Create an instance of a DrawingVisual.
-                        System.Windows.Media.DrawingVisual zkbVisual = new System.Windows.Media.DrawingVisual();
-
-                        // Retrieve the DrawingContext from the DrawingVisual.
-                        DrawingContext dc = zkbVisual.RenderOpen();
-
-                        double zkbVal = 5 + ((double)kvp.Value * ESIOverlayScale * 2);
-
-                        EVEData.System sys = EM.GetEveSystem(kvp.Key);
-                        if(sys == null)
+                    // Create ZKB render data with pre-calculated values
+                    var zkbRenderData = ZKBBaseFeed
+                        .Select(kvp => new
                         {
-                            // probably a WH
-                            continue;
-                        }
-                        double X = sys.UniverseX;
-                        // need to invert Z
-                        double Z = sys.UniverseY;
+                            System = EM.GetEveSystem(kvp.Key),
+                            ZkbValue = 5 + ((double)kvp.Value * ESIOverlayScale * 2),
+                            Count = kvp.Value
+                        })
+                        .Where(data => data.System != null) // Filter out WH systems
+                        .ToList();
 
-                        // draw a circle around the system
-                        dc.DrawEllipse(ZKBBrush, zkbPen, new Point(X, Z), zkbVal, zkbVal);
-                        dc.Close();
-                        VHZKB.AddChild(zkbVisual, "ZKBData");
-                    }
+                    // Use batched rendering for ZKill data
+                    BatchedRenderer.AddBatchedVisualsToHost(
+                        zkbRenderData,
+                        (dc, data) =>
+                        {
+                            dc.DrawEllipse(ZKBBrush, zkbPen, 
+                                new Point(data.System.UniverseX, data.System.UniverseY), 
+                                data.ZkbValue, data.ZkbValue);
+                        },
+                        VHZKB,
+                        batchSize: BatchedRenderer.GetOptimalBatchSize(zkbRenderData.Count),
+                        enableBitmapCaching: false  // Disable bitmap caching for small/variable-size circles
+                    );
                 }
 
-                // thera / turnur
+                // thera / turnur connections using batched rendering
 
-                Pen theraPen = new Pen(WHTheraColourBrush, 1.0);
+                Pen theraPen = BrushCache.GetPen(WHTheraColourBrush, 1.0);
+                Pen turnurPen = BrushCache.GetPen(WHTurnurColourBrush, 1.0);
+                
                 List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
-
-                foreach(TheraConnection tc in currentTheraConnections)
-                {
-                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
-                    // Retrieve the DrawingContext in order to create new drawing content.
-                    DrawingContext drawingContext = dataDV.RenderOpen();
-
-                    EVEData.System sys = EM.GetEveSystem(tc.System);
-
-                    double X = sys.UniverseX;
-
-                    // need to invert Z
-                    double Z = sys.UniverseY;
-
-                    drawingContext.DrawEllipse(WHTheraColourBrush, theraPen, new Point(X, Z), 5, 5);
-
-                    drawingContext.Close();
-                    VHRWHShapes.AddChild(dataDV);
-                }
-
-                Pen turnurPen = new Pen(WHTurnurColourBrush, 1.0);
                 List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
 
-                foreach(TurnurConnection tc in currentTurnurConnections)
-                {
-                    System.Windows.Media.DrawingVisual dataDV = new System.Windows.Media.DrawingVisual();
-                    // Retrieve the DrawingContext in order to create new drawing content.
-                    DrawingContext drawingContext = dataDV.RenderOpen();
+                // Create combined wormhole connection render data
+                var allConnections = new List<WormholeConnectionRenderInfo>();
+                
+                // Add Thera connections
+                allConnections.AddRange(currentTheraConnections
+                    .Where(tc => EM.GetEveSystem(tc.System) != null)
+                    .Select(tc => new WormholeConnectionRenderInfo(
+                        EM.GetEveSystem(tc.System), 
+                        WHTheraColourBrush, 
+                        theraPen)));
+                
+                // Add Turnur connections
+                allConnections.AddRange(currentTurnurConnections
+                    .Where(tc => EM.GetEveSystem(tc.System) != null)
+                    .Select(tc => new WormholeConnectionRenderInfo(
+                        EM.GetEveSystem(tc.System), 
+                        WHTurnurColourBrush, 
+                        turnurPen)));
 
-                    EVEData.System sys = EM.GetEveSystem(tc.System);
-
-                    double X = sys.UniverseX;
-
-                    // need to invert Z
-                    double Z = sys.UniverseY;
-
-                    drawingContext.DrawEllipse(WHTurnurColourBrush, turnurPen, new Point(X, Z), 5, 5);
-
-                    drawingContext.Close();
-                    VHRWHShapes.AddChild(dataDV);
-                }
+                // Use batched rendering for all wormhole connections
+                BatchedRenderer.AddBatchedVisualsToHost(
+                    allConnections,
+                    (dc, connection) =>
+                    {
+                        dc.DrawEllipse(connection.Brush, connection.Pen, 
+                            new Point(connection.System.UniverseX, connection.System.UniverseY), 5, 5);
+                    },
+                    VHRWHShapes,
+                    batchSize: BatchedRenderer.GetOptimalBatchSize(allConnections.Count),
+                    enableBitmapCaching: false  // Disable bitmap caching for small circles to maintain quality
+                );
 
                 // add turnur itself
                 {
