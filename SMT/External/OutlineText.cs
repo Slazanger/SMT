@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
+using SMT.Utils;
 
 namespace SMT
 {
@@ -15,13 +16,7 @@ namespace SMT
     {
         private void UpdatePen()
         {
-            _Pen = new Pen(Stroke, StrokeThickness)
-            {
-                DashCap = PenLineCap.Round,
-                EndLineCap = PenLineCap.Round,
-                LineJoin = PenLineJoin.Round,
-                StartLineCap = PenLineCap.Round
-            };
+            _Pen = BrushCache.GetPen(Stroke, StrokeThickness, null, PenLineCap.Round, PenLineCap.Round, PenLineJoin.Round, 10.0);
 
             InvalidateVisual();
         }

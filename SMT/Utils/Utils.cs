@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Utils
+namespace SMT.Utils
 {
     public class Misc
     {

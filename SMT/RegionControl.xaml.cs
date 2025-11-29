@@ -12,6 +12,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using SMT.EVEData;
 using SMT.ResourceUsage;
+using SMT.Utils;
 
 namespace SMT
 {
@@ -58,7 +59,7 @@ namespace SMT
 
         private const int THERA_Z_INDEX = 22;
 
-        private readonly Brush SelectedAllianceBrush = new SolidColorBrush(Color.FromArgb(180, 200, 200, 200));
+        private readonly Brush SelectedAllianceBrush = BrushCache.GetSolidBrush(180, 200, 200, 200);
         private Dictionary<string, EVEData.EveManager.JumpShip> activeJumpSpheres;
         private string currentCharacterJumpSystem;
         private string currentJumpCharacter;
@@ -99,13 +100,13 @@ namespace SMT
         private Dictionary<string, List<KeyValuePair<int, string>>> NameTrackingLocationMap = new Dictionary<string, List<KeyValuePair<int, string>>>();
         private long SelectedAlliance;
         private bool showJumpDistance;
-        private Brush StandingBadBrush = new SolidColorBrush(Color.FromArgb(110, 196, 72, 6));
-        private Brush StandingGoodBrush = new SolidColorBrush(Color.FromArgb(110, 43, 101, 196));
-        private Brush StandingNeutBrush = new SolidColorBrush(Color.FromArgb(110, 140, 140, 140));
+        private Brush StandingBadBrush = BrushCache.GetSolidBrush(110, 196, 72, 6);
+        private Brush StandingGoodBrush = BrushCache.GetSolidBrush(110, 43, 101, 196);
+        private Brush StandingNeutBrush = BrushCache.GetSolidBrush(110, 140, 140, 140);
 
         // Constant Colours
-        private Brush StandingVBadBrush = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
-        private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
+        private Brush StandingVBadBrush = BrushCache.GetSolidBrush(110, 148, 5, 5);
+        private Brush StandingVGoodBrush = BrushCache.GetSolidBrush(110, 5, 34, 120);
 
 
 
@@ -424,7 +425,7 @@ namespace SMT
                 return;
             }
 
-            Brush ActiveSovFightBrush = new SolidColorBrush(Colors.DarkRed);
+            Brush ActiveSovFightBrush = BrushCache.GetSolidBrush(Colors.DarkRed);
 
             foreach(SOVCampaign sc in EM.ActiveSovCampaigns)
             {
@@ -470,8 +471,8 @@ namespace SMT
 
         public void AddWHLinksSystemsToMap()
         {
-            Brush TheraWHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
-            Brush TurnurWHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
+            Brush TheraWHLinkBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+            Brush TurnurWHLinkBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
 
             List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
 
@@ -536,7 +537,7 @@ namespace SMT
 
         public void AddPOIsToMap()
         {
-            Brush POIBrush = new SolidColorBrush(Colors.White);
+            Brush POIBrush = BrushCache.CommonBrushes.White;
 
             foreach(POI p in EM.PointsOfInterest)
             {
@@ -681,9 +682,9 @@ namespace SMT
                 return;
             }
 
-            Brush trigBrush = new SolidColorBrush(Colors.DarkRed);
-            Brush trigOutlineBrush = new SolidColorBrush(Colors.Black);
-            Brush trigSecStatusChangeBrush = new SolidColorBrush(Colors.Orange);
+            Brush trigBrush = BrushCache.GetSolidBrush(Colors.DarkRed);
+            Brush trigOutlineBrush = BrushCache.CommonBrushes.Black;
+            Brush trigSecStatusChangeBrush = BrushCache.CommonBrushes.Orange;
 
             ImageBrush ib = new ImageBrush();
             ib.TileMode = TileMode.Tile;
@@ -784,14 +785,14 @@ namespace SMT
                 c1.G = (byte)(0.9 * c1.G);
                 c1.B = (byte)(0.9 * c1.B);
 
-                LinearGradientBrush lgb = new LinearGradientBrush();
-                lgb.StartPoint = new Point(0, 0);
-                lgb.EndPoint = new Point(0, 1);
-
-                lgb.GradientStops.Add(new GradientStop(c1, 0.0));
-                lgb.GradientStops.Add(new GradientStop(c2, 0.05));
-                lgb.GradientStops.Add(new GradientStop(c2, 0.95));
-                lgb.GradientStops.Add(new GradientStop(c1, 1.0));
+                GradientStopCollection gradientStops = new GradientStopCollection();
+                gradientStops.Add(new GradientStop(c1, 0.0));
+                gradientStops.Add(new GradientStop(c2, 0.05));
+                gradientStops.Add(new GradientStop(c2, 0.95));
+                gradientStops.Add(new GradientStop(c1, 1.0));
+                gradientStops.Freeze();
+                
+                LinearGradientBrush lgb = BrushCache.GetLinearGradientBrush(gradientStops, 90);
 
                 MainCanvasGrid.Background = lgb;
                 MainZoomControl.Background = lgb;
@@ -1110,10 +1111,10 @@ namespace SMT
                 double textYOffset = -24;
                 double textXOffset = 6;
 
-                SolidColorBrush fleetMemberText = new SolidColorBrush(MapConf.ActiveColourScheme.FleetMemberTextColour);
-                SolidColorBrush localCharacterText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
-                SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
-                SolidColorBrush characterTextOutline = new SolidColorBrush(Colors.Black);
+                SolidColorBrush fleetMemberText = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.FleetMemberTextColour);
+                SolidColorBrush localCharacterText = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+                SolidColorBrush localCharacterOfflineText = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
+                SolidColorBrush characterTextOutline = BrushCache.CommonBrushes.Black;
 
                 if(MapConf.ShowCompactCharactersOnMap)
                 {
@@ -1299,22 +1300,22 @@ namespace SMT
             DataLargeColorDelta.G = (byte)(DataLargeColorDelta.G * 0.4);
             DataLargeColorDelta.B = (byte)(DataLargeColorDelta.B * 0.4);
 
-            SolidColorBrush dataColor = new SolidColorBrush(DataColor);
+            SolidColorBrush dataColor = BrushCache.GetSolidBrush(DataColor);
             SolidColorBrush infoColour = dataColor;
 
-            SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
-            SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
+            SolidColorBrush PositiveDeltaColor = BrushCache.CommonBrushes.Green;
+            SolidColorBrush NegativeDeltaColor = BrushCache.CommonBrushes.Red;
 
-            Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
-            Brush JumpInRangeMulti = new SolidColorBrush(Colors.Black);
+            Brush JumpInRange = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+            Brush JumpInRangeMulti = BrushCache.CommonBrushes.Black;
 
-            SolidColorBrush infoColourDelta = new SolidColorBrush(DataLargeColorDelta);
+            SolidColorBrush infoColourDelta = BrushCache.GetSolidBrush(DataLargeColorDelta);
 
-            SolidColorBrush zkbColour = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
+            SolidColorBrush zkbColour = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
 
-            SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
-            SolidColorBrush infoVulnerable = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableColour);
-            SolidColorBrush infoVulnerableSoon = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableSoonColour);
+            SolidColorBrush infoLargeColour = BrushCache.GetSolidBrush(DataLargeColor);
+            SolidColorBrush infoVulnerable = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableColour);
+            SolidColorBrush infoVulnerableSoon = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableSoonColour);
 
             BridgeInfoStackPanel.Children.Clear();
             if(!string.IsNullOrEmpty(currentJumpCharacter))
@@ -1728,21 +1729,21 @@ namespace SMT
             }
         }
 
-        private Brush Gallente_FL = new SolidColorBrush(Color.FromArgb(100, 73, 171, 104));
-        private Brush Gallente_CLO = new SolidColorBrush(Color.FromArgb(100, 36, 90, 52));
-        private Brush Gallente_RG = new SolidColorBrush(Color.FromArgb(100, 13, 35, 19));
+        private Brush Gallente_FL = BrushCache.GetSolidBrush(100, 73, 171, 104);
+        private Brush Gallente_CLO = BrushCache.GetSolidBrush(100, 36, 90, 52);
+        private Brush Gallente_RG = BrushCache.GetSolidBrush(100, 13, 35, 19);
 
-        private Brush Caldari_FL = new SolidColorBrush(Color.FromArgb(100, 14, 186, 207));
-        private Brush Caldari_CLO = new SolidColorBrush(Color.FromArgb(100, 0, 110, 129));
-        private Brush Caldari_RG = new SolidColorBrush(Color.FromArgb(100, 0, 36, 43));
+        private Brush Caldari_FL = BrushCache.GetSolidBrush(100, 14, 186, 207);
+        private Brush Caldari_CLO = BrushCache.GetSolidBrush(100, 0, 110, 129);
+        private Brush Caldari_RG = BrushCache.GetSolidBrush(100, 0, 36, 43);
 
-        private Brush Amarr_FL = new SolidColorBrush(Color.FromArgb(100, 216, 191, 25));
-        private Brush Amarr_CLO = new SolidColorBrush(Color.FromArgb(100, 138, 114, 14));
-        private Brush Amarr_RG = new SolidColorBrush(Color.FromArgb(100, 46, 36, 5));
+        private Brush Amarr_FL = BrushCache.GetSolidBrush(100, 216, 191, 25);
+        private Brush Amarr_CLO = BrushCache.GetSolidBrush(100, 138, 114, 14);
+        private Brush Amarr_RG = BrushCache.GetSolidBrush(100, 46, 36, 5);
 
-        private Brush Minmatar_FL = new SolidColorBrush(Color.FromArgb(100, 221, 74, 79));
-        private Brush Minmatar_CLO = new SolidColorBrush(Color.FromArgb(100, 140, 34, 41));
-        private Brush Minmatar_RG = new SolidColorBrush(Color.FromArgb(100, 54, 11, 14));
+        private Brush Minmatar_FL = BrushCache.GetSolidBrush(100, 221, 74, 79);
+        private Brush Minmatar_CLO = BrushCache.GetSolidBrush(100, 140, 34, 41);
+        private Brush Minmatar_RG = BrushCache.GetSolidBrush(100, 54, 11, 14);
 
         private Brush GetBrushForFWState(FactionWarfareSystemInfo.State state, int Owner)
         {

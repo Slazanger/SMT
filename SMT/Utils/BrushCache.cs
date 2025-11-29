@@ -120,7 +120,9 @@ namespace SMT.Utils
 
                 if (dashArray != null)
                 {
-                    pen.DashArray = dashArray;
+                    var dashStyle = new DashStyle(dashArray, 0);
+                    dashStyle.Freeze();
+                    pen.DashStyle = dashStyle;
                 }
 
                 pen.Freeze();

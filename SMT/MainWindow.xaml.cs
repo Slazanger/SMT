@@ -18,6 +18,7 @@ using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
+using SMT.Utils;
 using NAudio.Wave;
 using NHotkey;
 using NHotkey.Wpf;
@@ -1191,7 +1192,7 @@ namespace SMT
 
         private void UpdateCharacterSelectionBasedOnActiveWindow()
         {
-            string ActiveWindowText = Utils.Misc.GetCaptionOfActiveWindow();
+            string ActiveWindowText = SMT.Utils.Misc.GetCaptionOfActiveWindow();
 
             if(ActiveWindowText.Contains("EVE - "))
             {
@@ -2499,7 +2500,7 @@ namespace SMT
                 // Do the conversion from bool to visibility
             }
 
-            return new SolidColorBrush(rowCol);
+            return BrushCache.GetSolidBrush(rowCol);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -2558,7 +2559,7 @@ namespace SMT
                 // Do the conversion from bool to visibility
             }
 
-            return new SolidColorBrush(rowCol);
+            return BrushCache.GetSolidBrush(rowCol);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

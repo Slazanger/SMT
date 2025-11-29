@@ -14,6 +14,7 @@ using Color = System.Windows.Media.Color;
 using FontFamily = System.Windows.Media.FontFamily;
 using Pen = System.Windows.Media.Pen;
 using Point = System.Windows.Point;
+using SMT.Utils;
 
 namespace SMT
 {
@@ -469,15 +470,10 @@ namespace SMT
                 activeJumpSpheres.Add(new KeyValuePair<string, decimal>(sys.Name, (decimal)LY));
             }
 
-            Brush rangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColourHighlight);
-            Brush rangeOverlapCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeOverlapHighlight);
-            Brush sysCentreCol = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
-            Brush sysRangeCol = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
-
-            rangeCol.Freeze();
-            rangeOverlapCol.Freeze();
-            sysCentreCol.Freeze();
-            sysRangeCol.Freeze();
+            Brush rangeCol = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.JumpRangeInColourHighlight);
+            Brush rangeOverlapCol = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.JumpRangeOverlapHighlight);
+            Brush sysCentreCol = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
+            Brush sysRangeCol = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
 
             System.Windows.Media.DrawingVisual rangeCircleDV = new System.Windows.Media.DrawingVisual();
             DrawingContext drawingContext = rangeCircleDV.RenderOpen();
@@ -493,8 +489,8 @@ namespace SMT
 
                 // Create an instance of a DrawingVisual.
 
-                drawingContext.DrawEllipse(rangeCol, new Pen(rangeCol, 1), new Point(X, Z), Radius, Radius);
-                drawingContext.DrawRectangle(sysCentreCol, new Pen(sysCentreCol, 1), new Rect(X - 5, Z - 5, 10, 10));
+                drawingContext.DrawEllipse(rangeCol, BrushCache.GetPen(rangeCol, 1), new Point(X, Z), Radius, Radius);
+                drawingContext.DrawRectangle(sysCentreCol, BrushCache.GetPen(sysCentreCol, 1), new Rect(X - 5, Z - 5, 10, 10));
             }
             VHRangeSpheres.AddChild(rangeCircleDV);
             drawingContext.Close();
@@ -528,11 +524,11 @@ namespace SMT
                     DrawingContext dcR = rangeSquareDV.RenderOpen();
                     if(overlap)
                     {
-                        dcR.DrawRectangle(sysRangeCol, new Pen(rangeOverlapCol, 1), new Rect(irX - 3, irZ - 3, 6, 6));
+                        dcR.DrawRectangle(sysRangeCol, BrushCache.GetPen(rangeOverlapCol, 1), new Rect(irX - 3, irZ - 3, 6, 6));
                     }
                     else
                     {
-                        dcR.DrawRectangle(sysRangeCol, new Pen(sysRangeCol, 1), new Rect(irX - 3, irZ - 3, 6, 6));
+                        dcR.DrawRectangle(sysRangeCol, BrushCache.GetPen(sysRangeCol, 1), new Rect(irX - 3, irZ - 3, 6, 6));
                     }
 
                     dcR.Close();
@@ -757,59 +753,40 @@ namespace SMT
             // recreate the brushes on a full draw
             if(FullRedraw)
             {
-                SystemColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemColour);
-                SystemColourHiSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(1.0, false));
-                SystemColourLowSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(0.4, false));
-                SystemColourNullSecBrush = new SolidColorBrush(MapColours.GetSecStatusColour(-0.5, true));
-                SystemColourOutlineBrush = new SolidColorBrush(Colors.Black);
+                SystemColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseSystemColour);
+                SystemColourHiSecBrush = BrushCache.GetSolidBrush(MapColours.GetSecStatusColour(1.0, false));
+                SystemColourLowSecBrush = BrushCache.GetSolidBrush(MapColours.GetSecStatusColour(0.4, false));
+                SystemColourNullSecBrush = BrushCache.GetSolidBrush(MapColours.GetSecStatusColour(-0.5, true));
+                SystemColourOutlineBrush = BrushCache.CommonBrushes.Black;
 
-                ConstellationColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseConstellationGateColour);
-                SystemTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseSystemTextColour);
-                RegionTextColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
-                RegionTextZoomedOutColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionMarkerTextColourFull);
-                GateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseGateColour);
-                JumpBridgeColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
-                DataColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
-                BackgroundColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseMapBackgroundColour);
-                RegionGateColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.UniverseRegionGateColour);
-                PochvenGateColourBrush = new SolidColorBrush(Colors.DimGray);
+                ConstellationColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseConstellationGateColour);
+                SystemTextColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseSystemTextColour);
+                RegionTextColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.RegionMarkerTextColour);
+                RegionTextZoomedOutColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.RegionMarkerTextColourFull);
+                GateColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseGateColour);
+                JumpBridgeColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+                DataColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ESIOverlayColour);
+                BackgroundColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseMapBackgroundColour);
+                RegionGateColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.UniverseRegionGateColour);
+                PochvenGateColourBrush = BrushCache.GetSolidBrush(Colors.DimGray);
 
                 Color RegionShapeFillCol = MapConf.ActiveColourScheme.UniverseMapBackgroundColour;
                 RegionShapeFillCol.R = (Byte)(RegionShapeFillCol.R * 0.8);
                 RegionShapeFillCol.G = (Byte)(RegionShapeFillCol.G * 0.8);
                 RegionShapeFillCol.B = (Byte)(RegionShapeFillCol.B * 0.8);
 
-                RegionShapeColourBrush = new SolidColorBrush(RegionShapeFillCol);
+                RegionShapeColourBrush = BrushCache.GetSolidBrush(RegionShapeFillCol);
 
-                WHTheraColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
-                WHTurnurColourBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
-
-                SystemColourBrush.Freeze();
-                SystemColourHiSecBrush.Freeze();
-                SystemColourLowSecBrush.Freeze();
-                SystemColourNullSecBrush.Freeze();
-                SystemColourOutlineBrush.Freeze();
-
-                ConstellationColourBrush.Freeze();
-
-                SystemTextColourBrush.Freeze();
-                RegionTextColourBrush.Freeze();
-                GateColourBrush.Freeze();
-                JumpBridgeColourBrush.Freeze();
-                DataColourBrush.Freeze();
-                BackgroundColourBrush.Freeze();
-                RegionTextZoomedOutColourBrush.Freeze();
-                RegionShapeColourBrush.Freeze();
-                WHTheraColourBrush.Freeze();
-                WHTurnurColourBrush.Freeze();
+                WHTheraColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+                WHTurnurColourBrush = BrushCache.GetSolidBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
             }
 
-            SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
-            SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
+            SolidColorBrush PositiveDeltaColor = BrushCache.CommonBrushes.Green;
+            SolidColorBrush NegativeDeltaColor = BrushCache.CommonBrushes.Red;
 
-            SolidColorBrush jumpRouteColour = new SolidColorBrush(Colors.Orange);
-            SolidColorBrush activeRouteColour = new SolidColorBrush(Colors.Yellow);
-            SolidColorBrush activeRouteAniblexColour = new SolidColorBrush(Colors.DarkMagenta);
+            SolidColorBrush jumpRouteColour = BrushCache.CommonBrushes.Orange;
+            SolidColorBrush activeRouteColour = BrushCache.CommonBrushes.Yellow;
+            SolidColorBrush activeRouteAniblexColour = BrushCache.GetSolidBrush(Colors.DarkMagenta);
 
             // update the background colours
             MainZoomControl.Background = BackgroundColourBrush;
@@ -828,11 +805,11 @@ namespace SMT
 
                 ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
 
-                Pen GatePen = new Pen(GateColourBrush, 0.6);
-                Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
-                Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
-                Pen SysOutlinePen = new Pen(SystemColourOutlineBrush, 0.3);
-                Pen PochvenGatePen = new Pen(PochvenGateColourBrush, 0.3);
+                Pen GatePen = BrushCache.GetPen(GateColourBrush, 0.6);
+                Pen ConstGatePen = BrushCache.GetPen(ConstellationColourBrush, 0.6);
+                Pen RegionGatePen = BrushCache.GetPen(RegionGateColourBrush, 0.8);
+                Pen SysOutlinePen = BrushCache.GetPen(SystemColourOutlineBrush, 0.3);
+                Pen PochvenGatePen = BrushCache.GetPen(PochvenGateColourBrush, 0.3);
 
                 System.Windows.Media.DrawingVisual gatesDrawingVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext gatesDrawingContext = gatesDrawingVisual.RenderOpen();
@@ -870,8 +847,7 @@ namespace SMT
 
                 if(ShowJumpBridges)
                 {
-                    Pen p = new Pen(JumpBridgeColourBrush, 0.6);
-                    p.DashStyle = DashStyles.Dot;
+                    Pen p = BrushCache.GetPen(JumpBridgeColourBrush, 0.6, new DoubleCollection { 1, 1 }, PenLineCap.Round, PenLineCap.Round, PenLineJoin.Round, 10.0);
 
                     System.Windows.Media.DrawingVisual jbDrawingVisual = new System.Windows.Media.DrawingVisual();
                     DrawingContext drawingContext;
@@ -990,7 +966,7 @@ namespace SMT
                 // update the data
                 VHDataSpheres.ClearAllChildren();
 
-                Pen dataPen = new Pen(dataBrush, 1);
+                Pen dataPen = BrushCache.GetPen(dataBrush, 1);
 
                 foreach(EVEData.System sys in EM.Systems)
                 {
