@@ -1801,9 +1801,9 @@ namespace SMT
                 return;
             }
 
-            Brush FWLineBrushA = new SolidColorBrush(Colors.Yellow);
-            Brush FWLineBrushB = new SolidColorBrush(Colors.Orange);
-            Brush FWLineBrushC = new SolidColorBrush(Colors.OrangeRed);
+            Brush FWLineBrushA = BrushCache.CommonBrushes.Yellow;
+            Brush FWLineBrushB = BrushCache.CommonBrushes.Orange;
+            Brush FWLineBrushC = BrushCache.GetSolidBrush(Colors.OrangeRed);
 
             DoubleCollection dashes = new DoubleCollection();
             dashes.Add(1.0);
@@ -2218,7 +2218,7 @@ namespace SMT
                     }
                 }
 
-                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
+                Brush securityColorFill = BrushCache.GetSolidBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
 
 
 
@@ -2329,7 +2329,7 @@ namespace SMT
                             r = (byte)(255 - (255 * (Blend - 0.5) / 0.5));
                         }
 
-                        SystemOutline.Fill = new SolidColorBrush(Color.FromRgb(r, g, 0));
+                        SystemOutline.Fill = BrushCache.GetSolidBrush(r, g, 0);
                     }
 
                     SystemOutline.DataContext = mapSystem;
