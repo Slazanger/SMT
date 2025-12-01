@@ -46,7 +46,7 @@ namespace SMT.EVEData
             KillStream = new List<ZKBDataSimple>();
 
             // set the queue id which is now required
-            QueueID = "SMT_" + EVEDataUtils.Misc.RandomString(10);
+            QueueID = "SMT_" + EVEDataUtils.Misc.RandomString(35);
 
             backgroundWorker = new BackgroundWorker();
             backgroundWorker.WorkerSupportsCancellation = true;
@@ -113,17 +113,26 @@ namespace SMT.EVEData
             {
                 ZKBDataSimple zs = new ZKBDataSimple();
                 zs.KillID = long.Parse(z.Package.KillId.ToString());
-                zs.VictimAllianceID = int.Parse(z.Package.Killmail.Victim.AllianceId.ToString());
-                zs.VictimCharacterID = int.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
-                zs.VictimCorpID = int.Parse(z.Package.Killmail.Victim.CharacterId.ToString());
-                zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(z.Package.Killmail.SolarSystemId);
-                if(zs.SystemName == string.Empty)
-                {
-                    zs.SystemName = z.Package.Killmail.SolarSystemId.ToString();
+
+                string killHash = z.Package.Zkb.Hash;
+
+                // now resolve the kill mail from ESI
+                var killMailResponseTask = EveManager.Instance.ESIClient.Killmails.Information(killHash, (int)zs.KillID);
+                killMailResponseTask.Wait();
+                ESI.NET.EsiResponse<ESI.NET.Models.Killmails.Information> killMailResponse = killMailResponseTask.Result;
+
+                if(!ESIHelpers.ValidateESICall(killMailResponse))
+                { 
+                    e.Result = -1;
+                    return;
                 }
 
-                zs.KillTime = z.Package.Killmail.KillmailTime.ToLocalTime();
-                string shipID = z.Package.Killmail.Victim.ShipTypeId.ToString();
+                zs.VictimAllianceID = killMailResponse.Data.Victim.AllianceId;
+                zs.VictimCharacterID = killMailResponse.Data.Victim.CharacterId;
+                zs.VictimCorpID = killMailResponse.Data.Victim.CorporationId;
+                zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(killMailResponse.Data.SolarSystemId);
+                zs.KillTime = killMailResponse.Data.KillmailTime.ToLocalTime();
+                string shipID = killMailResponse.Data.Victim.ShipTypeId.ToString();
                 if(EveManager.Instance.ShipTypes.ContainsKey(shipID))
                 {
                     zs.ShipType = EveManager.Instance.ShipTypes[shipID];
@@ -141,6 +150,7 @@ namespace SMT.EVEData
                 {
                     KillsAddedEvent();
                 }
+
             }
             else
             {
