@@ -3,6 +3,7 @@
 // This provides a migration path from singleton to dependency injection
 //-----------------------------------------------------------------------
 
+#nullable enable
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SMT.EVEData

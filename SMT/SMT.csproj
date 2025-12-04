@@ -48,9 +48,11 @@
     <PlatformTarget>x64</PlatformTarget>
     <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
+    <Nullable>disable</Nullable>
     <SignAssembly>False</SignAssembly>
     <Version>1.43</Version>
     <PackageProjectUrl>https://github.com/Slazanger/SMT</PackageProjectUrl>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>bin\x64\Debug\</OutputPath>

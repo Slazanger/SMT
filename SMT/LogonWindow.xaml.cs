@@ -32,7 +32,9 @@ namespace SMT
 
             try
             {
-                listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);
+                var callbackUrl = App.GetEveManager()?.ConfigurationService?.EveSettings?.Authentication?.CallbackUrl ?? 
+                    "http://localhost:8762/callback/";
+                listener.Prefixes.Add(callbackUrl);
                 listener.Start();
 
                 while (!serverDone)

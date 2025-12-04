@@ -2,6 +2,7 @@
 // EVE Configuration - Modern Configuration System
 //-----------------------------------------------------------------------
 
+#nullable enable
 namespace SMT.EVEData.Configuration
 {
     /// <summary>

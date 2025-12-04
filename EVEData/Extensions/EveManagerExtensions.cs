@@ -2,6 +2,7 @@
 // EVE Manager Extensions - Helper methods for migration
 //-----------------------------------------------------------------------
 
+#nullable enable
 using Microsoft.Extensions.DependencyInjection;
 using SMT.EVEData.Services;
 

@@ -2,6 +2,7 @@
 // Configuration Service Implementation
 //-----------------------------------------------------------------------
 
+#nullable enable
 using Microsoft.Extensions.Options;
 using SMT.EVEData.Configuration;
 

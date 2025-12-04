@@ -33,6 +33,11 @@ namespace SMT.EVEData
         private readonly IConfigurationService _configService;
         private readonly ILogger<EveManager> _logger;
 
+        /// <summary>
+        /// Configuration service for accessing application settings
+        /// </summary>
+        public IConfigurationService ConfigurationService => _configService;
+
         private bool BackgroundThreadShouldTerminate;
 
         /// <summary>

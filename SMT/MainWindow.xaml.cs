@@ -101,10 +101,10 @@ namespace SMT
 
             InitializeComponent();
 
-            Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
+            Title = "SMT : Rock Whisperer (Loading...)";
 
             // Load the Dock Manager Layout file
-            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
+            string dockManagerLayoutName = Path.Combine(GetStorageRoot(), "Layout_" + WindowLayoutVersion + ".dat");
             if(File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
             {
                 try
@@ -125,7 +125,7 @@ namespace SMT
             UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             // load any custom map settings off disk
-            string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion + ".dat");
+            string mapConfigFileName = Path.Combine(GetStorageRoot(), "MapConfig_" + MapConfig.SaveVersion + ".dat");
 
             if(File.Exists(mapConfigFileName))
             {
@@ -167,6 +167,24 @@ namespace SMT
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InitializeEveManager();
+        }
+
+        // Helper methods to get configuration values safely
+        private string GetStorageRoot()
+        {
+            return EVEManager?.ConfigurationService?.GetStorageRoot() ?? 
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMT");
+        }
+
+        private string GetVersionedStoragePath()
+        {
+            return EVEManager?.ConfigurationService?.GetVersionedStoragePath() ?? 
+                Path.Combine(GetStorageRoot(), "SMT_143");
+        }
+
+        private string GetApplicationVersion()
+        {
+            return EVEManager?.ConfigurationService?.EveSettings?.Application?.Version ?? "SMT_143";
         }
 
         private void InitializeEveManager()
@@ -229,6 +247,10 @@ namespace SMT
 
         private void InitializeEveManagerData()
         {
+            // Update title with actual configuration now that EveManager is initialized
+            var config = EVEManager.ConfigurationService;
+            Title = $"SMT : {config.EveSettings.Application.Title} ({config.EveSettings.Application.Version})";
+
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
             bool initFromScratch = false;
 
@@ -304,7 +326,7 @@ namespace SMT
             // load any custom universe view layout
             // Save any custom map Layout
 
-            string customLayoutFile = Path.Combine(EveAppConfig.VersionStorage, "CustomUniverseLayout.txt");
+            string customLayoutFile = Path.Combine(GetVersionedStoragePath(), "CustomUniverseLayout.txt");
 
             if(File.Exists(customLayoutFile))
             {
@@ -703,7 +725,7 @@ namespace SMT
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             // save off the dockmanager layout
-            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
+            string dockManagerLayoutName = Path.Combine(GetStorageRoot(), "Layout_" + WindowLayoutVersion + ".dat");
 
             try
             {
@@ -723,7 +745,7 @@ namespace SMT
                 MapConf.UseESIForCharacterPositions = EVEManager.UseESIForCharacterPositions;
 
                 // Save the Map Colours
-                string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion + ".dat");
+                string mapConfigFileName = Path.Combine(GetStorageRoot(), "MapConfig_" + MapConfig.SaveVersion + ".dat");
 
                 // save off the toolbar setup
                 MapConf.ToolBox_ShowJumpBridges = RegionUC.ShowJumpBridges;
@@ -746,7 +768,7 @@ namespace SMT
                 }
 
                 // Save any custom map Layout
-                string customLayoutFile = Path.Combine(EveAppConfig.VersionStorage, "CustomUniverseLayout.txt");
+                string customLayoutFile = Path.Combine(GetVersionedStoragePath(), "CustomUniverseLayout.txt");
 
                 using(TextWriter tw = new StreamWriter(customLayoutFile))
                 {
@@ -1110,7 +1132,7 @@ namespace SMT
             try
             {
                 HttpClient hc = new HttpClient();
-                hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", EveAppConfig.SMT_VERSION));
+                hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", GetApplicationVersion()));
                 var response = await hc.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 strContent = await response.Content.ReadAsStringAsync();
@@ -1124,13 +1146,13 @@ namespace SMT
 
             if(releaseInfo != null)
             {
-                if(releaseInfo.TagName != EveAppConfig.SMT_VERSION)
+                if(releaseInfo.TagName != GetApplicationVersion())
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         NewVersionWindow nw = new NewVersionWindow();
                         nw.ReleaseInfo = releaseInfo.Body;
-                        nw.CurrentVersion = EveAppConfig.SMT_VERSION;
+                        nw.CurrentVersion = GetApplicationVersion();
                         nw.NewVersion = releaseInfo.TagName;
                         nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
                         nw.Owner = this;
@@ -2082,7 +2104,7 @@ namespace SMT
             InfoLayer = new List<InfoItem>();
 
             // now add the beacons
-            string infoObjectsFile = Path.Combine(EveAppConfig.StorageRoot, "InfoObjects.txt");
+            string infoObjectsFile = Path.Combine(GetStorageRoot(), "InfoObjects.txt");
             if(File.Exists(infoObjectsFile))
             {
                 StreamReader file = new StreamReader(infoObjectsFile);

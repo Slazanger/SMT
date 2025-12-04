@@ -2,6 +2,7 @@
 // Service Collection Extensions for Dependency Injection Setup
 //-----------------------------------------------------------------------
 
+#nullable enable
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

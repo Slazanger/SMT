@@ -2,6 +2,7 @@
 // Configuration Service Interface
 //-----------------------------------------------------------------------
 
+#nullable enable
 using SMT.EVEData.Configuration;
 
 namespace SMT.EVEData.Services

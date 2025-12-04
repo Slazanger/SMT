@@ -98,7 +98,9 @@ namespace SMT
         {
             try
             {
-                System.Diagnostics.Process.Start("explorer.exe", EVEData.EveAppConfig.StorageRoot);
+                var storageRoot = App.GetEveManager()?.ConfigurationService?.GetStorageRoot() ?? 
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMT");
+                System.Diagnostics.Process.Start("explorer.exe", storageRoot);
             }
             catch(Exception ex)
             {
