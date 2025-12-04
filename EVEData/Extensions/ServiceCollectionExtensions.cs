@@ -33,6 +33,11 @@ namespace SMT.EVEData.Extensions
             // Register core services
             services.AddSingleton<IConfigurationService, ConfigurationService>();
             
+            // Register file monitoring service
+            services.AddSingleton<IFileMonitoringService, FileMonitoringService>();
+            services.AddHostedService<FileMonitoringService>(provider => 
+                (FileMonitoringService)provider.GetRequiredService<IFileMonitoringService>());
+            
             // Register EveManager as singleton
             services.AddEveManager();
 

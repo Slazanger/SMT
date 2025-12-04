@@ -4,6 +4,9 @@
 
 #nullable enable
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using SMT.EVEData.Configuration;
+using SMT.EVEData.Services;
 using SMT.EVEData.Services;
 
 namespace SMT.EVEData.Extensions
@@ -18,7 +21,13 @@ namespace SMT.EVEData.Extensions
         /// </summary>
         public static IServiceCollection AddEveManager(this IServiceCollection services)
         {
-            services.AddSingleton<EveManager>();
+            services.AddSingleton<EveManager>(provider =>
+            {
+                var configService = provider.GetRequiredService<IConfigurationService>();
+                var logger = provider.GetRequiredService<ILogger<EveManager>>();
+                var fileMonitoringService = provider.GetRequiredService<IFileMonitoringService>();
+                return new EveManager(configService, logger, fileMonitoringService);
+            });
             return services;
         }
 

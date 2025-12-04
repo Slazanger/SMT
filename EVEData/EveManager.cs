@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SMT.EVEData.Services;
 using SMT.EVEData.Configuration;
+using SMT.EVEData.Events;
 
 namespace SMT.EVEData
 {
@@ -32,6 +33,7 @@ namespace SMT.EVEData
         // Dependency injection fields
         private readonly IConfigurationService _configService;
         private readonly ILogger<EveManager> _logger;
+        private readonly IFileMonitoringService _fileMonitoringService;
 
         /// <summary>
         /// Configuration service for accessing application settings
@@ -137,10 +139,15 @@ namespace SMT.EVEData
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
-        public EveManager(IConfigurationService configService, ILogger<EveManager> logger)
+        public EveManager(IConfigurationService configService, ILogger<EveManager> logger, IFileMonitoringService fileMonitoringService)
         {
             _configService = configService ?? throw new ArgumentNullException(nameof(configService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _fileMonitoringService = fileMonitoringService ?? throw new ArgumentNullException(nameof(fileMonitoringService));
+
+            // Subscribe to file monitoring events
+            _fileMonitoringService.IntelFileChanged += OnIntelFileChanged;
+            _fileMonitoringService.GameLogFileChanged += OnGameLogFileChanged;
 
             // Validate configuration at startup
             if (!_configService.IsConfigurationValid(out var configErrors))
@@ -1956,7 +1963,104 @@ namespace SMT.EVEData
             }
 
             Init();
+
+            // Start file monitoring after initialization
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(EVELogFolder) && Directory.Exists(EVELogFolder))
+                    {
+                        await _fileMonitoringService.StartMonitoringAsync(EVELogFolder, IntelFilters ?? new List<string>(), CancellationToken.None);
+                        _logger.LogInformation("File monitoring started for EVE logs at: {LogFolder}", EVELogFolder);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("EVE log folder not found, file monitoring not started: {LogFolder}", EVELogFolder);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to start file monitoring");
+                }
+            });
         }
+
+        #region File Monitoring Event Handlers
+
+        /// <summary>
+        /// Handle intel file changes from the file monitoring service
+        /// </summary>
+        private void OnIntelFileChanged(object? sender, IntelFileChangedEventArgs e)
+        {
+            try
+            {
+                ProcessIntelFileLines(e.FilePath, e.ChannelName, e.IsLocalChat, e.NewLines);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing intel file change: {FilePath}", e.FilePath);
+            }
+        }
+
+        /// <summary>
+        /// Handle game log file changes from the file monitoring service
+        /// </summary>
+        private void OnGameLogFileChanged(object? sender, GameLogFileChangedEventArgs e)
+        {
+            try
+            {
+                ProcessGameLogFileLines(e.FilePath, e.CharacterName, e.NewLines);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing game log file change: {FilePath}", e.FilePath);
+            }
+        }
+
+        /// <summary>
+        /// Process intel file lines (extracted from legacy IntelFileWatcher_Changed)
+        /// </summary>
+        private void ProcessIntelFileLines(string filePath, string channelName, bool isLocalChat, List<string> newLines)
+        {
+            foreach (var line in newLines)
+            {
+                ProcessIntelLine(filePath, channelName, isLocalChat, line);
+            }
+        }
+
+        /// <summary>
+        /// Process game log file lines (extracted from legacy GameLogFileWatcher_Changed)
+        /// </summary>
+        private void ProcessGameLogFileLines(string filePath, string characterName, List<string> newLines)
+        {
+            foreach (var line in newLines)
+            {
+                ProcessGameLogLine(filePath, characterName, line);
+            }
+        }
+
+        /// <summary>
+        /// Process a single intel line
+        /// </summary>
+        private void ProcessIntelLine(string filePath, string channelName, bool isLocalChat, string line)
+        {
+            // TODO: Extract the intel processing logic from the original IntelFileWatcher_Changed method
+            // This is a placeholder - the actual logic needs to be extracted from the legacy method
+            _logger.LogTrace("Processing intel line from {FilePath}: {Line}", filePath, line);
+        }
+
+        /// <summary>
+        /// Process a single game log line
+        /// </summary>
+        private void ProcessGameLogLine(string filePath, string characterName, string line)
+        {
+            // TODO: Extract the game log processing logic from the original GameLogFileWatcher_Changed method
+            // This is a placeholder - the actual logic needs to be extracted from the legacy method
+            _logger.LogTrace("Processing game log line from {FilePath}: {Line}", filePath, line);
+        }
+
+        #endregion
 
         /// <summary>
         /// Load the jump bridge data from disk
