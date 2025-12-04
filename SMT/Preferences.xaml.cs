@@ -34,7 +34,7 @@ namespace SMT
         {
             InitializeComponent();
 
-            syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
+            syncESIPositionChk.IsChecked = SMT.App.GetEveManager().UseESIForCharacterPositions;
 
             waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
 
@@ -51,7 +51,7 @@ namespace SMT
                 waveOutEvent.Init(audioFileReader);
             }
 
-            JumpBridgeList.ItemsSource = EveManager.Instance.JumpBridges;
+            JumpBridgeList.ItemsSource = SMT.App.GetEveManager().JumpBridges;
         }
 
         public void Init()
@@ -111,12 +111,12 @@ namespace SMT
 
         private void syncESIPositionChk_Checked(object sender, RoutedEventArgs e)
         {
-            EveManager.Instance.UseESIForCharacterPositions = (bool)syncESIPositionChk.IsChecked;
+            SMT.App.GetEveManager().UseESIForCharacterPositions = (bool)syncESIPositionChk.IsChecked;
         }
 
         private void zkilltime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            EveManager.Instance.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
+            SMT.App.GetEveManager().ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
         }
 
         private void ResetColourData_Click(object sender, RoutedEventArgs e)
@@ -185,7 +185,7 @@ namespace SMT
 
         private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
         {
-            EveManager.Instance.JumpBridges.Clear();
+            SMT.App.GetEveManager().JumpBridges.Clear();
             EVEData.Navigation.ClearJumpBridges();
 
             CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
@@ -200,10 +200,10 @@ namespace SMT
 
             EVEData.JumpBridge jb = JumpBridgeList.SelectedItem as EVEData.JumpBridge;
 
-            EveManager.Instance.JumpBridges.Remove(jb);
+            SMT.App.GetEveManager().JumpBridges.Remove(jb);
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EveManager.Instance.JumpBridges);
+            EVEData.Navigation.UpdateJumpBridges(SMT.App.GetEveManager().JumpBridges);
 
             CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
             UpdateJumpBridgeSummary();
@@ -221,7 +221,7 @@ namespace SMT
             jb.Disabled = !jb.Disabled;
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EveManager.Instance.JumpBridges);
+            EVEData.Navigation.UpdateJumpBridges(SMT.App.GetEveManager().JumpBridges);
 
             CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
             UpdateJumpBridgeSummary();
@@ -231,19 +231,19 @@ namespace SMT
         {
             string ExportText = "";
 
-            foreach(EVEData.MapRegion mr in EveManager.Instance.Regions)
+            foreach(EVEData.MapRegion mr in SMT.App.GetEveManager().Regions)
             {
                 ExportText += "# " + mr.Name + "\n";
 
-                foreach(EVEData.JumpBridge jb in EveManager.Instance.JumpBridges)
+                foreach(EVEData.JumpBridge jb in SMT.App.GetEveManager().JumpBridges)
                 {
-                    EVEData.System es = EveManager.Instance.GetEveSystem(jb.From);
+                    EVEData.System es = SMT.App.GetEveManager().GetEveSystem(jb.From);
                     if(es.Region == mr.Name)
                     {
                         ExportText += $"{jb.FromID} {jb.From} --> {jb.To}\n";
                     }
 
-                    es = EveManager.Instance.GetEveSystem(jb.To);
+                    es = SMT.App.GetEveManager().GetEveSystem(jb.To);
                     if(es.Region == mr.Name)
                     {
                         ExportText += $"{jb.ToID} {jb.To} --> {jb.From}\n";
@@ -273,7 +273,7 @@ namespace SMT
             ImportPasteJumpGatesBtn.IsEnabled = false;
             ExportJumpGatesBtn.IsEnabled = false;
 
-            foreach(EVEData.LocalCharacter c in EveManager.Instance.LocalCharacters)
+            foreach(EVEData.LocalCharacter c in SMT.App.GetEveManager().LocalCharacters)
             {
                 if(c.ESILinked)
                 {
@@ -292,7 +292,7 @@ namespace SMT
                             {
                                 bool found = false;
 
-                                foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
+                                foreach(EVEData.JumpBridge jbr in SMT.App.GetEveManager().JumpBridges)
                                 {
                                     if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
                                     {
@@ -302,7 +302,7 @@ namespace SMT
 
                                 if(!found)
                                 {
-                                    EveManager.Instance.JumpBridges.Add(jb);
+                                    SMT.App.GetEveManager().JumpBridges.Add(jb);
                                 }
                             }
 
@@ -318,7 +318,7 @@ namespace SMT
                             {
                                 bool found = false;
 
-                                foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
+                                foreach(EVEData.JumpBridge jbr in SMT.App.GetEveManager().JumpBridges)
                                 {
                                     if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
                                     {
@@ -328,7 +328,7 @@ namespace SMT
 
                                 if(!found)
                                 {
-                                    EveManager.Instance.JumpBridges.Add(jb);
+                                    SMT.App.GetEveManager().JumpBridges.Add(jb);
                                 }
                             }
 
@@ -343,7 +343,7 @@ namespace SMT
                         {
                             bool found = false;
 
-                            foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
+                            foreach(EVEData.JumpBridge jbr in SMT.App.GetEveManager().JumpBridges)
                             {
                                 if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
                                 {
@@ -353,7 +353,7 @@ namespace SMT
 
                             if(!found)
                             {
-                                EveManager.Instance.JumpBridges.Add(jb);
+                                SMT.App.GetEveManager().JumpBridges.Add(jb);
                             }
                         }
                     }
@@ -361,7 +361,7 @@ namespace SMT
             }
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EveManager.Instance.JumpBridges);
+            EVEData.Navigation.UpdateJumpBridges(SMT.App.GetEveManager().JumpBridges);
             UpdateJumpBridgeSummary();
 
             ImportJumpGatesBtn.IsEnabled = true;
@@ -404,19 +404,19 @@ namespace SMT
                     long.TryParse(groups[1].Value, out IDFrom);
                     string from = groups[2].Value;
                     string to = groups[3].Value;
-                    EveManager.Instance.AddUpdateJumpBridge(from, to, IDFrom);
+                    SMT.App.GetEveManager().AddUpdateJumpBridge(from, to, IDFrom);
                 }
                 else if(groups[4].Value != "" && groups[5].Value != "" && groups[6].Value != "")
                 {
                     long.TryParse(groups[4].Value, out IDFrom);
                     string from = groups[5].Value.Trim();
                     string to = groups[6].Value.Trim();
-                    EveManager.Instance.AddUpdateJumpBridge(from, to, IDFrom);
+                    SMT.App.GetEveManager().AddUpdateJumpBridge(from, to, IDFrom);
                 }
             }
 
             EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EveManager.Instance.JumpBridges);
+            EVEData.Navigation.UpdateJumpBridges(SMT.App.GetEveManager().JumpBridges);
             UpdateJumpBridgeSummary();
             CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
         }
@@ -427,7 +427,7 @@ namespace SMT
             int MissingInfo = 0;
             int Disabled = 0;
 
-            foreach(EVEData.JumpBridge jb in EveManager.Instance.JumpBridges)
+            foreach(EVEData.JumpBridge jb in SMT.App.GetEveManager().JumpBridges)
             {
                 JBCount++;
 

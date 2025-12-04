@@ -36,7 +36,7 @@ namespace SMT
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            foreach (EVEData.LocalCharacter lc in EVEData.EveManager.Instance.LocalCharacters)
+            foreach (EVEData.LocalCharacter lc in App.GetEveManager().LocalCharacters)
             {
                 lc.warningSystemsNeedsUpdate = true;
             }

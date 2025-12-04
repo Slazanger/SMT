@@ -16,8 +16,11 @@ using ESI.NET.Enumerations;
 using ESI.NET.Models.SSO;
 using EVEDataUtils;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SMT.EVEData.Services;
+using SMT.EVEData.Configuration;
 
 namespace SMT.EVEData
 {
@@ -26,10 +29,9 @@ namespace SMT.EVEData
     /// </summary>
     public class EveManager
     {
-        /// <summary>
-        /// singleton instance of this class
-        /// </summary>
-        private static EveManager instance;
+        // Dependency injection fields
+        private readonly IConfigurationService _configService;
+        private readonly ILogger<EveManager> _logger;
 
         private bool BackgroundThreadShouldTerminate;
 
@@ -81,9 +83,12 @@ namespace SMT.EVEData
         {
             try
             {
+                var storageRoot = _configService.GetStorageRoot();
+                
                 // if we have a storageroot folder; we have already migrated settings
-                if(Directory.Exists(EveAppConfig.StorageRoot))
+                if(Directory.Exists(storageRoot))
                 {
+                    _logger.LogDebug("Settings already migrated to {StorageRoot}", storageRoot);
                     return;
                 }
 
@@ -92,8 +97,10 @@ namespace SMT.EVEData
                 // prior to 1.39 all settings were stored in the My Documents\SMT\ folder
                 if(Directory.Exists(oldSettingsFolder))
                 {
+                    _logger.LogInformation("Migrating settings from {OldPath} to {NewPath}", oldSettingsFolder, storageRoot);
+                    
                     // move the old settings folder to the new location
-                    string newSettingsFolder = EveAppConfig.StorageRoot;
+                    string newSettingsFolder = storageRoot;
                     if(!Directory.Exists(newSettingsFolder))
                     {
                         Directory.CreateDirectory(newSettingsFolder);
@@ -110,42 +117,58 @@ namespace SMT.EVEData
                     }
                     // delete the old settings folder
                     Directory.Delete(oldSettingsFolder, true);
+                    _logger.LogInformation("Settings migration completed successfully");
                 }
-
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning(ex, "Failed to migrate old settings - continuing with defaults");
                 // if we fail to migrate the settings, we just ignore it
                 // this is a one time migration so we don't need to worry about it again
             }
-
-
         }
 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
-        public EveManager(string version)
+        public EveManager(IConfigurationService configService, ILogger<EveManager> logger)
         {
-            LocalCharacters = new List<LocalCharacter>();
-            VersionStr = version;
+            _configService = configService ?? throw new ArgumentNullException(nameof(configService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
+            // Validate configuration at startup
+            if (!_configService.IsConfigurationValid(out var configErrors))
+            {
+                var errorMessage = string.Join(Environment.NewLine, configErrors);
+                
+                // In legacy mode, log warnings instead of failing hard
+                if (_configService.IsLegacyMode())
+                {
+                    _logger.LogWarning("Running in legacy compatibility mode with incomplete configuration: {Errors}", errorMessage);
+                    _logger.LogWarning("Some features may not work correctly. Please setup user secrets: dotnet user-secrets set \"Eve:Authentication:ClientId\" \"your-client-id\"");
+                }
+                else
+                {
+                    _logger.LogError("Invalid configuration: {Errors}", errorMessage);
+                    throw new InvalidOperationException($"Invalid configuration: {errorMessage}");
+                }
+            }
+
+            LocalCharacters = new List<LocalCharacter>();
+            VersionStr = _configService.EveSettings.Application.Version;
+
+            _logger.LogInformation("EveManager initializing with version {Version}", VersionStr);
 
             MigrateOldSettings();
 
-
-            string SaveDataRoot = EveAppConfig.StorageRoot;
-            if(!Directory.Exists(SaveDataRoot))
-            {
-                Directory.CreateDirectory(SaveDataRoot);
-            }
-
+            // Use configuration service instead of static properties
+            string SaveDataRoot = _configService.GetStorageRoot();
             DataRootFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
 
             SaveDataRootFolder = SaveDataRoot;
 
-            SaveDataVersionFolder = EveAppConfig.VersionStorage;
+            SaveDataVersionFolder = _configService.GetVersionedStoragePath();
             if(!Directory.Exists(SaveDataVersionFolder))
             {
                 Directory.CreateDirectory(SaveDataVersionFolder);
@@ -218,21 +241,8 @@ namespace SMT.EVEData
             Rorqual
         }
 
-        /// <summary>
-        /// Gets or sets the Singleton Instance of the EVEManager
-        /// </summary>
-        public static EveManager Instance
-        {
-            get
-            {
-                return instance;
-            }
-
-            set
-            {
-                EveManager.instance = value;
-            }
-        }
+        // NOTE: Singleton pattern removed - EveManager is now managed by dependency injection
+        // Use IServiceProvider.GetRequiredService<EveManager>() instead of EveManager.Instance
 
         public string EVELogFolder { get; set; }
 
@@ -2753,32 +2763,23 @@ namespace SMT.EVEData
         /// </summary>
         private void Init()
         {
+            // Use configuration service instead of EveAppConfig constants
+            var authConfig = _configService.EveSettings.Authentication;
+            
             IOptions<EsiConfig> config = Options.Create(new EsiConfig()
             {
-                EsiUrl = "https://esi.evetech.net",
+                EsiUrl = authConfig.EsiUrl,
                 DataSource = DataSource.Tranquility,
-                ClientId = EveAppConfig.ClientID,
+                ClientId = authConfig.ClientId,
                 SecretKey = "Unneeded",
-                CallbackUrl = EveAppConfig.CallbackURL,
-                UserAgent = "SMT-map-app : " + EveAppConfig.SMT_VERSION,
+                CallbackUrl = authConfig.CallbackUrl,
+                UserAgent = _configService.GetUserAgent(),
             });
 
             ESIClient = new ESI.NET.EsiClient(config);
-            ESIScopes = new List<string>
-            {
-                "publicData",
-                "esi-location.read_location.v1",
-                "esi-search.search_structures.v1",
-                "esi-clones.read_clones.v1",
-                "esi-ui.write_waypoint.v1",
-                "esi-characters.read_standings.v1",
-                "esi-location.read_online.v1",
-                "esi-characters.read_fatigue.v1",
-                "esi-corporations.read_contacts.v1",
-                "esi-alliances.read_contacts.v1",
-                "esi-universe.read_structures.v1",
-                "esi-fleets.read_fleet.v1"
-            };
+            ESIScopes = authConfig.RequiredScopes.ToList();
+            
+            _logger.LogDebug("ESI Client initialized with {ScopeCount} scopes", ESIScopes.Count);
 
             foreach(MapRegion rr in Regions)
             {

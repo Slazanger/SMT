@@ -117,7 +117,7 @@ namespace SMT.EVEData
                 string killHash = z.Package.Zkb.Hash;
 
                 // now resolve the kill mail from ESI
-                var killMailResponseTask = EveManager.Instance.ESIClient.Killmails.Information(killHash, (int)zs.KillID);
+                var killMailResponseTask = EveManagerProvider.Current.ESIClient.Killmails.Information(killHash, (int)zs.KillID);
                 killMailResponseTask.Wait();
                 ESI.NET.EsiResponse<ESI.NET.Models.Killmails.Information> killMailResponse = killMailResponseTask.Result;
 
@@ -130,19 +130,19 @@ namespace SMT.EVEData
                 zs.VictimAllianceID = killMailResponse.Data.Victim.AllianceId;
                 zs.VictimCharacterID = killMailResponse.Data.Victim.CharacterId;
                 zs.VictimCorpID = killMailResponse.Data.Victim.CorporationId;
-                zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(killMailResponse.Data.SolarSystemId);
+                zs.SystemName = EveManagerProvider.Current.GetEveSystemNameFromID(killMailResponse.Data.SolarSystemId);
                 zs.KillTime = killMailResponse.Data.KillmailTime.ToLocalTime();
                 string shipID = killMailResponse.Data.Victim.ShipTypeId.ToString();
-                if(EveManager.Instance.ShipTypes.ContainsKey(shipID))
+                if(EveManagerProvider.Current.ShipTypes.ContainsKey(shipID))
                 {
-                    zs.ShipType = EveManager.Instance.ShipTypes[shipID];
+                    zs.ShipType = EveManagerProvider.Current.ShipTypes[shipID];
                 }
                 else
                 {
                     zs.ShipType = "Unknown (" + shipID + ")";
                 }
 
-                zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);
+                zs.VictimAllianceName = EveManagerProvider.Current.GetAllianceName(zs.VictimAllianceID);
 
                 KillStream.Insert(0, zs);
 
@@ -171,13 +171,13 @@ namespace SMT.EVEData
             {
                 if(KillStream[i].VictimAllianceName == string.Empty)
                 {
-                    if(!EveManager.Instance.AllianceIDToTicker.ContainsKey(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
+                    if(!EveManagerProvider.Current.AllianceIDToTicker.ContainsKey(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
                     {
                         AllianceIDs.Add(KillStream[i].VictimAllianceID);
                     }
                     else
                     {
-                        KillStream[i].VictimAllianceName = EveManager.Instance.GetAllianceName(KillStream[i].VictimAllianceID);
+                        KillStream[i].VictimAllianceName = EveManagerProvider.Current.GetAllianceName(KillStream[i].VictimAllianceID);
                     }
                 }
 
@@ -190,7 +190,7 @@ namespace SMT.EVEData
             }
             if(AllianceIDs.Count > 0)
             {
-                EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
+                EveManagerProvider.Current.ResolveAllianceIDs(AllianceIDs);
             }
 
             if(updatedKillList)
@@ -265,7 +265,7 @@ namespace SMT.EVEData
 
             public override string ToString()
             {
-                string allianceTicker = EVEData.EveManager.Instance.GetAllianceTicker(VictimAllianceID);
+                string allianceTicker = EveManagerProvider.Current.GetAllianceTicker(VictimAllianceID);
                 if(allianceTicker == string.Empty)
                 {
                     allianceTicker = VictimAllianceID.ToString();

@@ -217,7 +217,7 @@ namespace SMT.EVEData
                         continue;
                     }
 
-                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysa.Name, sysb.Name);
+                    decimal Distance = EveManagerProvider.Current.GetRangeBetweenSystems(sysa.Name, sysb.Name);
                     if (Distance < maxRange && Distance > 0)
                     {
                         if (!rangeCache.ContainsKey(sysa.Name))
@@ -277,7 +277,7 @@ namespace SMT.EVEData
                 MapNode sysMN = MapNodes[s];
                 foreach (string t in jumpRangeCache[s])
                 {
-                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysMN.Name, t);
+                    decimal Distance = EveManagerProvider.Current.GetRangeBetweenSystems(sysMN.Name, t);
                     if (Distance < MaxRange && Distance > 0)
                     {
                         JumpLink jl = new JumpLink();
@@ -497,7 +497,7 @@ namespace SMT.EVEData
                 {
                     RoutePoint RP = new RoutePoint();
                     RP.SystemName = Route[i];
-                    RP.ActualSystem = EveManager.Instance.GetEveSystem(Route[i]);
+                    RP.ActualSystem = EveManagerProvider.Current.GetEveSystem(Route[i]);
                     RP.GateToTake = GateType.StarGate;
                     RP.LY = 0.0m;
 
@@ -633,7 +633,7 @@ namespace SMT.EVEData
 
                 if (i > 0)
                 {
-                    RP.LY = EveManager.Instance.GetRangeBetweenSystems(Route[i], Route[i - 1]);
+                    RP.LY = EveManagerProvider.Current.GetRangeBetweenSystems(Route[i], Route[i - 1]);
                 }
                 ActualRoute.Add(RP);
             }

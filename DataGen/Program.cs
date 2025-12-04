@@ -1,4 +1,6 @@
 ﻿using SMT.EVEData;
+using SMT.EVEData.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DataGen
 {
@@ -11,9 +13,26 @@ namespace DataGen
             // Data Creation
             Console.WriteLine("Creating SMT Data");
 
-            // Initialise the Main Mananger
-            EM = new(SMT.EVEData.EveAppConfig.SMT_VERSION);
-            EveManager.Instance = EM;
+            // Setup proper dependency injection
+            var configuration = ServiceCollectionExtensions.CreateEveDataConfiguration();
+            var services = new ServiceCollection();
+            services.AddEveDataServices(configuration);
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            try
+            {
+                serviceProvider.ValidateEveConfiguration();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Configuration validation failed: {ex.Message}");
+                Console.WriteLine("Please setup user secrets: dotnet user-secrets set \"Eve:Authentication:ClientId\" \"your-client-id\"");
+                return;
+            }
+
+            // Get EveManager through proper DI
+            EM = serviceProvider.GetRequiredService<EveManager>();
             string inputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
             string outputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
 

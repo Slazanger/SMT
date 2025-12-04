@@ -485,7 +485,7 @@ namespace SMT.EVEData
                 }
             }
 
-            Waypoints.Add(EveManager.Instance.SystemIDToName[systemID]);
+            Waypoints.Add(EveManagerProvider.Current.SystemIDToName[systemID]);
 
             routeNeedsUpdate = true;
             esiRouteNeedsUpdate = true;
@@ -512,7 +512,7 @@ namespace SMT.EVEData
 
             await UpdateLock.WaitAsync();
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                ESI.NET.EsiClient esiClient = EveManagerProvider.Current.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
                 Dictionary<long, ESI.NET.Models.Universe.Structure> SystemJumpGateList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
@@ -545,7 +545,7 @@ namespace SMT.EVEData
                                     string from = parts[0];
                                     string to = parts[2];
 
-                                    EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
+                                    EveManagerProvider.Current.AddUpdateJumpBridge(from, to, stationID);
                                 }
                             }
                             else
@@ -575,7 +575,7 @@ namespace SMT.EVEData
                 foreach (Navigation.RoutePoint rp in ActiveRoute)
                 {
                     string WayPointText = string.Empty;
-                    long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
+                    long wayPointSysID = EveManagerProvider.Current.GetEveSystem(rp.SystemName).ID;
                     // explicitly add interim waypoints for ansiblex gates or actual waypoints
                     if (rp.GateToTake == Navigation.GateType.Ansiblex)
                     {
@@ -585,7 +585,7 @@ namespace SMT.EVEData
                         {
                             string GateDesto = string.Empty;
 
-                            foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
+                            foreach (JumpBridge jb in EveManagerProvider.Current.JumpBridges)
                             {
                                 if (jb.From == rp.SystemName)
                                 {
@@ -626,7 +626,7 @@ namespace SMT.EVEData
                     if (Waypoints.Contains(rp.SystemName))
                     {
                         // regular waypoint
-                        wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
+                        wayPointSysID = EveManagerProvider.Current.GetEveSystem(rp.SystemName).ID;
 
                         WayPointText = "<url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + "</url>\n";
                     }
@@ -674,7 +674,7 @@ namespace SMT.EVEData
                 }
 
                 // if we're forcing ESI for our location OR we havent had one yet (due to timeout errors with the location endpoint)
-                if (EveManager.Instance.UseESIForCharacterPositions || string.IsNullOrEmpty(Location))
+                if (EveManagerProvider.Current.UseESIForCharacterPositions || string.IsNullOrEmpty(Location))
                 {
                     await UpdatePositionFromESI().ConfigureAwait(false);
                 }
@@ -727,7 +727,7 @@ namespace SMT.EVEData
                 SsoToken sst;
                 AuthorizedCharacterData acd;
 
-                sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken, "");
+                sst = await EveManagerProvider.Current.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken, "");
                 if (sst == null || sst.RefreshToken == null)
                 {
                     ssoErrorCount++;
@@ -745,7 +745,7 @@ namespace SMT.EVEData
                     return;
                 }
 
-                acd = await EveManager.Instance.ESIClient.SSO.Verify(sst);
+                acd = await EveManagerProvider.Current.ESIClient.SSO.Verify(sst);
 
                 if (String.IsNullOrEmpty(acd.Token))
                 {
@@ -779,10 +779,10 @@ namespace SMT.EVEData
                 esiSendRouteClear = false;
                 esiRouteNeedsUpdate = false;
 
-                System s = EveManager.Instance.GetEveSystem(Location);
+                System s = EveManagerProvider.Current.GetEveSystem(Location);
                 if (s != null)
                 {
-                    ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                    ESI.NET.EsiClient esiClient = EveManagerProvider.Current.ESIClient;
                     esiClient.SetCharacterData(ESIAuthData);
 
                     ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(s.ID, false, true);
@@ -806,7 +806,7 @@ namespace SMT.EVEData
 
                 // grab the simple list of thera connections
                 List<string> currentActiveTheraConnections = new List<string>();
-                foreach (TheraConnection tc in EveManager.Instance.TheraConnections.ToList())
+                foreach (TheraConnection tc in EveManagerProvider.Current.TheraConnections.ToList())
                 {
                     currentActiveTheraConnections.Add(tc.System);
                 }
@@ -814,7 +814,7 @@ namespace SMT.EVEData
 
                 // grab the simple list of turnur connections
                 List<string> currentActiveTurnurConnections = new List<string>();
-                foreach (TurnurConnection tc in EveManager.Instance.TurnurConnections.ToList())
+                foreach (TurnurConnection tc in EveManagerProvider.Current.TurnurConnections.ToList())
                 {
                     currentActiveTurnurConnections.Add(tc.System);
                 }
@@ -873,11 +873,11 @@ namespace SMT.EVEData
                                 Waypoints.Contains(rp.SystemName)
                             )
                         {
-                            long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
+                            long wayPointSysID = EveManagerProvider.Current.GetEveSystem(rp.SystemName).ID;
 
                             if (rp.GateToTake == Navigation.GateType.Ansiblex)
                             {
-                                foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
+                                foreach (JumpBridge jb in EveManagerProvider.Current.JumpBridges)
                                 {
                                     if (jb.From == rp.SystemName)
                                     {
@@ -907,7 +907,7 @@ namespace SMT.EVEData
 
                 foreach (long SysID in WayPointsToAdd)
                 {
-                    ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                    ESI.NET.EsiClient esiClient = EveManagerProvider.Current.ESIClient;
                     esiClient.SetCharacterData(ESIAuthData);
 
                     ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(SysID, false, firstRoute);
@@ -939,7 +939,7 @@ namespace SMT.EVEData
             {
                 bool sendFleetUpdatedEvent = false;
 
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                ESI.NET.EsiClient esiClient = EveManagerProvider.Current.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
                 if (FleetInfo.NextFleetMembershipCheck < DateTime.Now)
@@ -995,9 +995,9 @@ namespace SMT.EVEData
                                 sendFleetUpdatedEvent = true;
                             }
 
-                            EVEData.System es = EveManager.Instance.GetEveSystemFromID(esifm.SolarSystemId);
+                            EVEData.System es = EveManagerProvider.Current.GetEveSystemFromID(esifm.SolarSystemId);
 
-                            fm.Name = EveManager.Instance.GetCharacterName(esifm.CharacterId);
+                            fm.Name = EveManagerProvider.Current.GetCharacterName(esifm.CharacterId);
 
                             fm.CharacterID = esifm.CharacterId;
 
@@ -1011,9 +1011,9 @@ namespace SMT.EVEData
                                 fm.Location = es.Name;
                                 fm.Region = es.Region;
                             }
-                            if (EveManager.Instance.ShipTypes.ContainsKey(esifm.ShipTypeId.ToString()))
+                            if (EveManagerProvider.Current.ShipTypes.ContainsKey(esifm.ShipTypeId.ToString()))
                             {
-                                fm.ShipType = EveManager.Instance.ShipTypes[esifm.ShipTypeId.ToString()];
+                                fm.ShipType = EveManagerProvider.Current.ShipTypes[esifm.ShipTypeId.ToString()];
                             }
                             else
                             {
@@ -1028,7 +1028,7 @@ namespace SMT.EVEData
 
                         if (characterIDsToResolve.Count > 0)
                         {
-                            EveManager.Instance.ResolveCharacterIDs(characterIDsToResolve).Wait();
+                            EveManagerProvider.Current.ResolveCharacterIDs(characterIDsToResolve).Wait();
                         }
 
                         foreach (Fleet.FleetMember ff in FleetInfo.Members.ToList())
@@ -1080,7 +1080,7 @@ namespace SMT.EVEData
 
             try
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                ESI.NET.EsiClient esiClient = EveManagerProvider.Current.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
 
                 {
@@ -1227,7 +1227,7 @@ namespace SMT.EVEData
                 }
 
                 // get the character portrait
-                string portraitRoot = Path.Combine(EveManager.Instance.SaveDataRootFolder, "Portraits");
+                string portraitRoot = Path.Combine(EveManagerProvider.Current.SaveDataRootFolder, "Portraits");
                 string characterPortrait = Path.Combine(portraitRoot, ID.ToString());
                 if (!File.Exists(characterPortrait))
                 {
@@ -1308,7 +1308,7 @@ namespace SMT.EVEData
             {
             }
 
-            await EveManager.Instance.ResolveAllianceIDs(AllianceToResolve);
+            await EveManagerProvider.Current.ResolveAllianceIDs(AllianceToResolve);
         }
 
         /// <summary>
@@ -1323,7 +1323,7 @@ namespace SMT.EVEData
 
             try
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                ESI.NET.EsiClient esiClient = EveManagerProvider.Current.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
                 ESI.NET.EsiResponse<ESI.NET.Models.Location.Activity> esr = await esiClient.Location.Online();
 
@@ -1347,20 +1347,20 @@ namespace SMT.EVEData
 
             try
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
+                ESI.NET.EsiClient esiClient = EveManagerProvider.Current.ESIClient;
                 esiClient.SetCharacterData(ESIAuthData);
                 ESI.NET.EsiResponse<ESI.NET.Models.Location.Location> esr = await esiClient.Location.Location();
 
                 if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
                 {
-                    if (!EveManager.Instance.SystemIDToName.ContainsKey(esr.Data.SolarSystemId))
+                    if (!EveManagerProvider.Current.SystemIDToName.ContainsKey(esr.Data.SolarSystemId))
                     {
                         Location = "";
                         Region = "";
                         return;
                     }
-                    Location = EveManager.Instance.SystemIDToName[esr.Data.SolarSystemId];
-                    System s = EVEData.EveManager.Instance.GetEveSystem(Location);
+                    Location = EveManagerProvider.Current.SystemIDToName[esr.Data.SolarSystemId];
+                    System s = EVEData.EveManagerProvider.Current.GetEveSystem(Location);
                     if (s != null)
                     {
                         Region = s.Region;

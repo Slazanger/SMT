@@ -90,9 +90,9 @@ namespace SMT
 
                 RegionCharacterInfoSP.Children.Clear();
 
-                foreach (EVEData.LocalCharacter lc in EVEData.EveManager.Instance.LocalCharacters)
+                foreach (EVEData.LocalCharacter lc in App.GetEveManager().LocalCharacters)
                 {
-                    EVEData.System s = EVEData.EveManager.Instance.GetEveSystem(lc.Location);
+                    EVEData.System s = App.GetEveManager().GetEveSystem(lc.Location);
                     if (s != null && s.Region == selectedRegion.Name)
                     {
                         Label l = new Label();
@@ -137,7 +137,7 @@ namespace SMT
                 // now add connected regions
                 foreach (string s in selectedRegion.RegionLinks)
                 {
-                    EVEData.MapRegion mr = EVEData.EveManager.Instance.GetRegion(s);
+                    EVEData.MapRegion mr = App.GetEveManager().GetRegion(s);
 
                     // add circle for system
                     Rectangle connectedRegion = new Rectangle() { Height = 60, Width = 180 };
@@ -212,7 +212,7 @@ namespace SMT
                 WHLinkInfoSp.Children.Clear();
 
                 // check for Thera
-                List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
+                List<TheraConnection> currentTheraConnections = App.GetEveManager().TheraConnections.ToList();
                 bool TheraInRegion = false;
 
                 foreach (EVEData.TheraConnection tc in currentTheraConnections)
@@ -248,7 +248,7 @@ namespace SMT
                 }
 
                 // check for Turnur
-                List<TurnurConnection> currentTurnurConnections = EVEData.EveManager.Instance.TurnurConnections.ToList();
+                List<TurnurConnection> currentTurnurConnections = App.GetEveManager().TurnurConnections.ToList();
                 bool TurnurInRegion = false;
 
                 foreach (EVEData.TurnurConnection tc in currentTurnurConnections)
@@ -300,9 +300,9 @@ namespace SMT
             Brush theraBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceRegion);
             Brush characterBrush = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
 
-            List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
+            List<TheraConnection> currentTheraConnections = App.GetEveManager().TheraConnections.ToList();
 
-            foreach (EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
+            foreach (EVEData.MapRegion mr in App.GetEveManager().Regions)
             {
                 bool addTheraConnection = false;
                 foreach (EVEData.TheraConnection tc in currentTheraConnections)
@@ -338,9 +338,9 @@ namespace SMT
 
                 bool addCharacter = false;
 
-                foreach (EVEData.LocalCharacter lc in EVEData.EveManager.Instance.LocalCharacters)
+                foreach (EVEData.LocalCharacter lc in App.GetEveManager().LocalCharacters)
                 {
-                    EVEData.System s = EVEData.EveManager.Instance.GetEveSystem(lc.Location);
+                    EVEData.System s = App.GetEveManager().GetEveSystem(lc.Location);
                     if (s != null && s.Region == mr.Name)
                     {
                         addCharacter = true;
@@ -388,7 +388,7 @@ namespace SMT
             MainUniverseCanvas.Background = backgroundColourBrush;
             MainUniverseGrid.Background = backgroundColourBrush;
 
-            foreach (EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
+            foreach (EVEData.MapRegion mr in App.GetEveManager().Regions)
             {
                 // add circle for system
                 Rectangle regionShape = new Rectangle() { Height = 60, Width = 180 };
@@ -603,7 +603,7 @@ namespace SMT
                 // now add all the region links : TODO :  this will end up adding 2 lines, region a -> b and b -> a
                 foreach (string s in mr.RegionLinks)
                 {
-                    EVEData.MapRegion or = EVEData.EveManager.Instance.GetRegion(s);
+                    EVEData.MapRegion or = App.GetEveManager().GetRegion(s);
                     Line regionLink = new Line();
 
                     regionLink.X1 = mr.UniverseViewX;

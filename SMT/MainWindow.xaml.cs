@@ -18,6 +18,7 @@ using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.Extensions.DependencyInjection;
 using SMT.Utils;
 using NAudio.Wave;
 using NHotkey;
@@ -154,16 +155,80 @@ namespace SMT
                 this.Topmost = true;
             }
 
-            // Create the main EVE manager
-
+            // Create the main EVE manager through dependency injection
             CapitalRoute = new JumpRoute();
 
-            EVEManager = new EVEData.EveManager(EveAppConfig.SMT_VERSION);
-            EVEData.EveManager.Instance = EVEManager;
-            EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
+            // Defer EveManager initialization until the window is loaded
+            // This ensures App.OnStartup() has completed and ServiceProvider is available
+            this.Loaded += MainWindow_Loaded;
 
-            EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
+        }
 
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitializeEveManager();
+        }
+
+        private void InitializeEveManager()
+        {
+            if (EVEManager != null) return; // Already initialized
+
+            var debugMsg = $"InitializeEveManager called - App.IsReady: {App.IsReady}, ServiceProvider: {App.ServiceProvider != null}";
+            System.Diagnostics.Debug.WriteLine(debugMsg);
+            System.Console.WriteLine(debugMsg);
+
+            // Check if App is fully initialized
+            if (!App.IsReady)
+            {
+                System.Diagnostics.Debug.WriteLine("App not ready yet, retrying in 100ms...");
+                // Retry after a short delay
+                var timer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(100)
+                };
+                timer.Tick += (s, e) =>
+                {
+                    timer.Stop();
+                    InitializeEveManager(); // Retry
+                };
+                timer.Start();
+                return;
+            }
+
+            try
+            {
+                // Get EveManager from the DI container setup in App.xaml.cs
+                var eveManager = App.GetEveManager();
+                if (eveManager == null)
+                {
+                    throw new InvalidOperationException("Failed to get EveManager from DI container");
+                }
+
+                EVEManager = eveManager;
+                EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
+                EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
+
+                System.Diagnostics.Debug.WriteLine("EveManager initialized successfully");
+
+                // Continue with initialization that was previously in constructor
+                InitializeEveManagerData();
+            }
+            catch (Exception ex)
+            {
+                var detailedMessage = $"Failed to initialize EveManager: {ex.Message}\n\n" +
+                                    $"ServiceProvider is null: {App.ServiceProvider == null}\n" +
+                                    $"App.IsInitialized: {App.IsInitialized}\n" +
+                                    $"App.IsReady: {App.IsReady}\n\n" +
+                                    "Please ensure user secrets are configured properly.\n" +
+                                    "dotnet user-secrets set \"Eve:Authentication:ClientId\" \"your-client-id\"";
+
+                MessageBox.Show(detailedMessage, "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown(1);
+            }
+        }
+
+        private void InitializeEveManagerData()
+        {
             // if we want to re-build the data as we've changed the format, recreate it all from scratch
             bool initFromScratch = false;
 

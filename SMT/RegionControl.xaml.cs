@@ -720,7 +720,7 @@ namespace SMT
         /// </summary>
         public void Init()
         {
-            EM = EVEData.EveManager.Instance;
+            EM = App.GetEveManager();
             SelectedSystem = string.Empty;
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
@@ -1820,7 +1820,7 @@ namespace SMT
             foreach(EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
                 FactionWarfareSystemInfo fsw = null;
-                foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                foreach(FactionWarfareSystemInfo i in SMT.App.GetEveManager().FactionWarfareSystems)
                 {
                     if(i.SystemID == sys.ActualSystem.ID)
                     {
@@ -1858,7 +1858,7 @@ namespace SMT
 
                 if(fsw.SystemState == FactionWarfareSystemInfo.State.Rearguard)
                 {
-                    foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    foreach(FactionWarfareSystemInfo i in SMT.App.GetEveManager().FactionWarfareSystems)
                     {
                         if(i.SystemID != fsw.SystemID && i.OccupierID == fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation && sys.ActualSystem.Jumps.Contains(i.SystemName))
                         {
@@ -1888,7 +1888,7 @@ namespace SMT
 
                 if(fsw.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
                 {
-                    foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    foreach(FactionWarfareSystemInfo i in SMT.App.GetEveManager().FactionWarfareSystems)
                     {
                         if(i.SystemID != fsw.SystemID && i.OccupierID == fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.Frontline && sys.ActualSystem.Jumps.Contains(i.SystemName))
                         {
@@ -1918,7 +1918,7 @@ namespace SMT
 
                 if(fsw.SystemState == FactionWarfareSystemInfo.State.Frontline)
                 {
-                    foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    foreach(FactionWarfareSystemInfo i in SMT.App.GetEveManager().FactionWarfareSystems)
                     {
                         if(i.SystemID != fsw.SystemID && i.OccupierID != fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.Frontline && sys.ActualSystem.Jumps.Contains(i.SystemName))
                         {

@@ -315,7 +315,7 @@ namespace SMT
 
         public void Init()
         {
-            EM = EVEData.EveManager.Instance;
+            EM = App.GetEveManager();
 
             universeSysLinksCache = new List<GateHelper>();
             activeJumpSpheres = new List<KeyValuePair<string, decimal>>();

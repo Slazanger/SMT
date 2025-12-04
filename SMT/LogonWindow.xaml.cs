@@ -26,7 +26,7 @@ namespace SMT
             listener = new HttpListener();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             string challengeCode = EVEDataUtils.Misc.RandomString(32);
-            string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
+            string esiLogonURL = App.GetEveManager().GetESILogonURL(challengeCode);
 
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(esiLogonURL) { UseShellExecute = true });
 
@@ -43,7 +43,7 @@ namespace SMT
                     HttpListenerContext context = listener.GetContext();
                     HttpListenerRequest request = context.Request;
 
-                    EVEData.EveManager.Instance.HandleEveAuthSMTUri(request.Url, challengeCode);
+                    App.GetEveManager().HandleEveAuthSMTUri(request.Url, challengeCode);
 
                     // Obtain a response object.
                     HttpListenerResponse response = context.Response;
