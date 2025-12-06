@@ -159,6 +159,20 @@ namespace SMT
 
             EVEManager = new EVEData.EveManager(EveAppConfig.SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
+            
+            // Set up UI thread marshaling for ObservableCollection operations
+            EVEData.EveManager.UIThreadInvoker = (action) =>
+            {
+                if (Application.Current.Dispatcher.CheckAccess())
+                {
+                    action();
+                }
+                else
+                {
+                    Application.Current.Dispatcher.Invoke(action);
+                }
+            };
+            
             EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
 
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
