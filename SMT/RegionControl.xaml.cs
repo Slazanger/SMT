@@ -1726,6 +1726,34 @@ namespace SMT
                     }
                 }
             }
+
+            // Draw Infrastructure Upgrade indicators (green circles)
+            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            foreach(KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
+            {
+                EVEData.MapSystem sys = kvp.Value;
+                bool isSystemOOR = sys.OutOfRegion;
+
+                if(Region.MetaRegion)
+                {
+                    isSystemOOR = !sys.ActualSystem.FactionWarSystem;
+                }
+
+                if(!isSystemOOR && sys.ActualSystem.InfrastructureUpgrades.Count > 0)
+                {
+                    Shape UpgradeIndicator = new Ellipse { Width = 6, Height = 6 };
+                    UpgradeIndicator.Stroke = SysOutlineBrush;
+                    UpgradeIndicator.StrokeThickness = 1.0;
+                    UpgradeIndicator.StrokeLineJoin = PenLineJoin.Round;
+                    UpgradeIndicator.Fill = new SolidColorBrush(Colors.LimeGreen);
+
+                    Canvas.SetLeft(UpgradeIndicator, sys.Layout.X - 14);
+                    Canvas.SetTop(UpgradeIndicator, sys.Layout.Y - 3);
+                    Canvas.SetZIndex(UpgradeIndicator, ZINDEX_CYNOBEACON);
+                    MainCanvas.Children.Add(UpgradeIndicator);
+                    DynamicMapElements.Add(UpgradeIndicator);
+                }
+            }
         }
 
         private Brush Gallente_FL = new SolidColorBrush(Color.FromArgb(100, 73, 171, 104));
@@ -2534,22 +2562,6 @@ namespace SMT
                     Canvas.SetTop(CynoBeaconLogo, mapSystem.Layout.Y - 12);
                     Canvas.SetZIndex(CynoBeaconLogo, ZINDEX_CYNOBEACON);
                     MainCanvas.Children.Add(CynoBeaconLogo);
-                }
-
-                // Show Infrastructure Upgrade indicator (green circle on left)
-                if(!isSystemOOR && mapSystem.ActualSystem.InfrastructureUpgrades.Count > 0)
-                {
-                    Shape UpgradeIndicator = new Ellipse { Width = 6, Height = 6 };
-                    UpgradeIndicator.Stroke = SysOutlineBrush;
-                    UpgradeIndicator.StrokeThickness = 1.0;
-                    UpgradeIndicator.StrokeLineJoin = PenLineJoin.Round;
-                    UpgradeIndicator.Fill = new SolidColorBrush(Colors.LimeGreen);
-
-                    Canvas.SetLeft(UpgradeIndicator, mapSystem.Layout.X - 14);
-                    Canvas.SetTop(UpgradeIndicator, mapSystem.Layout.Y - 3);
-                    Canvas.SetZIndex(UpgradeIndicator, ZINDEX_CYNOBEACON);
-                    MainCanvas.Children.Add(UpgradeIndicator);
-                    DynamicMapElements.Add(UpgradeIndicator);
                 }
 
                 if(MapConf.ShowJoveObservatories && mapSystem.ActualSystem.HasJoveObservatory && !ShowSystemADM && !ShowSystemTimers)
