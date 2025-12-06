@@ -700,8 +700,16 @@ namespace SMT.EVEData
                     System from = GetEveSystemFromID(fromID);
                     System to = GetEveSystemFromID(toID);
 
+
                     if(from != null && to != null)
                     {
+                        if(from.Name == "Zarzakh" || to.Name == "Zarzakh")
+                        {
+                            // zarzakh is now in the jumps file; however we dont want to add the gates for it
+                            continue;
+                        }
+
+
                         if(!from.Jumps.Contains(to.Name))
                         {
                             from.Jumps.Add(to.Name);
