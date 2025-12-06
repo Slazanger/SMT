@@ -2800,6 +2800,13 @@ namespace SMT.EVEData
 
             ActiveSovCampaigns = new List<SOVCampaign>();
 
+            // Auto-load infrastructure upgrades if file exists
+            string upgradesFile = Path.Combine(SaveDataRootFolder, "InfrastructureUpgrades.txt");
+            if (File.Exists(upgradesFile))
+            {
+                LoadInfrastructureUpgrades(upgradesFile);
+            }
+
             InitZKillFeed();
 
             StartBackgroundThread();

@@ -59,19 +59,20 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Content="Slot Number:" Margin="5"/>
-                <TextBox x:Name="SlotNumberTextBox" Grid.Row="0" Grid.Column="1" Margin="5" Width="100" HorizontalAlignment="Left"/>
+                <!-- Row 1: Slot Number and Upgrade Type -->
+                <Label Grid.Row="0" Grid.Column="0" Content="Slot:" Margin="5" VerticalAlignment="Center"/>
+                <TextBox x:Name="SlotNumberTextBox" Grid.Row="0" Grid.Column="1" Margin="5" VerticalAlignment="Center"/>
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Upgrade Type:" Margin="5"/>
-                <ComboBox x:Name="UpgradeTypeComboBox" Grid.Row="1" Grid.Column="1" Margin="5">
+                <Label Grid.Row="0" Grid.Column="2" Content="Upgrade Type:" Margin="5" VerticalAlignment="Center"/>
+                <ComboBox x:Name="UpgradeTypeComboBox" Grid.Row="0" Grid.Column="3" Margin="5" VerticalAlignment="Center">
                     <ComboBoxItem Content="Major Threat Detection Array"/>
                     <ComboBoxItem Content="Minor Threat Detection Array"/>
                     <ComboBoxItem Content="Power Monitoring Division"/>
@@ -89,12 +90,14 @@
                     <ComboBoxItem Content="Clone Vat Bay"/>
                 </ComboBox>
 
-                <Label Grid.Row="2" Grid.Column="0" Content="Level (0-3):" Margin="5"/>
-                <TextBox x:Name="LevelTextBox" Grid.Row="2" Grid.Column="1" Margin="5" Width="100" HorizontalAlignment="Left" Text="0"/>
+                <!-- Row 2: Level and Online Status -->
+                <Label Grid.Row="1" Grid.Column="0" Content="Level:" Margin="5" VerticalAlignment="Center"/>
+                <TextBox x:Name="LevelTextBox" Grid.Row="1" Grid.Column="1" Margin="5" Text="0" VerticalAlignment="Center"/>
 
-                <CheckBox x:Name="OnlineCheckBox" Grid.Row="3" Grid.Column="1" Content="Online" Margin="5" IsChecked="True"/>
+                <CheckBox x:Name="OnlineCheckBox" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="Online" Margin="15,5,5,5" IsChecked="True" VerticalAlignment="Center"/>
 
-                <Button x:Name="AddUpdateButton" Grid.Row="4" Grid.Column="1" Content="Add Upgrade" Width="120" Margin="5" HorizontalAlignment="Left" Click="AddUpdateButton_Click"/>
+                <!-- Row 3: Add Button -->
+                <Button x:Name="AddUpdateButton" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Content="Add Upgrade" Width="150" Margin="5" HorizontalAlignment="Left" Click="AddUpdateButton_Click"/>
             </Grid>
         </GroupBox>
 

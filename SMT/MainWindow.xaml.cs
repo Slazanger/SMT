@@ -996,6 +996,17 @@ namespace SMT
             dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
             dlg.Title = "Load Infrastructure Upgrades";
 
+            // Default to the auto-load file location
+            string defaultPath = System.IO.Path.Combine(EVEData.EveAppConfig.StorageRoot, "InfrastructureUpgrades.txt");
+            if(System.IO.File.Exists(defaultPath))
+            {
+                dlg.FileName = defaultPath;
+            }
+            else
+            {
+                dlg.InitialDirectory = EVEData.EveAppConfig.StorageRoot;
+            }
+
             bool? result = dlg.ShowDialog();
 
             if(result == true)
@@ -1017,7 +1028,10 @@ namespace SMT
             dlg.DefaultExt = ".txt";
             dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
             dlg.Title = "Save Infrastructure Upgrades";
-            dlg.FileName = "infrastructure_upgrades.txt";
+
+            // Default to the auto-load file location
+            string defaultPath = System.IO.Path.Combine(EVEData.EveAppConfig.StorageRoot, "InfrastructureUpgrades.txt");
+            dlg.FileName = defaultPath;
 
             bool? result = dlg.ShowDialog();
 
