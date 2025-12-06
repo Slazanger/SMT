@@ -314,9 +314,7 @@ namespace SMT
                 EVEManager.LoadFromDisk();
             }
 
-            EVEManager.SetupIntelWatcher();
-            EVEManager.SetupGameLogWatcher();
-            EVEManager.SetupLogFileTriggers();
+            // Legacy file monitoring setup removed - now handled automatically by FileMonitoringService
 
             IntelCache = new ObservableCollection<IntelData>();
             RawIntelBox.ItemsSource = IntelCache;

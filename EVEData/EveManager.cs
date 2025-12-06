@@ -73,18 +73,18 @@ namespace SMT.EVEData
         /// <summary>
         /// File system watcher
         /// </summary>
-        private FileSystemWatcher intelFileWatcher;
+        // Legacy file watchers removed - now handled by FileMonitoringService
 
         /// <summary>
         /// File system watcher
         /// </summary>
-        private FileSystemWatcher gameLogFileWatcher;
+        // Legacy game log watcher removed - now handled by FileMonitoringService
 
         private string VersionStr;
 
-        private bool WatcherThreadShouldTerminate;
+        // WatcherThreadShouldTerminate removed - file monitoring now handled by FileMonitoringService
 
-        // Update rates moved to background services - CharacterUpdateService and UniverseDataService
+        // Legacy update rates moved to background services - CharacterUpdateService and UniverseDataService
 
         // Next update times moved to background services - CharacterUpdateService and UniverseDataService
         private DateTime LastDotlanUpdate = DateTime.MinValue;
@@ -2833,156 +2833,22 @@ namespace SMT.EVEData
 
             string chatlogFolder = Path.Combine(EVELogFolder, "Chatlogs");
 
-            if(Directory.Exists(chatlogFolder))
-            {
-                intelFileWatcher = new FileSystemWatcher(chatlogFolder)
-                {
-                    Filter = "*.txt",
-                    EnableRaisingEvents = true,
-                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
-                };
-                intelFileWatcher.Changed += IntelFileWatcher_Changed;
-            }
+            // Legacy file watcher setup removed - now handled by FileMonitoringService
         }
 
-        /// <summary>
-        /// Setup the game log0 watcher
-        /// </summary>
-        public void SetupGameLogWatcher()
-        {
-            gameFileReadPos = new Dictionary<string, int>();
-            gamelogFileCharacterMap = new Dictionary<string, string>();
+        // Legacy SetupGameLogWatcher method removed - now handled by FileMonitoringService
 
-            GameLogList = new FixedQueue<GameLogData>();
-            GameLogList.SetSizeLimit(50);
+        // SetupLogFileTriggers removed - file cache trigger now handled by FileMonitoringService
 
-            if(string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
-            {
-                string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
-                EVELogFolder = Path.Combine(logFolderLoc);
-            }
+        // Legacy LogFileCacheTrigger method removed - file cache trigger now handled by FileMonitoringService
 
-            string gameLogFolder = Path.Combine(EVELogFolder, "Gamelogs");
-
-            if(Directory.Exists(gameLogFolder))
-            {
-                gameLogFileWatcher = new FileSystemWatcher(gameLogFolder)
-                {
-                    Filter = "*.txt",
-                    EnableRaisingEvents = true,
-                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
-                };
-                gameLogFileWatcher.Changed += GameLogFileWatcher_Changed;
-            }
-        }
-
-        public void SetupLogFileTriggers()
-        {
-            // -----------------------------------------------------------------
-            // SUPER HACK WARNING....
-            //
-            // Start up a thread which just reads the text files in the eve log folder
-            // by opening and closing them it updates the sytem meta files which
-            // causes the file watcher to operate correctly otherwise this data
-            // doesnt get updated until something other than the eve client reads these files
-
-            List<string> logFolders = new List<string>();
-            string chatLogFolder = Path.Combine(EVELogFolder, "Chatlogs");
-            string gameLogFolder = Path.Combine(EVELogFolder, "Gamelogs");
-
-            logFolders.Add(chatLogFolder);
-            logFolders.Add(gameLogFolder);
-
-            new Thread(() =>
-            {
-                LogFileCacheTrigger(logFolders);
-            }).Start();
-
-            // END SUPERHACK
-            // -----------------------------------------------------------------
-        }
-
-        private void LogFileCacheTrigger(List<string> eveLogFolders)
-        {
-            Thread.CurrentThread.IsBackground = false;
-
-            foreach(string dir in eveLogFolders)
-            {
-                if(!Directory.Exists(dir))
-                {
-                    return;
-                }
-            }
-
-            // loop forever
-            while(WatcherThreadShouldTerminate == false)
-            {
-                foreach(string folder in eveLogFolders)
-                {
-                    DirectoryInfo di = new DirectoryInfo(folder);
-                    FileInfo[] files = di.GetFiles("*.txt");
-                    foreach(FileInfo file in files)
-                    {
-                        bool readFile = false;
-                        foreach(string intelFilterStr in IntelFilters)
-                        {
-                            if(file.Name.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
-                            {
-                                readFile = true;
-                                break;
-                            }
-                        }
-
-                        // local files
-                        if(file.Name.Contains("Local_"))
-                        {
-                            readFile = true;
-                        }
-
-                        // gamelogs
-                        if(folder.Contains("Gamelogs"))
-                        {
-                            readFile = true;
-                        }
-
-                        // only read files from the last day
-                        if(file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
-                        {
-                            FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                            ifs.Seek(0, SeekOrigin.End);
-                            ifs.Close();
-                        }
-                    }
-
-                    Thread.Sleep(1500);
-                }
-            }
-        }
-
-        public void ShuddownIntelWatcher()
-        {
-            if(intelFileWatcher != null)
-            {
-                intelFileWatcher.Changed -= IntelFileWatcher_Changed;
-            }
-            WatcherThreadShouldTerminate = true;
-        }
-
-        public void ShuddownGameLogWatcher()
-        {
-            if(gameLogFileWatcher != null)
-            {
-                gameLogFileWatcher.Changed -= GameLogFileWatcher_Changed;
-            }
-            WatcherThreadShouldTerminate = true;
-        }
+        // Legacy shutdown methods removed - file monitoring now handled by FileMonitoringService
 
         public void ShutDown()
         {
-            ShuddownIntelWatcher();
-            ShuddownGameLogWatcher();
-            // BackgroundThreadShouldTerminate removed - background services handle their own shutdown
-
+            // Legacy file monitoring shutdown removed - now handled by FileMonitoringService
+            // Background services handle their own shutdown via the hosting framework
+            
             ZKillFeed.ShutDown();
         }
 
@@ -2998,8 +2864,7 @@ namespace SMT.EVEData
 
             UpdateSovStructureUpdate();
 
-            // TEMP Disabled
-            //();
+            // Additional universe data updates can be added here
         }
 
         /// <summary>
