@@ -987,7 +987,7 @@ namespace SMT
             if(result == true)
             {
                 string filename = dlg.FileName;
-                EM.LoadInfrastructureUpgrades(filename);
+                EVEManager.LoadInfrastructureUpgrades(filename);
 
                 // Refresh the current region view to show the loaded upgrades
                 if(RegionUC != null)
@@ -1010,7 +1010,7 @@ namespace SMT
             if(result == true)
             {
                 string filename = dlg.FileName;
-                EM.SaveInfrastructureUpgrades(filename);
+                EVEManager.SaveInfrastructureUpgrades(filename);
             }
         }
 
