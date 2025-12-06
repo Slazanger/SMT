@@ -2537,7 +2537,7 @@ namespace SMT
                 }
 
                 // Show Infrastructure Upgrade indicator (green circle on left)
-                if(mapSystem.ActualSystem.InfrastructureUpgrades.Count > 0)
+                if(!isSystemOOR && mapSystem.ActualSystem.InfrastructureUpgrades.Count > 0)
                 {
                     Shape UpgradeIndicator = new Ellipse { Width = 6, Height = 6 };
                     UpgradeIndicator.Stroke = SysOutlineBrush;
@@ -2549,6 +2549,7 @@ namespace SMT
                     Canvas.SetTop(UpgradeIndicator, mapSystem.Layout.Y - 3);
                     Canvas.SetZIndex(UpgradeIndicator, ZINDEX_CYNOBEACON);
                     MainCanvas.Children.Add(UpgradeIndicator);
+                    DynamicMapElements.Add(UpgradeIndicator);
                 }
 
                 if(MapConf.ShowJoveObservatories && mapSystem.ActualSystem.HasJoveObservatory && !ShowSystemADM && !ShowSystemTimers)
