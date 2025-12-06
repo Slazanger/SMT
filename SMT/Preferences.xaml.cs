@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Data;
+using Microsoft.Extensions.DependencyInjection;
+using SMT.EVEData.Services;
 
 //using System.Windows.Forms;
 using NAudio.Wave;
@@ -118,7 +120,11 @@ namespace SMT
 
         private void zkilltime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            SMT.App.GetEveManager().ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
+            var zkillFeedService = App.ServiceProvider?.GetService<IZKillFeedService>();
+            if (zkillFeedService != null)
+            {
+                zkillFeedService.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
+            }
         }
 
         private void ResetColourData_Click(object sender, RoutedEventArgs e)

@@ -47,8 +47,9 @@ namespace SMT.EVEData.Configuration
 
         /// <summary>
         /// User agent string for ESI requests
+        /// Format: ProductName/Version (standard HTTP User-Agent format)
         /// </summary>
-        public string UserAgent => $"SMT-map-app : {Version}";
+        public string UserAgent => $"SMT-map-app/{Version}";
     }
 
     public class EveAuthenticationSettings

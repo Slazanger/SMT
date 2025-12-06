@@ -44,6 +44,7 @@ namespace SMT.EVEData.Extensions
             // Register background services (after EveManager)
             services.AddSingleton<ICharacterUpdateService, CharacterUpdateService>();
             services.AddSingleton<IUniverseDataService, UniverseDataService>();
+            services.AddSingleton<IZKillFeedService, ZKillFeedService>();
             
             // Background services will be started manually from MainWindow after full initialization
             // This avoids startup timing issues with WPF applications

@@ -2,6 +2,8 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
+#nullable enable
+
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -25,6 +27,7 @@ using Newtonsoft.Json.Linq;
 using SMT.EVEData.Services;
 using SMT.EVEData.Configuration;
 using SMT.EVEData.Events;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SMT.EVEData
 {
@@ -37,6 +40,7 @@ namespace SMT.EVEData
         private readonly IConfigurationService _configService;
         private readonly ILogger<EveManager> _logger;
         private readonly IFileMonitoringService _fileMonitoringService;
+        private readonly IServiceProvider? _serviceProvider;
 
         /// <summary>
         /// Configuration service for accessing application settings
@@ -147,11 +151,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
         /// </summary>
-        public EveManager(IConfigurationService configService, ILogger<EveManager> logger, IFileMonitoringService fileMonitoringService)
+        public EveManager(IConfigurationService configService, ILogger<EveManager> logger, IFileMonitoringService fileMonitoringService, IServiceProvider? serviceProvider = null)
         {
             _configService = configService ?? throw new ArgumentNullException(nameof(configService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _fileMonitoringService = fileMonitoringService ?? throw new ArgumentNullException(nameof(fileMonitoringService));
+            _serviceProvider = serviceProvider;
 
 
             // Subscribe to file monitoring events
@@ -678,8 +683,32 @@ namespace SMT.EVEData
 
         /// <summary>
         /// Gets or sets the current list of ZKillData
+        /// Legacy property - use IZKillFeedService from DI container instead
+        /// This is kept for backward compatibility but should be migrated to use the service
         /// </summary>
-        public ZKillRedisQ ZKillFeed { get; set; }
+        [Obsolete("Use IZKillFeedService from DI container instead")]
+        public ZKillRedisQ? ZKillFeed { get; set; }
+        
+        /// <summary>
+        /// Gets the ZKill feed service from DI (if available)
+        /// </summary>
+        public Services.IZKillFeedService? GetZKillFeedService()
+        {
+            return _serviceProvider?.GetService<Services.IZKillFeedService>();
+        }
+        
+        /// <summary>
+        /// Gets the ZKill kill stream - uses service if available, otherwise falls back to legacy ZKillFeed
+        /// </summary>
+        public List<ZKillRedisQ.ZKBDataSimple> GetZKillKillStream()
+        {
+            var service = GetZKillFeedService();
+            if (service != null)
+            {
+                return service.KillStream;
+            }
+            return ZKillFeed?.KillStream ?? new List<ZKillRedisQ.ZKBDataSimple>();
+        }
 
         /// <summary>
         /// Gets or sets the current list of clear markers for the intel (eg "Clear" "Clr" etc)
@@ -2848,8 +2877,7 @@ namespace SMT.EVEData
         {
             // Legacy file monitoring shutdown removed - now handled by FileMonitoringService
             // Background services handle their own shutdown via the hosting framework
-            
-            ZKillFeed.ShutDown();
+            // ZKill feed shutdown removed - now handled by ZKillFeedService via DI
         }
 
         /// <summary>
@@ -3268,7 +3296,7 @@ namespace SMT.EVEData
 
             ActiveSovCampaigns = new List<SOVCampaign>();
 
-            InitZKillFeed();
+            // ZKill feed initialization removed - now handled by ZKillFeedService via DI
 
             // StartBackgroundThread() removed - background services now handled by CharacterUpdateService and UniverseDataService
         }
@@ -3366,15 +3394,7 @@ namespace SMT.EVEData
             UpdateFactionWarfareInfo();
         }
 
-        /// <summary>
-        /// Initialise the ZKillBoard Feed
-        /// </summary>
-        private void InitZKillFeed()
-        {
-            ZKillFeed = new ZKillRedisQ();
-            ZKillFeed.VerString = VersionStr;
-            ZKillFeed.Initialise();
-        }
+        // Legacy InitZKillFeed removed - ZKill feed now handled by ZKillFeedService via DI
 
         /// <summary>
         /// Intel File watcher changed handler

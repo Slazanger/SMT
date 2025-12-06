@@ -22,6 +22,7 @@ using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using SMT.EVEData.Services;
+using static SMT.EVEData.ZKillRedisQ;
 using SMT.Utils;
 using NAudio.Wave;
 using NHotkey;
@@ -53,6 +54,8 @@ namespace SMT
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
         private bool manualZKillFilterRefreshRequired = true;
+        private IZKillFeedService? _zkillFeedService;
+        private EventHandler? _zkillKillsAddedHandler;
 
         private List<InfoItem> InfoLayer;
 
@@ -195,6 +198,13 @@ namespace SMT
                 {
                     await universeDataService.StartAsync(CancellationToken.None);
                     System.Diagnostics.Debug.WriteLine("Universe Data Service started manually");
+                }
+
+                var zkillFeedService = App.ServiceProvider?.GetService<IZKillFeedService>();
+                if (zkillFeedService != null)
+                {
+                    await zkillFeedService.StartAsync(CancellationToken.None);
+                    System.Diagnostics.Debug.WriteLine("ZKill Feed Service started manually");
                 }
             }
             catch (Exception ex)
@@ -342,7 +352,11 @@ namespace SMT
 
             MapConf.CurrentEveLogFolderLocation = EVEManager.EVELogFolder;
 
-            EVEManager.ZKillFeed.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
+            // Set ZKill expire time from configuration
+            if (_zkillFeedService != null)
+            {
+                _zkillFeedService.KillExpireTimeMinutes = MapConf.ZkillExpireTimeMinutes;
+            }
 
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
@@ -474,7 +488,14 @@ namespace SMT
             uiRefreshTimer.Interval = new TimeSpan(0, 0, 1);
             uiRefreshTimer.Start();
 
-            ZKBFeed.ItemsSource = EVEManager.ZKillFeed.KillStream;
+            // Get ZKill feed service from DI container
+            _zkillFeedService = App.ServiceProvider?.GetRequiredService<IZKillFeedService>();
+            ZKBFeed.ItemsSource = _zkillFeedService.KillStream;
+            _zkillKillsAddedHandler = (sender, e) => 
+            {
+                Application.Current.Dispatcher.Invoke(() => OnZKillsAdded());
+            };
+            _zkillFeedService.KillsAddedEvent += _zkillKillsAddedHandler;
 
             // Start background services manually after full initialization
             StartBackgroundServices();
@@ -489,12 +510,11 @@ namespace SMT
             zKBFeedview.Filter = item =>
             {
                 // copy the list before checking
-                var listToFilter = EVEManager.ZKillFeed.KillStream.ToList();
+                var killStream = _zkillFeedService?.KillStream ?? new List<ZKBDataSimple>();
+                var listToFilter = killStream.ToList();
                 var filteredItems = listToFilter.Where(initialFilter.Invoke).Take(30).ToList();
                 return filteredItems.Contains((ZKBDataSimple)item);
             };
-
-            EVEManager.ZKillFeed.KillsAddedEvent += OnZKillsAdded;
 
             foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
             {
@@ -770,7 +790,11 @@ namespace SMT
             Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
             Properties.Settings.Default.Save();
 
-            EVEManager.ZKillFeed.KillsAddedEvent -= OnZKillsAdded;
+            // Unsubscribe from ZKill feed service event
+            if (_zkillFeedService != null && _zkillKillsAddedHandler != null)
+            {
+                _zkillFeedService.KillsAddedEvent -= _zkillKillsAddedHandler;
+            }
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -990,7 +1014,10 @@ namespace SMT
 
             if(e.PropertyName == "ShowZKillData")
             {
-                EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
+                if (_zkillFeedService != null)
+                {
+                    _zkillFeedService.PauseUpdate = !MapConf.ShowZKillData;
+                }
                 // Use selective redraw for ZKill data only
                 UniverseUC?.RequestRedraw(RedrawType.ZKillData);
             }
@@ -1624,6 +1651,30 @@ namespace SMT
 
         private void OnZKillsAdded()
         {
+            // Refresh the ItemsSource with the updated kill stream
+            if (_zkillFeedService != null)
+            {
+                // Get the current collection view before updating
+                var currentView = CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
+                
+                // Update ItemsSource with fresh data
+                ZKBFeed.ItemsSource = _zkillFeedService.KillStream;
+                
+                // Re-apply the filter to the new collection view
+                var zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
+                if (zKBFeedview != null)
+                {
+                    Predicate<object> initialFilter = item => ZKBFeedFilter(item);
+                    zKBFeedview.Filter = item =>
+                    {
+                        var killStream = _zkillFeedService?.KillStream ?? new List<ZKBDataSimple>();
+                        var listToFilter = killStream.ToList();
+                        var filteredItems = listToFilter.Where(initialFilter.Invoke).Take(30).ToList();
+                        return filteredItems.Contains((ZKBDataSimple)item);
+                    };
+                    zKBFeedview.Refresh();
+                }
+            }
             manualZKillFilterRefreshRequired = true;
         }
 

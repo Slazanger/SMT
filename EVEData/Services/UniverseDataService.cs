@@ -153,7 +153,7 @@ namespace SMT.EVEData.Services
         /// <summary>
         /// Update SOV campaign data - extracted from original loop
         /// </summary>
-        private async Task UpdateSovCampaignsAsync()
+        private Task UpdateSovCampaignsAsync()
         {
             try
             {
@@ -166,12 +166,13 @@ namespace SMT.EVEData.Services
             {
                 _logger.LogError(ex, "Failed to update SOV campaigns");
             }
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Update low frequency data (universe data, server info, connections) - extracted from original loop
         /// </summary>
-        private async Task UpdateLowFrequencyDataAsync()
+        private Task UpdateLowFrequencyDataAsync()
         {
             try
             {
@@ -200,12 +201,13 @@ namespace SMT.EVEData.Services
             {
                 _logger.LogError(ex, "Failed to update low frequency data");
             }
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Update Dotlan kill delta information - extracted from original loop
         /// </summary>
-        private async Task UpdateDotlanDataAsync()
+        private Task UpdateDotlanDataAsync()
         {
             try
             {
@@ -218,6 +220,7 @@ namespace SMT.EVEData.Services
             {
                 _logger.LogError(ex, "Failed to update Dotlan data");
             }
+            return Task.CompletedTask;
         }
     }
 }
