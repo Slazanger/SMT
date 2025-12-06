@@ -43,7 +43,7 @@ namespace SMT.EVEData
         /// </summary>
         public IConfigurationService ConfigurationService => _configService;
 
-        private bool BackgroundThreadShouldTerminate;
+        // BackgroundThreadShouldTerminate removed - background services now handled by dedicated services
 
         /// <summary>
         /// Thread-safe access lock for LocalCharacters collection
@@ -84,14 +84,9 @@ namespace SMT.EVEData
 
         private bool WatcherThreadShouldTerminate;
 
-        private TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(2);
-        private TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
-        private TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
+        // Update rates moved to background services - CharacterUpdateService and UniverseDataService
 
-        private DateTime NextCharacterUpdate = DateTime.MinValue;
-        private DateTime NextLowFreqUpdate = DateTime.MinValue;
-        private DateTime NextSOVCampaignUpdate = DateTime.MinValue;
-        private DateTime NextDotlanUpdate = DateTime.MinValue;
+        // Next update times moved to background services - CharacterUpdateService and UniverseDataService
         private DateTime LastDotlanUpdate = DateTime.MinValue;
         private string LastDotlanETAG = "";
 
@@ -268,6 +263,13 @@ namespace SMT.EVEData
                     _logger.LogError(ex, "Failed to start file monitoring");
                 }
             });
+
+            // Characters will be loaded later via LoadFromDisk() -> Init() -> LoadCharacters()
+            // This preserves the original initialization order and prevents duplicate loading
+
+            // NOTE: Background services (character updates, universe data updates) are now handled 
+            // by dedicated BackgroundService classes: CharacterUpdateService and UniverseDataService
+            // The legacy StartBackgroundThread() call has been removed
         }
 
         /// <summary>
@@ -2979,7 +2981,7 @@ namespace SMT.EVEData
         {
             ShuddownIntelWatcher();
             ShuddownGameLogWatcher();
-            BackgroundThreadShouldTerminate = true;
+            // BackgroundThreadShouldTerminate removed - background services handle their own shutdown
 
             ZKillFeed.ShutDown();
         }
@@ -3390,6 +3392,7 @@ namespace SMT.EVEData
             }
 
             LoadCharacters();
+            _logger.LogInformation("Characters loaded: {CharacterCount}", LocalCharacterCount);
 
             InitTheraConnections();
             InitTurnurConnections();
@@ -3402,7 +3405,7 @@ namespace SMT.EVEData
 
             InitZKillFeed();
 
-            StartBackgroundThread();
+            // StartBackgroundThread() removed - background services now handled by CharacterUpdateService and UniverseDataService
         }
 
         private void InitPOI()
@@ -3948,85 +3951,15 @@ namespace SMT.EVEData
             }
         }
 
-        /// <summary>
-        /// Start the Low Frequency Update Thread
-        /// </summary>
-        private void StartBackgroundThread()
-        {
-            new Thread(async () =>
-            {
-                Thread.CurrentThread.IsBackground = false;
+        // StartBackgroundThread() method removed - background processing now handled by:
+        // - CharacterUpdateService: handles character position and info updates
+        // - UniverseDataService: handles SOV campaigns, universe data, server info, connections, and Dotlan updates
 
-
-                // split the intial requests into 3 for a better initialisation
-
-                foreach(LocalCharacter c in GetLocalCharactersCopy())
-                {
-                    await c.RefreshAccessToken().ConfigureAwait(true);
-                }
-
-                foreach(LocalCharacter c in GetLocalCharactersCopy())
-                {
-                    await c.UpdatePositionFromESI().ConfigureAwait(true);
-                }
-
-                foreach(LocalCharacter c in GetLocalCharactersCopy())
-                {
-                    await c.UpdateInfoFromESI().ConfigureAwait(true);
-                }
-
-
-
-
-                // loop forever
-                while(BackgroundThreadShouldTerminate == false)
-                {
-                    // character Update
-                    if((NextCharacterUpdate - DateTime.Now).Ticks < 0)
-                    {
-                        NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
-
-                        var characters = GetLocalCharactersCopy();
-                        for(int i = 0; i < characters.Count; i++)
-                        {
-                            LocalCharacter c = characters[i];
-                            await c.Update();
-                        }
-                    }
-
-                    // sov update
-                    if((NextSOVCampaignUpdate - DateTime.Now).Ticks < 0)
-                    {
-                        NextSOVCampaignUpdate = DateTime.Now + SOVCampaignUpdateRate;
-                        UpdateSovCampaigns();
-                    }
-
-                    // low frequency update
-                    if((NextLowFreqUpdate - DateTime.Now).Minutes < 0)
-                    {
-                        NextLowFreqUpdate = DateTime.Now + LowFreqUpdateRate;
-
-                        UpdateESIUniverseData();
-                        UpdateServerInfo();
-                        UpdateTheraConnections();
-                        UpdateTurnurConnections();
-                    }
-
-                    if((NextDotlanUpdate - DateTime.Now).Minutes < 0)
-                    {
-                        UpdateDotlanKillDeltaInfo();
-                    }
-
-                    Thread.Sleep(100);
-                }
-            }).Start();
-        }
-
-        private async void UpdateDotlanKillDeltaInfo()
+        public async void UpdateDotlanKillDeltaInfo()
         {
             // set the update for 20 minutes from now initially which will be pushed further once we have the last-modified
             // however if the request fails we still push out the request..
-            NextDotlanUpdate = DateTime.Now + TimeSpan.FromMinutes(20);
+            // NextDotlanUpdate removed - handled by UniverseDataService
 
             try
             {
@@ -4050,7 +3983,7 @@ namespace SMT.EVEData
                 if(response.Content.Headers.LastModified.HasValue)
                 {
                     Random rndUpdateOffset = new Random();
-                    NextDotlanUpdate = response.Content.Headers.LastModified.Value.DateTime.ToLocalTime() + TimeSpan.FromMinutes(60) + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300));
+                    // NextDotlanUpdate removed - handled by UniverseDataService
                 }
 
                 // update the values for the next request;
@@ -4173,7 +4106,7 @@ namespace SMT.EVEData
             }
         }
 
-        private async void UpdateSovCampaigns()
+        public async void UpdateSovCampaigns()
         {
             try
             {
@@ -4385,7 +4318,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Start the download for the Server Info
         /// </summary>
-        private async void UpdateServerInfo()
+        public async void UpdateServerInfo()
         {
             try
             {

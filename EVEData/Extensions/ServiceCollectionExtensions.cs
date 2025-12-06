@@ -38,8 +38,15 @@ namespace SMT.EVEData.Extensions
             services.AddHostedService<FileMonitoringService>(provider => 
                 (FileMonitoringService)provider.GetRequiredService<IFileMonitoringService>());
             
-            // Register EveManager as singleton
+            // Register EveManager as singleton FIRST (before background services that depend on it)
             services.AddEveManager();
+            
+            // Register background services (after EveManager)
+            services.AddSingleton<ICharacterUpdateService, CharacterUpdateService>();
+            services.AddSingleton<IUniverseDataService, UniverseDataService>();
+            
+            // Background services will be started manually from MainWindow after full initialization
+            // This avoids startup timing issues with WPF applications
 
             // Add logging
             services.AddLogging(builder =>

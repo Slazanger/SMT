@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +21,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Extensions.DependencyInjection;
+using SMT.EVEData.Services;
 using SMT.Utils;
 using NAudio.Wave;
 using NHotkey;
@@ -168,6 +171,38 @@ namespace SMT
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InitializeEveManager();
+        }
+
+        /// <summary>
+        /// Start background services manually after full application initialization
+        /// This replaces the automatic hosted service startup to avoid timing issues
+        /// </summary>
+        private async void StartBackgroundServices()
+        {
+            try
+            {
+                // Get the background services from DI container
+                var characterUpdateService = App.ServiceProvider?.GetService<ICharacterUpdateService>();
+                var universeDataService = App.ServiceProvider?.GetService<IUniverseDataService>();
+
+                if (characterUpdateService != null)
+                {
+                    await characterUpdateService.StartAsync(CancellationToken.None);
+                    System.Diagnostics.Debug.WriteLine("Character Update Service started manually");
+                }
+
+                if (universeDataService != null)
+                {
+                    await universeDataService.StartAsync(CancellationToken.None);
+                    System.Diagnostics.Debug.WriteLine("Universe Data Service started manually");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error starting background services: {ex.Message}");
+                MessageBox.Show($"Warning: Background services failed to start: {ex.Message}", 
+                    "Background Services Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         // Helper methods to get configuration values safely
@@ -442,6 +477,9 @@ namespace SMT
             uiRefreshTimer.Start();
 
             ZKBFeed.ItemsSource = EVEManager.ZKillFeed.KillStream;
+
+            // Start background services manually after full initialization
+            StartBackgroundServices();
 
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
             manualZKillFilterRefreshRequired = true;
