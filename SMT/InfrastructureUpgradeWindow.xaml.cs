@@ -45,6 +45,18 @@ namespace SMT
             if (EM != null && !string.IsNullOrEmpty(upgradesFilePath))
             {
                 EM.SaveInfrastructureUpgrades(upgradesFilePath);
+
+                // Immediately refresh the map to show changes
+                RefreshOwnerMap();
+            }
+        }
+
+        private void RefreshOwnerMap()
+        {
+            // Get the MainWindow owner and refresh its map
+            if (Owner is MainWindow mainWindow && mainWindow.RegionUC != null)
+            {
+                mainWindow.RegionUC.ReDrawMap(false);
             }
         }
 
