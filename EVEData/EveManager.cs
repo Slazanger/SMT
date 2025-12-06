@@ -3828,6 +3828,9 @@ namespace SMT.EVEData
         /// <summary>
         /// Load Infrastructure Hub Upgrades from a text file
         /// Format:
+        /// SYSTEMNAME
+        /// 1    Upgrade Name    Level    Status
+        /// or (legacy format):
         /// Sovereignty Hub SYSTEMNAME
         /// 1    Upgrade Name    Level    Status
         /// </summary>
@@ -3850,10 +3853,23 @@ namespace SMT.EVEData
                         continue;
                     }
 
-                    // Check if this is a system header line
-                    if (line.StartsWith("Sovereignty Hub "))
+                    string trimmedLine = line.Trim();
+
+                    // Check if this line starts with a digit (upgrade line)
+                    bool isUpgradeLine = char.IsDigit(trimmedLine.FirstOrDefault());
+
+                    if (!isUpgradeLine)
                     {
-                        currentSystem = line.Replace("Sovereignty Hub ", "").Trim();
+                        // This is a system header line
+                        // Support both "Sovereignty Hub SYSTEMNAME" and just "SYSTEMNAME"
+                        if (trimmedLine.StartsWith("Sovereignty Hub "))
+                        {
+                            currentSystem = trimmedLine.Replace("Sovereignty Hub ", "").Trim();
+                        }
+                        else
+                        {
+                            currentSystem = trimmedLine;
+                        }
 
                         // Clear existing upgrades for this system
                         System sys = GetEveSystem(currentSystem);
@@ -3933,7 +3949,7 @@ namespace SMT.EVEData
                 {
                     if (sys.InfrastructureUpgrades.Count > 0)
                     {
-                        lines.Add($"Sovereignty Hub {sys.Name}");
+                        lines.Add(sys.Name);
 
                         foreach (InfrastructureUpgrade upgrade in sys.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
                         {

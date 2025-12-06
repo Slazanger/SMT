@@ -2536,6 +2536,21 @@ namespace SMT
                     MainCanvas.Children.Add(CynoBeaconLogo);
                 }
 
+                // Show Infrastructure Upgrade indicator (green circle on left)
+                if(mapSystem.ActualSystem.InfrastructureUpgrades.Count > 0)
+                {
+                    Shape UpgradeIndicator = new Ellipse { Width = 6, Height = 6 };
+                    UpgradeIndicator.Stroke = SysOutlineBrush;
+                    UpgradeIndicator.StrokeThickness = 1.0;
+                    UpgradeIndicator.StrokeLineJoin = PenLineJoin.Round;
+                    UpgradeIndicator.Fill = new SolidColorBrush(Colors.LimeGreen);
+
+                    Canvas.SetLeft(UpgradeIndicator, mapSystem.Layout.X - 14);
+                    Canvas.SetTop(UpgradeIndicator, mapSystem.Layout.Y - 3);
+                    Canvas.SetZIndex(UpgradeIndicator, ZINDEX_CYNOBEACON);
+                    MainCanvas.Children.Add(UpgradeIndicator);
+                }
+
                 if(MapConf.ShowJoveObservatories && mapSystem.ActualSystem.HasJoveObservatory && !ShowSystemADM && !ShowSystemTimers)
                 {
                     Image JoveLogo = new Image

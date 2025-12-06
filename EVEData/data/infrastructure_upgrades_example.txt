@@ -1,33 +1,33 @@
-Sovereignty Hub L5D-ZL
+L5D-ZL
 1    Major Threat Detection Array    3    Online
 2    Minor Threat Detection Array    2    Online
 
-Sovereignty Hub Y-CWQY
+Y-CWQY
 1    Major Threat Detection Array    3    Online
 2    Advanced Logistics Network    Online
 3    Cynosural Navigation    Online
 
-Sovereignty Hub EIMJ-M
+EIMJ-M
 1    Power Monitoring Division    1    Online
 2    Major Threat Detection Array    3    Online
 3    Minor Threat Detection Array    1    Offline
 
-Sovereignty Hub VQE-CN
+VQE-CN
 1    Minor Threat Detection Array    2    Online
 2    Major Threat Detection Array    3    Online
 
-Sovereignty Hub 8KR9-5
+8KR9-5
 1    Major Threat Detection Array    2    Offline
 2    Minor Threat Detection Array    3    Offline
 3    Nocxium Prospecting Array    3    Offline
 4    Pyerite Prospecting Array    2    Online
 
-Sovereignty Hub 1-NJLK
+1-NJLK
 1    Supercapital Construction Facilities    Offline
 2    Minor Threat Detection Array    3    Online
 3    Major Threat Detection Array    3    Online
 
-Sovereignty Hub G-C8QO
+G-C8QO
 1    Power Monitoring Division    3    Online
 2    Pyerite Prospecting Array    2    Online
 3    Minor Threat Detection Array    3    Online

@@ -975,6 +975,20 @@ namespace SMT
             }
         }
 
+        private void ManageInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            InfrastructureUpgradeWindow upgradeWindow = new InfrastructureUpgradeWindow();
+            upgradeWindow.EM = EVEManager;
+            upgradeWindow.Owner = this;
+            upgradeWindow.ShowDialog();
+
+            // Refresh the current region view after closing the window
+            if(RegionUC != null)
+            {
+                RegionUC.ReDrawMap(false);
+            }
+        }
+
         private void LoadInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
