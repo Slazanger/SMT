@@ -21,12 +21,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "Rock Whisperer";
+        public const string SMT_TITLE = "Winter Migration Time";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_143";
+        public const string SMT_VERSION = "SMT_144";
 
         /// <summary>
         /// Folder to store all of the data from
