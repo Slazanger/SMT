@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +13,7 @@ namespace SMT
 
         private ObservableCollection<InfrastructureUpgrade> currentUpgrades;
         private string selectedSystemName;
+        private string upgradesFilePath;
 
         public InfrastructureUpgradeWindow()
         {
@@ -24,6 +26,9 @@ namespace SMT
         {
             if (EM != null)
             {
+                // Set up the auto-save file path
+                upgradesFilePath = Path.Combine(EveAppConfig.StorageRoot, "InfrastructureUpgrades.txt");
+
                 // Populate system combo box with all null sec systems
                 var nullSecSystems = EM.Systems
                     .Where(s => s.TrueSec < 0.0)
@@ -32,6 +37,14 @@ namespace SMT
                     .ToList();
 
                 SystemComboBox.ItemsSource = nullSecSystems;
+            }
+        }
+
+        private void AutoSave()
+        {
+            if (EM != null && !string.IsNullOrEmpty(upgradesFilePath))
+            {
+                EM.SaveInfrastructureUpgrades(upgradesFilePath);
             }
         }
 
@@ -96,6 +109,9 @@ namespace SMT
                 EM.SetInfrastructureUpgrade(selectedSystemName, slotNumber, upgradeName, level, isOnline);
                 LoadUpgradesForSystem(selectedSystemName);
 
+                // Auto-save after adding
+                AutoSave();
+
                 // Clear the form
                 SlotNumberTextBox.Clear();
                 LevelTextBox.Text = "0";
@@ -112,6 +128,9 @@ namespace SMT
                 {
                     EM.RemoveInfrastructureUpgrade(selectedSystemName, selectedUpgrade.SlotNumber);
                     LoadUpgradesForSystem(selectedSystemName);
+
+                    // Auto-save after deleting
+                    AutoSave();
                 }
             }
             else
@@ -122,6 +141,8 @@ namespace SMT
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            // Final save before closing
+            AutoSave();
             this.Close();
         }
     }
