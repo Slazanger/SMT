@@ -205,6 +205,41 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(characterSaveFolder);
             }
 
+            // Initialize collections that were previously set up in legacy setup methods
+            IntelFilters = new List<string>();
+            IntelAlertFilters = new List<string>();
+            IntelClearFilters = new List<string>();
+            IntelIgnoreFilters = new List<string>();
+
+            // Initialize data collections
+            IntelDataList = new FixedQueue<IntelData>();
+            IntelDataList.SetSizeLimit(250);
+            
+            GameLogList = new FixedQueue<GameLogData>();
+            GameLogList.SetSizeLimit(50);
+
+            // Initialize file position tracking dictionaries
+            intelFileReadPos = new Dictionary<string, int>();
+            gameFileReadPos = new Dictionary<string, int>();
+            gamelogFileCharacterMap = new Dictionary<string, string>();
+
+            // Set default EVE log folder
+            string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
+            EVELogFolder = Path.Combine(logFolderLoc);
+
+            // Load intel filters from disk (now that SaveDataRootFolder is set)
+            LoadIntelFiltersFromDisk();
+
+            // Debug logging for file monitoring setup
+            _logger.LogInformation("EveManager initialization complete:");
+            _logger.LogInformation("  EVE Log Folder: {EVELogFolder}", EVELogFolder);
+            _logger.LogInformation("  Intel Filters Count: {Count}", IntelFilters?.Count ?? 0);
+            _logger.LogInformation("  Intel Alert Filters Count: {Count}", IntelAlertFilters?.Count ?? 0);
+            if (IntelFilters != null && IntelFilters.Any())
+            {
+                _logger.LogInformation("  Intel Filters: {Filters}", string.Join(", ", IntelFilters));
+            }
+
             CharacterIDToName = new SerializableDictionary<int, string>();
             AllianceIDToName = new SerializableDictionary<int, string>();
             AllianceIDToTicker = new SerializableDictionary<int, string>();
@@ -212,6 +247,27 @@ namespace SMT.EVEData
             IDToSystem = new Dictionary<long, System>();
 
             ServerInfo = new EVEData.Server();
+
+            // Start file monitoring after initialization
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(EVELogFolder) && Directory.Exists(EVELogFolder))
+                    {
+                        await _fileMonitoringService.StartMonitoringAsync(EVELogFolder, IntelFilters, CancellationToken.None);
+                        _logger.LogInformation("File monitoring started for EVE logs at: {LogFolder}", EVELogFolder);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("EVE log folder not found, file monitoring not started: {LogFolder}", EVELogFolder);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to start file monitoring");
+                }
+            });
         }
 
         /// <summary>
@@ -2244,9 +2300,80 @@ namespace SMT.EVEData
         /// </summary>
         private void ProcessIntelLine(string filePath, string channelName, bool isLocalChat, string line)
         {
-            // TODO: Extract the intel processing logic from the original IntelFileWatcher_Changed method
-            // This is a placeholder - the actual logic needs to be extracted from the legacy method
-            _logger.LogTrace("Processing intel line from {FilePath}: {Line}", filePath, line);
+            if (string.IsNullOrWhiteSpace(line))
+                return;
+
+            // Skip system update lines and other non-intel content
+            if (line.Contains("Channel Name:") || line.Contains("Listener:") || line.Contains("Session started"))
+                return;
+
+            bool addToIntel = false;
+
+            // Check if we should add this line to intel
+            if (isLocalChat)
+            {
+                // For local chat, check if it's a system change or has intel content
+                if (line.Contains("> ") && !line.Contains("EVE System > "))
+                {
+                    addToIntel = true;
+                }
+            }
+            else
+            {
+                // For intel channels, check against alert filters
+                foreach (string alertFilterStr in IntelAlertFilters)
+                {
+                    if (string.IsNullOrEmpty(alertFilterStr))
+                    {
+                        addToIntel = true;
+                        break;
+                    }
+                    else if (line.Contains(alertFilterStr, StringComparison.OrdinalIgnoreCase))
+                    {
+                        addToIntel = true;
+                        break;
+                    }
+                }
+            }
+
+            if (addToIntel)
+            {
+                var intelData = new IntelData(line, channelName);
+
+                // Process the line to find system names and clear markers
+                foreach (string word in intelData.IntelString.Split(' '))
+                {
+                    if (string.IsNullOrEmpty(word) || word.Length < 3)
+                        continue;
+
+                    // Check for clear markers
+                    foreach (string clearMarker in IntelClearFilters)
+                    {
+                        if (clearMarker.IndexOf(word, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            intelData.ClearNotification = true;
+                        }
+                    }
+
+                    // Check for system names
+                    foreach (System sys in Systems)
+                    {
+                        if (sys.Name.IndexOf(word, StringComparison.OrdinalIgnoreCase) == 0 || 
+                            word.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            intelData.Systems.Add(sys.Name);
+                        }
+                    }
+                }
+
+                // Add to intel data list
+                IntelDataList.Enqueue(intelData);
+
+                // Raise the event that the UI listens to
+                IntelUpdatedEvent?.Invoke(IntelDataList);
+                
+                _logger.LogDebug("Added intel: {Line} -> Systems: {Systems}", line, string.Join(", ", intelData.Systems));
+            }
         }
 
         /// <summary>
@@ -2254,9 +2381,173 @@ namespace SMT.EVEData
         /// </summary>
         private void ProcessGameLogLine(string filePath, string characterName, string line)
         {
-            // TODO: Extract the game log processing logic from the original GameLogFileWatcher_Changed method
-            // This is a placeholder - the actual logic needs to be extracted from the legacy method
-            _logger.LogTrace("Processing game log line from {FilePath}: {Line}", filePath, line);
+            if (string.IsNullOrWhiteSpace(line))
+                return;
+
+            // Skip header lines
+            if (line.Contains("Gamelog") || line.Contains("Listener:") || line.Contains("Session started"))
+                return;
+
+            try
+            {
+                // Create game log data entry
+                var gameLogData = new GameLogData()
+                {
+                    Character = characterName,
+                    Text = line,
+                    RawText = line,
+                    Time = DateTime.Now,
+                    Severity = "Info"
+                };
+
+                // Add to game log list
+                GameLogList.Enqueue(gameLogData);
+
+                // Check for specific events
+                if (line.Contains("(cloaked)") && line.Contains("decloak"))
+                {
+                    string pilot = ExtractPilotNameFromGameLog(line);
+                    ShipDecloakedEvent?.Invoke(pilot, line);
+                }
+
+                if (line.Contains("belonging to") && (line.Contains("under attack") || line.Contains("reinforced")))
+                {
+                    string pilot = ExtractPilotNameFromGameLog(line);
+                    CombatEvent?.Invoke(pilot, line);
+                }
+
+                // Raise the game log updated event
+                GameLogAddedEvent?.Invoke(GameLogList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error processing game log line: {Line}", line);
+            }
+        }
+
+        /// <summary>
+        /// Extract pilot name from game log line
+        /// </summary>
+        private string ExtractPilotNameFromGameLog(string line)
+        {
+            // Simple extraction - may need refinement based on actual log format
+            try
+            {
+                if (line.Contains(" > "))
+                {
+                    var parts = line.Split(" > ");
+                    if (parts.Length > 1)
+                    {
+                        return parts[0].Trim();
+                    }
+                }
+                return "Unknown";
+            }
+            catch
+            {
+                return "Unknown";
+            }
+        }
+
+        /// <summary>
+        /// Load intel filters from disk (extracted from SetupIntelWatcher)
+        /// </summary>
+        private void LoadIntelFiltersFromDisk()
+        {
+            try
+            {
+                // Load Intel Channels
+                string intelFileFilter = Path.Combine(SaveDataRootFolder, "IntelChannels.txt");
+                if (File.Exists(intelFileFilter))
+                {
+                    StreamReader file = new StreamReader(intelFileFilter);
+                    string line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        line = line.Trim();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            IntelFilters.Add(line);
+                        }
+                    }
+                    file.Close();
+                }
+                else
+                {
+                    IntelFilters.Add("Int"); // Default filter
+                }
+
+                // Load Intel Clear Filters
+                string intelClearFileFilter = Path.Combine(SaveDataRootFolder, "IntelClearFilters.txt");
+                if (File.Exists(intelClearFileFilter))
+                {
+                    StreamReader file = new StreamReader(intelClearFileFilter);
+                    string line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        line = line.Trim();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            IntelClearFilters.Add(line);
+                        }
+                    }
+                    file.Close();
+                }
+                else
+                {
+                    IntelClearFilters.Add("clear");
+                    IntelClearFilters.Add("clr");
+                }
+
+                // Load Intel Ignore Filters
+                string intelIgnoreFileFilter = Path.Combine(SaveDataRootFolder, "IntelIgnoreFilters.txt");
+                if (File.Exists(intelIgnoreFileFilter))
+                {
+                    StreamReader file = new StreamReader(intelIgnoreFileFilter);
+                    string line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        line = line.Trim();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            IntelIgnoreFilters.Add(line);
+                        }
+                    }
+                    file.Close();
+                }
+
+                // Load Intel Alert Filters
+                string intelAlertFileFilter = Path.Combine(SaveDataRootFolder, "IntelAlertFilters.txt");
+                if (File.Exists(intelAlertFileFilter))
+                {
+                    StreamReader file = new StreamReader(intelAlertFileFilter);
+                    string line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        line = line.Trim();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            IntelAlertFilters.Add(line);
+                        }
+                    }
+                    file.Close();
+                }
+                else
+                {
+                    // Default: alert on nothing (empty string means alert on all)
+                    IntelAlertFilters.Add("");
+                }
+
+                _logger.LogInformation("Loaded intel filters: {IntelCount} channels, {AlertCount} alert filters", 
+                    IntelFilters.Count, IntelAlertFilters.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading intel filters from disk");
+                // Set defaults if loading fails
+                if (!IntelFilters.Any()) IntelFilters.Add("Int");
+                if (!IntelAlertFilters.Any()) IntelAlertFilters.Add("");
+            }
         }
 
         #endregion
