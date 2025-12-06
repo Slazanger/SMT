@@ -975,6 +975,45 @@ namespace SMT
             }
         }
 
+        private void LoadInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+            dlg.Title = "Load Infrastructure Upgrades";
+
+            bool? result = dlg.ShowDialog();
+
+            if(result == true)
+            {
+                string filename = dlg.FileName;
+                EM.LoadInfrastructureUpgrades(filename);
+
+                // Refresh the current region view to show the loaded upgrades
+                if(RegionUC != null)
+                {
+                    RegionUC.ReDrawMap(false);
+                }
+            }
+        }
+
+        private void SaveInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+            dlg.Title = "Save Infrastructure Upgrades";
+            dlg.FileName = "infrastructure_upgrades.txt";
+
+            bool? result = dlg.ShowDialog();
+
+            if(result == true)
+            {
+                string filename = dlg.FileName;
+                EM.SaveInfrastructureUpgrades(filename);
+            }
+        }
+
         private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             if(miFullScreenToggle.IsChecked)

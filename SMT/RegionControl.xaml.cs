@@ -3602,6 +3602,28 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(sov);
                 }
 
+                // update Infrastructure Upgrades
+                if(selectedSys.ActualSystem.InfrastructureUpgrades.Count > 0)
+                {
+                    Label upgradeHeader = new Label();
+                    upgradeHeader.Padding = one;
+                    upgradeHeader.Margin = one;
+                    upgradeHeader.Content = "Infrastructure Upgrades:";
+                    upgradeHeader.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    upgradeHeader.FontWeight = FontWeights.Bold;
+                    SystemInfoPopupSP.Children.Add(upgradeHeader);
+
+                    foreach(EVEData.InfrastructureUpgrade upgrade in selectedSys.ActualSystem.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
+                    {
+                        Label upgradeLabel = new Label();
+                        upgradeLabel.Padding = new Thickness(15, 1, 1, 1);
+                        upgradeLabel.Margin = one;
+                        upgradeLabel.Content = $"{upgrade.SlotNumber}. {upgrade.DisplayName} - {upgrade.Status}";
+                        upgradeLabel.Foreground = new SolidColorBrush(upgrade.IsOnline ? Colors.LightGreen : Colors.Gray);
+                        SystemInfoPopupSP.Children.Add(upgradeLabel);
+                    }
+                }
+
                 List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
                 // update Thera Info
                 foreach(EVEData.TheraConnection tc in currentTheraConnections)

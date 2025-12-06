@@ -60,6 +60,9 @@
                 </MenuItem>
 
                 <MenuItem Header="Data"  Height="Auto">
+                    <MenuItem Header="Load Infrastructure Upgrades..." Click="LoadInfrastructureUpgrades_Click" />
+                    <MenuItem Header="Save Infrastructure Upgrades..." Click="SaveInfrastructureUpgrades_Click" />
+                    <Separator />
                     <MenuItem Header="Clear Old Eve logs" Click="ClearOldEVELogs_Click" />
                 </MenuItem>
 
