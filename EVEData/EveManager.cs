@@ -75,7 +75,7 @@ namespace SMT.EVEData
 
         private bool WatcherThreadShouldTerminate;
 
-        private TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(4);
+        private TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(2);
         private TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
         private TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
 
