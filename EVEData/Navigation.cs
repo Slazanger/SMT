@@ -329,25 +329,28 @@ namespace SMT.EVEData
             MapNode Start = MapNodes[From];
             MapNode End = MapNodes[To];
 
-            List<MapNode> OpenList = new List<MapNode>();
-            List<MapNode> ClosedList = new List<MapNode>();
+            // Use SortedSet for O(log n) min extraction and HashSet for O(1) contains checks
+            SortedSet<MapNode> OpenList = new SortedSet<MapNode>(new MapNodeComparer());
+            HashSet<MapNode> OpenSet = new HashSet<MapNode>(); // For fast Contains operations
+            HashSet<MapNode> ClosedSet = new HashSet<MapNode>();
 
             MapNode CurrentNode = null;
 
             // add the start to the open list
             OpenList.Add(Start);
+            OpenSet.Add(Start);
 
             while (OpenList.Count > 0)
             {
-                // get the MapNode with the lowest F score
-                double lowest = OpenList.Min(mn => mn.MinCostToStart);
-                CurrentNode = OpenList.First(mn => mn.MinCostToStart == lowest);
+                // get the MapNode with the lowest cost - O(1) operation with SortedSet
+                CurrentNode = OpenList.Min;
 
-                // add the list to the closed list
-                ClosedList.Add(CurrentNode);
+                // add to the closed set
+                ClosedSet.Add(CurrentNode);
 
-                // remove it from the open list
+                // remove from the open list and set - O(log n) operation
                 OpenList.Remove(CurrentNode);
+                OpenSet.Remove(CurrentNode);
 
                 // Early termination: stop when we reach the destination
                 if (CurrentNode == End)
@@ -365,11 +368,20 @@ namespace SMT.EVEData
 
                     if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
                     {
+                        // If node is already in open set, remove it first to update its position
+                        if (OpenSet.Contains(CMN))
+                        {
+                            OpenList.Remove(CMN);
+                            OpenSet.Remove(CMN);
+                        }
+                        
                         CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
                         CMN.NearestToStart = CurrentNode;
-                        if (!OpenList.Contains(CMN))
+                        
+                        if (!ClosedSet.Contains(CMN))
                         {
                             OpenList.Add(CMN);
+                            OpenSet.Add(CMN);
                         }
                     }
                 }
@@ -377,13 +389,22 @@ namespace SMT.EVEData
                 if (UseJumpGates && CurrentNode.JBConnection != null)
                 {
                     MapNode JMN = MapNodes[CurrentNode.JBConnection];
-                    if (!JMN.Visited && JMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + JMN.Cost < JMN.MinCostToStart)
+                    if (!JMN.Visited && (JMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + JMN.Cost < JMN.MinCostToStart))
                     {
+                        // If node is already in open set, remove it first to update its position
+                        if (OpenSet.Contains(JMN))
+                        {
+                            OpenList.Remove(JMN);
+                            OpenSet.Remove(JMN);
+                        }
+                        
                         JMN.MinCostToStart = CurrentNode.MinCostToStart + JMN.Cost;
                         JMN.NearestToStart = CurrentNode;
-                        if (!OpenList.Contains(JMN))
+                        
+                        if (!ClosedSet.Contains(JMN))
                         {
                             OpenList.Add(JMN);
+                            OpenSet.Add(JMN);
                         }
                     }
                 }
@@ -403,11 +424,20 @@ namespace SMT.EVEData
 
                         if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
                         {
+                            // If node is already in open set, remove it first to update its position
+                            if (OpenSet.Contains(CMN))
+                            {
+                                OpenList.Remove(CMN);
+                                OpenSet.Remove(CMN);
+                            }
+                            
                             CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
                             CMN.NearestToStart = CurrentNode;
-                            if (!OpenList.Contains(CMN))
+                            
+                            if (!ClosedSet.Contains(CMN))
                             {
                                 OpenList.Add(CMN);
+                                OpenSet.Add(CMN);
                             }
                         }
                     }
@@ -428,11 +458,20 @@ namespace SMT.EVEData
 
                         if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
                         {
+                            // If node is already in open set, remove it first to update its position
+                            if (OpenSet.Contains(CMN))
+                            {
+                                OpenList.Remove(CMN);
+                                OpenSet.Remove(CMN);
+                            }
+                            
                             CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
                             CMN.NearestToStart = CurrentNode;
-                            if (!OpenList.Contains(CMN))
+                            
+                            if (!ClosedSet.Contains(CMN))
                             {
                                 OpenList.Add(CMN);
+                                OpenSet.Add(CMN);
                             }
                         }
                     }
@@ -453,11 +492,20 @@ namespace SMT.EVEData
 
                         if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
                         {
+                            // If node is already in open set, remove it first to update its position
+                            if (OpenSet.Contains(CMN))
+                            {
+                                OpenList.Remove(CMN);
+                                OpenSet.Remove(CMN);
+                            }
+                            
                             CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
                             CMN.NearestToStart = CurrentNode;
-                            if (!OpenList.Contains(CMN))
+                            
+                            if (!ClosedSet.Contains(CMN))
                             {
                                 OpenList.Add(CMN);
+                                OpenSet.Add(CMN);
                             }
                         }
                     }
@@ -701,6 +749,24 @@ namespace SMT.EVEData
                 }
 
                 return s;
+            }
+        }
+
+        private class MapNodeComparer : IComparer<MapNode>
+        {
+            public int Compare(MapNode x, MapNode y)
+            {
+                if (x == null && y == null) return 0;
+                if (x == null) return -1;
+                if (y == null) return 1;
+                
+                // Primary comparison: MinCostToStart
+                int costComparison = x.MinCostToStart.CompareTo(y.MinCostToStart);
+                if (costComparison != 0)
+                    return costComparison;
+                
+                // Tie-breaker: use system name for stable sorting
+                return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
             }
         }
 
