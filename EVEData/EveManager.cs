@@ -2,12 +2,15 @@
 // EVE Manager
 //-----------------------------------------------------------------------
 
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
@@ -43,6 +46,16 @@ namespace SMT.EVEData
         private bool BackgroundThreadShouldTerminate;
 
         /// <summary>
+        /// Thread-safe access lock for LocalCharacters collection
+        /// </summary>
+        private readonly object _localCharactersLock = new object();
+
+        /// <summary>
+        /// Observable collection for LocalCharacters that supports UI binding
+        /// </summary>
+        private readonly ObservableCollection<LocalCharacter> _localCharacters = new ObservableCollection<LocalCharacter>();
+
+        /// <summary>
         /// Read position map for the intel files
         /// </summary>
         private Dictionary<string, int> intelFileReadPos;
@@ -71,7 +84,7 @@ namespace SMT.EVEData
 
         private bool WatcherThreadShouldTerminate;
 
-        private TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(4);
+        private TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(2);
         private TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
         private TimeSpan SOVCampaignUpdateRate = TimeSpan.FromSeconds(30);
 
@@ -145,6 +158,7 @@ namespace SMT.EVEData
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _fileMonitoringService = fileMonitoringService ?? throw new ArgumentNullException(nameof(fileMonitoringService));
 
+
             // Subscribe to file monitoring events
             _fileMonitoringService.IntelFileChanged += OnIntelFileChanged;
             _fileMonitoringService.GameLogFileChanged += OnGameLogFileChanged;
@@ -167,7 +181,6 @@ namespace SMT.EVEData
                 }
             }
 
-            LocalCharacters = new List<LocalCharacter>();
             VersionStr = _configService.EveSettings.Application.Version;
 
             _logger.LogInformation("EveManager initializing with version {Version}", VersionStr);
@@ -351,10 +364,200 @@ namespace SMT.EVEData
         public List<JumpBridge> JumpBridges { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of Characters we are tracking
+        /// Gets the observable collection of Characters we are tracking (thread-safe for UI binding)
         /// </summary>
         [XmlIgnoreAttribute]
-        public List<LocalCharacter> LocalCharacters { get; set; }
+        public ObservableCollection<LocalCharacter> LocalCharacters 
+        { 
+            get 
+            { 
+                return _localCharacters;
+            } 
+        }
+
+        /// <summary>
+        /// Delegate for UI thread operations
+        /// </summary>
+        public static Action<Action> UIThreadInvoker { get; set; }
+
+        /// <summary>
+        /// Thread-safe add character method
+        /// </summary>
+        public void AddCharacter(LocalCharacter character)
+        {
+            // Use UI thread invoker if available (set by UI layer)
+            if (UIThreadInvoker != null)
+            {
+                UIThreadInvoker(() =>
+                {
+                    lock (_localCharactersLock)
+                    {
+                        _localCharacters.Add(character);
+                    }
+                });
+            }
+            else
+            {
+                // Direct access during initialization or from UI thread
+                lock (_localCharactersLock)
+                {
+                    _localCharacters.Add(character);
+                }
+            }
+            
+            // Notify UI - ObservableCollection handles this automatically, but keep for compatibility
+            LocalCharacterUpdateEvent?.Invoke();
+        }
+
+        /// <summary>
+        /// Thread-safe remove character method
+        /// </summary>
+        public void RemoveCharacter(LocalCharacter character)
+        {
+            // Use UI thread invoker if available (set by UI layer)
+            if (UIThreadInvoker != null)
+            {
+                UIThreadInvoker(() =>
+                {
+                    lock (_localCharactersLock)
+                    {
+                        _localCharacters.Remove(character);
+                    }
+                });
+            }
+            else
+            {
+                // Direct access during initialization or from UI thread
+                lock (_localCharactersLock)
+                {
+                    _localCharacters.Remove(character);
+                }
+            }
+            
+            // Notify UI - ObservableCollection handles this automatically, but keep for compatibility
+            LocalCharacterUpdateEvent?.Invoke();
+        }
+
+        /// <summary>
+        /// Thread-safe iteration helper - gets a safe copy for foreach loops
+        /// </summary>
+        public List<LocalCharacter> GetLocalCharactersCopy()
+        {
+            lock (_localCharactersLock)
+            {
+                return new List<LocalCharacter>(_localCharacters);
+            }
+        }
+
+        /// <summary>
+        /// Thread-safe character lookup by name
+        /// </summary>
+        public LocalCharacter FindCharacterByName(string characterName)
+        {
+            lock (_localCharactersLock)
+            {
+                return _localCharacters.FirstOrDefault(c => c.Name == characterName);
+            }
+        }
+
+        /// <summary>
+        /// Thread-safe character count
+        /// </summary>
+        public int LocalCharacterCount
+        {
+            get
+            {
+                lock (_localCharactersLock)
+                {
+                    return _localCharacters.Count;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Thread-safe character access by index
+        /// </summary>
+        public LocalCharacter GetCharacterAt(int index)
+        {
+            lock (_localCharactersLock)
+            {
+                return index >= 0 && index < _localCharacters.Count ? _localCharacters[index] : null;
+            }
+        }
+
+        /// <summary>
+        /// Move character up in the list
+        /// </summary>
+        public bool MoveLocalCharacterUp(LocalCharacter character)
+        {
+            if (UIThreadInvoker != null)
+            {
+                bool result = false;
+                UIThreadInvoker(() =>
+                {
+                    lock (_localCharactersLock)
+                    {
+                        int index = _localCharacters.IndexOf(character);
+                        if (index > 0)
+                        {
+                            _localCharacters.Move(index, index - 1);
+                            result = true;
+                        }
+                    }
+                });
+                return result;
+            }
+            else
+            {
+                lock (_localCharactersLock)
+                {
+                    int index = _localCharacters.IndexOf(character);
+                    if (index > 0)
+                    {
+                        _localCharacters.Move(index, index - 1);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Move character down in the list
+        /// </summary>
+        public bool MoveLocalCharacterDown(LocalCharacter character)
+        {
+            if (UIThreadInvoker != null)
+            {
+                bool result = false;
+                UIThreadInvoker(() =>
+                {
+                    lock (_localCharactersLock)
+                    {
+                        int index = _localCharacters.IndexOf(character);
+                        if (index >= 0 && index < _localCharacters.Count - 1)
+                        {
+                            _localCharacters.Move(index, index + 1);
+                            result = true;
+                        }
+                    }
+                });
+                return result;
+            }
+            else
+            {
+                lock (_localCharactersLock)
+                {
+                    int index = _localCharacters.IndexOf(character);
+                    if (index >= 0 && index < _localCharacters.Count - 1)
+                    {
+                        _localCharacters.Move(index, index + 1);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the list of Faction warfare systems
@@ -722,8 +925,16 @@ namespace SMT.EVEData
                     System from = GetEveSystemFromID(fromID);
                     System to = GetEveSystemFromID(toID);
 
+
                     if(from != null && to != null)
                     {
+                        if(from.Name == "Zarzakh" || to.Name == "Zarzakh")
+                        {
+                            // zarzakh is now in the jumps file; however we dont want to add the gates for it
+                            continue;
+                        }
+
+
                         if(!from.Jumps.Contains(to.Name))
                         {
                             from.Jumps.Add(to.Name);
@@ -1867,24 +2078,12 @@ namespace SMT.EVEData
             AuthorizedCharacterData acd = await ESIClient.SSO.Verify(sst);
 
             // now find the matching character and update..
-            LocalCharacter esiChar = null;
-            foreach(LocalCharacter c in LocalCharacters)
-            {
-                if(c.Name == acd.CharacterName)
-                {
-                    esiChar = c;
-                }
-            }
+            LocalCharacter esiChar = FindCharacterByName(acd.CharacterName);
 
             if(esiChar == null)
             {
                 esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
-                LocalCharacters.Add(esiChar);
-
-                if(LocalCharacterUpdateEvent != null)
-                {
-                    LocalCharacterUpdateEvent();
-                }
+                AddCharacter(esiChar);
             }
 
             esiChar.ESIRefreshToken = acd.RefreshToken;
@@ -2198,7 +2397,7 @@ namespace SMT.EVEData
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
             List<LocalCharacter> saveList = new List<LocalCharacter>();
 
-            foreach(LocalCharacter c in LocalCharacters)
+            foreach(LocalCharacter c in GetLocalCharactersCopy())
             {
                 if(!string.IsNullOrEmpty(c.ESIRefreshToken))
                 {
@@ -3086,7 +3285,7 @@ namespace SMT.EVEData
                                     characterName = l.Split(':')[1].Trim();
 
                                     bool addChar = true;
-                                    foreach(EVEData.LocalCharacter c in LocalCharacters)
+                                    foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
                                     {
                                         if(characterName == c.Name)
                                         {
@@ -3109,11 +3308,7 @@ namespace SMT.EVEData
 
                                     if(addChar)
                                     {
-                                        LocalCharacters.Add(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                        if(LocalCharacterUpdateEvent != null)
-                                        {
-                                            LocalCharacterUpdateEvent();
-                                        }
+                                        AddCharacter(new EVEData.LocalCharacter(characterName, changedFile, system));
                                     }
 
                                     break;
@@ -3158,7 +3353,7 @@ namespace SMT.EVEData
                             {
                                 string system = line.Split(':').Last().Trim();
 
-                                foreach(EVEData.LocalCharacter c in LocalCharacters)
+                                foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
                                 {
                                     if(c.LocalChatFile == changedFile)
                                     {
@@ -3384,7 +3579,7 @@ namespace SMT.EVEData
                         GameLogAddedEvent(GameLogList);
                     }
 
-                    foreach(LocalCharacter lc in LocalCharacters)
+                    foreach(LocalCharacter lc in GetLocalCharactersCopy())
                     {
                         if(lc.Name == characterName)
                         {
@@ -3454,12 +3649,7 @@ namespace SMT.EVEData
                     c.Location = string.Empty;
                     c.Region = string.Empty;
 
-                    LocalCharacters.Add(c);
-
-                    if(LocalCharacterUpdateEvent != null)
-                    {
-                        LocalCharacterUpdateEvent();
-                    }
+                    AddCharacter(c);
                 }
             }
             catch
@@ -3479,17 +3669,17 @@ namespace SMT.EVEData
 
                 // split the intial requests into 3 for a better initialisation
 
-                foreach(LocalCharacter c in LocalCharacters)
+                foreach(LocalCharacter c in GetLocalCharactersCopy())
                 {
                     await c.RefreshAccessToken().ConfigureAwait(true);
                 }
 
-                foreach(LocalCharacter c in LocalCharacters)
+                foreach(LocalCharacter c in GetLocalCharactersCopy())
                 {
                     await c.UpdatePositionFromESI().ConfigureAwait(true);
                 }
 
-                foreach(LocalCharacter c in LocalCharacters)
+                foreach(LocalCharacter c in GetLocalCharactersCopy())
                 {
                     await c.UpdateInfoFromESI().ConfigureAwait(true);
                 }
@@ -3505,9 +3695,10 @@ namespace SMT.EVEData
                     {
                         NextCharacterUpdate = DateTime.Now + CharacterUpdateRate;
 
-                        for(int i = 0; i < LocalCharacters.Count; i++)
+                        var characters = GetLocalCharactersCopy();
+                        for(int i = 0; i < characters.Count; i++)
                         {
-                            LocalCharacter c = LocalCharacters.ElementAt(i);
+                            LocalCharacter c = characters[i];
                             await c.Update();
                         }
                     }
@@ -3925,14 +4116,5 @@ namespace SMT.EVEData
             catch { }
         }
 
-        public void RemoveCharacter(LocalCharacter lc)
-        {
-            LocalCharacters.Remove(lc);
-
-            if(LocalCharacterUpdateEvent != null)
-            {
-                LocalCharacterUpdateEvent();
-            }
-        }
     }
 }

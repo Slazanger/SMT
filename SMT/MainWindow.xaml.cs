@@ -162,6 +162,7 @@ namespace SMT
             // This ensures App.OnStartup() has completed and ServiceProvider is available
             this.Loaded += MainWindow_Loaded;
 
+
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -225,6 +226,20 @@ namespace SMT
                 EVEManager = eveManager;
                 EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
                 EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
+
+
+                // Set up UI thread marshaling for ObservableCollection operations
+                EVEData.EveManager.UIThreadInvoker = (action) =>
+                {
+                    if(Application.Current.Dispatcher.CheckAccess())
+                    {
+                        action();
+                    }
+                    else
+                    {
+                        Application.Current.Dispatcher.Invoke(action);
+                    }
+                };
 
                 System.Diagnostics.Debug.WriteLine("EveManager initialized successfully");
 

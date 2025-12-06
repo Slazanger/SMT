@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SMT.EVEData.Configuration;
 using SMT.EVEData.Services;
-using SMT.EVEData.Services;
+
 
 namespace SMT.EVEData.Extensions
 {
