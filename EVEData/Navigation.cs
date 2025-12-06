@@ -349,6 +349,12 @@ namespace SMT.EVEData
                 // remove it from the open list
                 OpenList.Remove(CurrentNode);
 
+                // Early termination: stop when we reach the destination
+                if (CurrentNode == End)
+                {
+                    break;
+                }
+
                 // walk the connections
                 foreach (string connectionName in CurrentNode.Connections)
                 {
