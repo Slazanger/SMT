@@ -4,34 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Infrastructure Hub Upgrades Manager" Height="600" Width="800"
+        Title="Infrastructure Hub Upgrades Manager" Height="600" Width="600"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
         Loaded="Window_Loaded">
 
-    <Window.Resources>
-        <!-- ComboBox Style -->
-        <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
-            <Setter Property="Background" Value="#2A2A2A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#555555"/>
-        </Style>
-
-        <!-- ComboBoxItem Style -->
-        <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="#2A2A2A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Style.Triggers>
-                <Trigger Property="IsHighlighted" Value="True">
-                    <Setter Property="Background" Value="#404040"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#505050"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
-    <Grid Margin="10" Background="{DynamicResource ListBackground}">
+    <Grid Margin="0" Background="{DynamicResource MenuBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -40,17 +17,13 @@
         </Grid.RowDefinitions>
 
         <!-- System Selection -->
-        <GroupBox Grid.Row="0" Header="Select System" Padding="10" Margin="0,0,0,10"
-                  Foreground="LightGray" BorderBrush="#555555" BorderThickness="1">
-            <ComboBox x:Name="SystemComboBox"
-                      SelectionChanged="SystemComboBox_SelectionChanged"
-                      IsEditable="True"
-                      IsTextSearchEnabled="True"
-                      Style="{StaticResource DarkComboBoxStyle}"/>
+        <GroupBox Grid.Row="0" Header="Select System" Padding="5" Margin="0,0,0,10" BorderThickness="1">
+            <ComboBox x:Name="SystemComboBox" SelectionChanged="SystemComboBox_SelectionChanged" IsEditable="True" IsTextSearchEnabled="True" Height="20" />
+
         </GroupBox>
 
         <!-- Current Upgrades List -->
-        <GroupBox Grid.Row="1" Header="Current Upgrades" Padding="10" Margin="0,0,0,10"
+        <GroupBox Grid.Row="1" Header="Current Upgrades" Padding="5" Margin="0,0,0,10"
                   Foreground="LightGray" BorderBrush="#555555" BorderThickness="1">
             <Grid>
                 <Grid.RowDefinitions>
@@ -124,24 +97,28 @@
                 <Label Grid.Row="0" Grid.Column="0" Content="Slot:" Margin="5" VerticalAlignment="Center" Foreground="White"/>
                 <TextBox x:Name="SlotNumberTextBox" Grid.Row="0" Grid.Column="1" Margin="5" VerticalAlignment="Center"/>
 
-                <Label Grid.Row="0" Grid.Column="2" Content="Upgrade Type:" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-                <ComboBox x:Name="UpgradeTypeComboBox" Grid.Row="0" Grid.Column="3" Margin="5" VerticalAlignment="Center"
-                          Style="{StaticResource DarkComboBoxStyle}">
-                    <ComboBoxItem Content="Major Threat Detection Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Minor Threat Detection Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Power Monitoring Division" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Pyerite Prospecting Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Nocxium Prospecting Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Mexallon Prospecting Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Isogen Prospecting Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Zydrine Prospecting Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Megacyte Prospecting Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Morphite Prospecting Array" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Advanced Logistics Network" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Cynosural Navigation" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Cynosural Suppression" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Supercapital Construction Facilities" Style="{StaticResource DarkComboBoxItemStyle}"/>
-                    <ComboBoxItem Content="Clone Vat Bay" Style="{StaticResource DarkComboBoxItemStyle}"/>
+                <Label Grid.Row="0" Grid.Column="2" Content="Upgrade Type:" Margin="5" VerticalAlignment="Center"/>
+
+
+
+                <ComboBox x:Name="UpgradeTypeComboBox" Grid.Row="0" Grid.Column="3" Margin="5,0" FontSize="12" VerticalAlignment="Center">
+                    
+                    
+                    <ComboBoxItem Content="Major Threat Detection Array"/>
+                    <ComboBoxItem Content="Minor Threat Detection Array"/>
+                    <ComboBoxItem Content="Power Monitoring Division"/>
+                    <ComboBoxItem Content="Pyerite Prospecting Array"/>
+                    <ComboBoxItem Content="Nocxium Prospecting Array"/>
+                    <ComboBoxItem Content="Mexallon Prospecting Array"/>
+                    <ComboBoxItem Content="Isogen Prospecting Array" />
+                    <ComboBoxItem Content="Zydrine Prospecting Array"/>
+                    <ComboBoxItem Content="Megacyte Prospecting Array"/>
+                    <ComboBoxItem Content="Morphite Prospecting Array"/>
+                    <ComboBoxItem Content="Advanced Logistics Network"/>
+                    <ComboBoxItem Content="Cynosural Navigation"/>
+                    <ComboBoxItem Content="Cynosural Suppression"/>
+                    <ComboBoxItem Content="Supercapital Construction Facilities"/>
+                    <ComboBoxItem Content="Clone Vat Bay"/>
                 </ComboBox>
 
                 <!-- Row 2: Level and Online Status -->
