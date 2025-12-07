@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using SMT.EVEData;

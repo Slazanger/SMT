@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,7 +29,6 @@ using NAudio.Wave;
 using NHotkey;
 using NHotkey.Wpf;
 using SMT.EVEData;
-using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT
 {
@@ -68,7 +68,7 @@ namespace SMT
 
         private System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
 
-        private readonly string WindowLayoutVersion = "02";
+        private readonly string WindowLayoutVersion = "03";
 
         private IWavePlayer waveOutEvent;
         private AudioFileReader audioFileReader;
@@ -1152,6 +1152,73 @@ namespace SMT
                         }
                     }
                 }
+            }
+        }
+
+        private void ManageInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            InfrastructureUpgradeWindow upgradeWindow = new InfrastructureUpgradeWindow();
+            upgradeWindow.EM = EVEManager;
+            upgradeWindow.Owner = this;
+            upgradeWindow.ShowDialog();
+
+            // Refresh the current region view after closing the window
+            if(RegionUC != null)
+            {
+                RegionUC.ReDrawMap(false);
+            }
+        }
+
+        private void LoadInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+            dlg.Title = "Load Infrastructure Upgrades";
+
+            // Default to the auto-load file location
+            string defaultPath = System.IO.Path.Combine(GetStorageRoot(), "InfrastructureUpgrades.txt");
+            if(System.IO.File.Exists(defaultPath))
+            {
+                dlg.FileName = defaultPath;
+            }
+            else
+            {
+                dlg.InitialDirectory = GetStorageRoot();
+            }
+
+            bool? result = dlg.ShowDialog();
+
+            if(result == true)
+            {
+                string filename = dlg.FileName;
+                EVEManager.LoadInfrastructureUpgrades(filename);
+
+                // Refresh the current region view to show the loaded upgrades
+                if(RegionUC != null)
+                {
+                    RegionUC.ReDrawMap(false);
+                }
+            }
+        }
+
+        private void SaveInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+            dlg.Title = "Save Infrastructure Upgrades";
+
+            // Default to the auto-load file location
+            string defaultPath = System.IO.Path.Combine(GetStorageRoot(), "InfrastructureUpgrades.txt");
+            dlg.FileName = defaultPath;
+
+            bool? result = dlg.ShowDialog();
+
+            if(result == true)
+            {
+                string filename = dlg.FileName;
+                EVEManager.SaveInfrastructureUpgrades(filename);
             }
         }
 
@@ -2552,7 +2619,7 @@ namespace SMT
             {
                 HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OverlayWindows_ToggleClicktrough_HotkeyTrigger);
             }
-            catch(NHotkey.HotkeyAlreadyRegisteredException exception)
+            catch(NHotkey.HotkeyAlreadyRegisteredException)
             {
             }
 

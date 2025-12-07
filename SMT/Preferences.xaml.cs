@@ -104,7 +104,7 @@ namespace SMT
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMT");
                 System.Diagnostics.Process.Start("explorer.exe", storageRoot);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //MessageBox.Show("Error opening folder: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }

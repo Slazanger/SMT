@@ -1727,6 +1727,34 @@ namespace SMT
                     }
                 }
             }
+
+            // Draw Infrastructure Upgrade indicators (green circles)
+            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            foreach(KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
+            {
+                EVEData.MapSystem sys = kvp.Value;
+                bool isSystemOOR = sys.OutOfRegion;
+
+                if(Region.MetaRegion)
+                {
+                    isSystemOOR = !sys.ActualSystem.FactionWarSystem;
+                }
+
+                if(!isSystemOOR && sys.ActualSystem.InfrastructureUpgrades.Count > 0)
+                {
+                    Shape UpgradeIndicator = new Ellipse { Width = 6, Height = 6 };
+                    UpgradeIndicator.Stroke = SysOutlineBrush;
+                    UpgradeIndicator.StrokeThickness = 1.0;
+                    UpgradeIndicator.StrokeLineJoin = PenLineJoin.Round;
+                    UpgradeIndicator.Fill = new SolidColorBrush(Colors.LimeGreen);
+
+                    Canvas.SetLeft(UpgradeIndicator, sys.Layout.X - 14);
+                    Canvas.SetTop(UpgradeIndicator, sys.Layout.Y - 3);
+                    Canvas.SetZIndex(UpgradeIndicator, ZINDEX_CYNOBEACON);
+                    MainCanvas.Children.Add(UpgradeIndicator);
+                    DynamicMapElements.Add(UpgradeIndicator);
+                }
+            }
         }
 
         private Brush Gallente_FL = BrushCache.GetSolidBrush(100, 73, 171, 104);
@@ -3601,6 +3629,28 @@ namespace SMT
                     sov.Content = $"TCU\t:  {selectedSys.ActualSystem.TCUVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.TCUVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.TCUOccupancyLevel}";
                     sov.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(sov);
+                }
+
+                // update Infrastructure Upgrades
+                if(selectedSys.ActualSystem.InfrastructureUpgrades.Count > 0)
+                {
+                    Label upgradeHeader = new Label();
+                    upgradeHeader.Padding = one;
+                    upgradeHeader.Margin = one;
+                    upgradeHeader.Content = "Infrastructure Upgrades:";
+                    upgradeHeader.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    upgradeHeader.FontWeight = FontWeights.Bold;
+                    SystemInfoPopupSP.Children.Add(upgradeHeader);
+
+                    foreach(EVEData.InfrastructureUpgrade upgrade in selectedSys.ActualSystem.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
+                    {
+                        Label upgradeLabel = new Label();
+                        upgradeLabel.Padding = new Thickness(15, 1, 1, 1);
+                        upgradeLabel.Margin = one;
+                        upgradeLabel.Content = $"{upgrade.SlotNumber}. {upgrade.DisplayName} - {upgrade.Status}";
+                        upgradeLabel.Foreground = new SolidColorBrush(upgrade.IsOnline ? Colors.LightGreen : Colors.Gray);
+                        SystemInfoPopupSP.Children.Add(upgradeLabel);
+                    }
                 }
 
                 List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();

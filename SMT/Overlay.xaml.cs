@@ -297,7 +297,6 @@ namespace SMT
 
         private int overlayDepth = 8;
         private Dictionary<LocalCharacter, OverlaySystemData> currentPlayersSystemData = new();
-        private OverlaySystemData currentPlayerSystemData;
         private OverlayCanvasData canvasData = new OverlayCanvasData();
 
         private float intelUrgentPeriod = 300;
