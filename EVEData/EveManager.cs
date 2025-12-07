@@ -2999,6 +2999,13 @@ namespace SMT.EVEData
 
             ActiveSovCampaigns = new List<SOVCampaign>();
 
+            // Auto-load infrastructure upgrades if file exists
+            string upgradesFile = Path.Combine(SaveDataRootFolder, "InfrastructureUpgrades.txt");
+            if (File.Exists(upgradesFile))
+            {
+                LoadInfrastructureUpgrades(upgradesFile);
+            }
+
             InitZKillFeed();
 
             StartBackgroundThread();
@@ -4006,5 +4013,205 @@ namespace SMT.EVEData
             catch { }
         }
 
+        public void RemoveCharacter(LocalCharacter lc)
+        {
+            LocalCharacters.Remove(lc);
+
+            if(LocalCharacterUpdateEvent != null)
+            {
+                LocalCharacterUpdateEvent();
+            }
+        }
+
+        /// <summary>
+        /// Load Infrastructure Hub Upgrades from a text file
+        /// Format:
+        /// SYSTEMNAME
+        /// 1    Upgrade Name    Level    Status
+        /// or (legacy format):
+        /// Sovereignty Hub SYSTEMNAME
+        /// 1    Upgrade Name    Level    Status
+        /// </summary>
+        public void LoadInfrastructureUpgrades(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            try
+            {
+                string[] lines = File.ReadAllLines(filePath);
+                string currentSystem = null;
+
+                foreach (string line in lines)
+                {
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        continue;
+                    }
+
+                    string trimmedLine = line.Trim();
+
+                    // Check if this line starts with a digit (upgrade line)
+                    bool isUpgradeLine = char.IsDigit(trimmedLine.FirstOrDefault());
+
+                    if (!isUpgradeLine)
+                    {
+                        // This is a system header line
+                        // Support both "Sovereignty Hub SYSTEMNAME" and just "SYSTEMNAME"
+                        if (trimmedLine.StartsWith("Sovereignty Hub "))
+                        {
+                            currentSystem = trimmedLine.Replace("Sovereignty Hub ", "").Trim();
+                        }
+                        else
+                        {
+                            currentSystem = trimmedLine;
+                        }
+
+                        // Clear existing upgrades for this system
+                        System sys = GetEveSystem(currentSystem);
+                        if (sys != null)
+                        {
+                            sys.InfrastructureUpgrades.Clear();
+                        }
+                    }
+                    else if (currentSystem != null)
+                    {
+                        // Parse upgrade line
+                        string[] parts = line.Split(new[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        if (parts.Length >= 3)
+                        {
+                            System sys = GetEveSystem(currentSystem);
+                            if (sys != null)
+                            {
+                                InfrastructureUpgrade upgrade = new InfrastructureUpgrade();
+
+                                // Parse slot number
+                                if (int.TryParse(parts[0], out int slotNum))
+                                {
+                                    upgrade.SlotNumber = slotNum;
+                                }
+
+                                // Parse upgrade name and level
+                                // The upgrade name could be multiple words, and the level might be at the end
+                                // Status is always the last word (Online/Offline)
+                                string status = parts[parts.Length - 1];
+                                upgrade.IsOnline = status.Equals("Online", StringComparison.OrdinalIgnoreCase);
+
+                                // Check if second-to-last part is a number (level)
+                                int levelIndex = -1;
+                                int level = 0;
+                                if (parts.Length >= 4 && int.TryParse(parts[parts.Length - 2], out level))
+                                {
+                                    upgrade.Level = level;
+                                    levelIndex = parts.Length - 2;
+                                }
+                                else
+                                {
+                                    upgrade.Level = 0;
+                                    levelIndex = parts.Length - 1;
+                                }
+
+                                // Build upgrade name from remaining parts
+                                List<string> nameParts = new List<string>();
+                                for (int i = 1; i < levelIndex; i++)
+                                {
+                                    nameParts.Add(parts[i]);
+                                }
+                                upgrade.UpgradeName = string.Join(" ", nameParts);
+
+                                sys.InfrastructureUpgrades.Add(upgrade);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error if needed
+            }
+        }
+
+        /// <summary>
+        /// Save Infrastructure Hub Upgrades to a text file
+        /// </summary>
+        public void SaveInfrastructureUpgrades(string filePath)
+        {
+            try
+            {
+                List<string> lines = new List<string>();
+
+                foreach (System sys in Systems)
+                {
+                    if (sys.InfrastructureUpgrades.Count > 0)
+                    {
+                        lines.Add(sys.Name);
+
+                        foreach (InfrastructureUpgrade upgrade in sys.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
+                        {
+                            lines.Add(upgrade.ToString());
+                        }
+
+                        lines.Add(""); // Empty line between systems
+                    }
+                }
+
+                File.WriteAllLines(filePath, lines);
+            }
+            catch (Exception ex)
+            {
+                // Log error if needed
+            }
+        }
+
+        /// <summary>
+        /// Add or update an infrastructure upgrade for a system
+        /// </summary>
+        public void SetInfrastructureUpgrade(string systemName, int slotNumber, string upgradeName, int level, bool isOnline)
+        {
+            System sys = GetEveSystem(systemName);
+            if (sys != null)
+            {
+                // Check if upgrade already exists in this slot
+                InfrastructureUpgrade existing = sys.InfrastructureUpgrades.FirstOrDefault(u => u.SlotNumber == slotNumber);
+
+                if (existing != null)
+                {
+                    // Update existing
+                    existing.UpgradeName = upgradeName;
+                    existing.Level = level;
+                    existing.IsOnline = isOnline;
+                }
+                else
+                {
+                    // Add new
+                    sys.InfrastructureUpgrades.Add(new InfrastructureUpgrade
+                    {
+                        SlotNumber = slotNumber,
+                        UpgradeName = upgradeName,
+                        Level = level,
+                        IsOnline = isOnline
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove an infrastructure upgrade from a system
+        /// </summary>
+        public void RemoveInfrastructureUpgrade(string systemName, int slotNumber)
+        {
+            System sys = GetEveSystem(systemName);
+            if (sys != null)
+            {
+                InfrastructureUpgrade upgrade = sys.InfrastructureUpgrades.FirstOrDefault(u => u.SlotNumber == slotNumber);
+                if (upgrade != null)
+                {
+                    sys.InfrastructureUpgrades.Remove(upgrade);
+                }
+            }
+        }
     }
 }

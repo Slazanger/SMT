@@ -989,6 +989,73 @@ namespace SMT
             }
         }
 
+        private void ManageInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            InfrastructureUpgradeWindow upgradeWindow = new InfrastructureUpgradeWindow();
+            upgradeWindow.EM = EVEManager;
+            upgradeWindow.Owner = this;
+            upgradeWindow.ShowDialog();
+
+            // Refresh the current region view after closing the window
+            if(RegionUC != null)
+            {
+                RegionUC.ReDrawMap(false);
+            }
+        }
+
+        private void LoadInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+            dlg.Title = "Load Infrastructure Upgrades";
+
+            // Default to the auto-load file location
+            string defaultPath = System.IO.Path.Combine(EVEData.EveAppConfig.StorageRoot, "InfrastructureUpgrades.txt");
+            if(System.IO.File.Exists(defaultPath))
+            {
+                dlg.FileName = defaultPath;
+            }
+            else
+            {
+                dlg.InitialDirectory = EVEData.EveAppConfig.StorageRoot;
+            }
+
+            bool? result = dlg.ShowDialog();
+
+            if(result == true)
+            {
+                string filename = dlg.FileName;
+                EVEManager.LoadInfrastructureUpgrades(filename);
+
+                // Refresh the current region view to show the loaded upgrades
+                if(RegionUC != null)
+                {
+                    RegionUC.ReDrawMap(false);
+                }
+            }
+        }
+
+        private void SaveInfrastructureUpgrades_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+            dlg.Title = "Save Infrastructure Upgrades";
+
+            // Default to the auto-load file location
+            string defaultPath = System.IO.Path.Combine(EVEData.EveAppConfig.StorageRoot, "InfrastructureUpgrades.txt");
+            dlg.FileName = defaultPath;
+
+            bool? result = dlg.ShowDialog();
+
+            if(result == true)
+            {
+                string filename = dlg.FileName;
+                EVEManager.SaveInfrastructureUpgrades(filename);
+            }
+        }
+
         private void FullScreenToggle_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             if(miFullScreenToggle.IsChecked)

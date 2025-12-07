@@ -20,6 +20,7 @@ namespace SMT.EVEData
             Jumps = new List<string>();
             SOVAllianceID = 0;
             HasJumpBeacon = false;
+            InfrastructureUpgrades = new List<InfrastructureUpgrade>();
         }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace SMT.EVEData
             SOVAllianceID = 0;
 
             Jumps = new List<string>();
+            InfrastructureUpgrades = new List<InfrastructureUpgrade>();
         }
 
         public enum EdenComTrigStatus
@@ -211,6 +213,12 @@ namespace SMT.EVEData
 
         [XmlIgnoreAttribute]
         public DateTime TCUVunerabliltyStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of Infrastructure Hub Upgrades for this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public List<InfrastructureUpgrade> InfrastructureUpgrades { get; set; }
 
         /// <summary>
         /// Gets or sets the Systems True Security Value
