@@ -95,15 +95,25 @@
 
                 <!-- Row 1: Slot Number and Upgrade Type -->
                 <Label Grid.Row="0" Grid.Column="0" Content="Slot:" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-                <TextBox x:Name="SlotNumberTextBox" Grid.Row="0" Grid.Column="1" Margin="5" VerticalAlignment="Center"/>
+                <ComboBox x:Name="SlotComboBox" Grid.Row="0" Grid.Column="1" Margin="5" VerticalAlignment="Center">
+                    <ComboBoxItem Content="1"/>
+                    <ComboBoxItem Content="2"/>
+                    <ComboBoxItem Content="3"/>
+                    <ComboBoxItem Content="4"/>
+                    <ComboBoxItem Content="5"/>
+                    <ComboBoxItem Content="6"/>
+                    <ComboBoxItem Content="7"/>
+                    <ComboBoxItem Content="8"/>
+                    <ComboBoxItem Content="9"/>
+                    <ComboBoxItem Content="10"/>
+                </ComboBox>
+
 
                 <Label Grid.Row="0" Grid.Column="2" Content="Upgrade Type:" Margin="5" VerticalAlignment="Center"/>
 
 
 
                 <ComboBox x:Name="UpgradeTypeComboBox" Grid.Row="0" Grid.Column="3" Margin="5,0" FontSize="12" VerticalAlignment="Center">
-                    
-                    
                     <ComboBoxItem Content="Major Threat Detection Array"/>
                     <ComboBoxItem Content="Minor Threat Detection Array"/>
                     <ComboBoxItem Content="Power Monitoring Division"/>
@@ -123,7 +133,13 @@
 
                 <!-- Row 2: Level and Online Status -->
                 <Label Grid.Row="1" Grid.Column="0" Content="Level:" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-                <TextBox x:Name="LevelTextBox" Grid.Row="1" Grid.Column="1" Margin="5" Text="0" VerticalAlignment="Center"/>
+                <ComboBox x:Name="LevelComboBox" Grid.Row="1" Grid.Column="1" Margin="5" Text="0" VerticalAlignment="Center">
+                    <ComboBoxItem Content="0"/>
+                    <ComboBoxItem Content="1"/>
+                    <ComboBoxItem Content="2"/>
+                    <ComboBoxItem Content="3"/>
+                </ComboBox>
+
 
                 <CheckBox x:Name="OnlineCheckBox" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="Online" Margin="15,5,5,5" IsChecked="True" VerticalAlignment="Center" Foreground="White"/>
 

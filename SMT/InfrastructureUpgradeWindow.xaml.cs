@@ -101,17 +101,22 @@ namespace SMT
                 return;
             }
 
-            if (!int.TryParse(SlotNumberTextBox.Text, out int slotNumber) || slotNumber < 1 || slotNumber > 10)
-            {
-                MessageBox.Show("Please enter a valid slot number (1-10).", "Invalid Slot Number", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
 
-            if (!int.TryParse(LevelTextBox.Text, out int level) || level < 0 || level > 3)
+            if(SlotComboBox.SelectedIndex == -1)
             {
-                MessageBox.Show("Please enter a valid level (0-3).", "Invalid Level", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please select a valid slot number (1-10)..", "Invalid Slot", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+            int slotNumber = SlotComboBox.SelectedIndex + 1;
+
+
+
+            if(LevelComboBox.SelectedIndex == -1)
+            {
+                MessageBox.Show("Please select a valid level (0-3).", "Invalid Level", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            int level = LevelComboBox.SelectedIndex;
 
             string upgradeName = (UpgradeTypeComboBox.SelectedItem as ComboBoxItem).Content.ToString();
             bool isOnline = OnlineCheckBox.IsChecked ?? false;
@@ -125,8 +130,8 @@ namespace SMT
                 AutoSave();
 
                 // Clear the form
-                SlotNumberTextBox.Clear();
-                LevelTextBox.Text = "0";
+                SlotComboBox.SelectedIndex = -1;
+                LevelComboBox.SelectedIndex = -1;
                 UpgradeTypeComboBox.SelectedIndex = -1;
                 OnlineCheckBox.IsChecked = true;
             }
