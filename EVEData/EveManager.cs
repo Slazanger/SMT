@@ -4013,15 +4013,6 @@ namespace SMT.EVEData
             catch { }
         }
 
-        public void RemoveCharacter(LocalCharacter lc)
-        {
-            LocalCharacters.Remove(lc);
-
-            if(LocalCharacterUpdateEvent != null)
-            {
-                LocalCharacterUpdateEvent();
-            }
-        }
 
         /// <summary>
         /// Load Infrastructure Hub Upgrades from a text file

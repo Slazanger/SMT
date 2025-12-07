@@ -60,7 +60,7 @@ namespace SMT
 
         private System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
 
-        private readonly string WindowLayoutVersion = "02";
+        private readonly string WindowLayoutVersion = "03";
 
         private IWavePlayer waveOutEvent;
         private AudioFileReader audioFileReader;
