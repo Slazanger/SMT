@@ -24,8 +24,10 @@ namespace SMT.EVEData
         private static Dictionary<string, MapNode> MapNodes { get; set; }
         private static List<string> TheraLinks { get; set; }
         private static List<string> ZarzakhLinks { get; set; }
-
         private static List<string> TurnurLinks { get; set; }
+        
+        // Track nodes that were touched (visited OR added to open list) in the last navigation run for lazy reset
+        private static HashSet<MapNode> LastTouchedNodes { get; set; } = new HashSet<MapNode>();
 
         public static void ClearJumpBridges()
         {
@@ -297,87 +299,108 @@ namespace SMT.EVEData
                 return null;
             }
 
-            // clear the scores, values and parents from the list
-            foreach (MapNode mapNode in MapNodes.Values)
+            // Lazy reset: only clear nodes that were touched (visited OR in open list) in the previous run
+            foreach (MapNode mapNode in LastTouchedNodes)
             {
                 mapNode.NearestToStart = null;
                 mapNode.MinCostToStart = 0;
                 mapNode.Visited = false;
-
-                switch (routingMode)
-                {
-                    case RoutingMode.PreferLow:
-                        {
-                            if (mapNode.HighSec)
-                                mapNode.Cost = 1000;
-                        }
-                        break;
-
-                    case RoutingMode.Safest:
-                        {
-                            if (!mapNode.HighSec)
-                                mapNode.Cost = 1000;
-                        }
-                        break;
-
-                    case RoutingMode.Shortest:
-                        mapNode.Cost = 1;
-                        break;
-                }
             }
+            LastTouchedNodes.Clear();
+
+            // Routing costs will be calculated dynamically during pathfinding - no need to process all nodes
 
             MapNode Start = MapNodes[From];
             MapNode End = MapNodes[To];
 
-            List<MapNode> OpenList = new List<MapNode>();
-            List<MapNode> ClosedList = new List<MapNode>();
+            // Use local collections for thread safety and reliability
+            SortedSet<MapNode> OpenList = new SortedSet<MapNode>(new MapNodeComparer());
+            HashSet<MapNode> OpenSet = new HashSet<MapNode>(); // For fast Contains operations
+            HashSet<MapNode> ClosedSet = new HashSet<MapNode>();
 
             MapNode CurrentNode = null;
 
             // add the start to the open list
             OpenList.Add(Start);
+            OpenSet.Add(Start);
+            LastTouchedNodes.Add(Start);
 
             while (OpenList.Count > 0)
             {
-                // get the MapNode with the lowest F score
-                double lowest = OpenList.Min(mn => mn.MinCostToStart);
-                CurrentNode = OpenList.First(mn => mn.MinCostToStart == lowest);
+                // get the MapNode with the lowest cost - O(1) operation with SortedSet
+                CurrentNode = OpenList.Min;
 
-                // add the list to the closed list
-                ClosedList.Add(CurrentNode);
+                // add to the closed set
+                ClosedSet.Add(CurrentNode);
 
-                // remove it from the open list
+                // remove from the open list and set - O(log n) operation
                 OpenList.Remove(CurrentNode);
+                OpenSet.Remove(CurrentNode);
+
+                // Early termination: stop when we reach the destination
+                if (CurrentNode == End)
+                {
+                    break;
+                }
 
                 // walk the connections
                 foreach (string connectionName in CurrentNode.Connections)
                 {
-                    MapNode CMN = MapNodes[connectionName];
+                    MapNode connectionNode = MapNodes[connectionName];
 
-                    if (CMN.Visited)
+                    if (connectionNode.Visited)
                         continue;
 
-                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
+                    double connectionCost = GetRoutingCost(connectionNode, routingMode);
+                    double newCostToStart = CurrentNode.MinCostToStart + connectionCost;
+                    
+                    if (connectionNode.MinCostToStart == 0 || newCostToStart < connectionNode.MinCostToStart)
                     {
-                        CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
-                        CMN.NearestToStart = CurrentNode;
-                        if (!OpenList.Contains(CMN))
+                        // If node is already in open set, remove it first to update its position
+                        if (OpenSet.Contains(connectionNode))
                         {
-                            OpenList.Add(CMN);
+                            OpenList.Remove(connectionNode);
+                            OpenSet.Remove(connectionNode);
+                        }
+                        
+                        connectionNode.MinCostToStart = newCostToStart;
+                        connectionNode.NearestToStart = CurrentNode;
+                        LastTouchedNodes.Add(connectionNode);
+                        
+                        if (!ClosedSet.Contains(connectionNode))
+                        {
+                            OpenList.Add(connectionNode);
+                            OpenSet.Add(connectionNode);
                         }
                     }
                 }
 
                 if (UseJumpGates && CurrentNode.JBConnection != null)
                 {
-                    MapNode JMN = MapNodes[CurrentNode.JBConnection];
-                    if (!JMN.Visited && JMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + JMN.Cost < JMN.MinCostToStart)
+                    MapNode jumpBridgeNode = MapNodes[CurrentNode.JBConnection];
+                    if (!jumpBridgeNode.Visited)
                     {
-                        JMN.MinCostToStart = CurrentNode.MinCostToStart + JMN.Cost;
-                        JMN.NearestToStart = CurrentNode;
-                        if (!OpenList.Contains(JMN))
+                        double connectionCost = GetRoutingCost(jumpBridgeNode, routingMode);
+                        double newCostToStart = CurrentNode.MinCostToStart + connectionCost;
+                        
+                        if (jumpBridgeNode.MinCostToStart == 0 || newCostToStart < jumpBridgeNode.MinCostToStart)
                         {
-                            OpenList.Add(JMN);
+                            // If node is already in open set, remove it first to update its position
+                            if (OpenSet.Contains(jumpBridgeNode))
+                            {
+                                OpenList.Remove(jumpBridgeNode);
+                                OpenSet.Remove(jumpBridgeNode);
+                            }
+                            
+                            jumpBridgeNode.MinCostToStart = newCostToStart;
+                            jumpBridgeNode.NearestToStart = CurrentNode;
+                            LastTouchedNodes.Add(jumpBridgeNode);
+                            
+                            if (!ClosedSet.Contains(jumpBridgeNode))
+                            {
+                                OpenList.Add(jumpBridgeNode);
+                                OpenSet.Add(jumpBridgeNode);
+                            }
                         }
                     }
                 }
@@ -386,22 +409,35 @@ namespace SMT.EVEData
                 {
                     foreach (string theraConnection in CurrentNode.TheraConnections)
                     {
-                        MapNode CMN = MapNodes[theraConnection];
+                        MapNode theraNode = MapNodes[theraConnection];
 
-                        if (CMN.Visited)
+                        if (theraNode.Visited)
                             continue;
 
                         // dont jump back to the system we came from
                         if (CurrentNode.Name == theraConnection)
                             continue;
 
-                        if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
+                        double connectionCost = GetRoutingCost(theraNode, routingMode);
+                        double newCostToStart = CurrentNode.MinCostToStart + connectionCost;
+                        
+                        if (theraNode.MinCostToStart == 0 || newCostToStart < theraNode.MinCostToStart)
                         {
-                            CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
-                            CMN.NearestToStart = CurrentNode;
-                            if (!OpenList.Contains(CMN))
+                            // If node is already in open set, remove it first to update its position
+                            if (OpenSet.Contains(theraNode))
                             {
-                                OpenList.Add(CMN);
+                                OpenList.Remove(theraNode);
+                                OpenSet.Remove(theraNode);
+                            }
+                            
+                            theraNode.MinCostToStart = newCostToStart;
+                            theraNode.NearestToStart = CurrentNode;
+                            LastTouchedNodes.Add(theraNode);
+                            
+                            if (!ClosedSet.Contains(theraNode))
+                            {
+                                OpenList.Add(theraNode);
+                                OpenSet.Add(theraNode);
                             }
                         }
                     }
@@ -411,22 +447,35 @@ namespace SMT.EVEData
                 {
                     foreach (string turnurConnection in CurrentNode.TurnurConnections)
                     {
-                        MapNode CMN = MapNodes[turnurConnection];
+                        MapNode turnurNode = MapNodes[turnurConnection];
 
-                        if (CMN.Visited)
+                        if (turnurNode.Visited)
                             continue;
 
                         // dont jump back to the system we came from
                         if (CurrentNode.Name == turnurConnection)
                             continue;
 
-                        if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
+                        double connectionCost = GetRoutingCost(turnurNode, routingMode);
+                        double newCostToStart = CurrentNode.MinCostToStart + connectionCost;
+                        
+                        if (turnurNode.MinCostToStart == 0 || newCostToStart < turnurNode.MinCostToStart)
                         {
-                            CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
-                            CMN.NearestToStart = CurrentNode;
-                            if (!OpenList.Contains(CMN))
+                            // If node is already in open set, remove it first to update its position
+                            if (OpenSet.Contains(turnurNode))
                             {
-                                OpenList.Add(CMN);
+                                OpenList.Remove(turnurNode);
+                                OpenSet.Remove(turnurNode);
+                            }
+                            
+                            turnurNode.MinCostToStart = newCostToStart;
+                            turnurNode.NearestToStart = CurrentNode;
+                            LastTouchedNodes.Add(turnurNode);
+                            
+                            if (!ClosedSet.Contains(turnurNode))
+                            {
+                                OpenList.Add(turnurNode);
+                                OpenSet.Add(turnurNode);
                             }
                         }
                     }
@@ -436,22 +485,35 @@ namespace SMT.EVEData
                 {
                     foreach (string ZarzakhConnection in CurrentNode.ZarzakhConnections)
                     {
-                        MapNode CMN = MapNodes[ZarzakhConnection];
+                        MapNode zarzakhNode = MapNodes[ZarzakhConnection];
 
-                        if (CMN.Visited)
+                        if (zarzakhNode.Visited)
                             continue;
 
                         // don't jump back to the system we just came from
                         if (CurrentNode.Name == ZarzakhConnection)
                             continue;
 
-                        if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + CMN.Cost < CMN.MinCostToStart)
+                        double connectionCost = GetRoutingCost(zarzakhNode, routingMode);
+                        double newCostToStart = CurrentNode.MinCostToStart + connectionCost;
+                        
+                        if (zarzakhNode.MinCostToStart == 0 || newCostToStart < zarzakhNode.MinCostToStart)
                         {
-                            CMN.MinCostToStart = CurrentNode.MinCostToStart + CMN.Cost;
-                            CMN.NearestToStart = CurrentNode;
-                            if (!OpenList.Contains(CMN))
+                            // If node is already in open set, remove it first to update its position
+                            if (OpenSet.Contains(zarzakhNode))
                             {
-                                OpenList.Add(CMN);
+                                OpenList.Remove(zarzakhNode);
+                                OpenSet.Remove(zarzakhNode);
+                            }
+                            
+                            zarzakhNode.MinCostToStart = newCostToStart;
+                            zarzakhNode.NearestToStart = CurrentNode;
+                            LastTouchedNodes.Add(zarzakhNode);
+                            
+                            if (!ClosedSet.Contains(zarzakhNode))
+                            {
+                                OpenList.Add(zarzakhNode);
+                                OpenSet.Add(zarzakhNode);
                             }
                         }
                     }
@@ -465,6 +527,7 @@ namespace SMT.EVEData
                 */
 
                 CurrentNode.Visited = true;
+                LastTouchedNodes.Add(CurrentNode);
             }
 
             // build the path
@@ -606,6 +669,7 @@ namespace SMT.EVEData
                 }
 
                 CurrentNode.Visited = true;
+                LastTouchedNodes.Add(CurrentNode);
             }
 
             // build the path
@@ -657,6 +721,22 @@ namespace SMT.EVEData
             }
         }
 
+        private static double GetRoutingCost(MapNode node, RoutingMode routingMode)
+        {
+            switch (routingMode)
+            {
+                case RoutingMode.PreferLow:
+                    return node.HighSec ? 1000 : 1;
+                    
+                case RoutingMode.Safest:
+                    return !node.HighSec ? 1000 : 1;
+                    
+                case RoutingMode.Shortest:
+                default:
+                    return 1;
+            }
+        }
+
         private struct JumpLink
         {
             public decimal RangeLY;
@@ -695,6 +775,24 @@ namespace SMT.EVEData
                 }
 
                 return s;
+            }
+        }
+
+        private class MapNodeComparer : IComparer<MapNode>
+        {
+            public int Compare(MapNode x, MapNode y)
+            {
+                if (x == null && y == null) return 0;
+                if (x == null) return -1;
+                if (y == null) return 1;
+                
+                // Primary comparison: MinCostToStart
+                int costComparison = x.MinCostToStart.CompareTo(y.MinCostToStart);
+                if (costComparison != 0)
+                    return costComparison;
+                
+                // Reliable tie-breaker: use system name for stable, deterministic sorting
+                return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
             }
         }
 

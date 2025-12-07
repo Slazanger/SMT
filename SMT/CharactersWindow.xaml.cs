@@ -18,6 +18,9 @@ namespace SMT
         {
             MainWindow mw = Owner as MainWindow;
             mw.EVEManager.LocalCharacterUpdateEvent += EVEManager_LocalCharacterUpdateEvent;
+            
+            // Bind to the ObservableCollection
+            characterLV.ItemsSource = mw.EVEManager.LocalCharacters;
         }
 
         private void EVEManager_LocalCharacterUpdateEvent()
@@ -104,13 +107,8 @@ namespace SMT
             {
                 MainWindow mw = Owner as MainWindow;
 
-                int Index = mw.EVEManager.LocalCharacters.IndexOf(lc);
-                if (Index > 0)
+                if (mw.EVEManager.MoveLocalCharacterUp(lc))
                 {
-                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index - 1];
-                    mw.EVEManager.LocalCharacters[Index - 1] = lc;
-                    mw.EVEManager.LocalCharacters[Index] = swap;
-
                     characterLV.Items.Refresh();
                 }
             }
@@ -123,13 +121,8 @@ namespace SMT
             {
                 MainWindow mw = Owner as MainWindow;
 
-                int Index = mw.EVEManager.LocalCharacters.IndexOf(lc);
-                if (Index >= 0 && Index < mw.EVEManager.LocalCharacters.Count - 1)
+                if (mw.EVEManager.MoveLocalCharacterDown(lc))
                 {
-                    EVEData.LocalCharacter swap = mw.EVEManager.LocalCharacters[Index + 1];
-                    mw.EVEManager.LocalCharacters[Index + 1] = lc;
-                    mw.EVEManager.LocalCharacters[Index] = swap;
-
                     characterLV.Items.Refresh();
                 }
             }

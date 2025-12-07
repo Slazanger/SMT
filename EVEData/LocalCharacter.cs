@@ -67,6 +67,8 @@ namespace SMT.EVEData
 
         private int m_activeRouteLength = 0;
 
+        private bool m_updateTick = true;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class
         /// </summary>
@@ -657,7 +659,8 @@ namespace SMT.EVEData
 
             return toStr;
         }
-
+        
+        
 
         /// <summary>
         /// Update the Character info
@@ -666,6 +669,7 @@ namespace SMT.EVEData
         {
             await UpdateLock.WaitAsync();
             {
+
                 TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
                 if (ts.Minutes < 1)
                 {
@@ -679,9 +683,15 @@ namespace SMT.EVEData
                     await UpdatePositionFromESI().ConfigureAwait(false);
                 }
 
-                await UpdateOnlineStatus().ConfigureAwait(false);
+                // update onliune and fleet status every other tick
+                if(m_updateTick)
+                {
+                    await UpdateOnlineStatus().ConfigureAwait(false);
+                    await UpdateFleetInfo().ConfigureAwait(false);
+                }
 
-                await UpdateFleetInfo().ConfigureAwait(false);
+                m_updateTick = !m_updateTick;
+
 
                 if (routeNeedsUpdate)
                 {
