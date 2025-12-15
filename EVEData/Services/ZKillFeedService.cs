@@ -256,7 +256,7 @@ namespace SMT.EVEData.Services
                 List<int> allianceIdsToResolve = new List<int>();
                 if (string.IsNullOrEmpty(killSimple.VictimAllianceName) && killSimple.VictimAllianceID != 0)
                 {
-                    if (!eveManager.AllianceIDToTicker.ContainsKey(killSimple.VictimAllianceID))
+                    if (!eveManager.HasAllianceID(killSimple.VictimAllianceID))
                     {
                         allianceIdsToResolve.Add(killSimple.VictimAllianceID);
                     }
@@ -346,12 +346,12 @@ namespace SMT.EVEData.Services
                     {
                         if (string.IsNullOrEmpty(kill.VictimAllianceName) && kill.VictimAllianceID != 0)
                         {
-                            if (!eveManager.AllianceIDToTicker.ContainsKey(kill.VictimAllianceID) && 
+                            if (!eveManager.HasAllianceID(kill.VictimAllianceID) && 
                                 !allianceIdsToResolve.Contains(kill.VictimAllianceID))
                             {
                                 allianceIdsToResolve.Add(kill.VictimAllianceID);
                             }
-                            else if (eveManager.AllianceIDToTicker.ContainsKey(kill.VictimAllianceID))
+                            else if (eveManager.HasAllianceID(kill.VictimAllianceID))
                             {
                                 // Alliance is already resolved, just update the name
                                 kill.VictimAllianceName = eveManager.GetAllianceName(kill.VictimAllianceID);

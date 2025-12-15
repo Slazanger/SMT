@@ -60,6 +60,26 @@ namespace SMT.EVEData.Services
 
             _isMonitoring = true;
             _logger.LogInformation("File monitoring started successfully");
+            _logger.LogInformation("_isMonitoring set to true, _currentLogFolder: {Folder}", _currentLogFolder);
+            
+            // Also start the cache trigger directly here as a backup
+            // The BackgroundService should also start it, but this ensures it runs
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(2000); // Give BackgroundService a chance to start it first
+                if (_isMonitoring && !string.IsNullOrEmpty(_currentLogFolder))
+                {
+                    _logger.LogInformation("Starting file cache trigger directly (backup method)");
+                    try
+                    {
+                        await StartFileCacheTriggerAsync(CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error starting cache trigger directly");
+                    }
+                }
+            });
         }
 
         public async Task StopMonitoringAsync()
@@ -87,8 +107,29 @@ namespace SMT.EVEData.Services
         {
             _logger.LogInformation("FileMonitoringService background task starting");
 
-            // Start the file cache trigger (the "super hack" from original code)
-            await StartFileCacheTriggerAsync(stoppingToken);
+            // Wait for monitoring to be started before starting the cache trigger
+            // The cache trigger needs _currentLogFolder to be set
+            int waitCount = 0;
+            while (!_isMonitoring && !stoppingToken.IsCancellationRequested)
+            {
+                waitCount++;
+                if (waitCount % 5 == 0) // Log every 5 seconds
+                {
+                    _logger.LogInformation("Waiting for file monitoring to start... (waited {Seconds} seconds)", waitCount);
+                }
+                await Task.Delay(1000, stoppingToken);
+            }
+
+            if (_isMonitoring && !stoppingToken.IsCancellationRequested)
+            {
+                _logger.LogInformation("File monitoring is active, starting file cache trigger");
+                // Start the file cache trigger (the "super hack" from original code)
+                await StartFileCacheTriggerAsync(stoppingToken);
+            }
+            else if (!_isMonitoring)
+            {
+                _logger.LogWarning("File monitoring was never started, cache trigger not running");
+            }
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
@@ -107,22 +148,48 @@ namespace SMT.EVEData.Services
         {
             var chatlogFolder = Path.Combine(eveLogFolder, "Chatlogs");
 
+            _logger.LogInformation("Setting up intel watcher for folder: {ChatlogFolder}", chatlogFolder);
+            _logger.LogInformation("Chatlog folder exists: {Exists}", Directory.Exists(chatlogFolder));
+
             if (!Directory.Exists(chatlogFolder))
             {
                 _logger.LogWarning("Chat log folder does not exist: {ChatlogFolder}", chatlogFolder);
                 return;
             }
 
-            _intelFileWatcher = new FileSystemWatcher(chatlogFolder)
+            try
             {
-                Filter = "*.txt",
-                EnableRaisingEvents = true,
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
-            };
+                _intelFileWatcher = new FileSystemWatcher(chatlogFolder)
+                {
+                    Filter = "*.txt",
+                    EnableRaisingEvents = true,
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
+                };
 
-            _intelFileWatcher.Changed += OnIntelFileChanged;
+                _intelFileWatcher.Changed += OnIntelFileChanged;
+                
+                _logger.LogInformation("Intel file watcher setup for: {ChatlogFolder} (Filters: {Filters})", 
+                    chatlogFolder, string.Join(", ", _intelFilters));
+                _logger.LogInformation("FileSystemWatcher enabled: {Enabled}, Filter: {Filter}, NotifyFilter: {NotifyFilter}", 
+                    _intelFileWatcher.EnableRaisingEvents, _intelFileWatcher.Filter, _intelFileWatcher.NotifyFilter);
+                
+                // List some files in the directory for debugging
+                try
+                {
+                    var files = Directory.GetFiles(chatlogFolder, "*.txt").Take(5);
+                    _logger.LogInformation("Sample files in chatlog folder: {Files}", string.Join(", ", files.Select(Path.GetFileName)));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Could not list files in chatlog folder");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error setting up intel file watcher");
+                throw;
+            }
             
-            _logger.LogInformation("Intel file watcher setup for: {ChatlogFolder}", chatlogFolder);
             await Task.CompletedTask;
         }
 
@@ -193,7 +260,8 @@ namespace SMT.EVEData.Services
                 return;
             }
 
-            _logger.LogInformation("Starting file cache trigger for {FolderCount} folders", existingFolders.Count);
+            _logger.LogInformation("Starting file cache trigger for {FolderCount} folders: {Folders}", 
+                existingFolders.Count, string.Join(", ", existingFolders));
 
             try
             {
@@ -232,11 +300,48 @@ namespace SMT.EVEData.Services
                             break;
 
                         var shouldReadFile = ShouldProcessFile(file, folder);
+                        var isRecent = file.LastWriteTime > DateTime.Now.AddMinutes(-5) || file.CreationTime > DateTime.Now.AddDays(-1);
 
-                        // Only process files from the last day
-                        if (file.CreationTime > DateTime.Now.AddDays(-1) && shouldReadFile)
+                        // Process recent files or files from the last day
+                        if (isRecent && shouldReadFile)
                         {
-                            await TouchFileAsync(file.FullName);
+                            // Read new lines from the file (this is the "super hack" - direct file reading)
+                            var isChatlog = folder.Contains("Chatlogs");
+                            if (isChatlog)
+                            {
+                                var newLines = ReadNewLinesFromFile(file.FullName, _intelFileReadPos);
+                                if (newLines.Any())
+                                {
+                                    var fileName = file.Name;
+                                    var channelParts = fileName.Split("_");
+                                    var channelName = string.Join("_", channelParts, 0, Math.Max(0, channelParts.Length - 3));
+                                    var isLocalChat = fileName.Contains("Local_");
+                                    
+                                    _logger.LogInformation("File cache trigger found {Count} new lines in {FileName} (Channel: {Channel}, LocalChat: {IsLocal})", 
+                                        newLines.Count, fileName, channelName, isLocalChat);
+                                    var eventArgs = new IntelFileChangedEventArgs(file.FullName, fileName, channelName, isLocalChat, newLines);
+                                    IntelFileChanged?.Invoke(this, eventArgs);
+                                    _logger.LogInformation("IntelFileChanged event raised for {FileName}", fileName);
+                                }
+                            }
+                            else
+                            {
+                                // Game log
+                                var newLines = ReadNewLinesFromFile(file.FullName, _gameFileReadPos);
+                                if (newLines.Any())
+                                {
+                                    var fileName = file.Name;
+                                    var characterName = ExtractCharacterNameFromGameLog(fileName);
+                                    
+                                    _logger.LogInformation("File cache trigger found {Count} new lines in game log {FileName}", newLines.Count, fileName);
+                                    var eventArgs = new GameLogFileChangedEventArgs(file.FullName, fileName, characterName, newLines);
+                                    GameLogFileChanged?.Invoke(this, eventArgs);
+                                }
+                            }
+                        }
+                        else if (!shouldReadFile && isRecent)
+                        {
+                            //_logger.LogDebug("Skipping file {FileName} - doesn't match filters (Filters: {Filters})", file.Name, string.Join(", ", _intelFilters));
                         }
                     }
                 }
@@ -249,27 +354,31 @@ namespace SMT.EVEData.Services
 
         private bool ShouldProcessFile(FileInfo file, string folder)
         {
-            // Check intel filters
+            // Local chat files - always process
+            if (file.Name.Contains("Local_"))
+            {
+                //_logger.LogDebug("File {FileName} matches Local_ filter", file.Name);
+                return true;
+            }
+
+            // Game logs - always process
+            if (folder.Contains("Gamelogs"))
+            {
+                //_logger.LogDebug("File {FileName} is a game log", file.Name);
+                return true;
+            }
+
+            // Check intel filters for chat logs
             foreach (var intelFilter in _intelFilters)
             {
                 if (file.Name.Contains(intelFilter, StringComparison.OrdinalIgnoreCase))
                 {
+                    //_logger.LogDebug("File {FileName} matches intel filter '{Filter}'", file.Name, intelFilter);
                     return true;
                 }
             }
 
-            // Local chat files
-            if (file.Name.Contains("Local_"))
-            {
-                return true;
-            }
-
-            // Game logs
-            if (folder.Contains("Gamelogs"))
-            {
-                return true;
-            }
-
+            //_logger.LogTrace("File {FileName} does not match any filters (Filters: {Filters})", file.Name, string.Join(", ", _intelFilters));
             return false;
         }
 
@@ -301,6 +410,8 @@ namespace SMT.EVEData.Services
                 var changedFile = e.FullPath;
                 var fileName = e.Name ?? Path.GetFileName(changedFile);
                 
+                _logger.LogDebug("FileSystemWatcher detected intel file change: {FileName} ({FullPath})", fileName, changedFile);
+                
                 var channelParts = fileName.Split("_");
                 var channelName = string.Join("_", channelParts, 0, channelParts.Length - 3);
 
@@ -310,14 +421,26 @@ namespace SMT.EVEData.Services
 
                 if (!shouldProcess)
                 {
+                    _logger.LogDebug("Skipping file {FileName} - doesn't match filters (LocalChat: {IsLocal}, Filters: {Filters})", 
+                        fileName, isLocalChat, string.Join(", ", _intelFilters));
                     return;
                 }
+
+                _logger.LogDebug("Processing intel file: {FileName}, Channel: {Channel}, LocalChat: {IsLocal}", 
+                    fileName, channelName, isLocalChat);
 
                 var newLines = ReadNewLinesFromFile(changedFile, _intelFileReadPos);
                 if (newLines.Any())
                 {
+                    _logger.LogInformation("Found {Count} new lines in {FileName}, raising IntelFileChanged event", 
+                        newLines.Count, fileName);
                     var eventArgs = new IntelFileChangedEventArgs(changedFile, fileName, channelName, isLocalChat, newLines);
                     IntelFileChanged?.Invoke(this, eventArgs);
+                    _logger.LogDebug("IntelFileChanged event raised with {Count} lines", newLines.Count);
+                }
+                else
+                {
+                    _logger.LogDebug("No new lines found in {FileName}", fileName);
                 }
             }
             catch (Exception ex)

@@ -23,12 +23,12 @@ using System.Xml.Serialization;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using SMT.EVEData.Services;
-using static SMT.EVEData.ZKillRedisQ;
 using SMT.Utils;
 using NAudio.Wave;
 using NHotkey;
 using NHotkey.Wpf;
 using SMT.EVEData;
+using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT
 {
@@ -2619,8 +2619,9 @@ namespace SMT
             {
                 HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OverlayWindows_ToggleClicktrough_HotkeyTrigger);
             }
-            catch(NHotkey.HotkeyAlreadyRegisteredException)
+            catch (NHotkey.HotkeyAlreadyRegisteredException)
             {
+                // Hotkey already registered, ignore
             }
 
             Overlay newOverlayWindow = new Overlay(this);
