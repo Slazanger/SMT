@@ -171,7 +171,7 @@ namespace SMT.EVEData
             {
                 if(KillStream[i].VictimAllianceName == string.Empty)
                 {
-                    if(!EveManagerProvider.Current.AllianceIDToTicker.ContainsKey(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
+                    if(!EveManagerProvider.Current.HasAllianceID(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
                     {
                         AllianceIDs.Add(KillStream[i].VictimAllianceID);
                     }

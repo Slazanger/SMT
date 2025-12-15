@@ -143,7 +143,7 @@
                                         <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" />
                                         <Label x:Name="AnsiblexSummaryLbl" Content="" FontStyle="Italic" FontSize="12" />
 
-                                        <DataGrid x:Name="JumpBridgeList" Margin="2"  AutoGenerateColumns="False" AreRowDetailsFrozen="True" IsReadOnly="True" SelectionUnit="FullRow" SelectedItem="{Binding SelectedItemProperty, Mode=TwoWay}" Height="313">
+                                        <DataGrid x:Name="JumpBridgeList" Margin="2"  AutoGenerateColumns="False" AreRowDetailsFrozen="True" IsReadOnly="True" SelectionUnit="FullRow" Height="313">
 
                                             <DataGrid.CellStyle>
                                                 <Style TargetType="{x:Type DataGridCell}">

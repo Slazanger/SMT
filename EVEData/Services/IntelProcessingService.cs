@@ -103,6 +103,13 @@ namespace SMT.EVEData.Services
             _logger.LogDebug("Processing {Count} intel lines from {File} (Channel: {Channel}, LocalChat: {IsLocal})", 
                 newLines.Count, filePath, channelName, isLocalChat);
             
+            // Local chat files are only used for position tracking, not intel processing
+            if (isLocalChat)
+            {
+                _logger.LogDebug("Skipping intel processing for Local chat file (used only for position tracking): {File}", filePath);
+                return;
+            }
+            
             foreach (var line in newLines)
             {
                 ProcessIntelLine(filePath, channelName, isLocalChat, line);
@@ -134,17 +141,14 @@ namespace SMT.EVEData.Services
 
             bool addToIntel = false;
 
-            // Check if we should add this line to intel
+            // Local chat files should never be processed for intel (they're only for position tracking)
             if (isLocalChat)
             {
-                // For local chat, check if it's a system change or has intel content
-                if (line.Contains("> ") && !line.Contains("EVE System > "))
-                {
-                    addToIntel = true;
-                    _logger.LogDebug("Local chat intel detected: {Line}", line);
-                }
+                _logger.LogTrace("Skipping intel processing for Local chat line: {Line}", line);
+                return;
             }
-            else
+
+            // Check if we should add this line to intel
             {
                 // For intel channels, check against alert filters
                 // If no alert filters are configured, accept all intel
@@ -184,20 +188,24 @@ namespace SMT.EVEData.Services
                 }
             }
 
-            // Check for duplicate intel (within 5 seconds)
+            // Check for duplicate intel (within 10 seconds - increased from 5 to handle multiple EVE clients better)
             if (addToIntel)
             {
                 int start = line.IndexOf('>') + 1;
                 if (start > 0 && start < line.Length)
                 {
-                    string newIntelString = line.Substring(start);
+                    string newIntelString = line.Substring(start).Trim();
                     if (!string.IsNullOrEmpty(newIntelString))
                     {
+                        // Check against existing intel in the list
                         foreach (IntelData idl in IntelDataList)
                         {
-                            if (idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).TotalSeconds < 5)
+                            // Compare the intel string (case-insensitive) and check time window
+                            if (string.Equals(idl.IntelString, newIntelString, StringComparison.OrdinalIgnoreCase) 
+                                && (DateTime.Now - idl.IntelTime).TotalSeconds < 10)
                             {
                                 addToIntel = false;
+                                _logger.LogDebug("Duplicate intel detected (within 10s): {Intel}", newIntelString);
                                 break;
                             }
                         }

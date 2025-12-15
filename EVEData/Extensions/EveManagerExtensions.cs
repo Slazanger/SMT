@@ -26,7 +26,8 @@ namespace SMT.EVEData.Extensions
                 var configService = provider.GetRequiredService<IConfigurationService>();
                 var logger = provider.GetRequiredService<ILogger<EveManager>>();
                 var fileMonitoringService = provider.GetRequiredService<IFileMonitoringService>();
-                return new EveManager(configService, logger, fileMonitoringService, provider);
+                var intelProcessingService = provider.GetRequiredService<IIntelProcessingService>();
+                return new EveManager(configService, logger, fileMonitoringService, intelProcessingService, provider);
             });
             return services;
         }

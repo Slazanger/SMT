@@ -38,6 +38,9 @@ namespace SMT.EVEData.Extensions
             services.AddHostedService<FileMonitoringService>(provider => 
                 (FileMonitoringService)provider.GetRequiredService<IFileMonitoringService>());
             
+            // Register intel processing service
+            services.AddSingleton<IIntelProcessingService, IntelProcessingService>();
+            
             // Register EveManager as singleton FIRST (before background services that depend on it)
             services.AddEveManager();
             

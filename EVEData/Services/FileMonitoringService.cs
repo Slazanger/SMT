@@ -55,6 +55,9 @@ namespace SMT.EVEData.Services
             
             _logger.LogInformation("Starting file monitoring for EVE logs at: {LogFolder}", eveLogFolder);
 
+            // Initialize read positions to end of files to avoid reading old content on startup
+            InitializeReadPositions(eveLogFolder);
+
             await SetupIntelWatcherAsync(eveLogFolder);
             await SetupGameLogWatcherAsync(eveLogFolder);
 
@@ -382,6 +385,79 @@ namespace SMT.EVEData.Services
             return false;
         }
 
+        /// <summary>
+        /// Initialize read positions for all existing files to skip old content on startup
+        /// </summary>
+        private void InitializeReadPositions(string eveLogFolder)
+        {
+            try
+            {
+                var chatlogFolder = Path.Combine(eveLogFolder, "Chatlogs");
+                var gameLogFolder = Path.Combine(eveLogFolder, "Gamelogs");
+
+                // Initialize intel file read positions
+                if (Directory.Exists(chatlogFolder))
+                {
+                    var intelFiles = Directory.GetFiles(chatlogFolder, "*.txt");
+                    foreach (var file in intelFiles)
+                    {
+                        if (!_intelFileReadPos.ContainsKey(file))
+                        {
+                            InitializeFileReadPosition(file, _intelFileReadPos);
+                        }
+                    }
+                    _logger.LogInformation("Initialized read positions for {Count} intel files", intelFiles.Length);
+                }
+
+                // Initialize game log file read positions
+                if (Directory.Exists(gameLogFolder))
+                {
+                    var gameLogFiles = Directory.GetFiles(gameLogFolder, "*.txt");
+                    foreach (var file in gameLogFiles)
+                    {
+                        if (!_gameFileReadPos.ContainsKey(file))
+                        {
+                            InitializeFileReadPosition(file, _gameFileReadPos);
+                        }
+                    }
+                    _logger.LogInformation("Initialized read positions for {Count} game log files", gameLogFiles.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error initializing read positions");
+            }
+        }
+
+        /// <summary>
+        /// Initialize read position for a single file to the end (skip all existing content)
+        /// </summary>
+        private void InitializeFileReadPosition(string filePath, Dictionary<string, int> readPositions)
+        {
+            try
+            {
+                var encoding = Misc.GetEncoding(filePath);
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(fileStream, encoding);
+
+                int lineCount = 0;
+                while (!reader.EndOfStream)
+                {
+                    reader.ReadLine();
+                    lineCount++;
+                }
+                readPositions[filePath] = lineCount;
+                _logger.LogDebug("Initialized read position for {FileName} at line {LineCount} (end of file)", 
+                    Path.GetFileName(filePath), lineCount);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogTrace(ex, "Could not initialize read position for file: {FilePath}", filePath);
+                // If we can't read the file, set position to 0 so we'll try again later
+                readPositions[filePath] = 0;
+            }
+        }
+
         private async Task TouchFileAsync(string filePath)
         {
             try
@@ -482,7 +558,26 @@ namespace SMT.EVEData.Services
                 using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var reader = new StreamReader(fileStream, encoding);
 
-                var fileReadFrom = readPositions.ContainsKey(filePath) ? readPositions[filePath] : 0;
+                // Check if this is the first time we're reading this file
+                bool isFirstRead = !readPositions.ContainsKey(filePath);
+                
+                if (isFirstRead)
+                {
+                    // On first read, skip to the end of the file to only process new lines going forward
+                    // This prevents processing old intel when the app starts
+                    int lineCount = 0;
+                    while (!reader.EndOfStream)
+                    {
+                        reader.ReadLine();
+                        lineCount++;
+                    }
+                    readPositions[filePath] = lineCount;
+                    _logger.LogDebug("Initialized read position for {FileName} at line {LineCount} (end of file)", 
+                        Path.GetFileName(filePath), lineCount);
+                    return newLines; // Return empty - we've skipped all existing content
+                }
+
+                var fileReadFrom = readPositions[filePath];
                 
                 // Skip to the position we last read from
                 for (int i = 0; i < fileReadFrom && !reader.EndOfStream; i++)
