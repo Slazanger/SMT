@@ -67,20 +67,7 @@ namespace SMT.EVEData
         /// </summary>
         private readonly ObservableCollection<LocalCharacter> _localCharacters = new ObservableCollection<LocalCharacter>();
 
-        /// <summary>
-        /// Read position map for the intel files
-        /// </summary>
-        private Dictionary<string, int> intelFileReadPos;
-
-        /// <summary>
-        /// Read position map for the intel files
-        /// </summary>
-        private Dictionary<string, int> gameFileReadPos;
-
-        /// <summary>
-        /// Read position map for the intel files
-        /// </summary>
-        private Dictionary<string, string> gamelogFileCharacterMap;
+        // Legacy file read position dictionaries removed - now managed by FileMonitoringService
 
         /// <summary>
         /// File system watcher
@@ -218,10 +205,7 @@ namespace SMT.EVEData
             // Intel processing is now handled by IntelProcessingService
             // We'll delegate to the service's collections and filters
 
-            // Initialize file position tracking dictionaries
-            intelFileReadPos = new Dictionary<string, int>();
-            gameFileReadPos = new Dictionary<string, int>();
-            gamelogFileCharacterMap = new Dictionary<string, string>();
+            // File position tracking dictionaries removed - now managed by FileMonitoringService
 
             // Set default EVE log folder
             string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
@@ -731,14 +715,6 @@ namespace SMT.EVEData
         public List<POI> PointsOfInterest { get; set; }
 
         /// <summary>
-        /// Gets or sets the current list of ZKillData
-        /// Legacy property - use IZKillFeedService from DI container instead
-        /// This is kept for backward compatibility but should be migrated to use the service
-        /// </summary>
-        [Obsolete("Use IZKillFeedService from DI container instead")]
-        public ZKillRedisQ? ZKillFeed { get; set; }
-        
-        /// <summary>
         /// Gets the ZKill feed service from DI (if available)
         /// </summary>
         public Services.IZKillFeedService? GetZKillFeedService()
@@ -747,16 +723,17 @@ namespace SMT.EVEData
         }
         
         /// <summary>
-        /// Gets the ZKill kill stream - uses service if available, otherwise falls back to legacy ZKillFeed
+        /// Gets the ZKill kill stream from the service
         /// </summary>
         public List<ZKillRedisQ.ZKBDataSimple> GetZKillKillStream()
         {
             var service = GetZKillFeedService();
-            if (service != null)
+            if (service == null)
             {
-                return service.KillStream;
+                _logger.LogWarning("ZKillFeedService is not available");
+                return new List<ZKillRedisQ.ZKBDataSimple>();
             }
-            return ZKillFeed?.KillStream ?? new List<ZKillRedisQ.ZKBDataSimple>();
+            return service.KillStream;
         }
 
         /// <summary>
@@ -2109,10 +2086,10 @@ namespace SMT.EVEData
         {
             lock (_allianceDictionariesLock)
             {
-                if(AllianceIDToName.ContainsKey(id))
-                {
+            if(AllianceIDToName.ContainsKey(id))
+            {
                     return AllianceIDToName[id];
-                }
+            }
             }
             return string.Empty;
         }
@@ -2126,8 +2103,8 @@ namespace SMT.EVEData
         {
             lock (_allianceDictionariesLock)
             {
-                if(AllianceIDToTicker.ContainsKey(id))
-                {
+            if(AllianceIDToTicker.ContainsKey(id))
+            {
                     return AllianceIDToTicker[id];
                 }
             }
@@ -2745,11 +2722,11 @@ namespace SMT.EVEData
             List<int> UnknownIDs = new List<int>();
             lock (_allianceDictionariesLock)
             {
-                foreach(int l in IDs)
+            foreach(int l in IDs)
+            {
+                if((!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l)) && !UnknownIDs.Contains(l))
                 {
-                    if((!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l)) && !UnknownIDs.Contains(l))
-                    {
-                        UnknownIDs.Add(l);
+                    UnknownIDs.Add(l);
                     }
                 }
             }
@@ -2773,15 +2750,15 @@ namespace SMT.EVEData
                             // Thread-safe write
                             lock (_allianceDictionariesLock)
                             {
-                                if(ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
-                                {
-                                    AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
-                                    AllianceIDToName[ri.Id] = esraA.Data.Name;
-                                }
-                                else
-                                {
-                                    AllianceIDToTicker[ri.Id] = "???????????????";
-                                    AllianceIDToName[ri.Id] = "?????";
+                            if(ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
+                            {
+                                AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
+                                AllianceIDToName[ri.Id] = esraA.Data.Name;
+                            }
+                            else
+                            {
+                                AllianceIDToTicker[ri.Id] = "???????????????";
+                                AllianceIDToName[ri.Id] = "?????";
                                 }
                             }
                         }
@@ -2874,37 +2851,10 @@ namespace SMT.EVEData
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "CynoBeacons.txt"), beaconsToSave);
         }
 
-        /// <summary>
-        /// Setup the intel watcher;  Loads the intel channel filter list and creates the file system watchers
-        /// NOTE: This is a legacy method. Intel processing is now handled by IntelProcessingService.
-        /// This method now delegates to the service for backward compatibility.
-        /// </summary>
-        [Obsolete("Intel processing is now handled by IntelProcessingService. Use the service directly or let it initialize automatically.")]
-        public void SetupIntelWatcher()
-        {
-            // Legacy method - now delegates to IntelProcessingService
-            // The service is already initialized in the constructor, so this is mainly for backward compatibility
-            _intelProcessingService.LoadFiltersFromDisk(SaveDataRootFolder);
-            
-            // intelFileReadPos is now managed by FileMonitoringService, so we don't need to initialize it here
-
-            if(string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
-            {
-                string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
-                EVELogFolder = Path.Combine(logFolderLoc);
-            }
-
-            string chatlogFolder = Path.Combine(EVELogFolder, "Chatlogs");
-
-            // Legacy file watcher setup removed - now handled by FileMonitoringService
-        }
-
+        // Legacy SetupIntelWatcher method removed - now handled by FileMonitoringService and IntelProcessingService
         // Legacy SetupGameLogWatcher method removed - now handled by FileMonitoringService
-
         // SetupLogFileTriggers removed - file cache trigger now handled by FileMonitoringService
-
         // Legacy LogFileCacheTrigger method removed - file cache trigger now handled by FileMonitoringService
-
         // Legacy shutdown methods removed - file monitoring now handled by FileMonitoringService
 
         public void ShutDown()
@@ -2949,8 +2899,8 @@ namespace SMT.EVEData
                     lock (_allianceDictionariesLock)
                     {
                         if(!AllianceIDToName.ContainsKey(kvp.Value.ActualSystem.SOVAllianceID) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceID))
-                        {
-                            IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceID);
+                {
+                    IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceID);
                         }
                     }
                 }
@@ -3444,408 +3394,8 @@ namespace SMT.EVEData
 
         // Legacy InitZKillFeed removed - ZKill feed now handled by ZKillFeedService via DI
 
-        /// <summary>
-        /// Intel File watcher changed handler
-        /// </summary>
-        private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            string changedFile = e.FullPath;
-
-            string[] channelParts = e.Name.Split("_");
-            string channelName = string.Join("_", channelParts, 0, channelParts.Length - 3);
-
-            bool processFile = false;
-            bool localChat = false;
-
-            // check if the changed file path contains the name of a channel we're looking for
-            foreach(string intelFilterStr in IntelFilters)
-            {
-                if(changedFile.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
-                {
-                    processFile = true;
-                    break;
-                }
-            }
-
-            if(changedFile.Contains("Local_"))
-            {
-                localChat = true;
-                processFile = true;
-            }
-
-            if(processFile)
-            {
-                try
-                {
-                    Encoding fe = Misc.GetEncoding(changedFile);
-                    FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-                    StreamReader file = new StreamReader(ifs, fe);
-
-                    int fileReadFrom = 0;
-
-                    // have we seen this file before
-                    if(intelFileReadPos.ContainsKey(changedFile))
-                    {
-                        fileReadFrom = intelFileReadPos[changedFile];
-                    }
-                    else
-                    {
-                        if(localChat)
-                        {
-                            string system = string.Empty;
-                            string characterName = string.Empty;
-
-                            // read the iniital block
-                            while(!file.EndOfStream)
-                            {
-                                string l = file.ReadLine();
-                                fileReadFrom++;
-
-                                // explicitly skip just "local"
-                                if(l.Contains("Channel Name:    Local"))
-                                {
-                                    // now can read the next line
-                                    l = file.ReadLine(); // should be the "Listener : <CharName>"
-                                    fileReadFrom++;
-
-                                    characterName = l.Split(':')[1].Trim();
-
-                                    bool addChar = true;
-                                    foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
-                                    {
-                                        if(characterName == c.Name)
-                                        {
-                                            c.Location = system;
-                                            c.LocalChatFile = changedFile;
-
-                                            System s = GetEveSystem(system);
-                                            if(s != null)
-                                            {
-                                                c.Region = s.Region;
-                                            }
-                                            else
-                                            {
-                                                c.Region = "";
-                                            }
-
-                                            addChar = false;
-                                        }
-                                    }
-
-                                    if(addChar)
-                                    {
-                                        AddCharacter(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-
-                        while(file.ReadLine() != null)
-                        {
-                            fileReadFrom++;
-                        }
-
-                        fileReadFrom--;
-                        file.BaseStream.Seek(0, SeekOrigin.Begin);
-                    }
-
-                    for(int i = 0; i < fileReadFrom; i++)
-                    {
-                        file.ReadLine();
-                    }
-
-                    string line = file.ReadLine();
-
-                    while(line != null)
-                    {                    // trim any items off the front
-                        if(line.Contains('[') && line.Contains(']'))
-                        {
-                            line = line.Substring(line.IndexOf("["));
-                        }
-
-                        if(line == "")
-                        {
-                            line = file.ReadLine();
-                            continue;
-                        }
-
-                        fileReadFrom++;
-
-                        if(localChat)
-                        {
-                            if(line.StartsWith("[") && line.Contains("EVE System > Channel changed to Local"))
-                            {
-                                string system = line.Split(':').Last().Trim();
-
-                                foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
-                                {
-                                    if(c.LocalChatFile == changedFile)
-                                    {
-                                        c.Location = system;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // check if it is in the intel list already (ie if you have multiple clients running)
-                            bool addToIntel = true;
-
-                            int start = line.IndexOf('>') + 1;
-                            string newIntelString = line.Substring(start);
-
-                            if(newIntelString != null)
-                            {
-                                foreach(EVEData.IntelData idl in IntelDataList)
-                                {
-                                    if(idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).Seconds < 5)
-                                    {
-                                        addToIntel = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                addToIntel = false;
-                            }
-
-                            if(line.Contains("Channel MOTD:"))
-                            {
-                                addToIntel = false;
-                            }
-
-                            foreach(String ignoreMarker in IntelIgnoreFilters)
-                            {
-                                if(line.IndexOf(ignoreMarker, StringComparison.OrdinalIgnoreCase) != -1)
-                                {
-                                    addToIntel = false;
-                                    break;
-                                }
-                            }
-
-                            if(addToIntel)
-                            {
-                                EVEData.IntelData id = new EVEData.IntelData(line, channelName);
-
-                                foreach(string s in id.IntelString.Split(' '))
-                                {
-                                    if(s == "" || s.Length < 3)
-                                    {
-                                        continue;
-                                    }
-
-                                    foreach(String clearMarker in IntelClearFilters)
-                                    {
-                                        if(clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            id.ClearNotification = true;
-                                        }
-                                    }
-
-                                    foreach(System sys in Systems)
-                                    {
-                                        if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            id.Systems.Add(sys.Name);
-                                        }
-                                    }
-                                }
-
-                                IntelDataList.Enqueue(id);
-
-                                if(IntelUpdatedEvent != null)
-                                {
-                                    IntelUpdatedEvent(IntelDataList);
-                                }
-                            }
-                        }
-
-                        line = file.ReadLine();
-                    }
-
-                    ifs.Close();
-
-                    intelFileReadPos[changedFile] = fileReadFrom;
-                }
-                catch
-                {
-                }
-            }
-            else
-            {
-            }
-        }
-
-        /// <summary>
-        /// GameLog File watcher changed handler
-        /// </summary>
-        private void GameLogFileWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            string changedFile = e.FullPath;
-            string characterName = string.Empty;
-
-            try
-            {
-                Encoding fe = EVEDataUtils.Misc.GetEncoding(changedFile);
-                FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-                StreamReader file = new StreamReader(ifs, fe);
-
-                int fileReadFrom = 0;
-
-                // have we seen this file before
-                if(gameFileReadPos.ContainsKey(changedFile))
-                {
-                    fileReadFrom = gameFileReadPos[changedFile];
-                }
-                else
-                {
-                    // read the iniital block
-                    while(!file.EndOfStream)
-                    {
-                        string l = file.ReadLine();
-                        fileReadFrom++;
-
-                        // explicitly skip just "local"
-                        if(l.Contains("Gamelog"))
-                        {
-                            // now can read the next line
-                            l = file.ReadLine(); // should be the "Listener : <CharName>"
-
-                            // something wrong with the log file; clear
-                            if(!l.Contains("Listener"))
-                            {
-                                if(gameFileReadPos.ContainsKey(changedFile))
-                                {
-                                    gameFileReadPos.Remove(changedFile);
-                                }
-
-                                return;
-                            }
-
-                            fileReadFrom++;
-
-                            gamelogFileCharacterMap[changedFile] = l.Split(':')[1].Trim();
-
-                            // session started
-                            l = file.ReadLine();
-                            fileReadFrom++;
-
-                            // header end
-                            l = file.ReadLine();
-                            fileReadFrom++;
-
-                            // as its new; skip the entire file -1
-                            break;
-                        }
-                    }
-
-                    while(!file.EndOfStream)
-                    {
-                        string l = file.ReadLine();
-                        fileReadFrom++;
-                    }
-
-                    // back one line
-                    fileReadFrom--;
-
-                    file.BaseStream.Seek(0, SeekOrigin.Begin);
-                }
-
-                characterName = gamelogFileCharacterMap[changedFile];
-
-                for(int i = 0; i < fileReadFrom; i++)
-                {
-                    file.ReadLine();
-                }
-
-                string line = file.ReadLine();
-
-                while(line != null)
-                {                    // trim any items off the front
-                    if(line == "" || !line.StartsWith("["))
-                    {
-                        line = file.ReadLine();
-                        fileReadFrom++;
-                        continue;
-                    }
-
-                    fileReadFrom++;
-
-                    int typeStartPos = line.IndexOf("(") + 1;
-                    int typeEndPos = line.IndexOf(")");
-
-                    // file corrupt
-                    if(typeStartPos < 1 || typeEndPos < 1)
-                    {
-                        continue;
-                    }
-
-                    string type = line.Substring(typeStartPos, typeEndPos - typeStartPos);
-
-                    line = line.Substring(typeEndPos + 1);
-
-                    // strip the formatting from the log
-                    line = Regex.Replace(line, "<.*?>", String.Empty);
-
-                    GameLogData gd = new GameLogData()
-                    {
-                        Character = characterName,
-                        Text = line,
-                        Severity = type,
-                        Time = DateTime.Now,
-                    };
-
-                    GameLogList.Enqueue(gd);
-                    if(GameLogAddedEvent != null)
-                    {
-                        GameLogAddedEvent(GameLogList);
-                    }
-
-                    foreach(LocalCharacter lc in GetLocalCharactersCopy())
-                    {
-                        if(lc.Name == characterName)
-                        {
-                            if(type == "combat")
-                            {
-                                if(CombatEvent != null)
-                                {
-                                    lc.GameLogWarningText = line;
-                                    CombatEvent(characterName, line);
-                                }
-                            }
-
-                            if(
-                                line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") ||
-                                line.Contains("Your cloak deactivates due to proximity to") ||
-                                line.Contains("Your cloak deactivates due to a pulse from a Dazh Liminality Locus")
-                                )
-                            {
-                                if(ShipDecloakedEvent != null)
-                                {
-                                    ShipDecloakedEvent(characterName, line);
-                                    lc.GameLogWarningText = line;
-                                }
-                            }
-                        }
-                    }
-
-                    line = file.ReadLine();
-                    gameFileReadPos[changedFile] = fileReadFrom;
-                }
-
-                ifs.Close();
-
-                gameFileReadPos[changedFile] = fileReadFrom;
-            }
-            catch
-            {
-            }
-        }
+        // Legacy IntelFileWatcher_Changed method removed - now handled by FileMonitoringService and IntelProcessingService
+        // Legacy GameLogFileWatcher_Changed method removed - now handled by FileMonitoringService and IntelProcessingService
 
         /// <summary>
         /// Load the character data from disk
@@ -4110,15 +3660,15 @@ namespace SMT.EVEData
 
                         lock (_allianceDictionariesLock)
                         {
-                            if(AllianceIDToName.ContainsKey(ss.DefendingAllianceID))
+                        if(AllianceIDToName.ContainsKey(ss.DefendingAllianceID))
+                        {
+                            ss.DefendingAllianceName = AllianceIDToName[ss.DefendingAllianceID];
+                        }
+                        else
+                        {
+                            if(!allianceIDsToResolve.Contains(ss.DefendingAllianceID))
                             {
-                                ss.DefendingAllianceName = AllianceIDToName[ss.DefendingAllianceID];
-                            }
-                            else
-                            {
-                                if(!allianceIDsToResolve.Contains(ss.DefendingAllianceID))
-                                {
-                                    allianceIDsToResolve.Add(ss.DefendingAllianceID);
+                                allianceIDsToResolve.Add(ss.DefendingAllianceID);
                                 }
                             }
                         }
@@ -4148,10 +3698,10 @@ namespace SMT.EVEData
                 foreach(SOVCampaign sc in ActiveSovCampaigns.ToList())
                 {
                     lock (_allianceDictionariesLock)
+                {
+                    if(string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.ContainsKey(sc.DefendingAllianceID))
                     {
-                        if(string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.ContainsKey(sc.DefendingAllianceID))
-                        {
-                            sc.DefendingAllianceName = AllianceIDToName[sc.DefendingAllianceID];
+                        sc.DefendingAllianceName = AllianceIDToName[sc.DefendingAllianceID];
                         }
                     }
 
