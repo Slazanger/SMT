@@ -572,7 +572,7 @@
                             <xcadl:LayoutAnchorable Title="SOV Campaigns" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>
                                     <StackPanel>
-
+                                        <CheckBox Content="Selected Region Only" x:Name="SovCampaignFilterViewChk" IsChecked="False" Checked="SovCampaignFilterViewChk_Checked" Unchecked="SovCampaignFilterViewChk_Checked" Margin="4" />
                                         <DataGrid x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column">
 
                                             <DataGrid.CellStyle>
