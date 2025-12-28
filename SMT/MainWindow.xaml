@@ -589,8 +589,7 @@
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="System" Binding="{Binding Path=System, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                                                 <DataGridTextColumn Header="Region" Binding="{Binding Path=Region, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-                                                <DataGridTextColumn Header="Type" Binding="{Binding Path=Type, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-                                                <DataGridTemplateColumn  Header="Defenders Score"  Width="*">
+                                                <DataGridTemplateColumn  Header="Score"  Width="*">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <Grid>
