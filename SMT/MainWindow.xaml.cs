@@ -381,6 +381,8 @@ namespace SMT
             EVEManager.StormsUpdateEvent += Storms_CollectionChanged;
 
             SovCampaignList.ItemsSource = EVEManager.ActiveSovCampaigns;
+            CollectionView sovCampaignView = (CollectionView)CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource);
+            sovCampaignView.Filter = item => SovCampaignFilter(item);
             EVEManager.SovUpdateEvent += ActiveSovCampaigns_CollectionChanged;
 
             LoadInfoObjects();
@@ -1074,6 +1076,11 @@ namespace SMT
             }
 
             manualZKillFilterRefreshRequired = true;
+
+            if(SovCampaignList != null && SovCampaignList.ItemsSource != null)
+            {
+                CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+            }
         }
 
         private void RegionUC_UniverseSystemSelect(object sender, RoutedEventArgs e)
@@ -2107,6 +2114,7 @@ namespace SMT
             }
         }
 
+
         #endregion ZKillBoard
 
         #region Anoms
@@ -2257,6 +2265,36 @@ namespace SMT
         }
 
         #endregion Anoms
+
+
+        private bool sovCampaignFilterByRegion = false;
+
+        private void SovCampaignFilterViewChk_Checked(object sender, RoutedEventArgs e)
+        {
+            sovCampaignFilterByRegion = (bool)SovCampaignFilterViewChk.IsChecked;
+
+            if(SovCampaignList != null && SovCampaignList.ItemsSource != null)
+            {
+                CollectionViewSource.GetDefaultView(SovCampaignList.ItemsSource).Refresh();
+            }
+        }
+
+        private bool SovCampaignFilter(object item)
+        {
+            if(!sovCampaignFilterByRegion)
+                return true;
+
+            if(item is not EVEData.SOVCampaign sc)
+                return false;
+
+            string currentRegion = RegionUC?.Region?.Name;
+            if(string.IsNullOrEmpty(currentRegion))
+                return true; // no region selected => don't filter
+
+            return string.Equals(sc.Region, currentRegion, StringComparison.OrdinalIgnoreCase);
+        }
+
+
 
         private void Characters_MenuItem_Click(object sender, RoutedEventArgs e)
         {
