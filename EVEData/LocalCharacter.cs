@@ -5,8 +5,6 @@ using ESI.NET.Models.SSO;
 
 namespace SMT.EVEData
 {
-    //jumpclones
-
     public class LocalCharacter : Character, INotifyPropertyChanged 
     {
         public static readonly string SaveVersion = "03";

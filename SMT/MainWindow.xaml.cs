@@ -324,8 +324,6 @@ namespace SMT
                 EVEManager.LoadFromDisk();
             }
 
-            // Legacy file monitoring setup removed - now handled automatically by FileMonitoringService
-
             IntelCache = new ObservableCollection<IntelData>();
             RawIntelBox.ItemsSource = IntelCache;
 

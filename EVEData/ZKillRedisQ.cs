@@ -11,7 +11,6 @@ namespace SMT.EVEData
     /// </summary>
     public class ZKillRedisQ
     {
-        public string VerString = "ABC123";
         private BackgroundWorker backgroundWorker;
 
         private string QueueID;
@@ -70,9 +69,6 @@ namespace SMT.EVEData
             if(!backgroundWorker.IsBusy && !PauseUpdate)
             {
                 backgroundWorker.RunWorkerAsync();
-            }
-            else
-            {
             }
         }
 

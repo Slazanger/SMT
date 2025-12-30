@@ -50,8 +50,6 @@ namespace SMT.EVEData
         /// </summary>
         public IConfigurationService ConfigurationService => _configService;
 
-        // BackgroundThreadShouldTerminate removed - background services now handled by dedicated services
-
         /// <summary>
         /// Thread-safe access lock for LocalCharacters collection
         /// </summary>
@@ -67,25 +65,8 @@ namespace SMT.EVEData
         /// </summary>
         private readonly ObservableCollection<LocalCharacter> _localCharacters = new ObservableCollection<LocalCharacter>();
 
-        // Legacy file read position dictionaries removed - now managed by FileMonitoringService
-
-        /// <summary>
-        /// File system watcher
-        /// </summary>
-        // Legacy file watchers removed - now handled by FileMonitoringService
-
-        /// <summary>
-        /// File system watcher
-        /// </summary>
-        // Legacy game log watcher removed - now handled by FileMonitoringService
-
         private string VersionStr;
 
-        // WatcherThreadShouldTerminate removed - file monitoring now handled by FileMonitoringService
-
-        // Legacy update rates moved to background services - CharacterUpdateService and UniverseDataService
-
-        // Next update times moved to background services - CharacterUpdateService and UniverseDataService
         private DateTime LastDotlanUpdate = DateTime.MinValue;
         private string LastDotlanETAG = "";
 
@@ -205,8 +186,6 @@ namespace SMT.EVEData
             // Intel processing is now handled by IntelProcessingService
             // We'll delegate to the service's collections and filters
 
-            // File position tracking dictionaries removed - now managed by FileMonitoringService
-
             // Set default EVE log folder
             string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
             EVELogFolder = Path.Combine(logFolderLoc);
@@ -298,10 +277,6 @@ namespace SMT.EVEData
 
             // Characters will be loaded later via LoadFromDisk() -> Init() -> LoadCharacters()
             // This preserves the original initialization order and prevents duplicate loading
-
-            // NOTE: Background services (character updates, universe data updates) are now handled 
-            // by dedicated BackgroundService classes: CharacterUpdateService and UniverseDataService
-            // The legacy StartBackgroundThread() call has been removed
         }
 
         /// <summary>
@@ -2671,8 +2646,6 @@ namespace SMT.EVEData
             }
         }
 
-        // Intel processing methods removed - now handled by IntelProcessingService
-
         #endregion
 
         /// <summary>
@@ -2851,17 +2824,9 @@ namespace SMT.EVEData
             File.WriteAllLines(Path.Combine(SaveDataRootFolder, "CynoBeacons.txt"), beaconsToSave);
         }
 
-        // Legacy SetupIntelWatcher method removed - now handled by FileMonitoringService and IntelProcessingService
-        // Legacy SetupGameLogWatcher method removed - now handled by FileMonitoringService
-        // SetupLogFileTriggers removed - file cache trigger now handled by FileMonitoringService
-        // Legacy LogFileCacheTrigger method removed - file cache trigger now handled by FileMonitoringService
-        // Legacy shutdown methods removed - file monitoring now handled by FileMonitoringService
-
         public void ShutDown()
         {
-            // Legacy file monitoring shutdown removed - now handled by FileMonitoringService
             // Background services handle their own shutdown via the hosting framework
-            // ZKill feed shutdown removed - now handled by ZKillFeedService via DI
         }
 
         /// <summary>
@@ -3295,8 +3260,6 @@ namespace SMT.EVEData
             {
                 LoadInfrastructureUpgrades(upgradesFile);
             }
-
-            // StartBackgroundThread() removed - background services now handled by CharacterUpdateService and UniverseDataService
         }
 
         private void InitPOI()
@@ -3392,11 +3355,6 @@ namespace SMT.EVEData
             UpdateFactionWarfareInfo();
         }
 
-        // Legacy InitZKillFeed removed - ZKill feed now handled by ZKillFeedService via DI
-
-        // Legacy IntelFileWatcher_Changed method removed - now handled by FileMonitoringService and IntelProcessingService
-        // Legacy GameLogFileWatcher_Changed method removed - now handled by FileMonitoringService and IntelProcessingService
-
         /// <summary>
         /// Load the character data from disk
         /// </summary>
@@ -3434,15 +3392,10 @@ namespace SMT.EVEData
             }
         }
 
-        // StartBackgroundThread() method removed - background processing now handled by:
-        // - CharacterUpdateService: handles character position and info updates
-        // - UniverseDataService: handles SOV campaigns, universe data, server info, connections, and Dotlan updates
-
         public async void UpdateDotlanKillDeltaInfo()
         {
             // set the update for 20 minutes from now initially which will be pushed further once we have the last-modified
             // however if the request fails we still push out the request..
-            // NextDotlanUpdate removed - handled by UniverseDataService
 
             try
             {
@@ -3466,7 +3419,6 @@ namespace SMT.EVEData
                 if(response.Content.Headers.LastModified.HasValue)
                 {
                     Random rndUpdateOffset = new Random();
-                    // NextDotlanUpdate removed - handled by UniverseDataService
                 }
 
                 // update the values for the next request;
