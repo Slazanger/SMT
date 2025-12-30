@@ -3456,8 +3456,9 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception)
             {
+                // Silently ignore errors in background Dotlan update
             }
         }
 
@@ -3889,7 +3890,7 @@ namespace SMT.EVEData
             }
             catch (Exception ex)
             {
-                // Log error if needed
+                _logger.LogError(ex, "Failed to load infrastructure upgrades from {FilePath}", filePath);
             }
         }
 
@@ -3921,7 +3922,7 @@ namespace SMT.EVEData
             }
             catch (Exception ex)
             {
-                // Log error if needed
+                _logger.LogError(ex, "Failed to save infrastructure upgrades to {FilePath}", filePath);
             }
         }
 
