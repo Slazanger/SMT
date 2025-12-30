@@ -1085,7 +1085,7 @@ namespace SMT
                 // now add the zkill data
                 Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
                 {
-                    foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.GetZKillKillStream().ToList())
+                    foreach(ZKBDataSimple zs in EM.GetZKillKillStream().ToList())
                     {
                         if(ZKBBaseFeed.ContainsKey(zs.SystemName))
                         {
@@ -1735,7 +1735,7 @@ namespace SMT
             VHZKB.ClearAllChildren();
 
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
-            foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.GetZKillKillStream().ToList())
+            foreach(ZKBDataSimple zs in EM.GetZKillKillStream().ToList())
             {
                 if(ZKBBaseFeed.ContainsKey(zs.SystemName))
                 {

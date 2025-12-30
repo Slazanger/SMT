@@ -13,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using SMT.EVEData.Configuration;
 using ESI.NET;
 using Newtonsoft.Json;
-using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT.EVEData.Services
 {

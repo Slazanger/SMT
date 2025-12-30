@@ -28,7 +28,6 @@ using NAudio.Wave;
 using NHotkey;
 using NHotkey.Wpf;
 using SMT.EVEData;
-using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT
 {
@@ -2018,7 +2017,7 @@ namespace SMT
                 return;
             }
 
-            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+            ZKBDataSimple zkbs = ZKBFeed.SelectedItem as ZKBDataSimple;
 
             if(zkbs != null)
             {
@@ -2038,7 +2037,7 @@ namespace SMT
                 return;
             }
 
-            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+            ZKBDataSimple zkbs = ZKBFeed.SelectedItem as ZKBDataSimple;
 
             if(zkbs != null)
             {
@@ -2054,7 +2053,7 @@ namespace SMT
                 return;
             }
 
-            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+            ZKBDataSimple zkbs = ZKBFeed.SelectedItem as ZKBDataSimple;
 
             if(zkbs != null)
             {
@@ -2070,7 +2069,7 @@ namespace SMT
                 return;
             }
 
-            EVEData.ZKillRedisQ.ZKBDataSimple zkbs = ZKBFeed.SelectedItem as EVEData.ZKillRedisQ.ZKBDataSimple;
+            ZKBDataSimple zkbs = ZKBFeed.SelectedItem as ZKBDataSimple;
 
             if(zkbs != null)
             {
@@ -2088,7 +2087,7 @@ namespace SMT
                 return true;
             }
 
-            EVEData.ZKillRedisQ.ZKBDataSimple zs = item as EVEData.ZKillRedisQ.ZKBDataSimple;
+            ZKBDataSimple zs = item as ZKBDataSimple;
             if(zs == null)
             {
                 return false;
@@ -2764,7 +2763,7 @@ namespace SMT
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            EVEData.ZKillRedisQ.ZKBDataSimple zs = value as EVEData.ZKillRedisQ.ZKBDataSimple;
+            ZKBDataSimple zs = value as ZKBDataSimple;
             Color rowCol = (Color)ColorConverter.ConvertFromString("#FF333333");
             if(zs != null)
             {
@@ -2823,7 +2822,7 @@ namespace SMT
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            EVEData.ZKillRedisQ.ZKBDataSimple zs = value as EVEData.ZKillRedisQ.ZKBDataSimple;
+            ZKBDataSimple zs = value as ZKBDataSimple;
             Color rowCol = Colors.White;
             if(zs != null)
             {

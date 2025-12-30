@@ -342,10 +342,6 @@ namespace SMT.EVEData.Services
                                 }
                             }
                         }
-                        else if (!shouldReadFile && isRecent)
-                        {
-                            //_logger.LogDebug("Skipping file {FileName} - doesn't match filters (Filters: {Filters})", file.Name, string.Join(", ", _intelFilters));
-                        }
                     }
                 }
                 catch (Exception ex)
@@ -360,14 +356,12 @@ namespace SMT.EVEData.Services
             // Local chat files - always process
             if (file.Name.Contains("Local_"))
             {
-                //_logger.LogDebug("File {FileName} matches Local_ filter", file.Name);
                 return true;
             }
 
             // Game logs - always process
             if (folder.Contains("Gamelogs"))
             {
-                //_logger.LogDebug("File {FileName} is a game log", file.Name);
                 return true;
             }
 
@@ -376,12 +370,10 @@ namespace SMT.EVEData.Services
             {
                 if (file.Name.Contains(intelFilter, StringComparison.OrdinalIgnoreCase))
                 {
-                    //_logger.LogDebug("File {FileName} matches intel filter '{Filter}'", file.Name, intelFilter);
                     return true;
                 }
             }
 
-            //_logger.LogTrace("File {FileName} does not match any filters (Filters: {Filters})", file.Name, string.Join(", ", _intelFilters));
             return false;
         }
 

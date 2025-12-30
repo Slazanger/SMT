@@ -1062,7 +1062,7 @@ namespace SMT
                 ToolTipService.SetInitialShowDelay(systemData.systemCanvasElement, 0);
             }
 
-            // Todo: NPC Kills == 0, delta == 0, jumps, hunter/gatherer
+            // TODO: Enhance tooltip - add NPC Kills == 0 handling, delta == 0 display, jumps count, hunter/gatherer mode indicators
             string toolTipText = $"{systemData.system.Name} ({systemData.system.TrueSec.ToString("n2")})";
             if(!gathererMode) toolTipText += $"\nNPC Kills: {systemData.system.NPCKillsLastHour}\nDelta: {systemData.system.NPCKillsDeltaLastHour}";
             if(systemData.intelData != null) toolTipText += $"\nReported: {systemData.intelData.RawIntelString}";
@@ -1074,7 +1074,7 @@ namespace SMT
                     toolTipText += $"\nBridge: {jumpBridge.From} - {jumpBridge.To}";
                 }
             }
-            // Todo: Add Thera
+            // TODO: Add Thera connection information to tooltip
 
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Content = toolTipText;
             ((ToolTip)systemData.systemCanvasElement.ToolTip).Opacity = 0.75;

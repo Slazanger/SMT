@@ -3,7 +3,6 @@
 //-----------------------------------------------------------------------
 
 #nullable enable
-using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT.EVEData.Services
 {

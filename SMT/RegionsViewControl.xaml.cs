@@ -600,7 +600,7 @@ namespace SMT
                     MainUniverseCanvas.Children.Add(factionText);
                 }
 
-                // now add all the region links : TODO :  this will end up adding 2 lines, region a -> b and b -> a
+                // TODO: Optimize region links - currently adds duplicate lines (region a -> b and b -> a)
                 foreach (string s in mr.RegionLinks)
                 {
                     EVEData.MapRegion or = App.GetEveManager().GetRegion(s);
