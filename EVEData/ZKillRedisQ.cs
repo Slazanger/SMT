@@ -1,20 +1,23 @@
-﻿//-----------------------------------------------------------------------
-// ZKillboard ReDisQ feed
+//-----------------------------------------------------------------------
+// ZKillboard R2Z2 feed
 //-----------------------------------------------------------------------
 using System.ComponentModel;
+using System.Net.Http;
+using System.Net;
 using Timer = System.Timers.Timer;
 
 namespace SMT.EVEData
 {
     /// <summary>
-    /// The ZKillboard RedisQ representation
+    /// The ZKillboard R2Z2 feed representation
     /// </summary>
     public class ZKillRedisQ
     {
         public string VerString = "ABC123";
         private BackgroundWorker backgroundWorker;
 
-        private string QueueID;
+        private long currentSequence = 0;
+        private DateTime nextPollTime = DateTime.MinValue;
 
         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
@@ -45,16 +48,13 @@ namespace SMT.EVEData
         {
             KillStream = new List<ZKBDataSimple>();
 
-            // set the queue id which is now required
-            QueueID = "SMT_" + EVEDataUtils.Misc.RandomString(35);
-
             backgroundWorker = new BackgroundWorker();
             backgroundWorker.WorkerSupportsCancellation = true;
             backgroundWorker.WorkerReportsProgress = false;
             backgroundWorker.DoWork += zkb_DoWork;
             backgroundWorker.RunWorkerCompleted += zkb_DoWorkComplete;
 
-            Timer dp = new Timer(1000);
+            Timer dp = new Timer(150);
             dp.Elapsed += Dp_Tick;
             dp.AutoReset = true;
             dp.Enabled = true;
@@ -67,98 +67,105 @@ namespace SMT.EVEData
 
         private void Dp_Tick(object sender, EventArgs e)
         {
-            if(!backgroundWorker.IsBusy && !PauseUpdate)
+            if(!backgroundWorker.IsBusy && !PauseUpdate && DateTime.Now >= nextPollTime)
             {
                 backgroundWorker.RunWorkerAsync();
-            }
-            else
-            {
             }
         }
 
         private void zkb_DoWork(object sender, DoWorkEventArgs e)
         {
-            string redistURL = $"https://zkillredisq.stream/listen.php?queueID=SMT_{QueueID}";
-            string strContent = string.Empty;
             try
             {
                 HttpClient hc = new HttpClient();
-                var response = hc.GetAsync(redistURL).Result;
-                if(response.IsSuccessStatusCode)
+                hc.DefaultRequestHeaders.Add("User-Agent", $"SMT/{VerString}");
+
+                if (currentSequence == 0)
                 {
-                    strContent = response.Content.ReadAsStringAsync().Result;
+                    string seqUrl = "https://r2z2.zkillboard.com/ephemeral/sequence.json";
+                    var seqResponse = hc.GetAsync(seqUrl).Result;
+                    if (seqResponse.IsSuccessStatusCode)
+                    {
+                        string seqContent = seqResponse.Content.ReadAsStringAsync().Result;
+                        ZKBData.SequenceData seqData = ZKBData.SequenceData.FromJson(seqContent);
+                        if (seqData != null)
+                        {
+                            currentSequence = seqData.Sequence;
+                        }
+                    }
+                    if (currentSequence == 0)
+                    {
+                        nextPollTime = DateTime.Now.AddSeconds(6);
+                        e.Result = 0;
+                        return;
+                    }
+                }
+
+                string r2z2Url = $"https://r2z2.zkillboard.com/ephemeral/{currentSequence}.json";
+                var response = hc.GetAsync(r2z2Url).Result;
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    nextPollTime = DateTime.Now.AddSeconds(6);
+                    e.Result = 0;
+                    return;
+                }
+                else if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    nextPollTime = DateTime.Now.AddSeconds(60);
+                    e.Result = 0;
+                    return;
+                }
+                else if (response.IsSuccessStatusCode)
+                {
+                    string strContent = response.Content.ReadAsStringAsync().Result;
+                    ZKBData.R2Z2Data r2z2Data = ZKBData.R2Z2Data.FromJson(strContent);
+
+                    if (r2z2Data != null && r2z2Data.Esi != null && r2z2Data.Esi.Victim != null)
+                    {
+                        ZKBDataSimple zs = new ZKBDataSimple();
+                        zs.KillID = r2z2Data.KillmailId;
+                        zs.VictimAllianceID = r2z2Data.Esi.Victim.AllianceId;
+                        zs.VictimCharacterID = r2z2Data.Esi.Victim.CharacterId;
+                        zs.VictimCorpID = r2z2Data.Esi.Victim.CorporationId;
+                        zs.SystemName = EveManager.Instance.GetEveSystemNameFromID((int)r2z2Data.Esi.SolarSystemId);
+                        zs.KillTime = r2z2Data.Esi.KillmailTime.ToLocalTime();
+
+                        string shipID = r2z2Data.Esi.Victim.ShipTypeId.ToString();
+                        if(EveManager.Instance.ShipTypes.ContainsKey(shipID))
+                        {
+                            zs.ShipType = EveManager.Instance.ShipTypes[shipID];
+                        }
+                        else
+                        {
+                            zs.ShipType = "Unknown (" + shipID + ")";
+                        }
+
+                        zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);
+
+                        KillStream.Insert(0, zs);
+
+                        if(KillsAddedEvent != null)
+                        {
+                            KillsAddedEvent();
+                        }
+                    }
+
+                    currentSequence++;
+                    e.Result = 0;
                 }
                 else
                 {
-                    strContent = "Error";
+                    // Any other error, just back off for a bit
+                    nextPollTime = DateTime.Now.AddSeconds(10);
+                    e.Result = -1;
                 }
             }
             catch
             {
+                nextPollTime = DateTime.Now.AddSeconds(10);
                 e.Result = -1;
-                return;
             }
-
-            // todo : investigate issues beyond a ban.. the 429 should be handled with the null
-            if(strContent == "Error")
-            {
-                Thread.Sleep(500000);
-
-                e.Result = 0;
-                return;
-            }
-
-            ZKBData.ZkbData z = ZKBData.ZkbData.FromJson(strContent);
-            if(z != null && z.Package != null)
-            {
-                ZKBDataSimple zs = new ZKBDataSimple();
-                zs.KillID = long.Parse(z.Package.KillId.ToString());
-
-                string killHash = z.Package.Zkb.Hash;
-
-                // now resolve the kill mail from ESI
-                var killMailResponseTask = EveManager.Instance.ESIClient.Killmails.Information(killHash, (int)zs.KillID);
-                killMailResponseTask.Wait();
-                ESI.NET.EsiResponse<ESI.NET.Models.Killmails.Information> killMailResponse = killMailResponseTask.Result;
-
-                if(!ESIHelpers.ValidateESICall(killMailResponse))
-                { 
-                    e.Result = -1;
-                    return;
-                }
-
-                zs.VictimAllianceID = killMailResponse.Data.Victim.AllianceId;
-                zs.VictimCharacterID = killMailResponse.Data.Victim.CharacterId;
-                zs.VictimCorpID = killMailResponse.Data.Victim.CorporationId;
-                zs.SystemName = EveManager.Instance.GetEveSystemNameFromID(killMailResponse.Data.SolarSystemId);
-                zs.KillTime = killMailResponse.Data.KillmailTime.ToLocalTime();
-                string shipID = killMailResponse.Data.Victim.ShipTypeId.ToString();
-                if(EveManager.Instance.ShipTypes.ContainsKey(shipID))
-                {
-                    zs.ShipType = EveManager.Instance.ShipTypes[shipID];
-                }
-                else
-                {
-                    zs.ShipType = "Unknown (" + shipID + ")";
-                }
-
-                zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);
-
-                KillStream.Insert(0, zs);
-
-                if(KillsAddedEvent != null)
-                {
-                    KillsAddedEvent();
-                }
-
-            }
-            else
-            {
-                // no killmail, wait 10s
-                Thread.Sleep(10000);
-            }
-
-            e.Result = 0;
         }
 
         private void zkb_DoWorkComplete(object sender, RunWorkerCompletedEventArgs e)
