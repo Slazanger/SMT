@@ -13,7 +13,6 @@ namespace SMT.EVEData
     /// </summary>
     public class ZKillRedisQ
     {
-        public string VerString = "ABC123";
         private BackgroundWorker backgroundWorker;
 
         private long currentSequence = 0;
@@ -78,7 +77,9 @@ namespace SMT.EVEData
             try
             {
                 HttpClient hc = new HttpClient();
-                hc.DefaultRequestHeaders.Add("User-Agent", $"SMT/{VerString}");
+
+                string userAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS;
+                hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
 
                 if (currentSequence == 0)
                 {

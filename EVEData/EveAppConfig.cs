@@ -28,10 +28,18 @@ namespace SMT.EVEData
         /// </summary>
         public const string SMT_VERSION = "SMT_145";
 
+
+        /// <summary>
+        /// SMT User Agent Details 
+        /// </summary>
+        public const string SMT_USERAGENT_DETAILS = " (+https://github.com/Slazanger/SMT; eve:Slazanger, discord:Slazanger)";
+
+
         /// <summary>
         /// Folder to store all of the data from
         /// </summary>
         public static readonly string StorageRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMT");
+
 
         /// <summary>
         /// Folder to store all of the data from

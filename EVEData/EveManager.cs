@@ -2959,7 +2959,7 @@ namespace SMT.EVEData
                 ClientId = EveAppConfig.ClientID,
                 SecretKey = "Unneeded",
                 CallbackUrl = EveAppConfig.CallbackURL,
-                UserAgent = "SMT-map-app : " + EveAppConfig.SMT_VERSION,
+                UserAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS,
             });
 
             ESIClient = new ESI.NET.EsiClient(config);
@@ -3110,7 +3110,6 @@ namespace SMT.EVEData
         private void InitZKillFeed()
         {
             ZKillFeed = new ZKillRedisQ();
-            ZKillFeed.VerString = VersionStr;
             ZKillFeed.Initialise();
         }
 
@@ -3640,7 +3639,8 @@ namespace SMT.EVEData
 
                 HttpClient hc = new HttpClient();
                 string versionNum = VersionStr.Split("_")[1];
-                string userAgent = $"Mozilla/5.0 (Slazanger's Map Tool https://github.com/Slazanger/SMT/ version {versionNum} )";
+
+                string userAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS;
                 hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
                 hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
 
