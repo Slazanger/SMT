@@ -3640,7 +3640,7 @@ namespace SMT.EVEData
                 HttpClient hc = new HttpClient();
                 string versionNum = VersionStr.Split("_")[1];
 
-                string userAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS;
+                string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0";
                 hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
                 hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
 
