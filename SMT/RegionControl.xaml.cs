@@ -606,7 +606,7 @@ namespace SMT
                             }
                             break;
 
-                        case "Electrical":
+                        case "Electric":
                             {
                                 stormCloud.Source = stormImageEM;
                             }
