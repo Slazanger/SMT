@@ -939,7 +939,7 @@ namespace SMT
                     drawingContext.Close();
                     VHSystems.AddChild(systemShapeVisual, sys);
 
-                    FormattedText ft = new FormattedText(sys.Name,
+                    FormattedText ft = new FormattedText(sys.LocalizedName,
                              ci,
                              FlowDirection.LeftToRight,
                              MainTF,
@@ -1380,7 +1380,7 @@ namespace SMT
                 System.Windows.Media.DrawingVisual SystemTextVisual = new System.Windows.Media.DrawingVisual();
                 DrawingContext drawingContext = SystemTextVisual.RenderOpen();
 
-                FormattedText ft = new FormattedText(mr.Name, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, MainTF, RegionTextSize, rtb, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                FormattedText ft = new FormattedText(mr.LocalizedName, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, MainTF, RegionTextSize, rtb, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                 ft.TextAlignment = TextAlignment.Center;
                 drawingContext.DrawText(ft, new Point(X, Z));
 

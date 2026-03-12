@@ -157,6 +157,25 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         /// <summary>
+        /// 动态获取中英文名字
+        /// </summary>
+        public string LocalizedName
+        {
+            get
+            {
+                if (EveManager.CurrentLanguage == "zh-CN")
+                {
+                    if (EveManager.Translations.ContainsKey(Name))
+                    {
+                        return EveManager.Translations[Name];
+                    }
+                    // 加个后缀方便以后一眼看出哪些词典漏了
+                    return Name + " (未翻译)";
+                }
+                return Name;
+            }
+        }
+        /// <summary>
         /// Gets or sets the delta of NPC Kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
@@ -245,7 +264,8 @@ namespace SMT.EVEData
 
         public override string ToString()
         {
-            return $"{Name} ({Region})";
+            return LocalizedName;
         }
+
     }
 }
