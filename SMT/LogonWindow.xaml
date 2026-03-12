@@ -4,11 +4,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Auth.." Height="120" Width="270" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closed="Window_Closed">
+        Title="{DynamicResource Logon_Title}" Height="120" Width="270" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closed="Window_Closed">
     <Grid>
         <StackPanel Background="#FF232223">
-            <Label Height="23">logon using the browser that opened..</Label>
-            <Label Height="23">Close this window when you've added everyone</Label>
+            <Label Height="23" Content="{DynamicResource Logon_Line1}" />
+            <Label Height="23" Content="{DynamicResource Logon_Line2}" />
         </StackPanel>
     </Grid>
 </Window>

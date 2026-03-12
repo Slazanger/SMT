@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32319.34
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11520.95 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SMT", "SMT\SMT.csproj", "{D2916D4D-8A38-4195-97D8-25676ADA0AE3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EVEData", "EVEData\EVEData.csproj", "{26F78663-FF78-43F7-8AFB-20955DDF3EDE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataGen", "DataGen\DataGen.csproj", "{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{9F3D6EC2-A182-4C10-87CB-D7091BE1231C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESI.NET", "External\ESI.NET\ESI.NET\ESI.NET.csproj", "{903D1CC4-0BBD-A952-72A0-93FB7181FDAC}"
 EndProject
@@ -31,8 +29,6 @@ Global
 		{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}.Debug|x64.Build.0 = Debug|x64
 		{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}.Release|x64.ActiveCfg = Release|x64
 		{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}.Release|x64.Build.0 = Release|x64
-		{9F3D6EC2-A182-4C10-87CB-D7091BE1231C}.Debug|x64.ActiveCfg = Debug
-		{9F3D6EC2-A182-4C10-87CB-D7091BE1231C}.Release|x64.ActiveCfg = Release
 		{903D1CC4-0BBD-A952-72A0-93FB7181FDAC}.Debug|x64.ActiveCfg = Debug|x64
 		{903D1CC4-0BBD-A952-72A0-93FB7181FDAC}.Debug|x64.Build.0 = Debug|x64
 		{903D1CC4-0BBD-A952-72A0-93FB7181FDAC}.Release|x64.ActiveCfg = Release|x64

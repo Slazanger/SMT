@@ -28,30 +28,30 @@
             <MenuItem Header="{Binding Name}" FontWeight="Bold" />
 
             <Separator />
-            <MenuItem Header="Set Destination" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
-            <MenuItem Header="Set Destination (All)" Click="SysContexMenuItemSetDestinationAll_Click" />
-            <MenuItem Header="Add Waypoint" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
-            <MenuItem Header="Add Waypoint (All)" Click="SysContexMenuItemAddWaypointAll_Click" />
+            <MenuItem Header="{DynamicResource Ctx_SetDest}" Click="SysContexMenuItemSetDestination_Click" IsEnabled="False" />
+            <MenuItem Header="{DynamicResource Ctx_SetDestAll}" Click="SysContexMenuItemSetDestinationAll_Click" />
+            <MenuItem Header="{DynamicResource Ctx_AddWP}" Click="SysContexMenuItemAddWaypoint_Click" IsEnabled="False" />
+            <MenuItem Header="{DynamicResource Ctx_AddWPAll}" Click="SysContexMenuItemAddWaypointAll_Click" />
 
-            <MenuItem Header="Clear Route" Click="SysContexMenuItemClearRoute_Click" IsEnabled="False" />
+            <MenuItem Header="{DynamicResource Ctx_ClearRoute}" Click="SysContexMenuItemClearRoute_Click" IsEnabled="False" />
 
-            <MenuItem Header="Characters" IsEnabled="False" />
+            <MenuItem Header="{DynamicResource Ctx_Characters}" IsEnabled="False" />
 
-            <MenuItem Header="Show Jump Range">
-                <MenuItem Header="Remove All" DataContext="-1" Click="SetJumpRange_Click" />
-                <MenuItem Header="None" DataContext="0" Click="SetJumpRange_Click" />
-                <MenuItem Header="Super/Titan  (6.0LY)" DataContext="6" Click="SetJumpRange_Click" />
-                <MenuItem Header="Carriers/Fax (7.0LY)" DataContext="7" Click="SetJumpRange_Click" />
-                <MenuItem Header="Black Ops    (8.0LY)" DataContext="8" Click="SetJumpRange_Click" />
-                <MenuItem Header="JF/Rorq     (10.0LY)" DataContext="10" Click="SetJumpRange_Click" />
+            <MenuItem Header="{DynamicResource Ctx_ShowJumpRange}">
+                <MenuItem Header="{DynamicResource Ctx_RemoveAll}" DataContext="-1" Click="SetJumpRange_Click" />
+                <MenuItem Header="{DynamicResource Ctx_None}" DataContext="0" Click="SetJumpRange_Click" />
+                <MenuItem Header="{DynamicResource Ctx_Super}" DataContext="6" Click="SetJumpRange_Click" />
+                <MenuItem Header="{DynamicResource Ctx_Carrier}" DataContext="7" Click="SetJumpRange_Click" />
+                <MenuItem Header="{DynamicResource Ctx_Blops}" DataContext="8" Click="SetJumpRange_Click" />
+                <MenuItem Header="{DynamicResource Ctx_JF}" DataContext="10" Click="SetJumpRange_Click" />
             </MenuItem>
 
             <Separator />
-            <MenuItem Header="DotLan" Click="SysContexMenuItemDotlan_Click" />
-            <MenuItem Header="ZKillBoard" Click="SysContexMenuItemZKB_Click" />
-            <MenuItem Header="Copy Name" Click="SysContexMenuItemCopy_Click" />
-            <MenuItem Header="Copy Name (encoded)" Click="SysContexMenuItemCopyEncoded_Click" />
-            <MenuItem Header="Show In Universe" Click="SysContexMenuItemShowInUniverse_Click" />
+            <MenuItem Header="{DynamicResource Ctx_Dotlan}" Click="SysContexMenuItemDotlan_Click" />
+            <MenuItem Header="{DynamicResource Ctx_ZKB}" Click="SysContexMenuItemZKB_Click" />
+            <MenuItem Header="{DynamicResource Ctx_CopyName}" Click="SysContexMenuItemCopy_Click" />
+            <MenuItem Header="{DynamicResource Ctx_CopyNameEnc}" Click="SysContexMenuItemCopyEncoded_Click" />
+            <MenuItem Header="{DynamicResource Ctx_ShowInUni}" Click="SysContexMenuItemShowInUniverse_Click" />
         </ContextMenu>
     </UserControl.Resources>
 
@@ -64,8 +64,8 @@
         <StackPanel Margin="4,2,1,2"  Orientation="Horizontal" HorizontalAlignment="Left">
             <ComboBox x:Name="RegionSelectCB"  Width="120" Margin="5,0" FontSize="12" SelectionChanged="RegionSelectCB_SelectionChanged" />
             <ComboBox x:Name="SystemDropDownAC" IsEditable="True" Text="System"  Width="100" FontSize="12" Margin="5,0" SelectionChanged="SystemDropDownAC_SelectionChanged" />
-            <Label Content="Search :" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged" Foreground="Black" TextSearch.TextPath="Name">
+            <Label Content="{DynamicResource Main_Map_SearchLbl}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <dotNetKitControls:AutoCompleteComboBox x:Name="GlobalSystemDropDownAC" Width="200" FontSize="12" Margin="5,0" SelectionChanged="GlobalSystemDropDownAC_SelectionChanged" Foreground="Black" TextSearch.TextPath="LocalizedName">
                 <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
@@ -73,7 +73,7 @@
                 </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
             </dotNetKitControls:AutoCompleteComboBox>
 
-            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="Auto Follow Active Character" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
+            <CheckBox x:Name="FollowCharacterChk" Margin="5,-1,5,0" Content="{DynamicResource Main_Map_AutoFollow}" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="FollowCharacterChk_Checked" />
             <Separator />
         </StackPanel>
 
@@ -110,7 +110,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Ellipse Width="15" Height="15" Fill="LightGray" Stroke="Black" StrokeThickness="2" Grid.Row="0" Grid.Column="0" />
-                    <Label Content="System" Grid.Row="0" Grid.Column="1" />
+                    <Label Content="{DynamicResource Main_Map_SystemLbl}" Grid.Row="0" Grid.Column="1" />
                     <Rectangle Width="15" Height="15" Fill="LightGray" Stroke="Black" StrokeThickness="2" Grid.Row="1" Grid.Column="0" />
                     <Label Content="System with NPC Station" Grid.Row="1" Grid.Column="1" />
                     <Rectangle Width="20" Height="20" Fill="LightGray" StrokeThickness="2" Grid.Row="2" Grid.Column="0" />
