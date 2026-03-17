@@ -16,6 +16,33 @@
     * **情报悬浮窗**：汉化了鼠标悬停在星系上时显示的详细情报（星座、跳跃数、击杀数等）。
 * **色彩自定义双语化**：对 `MapColours.cs` 进行了处理，将颜色设置面板改为 **“English / 中文”** 双语显示，既保留原意又方便调节。
 * **无损原版体验**：默认语言为英文（en-US），完全兼容原版使用习惯。只有在设置中手动切换后才会启用中文。
+<div align="center">
+    <img src="images/主界面.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/右键菜单.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/常规选项.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/星域地图.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/导航与建筑.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/情报与警报.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/主权与舰队.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/置顶悬浮窗.png" width="600px" />
+</div>
+<div align="center">
+    <img src="images/颜色自定义.png" width="600px" />
+</div>
 
 ## 🚀 使用方法
 
