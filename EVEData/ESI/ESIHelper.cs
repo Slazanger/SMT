@@ -1,26 +1,18 @@
-﻿using System.Diagnostics;
-using System.Net;
-using ESI.NET;
+using System.Diagnostics;
+using EVEStandard.Models.API;
 
 namespace SMT.EVEData
 {
     public class ESIHelpers
     {
-        public static bool ValidateESICall<T>(EsiResponse<T> esiR)
+        public static bool ValidateESICall<T>(ESIModelDTO<T> esiR)
         {
-            if(esiR.Data == null)
+            if (esiR == null || esiR.Model == null)
             {
                 Debug.WriteLine("ESI data Null");
                 return false;
             }
-
-            if (esiR.StatusCode == HttpStatusCode.OK || esiR.StatusCode == HttpStatusCode.NoContent)
-            {
-                return true;
-            }
-
-            Debug.WriteLine("ESI Error : " + esiR.Message + " Error Limit Remaining : " + esiR.ErrorLimitRemain);
-            return false;
+            return true;
         }
     }
 }

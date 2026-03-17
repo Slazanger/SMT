@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -19,7 +19,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\External\ESI.NET\ESI.NET\ESI.NET.csproj" />
+    <PackageReference Include="PointyHatGames.EVEStandard" Version="4.0.2" />
   </ItemGroup>
 	<ItemGroup>
 	  <None Update="data\JumpRangeCache.dat">

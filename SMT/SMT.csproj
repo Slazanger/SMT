@@ -216,6 +216,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EVEData\EVEData.csproj" />
-    <ProjectReference Include="..\External\ESI.NET\ESI.NET\ESI.NET.csproj" />
   </ItemGroup>
 </Project>

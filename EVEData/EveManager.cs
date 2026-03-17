@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // EVE Manager
 //-----------------------------------------------------------------------
 
@@ -14,11 +14,12 @@ using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
-using ESI.NET;
-using ESI.NET.Enumerations;
-using ESI.NET.Models.SSO;
 using EVEDataUtils;
-using Microsoft.Extensions.Options;
+using EVEStandard;
+using EVEStandard.Enumerations;
+using EVEStandard.Models;
+using EVEStandard.Models.API;
+using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -322,7 +323,8 @@ namespace SMT.EVEData
         /// </summary>
         public SerializableDictionary<int, string> CharacterIDToName { get; set; }
 
-        public ESI.NET.EsiClient ESIClient { get; set; }
+        public EVEStandardAPI EveApiClient { get; set; }
+        public SSOv2 Sso { get; set; }
 
         public List<string> ESIScopes { get; set; }
 
@@ -1920,8 +1922,7 @@ namespace SMT.EVEData
         /// </summary>
         public string GetESILogonURL(string challengeCode)
         {
-            string URL = ESIClient.SSO.CreateAuthenticationUrl(ESIScopes, VersionStr, challengeCode);
-            return URL;
+            return Sso.AuthorizeToSSOPKCEUri(VersionStr, challengeCode, ESIScopes);
         }
 
         /// <summary>
@@ -2029,49 +2030,48 @@ namespace SMT.EVEData
         /// </summary>
         public async void HandleEveAuthSMTUri(Uri uri, string challengeCode)
         {
-            // parse the uri
             var query = HttpUtility.ParseQueryString(uri.Query);
-            if(query["code"] == null)
-            {
-                // we're missing a query code
+            if (query["code"] == null)
                 return;
-            }
 
             string code = query["code"];
-            SsoToken sst;
-
+            AccessTokenDetails tokenDetails;
             try
             {
-                sst = await ESIClient.SSO.GetToken(GrantType.AuthorizationCode, code, challengeCode);
-                if(sst == null || sst.ExpiresIn == 0)
-                {
+                tokenDetails = await Sso.VerifyAuthorizationForPKCEAuthAsync(code, challengeCode);
+                if (tokenDetails == null || tokenDetails.ExpiresIn <= 0)
                     return;
-                }
             }
             catch
             {
                 return;
             }
 
-            AuthorizedCharacterData acd = await ESIClient.SSO.Verify(sst);
-
-            // now find the matching character and update..
-            LocalCharacter esiChar = FindCharacterByName(acd.CharacterName);
-
-            if(esiChar == null)
+            CharacterDetails characterDetails;
+            try
             {
-                esiChar = new LocalCharacter(acd.CharacterName, string.Empty, string.Empty);
+                characterDetails = await Sso.GetCharacterDetailsAsync(tokenDetails.AccessToken);
+                if (characterDetails == null)
+                    return;
+            }
+            catch
+            {
+                return;
+            }
+
+            LocalCharacter esiChar = FindCharacterByName(characterDetails.CharacterName);
+            if (esiChar == null)
+            {
+                esiChar = new LocalCharacter(characterDetails.CharacterName, string.Empty, string.Empty);
                 AddCharacter(esiChar);
             }
 
-            esiChar.ESIRefreshToken = acd.RefreshToken;
+            esiChar.ESIRefreshToken = tokenDetails.RefreshToken;
             esiChar.ESILinked = true;
-            esiChar.ESIAccessToken = acd.Token;
-            esiChar.ESIAccessTokenExpiry = acd.ExpiresOn;
-            esiChar.ID = acd.CharacterID;
-            esiChar.ESIAuthData = acd;
-
-            // now to find if a matching character
+            esiChar.ESIAccessToken = tokenDetails.AccessToken;
+            esiChar.ESIAccessTokenExpiry = tokenDetails.ExpiresUtc.ToLocalTime();
+            esiChar.ID = characterDetails.CharacterId;
+            esiChar.ESIScopesStored = characterDetails.Scopes != null ? string.Join(" ", characterDetails.Scopes) : string.Empty;
         }
 
         public void InitNavigation()
@@ -2202,24 +2202,24 @@ namespace SMT.EVEData
 
             try
             {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+                var idsLong = UnknownIDs.ConvertAll(i => (long)i);
+                var esra = await EveApiClient.Universe.GetNamesAndCategoriesFromIdsAsync(idsLong);
+                if (ESIHelpers.ValidateESICall(esra))
                 {
-                    foreach(ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                    foreach (UniverseIdsToNames ri in esra.Model)
                     {
-                        if(ri.Category == ResolvedInfoCategory.Alliance)
+                        if (ri.Category == "alliance")
                         {
-                            ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esraA = await ESIClient.Alliance.Information((int)ri.Id);
-
-                            if(ESIHelpers.ValidateESICall<ESI.NET.Models.Alliance.Alliance>(esraA))
+                            var esraA = await EveApiClient.Alliance.GetAllianceInfoAsync(ri.Id);
+                            if (ESIHelpers.ValidateESICall(esraA))
                             {
-                                AllianceIDToTicker[ri.Id] = esraA.Data.Ticker;
-                                AllianceIDToName[ri.Id] = esraA.Data.Name;
+                                AllianceIDToTicker[(int)ri.Id] = esraA.Model.Ticker;
+                                AllianceIDToName[(int)ri.Id] = esraA.Model.Name;
                             }
                             else
                             {
-                                AllianceIDToTicker[ri.Id] = "???????????????";
-                                AllianceIDToName[ri.Id] = "?????";
+                                AllianceIDToTicker[(int)ri.Id] = "???????????????";
+                                AllianceIDToName[(int)ri.Id] = "?????";
                             }
                         }
                     }
@@ -2255,14 +2255,15 @@ namespace SMT.EVEData
 
             try
             {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.ResolvedInfo>> esra = await ESIClient.Universe.Names(UnknownIDs);
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.ResolvedInfo>>(esra))
+                var idsLong = UnknownIDs.ConvertAll(i => (long)i);
+                var esra = await EveApiClient.Universe.GetNamesAndCategoriesFromIdsAsync(idsLong);
+                if (ESIHelpers.ValidateESICall(esra))
                 {
-                    foreach(ESI.NET.Models.Universe.ResolvedInfo ri in esra.Data)
+                    foreach (UniverseIdsToNames ri in esra.Model)
                     {
-                        if(ri.Category == ResolvedInfoCategory.Character)
+                        if (ri.Category == "character")
                         {
-                            CharacterIDToName[ri.Id] = ri.Name;
+                            CharacterIDToName[(int)ri.Id] = ri.Name;
                         }
                     }
                 }
@@ -2821,28 +2822,28 @@ namespace SMT.EVEData
 
             try
             {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>> esr = await ESIClient.FactionWarfare.Systems();
+                var esr = await EveApiClient.FactionWarfare.FactionWarSystemOwnershipAsync();
 
                 string debugListofSytems = "";
 
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.FactionWarfare.FactionWarfareSystem>>(esr))
+                if (ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach(ESI.NET.Models.FactionWarfare.FactionWarfareSystem i in esr.Data)
+                    foreach (FactionWarSystem i in esr.Model)
                     {
                         FactionWarfareSystemInfo fwsi = new FactionWarfareSystemInfo();
                         fwsi.SystemState = FactionWarfareSystemInfo.State.None;
 
-                        fwsi.OccupierID = i.OccupierFactionId;
-                        fwsi.OccupierName = FactionWarfareSystemInfo.OwnerIDToName(i.OccupierFactionId);
+                        fwsi.OccupierID = (int)i.OccupierFactionId;
+                        fwsi.OccupierName = FactionWarfareSystemInfo.OwnerIDToName((int)i.OccupierFactionId);
 
-                        fwsi.OwnerID = i.OwnerFactionId;
-                        fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName(i.OwnerFactionId);
+                        fwsi.OwnerID = (int)i.OwnerFactionId;
+                        fwsi.OwnerName = FactionWarfareSystemInfo.OwnerIDToName((int)i.OwnerFactionId);
 
-                        fwsi.SystemID = i.SolarSystemId;
+                        fwsi.SystemID = (int)i.SolarSystemId;
                         fwsi.SystemName = GetEveSystemNameFromID(i.SolarSystemId);
                         fwsi.LinkSystemID = 0;
-                        fwsi.VictoryPoints = i.VictoryPoints;
-                        fwsi.VictoryPointsThreshold = i.VictoryPointsThreshold;
+                        fwsi.VictoryPoints = (int)i.VictoryPoints;
+                        fwsi.VictoryPointsThreshold = (int)i.VictoryPointsThreshold;
 
                         FactionWarfareSystems.Add(fwsi);
 
@@ -2952,17 +2953,10 @@ namespace SMT.EVEData
         /// </summary>
         private void Init()
         {
-            IOptions<EsiConfig> config = Options.Create(new EsiConfig()
-            {
-                EsiUrl = "https://esi.evetech.net",
-                DataSource = DataSource.Tranquility,
-                ClientId = EveAppConfig.ClientID,
-                SecretKey = "Unneeded",
-                CallbackUrl = EveAppConfig.CallbackURL,
-                UserAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS,
-            });
+            string userAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS;
+            EveApiClient = new EVEStandardAPI(userAgent, DataSource.Tranquility, CompatibilityDate.v2025_12_16, TimeSpan.FromSeconds(30));
+            Sso = new SSOv2(DataSource.Tranquility, EveAppConfig.CallbackURL, EveAppConfig.ClientID, null);
 
-            ESIClient = new ESI.NET.EsiClient(config);
             ESIScopes = new List<string>
             {
                 "publicData",
@@ -3706,12 +3700,12 @@ namespace SMT.EVEData
         {
             try
             {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Incursions.Incursion>> esr = await ESIClient.Incursions.All();
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Incursions.Incursion>>(esr))
+                var esr = await EveApiClient.Incursion.ListIncursionsAsync();
+                if (ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach(ESI.NET.Models.Incursions.Incursion i in esr.Data)
+                    foreach (Incursion i in esr.Model)
                     {
-                        foreach(long s in i.InfestedSystems)
+                        foreach (long s in i.InfestedSolarSystems ?? new List<long>())
                         {
                             EVEData.System sys = GetEveSystemFromID(s);
                             if(sys != null)
@@ -3734,15 +3728,15 @@ namespace SMT.EVEData
         {
             try
             {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.Jumps>> esr = await ESIClient.Universe.Jumps();
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.Jumps>>(esr))
+                var esr = await EveApiClient.Universe.GetSystemJumpsAsync();
+                if (ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach(ESI.NET.Models.Universe.Jumps j in esr.Data)
+                    foreach (SystemJumps j in esr.Model)
                     {
                         EVEData.System es = GetEveSystemFromID(j.SystemId);
-                        if(es != null)
+                        if (es != null)
                         {
-                            es.JumpsLastHour = j.ShipJumps;
+                            es.JumpsLastHour = (int)j.ShipJumps;
                         }
                     }
                 }
@@ -3759,17 +3753,17 @@ namespace SMT.EVEData
         {
             try
             {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Universe.Kills>> esr = await ESIClient.Universe.Kills();
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Universe.Kills>>(esr))
+                var esr = await EveApiClient.Universe.GetSystemKillsAsync();
+                if (ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach(ESI.NET.Models.Universe.Kills k in esr.Data)
+                    foreach (SystemKills k in esr.Model)
                     {
                         EVEData.System es = GetEveSystemFromID(k.SystemId);
-                        if(es != null)
+                        if (es != null)
                         {
-                            es.NPCKillsLastHour = k.NpcKills;
-                            es.PodKillsLastHour = k.PodKills;
-                            es.ShipKillsLastHour = k.ShipKills;
+                            es.NPCKillsLastHour = (int)k.NpcKills;
+                            es.PodKillsLastHour = (int)k.PodKills;
+                            es.ShipKillsLastHour = (int)k.ShipKills;
                         }
                     }
                 }
@@ -3792,10 +3786,10 @@ namespace SMT.EVEData
 
                 List<int> allianceIDsToResolve = new List<int>();
 
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Campaign>> esr = await ESIClient.Sovereignty.Campaigns();
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Campaign>>(esr))
+                var esr = await EveApiClient.Sovereignty.ListSovereigntyCampaignsAsync();
+                if (ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach(ESI.NET.Models.Sovereignty.Campaign c in esr.Data)
+                    foreach (SovereigntyCampaign c in esr.Model)
                     {
                         SOVCampaign ss = null;
 
@@ -3807,18 +3801,18 @@ namespace SMT.EVEData
                             }
                         }
 
-                        if(ss == null)
+                        if (ss == null)
                         {
                             System sys = GetEveSystemFromID(c.SolarSystemId);
-                            if(sys == null)
+                            if (sys == null)
                             {
                                 continue;
                             }
 
                             ss = new SOVCampaign
                             {
-                                CampaignID = c.CampaignId,
-                                DefendingAllianceID = c.DefenderId,
+                                CampaignID = (int)c.CampaignId,
+                                DefendingAllianceID = (int)(c.DefenderId ?? 0),
                                 System = sys.Name,
                                 Region = sys.Region,
                                 StartTime = c.StartTime,
@@ -3839,13 +3833,13 @@ namespace SMT.EVEData
                             sendUpdateEvent = true;
                         }
 
-                        if(ss.AttackersScore != c.AttackersScore || ss.DefendersScore != c.DefenderScore)
+                        if (ss.AttackersScore != (c.AttackersScore ?? 0) || ss.DefendersScore != (c.DefenderScore ?? 0))
                         {
                             sendUpdateEvent = true;
                         }
 
-                        ss.AttackersScore = c.AttackersScore;
-                        ss.DefendersScore = c.DefenderScore;
+                        ss.AttackersScore = c.AttackersScore ?? 0;
+                        ss.DefendersScore = c.DefenderScore ?? 0;
                         ss.Valid = true;
 
                         if(AllianceIDToName.ContainsKey(ss.DefendingAllianceID))
@@ -3954,32 +3948,29 @@ namespace SMT.EVEData
         {
             try
             {
-                ESI.NET.EsiResponse<List<ESI.NET.Models.Sovereignty.Structure>> esr = await ESIClient.Sovereignty.Structures();
-                if(ESIHelpers.ValidateESICall<List<ESI.NET.Models.Sovereignty.Structure>>(esr))
+                var esr = await EveApiClient.Sovereignty.ListSovereigntyStructuresAsync();
+                if (ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach(ESI.NET.Models.Sovereignty.Structure ss in esr.Data)
+                    foreach (SovereigntyStructure ss in esr.Model)
                     {
                         EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
-                        if(es != null)
+                        if (es != null)
                         {
-                            // structures :
-                            // Old TCU  : 32226
-                            // Old iHub :  32458
+                            // structures : Old TCU  : 32226, Old iHub : 32458
+                            es.SOVAllianceID = (int)ss.AllianceId;
 
-                            es.SOVAllianceID = ss.AllianceId;
-
-                            if(ss.TypeId == 32226)
+                            if (ss.StructureTypeId == 32226)
                             {
-                                es.TCUVunerabliltyStart = ss.VulnerableStartTime;
-                                es.TCUVunerabliltyEnd = ss.VulnerableEndTime;
-                                es.TCUOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                                es.TCUVunerabliltyStart = ss.VulnerableStartTime ?? default;
+                                es.TCUVunerabliltyEnd = ss.VulnerableEndTime ?? default;
+                                es.TCUOccupancyLevel = (float)(ss.VulnerabilityOccupancyLevel ?? 0);
                             }
 
-                            if(ss.TypeId == 32458)
+                            if (ss.StructureTypeId == 32458)
                             {
-                                es.IHubVunerabliltyStart = ss.VulnerableStartTime;
-                                es.IHubVunerabliltyEnd = ss.VulnerableEndTime;
-                                es.IHubOccupancyLevel = (float)ss.VulnerabilityOccupancyLevel;
+                                es.IHubVunerabliltyStart = ss.VulnerableStartTime ?? default;
+                                es.IHubVunerabliltyEnd = ss.VulnerableEndTime ?? default;
+                                es.IHubOccupancyLevel = (float)(ss.VulnerabilityOccupancyLevel ?? 0);
                             }
                         }
                     }
@@ -3995,13 +3986,13 @@ namespace SMT.EVEData
         {
             try
             {
-                ESI.NET.EsiResponse<ESI.NET.Models.Status.Status> esr = await ESIClient.Status.Retrieve();
+                var esr = await EveApiClient.Status.GetStatusAsync();
 
-                if(ESIHelpers.ValidateESICall<ESI.NET.Models.Status.Status>(esr))
+                if (ESIHelpers.ValidateESICall(esr))
                 {
                     ServerInfo.Name = "Tranquility";
-                    ServerInfo.NumPlayers = esr.Data.Players;
-                    ServerInfo.ServerVersion = esr.Data.ServerVersion.ToString();
+                    ServerInfo.NumPlayers = (int)esr.Model.Players;
+                    ServerInfo.ServerVersion = esr.Model.ServerVersion ?? string.Empty;
                 }
                 else
                 {

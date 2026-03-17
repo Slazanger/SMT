@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Xml.Serialization;
-using ESI.NET.Enumerations;
-using ESI.NET.Models.SSO;
+using EVEStandard.Models;
+using EVEStandard.Models.API;
+using EVEStandard.Models.SSO;
 
 namespace SMT.EVEData
 {
@@ -180,8 +181,10 @@ namespace SMT.EVEData
         /// </summary>
         public string ESIAuthCode { get; set; }
 
-        [XmlIgnoreAttribute]
-        public ESI.NET.Models.SSO.AuthorizedCharacterData ESIAuthData { get; set; }
+        /// <summary>
+        /// Stored scopes string for building AuthDTO (space-separated from CharacterDetails.Scopes).
+        /// </summary>
+        public string ESIScopesStored { get; set; }
 
         /// <summary>
         /// Gets or sets if this character is linked with ESI
@@ -192,6 +195,27 @@ namespace SMT.EVEData
         /// Gets or sets the ESI refresh Token
         /// </summary>
         public string ESIRefreshToken { get; set; }
+
+        /// <summary>
+        /// Builds AuthDTO for EVEStandard API calls. Returns null if not ESI linked or token missing.
+        /// </summary>
+        public AuthDTO GetAuthDTO()
+        {
+            if (!ESILinked || ID == 0 || string.IsNullOrEmpty(ESIAccessToken))
+                return null;
+            var expiry = ESIAccessTokenExpiry.Kind == DateTimeKind.Utc ? ESIAccessTokenExpiry : ESIAccessTokenExpiry.ToUniversalTime();
+            return new AuthDTO
+            {
+                CharacterId = ID,
+                AccessToken = new AccessTokenDetails
+                {
+                    AccessToken = ESIAccessToken,
+                    RefreshToken = ESIRefreshToken ?? string.Empty,
+                    ExpiresUtc = expiry
+                },
+                Scopes = ESIScopesStored ?? string.Empty
+            };
+        }
 
         /// <summary>
         /// Gets or sets the current fleet info for this character
@@ -514,48 +538,40 @@ namespace SMT.EVEData
 
             await UpdateLock.WaitAsync();
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-                esiClient.SetCharacterData(ESIAuthData);
-
-                Dictionary<long, ESI.NET.Models.Universe.Structure> SystemJumpGateList = new Dictionary<long, ESI.NET.Models.Universe.Structure>();
-
-                esiClient.SetCharacterData(ESIAuthData);
+                AuthDTO auth = GetAuthDTO();
+                if (auth == null)
+                {
+                    UpdateLock.Release();
+                    return jbl;
+                }
 
                 try
                 {
-                    ESI.NET.EsiResponse<ESI.NET.Models.SearchResults> esr = await esiClient.Search.Query(SearchType.Character, JumpBridgeFilterString, SearchCategory.Structure);
-                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.SearchResults>(esr))
+                    var esr = await EveManager.Instance.EveApiClient.Search.SearchCharacterAsync(auth, new List<string> { "structure" }, JumpBridgeFilterString);
+                    if (!ESIHelpers.ValidateESICall(esr) || esr.Model == null)
                     {
-                        if (esr.Data.Structures == null)
-                        {
-                            return jbl;
-                        }
+                        UpdateLock.Release();
+                        return jbl;
+                    }
 
-                        foreach (long stationID in esr.Data.Structures)
+                    List<long> structureIds = esr.Model.Structure ?? new List<long>();
+                    foreach (long stationID in structureIds)
+                    {
+                        var esrs = await EveManager.Instance.EveApiClient.Universe.GetStructureInfoAsync(auth, stationID);
+                        if (ESIHelpers.ValidateESICall(esrs) && esrs.Model != null)
                         {
-                            esiClient.SetCharacterData(ESIAuthData);
-                            ESI.NET.EsiResponse<ESI.NET.Models.Universe.Structure> esrs = await esiClient.Universe.Structure(stationID);
-
-                            if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Universe.Structure>(esrs))
+                            if (esrs.Model.TypeId == 35841)
                             {
-                                SystemJumpGateList[stationID] = esrs.Data;
-
-                                // found a jump gate
-                                if (esrs.Data.TypeId == 35841)
+                                string[] parts = (esrs.Model.Name ?? string.Empty).Split(' ');
+                                if (parts.Length >= 3)
                                 {
-                                    string[] parts = esrs.Data.Name.Split(' ');
                                     string from = parts[0];
                                     string to = parts[2];
-
                                     EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
                                 }
                             }
-                            else
-                            {
-                            }
-
-                            Thread.Sleep(100);
                         }
+                        Thread.Sleep(100);
                     }
                 }
                 catch
@@ -734,39 +750,30 @@ namespace SMT.EVEData
 
             try
             {
-                SsoToken sst;
-                AuthorizedCharacterData acd;
-
-                sst = await EveManager.Instance.ESIClient.SSO.GetToken(GrantType.RefreshToken, ESIRefreshToken, "");
-                if (sst == null || sst.RefreshToken == null)
+                AccessTokenDetails tokenDetails = await EveManager.Instance.Sso.GetNewPKCEAccessAndRefreshTokenAsync(ESIRefreshToken);
+                if (tokenDetails == null || string.IsNullOrEmpty(tokenDetails.AccessToken))
                 {
                     ssoErrorCount++;
-
                     Thread.Sleep(20000);
-
                     if (ssoErrorCount > 50)
                     {
-                        // we have a valid refresh token BUT it failed to auth; we need to force
-                        // a reauth
                         ESIRefreshToken = "";
                         ESILinked = false;
                     }
-
                     return;
                 }
 
-                acd = await EveManager.Instance.ESIClient.SSO.Verify(sst);
-
-                if (String.IsNullOrEmpty(acd.Token))
+                CharacterDetails characterDetails = await EveManager.Instance.Sso.GetCharacterDetailsAsync(tokenDetails.AccessToken);
+                if (characterDetails == null)
                 {
                     return;
                 }
 
-                ESIAccessToken = acd.Token;
-                ESIAccessTokenExpiry = acd.ExpiresOn.ToLocalTime();
-                ESIRefreshToken = acd.RefreshToken;
+                ESIAccessToken = tokenDetails.AccessToken;
+                ESIAccessTokenExpiry = tokenDetails.ExpiresUtc.ToLocalTime();
+                ESIRefreshToken = tokenDetails.RefreshToken ?? string.Empty;
                 ESILinked = true;
-                ESIAuthData = acd;
+                ESIScopesStored = characterDetails.Scopes != null ? string.Join(" ", characterDetails.Scopes) : string.Empty;
             }
             catch (Exception ex)
             {
@@ -792,13 +799,14 @@ namespace SMT.EVEData
                 System s = EveManager.Instance.GetEveSystem(Location);
                 if (s != null)
                 {
-                    ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-                    esiClient.SetCharacterData(ESIAuthData);
-
-                    ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(s.ID, false, true);
-                    if (EVEData.ESIHelpers.ValidateESICall<string>(esr))
+                    AuthDTO auth = GetAuthDTO();
+                    if (auth != null)
                     {
-                        // failed to clear route
+                        try
+                        {
+                            await EveManager.Instance.EveApiClient.UserInterface.SetAutopilotWaypointAsync(auth, true, true, s.ID);
+                        }
+                        catch { }
                     }
                 }
                 return;
@@ -915,20 +923,19 @@ namespace SMT.EVEData
 
                 bool firstRoute = true;
 
-                foreach (long SysID in WayPointsToAdd)
+                AuthDTO auth = GetAuthDTO();
+                if (auth != null)
                 {
-                    ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-                    esiClient.SetCharacterData(ESIAuthData);
-
-                    ESI.NET.EsiResponse<string> esr = await esiClient.UserInterface.Waypoint(SysID, false, firstRoute);
-                    if (EVEData.ESIHelpers.ValidateESICall<string>(esr))
+                    foreach (long SysID in WayPointsToAdd)
                     {
-                        //                        routeNeedsUpdate = true;
+                        try
+                        {
+                            await EveManager.Instance.EveApiClient.UserInterface.SetAutopilotWaypointAsync(auth, firstRoute, false, SysID);
+                        }
+                        catch { }
+                        firstRoute = false;
+                        Thread.Sleep(200);
                     }
-                    firstRoute = false;
-
-                    // with a shorter wait, ive found the occasional out of order route
-                    Thread.Sleep(200);
                 }
 
                 esiRouteUpdating = false;
@@ -940,7 +947,8 @@ namespace SMT.EVEData
         /// </summary>
         private async Task UpdateFleetInfo()
         {
-            if (ID == 0 || !ESILinked || ESIAuthData == null)
+            AuthDTO auth = GetAuthDTO();
+            if (auth == null || ID == 0 || !ESILinked)
             {
                 return;
             }
@@ -949,20 +957,15 @@ namespace SMT.EVEData
             {
                 bool sendFleetUpdatedEvent = false;
 
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-                esiClient.SetCharacterData(ESIAuthData);
-
                 if (FleetInfo.NextFleetMembershipCheck < DateTime.Now)
                 {
-                    // route is cached for 60s, however checking this can hit the rate limit
                     FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(240);
 
-                    ESI.NET.EsiResponse<ESI.NET.Models.Fleets.FleetInfo> esr = await esiClient.Fleets.FleetInfo();
-
-                    if (ESIHelpers.ValidateESICall<ESI.NET.Models.Fleets.FleetInfo>(esr))
+                    var esr = await EveManager.Instance.EveApiClient.Fleets.GetCharacterFleetInfoAsync(auth);
+                    if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                     {
-                        FleetInfo.FleetID = esr.Data.FleetId;
-                        FleetInfo.IsFleetBoss = esr.Data.Role == "fleet_commander" ? true : false;
+                        FleetInfo.FleetID = (int)esr.Model.FleetId;
+                        FleetInfo.IsFleetBoss = esr.Model.Role == "fleet_commander";
                     }
                     else
                     {
@@ -976,15 +979,15 @@ namespace SMT.EVEData
                 {
                     List<int> characterIDsToResolve = new List<int>();
 
-                    ESI.NET.EsiResponse<List<ESI.NET.Models.Fleets.Member>> esrf = await esiClient.Fleets.Members(FleetInfo.FleetID);
-                    if (ESIHelpers.ValidateESICall<List<ESI.NET.Models.Fleets.Member>>(esrf))
+                    var esrf = await EveManager.Instance.EveApiClient.Fleets.GetFleetMembersAsync(auth, FleetInfo.FleetID);
+                    if (ESIHelpers.ValidateESICall(esrf) && esrf.Model != null)
                     {
                         foreach (Fleet.FleetMember ff in FleetInfo.Members)
                         {
                             ff.IsValid = false;
                         }
 
-                        foreach (ESI.NET.Models.Fleets.Member esifm in esrf.Data)
+                        foreach (FleetMember esifm in esrf.Model)
                         {
                             Fleet.FleetMember fm = null;
 
@@ -1007,9 +1010,9 @@ namespace SMT.EVEData
 
                             EVEData.System es = EveManager.Instance.GetEveSystemFromID(esifm.SolarSystemId);
 
-                            fm.Name = EveManager.Instance.GetCharacterName(esifm.CharacterId);
+                            fm.Name = EveManager.Instance.GetCharacterName((int)esifm.CharacterId);
 
-                            fm.CharacterID = esifm.CharacterId;
+                            fm.CharacterID = (int)esifm.CharacterId;
 
                             if (es == null)
                             {
@@ -1032,7 +1035,7 @@ namespace SMT.EVEData
 
                             if (String.IsNullOrEmpty(fm.Name))
                             {
-                                characterIDsToResolve.Add(esifm.CharacterId);
+                                characterIDsToResolve.Add((int)esifm.CharacterId);
                             }
                         }
 
@@ -1077,7 +1080,8 @@ namespace SMT.EVEData
         /// </summary>
         public async Task UpdateInfoFromESI()
         {
-            if (ID == 0 || !ESILinked || ESIAuthData == null)
+            AuthDTO auth = GetAuthDTO();
+            if (auth == null || ID == 0 || !ESILinked)
             {
                 if (ESILinked)
                 {
@@ -1090,172 +1094,82 @@ namespace SMT.EVEData
 
             try
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-                esiClient.SetCharacterData(ESIAuthData);
-
+                var esr = await EveManager.Instance.EveApiClient.Character.GetCharacterPublicInfoAsync(ID);
+                if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                 {
-                    ESI.NET.EsiResponse<ESI.NET.Models.Character.Information> esr = await esiClient.Character.Information((int)ID);
-
-                    if (EVEData.ESIHelpers.ValidateESICall<ESI.NET.Models.Character.Information>(esr))
-                    {
-                        CorporationID = esr.Data.CorporationId;
-                        AllianceID = esr.Data.AllianceId;
-                    }
+                    CorporationID = (int)esr.Model.CorporationId;
+                    AllianceID = esr.Model.AllianceId ?? 0;
                 }
 
-                // if we have an alliance, and no current standings set
                 if (Standings.Count == 0)
                 {
-                    int page = 0;
-                    int maxPageCount = 1;
-                    ESI.NET.EsiResponse<List<ESI.NET.Models.Contacts.Contact>> esr;
-
                     if (AllianceID != 0)
                     {
-                        page = 0;
-                        maxPageCount = 1;
+                        int page = 1;
+                        int maxPageCount = 1;
                         do
                         {
-                            page++;
-
-                            // SJS here.. list modifeied exception
-
-                            esiClient.SetCharacterData(ESIAuthData);
-                            esr = await esiClient.Contacts.ListForAlliance(page);
-
-                            if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
+                            var esrAlliance = await EveManager.Instance.EveApiClient.Contacts.GetAllianceContactsAsync(auth, AllianceID, page);
+                            if (ESIHelpers.ValidateESICall(esrAlliance) && esrAlliance.Model != null)
                             {
-                                if (esr.Pages.HasValue)
-                                {
-                                    maxPageCount = (int)esr.Pages;
-                                }
-
-                                if (esr.Data == null)
-                                {
-                                    // in an alliance with no contacts
-                                    continue;
-                                }
-
-                                foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
+                                maxPageCount = esrAlliance.MaxPages > 0 ? esrAlliance.MaxPages : 1;
+                                foreach (AllianceContact con in esrAlliance.Model)
                                 {
                                     Standings[con.ContactId] = (float)con.Standing;
-                                    // Removed LabelMap[con.ContactId] = con.LabelIds;
-
                                     if (con.ContactType == "alliance")
                                     {
-                                        AllianceToResolve.Add(con.ContactId);
+                                        AllianceToResolve.Add((int)con.ContactId);
                                     }
                                 }
                             }
+                            page++;
                         }
-                        while (page < maxPageCount);
+                        while (page <= maxPageCount);
                     }
 
                     if (CorporationID != 0)
                     {
-                        page = 0;
-                        maxPageCount = 1;
+                        int page = 1;
+                        int maxPageCount = 1;
                         do
                         {
-                            page++;
-
-                            // SJS here.. list modifeied exception
-
-                            esiClient.SetCharacterData(ESIAuthData);
-                            esr = await esiClient.Contacts.ListForCorporation(page);
-
-                            if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
+                            var esrCorp = await EveManager.Instance.EveApiClient.Contacts.GetCorporationContactsAsync(auth, CorporationID, page);
+                            if (ESIHelpers.ValidateESICall(esrCorp) && esrCorp.Model != null)
                             {
-                                if (esr.Pages.HasValue)
-                                {
-                                    maxPageCount = (int)esr.Pages;
-                                }
-
-                                if (esr.Data == null)
-                                {
-                                    // in an corp with no contacts
-                                    continue;
-                                }
-
-                                foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
+                                maxPageCount = esrCorp.MaxPages > 0 ? esrCorp.MaxPages : 1;
+                                foreach (CorporationContact con in esrCorp.Model)
                                 {
                                     Standings[con.ContactId] = (float)con.Standing;
-                                    // Removed LabelMap[con.ContactId] = con.LabelIds;
-
                                     if (con.ContactType == "alliance")
                                     {
-                                        AllianceToResolve.Add(con.ContactId);
+                                        AllianceToResolve.Add((int)con.ContactId);
                                     }
                                 }
                             }
-                        }
-                        while (page < maxPageCount);
-                    }
-
-                    /*
-                    // personal contacts
-                    {
-                        page = 0;
-                        maxPageCount = 1;
-                        do
-                        {
                             page++;
-
-                            // SJS here.. list modifeied exception
-
-                            esiClient.SetCharacterData(ESIAuthData);
-                            esr = await esiClient.Contacts.ListForCharacter(page);
-
-                            if (EVEData.ESIHelpers.ValidateESICall<List<ESI.NET.Models.Contacts.Contact>>(esr))
-                            {
-                                if (esr.Pages.HasValue)
-                                {
-                                    maxPageCount = (int)esr.Pages;
-                                }
-
-                                if (esr.Data == null)
-                                {
-                                    // in an alliance with no contacts
-                                    continue;
-                                }
-
-                                foreach (ESI.NET.Models.Contacts.Contact con in esr.Data)
-                                {
-                                    Standings[con.ContactId] = (float)con.Standing;
-                                    // Removed LabelMap[con.ContactId] = con.LabelIds;
-
-                                    if (con.ContactType == "alliance")
-                                    {
-                                        AllianceToResolve.Add(con.ContactId);
-                                    }
-                                }
-                            }
                         }
-                        while (page < maxPageCount);
+                        while (page <= maxPageCount);
                     }
-                    */
+
                 }
 
-                // get the character portrait
                 string portraitRoot = Path.Combine(EveManager.Instance.SaveDataRootFolder, "Portraits");
                 string characterPortrait = Path.Combine(portraitRoot, ID.ToString());
                 if (!File.Exists(characterPortrait))
                 {
-                    ESI.NET.EsiResponse<ESI.NET.Models.Images> esri = await esiClient.Character.Portrait((int)ID);
-                    if (esri.Data != null)
+                    var esri = await EveManager.Instance.EveApiClient.Character.GetCharacterPortraitsAsync(ID);
+                    if (ESIHelpers.ValidateESICall(esri) && esri.Model != null && !string.IsNullOrEmpty(esri.Model.Px128x128))
                     {
                         try
                         {
                             HttpClient hc = new HttpClient();
-                            var response = await hc.GetAsync(esri.Data.x128);
+                            var response = await hc.GetAsync(esri.Model.Px128x128);
                             using (var fs = new FileStream(characterPortrait, FileMode.CreateNew))
                             {
                                 await response.Content.CopyToAsync(fs);
                             }
                         }
-                        catch
-                        {
-                        }
+                        catch { }
                     }
                 }
 
@@ -1264,25 +1178,23 @@ namespace SMT.EVEData
                     PortraitLocation = new Uri(characterPortrait);
                 }
 
-                //get the corp info
                 if (CorporationID != -1)
                 {
-                    ESI.NET.EsiResponse<ESI.NET.Models.Corporation.Corporation> esrc = await esiClient.Corporation.Information((int)CorporationID);
-                    if (esrc.Data != null)
+                    var esrc = await EveManager.Instance.EveApiClient.Corporation.GetCorporationInfoAsync(CorporationID);
+                    if (ESIHelpers.ValidateESICall(esrc) && esrc.Model != null)
                     {
-                        CorporationName = esrc.Data.Name;
-                        CorporationTicker = esrc.Data.Ticker;
+                        CorporationName = esrc.Model.Name;
+                        CorporationTicker = esrc.Model.Ticker;
                     }
                 }
 
-                //get the Alliance info
                 if (AllianceID > 0)
                 {
-                    ESI.NET.EsiResponse<ESI.NET.Models.Alliance.Alliance> esra = await esiClient.Alliance.Information((int)AllianceID);
-                    if (esra.Data != null)
+                    var esra = await EveManager.Instance.EveApiClient.Alliance.GetAllianceInfoAsync(AllianceID);
+                    if (ESIHelpers.ValidateESICall(esra) && esra.Model != null)
                     {
-                        AllianceName = esra.Data.Name;
-                        AllianceTicker = esra.Data.Ticker;
+                        AllianceName = esra.Model.Name;
+                        AllianceTicker = esra.Model.Ticker;
                     }
                 }
                 else
@@ -1291,25 +1203,20 @@ namespace SMT.EVEData
                     AllianceTicker = null;
                 }
 
-                // get the edencom and trig standings
+                EdenCommStandingsGood = false;
+                TrigStandingsGood = false;
+                var essl = await EveManager.Instance.EveApiClient.Character.GetStandingsAsync(auth);
+                if (ESIHelpers.ValidateESICall(essl) && essl.Model != null)
                 {
-                    EdenCommStandingsGood = false;
-                    TrigStandingsGood = false;
-
-                    ESI.NET.EsiResponse<List<ESI.NET.Models.Standing>> essl = await esiClient.Character.Standings();
-                    if (essl.Data != null)
+                    foreach (Standing standing in essl.Model)
                     {
-                        foreach (ESI.NET.Models.Standing standing in essl.Data)
+                        if (standing.FromId == 500027 && standing.StandingValue > 0)
                         {
-                            if (standing.FromId == 500027 && standing.Value > 0)
-                            {
-                                EdenCommStandingsGood = true;
-                            }
-
-                            if (standing.FromId == 500026 && standing.Value > 0)
-                            {
-                                TrigStandingsGood = true;
-                            }
+                            EdenCommStandingsGood = true;
+                        }
+                        if (standing.FromId == 500026 && standing.StandingValue > 0)
+                        {
+                            TrigStandingsGood = true;
                         }
                     }
                 }
@@ -1326,20 +1233,18 @@ namespace SMT.EVEData
         /// </summary>
         private async Task UpdateOnlineStatus()
         {
-            if (ID == 0 || !ESILinked || ESIAuthData == null)
+            AuthDTO auth = GetAuthDTO();
+            if (auth == null || ID == 0 || !ESILinked)
             {
                 return;
             }
 
             try
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-                esiClient.SetCharacterData(ESIAuthData);
-                ESI.NET.EsiResponse<ESI.NET.Models.Location.Activity> esr = await esiClient.Location.Online();
-
-                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Activity>(esr))
+                var esr = await EveManager.Instance.EveApiClient.Location.GetCharacterOnlineAsync(auth);
+                if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                 {
-                    IsOnline = esr.Data.Online;
+                    IsOnline = esr.Model.Online;
                 }
             }
             catch { }
@@ -1350,26 +1255,24 @@ namespace SMT.EVEData
         /// </summary>
         public async Task UpdatePositionFromESI()
         {
-            if (ID == 0 || !ESILinked || ESIAuthData == null)
+            AuthDTO auth = GetAuthDTO();
+            if (auth == null || ID == 0 || !ESILinked)
             {
                 return;
             }
 
             try
             {
-                ESI.NET.EsiClient esiClient = EveManager.Instance.ESIClient;
-                esiClient.SetCharacterData(ESIAuthData);
-                ESI.NET.EsiResponse<ESI.NET.Models.Location.Location> esr = await esiClient.Location.Location();
-
-                if (ESIHelpers.ValidateESICall<ESI.NET.Models.Location.Location>(esr))
+                var esr = await EveManager.Instance.EveApiClient.Location.GetCharacterLocationAsync(auth);
+                if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                 {
-                    if (!EveManager.Instance.SystemIDToName.ContainsKey(esr.Data.SolarSystemId))
+                    if (!EveManager.Instance.SystemIDToName.ContainsKey(esr.Model.SolarSystemId))
                     {
                         Location = "";
                         Region = "";
                         return;
                     }
-                    Location = EveManager.Instance.SystemIDToName[esr.Data.SolarSystemId];
+                    Location = EveManager.Instance.SystemIDToName[esr.Model.SolarSystemId];
                     System s = EVEData.EveManager.Instance.GetEveSystem(Location);
                     if (s != null)
                     {
