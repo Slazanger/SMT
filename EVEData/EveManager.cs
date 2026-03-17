@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Numerics;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -1918,11 +1919,31 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Get the ESI Logon URL String
+        /// Pending PKCE code_verifier for the next callback (same flow as old ESI.NET: one random string used to derive both challenge and verifier).
+        /// </summary>
+        private string _pendingPkceCodeVerifier;
+
+        /// <summary>
+        /// Get the ESI Logon URL String. Uses the same PKCE derivation as ESI.NET: code_verifier = base64url(UTF8(challengeCode)), code_challenge = base64url(SHA256(UTF8(code_verifier))).
+        /// The same challengeCode must be passed to HandleEveAuthSMTUri; we store code_verifier and use it when the callback arrives.
         /// </summary>
         public string GetESILogonURL(string challengeCode)
         {
-            return Sso.AuthorizeToSSOPKCEUri(VersionStr, challengeCode, ESIScopes);
+            // Match ESI.NET: code_verifier = base64url(UTF8(challengeCode)), code_challenge = base64url(SHA256(UTF8(code_verifier)))
+            string codeVerifier = ToBase64UrlString(Encoding.UTF8.GetBytes(challengeCode));
+            byte[] hash;
+            using (var sha256 = SHA256.Create())
+            {
+                hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
+            }
+            string codeChallenge = ToBase64UrlString(hash);
+            _pendingPkceCodeVerifier = codeVerifier;
+            return Sso.AuthorizeToSSOPKCEUri(VersionStr, codeChallenge, ESIScopes);
+        }
+
+        private static string ToBase64UrlString(byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
 
         /// <summary>
@@ -2035,10 +2056,14 @@ namespace SMT.EVEData
                 return;
 
             string code = query["code"];
+            // Use the code_verifier we stored when GetESILogonURL was called (PKCE requires verifier at token exchange, not the raw challenge string)
+            string codeVerifier = _pendingPkceCodeVerifier ?? ToBase64UrlString(Encoding.UTF8.GetBytes(challengeCode));
+            _pendingPkceCodeVerifier = null;
+
             AccessTokenDetails tokenDetails;
             try
             {
-                tokenDetails = await Sso.VerifyAuthorizationForPKCEAuthAsync(code, challengeCode);
+                tokenDetails = await Sso.VerifyAuthorizationForPKCEAuthAsync(code, codeVerifier);
                 if (tokenDetails == null || tokenDetails.ExpiresIn <= 0)
                     return;
             }
