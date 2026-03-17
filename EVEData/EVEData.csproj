@@ -7,7 +7,7 @@
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
-    <Platforms>x64</Platforms>
+    <Platforms>x64;AnyCPU</Platforms>
   </PropertyGroup>
 
 
