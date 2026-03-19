@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         Closed="Window_Closed"
         Loaded="Window_Loaded"
-        Title="Characters" Height="450" Width="750" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="{DynamicResource CharWin_Title}" Height="450" Width="750" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
         <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
@@ -30,19 +30,18 @@
         </Grid.RowDefinitions>
 
         <ListView x:Name="characterLV"  Grid.Row="0" BorderBrush="Black"   SelectionChanged="characterLV_Selected" Margin="4">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <WrapPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
                         <Image Source="{Binding PortraitLocation}" Width="32" Height="32" Margin="1" />
-                            <TextBlock Text="{Binding Name}" FontSize="16" />
-                        </WrapPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        <Button DockPanel.Dock="Bottom" Content="Add Character" Grid.Row="1" Click="AddCharacter_Click" Margin="4" />
+                        <TextBlock Text="{Binding Name}" FontSize="16" />
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button DockPanel.Dock="Bottom" Content="{DynamicResource CharWin_BtnAdd}" Grid.Row="1" Click="AddCharacter_Click" Margin="4" />
 
-        <Grid x:Name="characterInfoGrid" Grid.Column="1" Grid.RowSpan="2" Visibility="Hidden"
-              Background="{DynamicResource ListBackground}">
+        <Grid x:Name="characterInfoGrid" Grid.Column="1" Grid.RowSpan="2" Visibility="Hidden" Background="{DynamicResource ListBackground}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50*" />
                 <ColumnDefinition Width="50*" />
@@ -80,7 +79,7 @@
                 </TextBlock>
 
                 <TextBlock FontSize="14" Foreground="LightGray">
-                                    <Run Text="{Binding Location, FallbackValue='Unknown Location'}" />
+                                   <Run Text="{Binding Location, FallbackValue='Unknown Location'}" />
                 </TextBlock>
 
                 <TextBlock Text=" " />
@@ -90,11 +89,11 @@
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ESILinked}" Value="True">
-                                    <Setter Property="Text" Value="Authenticated" />
+                                    <Setter Property="Text" Value="{DynamicResource CharWin_Auth}" />
                                     <Setter Property="Foreground" Value="Green" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding ESILinked}" Value="False">
-                                    <Setter Property="Text" Value="Unauthenticated" />
+                                    <Setter Property="Text" Value="{DynamicResource CharWin_Unauth}" />
                                     <Setter Property="Foreground" Value="Red" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -107,11 +106,11 @@
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsOnline}" Value="True">
-                                    <Setter Property="Text" Value="Online" />
+                                    <Setter Property="Text" Value="{DynamicResource CharWin_Online}" />
                                     <Setter Property="Foreground" Value="LightGray" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsOnline}" Value="False">
-                                    <Setter Property="Text" Value="Offline" />
+                                    <Setter Property="Text" Value="{DynamicResource CharWin_Offline}" />
                                     <Setter Property="Foreground" Value="DarkGray" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -120,42 +119,42 @@
                 </TextBlock>
             </StackPanel>
 
-            <GroupBox Header="Navigation Options" Grid.Row="1" Grid.RowSpan="10" BorderBrush="DarkGray" Margin="5">
+            <GroupBox Header="{DynamicResource CharWin_NavOpt}" Grid.Row="1" Grid.RowSpan="10" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4">
                     <StackPanel Orientation="Horizontal" Margin="4">
-                        <Label Content="Autopilot" />
+                        <Label Content="{DynamicResource CharWin_AutoPilot}" />
                         <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding NavigationMode, Mode=TwoWay}" Margin="2" Width="140"  Background="Black" />
                     </StackPanel>
-                    <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="Use Ansiblex Gates" Margin="4" />
-                    <CheckBox IsChecked="{Binding UseTheraRouting}"  HorizontalAlignment="Left" Content="Use Thera" Margin="4" />
-                    <CheckBox IsChecked="{Binding UseTurnurRouting}"  HorizontalAlignment="Left" Content="Use Turnur" Margin="4" />
-                    <CheckBox IsChecked="{Binding UseZarzakhRouting}"  HorizontalAlignment="Left" Content="Use Zarzakh" Margin="4" />
+                    <CheckBox IsChecked="{Binding UseAnsiblexGates}"  HorizontalAlignment="Left" Content="{DynamicResource CharWin_UseAns}" Margin="4" />
+                    <CheckBox IsChecked="{Binding UseTheraRouting}"  HorizontalAlignment="Left" Content="{DynamicResource CharWin_UseThera}" Margin="4" />
+                    <CheckBox IsChecked="{Binding UseTurnurRouting}"  HorizontalAlignment="Left" Content="{DynamicResource CharWin_UseTurnur}" Margin="4" />
+                    <CheckBox IsChecked="{Binding UseZarzakhRouting}"  HorizontalAlignment="Left" Content="{DynamicResource CharWin_UseZarzakh}" Margin="4" />
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="DangerZone"  Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" BorderBrush="DarkGray" Margin="5">
+            <GroupBox Header="{DynamicResource CharWin_DangerGrp}"  Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4">
-                    <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked" Content="DangerZone Enabled" Margin="4" />
+                    <CheckBox IsChecked="{Binding DangerZoneActive}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="dangerZoneEnabled_Checked" Content="{DynamicResource CharWin_DangerEn}" Margin="4" />
                     <StackPanel Orientation="Horizontal" Margin="4">
                         <xctk:IntegerUpDown Value="{Binding DangerZoneRange}" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Width="45" Minimum="1" Maximum="6" Background="Transparent"  Foreground="White" ValueChanged="dangerzone_ValueChanged" />
-                        <Label Content="DangerZone Size" Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" />
+                        <Label Content="{DynamicResource CharWin_DangerSize}" Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Notifications"  Grid.Column="1" Grid.Row="5" Grid.RowSpan="6" BorderBrush="DarkGray" Margin="5">
+            <GroupBox Header="{DynamicResource CharWin_NotifGrp}" Grid.Column="1" Grid.Row="5" Grid.RowSpan="6" BorderBrush="DarkGray" Margin="5">
                 <StackPanel Margin="4">
-                    <CheckBox IsChecked="{Binding ObservatoryDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Mobile Observatory Decloak" Margin="4" />
-                    <CheckBox IsChecked="{Binding GateDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Gate Decloak" Margin="4" />
-                    <CheckBox IsChecked="{Binding DecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Other Decloak" Margin="4" />
-                    <CheckBox IsChecked="{Binding CombatWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Combat" Margin="4" />
+                    <CheckBox IsChecked="{Binding ObservatoryDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{DynamicResource CharWin_ObsDec}" Margin="4" />
+                    <CheckBox IsChecked="{Binding GateDecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{DynamicResource CharWin_GateDec}" Margin="4" />
+                    <CheckBox IsChecked="{Binding DecloakWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{DynamicResource CharWin_OthDec}" Margin="4" />
+                    <CheckBox IsChecked="{Binding CombatWarningEnabled}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{DynamicResource CharWin_Combat}" Margin="4" />
                 </StackPanel>
             </GroupBox>
 
             <StackPanel Grid.Column="1" Grid.Row="11" Orientation="Horizontal"  HorizontalAlignment="Right">
                 <Button Content="↓" Width="20" VerticalAlignment="Center"  Margin="4,0" x:Name="moveDownBtn" Click="MoveDownBtn_OnClick" />
                 <Button Content="↑" Width="20" VerticalAlignment="Center"  Margin="4,0" x:Name="moveUpBtn" Click="MoveUpBtn_OnClick" />
-                <Button Content="Delete" Width="100" VerticalAlignment="Center"   Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click" />
+                <Button Content="{DynamicResource CharWin_BtnDel}" Width="100" VerticalAlignment="Center"   Margin="20,0" x:Name="deleteBtn" Click="deleteBtn_Click" />
             </StackPanel>
         </Grid>
     </Grid>

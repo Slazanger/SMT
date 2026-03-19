@@ -82,6 +82,25 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         /// <summary>
+        /// 动态获取中英文名字
+        /// </summary>
+        public string LocalizedName
+        {
+            get
+            {
+                if (EveManager.CurrentLanguage == "zh-CN")
+                {
+                    if (EveManager.Translations.ContainsKey(Name))
+                    {
+                        return EveManager.Translations[Name];
+                    }
+                    // 加个后缀方便以后一眼看出哪些词典漏了
+                    return Name + " (未翻译)";
+                }
+                return Name;
+            }
+        }
+        /// <summary>
         /// Gets or sets the list of links to other Regions
         /// </summary>
         public List<string> RegionLinks { get; set; }
@@ -126,7 +145,9 @@ namespace SMT.EVEData
 
             return false;
         }
-
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            return LocalizedName;
+        }
     }
 }

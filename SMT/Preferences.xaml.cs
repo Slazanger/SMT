@@ -52,8 +52,16 @@ namespace SMT
             }
 
             JumpBridgeList.ItemsSource = EveManager.Instance.JumpBridges;
-        }
 
+            if (SMT.EVEData.EveManager.CurrentLanguage == "zh-CN")
+            {
+                LanguageComboBox.SelectedIndex = 1;
+            }
+            else
+            {
+                LanguageComboBox.SelectedIndex = 0;
+            }
+        }
         public void Init()
         {
             CynoBeaconSystems = new List<string>();
@@ -445,6 +453,66 @@ namespace SMT
 
             AnsiblexSummaryLbl.Content = Label;
         }
+
+        private void LanguageComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (LanguageComboBox.SelectedItem is System.Windows.Controls.ComboBoxItem selectedItem)
+            {
+                string langCode = selectedItem.Tag.ToString();
+
+                ResourceDictionary oldLangDict = null;
+                foreach (var dict in Application.Current.Resources.MergedDictionaries)
+                {
+                    if (dict.Source != null && dict.Source.OriginalString.StartsWith("Languages/"))
+                    {
+                        oldLangDict = dict;
+                        break;
+                    }
+                }
+
+                ResourceDictionary newLangDict = new ResourceDictionary
+                {
+                    Source = new Uri($"Languages/{langCode}.xaml", UriKind.Relative)
+                };
+
+                Application.Current.Resources.MergedDictionaries.Add(newLangDict);
+
+                if (oldLangDict != null)
+                {
+                    Application.Current.Resources.MergedDictionaries.Remove(oldLangDict);
+                }
+
+                // 1. 告诉核心中枢现在是什么语言 (直接调静态变量，不需要判断 Instance)
+                SMT.EVEData.EveManager.CurrentLanguage = langCode;
+
+                // 2. 强令两个地图瞬间清空并用新语言重新绘制
+                if (MainWindow.AppWindow != null)
+                {
+                    if (MainWindow.AppWindow.RegionUC != null)
+                    {
+                        // 强制假装切换一下星域，让它彻底重载所有星系文字
+                        if (MainWindow.AppWindow.RegionUC.Region != null)
+                        {
+                            MainWindow.AppWindow.RegionUC.SelectRegion(MainWindow.AppWindow.RegionUC.Region.Name);
+                        }
+                        MainWindow.AppWindow.RegionUC.ReDrawMap(true);
+                    }
+                    if (MainWindow.AppWindow.UniverseUC != null)
+                    {
+                        MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
+                    }
+                }
+                // 3. 呼叫主窗口，强行刷新那几个顽固的标签页
+                if (MainWindow.AppWindow != null)
+                {
+                    MainWindow.AppWindow.UpdateTabTitles();
+                }
+                if (MainWindow.AppWindow.RegionsViewUC != null)
+                {
+                    MainWindow.AppWindow.RegionsViewUC.Redraw(true);
+                }
+            }
+        }
     }
 
     public class JoinStringConverter : IValueConverter
@@ -488,4 +556,5 @@ namespace SMT
             throw new NotImplementedException();
         }
     }
+
 }
