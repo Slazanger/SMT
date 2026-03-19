@@ -38,12 +38,18 @@ namespace SMT
 
         public void Init()
         {
+            // 1. 如果有旧的定时器，先停掉，防止重复刷新
+            if (uiRefreshTimer != null)
+            {
+                uiRefreshTimer.Stop();
+            }
+
             uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
             uiRefreshTimer.Tick += UiRefreshTimer_Tick;
             uiRefreshTimer.Interval = new TimeSpan(0, 0, 5);
             uiRefreshTimer.Start();
 
-            AddRegions();
+            Redraw(true);
         }
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
@@ -563,7 +569,7 @@ namespace SMT
                 Label regionText = new Label();
                 regionText.Width = 180;
                 regionText.Height = 54;
-                regionText.Content = mr.Name;
+                regionText.Content = mr.LocalizedName;
                 regionText.Foreground = sysOutlineBrush;
                 regionText.FontSize = 24;
                 regionText.FontWeight = FontWeights.Bold;

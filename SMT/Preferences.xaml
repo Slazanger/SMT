@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:SMT"
         mc:Ignorable="d"
         Name="PrefsWindow"
-        Title="Preferences" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
+        Title="{DynamicResource Prefs_Title}" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Window.Resources>
         <local:JoinStringConverter  x:Key="stringJoiner" />
         <local:NegateBooleanConverter x:Key="NegateBooleanConverter" />
@@ -16,7 +16,7 @@
     <Grid Background="{DynamicResource ButtonBorder}" HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <DockPanel>
             <TabControl x:Name="tabControl" DockPanel.Dock="Top">
-                <TabItem Header="General">
+                <TabItem Header="{DynamicResource Prefs_Tab_General}">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
@@ -28,12 +28,20 @@
                                 <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                     <GroupBox Margin="4" Height="Auto">
                                         <StackPanel>
-                                            <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="Always on top" />
-                                            <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3">Auto sync character to active window</CheckBox>
-                                            <CheckBox x:Name="syncESIPositionChk" Margin="0,3" Checked="syncESIPositionChk_Checked" Unchecked="syncESIPositionChk_Checked">Use ESI for character positions</CheckBox>
-                                            <CheckBox IsChecked="{Binding Path=DrawRoute}" Margin="0,3" Content="Draw Route" />
-                                            <CheckBox IsChecked="{Binding MinimizeToTray}" Margin="0,3" Content="Minimize to tray" />
-                                            <CheckBox IsChecked="{Binding CloseToTray}" Margin="0,3" Content="Close to tray">
+                                            <StackPanel Orientation="Horizontal" Margin="0,3">
+                                                <Label Content="{DynamicResource Prefs_Language}" VerticalAlignment="Center" Foreground="White" />
+                                                <ComboBox x:Name="LanguageComboBox" Width="120" SelectionChanged="LanguageComboBox_SelectionChanged" Margin="5,0,0,0">
+                                                    <ComboBoxItem Content="English" Tag="en-US" />
+                                                    <ComboBoxItem Content="简体中文" Tag="zh-CN" />
+                                                </ComboBox>
+                                            </StackPanel>
+
+                                            <CheckBox IsChecked="{Binding Path=AlwaysOnTop}" Margin="0,3" Content="{DynamicResource Prefs_Gen_AlwaysTop}" />
+                                            <CheckBox IsChecked="{Binding Path=SyncActiveCharacterBasedOnActiveEVEClient}" Margin="0,3" Content="{DynamicResource Prefs_Gen_AutoSync}" />
+                                            <CheckBox x:Name="syncESIPositionChk" Margin="0,3" Checked="syncESIPositionChk_Checked" Unchecked="syncESIPositionChk_Checked" Content="{DynamicResource Prefs_Gen_UseESI}" />
+                                            <CheckBox IsChecked="{Binding Path=DrawRoute}" Margin="0,3" Content="{DynamicResource Prefs_Gen_DrawRoute}" />
+                                            <CheckBox IsChecked="{Binding MinimizeToTray}" Margin="0,3" Content="{DynamicResource Prefs_Gen_MinTray}" />
+                                            <CheckBox IsChecked="{Binding CloseToTray}" Margin="0,3" Content="{DynamicResource Prefs_Gen_CloseTray}">
                                                 <CheckBox.IsEnabled>
                                                     <Binding Path="MinimizeToTray" Converter="{StaticResource NegateBooleanConverter}" />
                                                 </CheckBox.IsEnabled>
@@ -42,13 +50,12 @@
                                     </GroupBox>
                                 </Border>
                                 <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                    <GroupBox Header="Logs (changing these requires a restart)" Margin="4" Height="125">
+                                    <GroupBox Header="{DynamicResource Prefs_Gen_LogsGrp}" Margin="4" Height="125">
                                         <StackPanel>
-                                            <Label Content="Current Log Folder : " />
+                                            <Label Content="{DynamicResource Prefs_Gen_CurLog}" />
                                             <Label Content="{Binding Path=CurrentEveLogFolderLocation}" />
-
-                                            <Button Name="SetLogLocation" Content="Set Custom Log Folder" Click="SetLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left" />
-                                            <Button Name="DefaultLogLocation" Content="Set Default Log Folder" Click="DefaultLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left" />
+                                            <Button Name="SetLogLocation" Content="{DynamicResource Prefs_Gen_SetLog}" Click="SetLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left" />
+                                            <Button Name="DefaultLogLocation" Content="{DynamicResource Prefs_Gen_DefLog}" Click="DefaultLogLocation_Click" Margin="3" Width="140" HorizontalAlignment="Left" />
                                         </StackPanel>
                                     </GroupBox>
                                 </Border>
@@ -57,25 +64,24 @@
 
                         <StackPanel Grid.Column="1">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="Performance" Margin="4" Height="Auto">
+                                <GroupBox Header="{DynamicResource Prefs_Gen_PerfGrp}" Margin="4" Height="Auto">
                                     <StackPanel>
-                                        <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3">Disable jump bridges path animation</CheckBox>
-                                        <CheckBox IsChecked="{Binding Path=DisableRoutePathAnimation}" Margin="0,3">Disable route path animation</CheckBox>
+                                        <CheckBox IsChecked="{Binding Path=DisableJumpBridgesPathAnimation}" Margin="0,3" Content="{DynamicResource Prefs_Gen_DisJBAnim}" />
+                                        <CheckBox IsChecked="{Binding Path=DisableRoutePathAnimation}" Margin="0,3" Content="{DynamicResource Prefs_Gen_DisRouteAnim}" />
                                     </StackPanel>
                                 </GroupBox>
                             </Border>
-
                             <Border  BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="Debug" Margin="4" Height="auto">
+                                <GroupBox Header="{DynamicResource Prefs_Gen_DebugGrp}" Margin="4" Height="auto">
                                     <StackPanel>
-                                        <CheckBox IsChecked="{Binding Path=Debug_EnableMapEdit}" Margin="0,2">Enable Universe Map Edits</CheckBox>
+                                        <CheckBox IsChecked="{Binding Path=Debug_EnableMapEdit}" Margin="0,2" Content="{DynamicResource Prefs_Gen_EnableEdit}" />
                                     </StackPanel>
                                 </GroupBox>
                             </Border>
                         </StackPanel>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Region" HorizontalAlignment="Left">
+                <TabItem Header="{DynamicResource Prefs_Tab_Region}" HorizontalAlignment="Left">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
@@ -85,20 +91,20 @@
                         <StackPanel Grid.Column="0">
                             <GroupBox  Margin="4" Height="Auto">
                                 <StackPanel>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowActiveIncursions}" Content="Show Active Incursions" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowJoveObservatories}" Content="Show Jove Observatories" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowToolBox}" Content="Show Toolbox" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrueSec}" Content="Show TrueSec" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSystemPopup}" Content="Show System Popups" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowZKillData}" Content="Show ZKill Data" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowNegativeRattingDelta}" Content="Show Negative Ratting Delta" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowRattingDataAsDelta}" Content="Show Ratting Data as Delta" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSimpleSecurityView}" Content="Show Simple Security View (Just HS/LS/null)" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrigInvasions}" Content="Show Trig Invasions" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowActiveIncursions}" Content="{DynamicResource Prefs_Reg_Incursions}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowJoveObservatories}" Content="{DynamicResource Prefs_Reg_Jove}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowToolBox}" Content="{DynamicResource Prefs_Reg_Toolbox}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrueSec}" Content="{DynamicResource Prefs_Reg_TrueSec}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSystemPopup}" Content="{DynamicResource Prefs_Reg_SysPop}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowZKillData}" Content="{DynamicResource Prefs_Reg_ZKill}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowNegativeRattingDelta}" Content="{DynamicResource Prefs_Reg_NegRat}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowRattingDataAsDelta}" Content="{DynamicResource Prefs_Reg_RatDelta}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowSimpleSecurityView}" Content="{DynamicResource Prefs_Reg_SimpSec}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowTrigInvasions}" Content="{DynamicResource Prefs_Reg_Trig}" />
 
                                     <StackPanel Orientation="Horizontal" Margin="0,0">
                                         <xctk:IntegerUpDown Margin="1,3" Value="{Binding Path=MaxESIOverlayValue}" Minimum="30" Maximum="300" Width="60"  Foreground="White" />
-                                        <Label>Maximum Overlay Size</Label>
+                                        <Label Content="{DynamicResource Prefs_Reg_MaxOver}" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
@@ -107,20 +113,19 @@
                         <StackPanel Grid.Column="1">
                             <GroupBox Margin="4" Height="Auto">
                                 <StackPanel>
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCompactCharactersOnMap}" Content="Compact Character Mode" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="Show Offline Characters" />
-
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="Limit data overlay to in-region only" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=FollowOnZoom}" Content="Follow Selected System when Zoomed" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ResetZoomOnRegionChange}" Content="Reset the zoom level on region change" />
-                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ClampMaxESIOverlayValue}" Content="Clamp overlay Data to Maximum" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCompactCharactersOnMap}" Content="{DynamicResource Prefs_Reg_CompChar}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowOfflineCharactersOnMap}" Content="{DynamicResource Prefs_Reg_OffChar}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=LimitESIDataToRegion}" Content="{DynamicResource Prefs_Reg_LimitOver}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=FollowOnZoom}" Content="{DynamicResource Prefs_Reg_FolZoom}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ResetZoomOnRegionChange}" Content="{DynamicResource Prefs_Reg_ResZoom}" />
+                                    <CheckBox Margin="0,3" IsChecked="{Binding Path=ClampMaxESIOverlayValue}" Content="{DynamicResource Prefs_Reg_ClampOver}" />
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="Nav Structures">
+                <TabItem Header="{DynamicResource Prefs_Tab_Nav}">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
@@ -129,51 +134,44 @@
 
                         <StackPanel Grid.Column="0" Grid.ColumnSpan="1" Margin="1">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="Ansiblex Gates" Margin="4" Height="auto">
+                                <GroupBox Header="{DynamicResource Prefs_Nav_AnsGrp}" Margin="4" Height="auto">
                                     <StackPanel>
-
                                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2" IsEnabled="true">
-                                            <Label Content="Gate SearchFilter : " />
+                                            <Label Content="{DynamicResource Prefs_Nav_Filter}" />
                                             <TextBox x:Name="GateSearchFilter" Text=" » " Width="167" />
                                         </StackPanel>
 
-                                        <Button x:Name="ImportJumpGatesBtn" Content="Find Gates" Click="FindJumpGatesBtn_Click" Margin="2" IsEnabled="true" />
-                                        <Button x:Name="ClearJumpGatesBtn" Content="Clear Gates" Click="ClearJumpGatesBtn_Click" Margin="2" />
-                                        <Button x:Name="ImportPasteJumpGatesBtn" Content="Import from Clipboard" Click="ImportPasteJumpGatesBtn_Click" Margin="2" />
-                                        <Button x:Name="ExportJumpGatesBtn" Content="Export Jump Bridges" Click="ExportJumpGatesBtn_Click"  Margin="2" />
+                                        <Button x:Name="ImportJumpGatesBtn" Content="{DynamicResource Prefs_Nav_Find}" Click="FindJumpGatesBtn_Click" Margin="2" IsEnabled="true" />
+                                        <Button x:Name="ClearJumpGatesBtn" Content="{DynamicResource Prefs_Nav_Clear}" Click="ClearJumpGatesBtn_Click" Margin="2" />
+                                        <Button x:Name="ImportPasteJumpGatesBtn" Content="{DynamicResource Prefs_Nav_Import}" Click="ImportPasteJumpGatesBtn_Click" Margin="2" />
+                                        <Button x:Name="ExportJumpGatesBtn" Content="{DynamicResource Prefs_Nav_Export}" Click="ExportJumpGatesBtn_Click"  Margin="2" />
                                         <Label x:Name="AnsiblexSummaryLbl" Content="" FontStyle="Italic" FontSize="12" />
 
                                         <DataGrid x:Name="JumpBridgeList" Margin="2"  AutoGenerateColumns="False" AreRowDetailsFrozen="True" IsReadOnly="True" SelectionUnit="FullRow" SelectedItem="{Binding SelectedItemProperty, Mode=TwoWay}" Height="313">
-
                                             <DataGrid.CellStyle>
                                                 <Style TargetType="{x:Type DataGridCell}">
-
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding FromID}" Value="0">
                                                             <Setter Property="Background" Value="#222" />
                                                         </DataTrigger>
-
                                                         <DataTrigger Binding="{Binding ToID}" Value="0">
                                                             <Setter Property="Background" Value="#222" />
                                                         </DataTrigger>
-
                                                         <DataTrigger Binding="{Binding Disabled}" Value="True">
                                                             <Setter Property="Background" Value="Red" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </DataGrid.CellStyle>
-
                                             <DataGrid.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem Header="Delete" Click="DeleteJumpGateMenuItem_Click" />
-                                                    <MenuItem Header="Enable/Disable" Click="EnableDisableJumpGateMenuItem_Click" />
+                                                    <MenuItem Header="{DynamicResource Prefs_Nav_CtxDel}" Click="DeleteJumpGateMenuItem_Click" />
+                                                    <MenuItem Header="{DynamicResource Prefs_Nav_CtxTog}" Click="EnableDisableJumpGateMenuItem_Click" />
                                                 </ContextMenu>
                                             </DataGrid.ContextMenu>
-
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="From" Binding="{Binding From}" Width="*" />
-                                                <DataGridTextColumn Header="To" Binding="{Binding To}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Prefs_Nav_GridFrom}" Binding="{Binding From}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Prefs_Nav_GridTo}" Binding="{Binding To}" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                     </StackPanel>
@@ -183,9 +181,9 @@
 
                         <StackPanel Grid.Column="1" Grid.ColumnSpan="1" Margin="1">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="Cyno Beacons" Margin="4" Height="auto">
+                                <GroupBox Header="{DynamicResource Prefs_Nav_CynGrp}" Margin="4" Height="auto">
                                     <StackPanel>
-                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="{DynamicResource Prefs_Nav_ShowCyn}" />
                                         <TextBox Width="271" Height="440" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=CynoBeaconSystems, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                     </StackPanel>
                                 </GroupBox>
@@ -194,7 +192,7 @@
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="Intel">
+                <TabItem Header="{DynamicResource Prefs_Tab_Intel}">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
@@ -203,46 +201,45 @@
 
                         <StackPanel Grid.Column="0" Grid.ColumnSpan="1" Margin="1">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="General" Margin="4">
+                                <GroupBox Header="{DynamicResource Prefs_Int_GenGrp}" Margin="4">
                                     <StackPanel>
-
-                                        <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2">Warning Sound</CheckBox>
-                                        <CheckBox IsChecked="{Binding PlayIntelSoundOnAlert}" Margin="0,2" Content="Warning Sound on Alert" />
-                                        <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="Flash Window" />
-                                        <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2">Warning on Unknown</CheckBox>
+                                        <CheckBox IsChecked="{Binding Path=PlayIntelSound}" Margin="0,2" Content="{DynamicResource Prefs_Int_WarnSnd}" />
+                                        <CheckBox IsChecked="{Binding PlayIntelSoundOnAlert}" Margin="0,2" Content="{DynamicResource Prefs_Int_WarnAlt}" />
+                                        <CheckBox IsChecked="{Binding Path=FlashWindow}" Margin="0,2" Content="{DynamicResource Prefs_Int_Flash}" />
+                                        <CheckBox IsChecked="{Binding Path=PlayIntelSoundOnUnknown}" Margin="0,2" Content="{DynamicResource Prefs_Int_WarnUnk}" />
 
                                         <StackPanel Orientation="Vertical" Margin="2">
-                                            <Label Content="Warning Sound Volume" />
+                                            <Label Content="{DynamicResource Prefs_Int_Vol}" />
                                             <Slider x:Name="intelVolumeSlider" Value="{Binding Path=IntelSoundVolume}" Minimum="0" Maximum="1" TickFrequency="0.1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=IntelTextSize}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="8" Maximum="20" Background="Transparent"  Foreground="White" />
-                                            <Label Content="Intel Text Size" />
+                                            <Label Content="{DynamicResource Prefs_Int_TxtSize}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=MaxIntelSeconds}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="30" Maximum="1200" Background="Transparent"  Foreground="White" />
-                                            <Label Content="Intel Max Time (s)" />
+                                            <Label Content="{DynamicResource Prefs_Int_MaxTime}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=ZkillExpireTimeMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="120" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
-                                            <Label Content="Zkill Max Time (minutes)" />
+                                            <Label Content="{DynamicResource Prefs_Int_ZTime}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </GroupBox>
                             </Border>
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="DangerZone" Margin="4">
+                                <GroupBox Header="{DynamicResource Prefs_Int_DangGrp}" Margin="4">
                                     <StackPanel>
-                                        <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2">Show Dangerzone</CheckBox>
-                                        <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2" Content="Limit Sound to Dangerzone">
+                                        <CheckBox IsChecked="{Binding Path=ShowDangerZone}" Margin="0,2" Content="{DynamicResource Prefs_Int_ShowDang}" />
+                                        <CheckBox IsChecked="{Binding Path=PlaySoundOnlyInDangerZone}" Margin="0,2" Content="{DynamicResource Prefs_Int_LimSnd}">
                                             <CheckBox.IsEnabled>
                                                 <Binding Path="PlayIntelSound" Converter="{StaticResource NegateBooleanConverter}" />
                                             </CheckBox.IsEnabled>
                                         </CheckBox>
-                                        <CheckBox IsChecked="{Binding Path=FlashWindowOnlyInDangerZone}" Margin="0,2" Content="Limit Window Flash to Dangerzone">
+                                        <CheckBox IsChecked="{Binding Path=FlashWindowOnlyInDangerZone}" Margin="0,2" Content="{DynamicResource Prefs_Int_LimFlash}">
                                             <CheckBox.IsEnabled>
                                                 <Binding Path="FlashWindow" Converter="{StaticResource NegateBooleanConverter}" />
                                             </CheckBox.IsEnabled>
@@ -255,15 +252,14 @@
                         <StackPanel Grid.Column="1" Grid.ColumnSpan="2">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Margin="4">
-
                                     <StackPanel Orientation="Vertical">
-                                        <Label Content="Channels to monitor (Partial text match, one per line)" />
+                                        <Label Content="{DynamicResource Prefs_Int_ChanLbl}" />
                                         <TextBox Width="271" Height="100" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                        <Label Content="Clear Filters (will change alert to warning)" />
+                                        <Label Content="{DynamicResource Prefs_Int_ClearLbl}" />
                                         <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelClearFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                        <Label Content="Ignore Filters (Text to ignore)" />
+                                        <Label Content="{DynamicResource Prefs_Int_IgnLbl}" />
                                         <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelIgnoreFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
-                                        <Label Content="Alert Filters (Text to always alert)" />
+                                        <Label Content="{DynamicResource Prefs_Int_AltLbl}" />
                                         <TextBox Width="271"  Height="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=EM.IntelAlertFilters, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                     </StackPanel>
                                 </GroupBox>
@@ -272,7 +268,7 @@
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="Misc">
+                <TabItem Header="{DynamicResource Prefs_Tab_Misc}">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
@@ -281,15 +277,13 @@
 
                         <StackPanel Grid.Column="0">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-
-                                <GroupBox Header="Fleet" Margin="4" Height="auto">
+                                <GroupBox Header="{DynamicResource Prefs_Msc_FltGrp}" Margin="4" Height="auto">
                                     <StackPanel>
-                                        <CheckBox IsChecked="{Binding Path=FleetShowOnMap}" Margin="0,2">Show Fleet Members</CheckBox>
-                                        <CheckBox IsChecked="{Binding Path=FleetShowShipType}" Margin="0,2">Show Fleet Member Ship Type</CheckBox>
-
+                                        <CheckBox IsChecked="{Binding Path=FleetShowOnMap}" Margin="0,2" Content="{DynamicResource Prefs_Msc_ShowFlt}" />
+                                        <CheckBox IsChecked="{Binding Path=FleetShowShipType}" Margin="0,2" Content="{DynamicResource Prefs_Msc_ShowShp}" />
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=FleetMaxMembersPerSystem}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="1" Maximum="30" Background="Transparent"  Foreground="White" />
-                                            <Label Content="Max Fleet Members Display" />
+                                            <Label Content="{DynamicResource Prefs_Msc_MaxFlt}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </GroupBox>
@@ -297,29 +291,27 @@
 
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <StackPanel Grid.Column="0">
-                                    <GroupBox Header ="Universe" Margin="4" Height="auto">
+                                    <GroupBox Header="{DynamicResource Prefs_Msc_UniGrp}" Margin="4" Height="auto">
                                         <StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="0,0">
                                                 <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
-                                                <Label Content="Systems Max Zoom" />
+                                                <Label Content="{DynamicResource Prefs_Msc_SysZom}" />
                                             </StackPanel>
-
                                             <StackPanel Orientation="Horizontal" Margin="0,0">
                                                 <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
-                                                <Label Content="Text Max Zoom" />
+                                                <Label Content="{DynamicResource Prefs_Msc_TxtZom}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </GroupBox>
                                 </StackPanel>
                             </Border>
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="SOV" Margin="4" Height="auto">
+                                <GroupBox Header="{DynamicResource Prefs_Msc_SovGrp}" Margin="4" Height="auto">
                                     <StackPanel>
-                                        <CheckBox IsChecked="{Binding Path=ShowIhubVunerabilities}" Margin="0,2">Show IHub Timer</CheckBox>
-
+                                        <CheckBox IsChecked="{Binding Path=ShowIhubVunerabilities}" Margin="0,2" Content="{DynamicResource Prefs_Msc_IHub}" />
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=UpcomingSovMinutes}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="360" Background="Transparent"  Foreground="White" />
-                                            <Label Content="Upcoming Period (Mins)" />
+                                            <Label Content="{DynamicResource Prefs_Msc_SovMin}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </GroupBox>
@@ -327,9 +319,9 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1">
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
-                                <GroupBox Header="Beacons" Margin="4" Height="auto">
+                                <GroupBox Header="{DynamicResource Prefs_Msc_BeaGrp}" Margin="4" Height="auto">
                                     <StackPanel>
-                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="Show Cyno Beacons" />
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=ShowCynoBeacons}" Content="{DynamicResource Prefs_Nav_ShowCyn}" />
                                         <TextBox Width="271" Height="390" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=CynoBeaconSystems, Converter={StaticResource stringJoiner}, Mode=TwoWay}"  TextWrapping="Wrap" AcceptsReturn="True" />
                                     </StackPanel>
                                 </GroupBox>
@@ -337,7 +329,7 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Overlay">
+                <TabItem Header="{DynamicResource Prefs_Tab_Overlay}">
                     <Grid Height="500" Width="600">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50*" />
@@ -346,46 +338,42 @@
 
                         <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                             <StackPanel Grid.Column="0">
-                                <GroupBox Header="General" Margin="4">
+                                <GroupBox Header="{DynamicResource Prefs_Int_GenGrp}" Margin="4">
                                     <StackPanel>
-
                                         <StackPanel Orientation="Vertical" Margin="0,2">
-                                            <Label Content="Overlay Window Background Opacity" />
+                                            <Label Content="{DynamicResource Prefs_Ovl_BgOp}" />
                                             <Slider x:Name="overlay_BackgroundOpacitySlider" Value="{Binding Path=OverlayBackgroundOpacity}" Minimum="0.05" Maximum="1.0" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
                                         </StackPanel>
-
                                         <StackPanel Orientation="Vertical" Margin="0,2">
-                                            <Label Content="Overlay Window Content Opacity" />
+                                            <Label Content="{DynamicResource Prefs_Ovl_CtOp}" />
                                             <Slider x:Name="overlay_OpacitySlider" Value="{Binding Path=OverlayOpacity}" Minimum="0.05" Maximum="1.0" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
                                         </StackPanel>
-
                                         <StackPanel Orientation="Vertical" Margin="0,2">
-                                            <Label Content="Overlay Jump Range" />
+                                            <Label Content="{DynamicResource Prefs_Ovl_Range}" />
                                             <Slider x:Name="overlay_RangeSlider" Value="{Binding Path=OverlayRange}" Minimum="1" Maximum="10" TickFrequency="1" TickPlacement="BottomRight" IsMoveToPointEnabled="True" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=IntelFreshTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="1" Maximum="900" Background="Transparent"  Foreground="White" />
-                                            <Label Content="First, Intel is fresh for x seconds" />
+                                            <Label Content="{DynamicResource Prefs_Ovl_Fresh}" />
                                         </StackPanel>
-
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=IntelStaleTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" />
-                                            <Label Content="Then, Intel is stale for x seconds" />
+                                            <Label Content="{DynamicResource Prefs_Ovl_Stale}" />
                                         </StackPanel>
-
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
                                             <xctk:IntegerUpDown Value="{Binding Path=IntelHistoricTime}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="70" Minimum="5" Maximum="1200" Background="Transparent"  Foreground="White" ValueChanged="zkilltime_ValueChanged" />
-                                            <Label Content="Finally, Intel is historic for x seconds" />
+                                            <Label Content="{DynamicResource Prefs_Ovl_Hist}" />
                                         </StackPanel>
-                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayIndividualCharacterWindows}" Content="Open individual windows for each character." />
+
+                                        <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayIndividualCharacterWindows}" Content="{DynamicResource Prefs_Ovl_IndWin}" />
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
-                                            <Label Content="Char names on overlay: " />
-                                            <ComboBox SelectedValuePath="Content" SelectedValue="{Binding Path=OverlayAdditionalCharacterNamesDisplay}" Width="120">
-                                                <ComboBoxItem Content="All"></ComboBoxItem>
-                                                <ComboBoxItem Content="Overlay Character"></ComboBoxItem>
-                                                <ComboBoxItem Content="None"></ComboBoxItem>
-                                                <ComboBoxItem Content="Number"></ComboBoxItem>
+                                            <Label Content="{DynamicResource Prefs_Ovl_CharLbl}" />
+                                            <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Path=OverlayAdditionalCharacterNamesDisplay}" Width="120">
+                                                <ComboBoxItem Content="{DynamicResource Prefs_Ovl_All}" Tag="All"></ComboBoxItem>
+                                                <ComboBoxItem Content="{DynamicResource Prefs_Ovl_OvlChr}" Tag="Overlay Character"></ComboBoxItem>
+                                                <ComboBoxItem Content="{DynamicResource Prefs_Ovl_None}" Tag="None"></ComboBoxItem>
+                                                <ComboBoxItem Content="{DynamicResource Prefs_Ovl_Num}" Tag="Number"></ComboBoxItem>
                                             </ComboBox>
                                         </StackPanel>
                                     </StackPanel>
@@ -396,18 +384,18 @@
                             <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Margin="2">
                                 <GroupBox Margin="4" Height="auto">
                                     <StackPanel>
-
                                         <StackPanel Orientation="Vertical" Margin="0,0">
-                                            <Label Content="Overlay Information" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharName}" Content="Show name of the active character in title" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharLocation}" Content="Show location of the active character in title" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowJumpBridges}" Content="Show JumpBridges on overlay" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowSystemNames}" Content="Show Individual System Names on overlay" />
-                                            <Label Content="Hunter Mode Information" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKills}" Content="Show NPC kills" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="Show NPC kill delta" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="Show the current route" />
-                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayHunterModeShowFullRegion}" Content="Show the full region in hunter mode" />
+                                            <Label Content="{DynamicResource Prefs_Ovl_InfoGrp}" />
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharName}" Content="{DynamicResource Prefs_Ovl_ShowNam}" />
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowCharLocation}" Content="{DynamicResource Prefs_Ovl_ShowLoc}" />
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowJumpBridges}" Content="{DynamicResource Prefs_Ovl_ShowJB}" />
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowSystemNames}" Content="{DynamicResource Prefs_Ovl_ShowSys}" />
+
+                                            <Label Content="{DynamicResource Prefs_Ovl_HntGrp}" Margin="0,10,0,0"/>
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKills}" Content="{DynamicResource Prefs_Ovl_NPCKil}" />
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowNPCKillDelta}" Content="{DynamicResource Prefs_Ovl_NPCDel}" />
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayShowRoute}" Content="{DynamicResource Prefs_Ovl_Route}" />
+                                            <CheckBox Margin="0,3" IsChecked="{Binding Path=OverlayHunterModeShowFullRegion}" Content="{DynamicResource Prefs_Ovl_FullReg}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </GroupBox>
@@ -416,7 +404,7 @@
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="Colours">
+                <TabItem Header="{DynamicResource Prefs_Tab_Colours}">
                     <Grid Height="500" Width="600">
                         <ScrollViewer>
                             <StackPanel>
@@ -427,16 +415,16 @@
                                         </DataTemplate>
                                     </xctk:PropertyGrid.CategoryGroupHeaderTemplate>
                                 </xctk:PropertyGrid>
-                                <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="Reset Colours" Margin="0,2" />
+                                <Button x:Name="ResetColourData" Click="ResetColourData_Click" Content="{DynamicResource Prefs_Col_Reset}" Margin="0,2" />
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
                 </TabItem>
             </TabControl>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,2">
-                <Button Content="Open Preferences Folder" Margin="10,0" Width="145" Click="Prefs_OpenFolder_Click" />
-                <Button Content="Default" Margin="3,0" Width="55" Click="Prefs_Default_Click" />
-                <Button Content="OK" Margin="3,0" Width="55" Click="Prefs_OK_Click" />
+                <Button Content="{DynamicResource Prefs_Btn_OpenFolder}" Margin="10,0" Width="145" Click="Prefs_OpenFolder_Click" />
+                <Button Content="{DynamicResource Prefs_Btn_Default}" Margin="3,0" Width="60" Click="Prefs_Default_Click" />
+                <Button Content="{DynamicResource Prefs_Btn_OK}" Margin="3,0" Width="55" Click="Prefs_OK_Click" />
             </StackPanel>
         </DockPanel>
     </Grid>

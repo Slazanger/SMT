@@ -29,6 +29,9 @@ namespace SMT.EVEData
     /// </summary>
     public class EveManager
     {
+        // 全局静态语言标记和翻译词典
+        public static string CurrentLanguage { get; set; } = "en-US";
+        public static Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// singleton instance of this class
         /// </summary>
@@ -144,12 +147,10 @@ namespace SMT.EVEData
             // LocalCharacters is now initialized as a private field
             VersionStr = version;
 
-
             MigrateOldSettings();
 
-
             string SaveDataRoot = EveAppConfig.StorageRoot;
-            if(!Directory.Exists(SaveDataRoot))
+            if (!Directory.Exists(SaveDataRoot))
             {
                 Directory.CreateDirectory(SaveDataRoot);
             }
@@ -159,13 +160,13 @@ namespace SMT.EVEData
             SaveDataRootFolder = SaveDataRoot;
 
             SaveDataVersionFolder = EveAppConfig.VersionStorage;
-            if(!Directory.Exists(SaveDataVersionFolder))
+            if (!Directory.Exists(SaveDataVersionFolder))
             {
                 Directory.CreateDirectory(SaveDataVersionFolder);
             }
 
             string characterSaveFolder = Path.Combine(SaveDataRootFolder, "Portraits");
-            if(!Directory.Exists(characterSaveFolder))
+            if (!Directory.Exists(characterSaveFolder))
             {
                 Directory.CreateDirectory(characterSaveFolder);
             }
@@ -177,6 +178,50 @@ namespace SMT.EVEData
             IDToSystem = new Dictionary<long, System>();
 
             ServerInfo = new EVEData.Server();
+
+            // === 老余的汉化：在初始化最后加载翻译 ===
+            LoadTranslations();
+        }
+
+        // === 老余的汉化：读取 CSV 的方法，放在构造函数正下方 ===
+        private void LoadTranslations()
+        {
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "Translation.csv");
+                if (File.Exists(path))
+                {
+                    // 强制使用 UTF8 读取
+                    string[] lines = File.ReadAllLines(path, global::System.Text.Encoding.UTF8);
+                    int count = 0;
+                    foreach (string line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+
+                        string[] parts = line.Split(',');
+                        if (parts.Length >= 2)
+                        {
+                            // Replace("\uFEFF", "") 是为了清除 CSV 文件头可能自带的隐藏编码字符
+                            string en = parts[0].Trim().Replace("\uFEFF", "");
+                            string zh = parts[1].Trim();
+                            if (!Translations.ContainsKey(en))
+                            {
+                                Translations.Add(en, zh);
+                                count++;
+                            }
+                        }
+                    }
+                    global::System.Diagnostics.Debug.WriteLine($"【老余战报】: 成功读取了 {count} 条翻译！");
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.WriteLine("【老余警告】: 找不到翻译文件: " + path);
+                }
+            }
+            catch (global::System.Exception ex)
+            {
+                global::System.Diagnostics.Debug.WriteLine("【老余警告】: CSV读取报错: " + ex.Message);
+            }
         }
 
         /// <summary>

@@ -879,7 +879,7 @@ namespace SMT
 
             // update the selected region
             Region = mr;
-            RegionNameLabel.Content = mr.Name;
+            RegionNameLabel.Content = mr.LocalizedName;
             MapConf.DefaultRegion = mr.Name;
 
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
@@ -2402,10 +2402,10 @@ namespace SMT
                 };
 
                 Label sysText = new Label();
-                sysText.Content = mapSystem.Name;
+                sysText.Content = mapSystem.LocalizedName;
 
 
-                if(MapConf.ActiveColourScheme.SystemTextSize > 0)
+                if (MapConf.ActiveColourScheme.SystemTextSize > 0)
                 {
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
                 }
@@ -2636,7 +2636,8 @@ namespace SMT
                     {
                         SystemSubText += "\n";
                     }
-                    SystemSubText += "(" + mapSystem.Region + ")";
+                    string localRegionName = EM.GetRegion(mapSystem.Region)?.LocalizedName ?? mapSystem.Region;
+                    SystemSubText += "(" + localRegionName + ")";
 
                     Polygon poly = new Polygon();
                     foreach(Vector2 p in mapSystem.CellPoints)
@@ -2800,8 +2801,8 @@ namespace SMT
                             }
                             jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
 
-                            jbOutofRegionText.Content = $"{to.Name}\n({to.Region})";
-                            if(MapConf.ActiveColourScheme.SystemSubTextSize > 2)
+                            jbOutofRegionText.Content = $"{to.LocalizedName}\n({to.Region})";
+                            if (MapConf.ActiveColourScheme.SystemSubTextSize > 2)
                             {
                                 jbOutofRegionText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                             }
@@ -3247,46 +3248,49 @@ namespace SMT
                         miChar.Header = lc.Name;
                         characters.Items.Add(miChar);
 
+                        // 1. 加个语言判断开关
+                        bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
+
                         // now create the child menu's
                         MenuItem miAutoRange = new MenuItem();
-                        miAutoRange.Header = "Auto Jump Range";
+                        miAutoRange.Header = isZH ? "自动跳跃范围" : "Auto Jump Range";
                         miAutoRange.DataContext = lc;
                         miChar.Items.Add(miAutoRange);
 
                         MenuItem miARNone = new MenuItem();
-                        miARNone.Header = "None";
+                        miARNone.Header = isZH ? "无" : "None";
                         miARNone.DataContext = "0";
                         miARNone.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARNone);
 
                         MenuItem miARSuper = new MenuItem();
-                        miARSuper.Header = "Super/Titan  (6.0LY)";
+                        miARSuper.Header = isZH ? "超级航母/泰坦 (6.0LY)" : "Super/Titan  (6.0LY)";
                         miARSuper.DataContext = "6";
                         miARSuper.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARSuper);
 
                         MenuItem miARCF = new MenuItem();
-                        miARCF.Header = "Carriers/Fax (7.0LY)";
+                        miARCF.Header = isZH ? "航母/无畏/传母 (7.0LY)" : "Carriers/Fax (7.0LY)";
                         miARCF.DataContext = "7";
                         miARCF.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARCF);
 
                         MenuItem miARBlops = new MenuItem();
-                        miARBlops.Header = "Black Ops    (8.0LY)";
+                        miARBlops.Header = isZH ? "黑隐特勤舰 (8.0LY)" : "Black Ops    (8.0LY)";
                         miARBlops.DataContext = "8";
                         miARBlops.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARBlops);
 
                         MenuItem miARJFR = new MenuItem();
-                        miARJFR.Header = "JF/Rorq     (10.0LY)";
+                        miARJFR.Header = isZH ? "跳货/大鲸鱼 (10.0LY)" : "JF/Rorq     (10.0LY)";
                         miARJFR.DataContext = "10";
                         miARJFR.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARJFR);
 
-                        if(!string.IsNullOrEmpty(lc.GameLogWarningText))
+                        if (!string.IsNullOrEmpty(lc.GameLogWarningText))
                         {
                             MenuItem miRemoveWarning = new MenuItem();
-                            miRemoveWarning.Header = "Clear Warning";
+                            miRemoveWarning.Header = isZH ? "清除警告" : "Clear Warning";
                             miRemoveWarning.DataContext = lc;
                             miRemoveWarning.Click += characterRightClickClearWarning;
                             miChar.Items.Add(miRemoveWarning);
@@ -3334,7 +3338,7 @@ namespace SMT
                 SystemInfoPopupSP.Children.Clear();
 
                 Label header = new Label();
-                header.Content = selectedSys.Name;
+                header.Content = selectedSys.LocalizedName;
                 header.FontWeight = FontWeights.Bold;
                 header.FontSize = 14;
                 header.Padding = one;
@@ -3379,64 +3383,67 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(new Separator());
                 }
 
+                // 1. 语言判断开关
+                bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
+
                 Label constellation = new Label();
                 constellation.Padding = one;
                 constellation.Margin = one;
-                constellation.Content = "Const\t:  " + selectedSys.ActualSystem.ConstellationName;
+                constellation.Content = (isZH ? "星座\t:  " : "Const\t:  ") + selectedSys.ActualSystem.ConstellationName;
                 constellation.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                 SystemInfoPopupSP.Children.Add(constellation);
 
                 Label secstatus = new Label();
                 secstatus.Padding = one;
                 secstatus.Margin = one;
-                secstatus.Content = "Security\t:  " + string.Format("{0:0.00}", selectedSys.ActualSystem.TrueSec) + " (" + selectedSys.ActualSystem.SecType + ")";
+                secstatus.Content = (isZH ? "安全等级\t:  " : "Security\t:  ") + string.Format("{0:0.00}", selectedSys.ActualSystem.TrueSec) + " (" + selectedSys.ActualSystem.SecType + ")";
                 secstatus.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                 SystemInfoPopupSP.Children.Add(secstatus);
 
                 SystemInfoPopupSP.Children.Add(new Separator());
 
-                if(selectedSys.ActualSystem.ShipKillsLastHour != 0)
+                if (selectedSys.ActualSystem.ShipKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
+                    data.Content = isZH ? $"舰船击杀\t:  {selectedSys.ActualSystem.ShipKillsLastHour}" : $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(selectedSys.ActualSystem.PodKillsLastHour != 0)
+                if (selectedSys.ActualSystem.PodKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
+                    data.Content = isZH ? $"太空舱击杀\t:  {selectedSys.ActualSystem.PodKillsLastHour}" : $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(selectedSys.ActualSystem.NPCKillsLastHour != 0)
+                if (selectedSys.ActualSystem.NPCKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, Delta ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})";
+                    data.Content = isZH ? $"NPC 击杀\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, 变化 ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})" : $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, Delta ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(selectedSys.ActualSystem.JumpsLastHour != 0)
+                if (selectedSys.ActualSystem.JumpsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
 
-                    data.Content = $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
+                    data.Content = isZH ? $"跳跃数\t:  {selectedSys.ActualSystem.JumpsLastHour}" : $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(ShowJumpBridges)
+                if (ShowJumpBridges)
                 {
                     Point from = new Point();
                     Point to = new Point(); ;
