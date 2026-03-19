@@ -964,7 +964,7 @@ namespace SMT.EVEData
                     var esr = await EveManager.Instance.EveApiClient.Fleets.GetCharacterFleetInfoAsync(auth);
                     if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                     {
-                        FleetInfo.FleetID = (int)esr.Model.FleetId;
+                        FleetInfo.FleetID = esr.Model.FleetId;
                         FleetInfo.IsFleetBoss = esr.Model.Role == "fleet_commander";
                     }
                     else

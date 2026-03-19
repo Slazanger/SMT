@@ -1,0 +1,32 @@
+<Window x:Class="SMT.EsiDebugWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:eveData="clr-namespace:SMT.EVEData;assembly=EVEData"
+        mc:Ignorable="d"
+        Title="ESI Rate Limit (Token Buckets)" Height="320" Width="480"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
+        Loaded="Window_Loaded" Closed="Window_Closed">
+    <Grid Margin="8" Background="{DynamicResource ListBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="ESI token buckets (per group). Updated from response headers when using ESI." 
+                   TextWrapping="Wrap" Margin="0,0,0,8" />
+        <DataGrid x:Name="BucketsDataGrid" Grid.Row="1" BorderThickness="1" BorderBrush="Gray"
+                  AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Group" Binding="{Binding Group}" Width="150" />
+                <DataGridTextColumn Header="Remain" Binding="{Binding Remain}" Width="80" />
+                <DataGridTextColumn Header="Reset at (UTC)" Binding="{Binding ResetAt, StringFormat=HH:mm:ss}" Width="120" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="EmptyMessage" Grid.Row="1" Text="No ESI data yet. Buckets populate after ESI calls return." 
+                   VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed" />
+        <TextBlock Grid.Row="2" x:Name="RefreshLabel" Margin="0,8,0,0" FontSize="11" Foreground="Gray" />
+    </Grid>
+</Window>

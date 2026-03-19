@@ -27,6 +27,16 @@ using Newtonsoft.Json.Linq;
 namespace SMT.EVEData
 {
     /// <summary>
+    /// State for one ESI rate-limit token bucket (e.g. error limit or a rate-limit group).
+    /// </summary>
+    public class EsiRateLimitBucketState
+    {
+        public string Group { get; set; } = string.Empty;
+        public int Remain { get; set; }
+        public DateTime ResetAt { get; set; }
+    }
+
+    /// <summary>
     /// The main EVE Manager
     /// </summary>
     public class EveManager
@@ -62,6 +72,16 @@ namespace SMT.EVEData
         /// Read position map for the intel files
         /// </summary>
         private Dictionary<string, string> gamelogFileCharacterMap;
+
+        /// <summary>
+        /// Lock for ESI rate-limit bucket updates and reads.
+        /// </summary>
+        private readonly object _esiRateLimitLock = new object();
+
+        /// <summary>
+        /// Per-group ESI token bucket state (e.g. ErrorLimit). Updated from response headers.
+        /// </summary>
+        private Dictionary<string, EsiRateLimitBucketState> _esiRateLimitBuckets = new Dictionary<string, EsiRateLimitBucketState>();
 
         /// <summary>
         /// File system watcher
@@ -328,6 +348,43 @@ namespace SMT.EVEData
         public SSOv2 Sso { get; set; }
 
         public List<string> ESIScopes { get; set; }
+
+        /// <summary>
+        /// Updates the ESI rate-limit bucket for the given group from response headers (X-Esi-Error-Limit-Remain, X-Esi-Error-Limit-Reset).
+        /// </summary>
+        /// <param name="group">Rate-limit group name (e.g. "ErrorLimit" for the global error limit).</param>
+        /// <param name="remain">Remaining tokens/errors (e.g. from X-Esi-Error-Limit-Remain).</param>
+        /// <param name="resetSeconds">Seconds until the window resets (e.g. from X-Esi-Error-Limit-Reset).</param>
+        public void UpdateEsiRateLimit(string group, int remain, int resetSeconds)
+        {
+            if (string.IsNullOrEmpty(group)) return;
+            var resetAt = DateTime.UtcNow.AddSeconds(resetSeconds);
+            lock (_esiRateLimitLock)
+            {
+                _esiRateLimitBuckets[group] = new EsiRateLimitBucketState
+                {
+                    Group = group,
+                    Remain = remain,
+                    ResetAt = resetAt
+                };
+            }
+        }
+
+        /// <summary>
+        /// Returns a snapshot of current ESI rate-limit bucket state per group (thread-safe).
+        /// </summary>
+        public List<EsiRateLimitBucketState> GetEsiRateLimitBuckets()
+        {
+            lock (_esiRateLimitLock)
+            {
+                return _esiRateLimitBuckets.Values.Select(b => new EsiRateLimitBucketState
+                {
+                    Group = b.Group,
+                    Remain = b.Remain,
+                    ResetAt = b.ResetAt
+                }).ToList();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the Intel List

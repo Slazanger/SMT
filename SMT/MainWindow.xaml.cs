@@ -2304,6 +2304,13 @@ namespace SMT
             dockManager.UpdateLayout();
         }
 
+        private void EsiDebug_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var esiDebugWindow = new EsiDebugWindow();
+            esiDebugWindow.Owner = this;
+            esiDebugWindow.Show();
+        }
+
         private void JumpPlannerShipType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(CapitalRoute != null)
