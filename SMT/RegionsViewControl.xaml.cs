@@ -38,7 +38,7 @@ namespace SMT
 
         public void Init()
         {
-            // 1. 如果有旧的定时器，先停掉，防止重复刷新
+            // stop the old timer if it exists
             if (uiRefreshTimer != null)
             {
                 uiRefreshTimer.Stop();

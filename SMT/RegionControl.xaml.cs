@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -107,7 +107,23 @@ namespace SMT
         private Brush StandingVBadBrush = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
 
+        /// <summary>Standing tier colours for map tickers: same semantic tiers as the kill feed, higher luminance for dark map backgrounds.</summary>
+        private static readonly SolidColorBrush TickerStandingTerribleBrush;
+        private static readonly SolidColorBrush TickerStandingBadBrush;
+        private static readonly SolidColorBrush TickerStandingGoodBrush;
+        private static readonly SolidColorBrush TickerStandingExcellentBrush;
 
+        static RegionControl()
+        {
+            TickerStandingTerribleBrush = new SolidColorBrush(Color.FromRgb(255, 95, 95));
+            TickerStandingBadBrush = new SolidColorBrush(Color.FromRgb(255, 184, 77));
+            TickerStandingGoodBrush = new SolidColorBrush(Color.FromRgb(110, 220, 255));
+            TickerStandingExcellentBrush = new SolidColorBrush(Color.FromRgb(140, 180, 255));
+            TickerStandingTerribleBrush.Freeze();
+            TickerStandingBadBrush.Freeze();
+            TickerStandingGoodBrush.Freeze();
+            TickerStandingExcellentBrush.Freeze();
+        }
 
         private List<Point> SystemIcon_Astrahaus = new List<Point>
         {
@@ -2159,6 +2175,57 @@ namespace SMT
         }
 
         /// <summary>
+        /// Alliance ticker / list row colour from standings (bright tier colours for dark maps) when ESI-linked; otherwise <paramref name="defaultBrush"/>.
+        /// Resolution matches the map standings overlay (own alliance, then corp, then alliance contact). Use <paramref name="sovCorpId"/> 0 for alliance-only rows (e.g. legend list).
+        /// </summary>
+        private static Brush GetAllianceTickerBrushFromStanding(LocalCharacter c, long sovAllianceId, long sovCorpId, Brush defaultBrush)
+        {
+            if(c == null || !c.ESILinked)
+            {
+                return defaultBrush;
+            }
+
+            float standing = 0.0f;
+
+            if(c.AllianceID != 0 && c.AllianceID == sovAllianceId)
+            {
+                standing = 10.0f;
+            }
+
+            if(sovCorpId != 0 && c.Standings.Keys.Contains(sovCorpId))
+            {
+                standing = c.Standings[sovCorpId];
+            }
+
+            if(sovAllianceId != 0 && c.Standings.Keys.Contains(sovAllianceId))
+            {
+                standing = c.Standings[sovAllianceId];
+            }
+
+            if(standing == -10.0f)
+            {
+                return TickerStandingTerribleBrush;
+            }
+
+            if(standing == -5.0f)
+            {
+                return TickerStandingBadBrush;
+            }
+
+            if(standing == 5.0f)
+            {
+                return TickerStandingGoodBrush;
+            }
+
+            if(standing == 10.0f)
+            {
+                return TickerStandingExcellentBrush;
+            }
+
+            return defaultBrush;
+        }
+
+        /// <summary>
         /// Add the base systems, and jumps to the map
         /// </summary>
         private void AddSystemsToMap()
@@ -2249,7 +2316,7 @@ namespace SMT
 
 
 
-                string SystemSubText = string.Empty;
+                var systemSubTextLines = new List<(string Text, Brush Foreground)>();
 
                 // add circle for system
                 Polygon systemShape = new Polygon();
@@ -2632,12 +2699,8 @@ namespace SMT
 
                 if(isSystemOOR)
                 {
-                    if(SystemSubText != string.Empty)
-                    {
-                        SystemSubText += "\n";
-                    }
                     string localRegionName = EM.GetRegion(mapSystem.Region)?.LocalizedName ?? mapSystem.Region;
-                    SystemSubText += "(" + localRegionName + ")";
+                    systemSubTextLines.Add(("(" + localRegionName + ")", SysOutRegionTextBrush));
 
                     Polygon poly = new Polygon();
                     foreach(Vector2 p in mapSystem.CellPoints)
@@ -2662,11 +2725,13 @@ namespace SMT
                     string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
                     string content = allianceTicker;
 
-                    if(SystemSubText != string.Empty)
-                    {
-                        SystemSubText += "\n";
-                    }
-                    SystemSubText += content;
+                    Brush defaultAllianceTickerBrush = isSystemOOR ? SysOutRegionTextBrush : SysInRegionTextBrush;
+                    Brush allianceSubTextBrush = GetAllianceTickerBrushFromStanding(
+                        ActiveCharacter,
+                        SystemAlliance,
+                        mapSystem.ActualSystem.SOVCorp,
+                        defaultAllianceTickerBrush);
+                    systemSubTextLines.Add((content, allianceSubTextBrush));
 
                     if(!AlliancesKeyList.Contains(SystemAlliance))
                     {
@@ -2674,52 +2739,51 @@ namespace SMT
                     }
                 }
 
-                if(!string.IsNullOrEmpty(SystemSubText))
+                if(systemSubTextLines.Count > 0)
                 {
-
-                    TextBlock sysSubText = new TextBlock();
-                    sysSubText.Text = SystemSubText;
-                    sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
-                    sysSubText.Padding = new Thickness(0);
-                    sysSubText.Margin = new Thickness(0);
-
+                    TextAlignment subTextAlignment;
                     switch(mapSystem.TextPos)
                     {
                         case MapSystem.TextPosition.Left:
-                            sysSubText.TextAlignment = TextAlignment.Right;
+                            subTextAlignment = TextAlignment.Right;
                             break;
 
                         case MapSystem.TextPosition.Right:
-                            sysSubText.TextAlignment = TextAlignment.Left;
+                            subTextAlignment = TextAlignment.Left;
                             break;
 
                         case MapSystem.TextPosition.Top:
-                            sysSubText.TextAlignment = TextAlignment.Center;
-                            break;
-
                         case MapSystem.TextPosition.Bottom:
-                            sysSubText.TextAlignment = TextAlignment.Center;
+                        default:
+                            subTextAlignment = TextAlignment.Center;
                             break;
-                    }
-
-                    sysSubText.IsHitTestVisible = false;
-
-                    if(MapConf.ActiveColourScheme.SystemSubTextSize > 0)
-                    {
-                        sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                     }
 
                     if(isSystemOOR)
                     {
-                        sysSubText.Foreground = SysOutRegionTextBrush;
                         regionMarkerOffset -= 4;
                     }
-                    else
-                    {
-                        sysSubText.Foreground = SysInRegionTextBrush;
-                    }
 
-                    sp.Children.Add(sysSubText);
+                    foreach((string lineText, Brush lineBrush) in systemSubTextLines)
+                    {
+                        TextBlock sysSubText = new TextBlock
+                        {
+                            Text = lineText,
+                            Width = SYSTEM_REGION_TEXT_WIDTH,
+                            Padding = new Thickness(0),
+                            Margin = new Thickness(0),
+                            TextAlignment = subTextAlignment,
+                            IsHitTestVisible = false,
+                            Foreground = lineBrush,
+                        };
+
+                        if(MapConf.ActiveColourScheme.SystemSubTextSize > 0)
+                        {
+                            sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
+                        }
+
+                        sp.Children.Add(sysSubText);
+                    }
                 }
             }
 
@@ -2921,7 +2985,7 @@ namespace SMT
                     akl.MouseDown += AllianceKeyList_MouseDown;
                     akl.DataContext = allianceID.ToString();
                     akl.Content = $"{allianceTicker}\t{allianceName}";
-                    akl.Foreground = fontColour;
+                    akl.Foreground = GetAllianceTickerBrushFromStanding(ActiveCharacter, allianceID, 0, fontColour);
                     akl.Margin = p;
                     akl.Padding = p;
 
