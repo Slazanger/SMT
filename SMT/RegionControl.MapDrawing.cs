@@ -1,0 +1,2619 @@
+//-----------------------------------------------------------------------
+// Region map drawing — layers, systems, gates, overlays (split from RegionControl.xaml.cs)
+//-----------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Numerics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Shapes;
+using System.Windows.Threading;
+using SMT.EVEData;
+using SMT.ResourceUsage;
+
+namespace SMT
+{
+    public partial class RegionControl : UserControl, INotifyPropertyChanged
+    {
+        public void AddSovConflictsToMap()
+        {
+            if(!ShowSystemTimers)
+            {
+                return;
+            }
+
+            Brush ActiveSovFightBrush = new SolidColorBrush(Colors.DarkRed);
+
+            foreach(SOVCampaign sc in EM.ActiveSovCampaigns)
+            {
+                if(Region.IsSystemOnMap(sc.System))
+                {
+                    MapSystem ms = Region.MapSystems[sc.System];
+
+                    Image SovFightLogo = new Image
+                    {
+                        Width = 10,
+                        Height = 10,
+                        Name = "FightLogo",
+                        Source = fightImage,
+                        Stretch = Stretch.Uniform,
+                        IsHitTestVisible = false,
+                    };
+                    SovFightLogo.IsHitTestVisible = false;
+
+                    Canvas.SetLeft(SovFightLogo, ms.Layout.X - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetTop(SovFightLogo, ms.Layout.Y - SYSTEM_SHAPE_OFFSET + 5);
+                    Canvas.SetZIndex(SovFightLogo, ZINDEX_SOV_FIGHT_LOGO);
+                    MainCanvas.Children.Add(SovFightLogo);
+                    DynamicMapElements.Add(SovFightLogo);
+
+                    if(sc.IsActive || sc.Type == "IHub")
+                    {
+                        Shape activeSovFightShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 18, Width = SYSTEM_SHAPE_SIZE + 18 };
+
+                        activeSovFightShape.Stroke = ActiveSovFightBrush;
+                        activeSovFightShape.StrokeThickness = 9;
+                        activeSovFightShape.StrokeLineJoin = PenLineJoin.Round;
+                        activeSovFightShape.Fill = ActiveSovFightBrush;
+
+                        Canvas.SetLeft(activeSovFightShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 9));
+                        Canvas.SetTop(activeSovFightShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 9));
+                        Canvas.SetZIndex(activeSovFightShape, ZINDEX_SOV_FIGHT_SHAPE);
+                        MainCanvas.Children.Add(activeSovFightShape);
+                        DynamicMapElements.Add(activeSovFightShape);
+                    }
+                }
+            }
+        }
+
+        public void AddWHLinksSystemsToMap()
+        {
+            Brush TheraWHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.TheraEntranceSystem);
+            Brush TurnurWHLinkBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ThurnurEntranceSystem);
+
+            List<TheraConnection> currentTheraConnections = EM.TheraConnections.ToList();
+
+            foreach(TheraConnection tc in currentTheraConnections)
+            {
+                if(Region.IsSystemOnMap(tc.System))
+                {
+                    MapSystem ms = Region.MapSystems[tc.System];
+
+                    Shape TheraShape;
+                    if(ms.ActualSystem.HasNPCStation)
+                    {
+                        TheraShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+                    else
+                    {
+                        TheraShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+
+                    TheraShape.Stroke = TheraWHLinkBrush;
+                    TheraShape.StrokeThickness = 1.5;
+                    TheraShape.StrokeLineJoin = PenLineJoin.Round;
+                    TheraShape.Fill = TheraWHLinkBrush;
+
+                    Canvas.SetLeft(TheraShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(TheraShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetZIndex(TheraShape, ZINDEX_THERA);
+                    MainCanvas.Children.Add(TheraShape);
+                }
+            }
+
+            List<TurnurConnection> currentTurnurConnections = EM.TurnurConnections.ToList();
+
+            foreach(TurnurConnection tc in currentTurnurConnections)
+            {
+                if(Region.IsSystemOnMap(tc.System))
+                {
+                    MapSystem ms = Region.MapSystems[tc.System];
+
+                    Shape TurnurShape;
+                    if(ms.ActualSystem.HasNPCStation)
+                    {
+                        TurnurShape = new Rectangle() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+                    else
+                    {
+                        TurnurShape = new Ellipse() { Height = SYSTEM_SHAPE_SIZE + 6, Width = SYSTEM_SHAPE_SIZE + 6 };
+                    }
+
+                    TurnurShape.Stroke = TurnurWHLinkBrush;
+                    TurnurShape.StrokeThickness = 1.5;
+                    TurnurShape.StrokeLineJoin = PenLineJoin.Round;
+                    TurnurShape.Fill = TurnurWHLinkBrush;
+
+                    Canvas.SetLeft(TurnurShape, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(TurnurShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetZIndex(TurnurShape, ZINDEX_TURNER);
+                    MainCanvas.Children.Add(TurnurShape);
+                }
+            }
+        }
+
+        public void AddPOIsToMap()
+        {
+            Brush POIBrush = new SolidColorBrush(Colors.White);
+
+            foreach(POI p in EM.PointsOfInterest)
+            {
+                if(Region.IsSystemOnMap(p.System))
+                {
+                    MapSystem ms = Region.MapSystems[p.System];
+                    string POISymbol = "â„¹";
+
+                    Label poiLbl = new Label();
+                    poiLbl.FontSize = 9;
+                    poiLbl.IsHitTestVisible = false;
+                    poiLbl.Content = POISymbol;
+                    poiLbl.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    poiLbl.VerticalContentAlignment = VerticalAlignment.Center;
+                    poiLbl.Width = SYSTEM_SHAPE_SIZE + 6;
+                    poiLbl.Height = SYSTEM_SHAPE_SIZE + 6;
+                    poiLbl.Foreground = POIBrush;
+                    poiLbl.FontWeight = FontWeights.Bold;
+
+                    Canvas.SetLeft(poiLbl, ms.Layout.X - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetTop(poiLbl, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
+                    Canvas.SetZIndex(poiLbl, ZINDEX_POI);
+                    MainCanvas.Children.Add(poiLbl);
+                    DynamicMapElements.Add(poiLbl);
+                }
+            }
+        }
+
+        public void AddStormsToMap()
+        {
+            foreach(Storm s in EM.MetaliminalStorms)
+            {
+                if(Region.IsSystemOnMap(s.System))
+                {
+                    MapSystem ms = Region.MapSystems[s.System];
+
+                    Image stormCloud = new Image
+                    {
+                        Width = 28,
+                        Height = 28,
+                        Name = "Storm",
+                        Source = stormImageBase,
+                        Stretch = Stretch.Uniform,
+                        IsHitTestVisible = false,
+                    };
+
+                    stormCloud.UseLayoutRounding = true;
+                    stormCloud.SnapsToDevicePixels = true;
+
+                    switch(s.Type)
+                    {
+                        case "Plasma":
+                            {
+                                stormCloud.Source = stormImageTherm;
+                            }
+                            break;
+
+                        case "Gamma":
+                            {
+                                stormCloud.Source = stormImageExp;
+                            }
+                            break;
+
+                        case "Exotic":
+                            {
+                                stormCloud.Source = stormImageKin;
+                            }
+                            break;
+
+                        case "Electric":
+                            {
+                                stormCloud.Source = stormImageEM;
+                            }
+                            break;
+                    }
+
+                    Canvas.SetLeft(stormCloud, ms.Layout.X - SYSTEM_SHAPE_OFFSET - 15);
+                    Canvas.SetTop(stormCloud, ms.Layout.Y - SYSTEM_SHAPE_OFFSET - 11);
+                    Canvas.SetZIndex(stormCloud, ZINDEX_STORM);
+                    MainCanvas.Children.Add(stormCloud);
+                    DynamicMapElements.Add(stormCloud);
+
+                    // now the strong area..
+                    foreach(string strongSys in s.StrongArea)
+                    {
+                        if(Region.IsSystemOnMap(strongSys))
+                        {
+                            MapSystem mss = Region.MapSystems[strongSys];
+
+                            Image strongStormCloud = new Image
+                            {
+                                Width = 28,
+                                Height = 28,
+                                Name = "Storm",
+                                Source = stormCloud.Source,
+                                Stretch = Stretch.Uniform,
+                                IsHitTestVisible = false,
+                                Opacity = 1.0,
+                            };
+
+                            Canvas.SetLeft(strongStormCloud, mss.Layout.X - SYSTEM_SHAPE_OFFSET - 15);
+                            Canvas.SetTop(strongStormCloud, mss.Layout.Y - SYSTEM_SHAPE_OFFSET - 11);
+                            Canvas.SetZIndex(strongStormCloud, ZINDEX_STORM);
+                            MainCanvas.Children.Add(strongStormCloud);
+                            DynamicMapElements.Add(strongStormCloud);
+                        }
+                    }
+
+                    // now the wiki area..
+                    foreach(string weakSys in s.WeakArea)
+                    {
+                        if(Region.IsSystemOnMap(weakSys))
+                        {
+                            MapSystem msw = Region.MapSystems[weakSys];
+
+                            Image weakStormCloud = new Image
+                            {
+                                Width = 18,
+                                Height = 18,
+                                Name = "Storm",
+                                Source = stormCloud.Source,
+                                Stretch = Stretch.Uniform,
+                                IsHitTestVisible = false,
+                                // Opacity = 0.5,
+                            };
+
+                            Canvas.SetLeft(weakStormCloud, msw.Layout.X - SYSTEM_SHAPE_OFFSET - 10);
+                            Canvas.SetTop(weakStormCloud, msw.Layout.Y - SYSTEM_SHAPE_OFFSET - 6);
+                            Canvas.SetZIndex(weakStormCloud, ZINDEX_STORM);
+                            MainCanvas.Children.Add(weakStormCloud);
+                            DynamicMapElements.Add(weakStormCloud);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void AddTrigInvasionSytemsToMap()
+        {
+            if(!MapConf.ShowTrigInvasions)
+            {
+                return;
+            }
+
+            Brush trigBrush = new SolidColorBrush(Colors.DarkRed);
+            Brush trigOutlineBrush = new SolidColorBrush(Colors.Black);
+            Brush trigSecStatusChangeBrush = new SolidColorBrush(Colors.Orange);
+
+            ImageBrush ib = new ImageBrush();
+            ib.TileMode = TileMode.Tile;
+            ib.Stretch = Stretch.None;
+            ib.ImageSource = trigLogoImage;
+
+            foreach(KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
+            {
+                EVEData.MapSystem ms = kvp.Value;
+                if(ms.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None && !ms.OutOfRegion)
+                {
+                    Polygon TrigShape;
+                    TrigShape = new Polygon();
+                    TrigShape.Points.Add(new Point(ms.Layout.X - 13, ms.Layout.Y + 6));
+                    TrigShape.Points.Add(new Point(ms.Layout.X, ms.Layout.Y - 14));
+                    TrigShape.Points.Add(new Point(ms.Layout.X + 13, ms.Layout.Y + 6));
+
+                    TrigShape.Stroke = trigOutlineBrush;
+                    TrigShape.StrokeThickness = 1;
+                    TrigShape.StrokeLineJoin = PenLineJoin.Round;
+                    TrigShape.Fill = trigBrush;
+
+                    Canvas.SetZIndex(TrigShape, ZINDEX_TRIG);
+
+                    MainCanvas.Children.Add(TrigShape);
+                    DynamicMapElements.Add(TrigShape);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initialise the control
+        /// </summary>
+        public void Init()
+        {
+            EM = EVEData.EveManager.Instance;
+            SelectedSystem = string.Empty;
+
+            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
+            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
+            GlobalSystemDropDownAC.SelectedItem = null;
+            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+
+            DynamicMapElements = new List<UIElement>();
+            DynamicMapElementsRangeMarkers = new List<UIElement>();
+            DynamicMapElementsRouteHighlight = new List<UIElement>();
+            DynamicMapElementsCharacters = new List<UIElement>();
+            DynamicMapElementsJBHighlight = new List<UIElement>();
+            DynamicMapElementsSysLinkHighlight = new List<UIElement>();
+
+            ActiveCharacter = null;
+
+            RegionSelectCB.ItemsSource = EM.Regions;
+
+            ShowJumpBridges = MapConf.ToolBox_ShowJumpBridges;
+            ShowNPCKills = MapConf.ToolBox_ShowNPCKills;
+            ShowPodKills = MapConf.ToolBox_ShowPodKills;
+            ShowShipJumps = MapConf.ToolBox_ShowShipJumps;
+            ShowShipKills = MapConf.ToolBox_ShowShipKills;
+            ShowSovOwner = MapConf.ToolBox_ShowSovOwner;
+            ShowStandings = MapConf.ToolBox_ShowStandings;
+            ShowSystemADM = MapConf.ToolBox_ShowSystemADM;
+            ShowSystemSecurity = MapConf.ToolBox_ShowSystemSecurity;
+            ShowSystemTimers = MapConf.ToolBox_ShowSystemTimers;
+            ESIOverlayScale = MapConf.ToolBox_ESIOverlayScale;
+
+            SelectRegion(MapConf.DefaultRegion);
+
+            uiRefreshTimer = new System.Windows.Threading.DispatcherTimer();
+            uiRefreshTimer.Tick += UiRefreshTimer_Tick; ;
+            uiRefreshTimer.Interval = new TimeSpan(0, 0, 2);
+            uiRefreshTimer.Start();
+
+            DataContext = this;
+
+            List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
+            SystemDropDownAC.ItemsSource = newList;
+
+            PropertyChanged += MapObjectChanged;
+        }
+
+        /// <summary>
+        /// Redraw the map
+        /// </summary>
+        /// <param name="FullRedraw">Clear all the static items or not</param>
+        public void ReDrawMap(bool FullRedraw = false)
+        {
+            if(ActiveCharacter != null && FollowCharacter == true)
+            {
+                UpdateActiveCharacter();
+            }
+
+            if(FullRedraw)
+            {
+                Color c1 = MapConf.ActiveColourScheme.MapBackgroundColour;
+                Color c2 = MapConf.ActiveColourScheme.MapBackgroundColour;
+                c1.R = (byte)(0.9 * c1.R);
+                c1.G = (byte)(0.9 * c1.G);
+                c1.B = (byte)(0.9 * c1.B);
+
+                LinearGradientBrush lgb = new LinearGradientBrush();
+                lgb.StartPoint = new Point(0, 0);
+                lgb.EndPoint = new Point(0, 1);
+
+                lgb.GradientStops.Add(new GradientStop(c1, 0.0));
+                lgb.GradientStops.Add(new GradientStop(c2, 0.05));
+                lgb.GradientStops.Add(new GradientStop(c2, 0.95));
+                lgb.GradientStops.Add(new GradientStop(c1, 1.0));
+
+                MainCanvasGrid.Background = lgb;
+                MainZoomControl.Background = lgb;
+
+                MainCanvas.Children.Clear();
+
+                // re-add the static content
+                AddSystemsToMap();
+            }
+            else
+            {
+                // remove anything temporary
+                foreach(UIElement uie in DynamicMapElements)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElements.Clear();
+
+                foreach(UIElement uie in DynamicMapElementsRangeMarkers)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElementsRangeMarkers.Clear();
+
+                foreach(UIElement uie in DynamicMapElementsRouteHighlight)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElementsRouteHighlight.Clear();
+
+                foreach(UIElement uie in DynamicMapElementsCharacters)
+                {
+                    MainCanvas.Children.Remove(uie);
+                }
+                DynamicMapElementsCharacters.Clear();
+            }
+
+            AddFWDataToMap();
+
+            AddCharactersToMap();
+            AddDataToMap();
+            AddSystemIntelOverlay();
+            AddHighlightToSystem(SelectedSystem);
+
+            if(MapConf.DrawRoute)
+            {
+                AddRouteToMap();
+            }
+
+            AddWHLinksSystemsToMap();
+            AddStormsToMap();
+            AddSovConflictsToMap();
+            AddTrigInvasionSytemsToMap();
+            AddPOIsToMap();
+        }
+
+        /// <summary>
+        /// Select A Region
+        /// </summary>
+        /// <param name="regionName">Region to Select</param>
+        public void SelectRegion(string regionName)
+        {
+            // check we havent selected the same system
+            if(Region != null && Region.Name == regionName)
+            {
+                return;
+            }
+
+            FollowCharacter = false;
+
+            // close the context menu if its open
+            ContextMenu cm = this.FindResource("SysRightClickContextMenu") as ContextMenu;
+            cm.IsOpen = false;
+
+            SelectedAlliance = 0;
+
+            EM.UpdateIDsForMapRegion(regionName);
+
+            // check its a valid system
+            EVEData.MapRegion mr = EM.GetRegion(regionName);
+            if(mr == null)
+            {
+                return;
+            }
+
+            // update the selected region
+            Region = mr;
+            RegionNameLabel.Content = mr.LocalizedName;
+            MapConf.DefaultRegion = mr.Name;
+
+            List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
+            SystemDropDownAC.ItemsSource = newList;
+
+            // SJS Disabled until ticket resolved with CCP
+            //            if (ActiveCharacter != null)
+            //            {
+            //                ActiveCharacter.UpdateStructureInfoForRegion2(regionName);
+            //            }
+
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                ReDrawMap(true);
+            }), DispatcherPriority.Normal);
+
+            // reset the zoom / export 
+            MainZoomControl.ZoomToFill();
+
+            // select the item in the dropdown
+            RegionSelectCB.SelectedItem = Region;
+
+            OnRegionChanged(regionName);
+        }
+
+        public void SelectSystem(string name, bool changeRegion = false)
+        {
+            if(SelectedSystem == name)
+            {
+                return;
+            }
+
+            EVEData.System sys = EM.GetEveSystem(name);
+
+            if(sys == null)
+            {
+                return;
+            }
+
+            if(changeRegion && !Region.IsSystemOnMap(name))
+            {
+                SelectRegion(sys.Region);
+            }
+
+            foreach(KeyValuePair<string, MapSystem> kvp in Region.MapSystems)
+            {
+                if(kvp.Value.Name == name)
+                {
+                    if(MainZoomControl.Mode == ZoomControl.ZoomControlModes.Custom && MapConf.FollowOnZoom)
+                    {
+                        MainZoomControl.Show(kvp.Value.Layout.X, kvp.Value.Layout.Y, MainZoomControl.Zoom);
+                    }
+
+                    SystemDropDownAC.SelectedItem = kvp.Value;
+                    SelectedSystem = kvp.Value.Name;
+                    AddHighlightToSystem(name);
+
+                    break;
+                }
+            }
+
+            // now setup the anom data
+
+            EVEData.AnomData system = ANOMManager.GetSystemAnomData(name);
+            ANOMManager.ActiveSystem = system;
+        }
+
+        public void UpdateActiveCharacter(EVEData.LocalCharacter c = null)
+        {
+            if(ActiveCharacter != c && c != null)
+            {
+                ActiveCharacter = c;
+            }
+
+            if(ActiveCharacter != null && FollowCharacter)
+            {
+                EVEData.System s = EM.GetEveSystem(ActiveCharacter.Location);
+                if(s != null)
+                {
+                    if(s.Region != Region.Name)
+                    {
+                        // change region
+                        SelectRegion(s.Region);
+                    }
+
+                    SelectSystem(ActiveCharacter.Location);
+
+                    // force the follow as this will be reset by the region change
+                    FollowCharacter = true;
+                }
+            }
+        }
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if(handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        protected void OnRegionChanged(string name)
+        {
+            PropertyChangedEventHandler handler = RegionChanged;
+            if(handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        /// <summary>
+        /// Add Characters to the region
+        /// </summary>
+        private void AddCharactersToMap()
+        {
+            // Cache all characters in the same system so we can render them on seperate lines
+            if(!MapConf.ShowCharacterNamesOnMap)
+            {
+                return;
+            }
+
+            // 0 = online
+            // 1 = offline
+            // 2 = fleet
+            // 3 = warning
+            NameTrackingLocationMap.Clear();
+
+            foreach(EVEData.LocalCharacter c in EM.LocalCharacters)
+            {
+                // ignore characters out of this Map..
+                if(!Region.IsSystemOnMap(c.Location))
+                {
+                    continue;
+                }
+
+                // skip offline characters if enabled..
+                if(!MapConf.ShowOfflineCharactersOnMap && !c.IsOnline)
+                {
+                    continue;
+                }
+
+                if(!NameTrackingLocationMap.ContainsKey(c.Location))
+                {
+                    NameTrackingLocationMap[c.Location] = new List<KeyValuePair<int, string>>();
+                }
+
+                int type = 0;
+                if(!c.IsOnline)
+                {
+                    type = 2;
+                }
+
+                if(!string.IsNullOrEmpty(c.GameLogWarningText))
+                {
+                    type = 1;
+                }
+
+                NameTrackingLocationMap[c.Location].Add(new KeyValuePair<int, string>(type, c.Name));
+            }
+
+            if(ActiveCharacter != null && MapConf.FleetShowOnMap)
+            {
+                foreach(Fleet.FleetMember fm in ActiveCharacter.FleetInfo.Members)
+                {
+                    if(!Region.IsSystemOnMap(fm.Location))
+                    {
+                        continue;
+                    }
+
+                    // check its not one of our characters
+                    bool addFleetMember = true;
+                    foreach(EVEData.LocalCharacter c in EM.LocalCharacters)
+                    {
+                        if(c.Name == fm.Name)
+                        {
+                            addFleetMember = false;
+                            break;
+                        }
+                    }
+
+                    if(addFleetMember)
+                    {
+                        // ignore characters out of this Map..
+                        if(!Region.IsSystemOnMap(fm.Location))
+                        {
+                            continue;
+                        }
+
+                        if(!NameTrackingLocationMap.ContainsKey(fm.Location))
+                        {
+                            NameTrackingLocationMap[fm.Location] = new List<KeyValuePair<int, string>>();
+                        }
+
+                        string displayName = fm.Name;
+                        if(MapConf.FleetShowShipType)
+                        {
+                            displayName += " (" + fm.ShipType + ")";
+                        }
+                        NameTrackingLocationMap[fm.Location].Add(new KeyValuePair<int, string>(3, displayName));
+                    }
+                }
+            }
+
+            foreach(string lkvpk in NameTrackingLocationMap.Keys)
+            {
+                List<KeyValuePair<int, string>> lkvp = NameTrackingLocationMap[lkvpk];
+
+                lkvp = lkvp.OrderByDescending(o => o.Key).ToList();
+
+                EVEData.MapSystem ms = Region.MapSystems[lkvpk];
+
+                bool addIndividualFleetMembers = true;
+                int fleetMemberCount = 0;
+                foreach(KeyValuePair<int, string> kvp in lkvp)
+                {
+                    if(kvp.Key == 3)
+                    {
+                        fleetMemberCount++;
+                    }
+                }
+
+                if(fleetMemberCount > MapConf.FleetMaxMembersPerSystem)
+                {
+                    addIndividualFleetMembers = false;
+                }
+
+                double textYOffset = -24;
+                double textXOffset = 6;
+
+                SolidColorBrush fleetMemberText = new SolidColorBrush(MapConf.ActiveColourScheme.FleetMemberTextColour);
+                SolidColorBrush localCharacterText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterTextColour);
+                SolidColorBrush localCharacterOfflineText = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterOfflineTextColour);
+                SolidColorBrush characterTextOutline = new SolidColorBrush(Colors.Black);
+
+                if(MapConf.ShowCompactCharactersOnMap)
+                {
+                    OutlinedTextBlock charText = new OutlinedTextBlock();
+                    charText.Text = lkvp.Count.ToString();
+                    charText.IsHitTestVisible = false;
+                    charText.Stroke = characterTextOutline;
+                    charText.Fill = localCharacterText;
+                    charText.StrokeThickness = 2;
+
+                    Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
+                    Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
+                    Canvas.SetZIndex(charText, ZINDEX_CHARACTERS);
+                    MainCanvas.Children.Add(charText);
+                    DynamicMapElements.Add(charText);
+                }
+                else
+                {
+                    foreach(KeyValuePair<int, string> kvp in lkvp)
+                    {
+                        if(kvp.Key == 1 && !MapConf.ShowOfflineCharactersOnMap)
+                        {
+                            continue;
+                        }
+
+                        if(kvp.Key == 0 || kvp.Key == 1 || kvp.Key == 2 || kvp.Key == 3 && addIndividualFleetMembers)
+                        {
+                            OutlinedTextBlock charText = new OutlinedTextBlock();
+                            charText.Text = kvp.Value;
+                            charText.IsHitTestVisible = false;
+                            charText.Stroke = characterTextOutline;
+                            charText.Fill = localCharacterText;
+                            charText.StrokeThickness = 2;
+
+                            switch(kvp.Key)
+                            {
+                                case 0:
+                                    charText.Fill = localCharacterText;
+
+                                    break;
+
+                                case 2:
+                                    charText.Fill = localCharacterOfflineText;
+                                    charText.Text += "(Offline)";
+                                    break;
+
+                                case 3:
+                                    charText.Fill = fleetMemberText;
+                                    break;
+
+                                case 1:
+                                    charText.Fill = localCharacterText;
+                                    charText.Text = "âš  " + kvp.Value + " âš ";
+                                    break;
+                            }
+
+                            if(MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                            {
+                                charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
+                            }
+
+                            Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
+                            Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
+                            Canvas.SetZIndex(charText, ZINDEX_CHARACTERS);
+                            MainCanvas.Children.Add(charText);
+                            DynamicMapElements.Add(charText);
+
+                            textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
+                        }
+                    }
+                }
+
+                if(!addIndividualFleetMembers)
+                {
+                    Label charText = new Label();
+                    charText.Content = "Fleet (" + fleetMemberCount + ")";
+                    charText.Foreground = fleetMemberText;
+                    charText.IsHitTestVisible = false;
+
+                    if(MapConf.ActiveColourScheme.CharacterTextSize > 0)
+                    {
+                        charText.FontSize = MapConf.ActiveColourScheme.CharacterTextSize;
+                    }
+
+                    Canvas.SetLeft(charText, ms.Layout.X + textXOffset);
+                    Canvas.SetTop(charText, ms.Layout.Y + textYOffset);
+                    Canvas.SetZIndex(charText, ZINDEX_CHARACTERS);
+                    MainCanvas.Children.Add(charText);
+                    DynamicMapElements.Add(charText);
+
+                    textYOffset -= (MapConf.ActiveColourScheme.CharacterTextSize + 4);
+                }
+
+                // add circle for system
+
+                double circleSize = 26;
+                double circleOffset = circleSize / 2;
+
+                Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
+
+                highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.CharacterHighlightColour);
+                highlightSystemCircle.StrokeThickness = 3;
+
+                RotateTransform rt = new RotateTransform();
+                rt.CenterX = circleSize / 2;
+                rt.CenterY = circleSize / 2;
+                highlightSystemCircle.RenderTransform = rt;
+
+                DoubleCollection dashes = new DoubleCollection();
+                dashes.Add(1.0);
+                dashes.Add(1.0);
+
+                highlightSystemCircle.StrokeDashArray = dashes;
+
+                Canvas.SetLeft(highlightSystemCircle, ms.Layout.X - circleOffset);
+                Canvas.SetTop(highlightSystemCircle, ms.Layout.Y - circleOffset);
+                Canvas.SetZIndex(highlightSystemCircle, ZINDEX_CHARACTERS - 1);
+
+                MainCanvas.Children.Add(highlightSystemCircle);
+                DynamicMapElements.Add(highlightSystemCircle);
+
+                // Storyboard s = new Storyboard();
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 360;
+                da.To = 0;
+                da.Duration = new Duration(TimeSpan.FromSeconds(12));
+                da.RepeatBehavior = RepeatBehavior.Forever;
+
+                Timeline.SetDesiredFrameRate(da, 20);
+
+                RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
+                eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+            }
+
+            List<string> WarningZoneHighlights = new List<string>();
+
+            foreach(EVEData.LocalCharacter c in EM.LocalCharacters)
+            {
+                if(MapConf.ShowDangerZone && c.WarningSystems != null && c.DangerZoneActive)
+                {
+                    foreach(string s in c.WarningSystems)
+                    {
+                        if(!WarningZoneHighlights.Contains(s))
+                        {
+                            WarningZoneHighlights.Add(s);
+                        }
+                    }
+                }
+            }
+
+            double warningCircleSize = 40;
+            double warningCircleSizeOffset = warningCircleSize / 2;
+
+            foreach(string s in WarningZoneHighlights)
+            {
+                if(Region.IsSystemOnMap(s))
+                {
+                    EVEData.MapSystem mss = Region.MapSystems[s];
+                    Shape WarninghighlightSystemCircle = new Ellipse() { Height = warningCircleSize, Width = warningCircleSize };
+                    WarninghighlightSystemCircle.Stroke = new SolidColorBrush(Colors.IndianRed);
+                    WarninghighlightSystemCircle.StrokeThickness = 3;
+
+                    Canvas.SetLeft(WarninghighlightSystemCircle, mss.Layout.X - warningCircleSizeOffset);
+                    Canvas.SetTop(WarninghighlightSystemCircle, mss.Layout.Y - warningCircleSizeOffset);
+                    Canvas.SetZIndex(WarninghighlightSystemCircle, 15);
+                    MainCanvas.Children.Add(WarninghighlightSystemCircle);
+                    DynamicMapElements.Add(WarninghighlightSystemCircle);
+                }
+            }
+        }
+
+        private void AddDataToMap()
+        {
+            Color DataColor = MapConf.ActiveColourScheme.ESIOverlayColour;
+            Color DataLargeColor = MapConf.ActiveColourScheme.ESIOverlayColour;
+
+            DataLargeColor.R = (byte)(DataLargeColor.R * 0.75);
+            DataLargeColor.G = (byte)(DataLargeColor.G * 0.75);
+            DataLargeColor.B = (byte)(DataLargeColor.B * 0.75);
+
+            Color DataLargeColorDelta = MapConf.ActiveColourScheme.ESIOverlayColour;
+            DataLargeColorDelta.R = (byte)(DataLargeColorDelta.R * 0.4);
+            DataLargeColorDelta.G = (byte)(DataLargeColorDelta.G * 0.4);
+            DataLargeColorDelta.B = (byte)(DataLargeColorDelta.B * 0.4);
+
+            SolidColorBrush dataColor = new SolidColorBrush(DataColor);
+            SolidColorBrush infoColour = dataColor;
+
+            SolidColorBrush PositiveDeltaColor = new SolidColorBrush(Colors.Green);
+            SolidColorBrush NegativeDeltaColor = new SolidColorBrush(Colors.Red);
+
+            Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+            Brush JumpInRangeMulti = new SolidColorBrush(Colors.Black);
+
+            SolidColorBrush infoColourDelta = new SolidColorBrush(DataLargeColorDelta);
+
+            SolidColorBrush zkbColour = new SolidColorBrush(MapConf.ActiveColourScheme.ZKillDataOverlay);
+
+            SolidColorBrush infoLargeColour = new SolidColorBrush(DataLargeColor);
+            SolidColorBrush infoVulnerable = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableColour);
+            SolidColorBrush infoVulnerableSoon = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableSoonColour);
+
+            BridgeInfoStackPanel.Children.Clear();
+            if(!string.IsNullOrEmpty(currentJumpCharacter))
+            {
+                EVEData.System js = EM.GetEveSystem(currentCharacterJumpSystem);
+                if(js != null)
+                {
+                    string text = "";
+                    if(MapConf.ShowCharacterNamesOnMap)
+                    {
+                        text = $"{jumpShipType} range from {currentJumpCharacter} : {currentCharacterJumpSystem} ({js.Region})";
+                    }
+                    else
+                    {
+                        text = $"{jumpShipType} range from {currentCharacterJumpSystem} ({js.Region})";
+                    }
+
+                    Label l = new Label();
+                    l.Content = text;
+                    l.FontSize = 14;
+                    l.FontWeight = FontWeights.Bold;
+                    l.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+
+                    BridgeInfoStackPanel.Children.Add(l);
+                }
+            }
+            foreach(string key in activeJumpSpheres.Keys)
+            {
+                EVEData.System js = EM.GetEveSystem(key);
+                string text = $"{activeJumpSpheres[key]} range from {key} ({js.Region})";
+
+                Label l = new Label();
+                l.Content = text;
+                l.FontSize = 14;
+                l.FontWeight = FontWeights.Bold;
+                l.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+
+                BridgeInfoStackPanel.Children.Add(l);
+            }
+
+            foreach(EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
+            {
+                bool isSystemOOR = sys.OutOfRegion;
+
+                if(Region.MetaRegion)
+                {
+                    isSystemOOR = !sys.ActualSystem.FactionWarSystem;
+                }
+
+                if(MapConf.LimitESIDataToRegion && isSystemOOR)
+                {
+                    continue;
+                }
+
+                infoColour = dataColor;
+                long SystemAlliance = sys.ActualSystem.SOVAllianceID;
+
+                int nPCKillsLastHour = sys.ActualSystem.NPCKillsLastHour;
+                int podKillsLastHour = sys.ActualSystem.PodKillsLastHour;
+                int shipKillsLastHour = sys.ActualSystem.ShipKillsLastHour;
+                int jumpsLastHour = sys.ActualSystem.JumpsLastHour;
+
+                int infoValue = -1;
+                double infoSize = 0.0;
+
+                if(ShowNPCKills)
+                {
+                    infoValue = nPCKillsLastHour;
+                    infoSize = 0.15f * infoValue * ESIOverlayScale;
+
+                    if(MapConf.ShowRattingDataAsDelta)
+                    {
+                        if(MapConf.ShowNegativeRattingDelta)
+                        {
+                            infoValue = Math.Abs(sys.ActualSystem.NPCKillsDeltaLastHour);
+                            infoSize = 0.15f * infoValue * ESIOverlayScale;
+
+                            if(sys.ActualSystem.NPCKillsDeltaLastHour > 0)
+                            {
+                                infoColour = PositiveDeltaColor;
+                            }
+                            else
+                            {
+                                infoColour = NegativeDeltaColor;
+                            }
+                        }
+                    }
+                }
+
+                if(ShowPodKills)
+                {
+                    infoValue = podKillsLastHour;
+                    infoSize = 20.0f * infoValue * ESIOverlayScale;
+                }
+
+                if(ShowShipKills)
+                {
+                    infoValue = shipKillsLastHour;
+                    infoSize = 20.0f * infoValue * ESIOverlayScale;
+                }
+
+                if(ShowShipJumps)
+                {
+                    infoValue = sys.ActualSystem.JumpsLastHour;
+                    infoSize = infoValue * ESIOverlayScale;
+                }
+
+                if(ShowSystemTimers && MapConf.ShowIhubVunerabilities)
+                {
+                    DateTime now = DateTime.Now;
+
+                    if(now > sys.ActualSystem.IHubVunerabliltyStart && now < sys.ActualSystem.IHubVunerabliltyEnd)
+                    {
+                        infoValue = (int)sys.ActualSystem.IHubOccupancyLevel;
+                        infoSize = 30;
+                        infoColour = infoVulnerable;
+                    }
+                    else if(now.AddMinutes(30) > sys.ActualSystem.IHubVunerabliltyStart)
+                    {
+                        infoValue = (int)sys.ActualSystem.IHubOccupancyLevel;
+                        infoSize = 27;
+                        infoColour = infoVulnerableSoon;
+                    }
+                    else
+                    {
+                        infoValue = -1;
+                    }
+                }
+
+                if(infoValue > 0)
+                {
+                    // clamp to a minimum
+                    if(infoSize < 24)
+                        infoSize = 24;
+
+                    if(MapConf.ClampMaxESIOverlayValue)
+                    {
+                        if(infoSize > MapConf.MaxESIOverlayValue)
+                        {
+                            infoSize = MapConf.MaxESIOverlayValue;
+                        }
+                    }
+
+                    Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
+                    infoCircle.Fill = infoColour;
+
+                    Canvas.SetZIndex(infoCircle, 10);
+                    Canvas.SetLeft(infoCircle, sys.Layout.X - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.Layout.Y - (infoSize / 2));
+                    MainCanvas.Children.Add(infoCircle);
+                    DynamicMapElements.Add(infoCircle);
+                }
+
+                if(ShowNPCKills && MapConf.ShowRattingDataAsDelta && !MapConf.ShowNegativeRattingDelta && sys.ActualSystem.NPCKillsDeltaLastHour > 0)
+                {
+                    infoValue = Math.Abs(sys.ActualSystem.NPCKillsDeltaLastHour);
+                    infoSize = 0.15f * infoValue * ESIOverlayScale;
+
+                    if(MapConf.ClampMaxESIOverlayValue)
+                    {
+                        if(infoSize > MapConf.MaxESIOverlayValue * .8)
+                        {
+                            infoSize = MapConf.MaxESIOverlayValue * .8;
+                        }
+                    }
+
+                    Shape infoCircle = new Ellipse() { Height = infoSize, Width = infoSize };
+                    infoCircle.Fill = infoColourDelta;
+
+                    Canvas.SetZIndex(infoCircle, 12);
+                    Canvas.SetLeft(infoCircle, sys.Layout.X - (infoSize / 2));
+                    Canvas.SetTop(infoCircle, sys.Layout.Y - (infoSize / 2));
+                    MainCanvas.Children.Add(infoCircle);
+                    DynamicMapElements.Add(infoCircle);
+                }
+
+                if(sys.ActualSystem.SOVAllianceID != 0 && ShowStandings)
+                {
+                    bool addToMap = true;
+                    Brush br = null;
+
+                    if(ActiveCharacter != null && ActiveCharacter.ESILinked)
+                    {
+                        float Standing = 0.0f;
+
+                        if(ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceID)
+                        {
+                            Standing = 10.0f;
+                        }
+
+                        if(sys.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
+                        {
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
+                        }
+
+                        if(sys.ActualSystem.SOVAllianceID != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceID))
+                        {
+                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceID];
+                        }
+
+                        if(Standing == 0.0f)
+                        {
+                            addToMap = false;
+                        }
+
+                        br = StandingNeutBrush;
+
+                        if(Standing == -10.0)
+                        {
+                            br = StandingVBadBrush;
+                        }
+
+                        if(Standing == -5.0)
+                        {
+                            br = StandingBadBrush;
+                        }
+
+                        if(Standing == 5.0)
+                        {
+                            br = StandingGoodBrush;
+                        }
+
+                        if(Standing == 10.0)
+                        {
+                            br = StandingVGoodBrush;
+                        }
+                    }
+                    else
+                    {
+                        // enabled but not linked
+                        addToMap = false;
+                    }
+
+                    if(addToMap)
+                    {
+                        Polygon poly = new Polygon();
+                        poly.Fill = br;
+                        //poly.SnapsToDevicePixels = true;
+                        poly.Stroke = poly.Fill;
+                        poly.StrokeThickness = 0.4;
+                        poly.StrokeDashCap = PenLineCap.Round;
+                        poly.StrokeLineJoin = PenLineJoin.Round;
+                        poly.Stretch = Stretch.None;
+
+                        foreach(Vector2 p in sys.CellPoints)
+                        {
+                            System.Windows.Point wp = new Point(p.X, p.Y);
+                            poly.Points.Add(wp);
+                        }
+
+                        MainCanvas.Children.Add(poly);
+
+                        // save the dynamic map elements
+                        DynamicMapElements.Add(poly);
+                    }
+                }
+
+                if(activeJumpSpheres.Count > 0 || currentJumpCharacter != null)
+                {
+                    bool AddHighlight = false;
+                    bool DoubleHighlight = false;
+
+                    // check character
+                    if(!string.IsNullOrEmpty(currentJumpCharacter))
+                    {
+                        decimal Distance = EM.GetRangeBetweenSystems(currentCharacterJumpSystem, sys.Name);
+
+                        decimal Max = 0.1m;
+
+                        switch(jumpShipType)
+                        {
+                            case EVEData.EveManager.JumpShip.Super: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Titan: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Dread: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.FAX: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Blops: { Max = 8.0m; } break;
+                            case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0m; } break;
+                            case EVEData.EveManager.JumpShip.JF: { Max = 10.0m; } break;
+                        }
+
+                        if(Distance < Max && Distance > 0.0m && sys.ActualSystem.TrueSec <= 0.45 && currentCharacterJumpSystem != sys.Name)
+                        {
+                            AddHighlight = true;
+                        }
+                    }
+
+                    foreach(string key in activeJumpSpheres.Keys)
+                    {
+                        if(!string.IsNullOrEmpty(currentJumpCharacter) && key == currentCharacterJumpSystem)
+                        {
+                            continue;
+                        }
+
+                        decimal Distance = EM.GetRangeBetweenSystems(key, sys.Name);
+                        decimal Max = 0.1m;
+
+                        switch(activeJumpSpheres[key])
+                        {
+                            case EVEData.EveManager.JumpShip.Super: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Titan: { Max = 6.0m; } break;
+                            case EVEData.EveManager.JumpShip.Dread: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.FAX: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.Blops: { Max = 8.0m; } break;
+                            case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0m; } break;
+                            case EVEData.EveManager.JumpShip.JF: { Max = 10.0m; } break;
+                        }
+
+                        if(Distance < Max && Distance > 0.0m && sys.ActualSystem.TrueSec <= 0.45 && key != sys.Name)
+                        {
+                            if(AddHighlight)
+                            {
+                                DoubleHighlight = true;
+                            }
+                            AddHighlight = true;
+                        }
+                    }
+
+                    if(AddHighlight)
+                    {
+                        Brush HighlightBrush = JumpInRange;
+                        if(DoubleHighlight)
+                        {
+                            HighlightBrush = JumpInRangeMulti;
+                        }
+
+                        if(MapConf.JumpRangeInAsOutline)
+                        {
+                            Shape InRangeMarker;
+
+                            double ShapeSize = SYSTEM_SHAPE_SIZE + 10;
+                            double halfShapeSize = ShapeSize / 2;
+
+                            if(sys.ActualSystem.HasNPCStation)
+                            {
+                                InRangeMarker = new Rectangle() { Height = ShapeSize, Width = ShapeSize };
+                            }
+                            else
+                            {
+                                InRangeMarker = new Ellipse() { Height = ShapeSize, Width = ShapeSize };
+                            }
+
+                            InRangeMarker.Stroke = HighlightBrush;
+                            InRangeMarker.StrokeThickness = 6;
+                            InRangeMarker.StrokeLineJoin = PenLineJoin.Round;
+                            InRangeMarker.Fill = HighlightBrush;
+
+                            Canvas.SetLeft(InRangeMarker, sys.Layout.X - halfShapeSize);
+                            Canvas.SetTop(InRangeMarker, sys.Layout.Y - halfShapeSize);
+                            Canvas.SetZIndex(InRangeMarker, ZINDEX_RANGEMARKER);
+
+                            MainCanvas.Children.Add(InRangeMarker);
+                            DynamicMapElements.Add(InRangeMarker);
+                        }
+                        else
+                        {
+                            Polygon poly = new Polygon();
+
+                            foreach(Vector2 p in sys.CellPoints)
+                            {
+                                System.Windows.Point wp = new Point(p.X, p.Y);
+                                poly.Points.Add(wp);
+                            }
+
+                            poly.Fill = HighlightBrush;
+                            poly.SnapsToDevicePixels = true;
+                            poly.Stroke = poly.Fill;
+                            poly.StrokeThickness = 3;
+                            poly.StrokeDashCap = PenLineCap.Round;
+                            poly.StrokeLineJoin = PenLineJoin.Round;
+                            MainCanvas.Children.Add(poly);
+                            DynamicMapElements.Add(poly);
+                        }
+                    }
+                }
+            }
+
+            Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
+            {
+                foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
+                {
+                    if(ZKBBaseFeed.Keys.Contains(zs.SystemName))
+                    {
+                        ZKBBaseFeed[zs.SystemName]++;
+                    }
+                    else
+                    {
+                        ZKBBaseFeed[zs.SystemName] = 1;
+                    }
+                }
+
+                foreach(KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
+                {
+                    EVEData.MapSystem sys = kvp.Value;
+
+                    if(ZKBBaseFeed.Keys.Contains(sys.ActualSystem.Name))
+                    {
+                        double ZKBValue = 24 + ((double)ZKBBaseFeed[sys.ActualSystem.Name] * ESIOverlayScale * 2);
+
+                        Shape infoCircle = new Ellipse() { Height = ZKBValue, Width = ZKBValue };
+                        infoCircle.Fill = zkbColour;
+
+                        Canvas.SetZIndex(infoCircle, 11);
+                        Canvas.SetLeft(infoCircle, sys.Layout.X - (ZKBValue / 2));
+                        Canvas.SetTop(infoCircle, sys.Layout.Y - (ZKBValue / 2));
+                        MainCanvas.Children.Add(infoCircle);
+                        DynamicMapElements.Add(infoCircle);
+                    }
+                }
+            }
+
+            // Draw Infrastructure Upgrade indicators (green circles)
+            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            foreach(KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
+            {
+                EVEData.MapSystem sys = kvp.Value;
+                bool isSystemOOR = sys.OutOfRegion;
+
+                if(Region.MetaRegion)
+                {
+                    isSystemOOR = !sys.ActualSystem.FactionWarSystem;
+                }
+
+                if(!isSystemOOR && sys.ActualSystem.InfrastructureUpgrades.Count > 0)
+                {
+                    Shape UpgradeIndicator = new Ellipse { Width = 6, Height = 6 };
+                    UpgradeIndicator.Stroke = SysOutlineBrush;
+                    UpgradeIndicator.StrokeThickness = 1.0;
+                    UpgradeIndicator.StrokeLineJoin = PenLineJoin.Round;
+                    UpgradeIndicator.Fill = new SolidColorBrush(Colors.LimeGreen);
+
+                    Canvas.SetLeft(UpgradeIndicator, sys.Layout.X - 14);
+                    Canvas.SetTop(UpgradeIndicator, sys.Layout.Y - 3);
+                    Canvas.SetZIndex(UpgradeIndicator, ZINDEX_CYNOBEACON);
+                    MainCanvas.Children.Add(UpgradeIndicator);
+                    DynamicMapElements.Add(UpgradeIndicator);
+                }
+            }
+        }
+
+        private Brush Gallente_FL = new SolidColorBrush(Color.FromArgb(100, 73, 171, 104));
+        private Brush Gallente_CLO = new SolidColorBrush(Color.FromArgb(100, 36, 90, 52));
+        private Brush Gallente_RG = new SolidColorBrush(Color.FromArgb(100, 13, 35, 19));
+
+        private Brush Caldari_FL = new SolidColorBrush(Color.FromArgb(100, 14, 186, 207));
+        private Brush Caldari_CLO = new SolidColorBrush(Color.FromArgb(100, 0, 110, 129));
+        private Brush Caldari_RG = new SolidColorBrush(Color.FromArgb(100, 0, 36, 43));
+
+        private Brush Amarr_FL = new SolidColorBrush(Color.FromArgb(100, 216, 191, 25));
+        private Brush Amarr_CLO = new SolidColorBrush(Color.FromArgb(100, 138, 114, 14));
+        private Brush Amarr_RG = new SolidColorBrush(Color.FromArgb(100, 46, 36, 5));
+
+        private Brush Minmatar_FL = new SolidColorBrush(Color.FromArgb(100, 221, 74, 79));
+        private Brush Minmatar_CLO = new SolidColorBrush(Color.FromArgb(100, 140, 34, 41));
+        private Brush Minmatar_RG = new SolidColorBrush(Color.FromArgb(100, 54, 11, 14));
+
+        private Brush GetBrushForFWState(FactionWarfareSystemInfo.State state, int Owner)
+        {
+            //500001: "Caldari State";
+            //500002: "Minmatar Republic";
+            //500003: "Amarr Empire";
+            //500004: "Gallente Federation";
+
+            switch(state)
+            {
+                case FactionWarfareSystemInfo.State.Frontline:
+                    {
+                        switch(Owner)
+                        {
+                            case 500001: return Caldari_FL;
+                            case 500002: return Minmatar_FL;
+                            case 500003: return Amarr_FL;
+                            case 500004: return Gallente_FL;
+                        }
+                    }
+                    break;
+
+                case FactionWarfareSystemInfo.State.CommandLineOperation:
+                    {
+                        switch(Owner)
+                        {
+                            case 500001: return Caldari_CLO;
+                            case 500002: return Minmatar_CLO;
+                            case 500003: return Amarr_CLO;
+                            case 500004: return Gallente_CLO;
+                        }
+                    }
+                    break;
+
+                case FactionWarfareSystemInfo.State.Rearguard:
+                    {
+                        switch(Owner)
+                        {
+                            case 500001: return Caldari_RG;
+                            case 500002: return Minmatar_RG;
+                            case 500003: return Amarr_RG;
+                            case 500004: return Gallente_RG;
+                        }
+                    }
+                    break;
+            }
+
+            return null;
+        }
+
+        private void AddFWDataToMap()
+        {
+            if(!Region.MetaRegion || !ShowSovOwner)
+            {
+                return;
+            }
+
+            Brush FWLineBrushA = new SolidColorBrush(Colors.Yellow);
+            Brush FWLineBrushB = new SolidColorBrush(Colors.Orange);
+            Brush FWLineBrushC = new SolidColorBrush(Colors.OrangeRed);
+
+            DoubleCollection dashes = new DoubleCollection();
+            dashes.Add(1.0);
+            dashes.Add(3.0);
+
+            DoubleAnimation da = new DoubleAnimation();
+            da.From = 20;
+            da.To = 0;
+            da.By = 2;
+            da.Duration = new Duration(TimeSpan.FromSeconds(10));
+            da.RepeatBehavior = RepeatBehavior.Forever;
+            Timeline.SetDesiredFrameRate(da, 20);
+
+            foreach(EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
+            {
+                FactionWarfareSystemInfo fsw = null;
+                foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                {
+                    if(i.SystemID == sys.ActualSystem.ID)
+                    {
+                        fsw = i;
+                        break;
+                    }
+                }
+
+                if(fsw == null)
+                {
+                    continue;
+                }
+
+                if(fsw.SystemState == FactionWarfareSystemInfo.State.None)
+                {
+                    continue;
+                }
+
+                Polygon poly = new Polygon();
+
+                foreach(Vector2 p in sys.CellPoints)
+                {
+                    System.Windows.Point wp = new Point(p.X, p.Y);
+                    poly.Points.Add(wp);
+                }
+
+                poly.Fill = GetBrushForFWState(fsw.SystemState, fsw.OccupierID);
+                poly.SnapsToDevicePixels = true;
+                poly.Stroke = null;
+                poly.StrokeThickness = 2;
+                poly.StrokeDashCap = PenLineCap.Round;
+                poly.StrokeLineJoin = PenLineJoin.Round;
+                MainCanvas.Children.Add(poly);
+                DynamicMapElements.Add(poly);
+
+                if(fsw.SystemState == FactionWarfareSystemInfo.State.Rearguard)
+                {
+                    foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    {
+                        if(i.SystemID != fsw.SystemID && i.OccupierID == fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation && sys.ActualSystem.Jumps.Contains(i.SystemName))
+                        {
+                            foreach(EVEData.MapSystem ms in Region.MapSystems.Values.ToList())
+                            {
+                                if(ms.Name == i.SystemName)
+                                {
+                                    Line l = new Line();
+                                    l.X1 = sys.Layout.X;
+                                    l.Y1 = sys.Layout.Y;
+                                    l.X2 = ms.Layout.X;
+                                    l.Y2 = ms.Layout.Y;
+                                    l.StrokeThickness = 1;
+                                    l.Stroke = FWLineBrushA;
+                                    l.StrokeDashArray = dashes;
+                                    l.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+                                    Canvas.SetZIndex(l, 19);
+                                    MainCanvas.Children.Add(l);
+                                    DynamicMapElements.Add(l);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(fsw.SystemState == FactionWarfareSystemInfo.State.CommandLineOperation)
+                {
+                    foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    {
+                        if(i.SystemID != fsw.SystemID && i.OccupierID == fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.Frontline && sys.ActualSystem.Jumps.Contains(i.SystemName))
+                        {
+                            foreach(EVEData.MapSystem ms in Region.MapSystems.Values.ToList())
+                            {
+                                if(ms.Name == i.SystemName)
+                                {
+                                    Line l = new Line();
+                                    l.X1 = sys.Layout.X;
+                                    l.Y1 = sys.Layout.Y;
+                                    l.X2 = ms.Layout.X;
+                                    l.Y2 = ms.Layout.Y;
+                                    l.StrokeThickness = 2;
+                                    l.Stroke = FWLineBrushB;
+                                    l.StrokeDashArray = dashes;
+                                    l.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+                                    Canvas.SetZIndex(l, 19);
+                                    MainCanvas.Children.Add(l);
+                                    DynamicMapElements.Add(l);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(fsw.SystemState == FactionWarfareSystemInfo.State.Frontline)
+                {
+                    foreach(FactionWarfareSystemInfo i in EveManager.Instance.FactionWarfareSystems)
+                    {
+                        if(i.SystemID != fsw.SystemID && i.OccupierID != fsw.OccupierID && i.SystemState == FactionWarfareSystemInfo.State.Frontline && sys.ActualSystem.Jumps.Contains(i.SystemName))
+                        {
+                            foreach(EVEData.MapSystem ms in Region.MapSystems.Values.ToList())
+                            {
+                                if(ms.Name == i.SystemName)
+                                {
+                                    Line l = new Line();
+                                    l.X1 = sys.Layout.X;
+                                    l.Y1 = sys.Layout.Y;
+                                    l.X2 = ms.Layout.X;
+                                    l.Y2 = ms.Layout.Y;
+                                    l.StrokeThickness = 3;
+                                    l.Stroke = FWLineBrushC;
+                                    l.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+
+                                    Canvas.SetZIndex(l, 19);
+                                    MainCanvas.Children.Add(l);
+                                    DynamicMapElements.Add(l);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void AddHighlightToSystem(string name)
+        {
+            if(!Region.MapSystems.Keys.Contains(name))
+            {
+                return;
+            }
+
+            EVEData.MapSystem selectedSys = Region.MapSystems[name];
+            if(selectedSys != null)
+            {
+                double circleSize = 32;
+                double circleOffset = circleSize / 2;
+
+                // add circle for system
+                Shape highlightSystemCircle = new Ellipse() { Height = circleSize, Width = circleSize };
+                highlightSystemCircle.Stroke = new SolidColorBrush(MapConf.ActiveColourScheme.SelectedSystemColour);
+
+                highlightSystemCircle.StrokeThickness = 5;
+
+                RotateTransform rt = new RotateTransform();
+                rt.CenterX = circleSize / 2;
+                rt.CenterY = circleSize / 2;
+                highlightSystemCircle.RenderTransform = rt;
+
+                DoubleCollection dashes = new DoubleCollection();
+                dashes.Add(0.71);
+                dashes.Add(0.71);
+
+                highlightSystemCircle.StrokeDashArray = dashes;
+
+                Canvas.SetLeft(highlightSystemCircle, selectedSys.Layout.X - circleOffset);
+                Canvas.SetTop(highlightSystemCircle, selectedSys.Layout.Y - circleOffset);
+                Canvas.SetZIndex(highlightSystemCircle, 19);
+
+                MainCanvas.Children.Add(highlightSystemCircle);
+                DynamicMapElements.Add(highlightSystemCircle);
+
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 0;
+                da.To = 360;
+                da.Duration = new Duration(TimeSpan.FromSeconds(6));
+                Timeline.SetDesiredFrameRate(da, 20);
+
+                try
+                {
+                    RotateTransform eTransform = (RotateTransform)highlightSystemCircle.RenderTransform;
+                    eTransform.BeginAnimation(RotateTransform.AngleProperty, da);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private void AddRouteToMap()
+        {
+            if(ActiveCharacter == null)
+                return;
+
+            Brush RouteBrush = new SolidColorBrush(Colors.Yellow);
+            Brush RouteAnsiblexBrush = new SolidColorBrush(Colors.DarkGray);
+
+            // no active route
+            if(ActiveCharacter.ActiveRoute.Count == 0)
+            {
+                return;
+            }
+
+            string Start = "";
+            string End = ActiveCharacter.Location;
+
+            try
+            {
+                for(int i = 1; i < ActiveCharacter.ActiveRoute.Count; i++)
+                {
+                    Start = End;
+                    End = ActiveCharacter.ActiveRoute[i].SystemName;
+
+                    if(!(Region.IsSystemOnMap(Start) && Region.IsSystemOnMap(End)))
+                    {
+                        continue;
+                    }
+
+                    EVEData.MapSystem from = Region.MapSystems[Start];
+                    EVEData.MapSystem to = Region.MapSystems[End];
+
+                    Line routeLine = new Line();
+
+                    routeLine.X1 = from.Layout.X;
+                    routeLine.Y1 = from.Layout.Y;
+
+                    routeLine.X2 = to.Layout.X;
+                    routeLine.Y2 = to.Layout.Y;
+
+                    routeLine.StrokeThickness = 5;
+                    routeLine.Visibility = Visibility.Visible;
+                    if(ActiveCharacter.ActiveRoute[i - 1].GateToTake == Navigation.GateType.Ansiblex)
+                    {
+                        routeLine.Stroke = RouteAnsiblexBrush;
+                    }
+                    else
+                    {
+                        routeLine.Stroke = RouteBrush;
+                    }
+
+                    DoubleCollection dashes = new DoubleCollection();
+                    dashes.Add(1.0);
+                    dashes.Add(1.0);
+
+                    routeLine.StrokeDashArray = dashes;
+
+                    // animate the jump bridges
+                    DoubleAnimation da = new DoubleAnimation();
+                    da.From = 200;
+                    da.To = 0;
+                    da.By = 2;
+                    da.Duration = new Duration(TimeSpan.FromSeconds(40));
+                    da.RepeatBehavior = RepeatBehavior.Forever;
+                    Timeline.SetDesiredFrameRate(da, 20);
+
+                    routeLine.StrokeDashArray = dashes;
+
+                    if(!MapConf.DisableRoutePathAnimation)
+                    {
+                        routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                    }
+
+                    Canvas.SetZIndex(routeLine, 19);
+                    MainCanvas.Children.Add(routeLine);
+
+                    DynamicMapElements.Add(routeLine);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private void AddSystemIntelOverlay()
+        {
+            Brush intelBlobBrush = new SolidColorBrush(MapConf.ActiveColourScheme.IntelOverlayColour);
+            Brush intelClearBlobBrush = new SolidColorBrush(MapConf.ActiveColourScheme.IntelClearOverlayColour);
+
+            //The tolist creates a temporary copy; however this is updated on a second thread
+            foreach(EVEData.IntelData id in EM.IntelDataList.ToList())
+            {
+                foreach(string sysStr in id.Systems)
+                {
+                    if(Region.IsSystemOnMap(sysStr))
+                    {
+                        EVEData.MapSystem sys = Region.MapSystems[sysStr];
+
+                        double radiusScale = (DateTime.Now - id.IntelTime).TotalSeconds / (double)MapConf.MaxIntelSeconds;
+
+                        if(radiusScale < 0.0 || radiusScale >= 1.0)
+                        {
+                            continue;
+                        }
+
+                        // add circle to the map
+                        double radius = 24 + (100 * (1.0 - radiusScale));
+                        double circleOffset = radius / 2;
+
+                        Shape intelShape = new Ellipse() { Height = radius, Width = radius };
+                        if(id.ClearNotification)
+                        {
+                            intelShape.Fill = intelClearBlobBrush;
+                        }
+                        else
+                        {
+                            intelShape.Fill = intelBlobBrush;
+                        }
+
+                        Canvas.SetLeft(intelShape, sys.Layout.X - circleOffset);
+                        Canvas.SetTop(intelShape, sys.Layout.Y - circleOffset);
+                        Canvas.SetZIndex(intelShape, 15);
+                        MainCanvas.Children.Add(intelShape);
+
+                        DynamicMapElements.Add(intelShape);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Alliance ticker / list row colour from standings (bright tier colours for dark maps) when ESI-linked; otherwise <paramref name="defaultBrush"/>.
+        /// Resolution matches the map standings overlay (own alliance, then corp, then alliance contact). Use <paramref name="sovCorpId"/> 0 for alliance-only rows (e.g. legend list).
+        /// </summary>
+        private static Brush GetAllianceTickerBrushFromStanding(LocalCharacter c, long sovAllianceId, long sovCorpId, Brush defaultBrush)
+        {
+            if(c == null || !c.ESILinked)
+            {
+                return defaultBrush;
+            }
+
+            float standing = 0.0f;
+
+            if(c.AllianceID != 0 && c.AllianceID == sovAllianceId)
+            {
+                standing = 10.0f;
+            }
+
+            if(sovCorpId != 0 && c.Standings.Keys.Contains(sovCorpId))
+            {
+                standing = c.Standings[sovCorpId];
+            }
+
+            if(sovAllianceId != 0 && c.Standings.Keys.Contains(sovAllianceId))
+            {
+                standing = c.Standings[sovAllianceId];
+            }
+
+            if(standing == -10.0f)
+            {
+                return TickerStandingTerribleBrush;
+            }
+
+            if(standing == -5.0f)
+            {
+                return TickerStandingBadBrush;
+            }
+
+            if(standing == 5.0f)
+            {
+                return TickerStandingGoodBrush;
+            }
+
+            if(standing == 10.0f)
+            {
+                return TickerStandingExcellentBrush;
+            }
+
+            return defaultBrush;
+        }
+
+        /// <summary>
+        /// Add the base systems, and jumps to the map
+        /// </summary>
+        private void AddSystemsToMap()
+        {
+            // brushes
+            Brush SysOutlineBrush = new SolidColorBrush(MapConf.ActiveColourScheme.SystemOutlineColour);
+            Brush SysInRegionBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemColour);
+            Brush SysOutRegionBrush = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemColour);
+
+            Brush SysInRegionDarkBrush = new SolidColorBrush(DarkenColour(MapConf.ActiveColourScheme.InRegionSystemColour));
+            Brush SysOutRegionDarkBrush = new SolidColorBrush(DarkenColour(MapConf.ActiveColourScheme.OutRegionSystemColour));
+
+            Brush HasIceBrush = new SolidColorBrush(Colors.LightBlue);
+
+            Brush SysInRegionTextBrush = new SolidColorBrush(MapConf.ActiveColourScheme.InRegionSystemTextColour);
+            Brush SysOutRegionTextBrush = new SolidColorBrush(MapConf.ActiveColourScheme.OutRegionSystemTextColour);
+
+            Brush FriendlyJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.FriendlyJumpBridgeColour);
+            Brush DisabledJumpBridgeBrush = new SolidColorBrush(MapConf.ActiveColourScheme.DisabledJumpBridgeColour);
+
+            Brush JumpInRange = new SolidColorBrush(MapConf.ActiveColourScheme.JumpRangeInColour);
+            Brush JumpInRangeMulti = new SolidColorBrush(Colors.Black);
+
+            Brush Incursion = new SolidColorBrush(MapConf.ActiveColourScheme.ActiveIncursionColour);
+
+            Brush ConstellationHighlight = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationHighlightColour);
+
+            Brush DarkTextColourBrush = new SolidColorBrush(Colors.Black);
+
+            Color bgtc = MapConf.ActiveColourScheme.MapBackgroundColour;
+            bgtc.A = 192;
+            Brush SysTextBackgroundBrush = new SolidColorBrush(bgtc);
+
+            Color bgd = MapConf.ActiveColourScheme.MapBackgroundColour;
+
+            float darkenFactor = 0.9f;
+
+            bgd.R = (byte)(darkenFactor * bgd.R);
+            bgd.G = (byte)(darkenFactor * bgd.G);
+            bgd.B = (byte)(darkenFactor * bgd.B);
+
+            Brush MapBackgroundBrushDarkend = new SolidColorBrush(bgd);
+
+            List<long> AlliancesKeyList = new List<long>();
+
+            Brush NormalGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
+            Brush ConstellationGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
+            Brush RegionGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionGateColour);
+
+            // cache all system links
+            List<GateHelper> systemLinks = new List<GateHelper>();
+
+            Random rnd = new Random(4);
+
+            foreach(KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
+            {
+                EVEData.MapSystem mapSystem = kvp.Value;
+
+                bool isSystemOOR = mapSystem.OutOfRegion;
+
+                if(Region.MetaRegion)
+                {
+                    var fws = EM.FactionWarfareSystems.FirstOrDefault(c => c.SystemName == mapSystem.Name);
+                    if(fws == null)
+                    {
+                        isSystemOOR = true;
+                    }
+                    else
+                    {
+                        isSystemOOR = false;
+                    }
+                }
+
+                double trueSecVal = mapSystem.ActualSystem.TrueSec;
+                if(MapConf.ShowSimpleSecurityView)
+                {
+                    if(mapSystem.ActualSystem.TrueSec >= 0.45)
+                    {
+                        trueSecVal = 1.0;
+                    }
+                    else if(mapSystem.ActualSystem.TrueSec > 0.0)
+                    {
+                        trueSecVal = 0.4;
+                    }
+                }
+
+                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
+
+
+
+                var systemSubTextLines = new List<(string Text, Brush Foreground)>();
+
+                // add circle for system
+                Polygon systemShape = new Polygon();
+                systemShape.StrokeThickness = 1.5;
+
+                bool needsOutline = true;
+                bool drawNPCStation = mapSystem.ActualSystem.HasNPCStation;
+
+                if(drawNPCStation)
+                {
+                    needsOutline = true;
+                }
+
+                // override
+                if(ShowSystemADM)
+                {
+                    needsOutline = true;
+                }
+
+                if(mapSystem.ActualSystem.HasIceBelt || mapSystem.ActualSystem.HasBlueA0Star)
+                {
+                    string icons = "";
+                    // â˜€â„ // â›­â˜¼ â˜€
+
+                    if(mapSystem.ActualSystem.HasBlueA0Star)
+                    {
+                        icons += "â›­";
+                    }
+
+                    if(mapSystem.ActualSystem.HasIceBelt)
+                    {
+                        icons += "â„";
+                    }
+
+                    Label sysIcons = new Label();
+                    sysIcons.FontSize = 8;
+                    sysIcons.IsHitTestVisible = false;
+                    sysIcons.Content = icons;
+                    sysIcons.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    sysIcons.VerticalContentAlignment = VerticalAlignment.Center;
+                    sysIcons.Foreground = HasIceBrush;
+
+                    Canvas.SetLeft(sysIcons, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 11);
+                    Canvas.SetTop(sysIcons, mapSystem.Layout.Y - SYSTEM_SHAPE_OFFSET - 9);
+                    Canvas.SetZIndex(sysIcons, ZINDEX_SYSICON);
+                    MainCanvas.Children.Add(sysIcons);
+                }
+
+                double shapeSize = SYSTEM_SHAPE_SIZE;
+                double shapeOffset = SYSTEM_SHAPE_OFFSET;
+
+                if(mapSystem.OutOfRegion)
+                {
+                    shapeSize = SYSTEM_SHAPE_OOR_SIZE;
+                    shapeOffset = SYSTEM_SHAPE_OOR_OFFSET;
+                }
+
+                if(needsOutline)
+                {
+                    Shape SystemOutline;
+                    if(mapSystem.ActualSystem.HasNPCStation)
+                    {
+                        SystemOutline = new Rectangle { Width = shapeSize, Height = shapeSize };
+                    }
+                    else
+                    {
+                        SystemOutline = new Ellipse { Width = shapeSize, Height = shapeSize };
+                    }
+
+                    SystemOutline.Stroke = SysOutlineBrush;
+                    SystemOutline.StrokeThickness = 1.5;
+                    SystemOutline.StrokeLineJoin = PenLineJoin.Round;
+
+                    if(isSystemOOR)
+                    {
+                        SystemOutline.Fill = SysOutRegionBrush;
+                    }
+                    else
+                    {
+                        SystemOutline.Fill = SysInRegionBrush;
+                    }
+
+                    // override with sec status colours
+                    if(ShowSystemSecurity)
+                    {
+                        SystemOutline.Fill = securityColorFill;
+                    }
+
+                    if(ShowSystemADM && mapSystem.ActualSystem.IHubOccupancyLevel != 0.0f)
+                    {
+                        float SovVal = mapSystem.ActualSystem.IHubOccupancyLevel;
+
+                        float Blend = 1.0f - ((SovVal - 1.0f) / 5.0f);
+                        byte r, g;
+
+                        if(Blend < 0.5)
+                        {
+                            r = 255;
+                            g = (byte)(255 * Blend / 0.5);
+                        }
+                        else
+                        {
+                            g = 255;
+                            r = (byte)(255 - (255 * (Blend - 0.5) / 0.5));
+                        }
+
+                        SystemOutline.Fill = new SolidColorBrush(Color.FromRgb(r, g, 0));
+                    }
+
+                    SystemOutline.DataContext = mapSystem;
+                    SystemOutline.MouseDown += ShapeMouseDownHandler;
+                    SystemOutline.MouseEnter += ShapeMouseOverHandler;
+                    SystemOutline.MouseLeave += ShapeMouseOverHandler;
+
+                    Canvas.SetLeft(SystemOutline, mapSystem.Layout.X - shapeOffset);
+                    Canvas.SetTop(SystemOutline, mapSystem.Layout.Y - shapeOffset);
+                    Canvas.SetZIndex(SystemOutline, ZINDEX_SYSTEM_OUTLINE);
+                    MainCanvas.Children.Add(SystemOutline);
+                }
+
+                if(ShowSystemADM && mapSystem.ActualSystem.IHubOccupancyLevel != 0.0 && !ShowSystemTimers && !mapSystem.OutOfRegion)
+                {
+                    Label sovADM = new Label();
+                    sovADM.Content = "1.0";
+                    sovADM.FontSize = 7;
+                    sovADM.IsHitTestVisible = false;
+                    sovADM.Content = $"{mapSystem.ActualSystem.IHubOccupancyLevel:f1}";
+                    sovADM.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    sovADM.VerticalContentAlignment = VerticalAlignment.Center;
+                    sovADM.Width = shapeSize + 2;
+                    sovADM.Height = shapeSize + 2;
+                    sovADM.Foreground = DarkTextColourBrush;
+                    sovADM.FontWeight = FontWeights.Bold;
+
+                    Canvas.SetLeft(sovADM, mapSystem.Layout.X - (shapeOffset + 1));
+                    Canvas.SetTop(sovADM, mapSystem.Layout.Y - (shapeOffset + 1));
+                    Canvas.SetZIndex(sovADM, ZINDEX_ADM);
+                    MainCanvas.Children.Add(sovADM);
+                }
+
+                Grid sysTextGrid = new Grid
+                {
+                    Width = SYSTEM_TEXT_WIDTH,
+                    Height = SYSTEM_TEXT_HEIGHT,
+                };
+
+                StackPanel sp = new StackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                };
+
+                Label sysText = new Label();
+                sysText.Content = mapSystem.LocalizedName;
+
+
+                if (MapConf.ActiveColourScheme.SystemTextSize > 0)
+                {
+                    sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
+                }
+
+                sysText.Foreground = SysInRegionTextBrush;
+                double sysTextOffset = SYSTEM_TEXT_Y_OFFSET;
+
+                if(mapSystem.OutOfRegion)
+                {
+                    sysText.Foreground = SysOutRegionTextBrush;
+                    sysText.FontSize -= 2;
+                    sysTextOffset -= 2;
+                }
+
+                Thickness border = new Thickness(0.0);
+
+                sysText.Padding = border;
+                sysText.Margin = border;
+                sysText.IsHitTestVisible = false;
+
+                sp.Children.Add(sysText);
+
+                switch(mapSystem.TextPos)
+                {
+                    case MapSystem.TextPosition.Top:
+                        {
+                            double spLeft = mapSystem.Layout.X - (SYSTEM_TEXT_X_OFFSET);
+                            double spTop = mapSystem.Layout.Y - (SYSTEM_SHAPE_OFFSET + SYSTEM_TEXT_HEIGHT + 1);
+                            Canvas.SetLeft(sysTextGrid, spLeft);
+                            Canvas.SetTop(sysTextGrid, spTop);
+
+                            sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sp.VerticalAlignment = VerticalAlignment.Bottom;
+                            sp.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            sysTextGrid.Children.Add(sp);
+                        }
+                        break;
+
+                    case MapSystem.TextPosition.Bottom:
+                        {
+                            double spLeft = mapSystem.Layout.X - (SYSTEM_TEXT_X_OFFSET);
+                            double spTop = mapSystem.Layout.Y + (SYSTEM_SHAPE_OFFSET) - 1;
+                            Canvas.SetLeft(sysTextGrid, spLeft);
+                            Canvas.SetTop(sysTextGrid, spTop);
+
+                            sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
+                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+
+                            sp.VerticalAlignment = VerticalAlignment.Top;
+                            sp.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            sysTextGrid.Children.Add(sp);
+                        }
+                        break;
+
+                    case MapSystem.TextPosition.Left:
+                        {
+                            double spLeft = mapSystem.Layout.X - (SYSTEM_SHAPE_OFFSET + SYSTEM_TEXT_WIDTH + 3);
+                            double spTop = mapSystem.Layout.Y - (SYSTEM_TEXT_Y_OFFSET);
+                            Canvas.SetLeft(sysTextGrid, spLeft);
+                            Canvas.SetTop(sysTextGrid, spTop);
+
+                            sysText.HorizontalContentAlignment = HorizontalAlignment.Right;
+                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sp.VerticalAlignment = VerticalAlignment.Center;
+                            sp.HorizontalAlignment = HorizontalAlignment.Right;
+                            sysTextGrid.Children.Add(sp);
+                        }
+                        break;
+
+                    case MapSystem.TextPosition.Right:
+                        {
+                            double spLeft = mapSystem.Layout.X + SYSTEM_SHAPE_OFFSET + 3;
+                            double spTop = mapSystem.Layout.Y - SYSTEM_TEXT_Y_OFFSET;
+                            Canvas.SetLeft(sysTextGrid, spLeft);
+                            Canvas.SetTop(sysTextGrid, spTop);
+                            sp.VerticalAlignment = VerticalAlignment.Center;
+                            sp.HorizontalAlignment = HorizontalAlignment.Left;
+
+                            sysText.HorizontalContentAlignment = HorizontalAlignment.Left;
+                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysTextGrid.Children.Add(sp);
+                        }
+                        break;
+                }
+
+                Canvas.SetZIndex(sysTextGrid, ZINDEX_SYSTEM);
+                Canvas.SetZIndex(sysText, ZINDEX_SYSTEM);
+
+                MainCanvas.Children.Add(sysTextGrid);
+
+                // generate the list of links
+                foreach(string jumpTo in mapSystem.ActualSystem.Jumps)
+                {
+                    if(Region.IsSystemOnMap(jumpTo))
+                    {
+                        EVEData.MapSystem to = Region.MapSystems[jumpTo];
+
+                        bool NeedsAdd = true;
+                        foreach(GateHelper gh in systemLinks)
+                        {
+                            if(((gh.from == mapSystem) || (gh.to == mapSystem)) && ((gh.from == to) || (gh.to == to)))
+                            {
+                                NeedsAdd = false;
+                                break;
+                            }
+                        }
+
+                        if(NeedsAdd)
+                        {
+                            GateHelper g = new GateHelper();
+                            g.from = mapSystem;
+                            g.to = to;
+                            systemLinks.Add(g);
+                        }
+                    }
+                }
+
+                double regionMarkerOffset = SYSTEM_REGION_TEXT_Y_OFFSET;
+
+                if(MapConf.ShowActiveIncursions && mapSystem.ActualSystem.ActiveIncursion)
+                {
+                    {
+                        Polygon poly = new Polygon();
+
+                        foreach(Vector2 p in mapSystem.CellPoints)
+                        {
+                            System.Windows.Point wp = new Point(p.X, p.Y);
+                            poly.Points.Add(wp);
+                        }
+
+                        //poly.Fill
+                        poly.Fill = Incursion;
+                        poly.SnapsToDevicePixels = true;
+                        poly.Stroke = poly.Fill;
+                        poly.StrokeThickness = 3;
+                        poly.StrokeDashCap = PenLineCap.Round;
+                        poly.StrokeLineJoin = PenLineJoin.Round;
+                        MainCanvas.Children.Add(poly);
+                    }
+                }
+
+                if(MapConf.ShowCynoBeacons && mapSystem.ActualSystem.HasJumpBeacon)
+                {
+                    Shape CynoBeaconLogo = new Ellipse { Width = 8, Height = 8 };
+                    CynoBeaconLogo.Stroke = SysOutlineBrush;
+                    CynoBeaconLogo.StrokeThickness = 1.0;
+                    CynoBeaconLogo.StrokeLineJoin = PenLineJoin.Round;
+                    CynoBeaconLogo.Fill = new SolidColorBrush(Colors.OrangeRed);
+
+                    Canvas.SetLeft(CynoBeaconLogo, mapSystem.Layout.X + 7);
+                    Canvas.SetTop(CynoBeaconLogo, mapSystem.Layout.Y - 12);
+                    Canvas.SetZIndex(CynoBeaconLogo, ZINDEX_CYNOBEACON);
+                    MainCanvas.Children.Add(CynoBeaconLogo);
+                }
+
+                if(MapConf.ShowJoveObservatories && mapSystem.ActualSystem.HasJoveObservatory && !ShowSystemADM && !ShowSystemTimers)
+                {
+                    Image JoveLogo = new Image
+                    {
+                        Width = (shapeSize / 20) * 10,
+                        Height = (shapeSize / 20) * 10,
+                        Name = "JoveLogo",
+                        Source = joveLogoImage,
+                        Stretch = Stretch.Uniform,
+                        IsHitTestVisible = false,
+                    };
+
+                    RenderOptions.SetBitmapScalingMode(JoveLogo, BitmapScalingMode.NearestNeighbor);
+
+                    Canvas.SetLeft(JoveLogo, mapSystem.Layout.X - (JoveLogo.Width / 2));
+                    Canvas.SetTop(JoveLogo, mapSystem.Layout.Y - (JoveLogo.Height / 2));
+                    Canvas.SetZIndex(JoveLogo, ZINDEX_JOVE);
+                    MainCanvas.Children.Add(JoveLogo);
+                }
+
+                EVEData.System es = EM.GetEveSystem(SelectedSystem);
+
+                if(es != null && ShowSystemTimers && MapConf.ShowIhubVunerabilities && mapSystem.ActualSystem.ConstellationID == es.ConstellationID)
+                {
+                    {
+                        Polygon poly = new Polygon();
+
+                        foreach(Vector2 p in mapSystem.CellPoints)
+                        {
+                            System.Windows.Point wp = new Point(p.X, p.Y);
+                            poly.Points.Add(wp);
+                        }
+
+                        //poly.Fill
+                        poly.Fill = ConstellationHighlight;
+                        poly.SnapsToDevicePixels = true;
+                        poly.Stroke = poly.Fill;
+                        poly.StrokeThickness = 3;
+                        poly.StrokeDashCap = PenLineCap.Round;
+                        poly.StrokeLineJoin = PenLineJoin.Round;
+                        MainCanvas.Children.Add(poly);
+                    }
+                }
+
+                int SystemAlliance = mapSystem.ActualSystem.SOVAllianceID;
+
+                if(ShowSovOwner && SelectedAlliance != 0 && SystemAlliance == SelectedAlliance)
+                {
+                    Polygon poly = new Polygon();
+
+                    foreach(Vector2 p in mapSystem.CellPoints)
+                    {
+                        System.Windows.Point wp = new Point(p.X, p.Y);
+                        poly.Points.Add(wp);
+                    }
+
+                    poly.Fill = SelectedAllianceBrush;
+                    poly.SnapsToDevicePixels = true;
+                    poly.Stroke = poly.Fill;
+                    poly.StrokeThickness = 1;
+                    poly.StrokeDashCap = PenLineCap.Round;
+                    poly.StrokeLineJoin = PenLineJoin.Round;
+                    Canvas.SetZIndex(poly, ZINDEX_POLY);
+                    MainCanvas.Children.Add(poly);
+                }
+
+                if(isSystemOOR)
+                {
+                    string localRegionName = EM.GetRegion(mapSystem.Region)?.LocalizedName ?? mapSystem.Region;
+                    systemSubTextLines.Add(("(" + localRegionName + ")", SysOutRegionTextBrush));
+
+                    Polygon poly = new Polygon();
+                    foreach(Vector2 p in mapSystem.CellPoints)
+                    {
+                        System.Windows.Point wp = new Point(p.X, p.Y);
+                        poly.Points.Add(wp);
+                    }
+
+                    //poly.Fill
+                    poly.Fill = MapBackgroundBrushDarkend;
+                    poly.SnapsToDevicePixels = true;
+                    poly.Stroke = MapBackgroundBrushDarkend;
+                    poly.StrokeThickness = 3;
+                    poly.StrokeDashCap = PenLineCap.Round;
+                    poly.StrokeLineJoin = PenLineJoin.Round;
+                    MainCanvas.Children.Add(poly);
+                }
+
+                if((ShowSovOwner) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
+                {
+                    string allianceName = EM.GetAllianceName(SystemAlliance);
+                    string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
+                    string content = allianceTicker;
+
+                    Brush defaultAllianceTickerBrush = isSystemOOR ? SysOutRegionTextBrush : SysInRegionTextBrush;
+                    Brush allianceSubTextBrush = GetAllianceTickerBrushFromStanding(
+                        ActiveCharacter,
+                        SystemAlliance,
+                        mapSystem.ActualSystem.SOVCorp,
+                        defaultAllianceTickerBrush);
+                    systemSubTextLines.Add((content, allianceSubTextBrush));
+
+                    if(!AlliancesKeyList.Contains(SystemAlliance))
+                    {
+                        AlliancesKeyList.Add(SystemAlliance);
+                    }
+                }
+
+                if(systemSubTextLines.Count > 0)
+                {
+                    TextAlignment subTextAlignment;
+                    switch(mapSystem.TextPos)
+                    {
+                        case MapSystem.TextPosition.Left:
+                            subTextAlignment = TextAlignment.Right;
+                            break;
+
+                        case MapSystem.TextPosition.Right:
+                            subTextAlignment = TextAlignment.Left;
+                            break;
+
+                        case MapSystem.TextPosition.Top:
+                        case MapSystem.TextPosition.Bottom:
+                        default:
+                            subTextAlignment = TextAlignment.Center;
+                            break;
+                    }
+
+                    if(isSystemOOR)
+                    {
+                        regionMarkerOffset -= 4;
+                    }
+
+                    foreach((string lineText, Brush lineBrush) in systemSubTextLines)
+                    {
+                        TextBlock sysSubText = new TextBlock
+                        {
+                            Text = lineText,
+                            Width = SYSTEM_REGION_TEXT_WIDTH,
+                            Padding = new Thickness(0),
+                            Margin = new Thickness(0),
+                            TextAlignment = subTextAlignment,
+                            IsHitTestVisible = false,
+                            Foreground = lineBrush,
+                        };
+
+                        if(MapConf.ActiveColourScheme.SystemSubTextSize > 0)
+                        {
+                            sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
+                        }
+
+                        sp.Children.Add(sysSubText);
+                    }
+                }
+            }
+
+            // now add the links
+            foreach(GateHelper gh in systemLinks)
+            {
+                Line sysLink = new Line();
+
+                sysLink.X1 = gh.from.Layout.X;
+                sysLink.Y1 = gh.from.Layout.Y;
+
+                sysLink.X2 = gh.to.Layout.X;
+                sysLink.Y2 = gh.to.Layout.Y;
+
+                sysLink.Stroke = NormalGateBrush;
+
+                if(gh.from.ActualSystem.ConstellationID != gh.to.ActualSystem.ConstellationID)
+                {
+                    sysLink.Stroke = ConstellationGateBrush;
+                }
+
+                if(gh.from.ActualSystem.Region != gh.to.ActualSystem.Region)
+                {
+                    sysLink.Stroke = RegionGateBrush;
+                }
+
+                sysLink.StrokeThickness = 2;
+                sysLink.Visibility = Visibility.Visible;
+
+                Canvas.SetZIndex(sysLink, SYSTEM_LINK_INDEX);
+                MainCanvas.Children.Add(sysLink);
+            }
+
+            if(ShowJumpBridges && EM.JumpBridges != null)
+            {
+                foreach(EVEData.JumpBridge jb in EM.JumpBridges)
+                {
+                    if(Region.IsSystemOnMap(jb.From) || Region.IsSystemOnMap(jb.To))
+                    {
+                        EVEData.MapSystem from;
+                        EVEData.System to;
+
+                        if(!Region.IsSystemOnMap(jb.From))
+                        {
+                            from = Region.MapSystems[jb.To];
+                            to = EM.GetEveSystem(jb.From);
+                        }
+                        else
+                        {
+                            from = Region.MapSystems[jb.From];
+                            to = EM.GetEveSystem(jb.To);
+                        }
+
+                        Point startPoint = new Point(from.Layout.X, from.Layout.Y);
+                        Point endPoint;
+
+                        if(!Region.IsSystemOnMap(jb.To) || !Region.IsSystemOnMap(jb.From))
+                        {
+                            endPoint = new Point(from.Layout.X - 20, from.Layout.Y - 40);
+
+                            Shape jbOutofSystemBlob = new Ellipse() { Height = 6, Width = 6 };
+                            Canvas.SetLeft(jbOutofSystemBlob, endPoint.X - 3);
+                            Canvas.SetTop(jbOutofSystemBlob, endPoint.Y - 3);
+                            Canvas.SetZIndex(jbOutofSystemBlob, 19);
+
+                            MainCanvas.Children.Add(jbOutofSystemBlob);
+
+                            Label jbOutofRegionText = new Label();
+
+                            if(jb.Disabled)
+                            {
+                                jbOutofSystemBlob.Stroke = DisabledJumpBridgeBrush;
+                                jbOutofRegionText.Foreground = DisabledJumpBridgeBrush;
+                            }
+                            else
+                            {
+                                jbOutofSystemBlob.Stroke = FriendlyJumpBridgeBrush;
+                                jbOutofRegionText.Foreground = FriendlyJumpBridgeBrush;
+                            }
+                            jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
+
+                            jbOutofRegionText.Content = $"{to.LocalizedName}\n({to.Region})";
+                            if (MapConf.ActiveColourScheme.SystemSubTextSize > 2)
+                            {
+                                jbOutofRegionText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
+                            }
+                            jbOutofRegionText.IsHitTestVisible = false;
+
+                            Canvas.SetLeft(jbOutofRegionText, from.Layout.X - 20);
+                            Canvas.SetTop(jbOutofRegionText, from.Layout.Y - 60);
+                            Canvas.SetZIndex(jbOutofRegionText, ZINDEX_SYSTEM);
+
+                            MainCanvas.Children.Add(jbOutofRegionText);
+                        }
+                        else
+                        {
+                            EVEData.MapSystem toSys = Region.MapSystems[jb.To];
+                            endPoint = new Point(toSys.Layout.X, toSys.Layout.Y);
+                        }
+
+                        Line jbLine = new Line();
+
+                        jbLine.X1 = startPoint.X;
+                        jbLine.Y1 = startPoint.Y;
+
+                        jbLine.X2 = endPoint.X;
+                        jbLine.Y2 = endPoint.Y;
+
+                        jbLine.StrokeThickness = 2;
+
+                        DoubleCollection dashes = new DoubleCollection();
+
+                        if(!jb.Disabled)
+                        {
+                            dashes.Add(1.0);
+                            dashes.Add(3.0);
+                            jbLine.Stroke = FriendlyJumpBridgeBrush;
+                        }
+                        else
+                        {
+                            dashes.Add(1.0);
+                            dashes.Add(6.0);
+                            jbLine.Stroke = DisabledJumpBridgeBrush;
+                        }
+
+                        jbLine.StrokeDashArray = dashes;
+
+                        // animate the jump bridges
+                        DoubleAnimation da = new DoubleAnimation();
+                        da.From = 0;
+                        da.To = 200;
+                        da.By = 2;
+                        da.Duration = new Duration(TimeSpan.FromSeconds(100));
+                        da.RepeatBehavior = RepeatBehavior.Forever;
+                        Timeline.SetDesiredFrameRate(da, 20);
+
+                        if(!MapConf.DisableJumpBridgesPathAnimation)
+                        {
+                            jbLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                        }
+
+                        Canvas.SetZIndex(jbLine, 19);
+
+                        MainCanvas.Children.Add(jbLine);
+                    }
+                }
+            }
+
+            bool showZakLinks = true;
+            if(showZakLinks && Region.IsSystemOnMap("Zarzakh"))
+            {
+                MapSystem zarSystem = Region.MapSystems["Zarzakh"];
+
+                foreach(MapSystem ms in Region.MapSystems.Values)
+                {
+                    if(ms.Name == "Zarzakh" || !ms.ActualSystem.HasJoveGate)
+                    {
+                        continue;
+                    }
+
+                    Line zarLink = new Line();
+
+                    zarLink.X1 = zarSystem.Layout.X;
+                    zarLink.Y1 = zarSystem.Layout.Y;
+
+                    zarLink.X2 = ms.Layout.X;
+                    zarLink.Y2 = ms.Layout.Y;
+
+                    zarLink.StrokeThickness = 1.2;
+
+                    DoubleCollection dashes = new DoubleCollection();
+
+                    dashes.Add(1.0);
+                    dashes.Add(1.0);
+                    zarLink.StrokeDashArray = dashes;
+                    zarLink.Stroke = ConstellationGateBrush;
+                    MainCanvas.Children.Add(zarLink);
+                }
+            }
+
+            if(AlliancesKeyList.Count > 0)
+            {
+                AllianceNameList.Visibility = Visibility.Visible;
+                AllianceNameListStackPanel.Children.Clear();
+
+                Brush fontColour = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF767576"));
+                Brush SelectedFont = new SolidColorBrush(Colors.White);
+
+                List<Label> AllianceNameListLabels = new List<Label>();
+
+                Thickness p = new Thickness(1);
+
+                foreach(int allianceID in AlliancesKeyList)
+                {
+                    string allianceName = EM.GetAllianceName(allianceID);
+                    string allianceTicker = EM.GetAllianceTicker(allianceID);
+
+                    Label akl = new Label();
+                    akl.MouseDown += AllianceKeyList_MouseDown;
+                    akl.DataContext = allianceID.ToString();
+                    akl.Content = $"{allianceTicker}\t{allianceName}";
+                    akl.Foreground = GetAllianceTickerBrushFromStanding(ActiveCharacter, allianceID, 0, fontColour);
+                    akl.Margin = p;
+                    akl.Padding = p;
+
+                    if(allianceID == SelectedAlliance)
+                    {
+                        akl.Foreground = SelectedFont;
+                    }
+
+                    AllianceNameListLabels.Add(akl);
+                }
+
+                List<Label> SortedAlliance = AllianceNameListLabels.OrderBy(an => an.Content).ToList();
+
+                foreach(Label l in SortedAlliance)
+                {
+                    AllianceNameListStackPanel.Children.Add(l);
+                }
+            }
+            else
+            {
+                AllianceNameList.Visibility = Visibility.Hidden;
+            }
+
+            // now add any info items
+            if(InfoLayer != null)
+            {
+                foreach(InfoItem ii in InfoLayer)
+                {
+                    if(ii.Region == Region.Name)
+                    {
+                        Shape s = ii.Draw();
+                        MainCanvas.Children.Add(s);
+                    }
+                }
+            }
+        }
+        private struct GateHelper
+        {
+            public EVEData.MapSystem from { get; set; }
+            public EVEData.MapSystem to { get; set; }
+        }
+    }
+}
+
