@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // Map Region
 //-----------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         /// <summary>
-        /// 动态获取中英文名字
+        /// Display name for the current UI language (uses <see cref="EveManager.Translations"/> when zh-CN).
         /// </summary>
         public string LocalizedName
         {
@@ -94,8 +94,8 @@ namespace SMT.EVEData
                     {
                         return EveManager.Translations[Name];
                     }
-                    // 加个后缀方便以后一眼看出哪些词典漏了
-                    return Name + " (未翻译)";
+                    // Suffix when CSV has no entry for this region name
+                    return Name + " (untranslated)";
                 }
                 return Name;
             }

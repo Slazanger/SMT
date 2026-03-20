@@ -3312,7 +3312,7 @@ namespace SMT
                         miChar.Header = lc.Name;
                         characters.Items.Add(miChar);
 
-                        // 1. 加个语言判断开关
+                        // Use zh-CN menu/popup strings when that UI language is active
                         bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
 
                         // now create the child menu's
@@ -3447,7 +3447,7 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(new Separator());
                 }
 
-                // 1. 语言判断开关
+                // Use zh-CN popup labels when that UI language is active
                 bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
 
                 Label constellation = new Label();

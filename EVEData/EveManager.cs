@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // EVE Manager
 //-----------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ namespace SMT.EVEData
     /// </summary>
     public class EveManager
     {
-        // 全局静态语言标记和翻译词典
+        // App-wide UI language and English→localized string map (loaded from Translation.csv)
         public static string CurrentLanguage { get; set; } = "en-US";
         public static Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
@@ -179,11 +179,11 @@ namespace SMT.EVEData
 
             ServerInfo = new EVEData.Server();
 
-            // === 老余的汉化：在初始化最后加载翻译 ===
+            // Load optional Translation.csv (zh-CN strings keyed by English) at end of init
             LoadTranslations();
         }
 
-        // === 老余的汉化：读取 CSV 的方法，放在构造函数正下方 ===
+        /// <summary>Loads <c>data/Translation.csv</c> into <see cref="Translations"/>.</summary>
         private void LoadTranslations()
         {
             try
@@ -191,7 +191,7 @@ namespace SMT.EVEData
                 string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "Translation.csv");
                 if (File.Exists(path))
                 {
-                    // 强制使用 UTF8 读取
+                    // Read as UTF-8 (required for non-ASCII translations)
                     string[] lines = File.ReadAllLines(path, global::System.Text.Encoding.UTF8);
                     int count = 0;
                     foreach (string line in lines)
@@ -201,7 +201,7 @@ namespace SMT.EVEData
                         string[] parts = line.Split(',');
                         if (parts.Length >= 2)
                         {
-                            // Replace("\uFEFF", "") 是为了清除 CSV 文件头可能自带的隐藏编码字符
+                            // Strip UTF-8 BOM if present on first column
                             string en = parts[0].Trim().Replace("\uFEFF", "");
                             string zh = parts[1].Trim();
                             if (!Translations.ContainsKey(en))
@@ -211,16 +211,16 @@ namespace SMT.EVEData
                             }
                         }
                     }
-                    global::System.Diagnostics.Debug.WriteLine($"【老余战报】: 成功读取了 {count} 条翻译！");
+                    global::System.Diagnostics.Debug.WriteLine($"Translation.csv: loaded {count} entries.");
                 }
                 else
                 {
-                    global::System.Diagnostics.Debug.WriteLine("【老余警告】: 找不到翻译文件: " + path);
+                    global::System.Diagnostics.Debug.WriteLine("Translation.csv: file not found: " + path);
                 }
             }
             catch (global::System.Exception ex)
             {
-                global::System.Diagnostics.Debug.WriteLine("【老余警告】: CSV读取报错: " + ex.Message);
+                global::System.Diagnostics.Debug.WriteLine("Translation.csv: read error: " + ex.Message);
             }
         }
 

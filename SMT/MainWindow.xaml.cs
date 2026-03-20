@@ -69,7 +69,7 @@ namespace SMT
         {
             try
             {
-                // 1. 刷新单个星域的标签页
+                // Refresh region map document title
                 if (RegionUC != null && RegionUC.Region != null)
                 {
                     RegionLayoutDoc.Title = RegionUC.Region.LocalizedName;
@@ -79,10 +79,10 @@ namespace SMT
                     RegionLayoutDoc.Title = Application.Current.TryFindResource("Main_Panel_Region") as string;
                 }
 
-                // 2. 刷新宇宙全景的标签页
+                // Refresh universe map document title
                 UniverseLayoutDoc.Title = Application.Current.TryFindResource("Main_Panel_Universe") as string;
 
-                // 3. 刷新 Regions 块状图的标签页 
+                // Refresh regions overview document title
                 var regionsDoc = dockManager.Layout.Descendents().OfType<AvalonDock.Layout.LayoutDocument>().FirstOrDefault(d => d.ContentId == "UniverseContentID");
                 if (regionsDoc != null)
                 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -482,15 +482,15 @@ namespace SMT
                     Application.Current.Resources.MergedDictionaries.Remove(oldLangDict);
                 }
 
-                // 1. 告诉核心中枢现在是什么语言 (直接调静态变量，不需要判断 Instance)
+                // Update app language (static on EveManager; no Instance required)
                 SMT.EVEData.EveManager.CurrentLanguage = langCode;
 
-                // 2. 强令两个地图瞬间清空并用新语言重新绘制
+                // Redraw maps so labels use the new language
                 if (MainWindow.AppWindow != null)
                 {
                     if (MainWindow.AppWindow.RegionUC != null)
                     {
-                        // 强制假装切换一下星域，让它彻底重载所有星系文字
+                        // Re-select current region to force full reload of system text
                         if (MainWindow.AppWindow.RegionUC.Region != null)
                         {
                             MainWindow.AppWindow.RegionUC.SelectRegion(MainWindow.AppWindow.RegionUC.Region.Name);
@@ -502,7 +502,7 @@ namespace SMT
                         MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
                     }
                 }
-                // 3. 呼叫主窗口，强行刷新那几个顽固的标签页
+                // Refresh dock tab titles and regions block view
                 if (MainWindow.AppWindow != null)
                 {
                     MainWindow.AppWindow.UpdateTabTitles();
