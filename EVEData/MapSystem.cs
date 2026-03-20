@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // Map System
 //-----------------------------------------------------------------------
 
@@ -41,6 +41,25 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         /// <summary>
+        /// Display name for the current UI language (uses <see cref="EveManager.Translations"/> when zh-CN).
+        /// </summary>
+        public string LocalizedName
+        {
+            get
+            {
+                if (EveManager.CurrentLanguage == "zh-CN")
+                {
+                    if (EveManager.Translations.ContainsKey(Name))
+                    {
+                        return EveManager.Translations[Name];
+                    }
+                    // Suffix when CSV has no entry for this system name
+                    return Name + " (untranslated)";
+                }
+                return Name;
+            }
+        }
+        /// <summary>
         /// Gets or sets the
         /// </summary>
         public TextPosition TextPos { get; set; } = TextPosition.Bottom;
@@ -54,7 +73,10 @@ namespace SMT.EVEData
         /// Gets or sets the region this system belongs to
         /// </summary>
         public string Region { get; set; }
+        public override string ToString()
+        {
+            return LocalizedName;
+        }
 
-        public override string ToString() => Name;
     }
 }

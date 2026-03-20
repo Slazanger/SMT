@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // System
 //-----------------------------------------------------------------------
 
@@ -157,6 +157,25 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         /// <summary>
+        /// Display name for the current UI language (uses <see cref="EveManager.Translations"/> when zh-CN).
+        /// </summary>
+        public string LocalizedName
+        {
+            get
+            {
+                if (EveManager.CurrentLanguage == "zh-CN")
+                {
+                    if (EveManager.Translations.ContainsKey(Name))
+                    {
+                        return EveManager.Translations[Name];
+                    }
+                    // Suffix when CSV has no entry for this system name
+                    return Name + " (untranslated)";
+                }
+                return Name;
+            }
+        }
+        /// <summary>
         /// Gets or sets the delta of NPC Kills in the last hour
         /// </summary>
         [XmlIgnoreAttribute]
@@ -245,7 +264,8 @@ namespace SMT.EVEData
 
         public override string ToString()
         {
-            return $"{Name} ({Region})";
+            return LocalizedName;
         }
+
     }
 }

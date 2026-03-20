@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -107,7 +107,23 @@ namespace SMT
         private Brush StandingVBadBrush = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
 
+        /// <summary>Standing tier colours for map tickers: same semantic tiers as the kill feed, higher luminance for dark map backgrounds.</summary>
+        private static readonly SolidColorBrush TickerStandingTerribleBrush;
+        private static readonly SolidColorBrush TickerStandingBadBrush;
+        private static readonly SolidColorBrush TickerStandingGoodBrush;
+        private static readonly SolidColorBrush TickerStandingExcellentBrush;
 
+        static RegionControl()
+        {
+            TickerStandingTerribleBrush = new SolidColorBrush(Color.FromRgb(255, 95, 95));
+            TickerStandingBadBrush = new SolidColorBrush(Color.FromRgb(255, 184, 77));
+            TickerStandingGoodBrush = new SolidColorBrush(Color.FromRgb(110, 220, 255));
+            TickerStandingExcellentBrush = new SolidColorBrush(Color.FromRgb(140, 180, 255));
+            TickerStandingTerribleBrush.Freeze();
+            TickerStandingBadBrush.Freeze();
+            TickerStandingGoodBrush.Freeze();
+            TickerStandingExcellentBrush.Freeze();
+        }
 
         private List<Point> SystemIcon_Astrahaus = new List<Point>
         {
@@ -879,7 +895,7 @@ namespace SMT
 
             // update the selected region
             Region = mr;
-            RegionNameLabel.Content = mr.Name;
+            RegionNameLabel.Content = mr.LocalizedName;
             MapConf.DefaultRegion = mr.Name;
 
             List<EVEData.MapSystem> newList = Region.MapSystems.Values.ToList().OrderBy(o => o.Name).ToList();
@@ -2159,6 +2175,57 @@ namespace SMT
         }
 
         /// <summary>
+        /// Alliance ticker / list row colour from standings (bright tier colours for dark maps) when ESI-linked; otherwise <paramref name="defaultBrush"/>.
+        /// Resolution matches the map standings overlay (own alliance, then corp, then alliance contact). Use <paramref name="sovCorpId"/> 0 for alliance-only rows (e.g. legend list).
+        /// </summary>
+        private static Brush GetAllianceTickerBrushFromStanding(LocalCharacter c, long sovAllianceId, long sovCorpId, Brush defaultBrush)
+        {
+            if(c == null || !c.ESILinked)
+            {
+                return defaultBrush;
+            }
+
+            float standing = 0.0f;
+
+            if(c.AllianceID != 0 && c.AllianceID == sovAllianceId)
+            {
+                standing = 10.0f;
+            }
+
+            if(sovCorpId != 0 && c.Standings.Keys.Contains(sovCorpId))
+            {
+                standing = c.Standings[sovCorpId];
+            }
+
+            if(sovAllianceId != 0 && c.Standings.Keys.Contains(sovAllianceId))
+            {
+                standing = c.Standings[sovAllianceId];
+            }
+
+            if(standing == -10.0f)
+            {
+                return TickerStandingTerribleBrush;
+            }
+
+            if(standing == -5.0f)
+            {
+                return TickerStandingBadBrush;
+            }
+
+            if(standing == 5.0f)
+            {
+                return TickerStandingGoodBrush;
+            }
+
+            if(standing == 10.0f)
+            {
+                return TickerStandingExcellentBrush;
+            }
+
+            return defaultBrush;
+        }
+
+        /// <summary>
         /// Add the base systems, and jumps to the map
         /// </summary>
         private void AddSystemsToMap()
@@ -2249,7 +2316,7 @@ namespace SMT
 
 
 
-                string SystemSubText = string.Empty;
+                var systemSubTextLines = new List<(string Text, Brush Foreground)>();
 
                 // add circle for system
                 Polygon systemShape = new Polygon();
@@ -2402,10 +2469,10 @@ namespace SMT
                 };
 
                 Label sysText = new Label();
-                sysText.Content = mapSystem.Name;
+                sysText.Content = mapSystem.LocalizedName;
 
 
-                if(MapConf.ActiveColourScheme.SystemTextSize > 0)
+                if (MapConf.ActiveColourScheme.SystemTextSize > 0)
                 {
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
                 }
@@ -2632,11 +2699,8 @@ namespace SMT
 
                 if(isSystemOOR)
                 {
-                    if(SystemSubText != string.Empty)
-                    {
-                        SystemSubText += "\n";
-                    }
-                    SystemSubText += "(" + mapSystem.Region + ")";
+                    string localRegionName = EM.GetRegion(mapSystem.Region)?.LocalizedName ?? mapSystem.Region;
+                    systemSubTextLines.Add(("(" + localRegionName + ")", SysOutRegionTextBrush));
 
                     Polygon poly = new Polygon();
                     foreach(Vector2 p in mapSystem.CellPoints)
@@ -2661,11 +2725,13 @@ namespace SMT
                     string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
                     string content = allianceTicker;
 
-                    if(SystemSubText != string.Empty)
-                    {
-                        SystemSubText += "\n";
-                    }
-                    SystemSubText += content;
+                    Brush defaultAllianceTickerBrush = isSystemOOR ? SysOutRegionTextBrush : SysInRegionTextBrush;
+                    Brush allianceSubTextBrush = GetAllianceTickerBrushFromStanding(
+                        ActiveCharacter,
+                        SystemAlliance,
+                        mapSystem.ActualSystem.SOVCorp,
+                        defaultAllianceTickerBrush);
+                    systemSubTextLines.Add((content, allianceSubTextBrush));
 
                     if(!AlliancesKeyList.Contains(SystemAlliance))
                     {
@@ -2673,52 +2739,51 @@ namespace SMT
                     }
                 }
 
-                if(!string.IsNullOrEmpty(SystemSubText))
+                if(systemSubTextLines.Count > 0)
                 {
-
-                    TextBlock sysSubText = new TextBlock();
-                    sysSubText.Text = SystemSubText;
-                    sysSubText.Width = SYSTEM_REGION_TEXT_WIDTH;
-                    sysSubText.Padding = new Thickness(0);
-                    sysSubText.Margin = new Thickness(0);
-
+                    TextAlignment subTextAlignment;
                     switch(mapSystem.TextPos)
                     {
                         case MapSystem.TextPosition.Left:
-                            sysSubText.TextAlignment = TextAlignment.Right;
+                            subTextAlignment = TextAlignment.Right;
                             break;
 
                         case MapSystem.TextPosition.Right:
-                            sysSubText.TextAlignment = TextAlignment.Left;
+                            subTextAlignment = TextAlignment.Left;
                             break;
 
                         case MapSystem.TextPosition.Top:
-                            sysSubText.TextAlignment = TextAlignment.Center;
-                            break;
-
                         case MapSystem.TextPosition.Bottom:
-                            sysSubText.TextAlignment = TextAlignment.Center;
+                        default:
+                            subTextAlignment = TextAlignment.Center;
                             break;
-                    }
-
-                    sysSubText.IsHitTestVisible = false;
-
-                    if(MapConf.ActiveColourScheme.SystemSubTextSize > 0)
-                    {
-                        sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                     }
 
                     if(isSystemOOR)
                     {
-                        sysSubText.Foreground = SysOutRegionTextBrush;
                         regionMarkerOffset -= 4;
                     }
-                    else
-                    {
-                        sysSubText.Foreground = SysInRegionTextBrush;
-                    }
 
-                    sp.Children.Add(sysSubText);
+                    foreach((string lineText, Brush lineBrush) in systemSubTextLines)
+                    {
+                        TextBlock sysSubText = new TextBlock
+                        {
+                            Text = lineText,
+                            Width = SYSTEM_REGION_TEXT_WIDTH,
+                            Padding = new Thickness(0),
+                            Margin = new Thickness(0),
+                            TextAlignment = subTextAlignment,
+                            IsHitTestVisible = false,
+                            Foreground = lineBrush,
+                        };
+
+                        if(MapConf.ActiveColourScheme.SystemSubTextSize > 0)
+                        {
+                            sysSubText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
+                        }
+
+                        sp.Children.Add(sysSubText);
+                    }
                 }
             }
 
@@ -2800,8 +2865,8 @@ namespace SMT
                             }
                             jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
 
-                            jbOutofRegionText.Content = $"{to.Name}\n({to.Region})";
-                            if(MapConf.ActiveColourScheme.SystemSubTextSize > 2)
+                            jbOutofRegionText.Content = $"{to.LocalizedName}\n({to.Region})";
+                            if (MapConf.ActiveColourScheme.SystemSubTextSize > 2)
                             {
                                 jbOutofRegionText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                             }
@@ -2920,7 +2985,7 @@ namespace SMT
                     akl.MouseDown += AllianceKeyList_MouseDown;
                     akl.DataContext = allianceID.ToString();
                     akl.Content = $"{allianceTicker}\t{allianceName}";
-                    akl.Foreground = fontColour;
+                    akl.Foreground = GetAllianceTickerBrushFromStanding(ActiveCharacter, allianceID, 0, fontColour);
                     akl.Margin = p;
                     akl.Padding = p;
 
@@ -3247,46 +3312,49 @@ namespace SMT
                         miChar.Header = lc.Name;
                         characters.Items.Add(miChar);
 
+                        // Use zh-CN menu/popup strings when that UI language is active
+                        bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
+
                         // now create the child menu's
                         MenuItem miAutoRange = new MenuItem();
-                        miAutoRange.Header = "Auto Jump Range";
+                        miAutoRange.Header = isZH ? "自动跳跃范围" : "Auto Jump Range";
                         miAutoRange.DataContext = lc;
                         miChar.Items.Add(miAutoRange);
 
                         MenuItem miARNone = new MenuItem();
-                        miARNone.Header = "None";
+                        miARNone.Header = isZH ? "无" : "None";
                         miARNone.DataContext = "0";
                         miARNone.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARNone);
 
                         MenuItem miARSuper = new MenuItem();
-                        miARSuper.Header = "Super/Titan  (6.0LY)";
+                        miARSuper.Header = isZH ? "超级航母/泰坦 (6.0LY)" : "Super/Titan  (6.0LY)";
                         miARSuper.DataContext = "6";
                         miARSuper.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARSuper);
 
                         MenuItem miARCF = new MenuItem();
-                        miARCF.Header = "Carriers/Fax (7.0LY)";
+                        miARCF.Header = isZH ? "航母/无畏/传母 (7.0LY)" : "Carriers/Fax (7.0LY)";
                         miARCF.DataContext = "7";
                         miARCF.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARCF);
 
                         MenuItem miARBlops = new MenuItem();
-                        miARBlops.Header = "Black Ops    (8.0LY)";
+                        miARBlops.Header = isZH ? "黑隐特勤舰 (8.0LY)" : "Black Ops    (8.0LY)";
                         miARBlops.DataContext = "8";
                         miARBlops.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARBlops);
 
                         MenuItem miARJFR = new MenuItem();
-                        miARJFR.Header = "JF/Rorq     (10.0LY)";
+                        miARJFR.Header = isZH ? "跳货/大鲸鱼 (10.0LY)" : "JF/Rorq     (10.0LY)";
                         miARJFR.DataContext = "10";
                         miARJFR.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARJFR);
 
-                        if(!string.IsNullOrEmpty(lc.GameLogWarningText))
+                        if (!string.IsNullOrEmpty(lc.GameLogWarningText))
                         {
                             MenuItem miRemoveWarning = new MenuItem();
-                            miRemoveWarning.Header = "Clear Warning";
+                            miRemoveWarning.Header = isZH ? "清除警告" : "Clear Warning";
                             miRemoveWarning.DataContext = lc;
                             miRemoveWarning.Click += characterRightClickClearWarning;
                             miChar.Items.Add(miRemoveWarning);
@@ -3334,7 +3402,7 @@ namespace SMT
                 SystemInfoPopupSP.Children.Clear();
 
                 Label header = new Label();
-                header.Content = selectedSys.Name;
+                header.Content = selectedSys.LocalizedName;
                 header.FontWeight = FontWeights.Bold;
                 header.FontSize = 14;
                 header.Padding = one;
@@ -3379,64 +3447,67 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(new Separator());
                 }
 
+                // Use zh-CN popup labels when that UI language is active
+                bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
+
                 Label constellation = new Label();
                 constellation.Padding = one;
                 constellation.Margin = one;
-                constellation.Content = "Const\t:  " + selectedSys.ActualSystem.ConstellationName;
+                constellation.Content = (isZH ? "星座\t:  " : "Const\t:  ") + selectedSys.ActualSystem.ConstellationName;
                 constellation.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                 SystemInfoPopupSP.Children.Add(constellation);
 
                 Label secstatus = new Label();
                 secstatus.Padding = one;
                 secstatus.Margin = one;
-                secstatus.Content = "Security\t:  " + string.Format("{0:0.00}", selectedSys.ActualSystem.TrueSec) + " (" + selectedSys.ActualSystem.SecType + ")";
+                secstatus.Content = (isZH ? "安全等级\t:  " : "Security\t:  ") + string.Format("{0:0.00}", selectedSys.ActualSystem.TrueSec) + " (" + selectedSys.ActualSystem.SecType + ")";
                 secstatus.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                 SystemInfoPopupSP.Children.Add(secstatus);
 
                 SystemInfoPopupSP.Children.Add(new Separator());
 
-                if(selectedSys.ActualSystem.ShipKillsLastHour != 0)
+                if (selectedSys.ActualSystem.ShipKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
+                    data.Content = isZH ? $"舰船击杀\t:  {selectedSys.ActualSystem.ShipKillsLastHour}" : $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(selectedSys.ActualSystem.PodKillsLastHour != 0)
+                if (selectedSys.ActualSystem.PodKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
+                    data.Content = isZH ? $"太空舱击杀\t:  {selectedSys.ActualSystem.PodKillsLastHour}" : $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(selectedSys.ActualSystem.NPCKillsLastHour != 0)
+                if (selectedSys.ActualSystem.NPCKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, Delta ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})";
+                    data.Content = isZH ? $"NPC 击杀\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, 变化 ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})" : $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, Delta ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(selectedSys.ActualSystem.JumpsLastHour != 0)
+                if (selectedSys.ActualSystem.JumpsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
                     data.Margin = one;
 
-                    data.Content = $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
+                    data.Content = isZH ? $"跳跃数\t:  {selectedSys.ActualSystem.JumpsLastHour}" : $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
                     data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if(ShowJumpBridges)
+                if (ShowJumpBridges)
                 {
                     Point from = new Point();
                     Point to = new Point(); ;

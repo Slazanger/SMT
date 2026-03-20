@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // Map Region
 //-----------------------------------------------------------------------
 
@@ -82,6 +82,25 @@ namespace SMT.EVEData
         public string Name { get; set; }
 
         /// <summary>
+        /// Display name for the current UI language (uses <see cref="EveManager.Translations"/> when zh-CN).
+        /// </summary>
+        public string LocalizedName
+        {
+            get
+            {
+                if (EveManager.CurrentLanguage == "zh-CN")
+                {
+                    if (EveManager.Translations.ContainsKey(Name))
+                    {
+                        return EveManager.Translations[Name];
+                    }
+                    // Suffix when CSV has no entry for this region name
+                    return Name + " (untranslated)";
+                }
+                return Name;
+            }
+        }
+        /// <summary>
         /// Gets or sets the list of links to other Regions
         /// </summary>
         public List<string> RegionLinks { get; set; }
@@ -126,7 +145,9 @@ namespace SMT.EVEData
 
             return false;
         }
-
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            return LocalizedName;
+        }
     }
 }

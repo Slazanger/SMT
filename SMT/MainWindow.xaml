@@ -10,13 +10,11 @@
         xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
         xmlns:xcadl="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
         xmlns:xcadt="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Expression"
-
         x:Class="SMT.MainWindow"
         mc:Ignorable="d"
         Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip" RenderOptions.ClearTypeHint="Enabled" TextOptions.TextFormattingMode="Ideal">
 
     <Window.Resources>
-
         <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
         <local:ZKBForegroundConverter x:Key="zkbBGFConverter" />
         <local:TimeSpanConverter x:Key="timeSpanConverter" />
@@ -52,74 +50,68 @@
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Background="{DynamicResource MenuBackground}" Height="Auto">
             <Menu Style="{DynamicResource ResourceKey={x:Type Menu}}" Height="Auto">
-                <MenuItem Header="File" Height="Auto">
-                    <MenuItem Header="Characters" Click="Characters_MenuItem_Click" />
-                    <MenuItem Header="Preferences" Click="Preferences_MenuItem_Click" />
-                    <MenuItem Header="Overlay" Click="OverlayWindow_MenuItem_Click" />
-                    <MenuItem Header="Exit" Click="Exit_MenuItem_Click" />
+                <MenuItem Header="{DynamicResource Menu_File}" Height="Auto">
+                    <MenuItem Header="{DynamicResource Main_Menu_Characters}" Click="Characters_MenuItem_Click" />
+                    <MenuItem Header="{DynamicResource Menu_Preferences}" Click="Preferences_MenuItem_Click" />
+                    <MenuItem Header="{DynamicResource Main_Menu_Overlay}" Click="OverlayWindow_MenuItem_Click" />
+                    <MenuItem Header="{DynamicResource Main_Menu_Exit}" Click="Exit_MenuItem_Click" />
                 </MenuItem>
 
-                <MenuItem Header="Data"  Height="Auto">
-                    <MenuItem Header="Manage Infrastructure Upgrades..." Click="ManageInfrastructureUpgrades_Click" />
-                    <MenuItem Header="Load Infrastructure Upgrades..." Click="LoadInfrastructureUpgrades_Click" />
-                    <MenuItem Header="Save Infrastructure Upgrades..." Click="SaveInfrastructureUpgrades_Click" />
+                <MenuItem Header="{DynamicResource Main_Menu_Data}"  Height="Auto">
+                    <MenuItem Header="{DynamicResource Main_Menu_ManageInfra}" Click="ManageInfrastructureUpgrades_Click" />
+                    <MenuItem Header="{DynamicResource Main_Menu_LoadInfra}" Click="LoadInfrastructureUpgrades_Click" />
+                    <MenuItem Header="{DynamicResource Main_Menu_SaveInfra}" Click="SaveInfrastructureUpgrades_Click" />
                     <Separator />
-                    <MenuItem Header="Clear Old Eve logs" Click="ClearOldEVELogs_Click" />
+                    <MenuItem Header="{DynamicResource Main_Menu_ClearLogs}" Click="ClearOldEVELogs_Click" />
                 </MenuItem>
 
-                <MenuItem Header="View" Height="Auto">
-                    <MenuItem x:Name="miFullScreenToggle" Header="FullScreen" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
-                    <MenuItem x:Name="miResetLayout" Header="Reset Layout" Click="miResetLayout_Click" />
-                    <MenuItem x:Name="miEsiDebug" Header="ESI Debug" Click="EsiDebug_MenuItem_Click" />
-                    <MenuItem x:Name="miToggleOverlayClickTrough" Header="Toggle Overlay ClickTrough (Shift + Ctrl + Alt + T)" Click="OverlayClickTroughToggle_MenuItem_Click" />
+                <MenuItem Header="{DynamicResource Main_Menu_View}" Height="Auto">
+                    <MenuItem x:Name="miFullScreenToggle" Header="{DynamicResource Main_Menu_FullScreen}" IsCheckable="True" IsChecked="False" Click="FullScreenToggle_MenuItem_Click" />
+                    <MenuItem x:Name="miResetLayout" Header="{DynamicResource Main_Menu_ResetLayout}" Click="miResetLayout_Click" />
+                    <MenuItem x:Name="miToggleOverlayClickTrough" Header="{DynamicResource Main_Menu_ToggleOverlay}" Click="OverlayClickTroughToggle_MenuItem_Click" />
                 </MenuItem>
             </Menu>
 
-            <Label Margin="30,0,0,0" Padding="7">Active Character :</Label>
+            <Label Content="{DynamicResource Main_ActiveChar}" Margin="30,0,0,0" Padding="7" />
             <ComboBox x:Name="CurrentActiveCharacterCombo" Width="180"  IsReadOnly="True" SelectionChanged="CurrentActiveCharacterCombo_Selected"  Height="18" />
         </StackPanel>
 
         <StatusBar x:Name="AppStatusBar" DockPanel.Dock="Bottom" Height="Auto">
             <StatusBarItem>
-                <TextBlock><Run Text="EVE Time :" /></TextBlock>
+                <TextBlock Text="{DynamicResource Main_EveTime}" />
             </StatusBarItem>
-
             <StatusBarItem>
                 <TextBlock Text="{Binding ServerTime, StringFormat=HH:mm}" Foreground="White" />
             </StatusBarItem>
 
             <Separator />
-
             <StatusBarItem>
-                <TextBlock><Run Text="Tranquility Version:" /></TextBlock>
+                <TextBlock Text="{DynamicResource Main_TQVersion}" />
             </StatusBarItem>
-
             <StatusBarItem>
                 <TextBlock Text="{Binding ServerVersion}" Foreground="White" />
             </StatusBarItem>
 
             <Separator />
-
             <StatusBarItem>
                 <TextBlock Text="{Binding NumPlayers}" Foreground="White" />
             </StatusBarItem>
-
             <StatusBarItem>
-                <TextBlock Text="Players" />
+                <TextBlock Text="{DynamicResource Main_Players}" />
             </StatusBarItem>
         </StatusBar>
+
         <xcad:DockingManager x:Name="dockManager">
             <xcad:DockingManager.Theme>
                 <xcadt:ExpressionDarkTheme />
             </xcad:DockingManager.Theme>
 
             <xcadl:LayoutRoot>
-
                 <xcadl:LayoutRoot.RightSide>
                     <xcadl:LayoutAnchorSide>
                         <xcadl:LayoutAnchorGroup>
 
-                            <xcadl:LayoutAnchorable Title="Anoms" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" x:Name="avlpAnoms">
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_Anoms}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="AnomsContentID" AutoHideMinHeight="200" AutoHideMinWidth="280" x:Name="avlpAnoms">
                                 <Grid x:Name="MainAnomGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="auto" />
@@ -171,42 +163,34 @@
                                             </Style>
                                         </DataGrid.RowStyle>
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="SIG" Binding="{Binding Signature}" Width="60" />
-                                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="75" />
-                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
-                                            <DataGridTextColumn Header="Since" Binding="{Binding TimeFound, Converter={StaticResource TimeSinceConverter}}" Width="Auto" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Anom_ColSig}" Binding="{Binding Signature}" Width="60" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Anom_ColType}" Binding="{Binding Type}" Width="75" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Anom_ColName}" Binding="{Binding Name}" Width="*" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Anom_ColSince}" Binding="{Binding TimeFound, Converter={StaticResource TimeSinceConverter}}" Width="Auto" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <UniformGrid Grid.Row="2" Columns="2" Margin="8,0,8,8">
-                                        <Button x:Name="btnUpdateAnomList" Content="Update from Clipboard" Click="btnUpdateAnomList_Click" Margin="0,0,4,0" Height="32" />
-                                        <Button x:Name="btnDeleteSelectedAnoms" Content="Delete Selected" Click="btnDeleteSelectedAnoms_Click" Margin="4,0,0,0" Height="32" />
+                                        <Button x:Name="btnUpdateAnomList" Content="{DynamicResource Main_Anom_BtnUpdate}" Click="btnUpdateAnomList_Click" Margin="0,0,4,0" Height="32" />
+                                        <Button x:Name="btnDeleteSelectedAnoms" Content="{DynamicResource Main_Anom_BtnDelete}" Click="btnDeleteSelectedAnoms_Click" Margin="4,0,0,0" Height="32" />
                                     </UniformGrid>
-                                    <Button Grid.Row="3" x:Name="btnClearAnomList" Content="Clear" Click="btnClearAnomList_Click" Margin="8,0,8,8" Height="32" />
+                                    <Button Grid.Row="3" x:Name="btnClearAnomList" Content="{DynamicResource Main_Anom_BtnClear}" Click="btnClearAnomList_Click" Margin="8,0,8,8" Height="32" />
                                 </Grid>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Characters" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_Characters}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="CharactersContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                     <StackPanel>
                                         <DataGrid  x:Name="CharactersList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="False" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False" ItemsSource="{Binding Path=., Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}">
-
                                             <DataGrid.CellStyle>
                                                 <Style TargetType="{x:Type DataGridCell}">
-
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsOnline}" Value="False">
                                                             <Setter Property="Background" Value="DarkGray" />
                                                             <Setter Property="Foreground" Value="Black" />
                                                         </DataTrigger>
-
                                                         <DataTrigger Binding="{Binding IsOnline}" Value="True">
                                                             <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
                                                         </DataTrigger>
-
-                                                        <DataTrigger Binding="{Binding IsOnline}" Value="True">
-                                                            <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
-                                                        </DataTrigger>
-
                                                         <DataTrigger Binding="{Binding WarningState}" Value="Warning">
                                                             <Setter Property="Background" Value="Yellow" />
                                                             <Setter Property="Foreground" Value="Black" />
@@ -214,94 +198,81 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </DataGrid.CellStyle>
-
                                             <DataGrid.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem Header="Delete" Click="CharactersListMenuItemDelete_Click" />
+                                                    <MenuItem Header="{DynamicResource Main_Char_CtxDelete}" Click="CharactersListMenuItemDelete_Click" />
                                                 </ContextMenu>
                                             </DataGrid.ContextMenu>
-
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" IsReadOnly="True" />
-                                                <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" IsReadOnly="True" />
-                                                <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_Char_ColName}" Binding="{Binding Name}" CanUserReorder="False" Width="*" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_Char_ColLoc}" Binding="{Binding Location}" CanUserReorder="False" Width="*" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_Char_ColReg}" Binding="{Binding Region}" CanUserReorder="False" Width="*" IsReadOnly="True" />
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                        <CheckBox Content="Show Characters On Map" IsChecked="{Binding MapConf.ShowCharacterNamesOnMap}" Margin="3" />
-                                        <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="Add Character" />
+                                        <CheckBox Content="{DynamicResource Main_Char_ChkShow}" IsChecked="{Binding MapConf.ShowCharacterNamesOnMap}" Margin="3" />
+                                        <Button x:Name="btn_AddCharacter" Click="btn_AddCharacter_Click" Content="{DynamicResource Main_Char_BtnAdd}" />
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Route" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_Route}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="RouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid x:Name="MainRouteGrid">
                                     <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                         <StackPanel>
-
-                                            <GroupBox Header="Navigation Options">
+                                            <GroupBox Header="{DynamicResource Main_Rte_GrpNav}">
                                                 <StackPanel Margin="4">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Label Content="Mode" />
+                                                        <Label Content="{DynamicResource Main_Rte_LblMode}" />
                                                         <ComboBox ItemsSource="{Binding Source={StaticResource navigationEnumData}}" SelectedItem="{Binding ActiveCharacter.NavigationMode, ElementName=RegionUC, Mode=TwoWay}" Margin="2" Width="150" />
                                                     </StackPanel>
-
-                                                    <CheckBox Content="Use Ansiblex Gates" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionUC}" Margin="2" />
-                                                    <CheckBox Content="Use Thera" IsChecked="{Binding ActiveCharacter.UseTheraRouting, ElementName=RegionUC}" Margin="2" />
-                                                    <CheckBox Content="Use Turnur" IsChecked="{Binding ActiveCharacter.UseTurnurRouting, ElementName=RegionUC}" Margin="2" />
-                                                    <CheckBox Content="Use Zarzakh" IsChecked="{Binding ActiveCharacter.UseZarzakhRouting, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="{DynamicResource Main_Rte_ChkAnsiblex}" IsChecked="{Binding ActiveCharacter.UseAnsiblexGates, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="{DynamicResource Main_Rte_ChkThera}" IsChecked="{Binding ActiveCharacter.UseTheraRouting, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="{DynamicResource Main_Rte_ChkTurnur}" IsChecked="{Binding ActiveCharacter.UseTurnurRouting, ElementName=RegionUC}" Margin="2" />
+                                                    <CheckBox Content="{DynamicResource Main_Rte_ChkZarzakh}" IsChecked="{Binding ActiveCharacter.UseZarzakhRouting, ElementName=RegionUC}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
-                                            <GroupBox Header="WayPoints">
+                                            <GroupBox Header="{DynamicResource Main_Rte_GrpWaypoints}">
                                                 <StackPanel Margin="4">
                                                     <ListBox x:Name="lbActiveCharacterWaypoints" ItemsSource="{Binding ActiveCharacter.Waypoints, ElementName=RegionUC}" MinHeight="50" Margin="2" />
                                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
-                                                        <Button x:Name="AddWaypointsBtn" Click="AddWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="RouteSystemDropDownAC" TextSearch.TextPath="LocalizedName" FontSize="12" Width="156" />
+                                                        <Button x:Name="AddWaypointsBtn" Click="AddWaypointsBtn_Click"  Content="{DynamicResource Main_Rte_BtnAddWP}" Margin="2" />
                                                     </StackPanel>
-
-                                                    <Button x:Name="ReCalculateRouteBtn" Click="ReCalculateRouteBtn_Click"  Content="Recalculate" Margin="2" />
-                                                    <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="Clear All" Margin="2" />
+                                                    <Button x:Name="ReCalculateRouteBtn" Click="ReCalculateRouteBtn_Click"  Content="{DynamicResource Main_Rte_BtnRecalc}" Margin="2" />
+                                                    <Button x:Name="ClearWaypointsBtn" Click="ClearWaypointsBtn_Click" Content="{DynamicResource Main_Rte_BtnClear}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
 
-                                            <GroupBox Header="Route">
+                                            <GroupBox Header="{DynamicResource Main_Rte_GrpRoute}">
                                                 <StackPanel Margin="4">
                                                     <DataGrid x:Name="dgActiveCharacterRoute" ItemsSource="{Binding ActiveCharacter.ActiveRoute, ElementName=RegionUC}" MinHeight="50" AutoGenerateColumns="false">
                                                         <DataGrid.CellStyle>
                                                             <Style TargetType="{x:Type DataGridCell}">
-
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Thera">
                                                                         <Setter Property="Background" Value="#292" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Turnur">
                                                                         <Setter Property="Background" Value="DarkRed" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Ansiblex">
                                                                         <Setter Property="Background" Value="blue" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding GateToTake}" Value="Zarzakh">
                                                                         <Setter Property="Background" Value="Purple" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
                                                                         <Setter Property="Background" Value="yellow" />
                                                                         <Setter Property="Foreground" Value="black" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory">
                                                                         <Setter Property="Background" Value="yellow" />
                                                                         <Setter Property="Foreground" Value="black" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress">
                                                                         <Setter Property="Background" Value="yellow" />
                                                                         <Setter Property="Foreground" Value="black" />
                                                                     </DataTrigger>
-
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
                                                                             <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
@@ -309,7 +280,6 @@
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
-
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
                                                                             <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
@@ -317,7 +287,6 @@
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
-
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
                                                                             <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False" />
@@ -325,7 +294,6 @@
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
-
                                                                     <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
                                                                         <Setter Property="Background" Value="blue" />
                                                                     </DataTrigger>
@@ -333,20 +301,19 @@
                                                             </Style>
                                                         </DataGrid.CellStyle>
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="Con" Binding="{Binding GateToTake}" Width="8*" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="Jumps" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="SK" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="PK" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="Trig" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_Rte_ColSys}" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_Rte_ColCon}" Binding="{Binding GateToTake}" Width="8*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_Rte_ColJumps}" Binding="{Binding ActualSystem.JumpsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_Rte_ColSK}" Binding="{Binding ActualSystem.ShipKillsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_Rte_ColPK}" Binding="{Binding ActualSystem.PodKillsLastHour}" Width="5*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_Rte_ColTrig}" Binding="{Binding ActualSystem.TrigInvasionStatus}" Width="5*" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                     </DataGrid>
-
                                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                                        <Label Content="Total number of jumps : " />
+                                                        <Label Content="{DynamicResource Main_Rte_LblTotalJumps}" />
                                                         <Label Content="{Binding ActiveCharacter.ActiveRouteLength, ElementName=RegionUC}" />
                                                     </StackPanel>
-                                                    <Button x:Name="CopyRouteBtn" Click="CopyRouteBtn_Click" Content="Copy Route" Margin="2" />
+                                                    <Button x:Name="CopyRouteBtn" Click="CopyRouteBtn_Click" Content="{DynamicResource Main_Rte_BtnCopy}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
                                         </StackPanel>
@@ -354,88 +321,80 @@
                                 </Grid>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Jump Planner" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpRouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_JumpPlanner}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="JumpRouteContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid x:Name="MainJumpRouteGrid">
                                     <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                         <StackPanel>
-
-                                            <GroupBox Header="Navigation Options">
+                                            <GroupBox Header="{DynamicResource Main_JP_GrpNav}">
                                                 <StackPanel Margin="4">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Label Width="70">Ship Type</Label>
+                                                        <Label Width="70" Content="{DynamicResource Main_JP_LblShip}" />
                                                         <ComboBox x:Name="jumpPlannerShipType" SelectionChanged="JumpPlannerShipType_OnSelectionChanged">
-                                                            <ComboBoxItem DataContext="6.0">Ansiblex</ComboBoxItem>
-                                                            <ComboBoxItem DataContext="6.0">Super/Titan</ComboBoxItem>
-                                                            <ComboBoxItem DataContext="7.0" IsSelected="True">Regular Caps</ComboBoxItem>
-                                                            <ComboBoxItem DataContext="8.0">Blops</ComboBoxItem>
-                                                            <ComboBoxItem DataContext="10.0">JF/Rorqs</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="6.0" Content="{DynamicResource Main_JP_ShipAnsiblex}" />
+                                                            <ComboBoxItem DataContext="6.0" Content="{DynamicResource Main_JP_ShipSuper}" />
+                                                            <ComboBoxItem DataContext="7.0" IsSelected="True" Content="{DynamicResource Main_JP_ShipReg}" />
+                                                            <ComboBoxItem DataContext="8.0" Content="{DynamicResource Main_JP_ShipBlops}" />
+                                                            <ComboBoxItem DataContext="10.0" Content="{DynamicResource Main_JP_ShipJF}" />
                                                         </ComboBox>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Label Width="70">Skills</Label>
+                                                        <Label Width="70" Content="{DynamicResource Main_JP_LblSkills}" />
                                                         <ComboBox x:Name="jumpPlannerJDC" SelectionChanged="JumpPlannerJDC_OnSelectionChanged">
-                                                            <ComboBoxItem DataContext="4">JDC 4 SubHuman</ComboBoxItem>
-                                                            <ComboBoxItem DataContext="5" IsSelected="True">JDC 5</ComboBoxItem>
+                                                            <ComboBoxItem DataContext="4" Content="{DynamicResource Main_JP_Skill4}" />
+                                                            <ComboBoxItem DataContext="5" IsSelected="True" Content="{DynamicResource Main_JP_Skill5}" />
                                                         </ComboBox>
                                                     </StackPanel>
                                                 </StackPanel>
                                             </GroupBox>
-                                            <GroupBox Header="WayPoints">
+                                            <GroupBox Header="{DynamicResource Main_JP_GrpWP}">
                                                 <StackPanel Margin="4">
                                                     <ListBox x:Name="capitalRouteWaypointsLB" ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" AllowDrop="True">
                                                         <ListBox.ContextMenu>
                                                             <ContextMenu>
-                                                                <MenuItem Header="Move Up" Click="CapitalWaypointsContextMenuMoveUp_Click" />
-                                                                <MenuItem Header="Move Down" Click="CapitalWaypointsContextMenuMoveDown_Click" />
-                                                                <MenuItem Header="Delete" Click="CapitalWaypointsContextMenuDelete_Click" />
+                                                                <MenuItem Header="{DynamicResource Main_JP_CtxMoveUp}" Click="CapitalWaypointsContextMenuMoveUp_Click" />
+                                                                <MenuItem Header="{DynamicResource Main_JP_CtxMoveDown}" Click="CapitalWaypointsContextMenuMoveDown_Click" />
+                                                                <MenuItem Header="{DynamicResource Main_JP_CtxDelete}" Click="CapitalWaypointsContextMenuDelete_Click" />
                                                             </ContextMenu>
                                                         </ListBox.ContextMenu>
                                                     </ListBox>
                                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
-                                                        <Button x:Name="AddJumpWaypointsBtn" Click="AddJumpWaypointsBtn_Click"  Content="Add WayPoint" Margin="2" />
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteSystemDropDownAC" TextSearch.TextPath="LocalizedName" FontSize="12" Width="156" />
+                                                        <Button x:Name="AddJumpWaypointsBtn" Click="AddJumpWaypointsBtn_Click"  Content="{DynamicResource Main_JP_BtnAddWP}" Margin="2" />
                                                     </StackPanel>
-
-                                                    <Button x:Name="ClearJumpWaypointsBtn" Click="ClearJumpWaypointsBtn_Click" Content="Clear All" Margin="2" />
+                                                    <Button x:Name="ClearJumpWaypointsBtn" Click="ClearJumpWaypointsBtn_Click" Content="{DynamicResource Main_JP_BtnClearWP}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
 
-                                            <GroupBox Header="Avoidance">
+                                            <GroupBox Header="{DynamicResource Main_JP_GrpAvoid}">
                                                 <StackPanel Margin="4">
                                                     <ListBox x:Name="capitalRouteAvoidLB"  ItemsSource="{Binding CapitalRoute.AvoidSystems}" MinHeight="50" Margin="2" />
                                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteAvoidSystemDropDownAC" TextSearch.TextPath="Name" FontSize="12" Width="156" />
-                                                        <Button x:Name="AddJumpAvoidSystemsBtn" Click="AddJumpAvoidSystemsBtn_Click"  Content="Add Avoidance" Margin="2" />
+                                                        <dotNetKitControls:AutoCompleteComboBox x:Name="JumpRouteAvoidSystemDropDownAC" TextSearch.TextPath="LocalizedName" FontSize="12" Width="156" />
+                                                        <Button x:Name="AddJumpAvoidSystemsBtn" Click="AddJumpAvoidSystemsBtn_Click"  Content="{DynamicResource Main_JP_BtnAddAvoid}" Margin="2" />
                                                     </StackPanel>
-
-                                                    <Button x:Name="ClearJumpAvoidSystemsBtn" Click="ClearJumpAvoidSystemsBtn_Click" Content="Clear All" Margin="2" />
+                                                    <Button x:Name="ClearJumpAvoidSystemsBtn" Click="ClearJumpAvoidSystemsBtn_Click" Content="{DynamicResource Main_JP_BtnClearAvoid}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
 
-                                            <GroupBox Header="Route">
+                                            <GroupBox Header="{DynamicResource Main_JP_GrpRoute}">
                                                 <StackPanel Margin="4">
                                                     <Label x:Name="lblCapitalRouteSummary" Content="" />
-                                                    <DataGrid x:Name="dgCapitalRouteCurrentRoute" ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false"  SelectionChanged="CurrentCapitalRouteItem_Selected" IsReadOnly="True">
+                                                    <DataGrid x:Name="dgCapitalRouteCurrentRoute" ItemsSource="{Binding CapitalRoute.CurrentRoute}" MinHeight="50" AutoGenerateColumns="false" SelectionChanged="CurrentCapitalRouteItem_Selected" IsReadOnly="True">
                                                         <DataGrid.CellStyle>
                                                             <Style TargetType="{x:Type DataGridCell}">
-
                                                                 <Style.Triggers>
-
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="TriglavianMinorVictory">
                                                                         <Setter Property="Background" Value="yellow" />
                                                                         <Setter Property="Foreground" Value="black" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="EdencomMinorVictory">
                                                                         <Setter Property="Background" Value="yellow" />
                                                                         <Setter Property="Foreground" Value="black" />
                                                                     </DataTrigger>
-
                                                                     <DataTrigger Binding="{Binding ActualSystem.TrigInvasionStatus}" Value="Fortress">
                                                                         <Setter Property="Background" Value="yellow" />
                                                                         <Setter Property="Foreground" Value="black" />
                                                                     </DataTrigger>
-
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
                                                                             <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
@@ -443,7 +402,6 @@
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
-
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
                                                                             <Condition Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False" />
@@ -451,7 +409,6 @@
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
-
                                                                     <MultiDataTrigger>
                                                                         <MultiDataTrigger.Conditions>
                                                                             <Condition Binding="{Binding ActiveCharacter.TrigStandingsGood,ElementName=RegionUC}" Value="False" />
@@ -459,7 +416,6 @@
                                                                         </MultiDataTrigger.Conditions>
                                                                         <Setter Property="Background" Value="Red" />
                                                                     </MultiDataTrigger>
-
                                                                     <DataTrigger Binding="{Binding ActiveCharacter.EdenCommStandingsGood}" Value="False">
                                                                         <Setter Property="Background" Value="blue" />
                                                                     </DataTrigger>
@@ -467,22 +423,22 @@
                                                             </Style>
                                                         </DataGrid.CellStyle>
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
-                                                            <DataGridTextColumn Header="Distance (LY)" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_JP_ColSys}" Binding="{Binding SystemName}" Width="15*" CanUserSort="False" />
+                                                            <DataGridTextColumn Header="{DynamicResource Main_JP_ColDist}" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                     </DataGrid>
                                                 </StackPanel>
                                             </GroupBox>
-                                            <GroupBox Header="Alternate Mids">
+                                            <GroupBox Header="{DynamicResource Main_JP_GrpAlt}">
                                                 <StackPanel Orientation="Vertical">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Label Content="Alternates for : " />
+                                                        <Label Content="{DynamicResource Main_JP_LblAltFor}" />
                                                         <Label x:Name="lblAlternateMids" />
                                                     </StackPanel>
                                                     <ListBox x:Name="lbAlternateMids">
                                                         <ListBox.ContextMenu>
                                                             <ContextMenu>
-                                                                <MenuItem Header="Use Alt" Click="CapitalRouteContextMenuUseAlt_Click" />
+                                                                <MenuItem Header="{DynamicResource Main_JP_CtxUseAlt}" Click="CapitalRouteContextMenuUseAlt_Click" />
                                                             </ContextMenu>
                                                         </ListBox.ContextMenu>
                                                     </ListBox>
@@ -493,15 +449,14 @@
                                 </Grid>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="WH Connections" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_WH}" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="TheraContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <TabControl>
-                                    <TabItem Header="Thera">
+                                    <TabItem Header="{DynamicResource Main_WH_TabThera}">
                                         <ScrollViewer>
                                             <StackPanel>
                                                 <DataGrid  x:Name="TheraConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TheraConnectionsList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
                                                     <DataGrid.CellStyle>
                                                         <Style TargetType="{x:Type DataGridCell}">
-
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
                                                                     <Setter Property="Background" Value="Red" />
@@ -509,27 +464,24 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </DataGrid.CellStyle>
-
                                                     <DataGrid.Columns>
-                                                        <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
-                                                        <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
-                                                        <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*" />
-                                                        <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
-                                                        <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColSys}" Binding="{Binding System}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColReg}" Binding="{Binding Region}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColInSig}" Binding="{Binding InSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColOutSig}" Binding="{Binding OutSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColEOL}" Binding="{Binding EstimatedEOL}" Width="*" />
                                                     </DataGrid.Columns>
                                                 </DataGrid>
-
-                                                <Button x:Name="btn_UpdateThera" Click="btn_UpdateThera_Click"  Content="Update Connections" />
+                                                <Button x:Name="btn_UpdateThera" Click="btn_UpdateThera_Click" Content="{DynamicResource Main_WH_BtnUpdate}" />
                                             </StackPanel>
                                         </ScrollViewer>
                                     </TabItem>
-                                    <TabItem Header="Turnur">
+                                    <TabItem Header="{DynamicResource Main_WH_TabTurnur}">
                                         <ScrollViewer>
                                             <StackPanel>
                                                 <DataGrid  x:Name="TurnurConnectionsList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TurnurConnectionsList_MouseDoubleClick" HeadersVisibility="Column" Background="AliceBlue">
                                                     <DataGrid.CellStyle>
                                                         <Style TargetType="{x:Type DataGridCell}">
-
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding EstimatedEOL}" Value="critical">
                                                                     <Setter Property="Background" Value="Red" />
@@ -537,48 +489,42 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </DataGrid.CellStyle>
-
                                                     <DataGrid.Columns>
-                                                        <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
-                                                        <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
-                                                        <DataGridTextColumn Header="In Sig" Binding="{Binding InSignatureID}" Width="*" />
-                                                        <DataGridTextColumn Header="Out Sig" Binding="{Binding OutSignatureID}" Width="*" />
-                                                        <DataGridTextColumn Header="EOL Status" Binding="{Binding EstimatedEOL}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColSys}" Binding="{Binding System}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColReg}" Binding="{Binding Region}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColInSig}" Binding="{Binding InSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColOutSig}" Binding="{Binding OutSignatureID}" Width="*" />
+                                                        <DataGridTextColumn Header="{DynamicResource Main_WH_ColEOL}" Binding="{Binding EstimatedEOL}" Width="*" />
                                                     </DataGrid.Columns>
                                                 </DataGrid>
-
-                                                <Button x:Name="btn_UpdateTurnur" Click="btn_UpdateTurnur_Click"  Content="Update Connections" />
+                                                <Button x:Name="btn_UpdateTurnur" Click="btn_UpdateTurnur_Click" Content="{DynamicResource Main_WH_BtnUpdate}" />
                                             </StackPanel>
                                         </ScrollViewer>
                                     </TabItem>
                                 </TabControl>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="Storms" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="StormContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_Storms}" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="StormContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>
                                     <StackPanel>
-
                                         <DataGrid  x:Name="MetaliminalStormList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="AliceBlue" MouseDoubleClick="MetaliminalStormList_MouseDoubleClick">
-
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="System" Binding="{Binding System}" Width="*" />
-                                                <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" />
-                                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_Stm_ColSys}" Binding="{Binding System}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_Stm_ColReg}" Binding="{Binding Region}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_Stm_ColType}" Binding="{Binding Type}" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                     </StackPanel>
                                 </ScrollViewer>
                             </xcadl:LayoutAnchorable>
 
-                            <xcadl:LayoutAnchorable Title="SOV Campaigns" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_SOV}" CanClose="False" CanAutoHide="True" CanHide="false" ContentId="SOVCampaignsID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer>
                                     <StackPanel>
-                                        <CheckBox Content="Selected Region Only" x:Name="SovCampaignFilterViewChk" IsChecked="False" Checked="SovCampaignFilterViewChk_Checked" Unchecked="SovCampaignFilterViewChk_Checked" Margin="4" />
+                                        <CheckBox Content="{DynamicResource Main_SOV_ChkRegOnly}" x:Name="SovCampaignFilterViewChk" IsChecked="False" Checked="SovCampaignFilterViewChk_Checked" Unchecked="SovCampaignFilterViewChk_Checked" Margin="4" />
                                         <DataGrid x:Name="SovCampaignList" Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="SovCampaignList_MouseDoubleClick" HeadersVisibility="Column">
-
                                             <DataGrid.CellStyle>
                                                 <Style TargetType="{x:Type DataGridCell}">
-
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Path=IsActive, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged}" Value="true">
                                                             <Setter Property="Background" Value="DarkRed" />
@@ -586,11 +532,10 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </DataGrid.CellStyle>
-
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="System" Binding="{Binding Path=System, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-                                                <DataGridTextColumn Header="Region" Binding="{Binding Path=Region, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-                                                <DataGridTemplateColumn  Header="Score"  Width="*">
+                                                <DataGridTextColumn Header="{DynamicResource Main_SOV_ColSys}" Binding="{Binding Path=System, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_SOV_ColReg}" Binding="{Binding Path=Region, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTemplateColumn  Header="{DynamicResource Main_SOV_ColScore}"  Width="*">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <Grid>
@@ -600,8 +545,8 @@
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
-                                                <DataGridTextColumn Header="Starts in" Binding="{Binding Path=TimeToStart, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource timeSpanConverter}}" Width="*" />
-                                                <DataGridTextColumn Header="Defenders" Binding="{Binding Path=DefendingAllianceName, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_SOV_ColStarts}" Binding="{Binding Path=TimeToStart, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource timeSpanConverter}}" Width="*" />
+                                                <DataGridTextColumn Header="{DynamicResource Main_SOV_ColDef}" Binding="{Binding Path=DefendingAllianceName, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                     </StackPanel>
@@ -610,19 +555,34 @@
                         </xcadl:LayoutAnchorGroup>
                     </xcadl:LayoutAnchorSide>
                 </xcadl:LayoutRoot.RightSide>
+
                 <xcadl:LayoutPanel>
                     <xcadl:LayoutAnchorablePaneGroup DockWidth="250" DockMinWidth="250" Orientation="Vertical">
                         <xcadl:LayoutAnchorablePane>
-                            <xcadl:LayoutAnchorable x:Name="ZKBLayoutAnchorable"  Title="ZKB Feed" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable x:Name="ZKBLayoutAnchorable" Title="{DynamicResource Main_Panel_ZKB}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="ZKBContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid>
                                     <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                         <StackPanel CanVerticallyScroll="True" ScrollViewer.CanContentScroll="True">
-                                            <CheckBox Content="Selected Region Only" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" Margin="4" />
+                                            <CheckBox Content="{DynamicResource Main_ZKB_ChkRegOnly}" x:Name="ZKBFeedFilterViewChk" IsChecked="True" Checked="ZKBFeedFilterViewChk_Checked" Unchecked="ZKBFeedFilterViewChk_Checked" Margin="4" />
                                             <DataGrid x:Name="ZKBFeed" Grid.Row="1" AreRowDetailsFrozen="True" Cursor="Hand" AutoGenerateColumns="False" CanUserAddRows="False" MouseUp="ZKBContexMenu_ShowSystem_Click" MouseDoubleClick="ZKBFeed_MouseDoubleClick_1" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None"  MinHeight="200">
                                                 <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="System" Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
-                                                    <DataGridTextColumn Header="Alliance" Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
-                                                    <DataGridTextColumn Header="Ship Type" Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" />
+                                                    <DataGridTextColumn Binding="{Binding SystemName}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False">
+                                                        <DataGridTextColumn.Header>
+                                                            <TextBlock Text="{DynamicResource ZKB_Column_System}" />
+                                                        </DataGridTextColumn.Header>
+                                                    </DataGridTextColumn>
+
+                                                    <DataGridTextColumn Binding="{Binding VictimAllianceName}" Width="40*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False">
+                                                        <DataGridTextColumn.Header>
+                                                            <TextBlock Text="{DynamicResource ZKB_Column_Alliance}" />
+                                                        </DataGridTextColumn.Header>
+                                                    </DataGridTextColumn>
+
+                                                    <DataGridTextColumn Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False">
+                                                        <DataGridTextColumn.Header>
+                                                            <TextBlock Text="{DynamicResource ZKB_Column_ShipType}" />
+                                                        </DataGridTextColumn.Header>
+                                                    </DataGridTextColumn>
                                                 </DataGrid.Columns>
                                                 <DataGrid.RowStyle>
                                                     <Style TargetType="{x:Type DataGridRow}">
@@ -631,11 +591,10 @@
                                                         <Setter Property="FontSize" Value="10" />
                                                     </Style>
                                                 </DataGrid.RowStyle>
-
                                                 <DataGrid.ContextMenu>
                                                     <ContextMenu>
-                                                        <MenuItem Header="Show System" Click="ZKBContexMenu_ShowSystem_Click" />
-                                                        <MenuItem Header="Open Kill on ZKB" Click="ZKBContexMenu_ShowZKB_Click" />
+                                                        <MenuItem Header="{DynamicResource Main_ZKB_CtxShowSys}" Click="ZKBContexMenu_ShowSystem_Click" />
+                                                        <MenuItem Header="{DynamicResource Main_ZKB_CtxOpen}" Click="ZKBContexMenu_ShowZKB_Click" />
                                                     </ContextMenu>
                                                 </DataGrid.ContextMenu>
                                             </DataGrid>
@@ -646,35 +605,35 @@
                         </xcadl:LayoutAnchorablePane>
 
                         <xcadl:LayoutAnchorablePane>
-                            <xcadl:LayoutAnchorable x:Name="IntelLayoutAnchorable"  Title="Intel" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable x:Name="IntelLayoutAnchorable" Title="{DynamicResource Main_Panel_Intel}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="IntelContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="25" />
                                     </Grid.RowDefinitions>
                                     <ListView x:Name="RawIntelBox" Margin="0,2" MouseDoubleClick="RawIntelBox_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource intelDataDataTemplate}" />
-                                    <Button Content="Clear Intel" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
+                                    <Button Content="{DynamicResource Main_Int_BtnClear}" Grid.Row="1" x:Name="ClearIntelBtn" Click="ClearIntelBtn_Click" />
                                 </Grid>
                             </xcadl:LayoutAnchorable>
-                            <xcadl:LayoutAnchorable x:Name="GamelogLayoutAnchorable"  Title="Gamelog" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="GameLogContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+                            <xcadl:LayoutAnchorable x:Name="GamelogLayoutAnchorable" Title="{DynamicResource Main_Panel_Gamelog}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="GameLogContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="25" />
                                     </Grid.RowDefinitions>
-
                                     <ListView x:Name="RawGameDataBox" Margin="0,2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0" ItemTemplate="{StaticResource gameLogDataDataTemplate}" />
-                                    <Button Content="Clear GameLog" Grid.Row="1" x:Name="ClearGameLogBtn" Click="ClearGameLogBtn_Click" />
+                                    <Button Content="{DynamicResource Main_Log_BtnClear}" Grid.Row="1" x:Name="ClearGameLogBtn" Click="ClearGameLogBtn_Click" />
                                 </Grid>
                             </xcadl:LayoutAnchorable>
-                            <xcadl:LayoutAnchorable Title="Fleet" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
+
+                            <xcadl:LayoutAnchorable Title="{DynamicResource Main_Panel_Fleet}" CanClose="False" CanAutoHide="True" CanHide="False" ContentId="FleetContentID" AutoHideMinHeight="200" AutoHideMinWidth="280">
                                 <ScrollViewer Background="{DynamicResource ButtonBackground}">
                                     <DataGrid  x:Name="FleetMembersList"  Grid.Row="1" AreRowDetailsFrozen="True" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MouseDoubleClick="CharactersList_MouseDoubleClick" HeadersVisibility="Column" SelectionUnit="FullRow" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="False">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
-                                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" CanUserReorder="False" Width="*" />
-                                            <DataGridTextColumn Header="Region" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
-                                            <DataGridTextColumn Header="ShipType" Binding="{Binding ShipType}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Flt_ColName}" Binding="{Binding Name}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Flt_ColLoc}" Binding="{Binding Location}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Flt_ColReg}" Binding="{Binding Region}" CanUserReorder="False" Width="*" />
+                                            <DataGridTextColumn Header="{DynamicResource Main_Flt_ColShip}" Binding="{Binding ShipType}" CanUserReorder="False" Width="*" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </ScrollViewer>
@@ -683,17 +642,17 @@
                     </xcadl:LayoutAnchorablePaneGroup>
 
                     <xcadl:LayoutDocumentPane ShowHeader="True" AllowDuplicateContent="False">
-                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="Regions">
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="UniverseContentID" Title="{DynamicResource Main_Panel_Regions}">
                             <Grid>
                                 <local:RegionsViewControl x:Name="RegionsViewUC" />
                             </Grid>
                         </xcadl:LayoutDocument>
 
-                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="Region">
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="MapRegionContentID" Title="{DynamicResource Main_Panel_Region}">
                             <local:RegionControl x:Name="RegionUC" />
                         </xcadl:LayoutDocument>
 
-                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverseViewID" Title="Universe">
+                        <xcadl:LayoutDocument CanClose="False" CanFloat="True" ContentId="FullUniverseViewID" Title="{DynamicResource Main_Panel_Universe}">
                             <local:UniverseControl x:Name="UniverseUC" />
                         </xcadl:LayoutDocument>
                     </xcadl:LayoutDocumentPane>

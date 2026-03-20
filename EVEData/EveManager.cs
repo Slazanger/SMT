@@ -41,6 +41,9 @@ namespace SMT.EVEData
     /// </summary>
     public class EveManager
     {
+        // App-wide UI language and English→localized string map (loaded from Translation.csv)
+        public static string CurrentLanguage { get; set; } = "en-US";
+        public static Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// singleton instance of this class
         /// </summary>
@@ -166,12 +169,10 @@ namespace SMT.EVEData
             // LocalCharacters is now initialized as a private field
             VersionStr = version;
 
-
             MigrateOldSettings();
 
-
             string SaveDataRoot = EveAppConfig.StorageRoot;
-            if(!Directory.Exists(SaveDataRoot))
+            if (!Directory.Exists(SaveDataRoot))
             {
                 Directory.CreateDirectory(SaveDataRoot);
             }
@@ -181,13 +182,13 @@ namespace SMT.EVEData
             SaveDataRootFolder = SaveDataRoot;
 
             SaveDataVersionFolder = EveAppConfig.VersionStorage;
-            if(!Directory.Exists(SaveDataVersionFolder))
+            if (!Directory.Exists(SaveDataVersionFolder))
             {
                 Directory.CreateDirectory(SaveDataVersionFolder);
             }
 
             string characterSaveFolder = Path.Combine(SaveDataRootFolder, "Portraits");
-            if(!Directory.Exists(characterSaveFolder))
+            if (!Directory.Exists(characterSaveFolder))
             {
                 Directory.CreateDirectory(characterSaveFolder);
             }
@@ -199,6 +200,50 @@ namespace SMT.EVEData
             IDToSystem = new Dictionary<long, System>();
 
             ServerInfo = new EVEData.Server();
+
+            // Load optional Translation.csv (zh-CN strings keyed by English) at end of init
+            LoadTranslations();
+        }
+
+        /// <summary>Loads <c>data/Translation.csv</c> into <see cref="Translations"/>.</summary>
+        private void LoadTranslations()
+        {
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "Translation.csv");
+                if (File.Exists(path))
+                {
+                    // Read as UTF-8 (required for non-ASCII translations)
+                    string[] lines = File.ReadAllLines(path, global::System.Text.Encoding.UTF8);
+                    int count = 0;
+                    foreach (string line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+
+                        string[] parts = line.Split(',');
+                        if (parts.Length >= 2)
+                        {
+                            // Strip UTF-8 BOM if present on first column
+                            string en = parts[0].Trim().Replace("\uFEFF", "");
+                            string zh = parts[1].Trim();
+                            if (!Translations.ContainsKey(en))
+                            {
+                                Translations.Add(en, zh);
+                                count++;
+                            }
+                        }
+                    }
+                    global::System.Diagnostics.Debug.WriteLine($"Translation.csv: loaded {count} entries.");
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.WriteLine("Translation.csv: file not found: " + path);
+                }
+            }
+            catch (global::System.Exception ex)
+            {
+                global::System.Diagnostics.Debug.WriteLine("Translation.csv: read error: " + ex.Message);
+            }
         }
 
         /// <summary>

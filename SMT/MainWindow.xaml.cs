@@ -1,3 +1,9 @@
+using AvalonDock.Layout;
+using Microsoft.Toolkit.Uwp.Notifications;
+using NAudio.Wave;
+using NHotkey;
+using NHotkey.Wpf;
+using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,11 +23,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using Microsoft.Toolkit.Uwp.Notifications;
-using NAudio.Wave;
-using NHotkey;
-using NHotkey.Wpf;
-using SMT.EVEData;
 using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT
@@ -64,10 +65,53 @@ namespace SMT
 
         private IWavePlayer waveOutEvent;
         private AudioFileReader audioFileReader;
+        public void UpdateTabTitles()
+        {
+            try
+            {
+                // Refresh region map document title
+                if (RegionUC != null && RegionUC.Region != null)
+                {
+                    RegionLayoutDoc.Title = RegionUC.Region.LocalizedName;
+                }
+                else
+                {
+                    RegionLayoutDoc.Title = Application.Current.TryFindResource("Main_Panel_Region") as string;
+                }
 
-        /// <summary>
-        /// Main Window
-        /// </summary>
+                // Refresh universe map document title
+                UniverseLayoutDoc.Title = Application.Current.TryFindResource("Main_Panel_Universe") as string;
+
+                // Refresh regions overview document title
+                var regionsDoc = dockManager.Layout.Descendents().OfType<AvalonDock.Layout.LayoutDocument>().FirstOrDefault(d => d.ContentId == "UniverseContentID");
+                if (regionsDoc != null)
+                {
+                    regionsDoc.Title = Application.Current.TryFindResource("Main_Panel_Regions") as string;
+                }
+                var anchorables = dockManager.Layout.Descendents().OfType<AvalonDock.Layout.LayoutAnchorable>();
+                foreach (var panel in anchorables)
+                {
+                    switch (panel.ContentId)
+                    {
+                        case "AnomsContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Anoms") as string; break;
+                        case "CharactersContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Characters") as string; break;
+                        case "RouteContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Route") as string; break;
+                        case "JumpRouteContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_JumpPlanner") as string; break;
+                        case "TheraContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_WH") as string; break;
+                        case "StormContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Storms") as string; break;
+                        case "SOVCampaignsID": panel.Title = Application.Current.TryFindResource("Main_Panel_SOV") as string; break;
+                        case "ZKBContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_ZKB") as string; break;
+                        case "IntelContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Intel") as string; break;
+                        case "GameLogContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Gamelog") as string; break;
+                        case "FleetContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Fleet") as string; break;
+                    }
+                }
+            }
+            catch { }
+        }
+            /// <summary>
+            /// Main Window
+            /// </summary>
         public MainWindow()
         {
             AppWindow = this;
@@ -906,7 +950,7 @@ namespace SMT
         {
             if(RegionLayoutDoc != null)
             {
-                RegionLayoutDoc.Title = RegionUC.Region.Name;
+                RegionLayoutDoc.Title = RegionUC.Region.LocalizedName;
             }
 
             manualZKillFilterRefreshRequired = true;
