@@ -532,7 +532,7 @@ namespace SMT.EVEData
         /// </summary>
         private void InitZKillFeed()
         {
-            ZKillFeed = new ZKillRedisQ();
+            ZKillFeed = new ZKillR2Z2();
             ZKillFeed.Initialise();
         }
         /// <summary>

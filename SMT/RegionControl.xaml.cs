@@ -1713,7 +1713,7 @@ namespace SMT
 
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
             {
-                foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
+                foreach(EVEData.ZKillR2Z2.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
                 {
                     if(ZKBBaseFeed.Keys.Contains(zs.SystemName))
                     {

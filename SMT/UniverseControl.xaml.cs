@@ -1136,7 +1136,7 @@ namespace SMT
                 // now add the zkill data
                 Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
                 {
-                    foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
+                    foreach(EVEData.ZKillR2Z2.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
                     {
                         if(ZKBBaseFeed.ContainsKey(zs.SystemName))
                         {

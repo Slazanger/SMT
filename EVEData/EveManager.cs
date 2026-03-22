@@ -608,7 +608,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current list of ZKillData
         /// </summary>
-        public ZKillRedisQ ZKillFeed { get; set; }
+        public ZKillR2Z2 ZKillFeed { get; set; }
 
         /// <summary>
         /// Gets or sets the current list of clear markers for the intel (eg "Clear" "Clr" etc)
