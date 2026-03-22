@@ -87,7 +87,7 @@ namespace SMT.EVEData
                     if(seqResponse.IsSuccessStatusCode)
                     {
                         string seqContent = seqResponse.Content.ReadAsStringAsync().Result;
-                        ZKBData.SequenceData seqData = ZKBData.SequenceData.FromJson(seqContent);
+                        EVEData.SequenceData seqData = EVEData.SequenceData.FromJson(seqContent);
                         if(seqData != null)
                         {
                             currentSequence = seqData.Sequence;
@@ -119,7 +119,7 @@ namespace SMT.EVEData
                 else if(response.IsSuccessStatusCode)
                 {
                     string strContent = response.Content.ReadAsStringAsync().Result;
-                    ZKBData.R2Z2Data r2z2Data = ZKBData.R2Z2Data.FromJson(strContent);
+                    EVEData.R2Z2Data r2z2Data = EVEData.R2Z2Data.FromJson(strContent);
 
                     if(r2z2Data != null && r2z2Data.Esi != null && r2z2Data.Esi.Victim != null)
                     {

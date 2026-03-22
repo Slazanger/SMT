@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using EVEStandard.Models.API;
+using SMT.EVEData;
 
 namespace SMT.EVEData
 {
