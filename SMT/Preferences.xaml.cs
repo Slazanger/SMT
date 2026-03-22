@@ -10,7 +10,7 @@ using System.Windows.Data;
 
 //using System.Windows.Forms;
 using NAudio.Wave;
-using SMT.EVEData;
+using EVEData;
 using MessageBox = System.Windows.MessageBox;
 
 namespace SMT
@@ -21,7 +21,7 @@ namespace SMT
     public partial class PreferencesWindow : Window
     {
         public SMT.MapConfig MapConf;
-        public SMT.EVEData.EveManager EM { get; set; }
+        public EVEData.EveManager EM { get; set; }
 
         public List<string> CynoBeaconSystems { get; set; }
 
@@ -53,7 +53,7 @@ namespace SMT
 
             JumpBridgeList.ItemsSource = EveManager.Instance.JumpBridges;
 
-            if(SMT.EVEData.EveManager.CurrentLanguage == "zh-CN")
+            if(EVEData.EveManager.CurrentLanguage == "zh-CN")
             {
                 LanguageComboBox.SelectedIndex = 1;
             }
@@ -480,7 +480,7 @@ namespace SMT
                 }
 
                 // Update app language (static on EveManager; no Instance required)
-                SMT.EVEData.EveManager.CurrentLanguage = langCode;
+                EVEData.EveManager.CurrentLanguage = langCode;
 
                 // Redraw maps so labels use the new language
                 if(MainWindow.AppWindow != null)

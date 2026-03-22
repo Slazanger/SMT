@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using SMT.EVEData;
+using EVEData;
 
 namespace SMT
 {

@@ -2,7 +2,7 @@
 // Fleet
 //-----------------------------------------------------------------------
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// Represents a fleet

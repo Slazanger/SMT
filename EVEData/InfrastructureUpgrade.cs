@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// Represents an Infrastructure Hub Upgrade

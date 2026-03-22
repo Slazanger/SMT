@@ -13,15 +13,15 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
-using EVEDataUtils;
 using EVEStandard;
 using EVEStandard.Enumerations;
 using EVEStandard.Models;
 using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Utils;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     // Auth, migration, load/save, characters from disk
     public partial class EveManager

@@ -5,7 +5,7 @@
 using System.Numerics;
 using System.Xml.Serialization;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// Represents the actual eve system, this may be referenced by multiple regions in the case of either border systems or systems that make sense to be drawn in another region
@@ -65,7 +65,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the an incursion is active in this system
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public bool ActiveIncursion { get; set; }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace SMT.EVEData
         /// </summary>
         public Vector2 Universe { get => new Vector2((float)UniverseX, (float)UniverseY); }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public bool CustomUniverseLayout { get; set; }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace SMT.EVEData
 
         public bool FactionWarSystem { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public bool HasJumpBeacon { get; set; }
 
         /// <summary>
@@ -131,13 +131,13 @@ namespace SMT.EVEData
         /// </summary>
         public long ID { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public float IHubOccupancyLevel { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public DateTime IHubVunerabliltyEnd { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public DateTime IHubVunerabliltyStart { get; set; }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the number of pods killed in the last hour
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public int JumpsLastHour { get; set; }
 
         /// <summary>
@@ -179,25 +179,25 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the delta of NPC Kills in the last hour
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public int NPCKillsDeltaLastHour { get; set; }
 
         /// <summary>
         /// Gets or sets the number of NPC Kills in the last hour
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public int NPCKillsLastHour { get; set; }
 
         /// <summary>
         /// Gets or sets the Faction of the system if owned by an NPC Corp
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public string NPCSOVFaction { get; set; }
 
         /// <summary>
         /// Gets or sets the number of pod kills in the last hour
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public int PodKillsLastHour { get; set; }
 
         public double RadiusAU { get; set; }
@@ -210,34 +210,34 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the number of player ships killed in the last hour
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public int ShipKillsLastHour { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the alliance holding sov in this system
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public int SOVAllianceID { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the corporation holding sov in this system
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public int SOVCorp { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public float TCUOccupancyLevel { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public DateTime TCUVunerabliltyEnd { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public DateTime TCUVunerabliltyStart { get; set; }
 
         /// <summary>
         /// Gets or sets the list of Infrastructure Hub Upgrades for this system
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public List<InfrastructureUpgrade> InfrastructureUpgrades { get; set; }
 
         /// <summary>

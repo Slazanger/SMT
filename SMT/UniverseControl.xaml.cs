@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using SMT.EVEData;
+using EVEData;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
 using FontFamily = System.Windows.Media.FontFamily;

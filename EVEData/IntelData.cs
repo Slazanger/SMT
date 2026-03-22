@@ -4,7 +4,7 @@
 
 using System.ComponentModel;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// Intel Data, Represents a single line of intel data

@@ -13,15 +13,15 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
-using EVEDataUtils;
 using EVEStandard;
 using EVEStandard.Enumerations;
 using EVEStandard.Models;
 using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Utils;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     // Intel and game log watchers
     public partial class EveManager
@@ -519,7 +519,7 @@ namespace SMT.EVEData
 
             try
             {
-                Encoding fe = EVEDataUtils.Misc.GetEncoding(changedFile);
+                Encoding fe = Utils.Misc.GetEncoding(changedFile);
                 FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 StreamReader file = new StreamReader(ifs, fe);

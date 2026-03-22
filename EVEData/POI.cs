@@ -1,4 +1,4 @@
-﻿namespace SMT.EVEData
+﻿namespace EVEData
 {
     /// <summary>
     /// A Point of Interest in the game

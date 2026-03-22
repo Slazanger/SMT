@@ -8,7 +8,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     public partial class SequenceData
     {

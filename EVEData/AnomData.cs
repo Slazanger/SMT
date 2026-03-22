@@ -2,9 +2,10 @@
 // EVE Anom Data
 //-----------------------------------------------------------------------
 
-using EVEDataUtils;
+using Utils;
 
-namespace SMT.EVEData
+
+namespace EVEData
 {
     /// <summary>
     /// The Per system Anom Data

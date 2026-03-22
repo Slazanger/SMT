@@ -2,7 +2,7 @@
 // EVE Anoms
 //-----------------------------------------------------------------------
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// An Signature / Anom

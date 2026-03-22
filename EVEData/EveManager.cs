@@ -13,15 +13,15 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
-using EVEDataUtils;
 using EVEStandard;
 using EVEStandard.Enumerations;
 using EVEStandard.Models;
 using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Utils;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// State for one ESI rate-limit token bucket (e.g. error limit or a rate-limit group).
@@ -285,7 +285,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the character cache
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public SerializableDictionary<string, Character> CharacterCache { get; set; }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets the observable collection of Characters we are tracking (thread-safe for UI binding)
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public ObservableCollection<LocalCharacter> LocalCharacters
         {
             get
@@ -549,7 +549,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the list of Faction warfare systems
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public List<FactionWarfareSystemInfo> FactionWarfareSystems { get; set; }
 
         /// <summary>

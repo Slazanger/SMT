@@ -2,7 +2,7 @@
 // Turnur Connection
 //-----------------------------------------------------------------------
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// Represents a Connection into Turnur (sourced from Eve-Scout)

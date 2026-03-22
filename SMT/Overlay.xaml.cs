@@ -13,9 +13,12 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using SMT.EVEData;
+using EVEData;
 using SMT.Helpers;
-using static SMT.EVEData.Navigation;
+using static EVEData.Navigation;
+using Utils;
+using Vector2f = Utils.csDelaunay.Geom.Vector2f;
+
 
 public static class WindowsServices
 {

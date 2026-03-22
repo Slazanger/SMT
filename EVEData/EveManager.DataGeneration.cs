@@ -13,15 +13,19 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
-using EVEDataUtils;
 using EVEStandard;
 using EVEStandard.Enumerations;
 using EVEStandard.Models;
 using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Utils;
+using Utils.csDelaunay.Geom;
+using Utils.csDelaunay.Delaunay;
+using Utils.nAlpha;
 
-namespace SMT.EVEData
+
+namespace EVEData
 {
     // Data generation (CreateFromScratch)
     public partial class EveManager
@@ -225,7 +229,6 @@ namespace SMT.EVEData
                     if(s != null)
                     {
                         // note : scale the coordinates to Light Year scale as at M double doesnt have enough precision however decimal doesnt
-                        // have the range for the calculations
                         s.ActualX = x / LYScale;
                         s.ActualY = y / LYScale;
                         s.ActualZ = z / LYScale;
@@ -640,13 +643,13 @@ namespace SMT.EVEData
                 Rectf clipRect = new Rectf(-margin, -margin, 1050 + 2 * margin, 800 + 2 * margin);
 
                 // create the voronoi
-                csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, clipRect, 0);
+                Voronoi v = new Voronoi(points, clipRect, 0);
 
                 int i = 0;
                 // extract the points from the graph for each cell
                 foreach(MapSystem ms in mr.MapSystems.Values.ToList())
                 {
-                    csDelaunay.Site s = v.SitesIndexedByLocation[points[i]];
+                    Site s = v.SitesIndexedByLocation[points[i]];
                     i++;
 
                     List<Vector2f> cellList = s.Region(clipRect);
@@ -1133,21 +1136,21 @@ namespace SMT.EVEData
                 mr.RegionX = (mr.RegionX - universeXMin) * universeScale;
                 mr.RegionY = (universeDepth - (mr.RegionY - universeZMin)) * universeScale;
 
-                List<nAlpha.Point> regionShapePL = new List<nAlpha.Point>();
+                List<Utils.nAlpha.Point> regionShapePL = new List<Utils.nAlpha.Point>();
                 foreach(System s in Systems)
                 {
                     if(s.Region == mr.Name)
                     {
-                        nAlpha.Point p = new nAlpha.Point(s.UniverseX, s.UniverseY);
+                        Utils.nAlpha.Point p = new Utils.nAlpha.Point(s.UniverseX, s.UniverseY);
                         regionShapePL.Add(p);
                     }
                 }
 
-                nAlpha.AlphaShapeCalculator shapeCalc = new nAlpha.AlphaShapeCalculator();
+                Utils.nAlpha.AlphaShapeCalculator shapeCalc = new Utils.nAlpha.AlphaShapeCalculator();
                 shapeCalc.Alpha = 1 / (20 * 5.22295244275827E-15);
                 shapeCalc.CloseShape = true;
 
-                nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
+                Utils.nAlpha.Shape ns = shapeCalc.CalculateShape(regionShapePL.ToArray());
 
                 mr.RegionOutline = new List<Vector2>();
 

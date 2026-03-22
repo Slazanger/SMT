@@ -3,9 +3,9 @@
 //-----------------------------------------------------------------------
 
 using System.Numerics;
-using EVEDataUtils;
+using Utils;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// Represents a Map of a Region (will have out of region systems on the map)

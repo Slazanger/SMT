@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:SMT"
-        xmlns:eveData="clr-namespace:SMT.EVEData;assembly=EVEData"
+        xmlns:eveData="clr-namespace:EVEData;assembly=EVEData"
         xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
         xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
         xmlns:xcadl="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using Utils;
 
 namespace SMT
 {
@@ -25,7 +26,7 @@ namespace SMT
             // create the http Server
             listener = new HttpListener();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            string challengeCode = EVEDataUtils.Misc.RandomString(32);
+            string challengeCode = Misc.RandomString(32);
             string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
 
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(esiLogonURL) { UseShellExecute = true });

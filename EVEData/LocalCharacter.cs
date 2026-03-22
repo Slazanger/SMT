@@ -4,7 +4,7 @@ using EVEStandard.Models;
 using EVEStandard.Models.API;
 using EVEStandard.Models.SSO;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     //jumpclones
 
@@ -12,13 +12,13 @@ namespace SMT.EVEData
     {
         public static readonly string SaveVersion = "03";
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public object ActiveRouteLock;
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public SemaphoreSlim UpdateLock;
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public bool warningSystemsNeedsUpdate;
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current active route
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public List<Navigation.RoutePoint> ActiveRoute { get; set; }
 
         public int ActiveRouteLength
@@ -168,7 +168,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the ESI access token
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public string ESIAccessToken { get; set; }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the current fleet info for this character
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public Fleet FleetInfo { get; set; }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace SMT.EVEData
 
         private string m_gameLogWarningText;
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public string GameLogWarningText
         {
             get
@@ -326,10 +326,10 @@ namespace SMT.EVEData
 
         public string WarningState { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public Dictionary<long, long> LabelMap { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public Dictionary<long, string> LabelNames { get; set; }
 
         /// <summary>
@@ -388,7 +388,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the character standings dictionary
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public Dictionary<long, float> Standings { get; set; }
 
         public bool UseAnsiblexGates
@@ -473,25 +473,25 @@ namespace SMT.EVEData
 
         public int DangerZoneRange { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public List<string> WarningSystems { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public Uri PortraitLocation { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public String AlertText { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public bool EdenCommStandingsGood { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public bool TrigStandingsGood { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public List<string> Waypoints { get; set; }
 
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public List<string> JumpWaypoints { get; set; }
 
         /// <summary>
@@ -1220,7 +1220,7 @@ namespace SMT.EVEData
             {
             }
 
-            await EveManager.Instance.ResolveAllianceIDs(AllianceToResolve);
+            EveManager.Instance.ResolveAllianceIDs(AllianceToResolve);
         }
 
         /// <summary>

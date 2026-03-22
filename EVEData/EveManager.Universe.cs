@@ -13,7 +13,6 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
-using EVEDataUtils;
 using EVEStandard;
 using EVEStandard.Enumerations;
 using EVEStandard.Models;
@@ -21,7 +20,10 @@ using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SMT.EVEData
+using Utils;
+
+
+namespace EVEData
 {
     // Universe / map lookups and navigation init
     public partial class EveManager

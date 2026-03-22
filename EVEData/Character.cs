@@ -2,7 +2,7 @@
 // EVE AnomManager
 //-----------------------------------------------------------------------
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// EVE Character

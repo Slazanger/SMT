@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:SMT"
-        xmlns:eveData="clr-namespace:SMT.EVEData;assembly=EVEData"
+        xmlns:eveData="clr-namespace:EVEData;assembly=EVEData"
         mc:Ignorable="d"
         Closed="Window_Closed"
         Loaded="Window_Loaded"

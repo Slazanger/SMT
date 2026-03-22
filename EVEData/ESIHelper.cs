@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Reflection;
 using EVEStandard.Models.API;
-using SMT.EVEData;
+using EVEData;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     public class ESIHelpers
     {

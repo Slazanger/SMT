@@ -1,16 +1,16 @@
-using SMT.EVEData;
+using EVEData;
 
 namespace DataGen
 {
     internal static class Program
     {
 
-        private static SMT.EVEData.EveManager EM { get; set; } = null!; // Use null-forgiving operator
+        private static EVEData.EveManager EM { get; set; } = null!; // Use null-forgiving operator
 
         // Static constructor ensures the static non-nullable property is initialized
         static Program()
         {
-            EM = new(SMT.EVEData.EveAppConfig.SMT_VERSION);
+            EM = new(EVEData.EveAppConfig.SMT_VERSION);
             EveManager.Instance = EM;
         }
 

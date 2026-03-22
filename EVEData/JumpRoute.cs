@@ -1,4 +1,4 @@
-﻿namespace SMT.EVEData
+﻿namespace EVEData
 {
     public class JumpRoute
     {

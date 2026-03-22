@@ -22,8 +22,8 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using NAudio.Wave;
 using NHotkey;
 using NHotkey.Wpf;
-using SMT.EVEData;
-using static SMT.EVEData.ZKillR2Z2;
+using EVEData;
+using static EVEData.ZKillR2Z2;
 
 namespace SMT
 {
@@ -1332,7 +1332,7 @@ namespace SMT
 
         private void UpdateCharacterSelectionBasedOnActiveWindow()
         {
-            string ActiveWindowText = Utils.Misc.GetCaptionOfActiveWindow();
+            string ActiveWindowText = Utils.WindowHelper.GetCaptionOfActiveWindow();
 
             if(ActiveWindowText.Contains("EVE - "))
             {

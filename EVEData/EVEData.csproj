@@ -21,6 +21,11 @@
   <ItemGroup>
     <PackageReference Include="PointyHatGames.EVEStandard" Version="4.0.2" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Utils\Utils\Utils.csproj" />
+  </ItemGroup>
 	<ItemGroup>
 	  <None Update="data\JumpRangeCache.dat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>

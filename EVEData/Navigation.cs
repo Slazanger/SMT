@@ -1,6 +1,7 @@
-﻿using EVEDataUtils;
+﻿using Utils;
 
-namespace SMT.EVEData
+
+namespace EVEData
 {
     public enum RoutingMode
     {

@@ -10,7 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using SMT.EVEData;
+using EVEData;
 using SMT.ResourceUsage;
 
 namespace SMT
@@ -3312,7 +3312,7 @@ namespace SMT
                         characters.Items.Add(miChar);
 
                         // Use zh-CN menu/popup strings when that UI language is active
-                        bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
+                        bool isZH = EVEData.EveManager.CurrentLanguage == "zh-CN";
 
                         // now create the child menu's
                         MenuItem miAutoRange = new MenuItem();
@@ -3447,7 +3447,7 @@ namespace SMT
                 }
 
                 // Use zh-CN popup labels when that UI language is active
-                bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
+                bool isZH = EVEData.EveManager.CurrentLanguage == "zh-CN";
 
                 Label constellation = new Label();
                 constellation.Padding = one;

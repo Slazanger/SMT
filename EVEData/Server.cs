@@ -2,7 +2,7 @@
 using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
 using Timer = System.Timers.Timer;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     public class Server : INotifyPropertyChanged
     {

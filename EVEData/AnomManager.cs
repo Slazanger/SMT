@@ -2,90 +2,87 @@
 // EVE AnomManager
 //-----------------------------------------------------------------------
 
-using System.ComponentModel;
-using EVEDataUtils;
+#region
 
-namespace SMT.EVEData
+using System.ComponentModel;
+using Utils;
+
+#endregion
+
+namespace EVEData;
+
+/// <summary>
+///     Anom Manager
+/// </summary>
+public class AnomManager : INotifyPropertyChanged
 {
     /// <summary>
-    /// Anom Manager
+    ///     The current active System
     /// </summary>
-    public class AnomManager : INotifyPropertyChanged
+    private AnomData activeSystem;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AnomManager" /> class
+    /// </summary>
+    public AnomManager()
     {
-        /// <summary>
-        /// The current active System
-        /// </summary>
-        private AnomData activeSystem;
+        Systems = new SerializableDictionary<string, AnomData>();
+        ActiveSystem = null;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AnomManager" /> class
-        /// </summary>
-        public AnomManager()
+    /// <summary>
+    ///     Gets or sets the current active system
+    /// </summary>
+    public AnomData ActiveSystem
+    {
+        get => activeSystem;
+
+        set
         {
-            Systems = new SerializableDictionary<string, AnomData>();
-            ActiveSystem = null;
+            activeSystem = value;
+            OnPropertyChanged("ActiveSystem");
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the System to AnomData
+    /// </summary>
+    public SerializableDictionary<string, AnomData> Systems { get; set; }
+
+    /// <summary>
+    ///     Property Changed Event
+    /// </summary>
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    /// <summary>
+    ///     Gets the Anom data for the specified system, creates it if it doesn't exist
+    /// </summary>
+    /// <param name="sysName">Name of the System</param>
+    /// <returns>Anom Data</returns>
+    public AnomData GetSystemAnomData(string sysName)
+    {
+        AnomData ret;
+        if (Systems.ContainsKey(sysName))
+        {
+            ret = Systems[sysName];
+        }
+        else
+        {
+            ret = new AnomData();
+            ret.SystemName = sysName;
+            Systems.Add(sysName, ret);
         }
 
-        /// <summary>
-        /// Property Changed Event
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
+        return ret;
+    }
 
-        /// <summary>
-        /// Gets or sets the current active system
-        /// </summary>
-        public AnomData ActiveSystem
-        {
-            get
-            {
-                return activeSystem;
-            }
-
-            set
-            {
-                activeSystem = value;
-                OnPropertyChanged("ActiveSystem");
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the System to AnomData
-        /// </summary>
-        public SerializableDictionary<string, AnomData> Systems { get; set; }
-
-        /// <summary>
-        /// Gets the Anom data for the specified system, creates it if it doesn't exist
-        /// </summary>
-        /// <param name="sysName">Name of the System</param>
-        /// <returns>Anom Data</returns>
-        public AnomData GetSystemAnomData(string sysName)
-        {
-            AnomData ret;
-            if(Systems.ContainsKey(sysName))
-            {
-                ret = Systems[sysName];
-            }
-            else
-            {
-                ret = new AnomData();
-                ret.SystemName = sysName;
-                Systems.Add(sysName, ret);
-            }
-
-            return ret;
-        }
-
-        /// <summary>
-        /// On Property Changed helper
-        /// </summary>
-        /// <param name="name">Name of Property that changed</param>
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if(handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
-        }
+    /// <summary>
+    ///     On Property Changed helper
+    /// </summary>
+    /// <param name="name">Name of Property that changed</param>
+    protected void OnPropertyChanged(string name)
+    {
+        var handler = PropertyChanged;
+        if (handler != null) handler(this, new PropertyChangedEventArgs(name));
     }
 }

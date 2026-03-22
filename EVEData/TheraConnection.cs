@@ -2,7 +2,7 @@
 // Thera Connection
 //-----------------------------------------------------------------------
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// Represents a Connection into Thera (sourced from Eve-Scout)

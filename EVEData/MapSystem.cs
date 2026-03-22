@@ -5,7 +5,7 @@
 using System.Numerics;
 using System.Xml.Serialization;
 
-namespace SMT.EVEData
+namespace EVEData
 {
     /// <summary>
     /// This is a representation of a System on a map.. usually these would be in the same region, however
@@ -22,7 +22,7 @@ namespace SMT.EVEData
         /// <summary>
         ///  Gets or sets the  actual eve system
         /// </summary>
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public System ActualSystem { get; set; }
 
         /// <summary>
