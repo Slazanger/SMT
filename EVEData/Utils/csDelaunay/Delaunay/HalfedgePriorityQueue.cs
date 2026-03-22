@@ -21,7 +21,7 @@
         public void Dispose()
         {
             // Get rid of dummies
-            for (int i = 0; i < hashSize; i++)
+            for(int i = 0; i < hashSize; i++)
             {
                 hash[i].Dispose();
             }
@@ -53,7 +53,7 @@
             minBucked = 0;
             hash = new Halfedge[hashSize];
             // Dummy Halfedge at the top of each hash
-            for (int i = 0; i < hashSize; i++)
+            for(int i = 0; i < hashSize; i++)
             {
                 hash[i] = Halfedge.CreateDummy();
                 hash[i].nextInPriorityQueue = null;
@@ -65,12 +65,12 @@
             Halfedge previous, next;
 
             int insertionBucket = Bucket(halfedge);
-            if (insertionBucket < minBucked)
+            if(insertionBucket < minBucked)
             {
                 minBucked = insertionBucket;
             }
             previous = hash[insertionBucket];
-            while ((next = previous.nextInPriorityQueue) != null &&
+            while((next = previous.nextInPriorityQueue) != null &&
                    (halfedge.ystar > next.ystar || (halfedge.ystar == next.ystar && halfedge.vertex.x > next.vertex.x)))
             {
                 previous = next;
@@ -92,10 +92,10 @@
             Halfedge previous;
             int removalBucket = Bucket(halfedge);
 
-            if (halfedge.vertex != null)
+            if(halfedge.vertex != null)
             {
                 previous = hash[removalBucket];
-                while (previous.nextInPriorityQueue != halfedge)
+                while(previous.nextInPriorityQueue != halfedge)
                 {
                     previous = previous.nextInPriorityQueue;
                 }
@@ -109,7 +109,7 @@
 
         private void AdjustMinBucket()
         {
-            while (minBucked < hashSize - 1 && IsEmpty(minBucked))
+            while(minBucked < hashSize - 1 && IsEmpty(minBucked))
             {
                 minBucked++;
             }
@@ -118,8 +118,8 @@
         private int Bucket(Halfedge halfedge)
         {
             int theBucket = (int)((halfedge.ystar - ymin) / deltaY * hashSize);
-            if (theBucket < 0) theBucket = 0;
-            if (theBucket >= hashSize) theBucket = hashSize - 1;
+            if(theBucket < 0) theBucket = 0;
+            if(theBucket >= hashSize) theBucket = hashSize - 1;
             return theBucket;
         }
 

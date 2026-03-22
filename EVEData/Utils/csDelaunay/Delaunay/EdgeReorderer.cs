@@ -9,7 +9,7 @@
         {
             edges = new List<Edge>();
             edgeOrientations = new List<LR>();
-            if (origEdges.Count > 0)
+            if(origEdges.Count > 0)
             {
                 edges = ReorderEdges(origEdges, criterion);
             }
@@ -35,7 +35,7 @@
             // We're going to reorder the edges in order of traversal
             List<bool> done = new List<bool>();
             int nDone = 0;
-            for (int b = 0; b < n; b++) done.Add(false);
+            for(int b = 0; b < n; b++) done.Add(false);
             List<Edge> newEdges = new List<Edge>();
 
             i = 0;
@@ -44,7 +44,7 @@
             edgeOrientations.Add(LR.LEFT);
             ICoord firstPoint;
             ICoord lastPoint;
-            if (criterion == typeof(Vertex))
+            if(criterion == typeof(Vertex))
             {
                 firstPoint = edge.LeftVertex;
                 lastPoint = edge.RightVertex;
@@ -55,7 +55,7 @@
                 lastPoint = edge.RightSite;
             }
 
-            if (firstPoint == Vertex.VERTEX_AT_INFINITY || lastPoint == Vertex.VERTEX_AT_INFINITY)
+            if(firstPoint == Vertex.VERTEX_AT_INFINITY || lastPoint == Vertex.VERTEX_AT_INFINITY)
             {
                 return new List<Edge>();
             }
@@ -63,18 +63,18 @@
             done[i] = true;
             nDone++;
 
-            while (nDone < n)
+            while(nDone < n)
             {
-                for (i = 1; i < n; i++)
+                for(i = 1; i < n; i++)
                 {
-                    if (done[i])
+                    if(done[i])
                     {
                         continue;
                     }
                     edge = origEdges[i];
                     ICoord leftPoint;
                     ICoord rightPoint;
-                    if (criterion == typeof(Vertex))
+                    if(criterion == typeof(Vertex))
                     {
                         leftPoint = edge.LeftVertex;
                         rightPoint = edge.RightVertex;
@@ -84,39 +84,39 @@
                         leftPoint = edge.LeftSite;
                         rightPoint = edge.RightSite;
                     }
-                    if (leftPoint == Vertex.VERTEX_AT_INFINITY || rightPoint == Vertex.VERTEX_AT_INFINITY)
+                    if(leftPoint == Vertex.VERTEX_AT_INFINITY || rightPoint == Vertex.VERTEX_AT_INFINITY)
                     {
                         return new List<Edge>();
                     }
-                    if (leftPoint == lastPoint)
+                    if(leftPoint == lastPoint)
                     {
                         lastPoint = rightPoint;
                         edgeOrientations.Add(LR.LEFT);
                         newEdges.Add(edge);
                         done[i] = true;
                     }
-                    else if (rightPoint == firstPoint)
+                    else if(rightPoint == firstPoint)
                     {
                         firstPoint = leftPoint;
                         edgeOrientations.Insert(0, LR.LEFT);
                         newEdges.Insert(0, edge);
                         done[i] = true;
                     }
-                    else if (leftPoint == firstPoint)
+                    else if(leftPoint == firstPoint)
                     {
                         firstPoint = rightPoint;
                         edgeOrientations.Insert(0, LR.RIGHT);
                         newEdges.Insert(0, edge);
                         done[i] = true;
                     }
-                    else if (rightPoint == lastPoint)
+                    else if(rightPoint == lastPoint)
                     {
                         lastPoint = leftPoint;
                         edgeOrientations.Add(LR.RIGHT);
                         newEdges.Add(edge);
                         done[i] = true;
                     }
-                    if (done[i])
+                    if(done[i])
                     {
                         nDone++;
                     }

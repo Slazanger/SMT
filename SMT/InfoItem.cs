@@ -41,14 +41,14 @@ namespace SMT
 
         public Shape Draw()
         {
-            if (FillBrush == null)
+            if(FillBrush == null)
             {
                 FillBrush = new SolidColorBrush(Fill);
             }
 
             Shape infoObject = null;
 
-            switch (DrawType)
+            switch(DrawType)
             {
                 case ShapeType.Line:
                     {
@@ -64,7 +64,7 @@ namespace SMT
                         infoLine.Visibility = System.Windows.Visibility.Visible;
                         infoLine.Stroke = FillBrush;
 
-                        if (LineStyle == LineType.Dashed)
+                        if(LineStyle == LineType.Dashed)
                         {
                             DoubleCollection dashes = new DoubleCollection();
                             dashes.Add(1.0);
@@ -73,7 +73,7 @@ namespace SMT
                             infoLine.StrokeDashArray = dashes;
                         }
 
-                        if (LineStyle == LineType.LightDashed)
+                        if(LineStyle == LineType.LightDashed)
                         {
                             DoubleCollection dashes = new DoubleCollection();
                             dashes.Add(1.0);
@@ -102,7 +102,7 @@ namespace SMT
                         infoLine.Visibility = System.Windows.Visibility.Visible;
                         infoLine.Stroke = FillBrush;
 
-                        if (LineStyle == LineType.Dashed)
+                        if(LineStyle == LineType.Dashed)
                         {
                             DoubleCollection dashes = new DoubleCollection();
                             dashes.Add(1.0);
@@ -111,7 +111,7 @@ namespace SMT
                             infoLine.StrokeDashArray = dashes;
                         }
 
-                        if (LineStyle == LineType.LightDashed)
+                        if(LineStyle == LineType.LightDashed)
                         {
                             DoubleCollection dashes = new DoubleCollection();
                             dashes.Add(1.0);

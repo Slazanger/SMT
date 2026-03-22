@@ -1,9 +1,3 @@
-using AvalonDock.Layout;
-using Microsoft.Toolkit.Uwp.Notifications;
-using NAudio.Wave;
-using NHotkey;
-using NHotkey.Wpf;
-using SMT.EVEData;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,6 +17,12 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using AvalonDock.Layout;
+using Microsoft.Toolkit.Uwp.Notifications;
+using NAudio.Wave;
+using NHotkey;
+using NHotkey.Wpf;
+using SMT.EVEData;
 using static SMT.EVEData.ZKillRedisQ;
 
 namespace SMT
@@ -65,12 +65,13 @@ namespace SMT
 
         private IWavePlayer waveOutEvent;
         private AudioFileReader audioFileReader;
+
         public void UpdateTabTitles()
         {
             try
             {
                 // Refresh region map document title
-                if (RegionUC != null && RegionUC.Region != null)
+                if(RegionUC != null && RegionUC.Region != null)
                 {
                     RegionLayoutDoc.Title = RegionUC.Region.LocalizedName;
                 }
@@ -84,14 +85,14 @@ namespace SMT
 
                 // Refresh regions overview document title
                 var regionsDoc = dockManager.Layout.Descendents().OfType<AvalonDock.Layout.LayoutDocument>().FirstOrDefault(d => d.ContentId == "UniverseContentID");
-                if (regionsDoc != null)
+                if(regionsDoc != null)
                 {
                     regionsDoc.Title = Application.Current.TryFindResource("Main_Panel_Regions") as string;
                 }
                 var anchorables = dockManager.Layout.Descendents().OfType<AvalonDock.Layout.LayoutAnchorable>();
-                foreach (var panel in anchorables)
+                foreach(var panel in anchorables)
                 {
-                    switch (panel.ContentId)
+                    switch(panel.ContentId)
                     {
                         case "AnomsContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Anoms") as string; break;
                         case "CharactersContentID": panel.Title = Application.Current.TryFindResource("Main_Panel_Characters") as string; break;
@@ -109,9 +110,10 @@ namespace SMT
             }
             catch { }
         }
-            /// <summary>
-            /// Main Window
-            /// </summary>
+
+        /// <summary>
+        /// Main Window
+        /// </summary>
         public MainWindow()
         {
             AppWindow = this;
@@ -120,7 +122,6 @@ namespace SMT
             this.FontFamily = new FontFamily(new Uri("pack://application:,,,/External/AtkinsonHyperlegible/"), "./#Atkinson Hyperlegible");
 
             Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-
 
             waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
 
@@ -136,7 +137,6 @@ namespace SMT
                 waveOutEvent = new DirectSoundOut();
                 waveOutEvent.Init(audioFileReader);
             }
-
 
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
@@ -203,11 +203,11 @@ namespace SMT
 
             EVEManager = new EVEData.EveManager(EveAppConfig.SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
-            
+
             // Set up UI thread marshaling for ObservableCollection operations
             EVEData.EveManager.UIThreadInvoker = (action) =>
             {
-                if (Application.Current.Dispatcher.CheckAccess())
+                if(Application.Current.Dispatcher.CheckAccess())
                 {
                     action();
                 }
@@ -216,7 +216,7 @@ namespace SMT
                     Application.Current.Dispatcher.Invoke(action);
                 }
             };
-            
+
             EVEManager.EVELogFolder = MapConf.CustomEveLogFolderLocation;
 
             EVEManager.UseESIForCharacterPositions = MapConf.UseESIForCharacterPositions;
@@ -1431,7 +1431,6 @@ namespace SMT
                 flashWindow = true;
             }
 
-
             if(MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
             {
                 if(MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
@@ -1968,7 +1967,6 @@ namespace SMT
             }
         }
 
-
         #endregion ZKillBoard
 
         #region Anoms
@@ -2120,7 +2118,6 @@ namespace SMT
 
         #endregion Anoms
 
-
         private bool sovCampaignFilterByRegion = false;
 
         private void SovCampaignFilterViewChk_Checked(object sender, RoutedEventArgs e)
@@ -2147,8 +2144,6 @@ namespace SMT
 
             return string.Equals(sc.Region, currentRegion, StringComparison.OrdinalIgnoreCase);
         }
-
-
 
         private void Characters_MenuItem_Click(object sender, RoutedEventArgs e)
         {

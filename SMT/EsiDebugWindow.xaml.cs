@@ -40,7 +40,7 @@ namespace SMT
         {
             var snapshot = EveManager.Instance.GetEsiRateLimitBuckets();
             _buckets.Clear();
-            foreach (var b in snapshot)
+            foreach(var b in snapshot)
                 _buckets.Add(b);
             EmptyMessage.Visibility = _buckets.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             RefreshLabel.Text = _buckets.Count == 0 ? "Refreshing every 3 s." : $"Last refresh: {DateTime.Now:HH:mm:ss} (every 3 s)";

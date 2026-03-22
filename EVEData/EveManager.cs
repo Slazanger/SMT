@@ -4,14 +4,12 @@
 
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
@@ -19,7 +17,6 @@ using EVEDataUtils;
 using EVEStandard;
 using EVEStandard.Enumerations;
 using EVEStandard.Models;
-using EVEStandard.Models.API;
 using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -43,7 +40,9 @@ namespace SMT.EVEData
     {
         // App-wide UI language and English→localized string map (loaded from Translation.csv)
         public static string CurrentLanguage { get; set; } = "en-US";
+
         public static Dictionary<string, string> Translations { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>
         /// singleton instance of this class
         /// </summary>
@@ -111,7 +110,6 @@ namespace SMT.EVEData
         private DateTime LastDotlanUpdate = DateTime.MinValue;
         private string LastDotlanETAG = "";
 
-
         /// <summary>
         /// Migrates old settings from previous versions of the application
         /// </summary>
@@ -149,17 +147,13 @@ namespace SMT.EVEData
                     // delete the old settings folder
                     Directory.Delete(oldSettingsFolder, true);
                 }
-
             }
             catch
             {
                 // if we fail to migrate the settings, we just ignore it
                 // this is a one time migration so we don't need to worry about it again
             }
-
-
         }
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EveManager" /> class
@@ -172,7 +166,7 @@ namespace SMT.EVEData
             MigrateOldSettings();
 
             string SaveDataRoot = EveAppConfig.StorageRoot;
-            if (!Directory.Exists(SaveDataRoot))
+            if(!Directory.Exists(SaveDataRoot))
             {
                 Directory.CreateDirectory(SaveDataRoot);
             }
@@ -182,13 +176,13 @@ namespace SMT.EVEData
             SaveDataRootFolder = SaveDataRoot;
 
             SaveDataVersionFolder = EveAppConfig.VersionStorage;
-            if (!Directory.Exists(SaveDataVersionFolder))
+            if(!Directory.Exists(SaveDataVersionFolder))
             {
                 Directory.CreateDirectory(SaveDataVersionFolder);
             }
 
             string characterSaveFolder = Path.Combine(SaveDataRootFolder, "Portraits");
-            if (!Directory.Exists(characterSaveFolder))
+            if(!Directory.Exists(characterSaveFolder))
             {
                 Directory.CreateDirectory(characterSaveFolder);
             }
@@ -211,22 +205,22 @@ namespace SMT.EVEData
             try
             {
                 string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "Translation.csv");
-                if (File.Exists(path))
+                if(File.Exists(path))
                 {
                     // Read as UTF-8 (required for non-ASCII translations)
                     string[] lines = File.ReadAllLines(path, global::System.Text.Encoding.UTF8);
                     int count = 0;
-                    foreach (string line in lines)
+                    foreach(string line in lines)
                     {
-                        if (string.IsNullOrWhiteSpace(line)) continue;
+                        if(string.IsNullOrWhiteSpace(line)) continue;
 
                         string[] parts = line.Split(',');
-                        if (parts.Length >= 2)
+                        if(parts.Length >= 2)
                         {
                             // Strip UTF-8 BOM if present on first column
                             string en = parts[0].Trim().Replace("\uFEFF", "");
                             string zh = parts[1].Trim();
-                            if (!Translations.ContainsKey(en))
+                            if(!Translations.ContainsKey(en))
                             {
                                 Translations.Add(en, zh);
                                 count++;
@@ -240,7 +234,7 @@ namespace SMT.EVEData
                     global::System.Diagnostics.Debug.WriteLine("Translation.csv: file not found: " + path);
                 }
             }
-            catch (global::System.Exception ex)
+            catch(global::System.Exception ex)
             {
                 global::System.Diagnostics.Debug.WriteLine("Translation.csv: read error: " + ex.Message);
             }
@@ -402,9 +396,9 @@ namespace SMT.EVEData
         /// <param name="resetSeconds">Seconds until the window resets (e.g. from X-Esi-Error-Limit-Reset).</param>
         public void UpdateEsiRateLimit(string group, int remain, int resetSeconds)
         {
-            if (string.IsNullOrEmpty(group)) return;
+            if(string.IsNullOrEmpty(group)) return;
             var resetAt = DateTime.UtcNow.AddSeconds(resetSeconds);
-            lock (_esiRateLimitLock)
+            lock(_esiRateLimitLock)
             {
                 _esiRateLimitBuckets[group] = new EsiRateLimitBucketState
                 {
@@ -420,7 +414,7 @@ namespace SMT.EVEData
         /// </summary>
         public List<EsiRateLimitBucketState> GetEsiRateLimitBuckets()
         {
-            lock (_esiRateLimitLock)
+            lock(_esiRateLimitLock)
             {
                 return _esiRateLimitBuckets.Values.Select(b => new EsiRateLimitBucketState
                 {
@@ -450,12 +444,12 @@ namespace SMT.EVEData
         /// Gets the observable collection of Characters we are tracking (thread-safe for UI binding)
         /// </summary>
         [XmlIgnoreAttribute]
-        public ObservableCollection<LocalCharacter> LocalCharacters 
-        { 
-            get 
-            { 
+        public ObservableCollection<LocalCharacter> LocalCharacters
+        {
+            get
+            {
                 return _localCharacters;
-            } 
+            }
         }
 
         /// <summary>
@@ -469,11 +463,11 @@ namespace SMT.EVEData
         public void AddCharacter(LocalCharacter character)
         {
             // Use UI thread invoker if available (set by UI layer)
-            if (UIThreadInvoker != null)
+            if(UIThreadInvoker != null)
             {
                 UIThreadInvoker(() =>
                 {
-                    lock (_localCharactersLock)
+                    lock(_localCharactersLock)
                     {
                         _localCharacters.Add(character);
                     }
@@ -482,12 +476,12 @@ namespace SMT.EVEData
             else
             {
                 // Direct access during initialization or from UI thread
-                lock (_localCharactersLock)
+                lock(_localCharactersLock)
                 {
                     _localCharacters.Add(character);
                 }
             }
-            
+
             // Notify UI - ObservableCollection handles this automatically, but keep for compatibility
             LocalCharacterUpdateEvent?.Invoke();
         }
@@ -498,11 +492,11 @@ namespace SMT.EVEData
         public void RemoveCharacter(LocalCharacter character)
         {
             // Use UI thread invoker if available (set by UI layer)
-            if (UIThreadInvoker != null)
+            if(UIThreadInvoker != null)
             {
                 UIThreadInvoker(() =>
                 {
-                    lock (_localCharactersLock)
+                    lock(_localCharactersLock)
                     {
                         _localCharacters.Remove(character);
                     }
@@ -511,12 +505,12 @@ namespace SMT.EVEData
             else
             {
                 // Direct access during initialization or from UI thread
-                lock (_localCharactersLock)
+                lock(_localCharactersLock)
                 {
                     _localCharacters.Remove(character);
                 }
             }
-            
+
             // Notify UI - ObservableCollection handles this automatically, but keep for compatibility
             LocalCharacterUpdateEvent?.Invoke();
         }
@@ -526,7 +520,7 @@ namespace SMT.EVEData
         /// </summary>
         public List<LocalCharacter> GetLocalCharactersCopy()
         {
-            lock (_localCharactersLock)
+            lock(_localCharactersLock)
             {
                 return new List<LocalCharacter>(_localCharacters);
             }
@@ -537,7 +531,7 @@ namespace SMT.EVEData
         /// </summary>
         public LocalCharacter FindCharacterByName(string characterName)
         {
-            lock (_localCharactersLock)
+            lock(_localCharactersLock)
             {
                 return _localCharacters.FirstOrDefault(c => c.Name == characterName);
             }
@@ -550,7 +544,7 @@ namespace SMT.EVEData
         {
             get
             {
-                lock (_localCharactersLock)
+                lock(_localCharactersLock)
                 {
                     return _localCharacters.Count;
                 }
@@ -562,7 +556,7 @@ namespace SMT.EVEData
         /// </summary>
         public LocalCharacter GetCharacterAt(int index)
         {
-            lock (_localCharactersLock)
+            lock(_localCharactersLock)
             {
                 return index >= 0 && index < _localCharacters.Count ? _localCharacters[index] : null;
             }
@@ -573,15 +567,15 @@ namespace SMT.EVEData
         /// </summary>
         public bool MoveLocalCharacterUp(LocalCharacter character)
         {
-            if (UIThreadInvoker != null)
+            if(UIThreadInvoker != null)
             {
                 bool result = false;
                 UIThreadInvoker(() =>
                 {
-                    lock (_localCharactersLock)
+                    lock(_localCharactersLock)
                     {
                         int index = _localCharacters.IndexOf(character);
-                        if (index > 0)
+                        if(index > 0)
                         {
                             _localCharacters.Move(index, index - 1);
                             result = true;
@@ -592,10 +586,10 @@ namespace SMT.EVEData
             }
             else
             {
-                lock (_localCharactersLock)
+                lock(_localCharactersLock)
                 {
                     int index = _localCharacters.IndexOf(character);
-                    if (index > 0)
+                    if(index > 0)
                     {
                         _localCharacters.Move(index, index - 1);
                         return true;
@@ -610,15 +604,15 @@ namespace SMT.EVEData
         /// </summary>
         public bool MoveLocalCharacterDown(LocalCharacter character)
         {
-            if (UIThreadInvoker != null)
+            if(UIThreadInvoker != null)
             {
                 bool result = false;
                 UIThreadInvoker(() =>
                 {
-                    lock (_localCharactersLock)
+                    lock(_localCharactersLock)
                     {
                         int index = _localCharacters.IndexOf(character);
-                        if (index >= 0 && index < _localCharacters.Count - 1)
+                        if(index >= 0 && index < _localCharacters.Count - 1)
                         {
                             _localCharacters.Move(index, index + 1);
                             result = true;
@@ -629,10 +623,10 @@ namespace SMT.EVEData
             }
             else
             {
-                lock (_localCharactersLock)
+                lock(_localCharactersLock)
                 {
                     int index = _localCharacters.IndexOf(character);
-                    if (index >= 0 && index < _localCharacters.Count - 1)
+                    if(index >= 0 && index < _localCharacters.Count - 1)
                     {
                         _localCharacters.Move(index, index + 1);
                         return true;
@@ -861,8 +855,6 @@ namespace SMT.EVEData
                     x = (float)Math.Round(x, 0);
                     y = (float)Math.Round(y, 0);
 
-
-
                     string name;
                     string region;
 
@@ -1008,7 +1000,6 @@ namespace SMT.EVEData
                     System from = GetEveSystemFromID(fromID);
                     System to = GetEveSystemFromID(toID);
 
-
                     if(from != null && to != null)
                     {
                         if(from.Name == "Zarzakh" || to.Name == "Zarzakh")
@@ -1016,7 +1007,6 @@ namespace SMT.EVEData
                             // zarzakh is now in the jumps file; however we dont want to add the gates for it
                             continue;
                         }
-
 
                         if(!from.Jumps.Contains(to.Name))
                         {
@@ -1424,7 +1414,6 @@ namespace SMT.EVEData
                 }
             }
 
-
             /*DISABLED FOR NOW
 
             // calculate the optimal text offset
@@ -1437,8 +1426,6 @@ namespace SMT.EVEData
                     bool LeftClear = true;
                     bool RightClear = true;
                     float MaxDistance = 60.0f;
-
-                    
 
                     foreach(string sj in msA.ActualSystem.Jumps)
                     {
@@ -1573,7 +1560,6 @@ namespace SMT.EVEData
                     }
                 }
             }
-
 
             */
 
@@ -1731,7 +1717,7 @@ namespace SMT.EVEData
             // until we build a new jsonline parser for the new SDE format manually add the new ships from Catalyst which are
             // the Pioneer,
             // Outrider,
-            // Venture Consortium Issue 
+            // Venture Consortium Issue
             // Pioneer Consortium Issue
             // Odysseus
 
@@ -1740,10 +1726,6 @@ namespace SMT.EVEData
             ShipTypes.Add("89648", "Venture Consortium Issue");
             ShipTypes.Add("89647", "Pioneer Consortium Issue");
             ShipTypes.Add("89607", "Odysseus");
-
-
-
-
 
             // now add the jove systems
             string eveStaticDataJoveObservatories = sourceFolder + @"\data\JoveSystems.csv";
@@ -2034,7 +2016,7 @@ namespace SMT.EVEData
             // Match ESI.NET: code_verifier = base64url(UTF8(challengeCode)), code_challenge = base64url(SHA256(UTF8(code_verifier)))
             string codeVerifier = ToBase64UrlString(Encoding.UTF8.GetBytes(challengeCode));
             byte[] hash;
-            using (var sha256 = SHA256.Create())
+            using(var sha256 = SHA256.Create())
             {
                 hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
             }
@@ -2154,7 +2136,7 @@ namespace SMT.EVEData
         public async void HandleEveAuthSMTUri(Uri uri, string challengeCode)
         {
             var query = HttpUtility.ParseQueryString(uri.Query);
-            if (query["code"] == null)
+            if(query["code"] == null)
                 return;
 
             string code = query["code"];
@@ -2166,7 +2148,7 @@ namespace SMT.EVEData
             try
             {
                 tokenDetails = await Sso.VerifyAuthorizationForPKCEAuthAsync(code, codeVerifier);
-                if (tokenDetails == null || tokenDetails.ExpiresIn <= 0)
+                if(tokenDetails == null || tokenDetails.ExpiresIn <= 0)
                     return;
             }
             catch
@@ -2178,7 +2160,7 @@ namespace SMT.EVEData
             try
             {
                 characterDetails = await Sso.GetCharacterDetailsAsync(tokenDetails.AccessToken);
-                if (characterDetails == null)
+                if(characterDetails == null)
                     return;
             }
             catch
@@ -2187,7 +2169,7 @@ namespace SMT.EVEData
             }
 
             LocalCharacter esiChar = FindCharacterByName(characterDetails.CharacterName);
-            if (esiChar == null)
+            if(esiChar == null)
             {
                 esiChar = new LocalCharacter(characterDetails.CharacterName, string.Empty, string.Empty);
                 AddCharacter(esiChar);
@@ -2331,14 +2313,14 @@ namespace SMT.EVEData
             {
                 var idsLong = UnknownIDs.ConvertAll(i => (long)i);
                 var esra = await EveApiClient.Universe.GetNamesAndCategoriesFromIdsAsync(idsLong);
-                if (ESIHelpers.ValidateESICall(esra))
+                if(ESIHelpers.ValidateESICall(esra))
                 {
-                    foreach (UniverseIdsToNames ri in esra.Model)
+                    foreach(UniverseIdsToNames ri in esra.Model)
                     {
-                        if (ri.Category == "alliance")
+                        if(ri.Category == "alliance")
                         {
                             var esraA = await EveApiClient.Alliance.GetAllianceInfoAsync(ri.Id);
-                            if (ESIHelpers.ValidateESICall(esraA))
+                            if(ESIHelpers.ValidateESICall(esraA))
                             {
                                 AllianceIDToTicker[(int)ri.Id] = esraA.Model.Ticker;
                                 AllianceIDToName[(int)ri.Id] = esraA.Model.Name;
@@ -2384,11 +2366,11 @@ namespace SMT.EVEData
             {
                 var idsLong = UnknownIDs.ConvertAll(i => (long)i);
                 var esra = await EveApiClient.Universe.GetNamesAndCategoriesFromIdsAsync(idsLong);
-                if (ESIHelpers.ValidateESICall(esra))
+                if(ESIHelpers.ValidateESICall(esra))
                 {
-                    foreach (UniverseIdsToNames ri in esra.Model)
+                    foreach(UniverseIdsToNames ri in esra.Model)
                     {
-                        if (ri.Category == "character")
+                        if(ri.Category == "character")
                         {
                             CharacterIDToName[(int)ri.Id] = ri.Name;
                         }
@@ -2953,9 +2935,9 @@ namespace SMT.EVEData
 
                 string debugListofSytems = "";
 
-                if (ESIHelpers.ValidateESICall(esr))
+                if(ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach (FactionWarSystem i in esr.Model)
+                    foreach(FactionWarSystem i in esr.Model)
                     {
                         FactionWarfareSystemInfo fwsi = new FactionWarfareSystemInfo();
                         fwsi.SystemState = FactionWarfareSystemInfo.State.None;
@@ -3122,7 +3104,7 @@ namespace SMT.EVEData
 
             // Auto-load infrastructure upgrades if file exists
             string upgradesFile = Path.Combine(SaveDataRootFolder, "InfrastructureUpgrades.txt");
-            if (File.Exists(upgradesFile))
+            if(File.Exists(upgradesFile))
             {
                 LoadInfrastructureUpgrades(upgradesFile);
             }
@@ -3683,7 +3665,6 @@ namespace SMT.EVEData
             {
                 Thread.CurrentThread.IsBackground = false;
 
-
                 // split the intial requests into 3 for a better initialisation
 
                 foreach(LocalCharacter c in GetLocalCharactersCopy())
@@ -3700,9 +3681,6 @@ namespace SMT.EVEData
                 {
                     await c.UpdateInfoFromESI().ConfigureAwait(true);
                 }
-
-
-
 
                 // loop forever
                 while(BackgroundThreadShouldTerminate == false)
@@ -3828,11 +3806,11 @@ namespace SMT.EVEData
             try
             {
                 var esr = await EveApiClient.Incursion.ListIncursionsAsync();
-                if (ESIHelpers.ValidateESICall(esr))
+                if(ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach (Incursion i in esr.Model)
+                    foreach(Incursion i in esr.Model)
                     {
-                        foreach (long s in i.InfestedSolarSystems ?? new List<long>())
+                        foreach(long s in i.InfestedSolarSystems ?? new List<long>())
                         {
                             EVEData.System sys = GetEveSystemFromID(s);
                             if(sys != null)
@@ -3856,12 +3834,12 @@ namespace SMT.EVEData
             try
             {
                 var esr = await EveApiClient.Universe.GetSystemJumpsAsync();
-                if (ESIHelpers.ValidateESICall(esr))
+                if(ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach (SystemJumps j in esr.Model)
+                    foreach(SystemJumps j in esr.Model)
                     {
                         EVEData.System es = GetEveSystemFromID(j.SystemId);
-                        if (es != null)
+                        if(es != null)
                         {
                             es.JumpsLastHour = (int)j.ShipJumps;
                         }
@@ -3881,12 +3859,12 @@ namespace SMT.EVEData
             try
             {
                 var esr = await EveApiClient.Universe.GetSystemKillsAsync();
-                if (ESIHelpers.ValidateESICall(esr))
+                if(ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach (SystemKills k in esr.Model)
+                    foreach(SystemKills k in esr.Model)
                     {
                         EVEData.System es = GetEveSystemFromID(k.SystemId);
-                        if (es != null)
+                        if(es != null)
                         {
                             es.NPCKillsLastHour = (int)k.NpcKills;
                             es.PodKillsLastHour = (int)k.PodKills;
@@ -3914,9 +3892,9 @@ namespace SMT.EVEData
                 List<int> allianceIDsToResolve = new List<int>();
 
                 var esr = await EveApiClient.Sovereignty.ListSovereigntyCampaignsAsync();
-                if (ESIHelpers.ValidateESICall(esr))
+                if(ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach (SovereigntyCampaign c in esr.Model)
+                    foreach(SovereigntyCampaign c in esr.Model)
                     {
                         SOVCampaign ss = null;
 
@@ -3928,10 +3906,10 @@ namespace SMT.EVEData
                             }
                         }
 
-                        if (ss == null)
+                        if(ss == null)
                         {
                             System sys = GetEveSystemFromID(c.SolarSystemId);
-                            if (sys == null)
+                            if(sys == null)
                             {
                                 continue;
                             }
@@ -3960,7 +3938,7 @@ namespace SMT.EVEData
                             sendUpdateEvent = true;
                         }
 
-                        if (ss.AttackersScore != (c.AttackersScore ?? 0) || ss.DefendersScore != (c.DefenderScore ?? 0))
+                        if(ss.AttackersScore != (c.AttackersScore ?? 0) || ss.DefendersScore != (c.DefenderScore ?? 0))
                         {
                             sendUpdateEvent = true;
                         }
@@ -4076,24 +4054,24 @@ namespace SMT.EVEData
             try
             {
                 var esr = await EveApiClient.Sovereignty.ListSovereigntyStructuresAsync();
-                if (ESIHelpers.ValidateESICall(esr))
+                if(ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach (SovereigntyStructure ss in esr.Model)
+                    foreach(SovereigntyStructure ss in esr.Model)
                     {
                         EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
-                        if (es != null)
+                        if(es != null)
                         {
                             // structures : Old TCU  : 32226, Old iHub : 32458
                             es.SOVAllianceID = (int)ss.AllianceId;
 
-                            if (ss.StructureTypeId == 32226)
+                            if(ss.StructureTypeId == 32226)
                             {
                                 es.TCUVunerabliltyStart = ss.VulnerableStartTime ?? default;
                                 es.TCUVunerabliltyEnd = ss.VulnerableEndTime ?? default;
                                 es.TCUOccupancyLevel = (float)(ss.VulnerabilityOccupancyLevel ?? 0);
                             }
 
-                            if (ss.StructureTypeId == 32458)
+                            if(ss.StructureTypeId == 32458)
                             {
                                 es.IHubVunerabliltyStart = ss.VulnerableStartTime ?? default;
                                 es.IHubVunerabliltyEnd = ss.VulnerableEndTime ?? default;
@@ -4115,7 +4093,7 @@ namespace SMT.EVEData
             {
                 var esr = await EveApiClient.Status.GetStatusAsync();
 
-                if (ESIHelpers.ValidateESICall(esr))
+                if(ESIHelpers.ValidateESICall(esr))
                 {
                     ServerInfo.Name = "Tranquility";
                     ServerInfo.NumPlayers = (int)esr.Model.Players;
@@ -4131,7 +4109,6 @@ namespace SMT.EVEData
             catch { }
         }
 
-
         /// <summary>
         /// Load Infrastructure Hub Upgrades from a text file
         /// Format:
@@ -4143,7 +4120,7 @@ namespace SMT.EVEData
         /// </summary>
         public void LoadInfrastructureUpgrades(string filePath)
         {
-            if (!File.Exists(filePath))
+            if(!File.Exists(filePath))
             {
                 return;
             }
@@ -4153,9 +4130,9 @@ namespace SMT.EVEData
                 string[] lines = File.ReadAllLines(filePath);
                 string currentSystem = null;
 
-                foreach (string line in lines)
+                foreach(string line in lines)
                 {
-                    if (string.IsNullOrWhiteSpace(line))
+                    if(string.IsNullOrWhiteSpace(line))
                     {
                         continue;
                     }
@@ -4165,11 +4142,11 @@ namespace SMT.EVEData
                     // Check if this line starts with a digit (upgrade line)
                     bool isUpgradeLine = char.IsDigit(trimmedLine.FirstOrDefault());
 
-                    if (!isUpgradeLine)
+                    if(!isUpgradeLine)
                     {
                         // This is a system header line
                         // Support both "Sovereignty Hub SYSTEMNAME" and just "SYSTEMNAME"
-                        if (trimmedLine.StartsWith("Sovereignty Hub "))
+                        if(trimmedLine.StartsWith("Sovereignty Hub "))
                         {
                             currentSystem = trimmedLine.Replace("Sovereignty Hub ", "").Trim();
                         }
@@ -4180,25 +4157,25 @@ namespace SMT.EVEData
 
                         // Clear existing upgrades for this system
                         System sys = GetEveSystem(currentSystem);
-                        if (sys != null)
+                        if(sys != null)
                         {
                             sys.InfrastructureUpgrades.Clear();
                         }
                     }
-                    else if (currentSystem != null)
+                    else if(currentSystem != null)
                     {
                         // Parse upgrade line
                         string[] parts = line.Split(new[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                        if (parts.Length >= 3)
+                        if(parts.Length >= 3)
                         {
                             System sys = GetEveSystem(currentSystem);
-                            if (sys != null)
+                            if(sys != null)
                             {
                                 InfrastructureUpgrade upgrade = new InfrastructureUpgrade();
 
                                 // Parse slot number
-                                if (int.TryParse(parts[0], out int slotNum))
+                                if(int.TryParse(parts[0], out int slotNum))
                                 {
                                     upgrade.SlotNumber = slotNum;
                                 }
@@ -4212,7 +4189,7 @@ namespace SMT.EVEData
                                 // Check if second-to-last part is a number (level)
                                 int levelIndex = -1;
                                 int level = 0;
-                                if (parts.Length >= 4 && int.TryParse(parts[parts.Length - 2], out level))
+                                if(parts.Length >= 4 && int.TryParse(parts[parts.Length - 2], out level))
                                 {
                                     upgrade.Level = level;
                                     levelIndex = parts.Length - 2;
@@ -4225,7 +4202,7 @@ namespace SMT.EVEData
 
                                 // Build upgrade name from remaining parts
                                 List<string> nameParts = new List<string>();
-                                for (int i = 1; i < levelIndex; i++)
+                                for(int i = 1; i < levelIndex; i++)
                                 {
                                     nameParts.Add(parts[i]);
                                 }
@@ -4237,7 +4214,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 // Log error if needed
             }
@@ -4252,13 +4229,13 @@ namespace SMT.EVEData
             {
                 List<string> lines = new List<string>();
 
-                foreach (System sys in Systems)
+                foreach(System sys in Systems)
                 {
-                    if (sys.InfrastructureUpgrades.Count > 0)
+                    if(sys.InfrastructureUpgrades.Count > 0)
                     {
                         lines.Add(sys.Name);
 
-                        foreach (InfrastructureUpgrade upgrade in sys.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
+                        foreach(InfrastructureUpgrade upgrade in sys.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
                         {
                             lines.Add(upgrade.ToString());
                         }
@@ -4269,7 +4246,7 @@ namespace SMT.EVEData
 
                 File.WriteAllLines(filePath, lines);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 // Log error if needed
             }
@@ -4281,12 +4258,12 @@ namespace SMT.EVEData
         public void SetInfrastructureUpgrade(string systemName, int slotNumber, string upgradeName, int level, bool isOnline)
         {
             System sys = GetEveSystem(systemName);
-            if (sys != null)
+            if(sys != null)
             {
                 // Check if upgrade already exists in this slot
                 InfrastructureUpgrade existing = sys.InfrastructureUpgrades.FirstOrDefault(u => u.SlotNumber == slotNumber);
 
-                if (existing != null)
+                if(existing != null)
                 {
                     // Update existing
                     existing.UpgradeName = upgradeName;
@@ -4313,10 +4290,10 @@ namespace SMT.EVEData
         public void RemoveInfrastructureUpgrade(string systemName, int slotNumber)
         {
             System sys = GetEveSystem(systemName);
-            if (sys != null)
+            if(sys != null)
             {
                 InfrastructureUpgrade upgrade = sys.InfrastructureUpgrades.FirstOrDefault(u => u.SlotNumber == slotNumber);
-                if (upgrade != null)
+                if(upgrade != null)
                 {
                     sys.InfrastructureUpgrades.Remove(upgrade);
                 }

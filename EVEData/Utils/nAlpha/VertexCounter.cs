@@ -6,7 +6,7 @@ namespace nAlpha
 
         public void IncreaseForIndex(int index)
         {
-            if (!vertexCounts.ContainsKey(index))
+            if(!vertexCounts.ContainsKey(index))
             {
                 vertexCounts.Add(index, 0);
             }

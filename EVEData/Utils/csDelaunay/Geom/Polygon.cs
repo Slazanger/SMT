@@ -17,11 +17,11 @@
         public Winding PolyWinding()
         {
             float signedDoubleArea = SignedDoubleArea();
-            if (signedDoubleArea < 0)
+            if(signedDoubleArea < 0)
             {
                 return Winding.CLOCKWISE;
             }
-            if (signedDoubleArea > 0)
+            if(signedDoubleArea > 0)
             {
                 return Winding.COUNTERCLOCKWISE;
             }
@@ -35,7 +35,7 @@
             Vector2f point, next;
             float signedDoubleArea = 0;
 
-            for (index = 0; index < n; index++)
+            for(index = 0; index < n; index++)
             {
                 nextIndex = (index + 1) % n;
                 point = vertices[index];

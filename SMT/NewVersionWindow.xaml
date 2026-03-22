@@ -22,8 +22,8 @@
                 <Label Content="{Binding ReleaseInfo}" />
                 <Separator />
                 <Label>
-                    <Hyperlink NavigateUri="{Binding ReleaseURL}" RequestNavigate="Hyperlink_RequestNavigate" >
-                        <Run Text="{DynamicResource NewVer_Down}"/>
+                    <Hyperlink NavigateUri="{Binding ReleaseURL}" RequestNavigate="Hyperlink_RequestNavigate">
+                        <Run Text="{DynamicResource NewVer_Down}" />
                     </Hyperlink>
                 </Label>
             </StackPanel>

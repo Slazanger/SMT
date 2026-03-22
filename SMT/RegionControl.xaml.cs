@@ -105,10 +105,12 @@ namespace SMT
 
         // Constant Colours
         private Brush StandingVBadBrush = new SolidColorBrush(Color.FromArgb(110, 148, 5, 5));
+
         private Brush StandingVGoodBrush = new SolidColorBrush(Color.FromArgb(110, 5, 34, 120));
 
         /// <summary>Standing tier colours for map tickers: same semantic tiers as the kill feed, higher luminance for dark map backgrounds.</summary>
         private static readonly SolidColorBrush TickerStandingTerribleBrush;
+
         private static readonly SolidColorBrush TickerStandingBadBrush;
         private static readonly SolidColorBrush TickerStandingGoodBrush;
         private static readonly SolidColorBrush TickerStandingExcellentBrush;
@@ -912,7 +914,7 @@ namespace SMT
                 ReDrawMap(true);
             }), DispatcherPriority.Normal);
 
-            // reset the zoom / export 
+            // reset the zoom / export
             MainZoomControl.ZoomToFill();
 
             // select the item in the dropdown
@@ -2314,8 +2316,6 @@ namespace SMT
 
                 Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
 
-
-
                 var systemSubTextLines = new List<(string Text, Brush Foreground)>();
 
                 // add circle for system
@@ -2471,8 +2471,7 @@ namespace SMT
                 Label sysText = new Label();
                 sysText.Content = mapSystem.LocalizedName;
 
-
-                if (MapConf.ActiveColourScheme.SystemTextSize > 0)
+                if(MapConf.ActiveColourScheme.SystemTextSize > 0)
                 {
                     sysText.FontSize = MapConf.ActiveColourScheme.SystemTextSize;
                 }
@@ -2866,7 +2865,7 @@ namespace SMT
                             jbOutofSystemBlob.Fill = jbOutofSystemBlob.Stroke;
 
                             jbOutofRegionText.Content = $"{to.LocalizedName}\n({to.Region})";
-                            if (MapConf.ActiveColourScheme.SystemSubTextSize > 2)
+                            if(MapConf.ActiveColourScheme.SystemSubTextSize > 2)
                             {
                                 jbOutofRegionText.FontSize = MapConf.ActiveColourScheme.SystemSubTextSize;
                             }
@@ -3351,7 +3350,7 @@ namespace SMT
                         miARJFR.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARJFR);
 
-                        if (!string.IsNullOrEmpty(lc.GameLogWarningText))
+                        if(!string.IsNullOrEmpty(lc.GameLogWarningText))
                         {
                             MenuItem miRemoveWarning = new MenuItem();
                             miRemoveWarning.Header = isZH ? "清除警告" : "Clear Warning";
@@ -3466,7 +3465,7 @@ namespace SMT
 
                 SystemInfoPopupSP.Children.Add(new Separator());
 
-                if (selectedSys.ActualSystem.ShipKillsLastHour != 0)
+                if(selectedSys.ActualSystem.ShipKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
@@ -3476,7 +3475,7 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if (selectedSys.ActualSystem.PodKillsLastHour != 0)
+                if(selectedSys.ActualSystem.PodKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
@@ -3486,7 +3485,7 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if (selectedSys.ActualSystem.NPCKillsLastHour != 0)
+                if(selectedSys.ActualSystem.NPCKillsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
@@ -3496,7 +3495,7 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if (selectedSys.ActualSystem.JumpsLastHour != 0)
+                if(selectedSys.ActualSystem.JumpsLastHour != 0)
                 {
                     Label data = new Label();
                     data.Padding = one;
@@ -3507,7 +3506,7 @@ namespace SMT
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
-                if (ShowJumpBridges)
+                if(ShowJumpBridges)
                 {
                     Point from = new Point();
                     Point to = new Point(); ;
@@ -3574,9 +3573,6 @@ namespace SMT
                         }
                     }
 
-
-
-
                     if(AddJBHighlight)
                     {
                         Line jbHighlight = new Line();
@@ -3635,8 +3631,6 @@ namespace SMT
 
                     foreach(string connection in selectedSys.ActualSystem.Jumps)
                     {
-
-
                         if(Region.MapSystems.ContainsKey(connection))
                         {
                             MapSystem s1 = Region.MapSystems[connection];
@@ -3654,14 +3648,11 @@ namespace SMT
                                 sysLink.Stroke = RegionGateBrush;
                             }
 
-
-
                             sysLink.X1 = selectedSys.Layout.X;
                             sysLink.Y1 = selectedSys.Layout.Y;
 
                             sysLink.X2 = s1.Layout.X;
                             sysLink.Y2 = s1.Layout.Y;
-
 
                             sysLink.StrokeThickness = 4;
 
@@ -3669,8 +3660,6 @@ namespace SMT
                             Canvas.SetZIndex(sysLink, 19);
                             MainCanvas.Children.Add(sysLink);
                         }
-
-
                     }
                 }
 
@@ -3919,8 +3908,6 @@ namespace SMT
             }
             catch { }
         }
-
-
 
         /// <summary>
         /// Dotlan Clicked

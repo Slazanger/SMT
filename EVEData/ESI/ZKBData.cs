@@ -4,7 +4,6 @@
 //
 //    var r2z2Data = R2Z2Data.FromJson(jsonString);
 
-using System;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;

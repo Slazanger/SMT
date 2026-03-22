@@ -2,7 +2,6 @@
 // ZKillboard R2Z2 feed
 //-----------------------------------------------------------------------
 using System.ComponentModel;
-using System.Net.Http;
 using System.Net;
 using Timer = System.Timers.Timer;
 
@@ -81,20 +80,20 @@ namespace SMT.EVEData
                 string userAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS;
                 hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
 
-                if (currentSequence == 0)
+                if(currentSequence == 0)
                 {
                     string seqUrl = "https://r2z2.zkillboard.com/ephemeral/sequence.json";
                     var seqResponse = hc.GetAsync(seqUrl).Result;
-                    if (seqResponse.IsSuccessStatusCode)
+                    if(seqResponse.IsSuccessStatusCode)
                     {
                         string seqContent = seqResponse.Content.ReadAsStringAsync().Result;
                         ZKBData.SequenceData seqData = ZKBData.SequenceData.FromJson(seqContent);
-                        if (seqData != null)
+                        if(seqData != null)
                         {
                             currentSequence = seqData.Sequence;
                         }
                     }
-                    if (currentSequence == 0)
+                    if(currentSequence == 0)
                     {
                         nextPollTime = DateTime.Now.AddSeconds(6);
                         e.Result = 0;
@@ -105,24 +104,24 @@ namespace SMT.EVEData
                 string r2z2Url = $"https://r2z2.zkillboard.com/ephemeral/{currentSequence}.json";
                 var response = hc.GetAsync(r2z2Url).Result;
 
-                if (response.StatusCode == HttpStatusCode.NotFound)
+                if(response.StatusCode == HttpStatusCode.NotFound)
                 {
                     nextPollTime = DateTime.Now.AddSeconds(6);
                     e.Result = 0;
                     return;
                 }
-                else if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                else if(response.StatusCode == HttpStatusCode.TooManyRequests)
                 {
                     nextPollTime = DateTime.Now.AddSeconds(60);
                     e.Result = 0;
                     return;
                 }
-                else if (response.IsSuccessStatusCode)
+                else if(response.IsSuccessStatusCode)
                 {
                     string strContent = response.Content.ReadAsStringAsync().Result;
                     ZKBData.R2Z2Data r2z2Data = ZKBData.R2Z2Data.FromJson(strContent);
 
-                    if (r2z2Data != null && r2z2Data.Esi != null && r2z2Data.Esi.Victim != null)
+                    if(r2z2Data != null && r2z2Data.Esi != null && r2z2Data.Esi.Victim != null)
                     {
                         ZKBDataSimple zs = new ZKBDataSimple();
                         zs.KillID = r2z2Data.KillmailId;

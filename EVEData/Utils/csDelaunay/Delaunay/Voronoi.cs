@@ -37,19 +37,19 @@
 
         public static int CompareByYThenX(Site s1, Site s2)
         {
-            if (s1.y < s2.y) return -1;
-            if (s1.y > s2.y) return 1;
-            if (s1.x < s2.x) return -1;
-            if (s1.x > s2.x) return 1;
+            if(s1.y < s2.y) return -1;
+            if(s1.y > s2.y) return 1;
+            if(s1.x < s2.x) return -1;
+            if(s1.x > s2.x) return 1;
             return 0;
         }
 
         public static int CompareByYThenX(Site s1, Vector2f s2)
         {
-            if (s1.y < s2.y) return -1;
-            if (s1.y > s2.y) return 1;
-            if (s1.x < s2.x) return -1;
-            if (s1.x > s2.x) return 1;
+            if(s1.y < s2.y) return -1;
+            if(s1.y > s2.y) return 1;
+            if(s1.x < s2.x) return -1;
+            if(s1.x > s2.x) return 1;
             return 0;
         }
 
@@ -63,13 +63,13 @@
             sites.Dispose();
             sites = null;
 
-            foreach (Triangle t in triangles)
+            foreach(Triangle t in triangles)
             {
                 t.Dispose();
             }
             triangles.Clear();
 
-            foreach (Edge e in edges)
+            foreach(Edge e in edges)
             {
                 e.Dispose();
             }
@@ -90,7 +90,7 @@
             List<Edge> hullEdges = HullEdges();
 
             List<Vector2f> points = new List<Vector2f>();
-            if (hullEdges.Count == 0)
+            if(hullEdges.Count == 0)
             {
                 return points;
             }
@@ -101,7 +101,7 @@
             reorderer.Dispose();
 
             LR orientation;
-            for (int i = 0; i < hullEdges.Count; i++)
+            for(int i = 0; i < hullEdges.Count; i++)
             {
                 Edge edge = hullEdges[i];
                 orientation = orientations[i];
@@ -113,18 +113,18 @@
         public void LloydRelaxation(int nbIterations)
         {
             // Reapeat the whole process for the number of iterations asked
-            for (int i = 0; i < nbIterations; i++)
+            for(int i = 0; i < nbIterations; i++)
             {
                 List<Vector2f> newPoints = new List<Vector2f>();
                 // Go thourgh all sites
                 sites.ResetListIndex();
                 Site site = sites.Next();
 
-                while (site != null)
+                while(site != null)
                 {
                     // Loop all corners of the site to calculate the centroid
                     List<Vector2f> region = site.Region(plotBounds);
-                    if (region.Count < 1)
+                    if(region.Count < 1)
                     {
                         site = sites.Next();
                         continue;
@@ -138,7 +138,7 @@
                     float y1 = 0;
                     float a = 0;
                     // For all vertices except last
-                    for (int j = 0; j < region.Count - 1; j++)
+                    for(int j = 0; j < region.Count - 1; j++)
                     {
                         x0 = region[j].x;
                         y0 = region[j].y;
@@ -179,10 +179,10 @@
         {
             List<Vector2f> points = new List<Vector2f>();
             Site site;
-            if (sitesIndexedByLocation.TryGetValue(coord, out site))
+            if(sitesIndexedByLocation.TryGetValue(coord, out site))
             {
                 List<Site> sites = site.NeighborSites();
-                foreach (Site neighbor in sites)
+                foreach(Site neighbor in sites)
                 {
                     points.Add(neighbor.Coord);
                 }
@@ -194,7 +194,7 @@
         public List<Vector2f> Region(Vector2f p)
         {
             Site site;
-            if (sitesIndexedByLocation.TryGetValue(p, out site))
+            if(sitesIndexedByLocation.TryGetValue(p, out site))
             {
                 return site.Region(plotBounds);
             }
@@ -234,7 +234,7 @@
 
         private void AddSites(List<Vector2f> points)
         {
-            for (int i = 0; i < points.Count; i++)
+            for(int i = 0; i < points.Count; i++)
             {
                 AddSite(points[i], i);
             }
@@ -260,14 +260,14 @@
             Site bottomMostSite = sites.Next();
             newSite = sites.Next();
 
-            while (true)
+            while(true)
             {
-                if (!heap.Empty())
+                if(!heap.Empty())
                 {
                     newIntStar = heap.Min();
                 }
 
-                if (newSite != null &&
+                if(newSite != null &&
                     (heap.Empty() || CompareByYThenX(newSite, newIntStar) < 0))
                 {
                     // New site is smallest
@@ -294,7 +294,7 @@
                     EdgeList.Insert(lbnd, bisector);
 
                     // First half of Step 11:
-                    if ((vertex = Vertex.Intersect(lbnd, bisector)) != null)
+                    if((vertex = Vertex.Intersect(lbnd, bisector)) != null)
                     {
                         vertices.Add(vertex);
                         heap.Remove(lbnd);
@@ -311,7 +311,7 @@
                     EdgeList.Insert(lbnd, bisector);
 
                     // Second half of Step 11:
-                    if ((vertex = Vertex.Intersect(bisector, rbnd)) != null)
+                    if((vertex = Vertex.Intersect(bisector, rbnd)) != null)
                     {
                         vertices.Add(vertex);
                         bisector.vertex = vertex;
@@ -321,7 +321,7 @@
 
                     newSite = sites.Next();
                 }
-                else if (!heap.Empty())
+                else if(!heap.Empty())
                 {
                     // Intersection is smallest
                     lbnd = heap.ExtractMin();
@@ -342,7 +342,7 @@
                     heap.Remove(rbnd);
                     EdgeList.Remove(rbnd);
                     leftRight = LR.LEFT;
-                    if (bottomSite.y > topSite.y)
+                    if(bottomSite.y > topSite.y)
                     {
                         tempSite = bottomSite;
                         bottomSite = topSite;
@@ -355,7 +355,7 @@
                     halfEdges.Add(bisector);
                     EdgeList.Insert(llbnd, bisector);
                     edge.SetVertex(LR.Other(leftRight), v);
-                    if ((vertex = Vertex.Intersect(llbnd, bisector)) != null)
+                    if((vertex = Vertex.Intersect(llbnd, bisector)) != null)
                     {
                         vertices.Add(vertex);
                         heap.Remove(llbnd);
@@ -363,7 +363,7 @@
                         llbnd.ystar = vertex.y + bottomSite.Dist(vertex);
                         heap.Insert(llbnd);
                     }
-                    if ((vertex = Vertex.Intersect(bisector, rrbnd)) != null)
+                    if((vertex = Vertex.Intersect(bisector, rrbnd)) != null)
                     {
                         vertices.Add(vertex);
                         bisector.vertex = vertex;
@@ -381,19 +381,19 @@
             heap.Dispose();
             edgeList.Dispose();
 
-            foreach (Halfedge halfedge in halfEdges)
+            foreach(Halfedge halfedge in halfEdges)
             {
                 halfedge.ReallyDispose();
             }
             halfEdges.Clear();
 
             // we need the vertices to clip the edges
-            foreach (Edge e in edges)
+            foreach(Edge e in edges)
             {
                 e.ClipVertices(plotBounds);
             }
             // But we don't actually ever use them again!
-            foreach (Vertex ve in vertices)
+            foreach(Vertex ve in vertices)
             {
                 ve.Dispose();
             }
@@ -424,7 +424,7 @@
         private static Site LeftRegion(Halfedge he, Site bottomMostSite)
         {
             Edge edge = he.edge;
-            if (edge == null)
+            if(edge == null)
             {
                 return bottomMostSite;
             }
@@ -434,7 +434,7 @@
         private static Site RightRegion(Halfedge he, Site bottomMostSite)
         {
             Edge edge = he.edge;
-            if (edge == null)
+            if(edge == null)
             {
                 return bottomMostSite;
             }

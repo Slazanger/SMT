@@ -35,7 +35,7 @@ namespace SMT
                 listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);
                 listener.Start();
 
-                while (!serverDone)
+                while(!serverDone)
                 {
                     Console.WriteLine("Listening...");
 
@@ -69,7 +69,7 @@ namespace SMT
             {
                 serverDone = true;
 
-                if (listener != null && listener.IsListening)
+                if(listener != null && listener.IsListening)
                 {
                     listener.Stop();
                 }

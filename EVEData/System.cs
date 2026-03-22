@@ -163,9 +163,9 @@ namespace SMT.EVEData
         {
             get
             {
-                if (EveManager.CurrentLanguage == "zh-CN")
+                if(EveManager.CurrentLanguage == "zh-CN")
                 {
-                    if (EveManager.Translations.ContainsKey(Name))
+                    if(EveManager.Translations.ContainsKey(Name))
                     {
                         return EveManager.Translations[Name];
                     }
@@ -175,6 +175,7 @@ namespace SMT.EVEData
                 return Name;
             }
         }
+
         /// <summary>
         /// Gets or sets the delta of NPC Kills in the last hour
         /// </summary>
@@ -248,12 +249,12 @@ namespace SMT.EVEData
         {
             get
             {
-                if (TrueSec >= 0.45)
+                if(TrueSec >= 0.45)
                 {
                     return "High Sec";
                 }
 
-                if (TrueSec > 0.0 && TrueSec < 0.45)
+                if(TrueSec > 0.0 && TrueSec < 0.45)
                 {
                     return "Low Sec";
                 }
@@ -266,6 +267,5 @@ namespace SMT.EVEData
         {
             return LocalizedName;
         }
-
     }
 }

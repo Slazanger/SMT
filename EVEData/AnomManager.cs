@@ -61,7 +61,7 @@ namespace SMT.EVEData
         public AnomData GetSystemAnomData(string sysName)
         {
             AnomData ret;
-            if (Systems.ContainsKey(sysName))
+            if(Systems.ContainsKey(sysName))
             {
                 ret = Systems[sysName];
             }
@@ -82,7 +82,7 @@ namespace SMT.EVEData
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(name));
             }

@@ -19,7 +19,7 @@ public class ElementPool<T> where T : UIElement, new()
     /// <returns>An element of the desired type.</returns>
     public T Get()
     {
-        if (_pool.Count > 0)
+        if(_pool.Count > 0)
         {
             T item = _pool.Pop();
             item.Visibility = Visibility.Visible;
@@ -37,9 +37,9 @@ public class ElementPool<T> where T : UIElement, new()
     /// <param name="item"></param>
     public void Release(Canvas canvas, T item)
     {
-        if (item == null) return;
+        if(item == null) return;
         item.Visibility = Visibility.Collapsed;
-        if (canvas.Children.Contains(item))
+        if(canvas.Children.Contains(item))
         {
             canvas.Children.Remove(item);
         }

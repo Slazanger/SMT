@@ -76,7 +76,7 @@ namespace SMT
 
         public static void SetPlacement(IntPtr windowHandle, string placementXml)
         {
-            if (string.IsNullOrEmpty(placementXml))
+            if(string.IsNullOrEmpty(placementXml))
             {
                 return;
             }
@@ -86,7 +86,7 @@ namespace SMT
 
             try
             {
-                using (MemoryStream memoryStream = new MemoryStream(xmlBytes))
+                using(MemoryStream memoryStream = new MemoryStream(xmlBytes))
                 {
                     placement = (WINDOWPLACEMENT)serializer.Deserialize(memoryStream);
                 }
@@ -96,7 +96,7 @@ namespace SMT
                 placement.showCmd = (placement.showCmd == SW_SHOWMINIMIZED ? SW_SHOWNORMAL : placement.showCmd);
                 SetWindowPlacement(windowHandle, ref placement);
             }
-            catch (InvalidOperationException)
+            catch(InvalidOperationException)
             {
                 // Parsing placement XML failed. Fail silently.
             }
@@ -107,9 +107,9 @@ namespace SMT
             WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
             GetWindowPlacement(windowHandle, out placement);
 
-            using (MemoryStream memoryStream = new MemoryStream())
+            using(MemoryStream memoryStream = new MemoryStream())
             {
-                using (XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8))
+                using(XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8))
                 {
                     serializer.Serialize(xmlTextWriter, placement);
                     byte[] xmlBytes = memoryStream.ToArray();

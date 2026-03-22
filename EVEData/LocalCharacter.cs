@@ -8,7 +8,7 @@ namespace SMT.EVEData
 {
     //jumpclones
 
-    public class LocalCharacter : Character, INotifyPropertyChanged 
+    public class LocalCharacter : Character, INotifyPropertyChanged
     {
         public static readonly string SaveVersion = "03";
 
@@ -201,7 +201,7 @@ namespace SMT.EVEData
         /// </summary>
         public AuthDTO GetAuthDTO()
         {
-            if (!ESILinked || ID == 0 || string.IsNullOrEmpty(ESIAccessToken))
+            if(!ESILinked || ID == 0 || string.IsNullOrEmpty(ESIAccessToken))
                 return null;
             var expiry = ESIAccessTokenExpiry.Kind == DateTimeKind.Utc ? ESIAccessTokenExpiry : ESIAccessTokenExpiry.ToUniversalTime();
             return new AuthDTO
@@ -310,7 +310,7 @@ namespace SMT.EVEData
             set
             {
                 m_gameLogWarningText = value;
-                if (string.IsNullOrEmpty(value))
+                if(string.IsNullOrEmpty(value))
                 {
                     WarningState = "";
                 }
@@ -349,7 +349,7 @@ namespace SMT.EVEData
 
             set
             {
-                if (location == value)
+                if(location == value)
                 {
                     return;
                 }
@@ -372,7 +372,7 @@ namespace SMT.EVEData
             }
             set
             {
-                if (m_NavigationMode == value)
+                if(m_NavigationMode == value)
                 {
                     return;
                 }
@@ -399,7 +399,7 @@ namespace SMT.EVEData
             }
             set
             {
-                if (m_UseAnsiblexGates == value)
+                if(m_UseAnsiblexGates == value)
                 {
                     return;
                 }
@@ -419,7 +419,7 @@ namespace SMT.EVEData
             }
             set
             {
-                if (m_UseTheraRouting == value)
+                if(m_UseTheraRouting == value)
                 {
                     return;
                 }
@@ -439,7 +439,7 @@ namespace SMT.EVEData
             }
             set
             {
-                if (m_UseZarzakhRouting == value)
+                if(m_UseZarzakhRouting == value)
                 {
                     return;
                 }
@@ -459,7 +459,7 @@ namespace SMT.EVEData
             }
             set
             {
-                if (m_UseTurnurRouting == value)
+                if(m_UseTurnurRouting == value)
                 {
                     return;
                 }
@@ -501,9 +501,9 @@ namespace SMT.EVEData
         /// <param name="clear">Clear all waypoints before setting?</param>
         public void AddDestination(long systemID, bool clear)
         {
-            lock (ActiveRouteLock)
+            lock(ActiveRouteLock)
             {
-                if (clear)
+                if(clear)
                 {
                     Waypoints.Clear();
                     ActiveRoute.Clear();
@@ -519,7 +519,7 @@ namespace SMT.EVEData
 
         public void ClearAllWaypoints()
         {
-            lock (ActiveRouteLock)
+            lock(ActiveRouteLock)
             {
                 ActiveRoute.Clear();
                 ActiveRouteLength = 0;
@@ -533,13 +533,13 @@ namespace SMT.EVEData
         {
             List<JumpBridge> jbl = new List<JumpBridge>();
 
-            if (!ESILinked)
+            if(!ESILinked)
                 return jbl;
 
             await UpdateLock.WaitAsync();
             {
                 AuthDTO auth = GetAuthDTO();
-                if (auth == null)
+                if(auth == null)
                 {
                     UpdateLock.Release();
                     return jbl;
@@ -548,22 +548,22 @@ namespace SMT.EVEData
                 try
                 {
                     var esr = await EveManager.Instance.EveApiClient.Search.SearchCharacterAsync(auth, new List<string> { "structure" }, JumpBridgeFilterString);
-                    if (!ESIHelpers.ValidateESICall(esr) || esr.Model == null)
+                    if(!ESIHelpers.ValidateESICall(esr) || esr.Model == null)
                     {
                         UpdateLock.Release();
                         return jbl;
                     }
 
                     List<long> structureIds = esr.Model.Structure ?? new List<long>();
-                    foreach (long stationID in structureIds)
+                    foreach(long stationID in structureIds)
                     {
                         var esrs = await EveManager.Instance.EveApiClient.Universe.GetStructureInfoAsync(auth, stationID);
-                        if (ESIHelpers.ValidateESICall(esrs) && esrs.Model != null)
+                        if(ESIHelpers.ValidateESICall(esrs) && esrs.Model != null)
                         {
-                            if (esrs.Model.TypeId == 35841)
+                            if(esrs.Model.TypeId == 35841)
                             {
                                 string[] parts = (esrs.Model.Name ?? string.Empty).Split(' ');
-                                if (parts.Length >= 3)
+                                if(parts.Length >= 3)
                                 {
                                     string from = parts[0];
                                     string to = parts[2];
@@ -588,26 +588,26 @@ namespace SMT.EVEData
         {
             string ClipboardText = "Waypoints\n==============\n";
 
-            lock (ActiveRouteLock)
+            lock(ActiveRouteLock)
             {
-                foreach (Navigation.RoutePoint rp in ActiveRoute)
+                foreach(Navigation.RoutePoint rp in ActiveRoute)
                 {
                     string WayPointText = string.Empty;
                     long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
                     // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                    if (rp.GateToTake == Navigation.GateType.Ansiblex)
+                    if(rp.GateToTake == Navigation.GateType.Ansiblex)
                     {
                         bool isSystemLink = true;
 
-                        if (rp.GateToTake == Navigation.GateType.Ansiblex)
+                        if(rp.GateToTake == Navigation.GateType.Ansiblex)
                         {
                             string GateDesto = string.Empty;
 
-                            foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
+                            foreach(JumpBridge jb in EveManager.Instance.JumpBridges)
                             {
-                                if (jb.From == rp.SystemName)
+                                if(jb.From == rp.SystemName)
                                 {
-                                    if (jb.FromID != 0)
+                                    if(jb.FromID != 0)
                                     {
                                         wayPointSysID = jb.FromID;
                                         isSystemLink = false;
@@ -617,9 +617,9 @@ namespace SMT.EVEData
                                     break;
                                 }
 
-                                if (jb.To == rp.SystemName)
+                                if(jb.To == rp.SystemName)
                                 {
-                                    if (jb.ToID != 0)
+                                    if(jb.ToID != 0)
                                     {
                                         wayPointSysID = jb.ToID;
                                         isSystemLink = false;
@@ -630,7 +630,7 @@ namespace SMT.EVEData
                                 }
                             }
 
-                            if (isSystemLink)
+                            if(isSystemLink)
                             {
                                 WayPointText = "Ansiblex: <url=showinfo:5//" + wayPointSysID + ">" + rp.SystemName + " » " + GateDesto + " </url>\n";
                             }
@@ -641,7 +641,7 @@ namespace SMT.EVEData
                         }
                     }
 
-                    if (Waypoints.Contains(rp.SystemName))
+                    if(Waypoints.Contains(rp.SystemName))
                     {
                         // regular waypoint
                         wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
@@ -668,15 +668,13 @@ namespace SMT.EVEData
         public override string ToString()
         {
             string toStr = Name;
-            if (ESILinked)
+            if(ESILinked)
             {
                 toStr += " (ESI)";
             }
 
             return toStr;
         }
-        
-        
 
         /// <summary>
         /// Update the Character info
@@ -685,16 +683,15 @@ namespace SMT.EVEData
         {
             await UpdateLock.WaitAsync();
             {
-
                 TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
-                if (ts.Minutes < 1)
+                if(ts.Minutes < 1)
                 {
                     await RefreshAccessToken().ConfigureAwait(false);
                     await UpdateInfoFromESI().ConfigureAwait(false);
                 }
 
                 // if we're forcing ESI for our location OR we havent had one yet (due to timeout errors with the location endpoint)
-                if (EveManager.Instance.UseESIForCharacterPositions || string.IsNullOrEmpty(Location))
+                if(EveManager.Instance.UseESIForCharacterPositions || string.IsNullOrEmpty(Location))
                 {
                     await UpdatePositionFromESI().ConfigureAwait(false);
                 }
@@ -708,19 +705,18 @@ namespace SMT.EVEData
 
                 m_updateTick = !m_updateTick;
 
-
-                if (routeNeedsUpdate)
+                if(routeNeedsUpdate)
                 {
                     routeNeedsUpdate = false;
                     UpdateActiveRoute();
 
-                    if (RouteUpdatedEvent != null)
+                    if(RouteUpdatedEvent != null)
                     {
                         RouteUpdatedEvent();
                     }
                 }
 
-                if (warningSystemsNeedsUpdate)
+                if(warningSystemsNeedsUpdate)
                 {
                     warningSystemsNeedsUpdate = false;
                     UpdateWarningSystems();
@@ -732,7 +728,7 @@ namespace SMT.EVEData
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(name));
             }
@@ -743,7 +739,7 @@ namespace SMT.EVEData
         /// </summary>
         public async Task RefreshAccessToken()
         {
-            if (String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
+            if(String.IsNullOrEmpty(ESIRefreshToken) || !ESILinked)
             {
                 return;
             }
@@ -751,11 +747,11 @@ namespace SMT.EVEData
             try
             {
                 AccessTokenDetails tokenDetails = await EveManager.Instance.Sso.GetNewPKCEAccessAndRefreshTokenAsync(ESIRefreshToken);
-                if (tokenDetails == null || string.IsNullOrEmpty(tokenDetails.AccessToken))
+                if(tokenDetails == null || string.IsNullOrEmpty(tokenDetails.AccessToken))
                 {
                     ssoErrorCount++;
                     Thread.Sleep(20000);
-                    if (ssoErrorCount > 50)
+                    if(ssoErrorCount > 50)
                     {
                         ESIRefreshToken = "";
                         ESILinked = false;
@@ -764,7 +760,7 @@ namespace SMT.EVEData
                 }
 
                 CharacterDetails characterDetails = await EveManager.Instance.Sso.GetCharacterDetailsAsync(tokenDetails.AccessToken);
-                if (characterDetails == null)
+                if(characterDetails == null)
                 {
                     return;
                 }
@@ -775,10 +771,10 @@ namespace SMT.EVEData
                 ESILinked = true;
                 ESIScopesStored = characterDetails.Scopes != null ? string.Join(" ", characterDetails.Scopes) : string.Empty;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 // expired token
-                if (ex.HResult == -2147024809)
+                if(ex.HResult == -2147024809)
                 {
                     ESIRefreshToken = "";
                     ESILinked = false;
@@ -791,16 +787,16 @@ namespace SMT.EVEData
         /// </summary>
         private async void UpdateActiveRoute()
         {
-            if (esiSendRouteClear)
+            if(esiSendRouteClear)
             {
                 esiSendRouteClear = false;
                 esiRouteNeedsUpdate = false;
 
                 System s = EveManager.Instance.GetEveSystem(Location);
-                if (s != null)
+                if(s != null)
                 {
                     AuthDTO auth = GetAuthDTO();
-                    if (auth != null)
+                    if(auth != null)
                     {
                         try
                         {
@@ -812,7 +808,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            if (Waypoints.Count == 0)
+            if(Waypoints.Count == 0)
             {
                 return;
             }
@@ -824,7 +820,7 @@ namespace SMT.EVEData
 
                 // grab the simple list of thera connections
                 List<string> currentActiveTheraConnections = new List<string>();
-                foreach (TheraConnection tc in EveManager.Instance.TheraConnections.ToList())
+                foreach(TheraConnection tc in EveManager.Instance.TheraConnections.ToList())
                 {
                     currentActiveTheraConnections.Add(tc.System);
                 }
@@ -832,15 +828,15 @@ namespace SMT.EVEData
 
                 // grab the simple list of turnur connections
                 List<string> currentActiveTurnurConnections = new List<string>();
-                foreach (TurnurConnection tc in EveManager.Instance.TurnurConnections.ToList())
+                foreach(TurnurConnection tc in EveManager.Instance.TurnurConnections.ToList())
                 {
                     currentActiveTurnurConnections.Add(tc.System);
                 }
                 Navigation.UpdateTurnurConnections(currentActiveTurnurConnections);
 
-                lock (ActiveRouteLock)
+                lock(ActiveRouteLock)
                 {
-                    if (Location == Waypoints[0])
+                    if(Location == Waypoints[0])
                     {
                         Waypoints.RemoveAt(0);
                     }
@@ -849,18 +845,18 @@ namespace SMT.EVEData
                 ActiveRoute.Clear();
 
                 // loop through all the waypoints
-                for (int i = 0; i < Waypoints.Count; i++)
+                for(int i = 0; i < Waypoints.Count; i++)
                 {
                     start = end;
                     end = Waypoints[i];
 
                     List<Navigation.RoutePoint> sysList = Navigation.Navigate(start, end, UseAnsiblexGates, UseTheraRouting, UseZarzakhRouting, UseTurnurRouting, NavigationMode);
 
-                    if (sysList != null)
+                    if(sysList != null)
                     {
-                        lock (ActiveRouteLock)
+                        lock(ActiveRouteLock)
                         {
-                            foreach (Navigation.RoutePoint s in sysList)
+                            foreach(Navigation.RoutePoint s in sysList)
                             {
                                 ActiveRoute.Add(s);
                             }
@@ -871,19 +867,19 @@ namespace SMT.EVEData
                 ActiveRouteLength = ActiveRoute.Count;
             }
 
-            if (esiRouteNeedsUpdate && !esiRouteUpdating)
+            if(esiRouteNeedsUpdate && !esiRouteUpdating)
             {
                 esiRouteNeedsUpdate = false;
                 esiRouteUpdating = true;
 
                 List<long> WayPointsToAdd = new List<long>();
 
-                lock (ActiveRouteLock)
+                lock(ActiveRouteLock)
                 {
-                    foreach (Navigation.RoutePoint rp in ActiveRoute)
+                    foreach(Navigation.RoutePoint rp in ActiveRoute)
                     {
                         // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                        if (
+                        if(
                                 rp.GateToTake == Navigation.GateType.Ansiblex ||
                                 rp.GateToTake == Navigation.GateType.Thera ||
                                 rp.GateToTake == Navigation.GateType.Turnur ||
@@ -893,22 +889,22 @@ namespace SMT.EVEData
                         {
                             long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
 
-                            if (rp.GateToTake == Navigation.GateType.Ansiblex)
+                            if(rp.GateToTake == Navigation.GateType.Ansiblex)
                             {
-                                foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
+                                foreach(JumpBridge jb in EveManager.Instance.JumpBridges)
                                 {
-                                    if (jb.From == rp.SystemName)
+                                    if(jb.From == rp.SystemName)
                                     {
-                                        if (jb.FromID != 0)
+                                        if(jb.FromID != 0)
                                         {
                                             wayPointSysID = jb.FromID;
                                         }
                                         break;
                                     }
 
-                                    if (jb.To == rp.SystemName)
+                                    if(jb.To == rp.SystemName)
                                     {
-                                        if (jb.ToID != 0)
+                                        if(jb.ToID != 0)
                                         {
                                             wayPointSysID = jb.ToID;
                                         }
@@ -924,9 +920,9 @@ namespace SMT.EVEData
                 bool firstRoute = true;
 
                 AuthDTO auth = GetAuthDTO();
-                if (auth != null)
+                if(auth != null)
                 {
-                    foreach (long SysID in WayPointsToAdd)
+                    foreach(long SysID in WayPointsToAdd)
                     {
                         try
                         {
@@ -948,7 +944,7 @@ namespace SMT.EVEData
         private async Task UpdateFleetInfo()
         {
             AuthDTO auth = GetAuthDTO();
-            if (auth == null || ID == 0 || !ESILinked)
+            if(auth == null || ID == 0 || !ESILinked)
             {
                 return;
             }
@@ -957,12 +953,12 @@ namespace SMT.EVEData
             {
                 bool sendFleetUpdatedEvent = false;
 
-                if (FleetInfo.NextFleetMembershipCheck < DateTime.Now)
+                if(FleetInfo.NextFleetMembershipCheck < DateTime.Now)
                 {
                     FleetInfo.NextFleetMembershipCheck = DateTime.Now + TimeSpan.FromSeconds(240);
 
                     var esr = await EveManager.Instance.EveApiClient.Fleets.GetCharacterFleetInfoAsync(auth);
-                    if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
+                    if(ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                     {
                         FleetInfo.FleetID = esr.Model.FleetId;
                         FleetInfo.IsFleetBoss = esr.Model.Role == "fleet_commander";
@@ -975,32 +971,32 @@ namespace SMT.EVEData
                     }
                 }
 
-                if (FleetInfo.FleetID != 0 && FleetInfo.IsFleetBoss)
+                if(FleetInfo.FleetID != 0 && FleetInfo.IsFleetBoss)
                 {
                     List<int> characterIDsToResolve = new List<int>();
 
                     var esrf = await EveManager.Instance.EveApiClient.Fleets.GetFleetMembersAsync(auth, FleetInfo.FleetID);
-                    if (ESIHelpers.ValidateESICall(esrf) && esrf.Model != null)
+                    if(ESIHelpers.ValidateESICall(esrf) && esrf.Model != null)
                     {
-                        foreach (Fleet.FleetMember ff in FleetInfo.Members)
+                        foreach(Fleet.FleetMember ff in FleetInfo.Members)
                         {
                             ff.IsValid = false;
                         }
 
-                        foreach (FleetMember esifm in esrf.Model)
+                        foreach(FleetMember esifm in esrf.Model)
                         {
                             Fleet.FleetMember fm = null;
 
-                            foreach (Fleet.FleetMember ff in FleetInfo.Members)
+                            foreach(Fleet.FleetMember ff in FleetInfo.Members)
                             {
-                                if (ff.CharacterID == esifm.CharacterId)
+                                if(ff.CharacterID == esifm.CharacterId)
                                 {
                                     fm = ff;
                                     fm.IsValid = true;
                                 }
                             }
 
-                            if (fm == null)
+                            if(fm == null)
                             {
                                 fm = new Fleet.FleetMember();
                                 fm.IsValid = true;
@@ -1014,7 +1010,7 @@ namespace SMT.EVEData
 
                             fm.CharacterID = (int)esifm.CharacterId;
 
-                            if (es == null)
+                            if(es == null)
                             {
                                 fm.Location = "";
                                 fm.Region = "";
@@ -1024,7 +1020,7 @@ namespace SMT.EVEData
                                 fm.Location = es.Name;
                                 fm.Region = es.Region;
                             }
-                            if (EveManager.Instance.ShipTypes.ContainsKey(esifm.ShipTypeId.ToString()))
+                            if(EveManager.Instance.ShipTypes.ContainsKey(esifm.ShipTypeId.ToString()))
                             {
                                 fm.ShipType = EveManager.Instance.ShipTypes[esifm.ShipTypeId.ToString()];
                             }
@@ -1033,20 +1029,20 @@ namespace SMT.EVEData
                                 fm.ShipType = "Unknown : " + esifm.ShipTypeId.ToString();
                             }
 
-                            if (String.IsNullOrEmpty(fm.Name))
+                            if(String.IsNullOrEmpty(fm.Name))
                             {
                                 characterIDsToResolve.Add((int)esifm.CharacterId);
                             }
                         }
 
-                        if (characterIDsToResolve.Count > 0)
+                        if(characterIDsToResolve.Count > 0)
                         {
                             EveManager.Instance.ResolveCharacterIDs(characterIDsToResolve).Wait();
                         }
 
-                        foreach (Fleet.FleetMember ff in FleetInfo.Members.ToList())
+                        foreach(Fleet.FleetMember ff in FleetInfo.Members.ToList())
                         {
-                            if (!ff.IsValid)
+                            if(!ff.IsValid)
                             {
                                 FleetInfo.Members.Remove(ff);
                                 sendFleetUpdatedEvent = true;
@@ -1064,9 +1060,9 @@ namespace SMT.EVEData
                     }
                 }
 
-                if (sendFleetUpdatedEvent)
+                if(sendFleetUpdatedEvent)
                 {
-                    if (FleetUpdatedEvent != null)
+                    if(FleetUpdatedEvent != null)
                     {
                         FleetUpdatedEvent(this);
                     }
@@ -1081,9 +1077,9 @@ namespace SMT.EVEData
         public async Task UpdateInfoFromESI()
         {
             AuthDTO auth = GetAuthDTO();
-            if (auth == null || ID == 0 || !ESILinked)
+            if(auth == null || ID == 0 || !ESILinked)
             {
-                if (ESILinked)
+                if(ESILinked)
                 {
                     ESIAccessTokenExpiry = DateTime.Now;
                 }
@@ -1095,28 +1091,28 @@ namespace SMT.EVEData
             try
             {
                 var esr = await EveManager.Instance.EveApiClient.Character.GetCharacterPublicInfoAsync(ID);
-                if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
+                if(ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                 {
                     CorporationID = (int)esr.Model.CorporationId;
                     AllianceID = esr.Model.AllianceId ?? 0;
                 }
 
-                if (Standings.Count == 0)
+                if(Standings.Count == 0)
                 {
-                    if (AllianceID != 0)
+                    if(AllianceID != 0)
                     {
                         int page = 1;
                         int maxPageCount = 1;
                         do
                         {
                             var esrAlliance = await EveManager.Instance.EveApiClient.Contacts.GetAllianceContactsAsync(auth, AllianceID, page);
-                            if (ESIHelpers.ValidateESICall(esrAlliance) && esrAlliance.Model != null)
+                            if(ESIHelpers.ValidateESICall(esrAlliance) && esrAlliance.Model != null)
                             {
                                 maxPageCount = esrAlliance.MaxPages > 0 ? esrAlliance.MaxPages : 1;
-                                foreach (AllianceContact con in esrAlliance.Model)
+                                foreach(AllianceContact con in esrAlliance.Model)
                                 {
                                     Standings[con.ContactId] = (float)con.Standing;
-                                    if (con.ContactType == "alliance")
+                                    if(con.ContactType == "alliance")
                                     {
                                         AllianceToResolve.Add((int)con.ContactId);
                                     }
@@ -1124,23 +1120,23 @@ namespace SMT.EVEData
                             }
                             page++;
                         }
-                        while (page <= maxPageCount);
+                        while(page <= maxPageCount);
                     }
 
-                    if (CorporationID != 0)
+                    if(CorporationID != 0)
                     {
                         int page = 1;
                         int maxPageCount = 1;
                         do
                         {
                             var esrCorp = await EveManager.Instance.EveApiClient.Contacts.GetCorporationContactsAsync(auth, CorporationID, page);
-                            if (ESIHelpers.ValidateESICall(esrCorp) && esrCorp.Model != null)
+                            if(ESIHelpers.ValidateESICall(esrCorp) && esrCorp.Model != null)
                             {
                                 maxPageCount = esrCorp.MaxPages > 0 ? esrCorp.MaxPages : 1;
-                                foreach (CorporationContact con in esrCorp.Model)
+                                foreach(CorporationContact con in esrCorp.Model)
                                 {
                                     Standings[con.ContactId] = (float)con.Standing;
-                                    if (con.ContactType == "alliance")
+                                    if(con.ContactType == "alliance")
                                     {
                                         AllianceToResolve.Add((int)con.ContactId);
                                     }
@@ -1148,23 +1144,22 @@ namespace SMT.EVEData
                             }
                             page++;
                         }
-                        while (page <= maxPageCount);
+                        while(page <= maxPageCount);
                     }
-
                 }
 
                 string portraitRoot = Path.Combine(EveManager.Instance.SaveDataRootFolder, "Portraits");
                 string characterPortrait = Path.Combine(portraitRoot, ID.ToString());
-                if (!File.Exists(characterPortrait))
+                if(!File.Exists(characterPortrait))
                 {
                     var esri = await EveManager.Instance.EveApiClient.Character.GetCharacterPortraitsAsync(ID);
-                    if (ESIHelpers.ValidateESICall(esri) && esri.Model != null && !string.IsNullOrEmpty(esri.Model.Px128x128))
+                    if(ESIHelpers.ValidateESICall(esri) && esri.Model != null && !string.IsNullOrEmpty(esri.Model.Px128x128))
                     {
                         try
                         {
                             HttpClient hc = new HttpClient();
                             var response = await hc.GetAsync(esri.Model.Px128x128);
-                            using (var fs = new FileStream(characterPortrait, FileMode.CreateNew))
+                            using(var fs = new FileStream(characterPortrait, FileMode.CreateNew))
                             {
                                 await response.Content.CopyToAsync(fs);
                             }
@@ -1173,25 +1168,25 @@ namespace SMT.EVEData
                     }
                 }
 
-                if (File.Exists(characterPortrait))
+                if(File.Exists(characterPortrait))
                 {
                     PortraitLocation = new Uri(characterPortrait);
                 }
 
-                if (CorporationID != -1)
+                if(CorporationID != -1)
                 {
                     var esrc = await EveManager.Instance.EveApiClient.Corporation.GetCorporationInfoAsync(CorporationID);
-                    if (ESIHelpers.ValidateESICall(esrc) && esrc.Model != null)
+                    if(ESIHelpers.ValidateESICall(esrc) && esrc.Model != null)
                     {
                         CorporationName = esrc.Model.Name;
                         CorporationTicker = esrc.Model.Ticker;
                     }
                 }
 
-                if (AllianceID > 0)
+                if(AllianceID > 0)
                 {
                     var esra = await EveManager.Instance.EveApiClient.Alliance.GetAllianceInfoAsync(AllianceID);
-                    if (ESIHelpers.ValidateESICall(esra) && esra.Model != null)
+                    if(ESIHelpers.ValidateESICall(esra) && esra.Model != null)
                     {
                         AllianceName = esra.Model.Name;
                         AllianceTicker = esra.Model.Ticker;
@@ -1206,22 +1201,22 @@ namespace SMT.EVEData
                 EdenCommStandingsGood = false;
                 TrigStandingsGood = false;
                 var essl = await EveManager.Instance.EveApiClient.Character.GetStandingsAsync(auth);
-                if (ESIHelpers.ValidateESICall(essl) && essl.Model != null)
+                if(ESIHelpers.ValidateESICall(essl) && essl.Model != null)
                 {
-                    foreach (Standing standing in essl.Model)
+                    foreach(Standing standing in essl.Model)
                     {
-                        if (standing.FromId == 500027 && standing.StandingValue > 0)
+                        if(standing.FromId == 500027 && standing.StandingValue > 0)
                         {
                             EdenCommStandingsGood = true;
                         }
-                        if (standing.FromId == 500026 && standing.StandingValue > 0)
+                        if(standing.FromId == 500026 && standing.StandingValue > 0)
                         {
                             TrigStandingsGood = true;
                         }
                     }
                 }
             }
-            catch (Exception)
+            catch(Exception)
             {
             }
 
@@ -1234,7 +1229,7 @@ namespace SMT.EVEData
         private async Task UpdateOnlineStatus()
         {
             AuthDTO auth = GetAuthDTO();
-            if (auth == null || ID == 0 || !ESILinked)
+            if(auth == null || ID == 0 || !ESILinked)
             {
                 return;
             }
@@ -1242,7 +1237,7 @@ namespace SMT.EVEData
             try
             {
                 var esr = await EveManager.Instance.EveApiClient.Location.GetCharacterOnlineAsync(auth);
-                if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
+                if(ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                 {
                     IsOnline = esr.Model.Online;
                 }
@@ -1256,7 +1251,7 @@ namespace SMT.EVEData
         public async Task UpdatePositionFromESI()
         {
             AuthDTO auth = GetAuthDTO();
-            if (auth == null || ID == 0 || !ESILinked)
+            if(auth == null || ID == 0 || !ESILinked)
             {
                 return;
             }
@@ -1264,9 +1259,9 @@ namespace SMT.EVEData
             try
             {
                 var esr = await EveManager.Instance.EveApiClient.Location.GetCharacterLocationAsync(auth);
-                if (ESIHelpers.ValidateESICall(esr) && esr.Model != null)
+                if(ESIHelpers.ValidateESICall(esr) && esr.Model != null)
                 {
-                    if (!EveManager.Instance.SystemIDToName.ContainsKey(esr.Model.SolarSystemId))
+                    if(!EveManager.Instance.SystemIDToName.ContainsKey(esr.Model.SolarSystemId))
                     {
                         Location = "";
                         Region = "";
@@ -1274,7 +1269,7 @@ namespace SMT.EVEData
                     }
                     Location = EveManager.Instance.SystemIDToName[esr.Model.SolarSystemId];
                     System s = EVEData.EveManager.Instance.GetEveSystem(Location);
-                    if (s != null)
+                    if(s != null)
                     {
                         Region = s.Region;
                     }
@@ -1290,16 +1285,16 @@ namespace SMT.EVEData
         private void UpdateWarningSystems()
         {
             // only track warning systems if the character is logged in
-            if (IsOnline)
+            if(IsOnline)
             {
-                if (!string.IsNullOrEmpty(Location) && DangerZoneRange > 0 && DangerZoneActive)
+                if(!string.IsNullOrEmpty(Location) && DangerZoneRange > 0 && DangerZoneActive)
                 {
                     WarningSystems = Navigation.GetSystemsXJumpsFrom(new List<string>(), Location, DangerZoneRange);
                 }
             }
             else
             {
-                if (WarningSystems != null)
+                if(WarningSystems != null)
                 {
                     WarningSystems.Clear();
                 }

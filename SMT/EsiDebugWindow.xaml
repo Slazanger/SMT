@@ -14,7 +14,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="ESI token buckets (per group). Updated from response headers when using ESI." 
+        <TextBlock Grid.Row="0" Text="ESI token buckets (per group). Updated from response headers when using ESI."
                    TextWrapping="Wrap" Margin="0,0,0,8" />
         <DataGrid x:Name="BucketsDataGrid" Grid.Row="1" BorderThickness="1" BorderBrush="Gray"
                   AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
@@ -25,7 +25,7 @@
                 <DataGridTextColumn Header="Reset at (UTC)" Binding="{Binding ResetAt, StringFormat=HH:mm:ss}" Width="120" />
             </DataGrid.Columns>
         </DataGrid>
-        <TextBlock x:Name="EmptyMessage" Grid.Row="1" Text="No ESI data yet. Buckets populate after ESI calls return." 
+        <TextBlock x:Name="EmptyMessage" Grid.Row="1" Text="No ESI data yet. Buckets populate after ESI calls return."
                    VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed" />
         <TextBlock Grid.Row="2" x:Name="RefreshLabel" Margin="0,8,0,0" FontSize="11" Foreground="Gray" />
     </Grid>

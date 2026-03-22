@@ -28,7 +28,7 @@
                     .Select(tr => tr.Elements("td").Select(td => td.InnerText.Trim()).ToList())
                     .ToList();
 
-                foreach (List<string> ls in table)
+                foreach(List<string> ls in table)
                 {
                     Storm s = new Storm();
                     s.Region = ls[0];

@@ -6,7 +6,7 @@
 
         public void SetSizeLimit(int size)
         {
-            if (size >= 0)
+            if(size >= 0)
             {
                 sizeLimit = size;
             }
@@ -16,7 +16,7 @@
         {
             base.Insert(0, item);
 
-            if (sizeLimit != 0 && base.Count > sizeLimit)
+            if(sizeLimit != 0 && base.Count > sizeLimit)
             {
                 Dequeue();
             }

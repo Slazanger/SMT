@@ -53,7 +53,7 @@ namespace SMT
 
             JumpBridgeList.ItemsSource = EveManager.Instance.JumpBridges;
 
-            if (SMT.EVEData.EveManager.CurrentLanguage == "zh-CN")
+            if(SMT.EVEData.EveManager.CurrentLanguage == "zh-CN")
             {
                 LanguageComboBox.SelectedIndex = 1;
             }
@@ -62,6 +62,7 @@ namespace SMT
                 LanguageComboBox.SelectedIndex = 0;
             }
         }
+
         public void Init()
         {
             CynoBeaconSystems = new List<string>();
@@ -101,7 +102,6 @@ namespace SMT
             }
         }
 
-
         private void Prefs_OpenFolder_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -113,9 +113,6 @@ namespace SMT
                 //MessageBox.Show("Error opening folder: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        
-
 
         private void syncESIPositionChk_Checked(object sender, RoutedEventArgs e)
         {
@@ -456,14 +453,14 @@ namespace SMT
 
         private void LanguageComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (LanguageComboBox.SelectedItem is System.Windows.Controls.ComboBoxItem selectedItem)
+            if(LanguageComboBox.SelectedItem is System.Windows.Controls.ComboBoxItem selectedItem)
             {
                 string langCode = selectedItem.Tag.ToString();
 
                 ResourceDictionary oldLangDict = null;
-                foreach (var dict in Application.Current.Resources.MergedDictionaries)
+                foreach(var dict in Application.Current.Resources.MergedDictionaries)
                 {
-                    if (dict.Source != null && dict.Source.OriginalString.StartsWith("Languages/"))
+                    if(dict.Source != null && dict.Source.OriginalString.StartsWith("Languages/"))
                     {
                         oldLangDict = dict;
                         break;
@@ -477,7 +474,7 @@ namespace SMT
 
                 Application.Current.Resources.MergedDictionaries.Add(newLangDict);
 
-                if (oldLangDict != null)
+                if(oldLangDict != null)
                 {
                     Application.Current.Resources.MergedDictionaries.Remove(oldLangDict);
                 }
@@ -486,28 +483,28 @@ namespace SMT
                 SMT.EVEData.EveManager.CurrentLanguage = langCode;
 
                 // Redraw maps so labels use the new language
-                if (MainWindow.AppWindow != null)
+                if(MainWindow.AppWindow != null)
                 {
-                    if (MainWindow.AppWindow.RegionUC != null)
+                    if(MainWindow.AppWindow.RegionUC != null)
                     {
                         // Re-select current region to force full reload of system text
-                        if (MainWindow.AppWindow.RegionUC.Region != null)
+                        if(MainWindow.AppWindow.RegionUC.Region != null)
                         {
                             MainWindow.AppWindow.RegionUC.SelectRegion(MainWindow.AppWindow.RegionUC.Region.Name);
                         }
                         MainWindow.AppWindow.RegionUC.ReDrawMap(true);
                     }
-                    if (MainWindow.AppWindow.UniverseUC != null)
+                    if(MainWindow.AppWindow.UniverseUC != null)
                     {
                         MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
                     }
                 }
                 // Refresh dock tab titles and regions block view
-                if (MainWindow.AppWindow != null)
+                if(MainWindow.AppWindow != null)
                 {
                     MainWindow.AppWindow.UpdateTabTitles();
                 }
-                if (MainWindow.AppWindow.RegionsViewUC != null)
+                if(MainWindow.AppWindow.RegionsViewUC != null)
                 {
                     MainWindow.AppWindow.RegionsViewUC.Redraw(true);
                 }
@@ -556,5 +553,4 @@ namespace SMT
             throw new NotImplementedException();
         }
     }
-
 }

@@ -30,7 +30,7 @@
             absdy = dy > 0 ? dy : -dy;
             c = (s0.x * dx) + (s0.y * dy) + (((dx * dx) + (dy * dy)) * 0.5f);
 
-            if (absdx > absdy)
+            if(absdx > absdy)
             {
                 a = 1;
                 b = dy / dx;
@@ -60,7 +60,7 @@
         private static Edge Create()
         {
             Edge edge;
-            if (pool.Count > 0)
+            if(pool.Count > 0)
             {
                 edge = pool.Dequeue();
                 edge.Init();
@@ -82,13 +82,13 @@
             return edgesToTest.FindAll(
             delegate (Edge e)
             {
-                if (e.LeftSite != null)
+                if(e.LeftSite != null)
                 {
-                    if (e.LeftSite.Coord == coord) return true;
+                    if(e.LeftSite.Coord == coord) return true;
                 }
-                if (e.RightSite != null)
+                if(e.RightSite != null)
                 {
-                    if (e.RightSite.Coord == coord) return true;
+                    if(e.RightSite.Coord == coord) return true;
                 }
                 return false;
             });
@@ -146,11 +146,11 @@
         {
             float length0 = edge0.SitesDistance();
             float length1 = edge1.SitesDistance();
-            if (length0 < length1)
+            if(length0 < length1)
             {
                 return 1;
             }
-            if (length0 > length1)
+            if(length0 > length1)
             {
                 return -1;
             }
@@ -167,7 +167,7 @@
             Vertex vertex0, vertex1;
             float x0, x1, y0, y1;
 
-            if (a == 1 && b >= 0)
+            if(a == 1 && b >= 0)
             {
                 vertex0 = rightVertex;
                 vertex1 = leftVertex;
@@ -178,52 +178,52 @@
                 vertex1 = rightVertex;
             }
 
-            if (a == 1)
+            if(a == 1)
             {
                 y0 = ymin;
-                if (vertex0 != null && vertex0.y > ymin)
+                if(vertex0 != null && vertex0.y > ymin)
                 {
                     y0 = vertex0.y;
                 }
-                if (y0 > ymax)
+                if(y0 > ymax)
                 {
                     return;
                 }
                 x0 = c - (b * y0);
 
                 y1 = ymax;
-                if (vertex1 != null && vertex1.y < ymax)
+                if(vertex1 != null && vertex1.y < ymax)
                 {
                     y1 = vertex1.y;
                 }
-                if (y1 < ymin)
+                if(y1 < ymin)
                 {
                     return;
                 }
                 x1 = c - (b * y1);
 
-                if ((x0 > xmax && x1 > xmax) || (x0 < xmin && x1 < xmin))
+                if((x0 > xmax && x1 > xmax) || (x0 < xmin && x1 < xmin))
                 {
                     return;
                 }
 
-                if (x0 > xmax)
+                if(x0 > xmax)
                 {
                     x0 = xmax;
                     y0 = (c - x0) / b;
                 }
-                else if (x0 < xmin)
+                else if(x0 < xmin)
                 {
                     x0 = xmin;
                     y0 = (c - x0) / b;
                 }
 
-                if (x1 > xmax)
+                if(x1 > xmax)
                 {
                     x1 = xmax;
                     y1 = (c - x1) / b;
                 }
-                else if (x1 < xmin)
+                else if(x1 < xmin)
                 {
                     x1 = xmin;
                     y1 = (c - x1) / b;
@@ -232,49 +232,49 @@
             else
             {
                 x0 = xmin;
-                if (vertex0 != null && vertex0.x > xmin)
+                if(vertex0 != null && vertex0.x > xmin)
                 {
                     x0 = vertex0.x;
                 }
-                if (x0 > xmax)
+                if(x0 > xmax)
                 {
                     return;
                 }
                 y0 = c - (a * x0);
 
                 x1 = xmax;
-                if (vertex1 != null && vertex1.x < xmax)
+                if(vertex1 != null && vertex1.x < xmax)
                 {
                     x1 = vertex1.x;
                 }
-                if (x1 < xmin)
+                if(x1 < xmin)
                 {
                     return;
                 }
                 y1 = c - (a * x1);
 
-                if ((y0 > ymax && y1 > ymax) || (y0 < ymin && y1 < ymin))
+                if((y0 > ymax && y1 > ymax) || (y0 < ymin && y1 < ymin))
                 {
                     return;
                 }
 
-                if (y0 > ymax)
+                if(y0 > ymax)
                 {
                     y0 = ymax;
                     x0 = (c - y0) / a;
                 }
-                else if (y0 < ymin)
+                else if(y0 < ymin)
                 {
                     y0 = ymin;
                     x0 = (c - y0) / a;
                 }
 
-                if (y1 > ymax)
+                if(y1 > ymax)
                 {
                     y1 = ymax;
                     x1 = (c - y1) / a;
                 }
-                else if (y1 < ymin)
+                else if(y1 < ymin)
                 {
                     y1 = ymin;
                     x1 = (c - y1) / a;
@@ -282,7 +282,7 @@
             }
 
             clippedVertices = new Dictionary<LR, Vector2f>();
-            if (vertex0 == leftVertex)
+            if(vertex0 == leftVertex)
             {
                 clippedVertices[LR.LEFT] = new Vector2f(x0, y0);
                 clippedVertices[LR.RIGHT] = new Vector2f(x1, y1);
@@ -298,7 +298,7 @@
         {
             leftVertex = null;
             rightVertex = null;
-            if (clippedVertices != null)
+            if(clippedVertices != null)
             {
                 clippedVertices.Clear();
                 clippedVertices = null;
@@ -323,7 +323,7 @@
 
         public void SetVertex(LR leftRight, Vertex v)
         {
-            if (leftRight == LR.LEFT)
+            if(leftRight == LR.LEFT)
             {
                 leftVertex = v;
             }

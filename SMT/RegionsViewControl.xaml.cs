@@ -39,7 +39,7 @@ namespace SMT
         public void Init()
         {
             // stop the old timer if it exists
-            if (uiRefreshTimer != null)
+            if(uiRefreshTimer != null)
             {
                 uiRefreshTimer.Stop();
             }
@@ -59,20 +59,20 @@ namespace SMT
 
         public void Redraw(bool redraw)
         {
-            if (redraw)
+            if(redraw)
             {
                 MainUniverseCanvas.Children.Clear();
                 AddRegions();
             }
             else
             {
-                foreach (UIElement uie in dynamicRegionsViewElements)
+                foreach(UIElement uie in dynamicRegionsViewElements)
                 {
                     MainUniverseCanvas.Children.Remove(uie);
                 }
                 dynamicRegionsViewElements.Clear();
 
-                foreach (UIElement uie in dynamicRegionsViewHighlightElements)
+                foreach(UIElement uie in dynamicRegionsViewHighlightElements)
                 {
                     MainUniverseCanvas.Children.Remove(uie);
                 }
@@ -88,7 +88,7 @@ namespace SMT
 
             EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
 
-            if (obj.IsMouseOver)
+            if(obj.IsMouseOver)
             {
                 RegionCharacterInfo.PlacementTarget = obj;
                 RegionCharacterInfo.VerticalOffset = 5;
@@ -96,10 +96,10 @@ namespace SMT
 
                 RegionCharacterInfoSP.Children.Clear();
 
-                foreach (EVEData.LocalCharacter lc in EVEData.EveManager.Instance.LocalCharacters)
+                foreach(EVEData.LocalCharacter lc in EVEData.EveManager.Instance.LocalCharacters)
                 {
                     EVEData.System s = EVEData.EveManager.Instance.GetEveSystem(lc.Location);
-                    if (s != null && s.Region == selectedRegion.Name)
+                    if(s != null && s.Region == selectedRegion.Name)
                     {
                         Label l = new Label();
                         l.Content = lc.Name + " (" + lc.Location + ")";
@@ -120,7 +120,7 @@ namespace SMT
             Shape obj = sender as Shape;
             EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
 
-            if (obj.IsMouseOver)
+            if(obj.IsMouseOver)
             {
                 Brush HighlightOutlineBrush = new SolidColorBrush(Colors.Black);
                 Brush ConnectedHighlightOutlineBrush = new SolidColorBrush(Colors.SlateGray);
@@ -141,7 +141,7 @@ namespace SMT
                 dynamicRegionsViewHighlightElements.Add(regionShape);
 
                 // now add connected regions
-                foreach (string s in selectedRegion.RegionLinks)
+                foreach(string s in selectedRegion.RegionLinks)
                 {
                     EVEData.MapRegion mr = EVEData.EveManager.Instance.GetRegion(s);
 
@@ -179,7 +179,7 @@ namespace SMT
             }
             else
             {
-                foreach (UIElement uie in dynamicRegionsViewHighlightElements)
+                foreach(UIElement uie in dynamicRegionsViewHighlightElements)
                 {
                     MainUniverseCanvas.Children.Remove(uie);
                 }
@@ -191,12 +191,12 @@ namespace SMT
         {
             Shape obj = sender as Shape;
             EVEData.MapRegion mr = obj.DataContext as EVEData.MapRegion;
-            if (mr == null)
+            if(mr == null)
             {
                 return;
             }
 
-            if (e.ClickCount == 2)
+            if(e.ClickCount == 2)
             {
                 RoutedEventArgs newEventArgs = new RoutedEventArgs(RequestRegionSelectEvent, mr.Name);
                 RaiseEvent(newEventArgs);
@@ -209,7 +209,7 @@ namespace SMT
 
             EVEData.MapRegion selectedRegion = obj.DataContext as EVEData.MapRegion;
 
-            if (obj.IsMouseOver)
+            if(obj.IsMouseOver)
             {
                 WHLinkInfo.PlacementTarget = obj;
                 WHLinkInfo.VerticalOffset = 5;
@@ -221,16 +221,16 @@ namespace SMT
                 List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
                 bool TheraInRegion = false;
 
-                foreach (EVEData.TheraConnection tc in currentTheraConnections)
+                foreach(EVEData.TheraConnection tc in currentTheraConnections)
                 {
-                    if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                    if(string.Compare(tc.Region, selectedRegion.Name, true) == 0)
                     {
                         TheraInRegion = true;
                         break;
                     }
                 }
 
-                if (TheraInRegion)
+                if(TheraInRegion)
                 {
                     Label header = new Label();
                     header.Content = "Thera Connections";
@@ -239,9 +239,9 @@ namespace SMT
                     header.Padding = new Thickness(1);
                     WHLinkInfoSp.Children.Add(header);
 
-                    foreach (EVEData.TheraConnection tc in currentTheraConnections)
+                    foreach(EVEData.TheraConnection tc in currentTheraConnections)
                     {
-                        if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                        if(string.Compare(tc.Region, selectedRegion.Name, true) == 0)
                         {
                             Label l = new Label();
                             l.Content = $"    {tc.System}";
@@ -257,16 +257,16 @@ namespace SMT
                 List<TurnurConnection> currentTurnurConnections = EVEData.EveManager.Instance.TurnurConnections.ToList();
                 bool TurnurInRegion = false;
 
-                foreach (EVEData.TurnurConnection tc in currentTurnurConnections)
+                foreach(EVEData.TurnurConnection tc in currentTurnurConnections)
                 {
-                    if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                    if(string.Compare(tc.Region, selectedRegion.Name, true) == 0)
                     {
                         TurnurInRegion = true;
                         break;
                     }
                 }
 
-                if (TurnurInRegion)
+                if(TurnurInRegion)
                 {
                     Label header = new Label();
                     header.Content = "Turnur Connections";
@@ -275,9 +275,9 @@ namespace SMT
                     header.Padding = new Thickness(1);
                     WHLinkInfoSp.Children.Add(header);
 
-                    foreach (EVEData.TurnurConnection tc in currentTurnurConnections)
+                    foreach(EVEData.TurnurConnection tc in currentTurnurConnections)
                     {
-                        if (string.Compare(tc.Region, selectedRegion.Name, true) == 0)
+                        if(string.Compare(tc.Region, selectedRegion.Name, true) == 0)
                         {
                             Label l = new Label();
                             l.Content = $"    {tc.System}";
@@ -308,19 +308,19 @@ namespace SMT
 
             List<TheraConnection> currentTheraConnections = EVEData.EveManager.Instance.TheraConnections.ToList();
 
-            foreach (EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
+            foreach(EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
             {
                 bool addTheraConnection = false;
-                foreach (EVEData.TheraConnection tc in currentTheraConnections)
+                foreach(EVEData.TheraConnection tc in currentTheraConnections)
                 {
-                    if (string.Compare(tc.Region, mr.Name, true) == 0)
+                    if(string.Compare(tc.Region, mr.Name, true) == 0)
                     {
                         addTheraConnection = true;
                         break;
                     }
                 }
 
-                if (addTheraConnection)
+                if(addTheraConnection)
                 {
                     Rectangle theraShape = new Rectangle() { Width = 16, Height = 16 };
 
@@ -344,16 +344,16 @@ namespace SMT
 
                 bool addCharacter = false;
 
-                foreach (EVEData.LocalCharacter lc in EVEData.EveManager.Instance.LocalCharacters)
+                foreach(EVEData.LocalCharacter lc in EVEData.EveManager.Instance.LocalCharacters)
                 {
                     EVEData.System s = EVEData.EveManager.Instance.GetEveSystem(lc.Location);
-                    if (s != null && s.Region == mr.Name)
+                    if(s != null && s.Region == mr.Name)
                     {
                         addCharacter = true;
                     }
                 }
 
-                if (addCharacter && MapConf.ShowCharacterNamesOnMap)
+                if(addCharacter && MapConf.ShowCharacterNamesOnMap)
                 {
                     Rectangle characterShape = new Rectangle() { Width = 16, Height = 16 };
 
@@ -394,7 +394,7 @@ namespace SMT
             MainUniverseCanvas.Background = backgroundColourBrush;
             MainUniverseGrid.Background = backgroundColourBrush;
 
-            foreach (EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
+            foreach(EVEData.MapRegion mr in EVEData.EveManager.Instance.Regions)
             {
                 // add circle for system
                 Rectangle regionShape = new Rectangle() { Height = 60, Width = 180 };
@@ -409,51 +409,51 @@ namespace SMT
                 regionShape.MouseEnter += RegionShape_MouseOverHandler;
                 regionShape.MouseLeave += RegionShape_MouseOverHandler;
 
-                if (mr.Faction == "Amarr")
+                if(mr.Faction == "Amarr")
                 {
                     regionShape.Fill = amarrBg;
                 }
-                if (mr.Faction == "Gallente")
+                if(mr.Faction == "Gallente")
                 {
                     regionShape.Fill = gallenteBg;
                 }
-                if (mr.Faction == "Minmatar")
+                if(mr.Faction == "Minmatar")
                 {
                     regionShape.Fill = minmatarBg;
                 }
-                if (mr.Faction == "Caldari")
+                if(mr.Faction == "Caldari")
                 {
                     regionShape.Fill = caldariBg;
                 }
 
-                if (mr.HasHighSecSystems)
+                if(mr.HasHighSecSystems)
                 {
                     regionShape.StrokeThickness = 2.0;
                 }
 
-                if (ActiveCharacter != null && ActiveCharacter.ESILinked && MapConf.ShowRegionStandings)
+                if(ActiveCharacter != null && ActiveCharacter.ESILinked && MapConf.ShowRegionStandings)
                 {
                     float averageStanding = 0.0f;
                     float numSystems = 0;
 
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
+                    foreach(EVEData.MapSystem s in mr.MapSystems.Values)
                     {
-                        if (s.OutOfRegion)
+                        if(s.OutOfRegion)
                             continue;
 
                         numSystems++;
 
-                        if (ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceID)
+                        if(ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == s.ActualSystem.SOVAllianceID)
                         {
                             averageStanding += 10.0f;
                         }
 
-                        if (s.ActualSystem.SOVAllianceID != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceID))
+                        if(s.ActualSystem.SOVAllianceID != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVAllianceID))
                         {
                             averageStanding += ActiveCharacter.Standings[s.ActualSystem.SOVAllianceID];
                         }
 
-                        if (s.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
+                        if(s.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(s.ActualSystem.SOVCorp))
                         {
                             averageStanding += ActiveCharacter.Standings[s.ActualSystem.SOVCorp];
                         }
@@ -461,13 +461,13 @@ namespace SMT
 
                     averageStanding = averageStanding / numSystems;
 
-                    if (averageStanding > 0.55)
+                    if(averageStanding > 0.55)
                     {
                         Color blueIsh = Colors.Black;
                         blueIsh.B = (byte)(255 * (averageStanding / 10.0f));
                         regionShape.Fill = new SolidColorBrush(blueIsh);
                     }
-                    else if (averageStanding < -0.55)
+                    else if(averageStanding < -0.55)
                     {
                         averageStanding *= -1;
                         Color redIsh = Colors.Black;
@@ -479,19 +479,19 @@ namespace SMT
                         regionShape.Fill = new SolidColorBrush(Colors.Gray);
                     }
 
-                    if (mr.HasHighSecSystems)
+                    if(mr.HasHighSecSystems)
                     {
                         regionShape.Fill = new SolidColorBrush(Colors.LightGray);
                     }
                 }
 
-                if (MapConf.ShowUniverseRats)
+                if(MapConf.ShowUniverseRats)
                 {
                     double numRatkills = 0.0f;
 
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
+                    foreach(EVEData.MapSystem s in mr.MapSystems.Values)
                     {
-                        if (s.OutOfRegion)
+                        if(s.OutOfRegion)
                             continue;
 
                         numRatkills += s.ActualSystem.NPCKillsLastHour;
@@ -511,13 +511,13 @@ namespace SMT
                     regionShape.Fill = new SolidColorBrush(c);
                 }
 
-                if (MapConf.ShowUniversePods)
+                if(MapConf.ShowUniversePods)
                 {
                     float numPodKills = 0.0f;
 
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
+                    foreach(EVEData.MapSystem s in mr.MapSystems.Values)
                     {
-                        if (s.OutOfRegion)
+                        if(s.OutOfRegion)
                             continue;
 
                         numPodKills += s.ActualSystem.PodKillsLastHour;
@@ -537,13 +537,13 @@ namespace SMT
                     regionShape.Fill = new SolidColorBrush(c);
                 }
 
-                if (MapConf.ShowUniverseKills)
+                if(MapConf.ShowUniverseKills)
                 {
                     float numShipKills = 0.0f;
 
-                    foreach (EVEData.MapSystem s in mr.MapSystems.Values)
+                    foreach(EVEData.MapSystem s in mr.MapSystems.Values)
                     {
-                        if (s.OutOfRegion)
+                        if(s.OutOfRegion)
                             continue;
 
                         numShipKills += s.ActualSystem.ShipKillsLastHour;
@@ -585,7 +585,7 @@ namespace SMT
                 Canvas.SetZIndex(regionText, 23);
                 MainUniverseCanvas.Children.Add(regionText);
 
-                if (!string.IsNullOrEmpty(mr.Faction))
+                if(!string.IsNullOrEmpty(mr.Faction))
                 {
                     Label factionText = new Label();
                     factionText.Width = 180;
@@ -607,7 +607,7 @@ namespace SMT
                 }
 
                 // now add all the region links : TODO :  this will end up adding 2 lines, region a -> b and b -> a
-                foreach (string s in mr.RegionLinks)
+                foreach(string s in mr.RegionLinks)
                 {
                     EVEData.MapRegion or = EVEData.EveManager.Instance.GetRegion(s);
                     Line regionLink = new Line();

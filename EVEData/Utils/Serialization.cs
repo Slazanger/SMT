@@ -26,7 +26,7 @@ namespace EVEDataUtils
         {
             XmlSerializer xms = new XmlSerializer(typeof(T));
 
-            using (TextWriter tw = new StreamWriter(fileName))
+            using(TextWriter tw = new StreamWriter(fileName))
             {
                 xms.Serialize(tw, obj);
             }

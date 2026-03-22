@@ -7,7 +7,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="External/ZoomControl/Themes/Generic.xaml" />
                 <ResourceDictionary Source="Themes/Styles.xaml" />
-                <ResourceDictionary Source="Languages\en-US.xaml"/>
+                <ResourceDictionary Source="Languages\en-US.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

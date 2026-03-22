@@ -11,11 +11,11 @@
 
         private static Vertex Create(float x, float y)
         {
-            if (float.IsNaN(x) || float.IsNaN(y))
+            if(float.IsNaN(x) || float.IsNaN(y))
             {
                 return VERTEX_AT_INFINITY;
             }
-            if (pool.Count > 0)
+            if(pool.Count > 0)
             {
                 return pool.Dequeue().Init(x, y);
             }
@@ -58,17 +58,17 @@
 
             edge0 = halfedge0.edge;
             edge1 = halfedge1.edge;
-            if (edge0 == null || edge1 == null)
+            if(edge0 == null || edge1 == null)
             {
                 return null;
             }
-            if (edge0.RightSite == edge1.RightSite)
+            if(edge0.RightSite == edge1.RightSite)
             {
                 return null;
             }
 
             determinant = (edge0.a * edge1.b) - (edge0.b * edge1.a);
-            if (Math.Abs(determinant) < 1E-10)
+            if(Math.Abs(determinant) < 1E-10)
             {
                 // The edges are parallel
                 return null;
@@ -77,7 +77,7 @@
             intersectionX = ((edge0.c * edge1.b) - (edge1.c * edge0.b)) / determinant;
             intersectionY = ((edge1.c * edge0.a) - (edge0.c * edge1.a)) / determinant;
 
-            if (Voronoi.CompareByYThenX(edge0.RightSite, edge1.RightSite) < 0)
+            if(Voronoi.CompareByYThenX(edge0.RightSite, edge1.RightSite) < 0)
             {
                 halfedge = halfedge0;
                 edge = edge0;
@@ -88,7 +88,7 @@
                 edge = edge1;
             }
             rightOfSite = intersectionX >= edge.RightSite.x;
-            if ((rightOfSite && halfedge.leftRight == LR.LEFT) ||
+            if((rightOfSite && halfedge.leftRight == LR.LEFT) ||
                 (!rightOfSite && halfedge.leftRight == LR.RIGHT))
             {
                 return null;

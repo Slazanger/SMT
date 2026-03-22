@@ -25,7 +25,7 @@
 
         public static string OwnerIDToName(int id)
         {
-            switch (id)
+            switch(id)
             {
                 case 500001: return "Caldari State";
                 case 500002: return "Minmatar Republic";

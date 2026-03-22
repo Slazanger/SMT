@@ -88,9 +88,9 @@ namespace SMT.EVEData
         {
             get
             {
-                if (EveManager.CurrentLanguage == "zh-CN")
+                if(EveManager.CurrentLanguage == "zh-CN")
                 {
-                    if (EveManager.Translations.ContainsKey(Name))
+                    if(EveManager.Translations.ContainsKey(Name))
                     {
                         return EveManager.Translations[Name];
                     }
@@ -100,6 +100,7 @@ namespace SMT.EVEData
                 return Name;
             }
         }
+
         /// <summary>
         /// Gets or sets the list of links to other Regions
         /// </summary>
@@ -135,9 +136,9 @@ namespace SMT.EVEData
         public bool IsSystemOnMap(string name)
         {
             // to catch out of region systems on the current map, ie region boundaries or strange intra-region settings
-            foreach (KeyValuePair<string, MapSystem> kvp in MapSystems)
+            foreach(KeyValuePair<string, MapSystem> kvp in MapSystems)
             {
-                if (kvp.Value.Name == name)
+                if(kvp.Value.Name == name)
                 {
                     return true;
                 }
@@ -145,6 +146,7 @@ namespace SMT.EVEData
 
             return false;
         }
+
         public override string ToString()
         {
             return LocalizedName;

@@ -295,7 +295,6 @@ namespace SMT
             }
         }
 
-
         public bool LimitESIDataToRegion
         {
             get
@@ -1329,7 +1328,6 @@ namespace SMT
             ShowIhubVunerabilities = true;
             PlayIntelSoundOnUnknown = true;
 
-
             ShowJoveObservatories = true;
             ShowCynoBeacons = true;
             LimitESIDataToRegion = false;
@@ -1358,9 +1356,6 @@ namespace SMT
 
             ToolBox_ShowJumpBridges = true;
             ToolBox_ShowSovOwner = true;
-
-            
-
         }
 
         protected void OnPropertyChanged(string name)

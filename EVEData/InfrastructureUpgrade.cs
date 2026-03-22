@@ -71,7 +71,7 @@ namespace SMT.EVEData
         {
             get
             {
-                if (Level > 0)
+                if(Level > 0)
                 {
                     return $"{UpgradeName} {Level}";
                 }
@@ -92,7 +92,7 @@ namespace SMT.EVEData
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(name));
             }

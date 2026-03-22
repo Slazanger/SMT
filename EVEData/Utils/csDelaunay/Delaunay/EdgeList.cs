@@ -38,7 +38,7 @@
         {
             Halfedge halfedge = leftEnd;
             Halfedge prevHe;
-            while (halfedge != rightEnd)
+            while(halfedge != rightEnd)
             {
                 prevHe = halfedge;
                 halfedge = halfedge.edgeListRightNeighbor;
@@ -64,30 +64,30 @@
 
             // Use hash table to get close to desired halfedge
             bucket = (int)((p.x - xmin) / deltaX * hashSize);
-            if (bucket < 0)
+            if(bucket < 0)
             {
                 bucket = 0;
             }
-            if (bucket >= hashSize)
+            if(bucket >= hashSize)
             {
                 bucket = hashSize - 1;
             }
             halfedge = GetHash(bucket);
-            if (halfedge == null)
+            if(halfedge == null)
             {
-                for (int i = 0; true; i++)
+                for(int i = 0; true; i++)
                 {
-                    if ((halfedge = GetHash(bucket - i)) != null) break;
-                    if ((halfedge = GetHash(bucket + i)) != null) break;
+                    if((halfedge = GetHash(bucket - i)) != null) break;
+                    if((halfedge = GetHash(bucket + i)) != null) break;
                 }
             }
             // Now search linear list of haledges for the correct one
-            if (halfedge == leftEnd || (halfedge != rightEnd && halfedge.IsLeftOf(p)))
+            if(halfedge == leftEnd || (halfedge != rightEnd && halfedge.IsLeftOf(p)))
             {
                 do
                 {
                     halfedge = halfedge.edgeListRightNeighbor;
-                } while (halfedge != rightEnd && halfedge.IsLeftOf(p));
+                } while(halfedge != rightEnd && halfedge.IsLeftOf(p));
                 halfedge = halfedge.edgeListLeftNeighbor;
             }
             else
@@ -95,11 +95,11 @@
                 do
                 {
                     halfedge = halfedge.edgeListLeftNeighbor;
-                } while (halfedge != leftEnd && !halfedge.IsLeftOf(p));
+                } while(halfedge != leftEnd && !halfedge.IsLeftOf(p));
             }
 
             // Update hash table and reference counts
-            if (bucket > 0 && bucket < hashSize - 1)
+            if(bucket > 0 && bucket < hashSize - 1)
             {
                 hash[bucket] = halfedge;
             }
@@ -139,12 +139,12 @@
         {
             Halfedge halfedge;
 
-            if (b < 0 || b >= hashSize)
+            if(b < 0 || b >= hashSize)
             {
                 return null;
             }
             halfedge = hash[b];
-            if (halfedge != null && halfedge.edge == Edge.DELETED)
+            if(halfedge != null && halfedge.edge == Edge.DELETED)
             {
                 // Hash table points to deleted halfedge. Patch as necessary
                 hash[b] = null;

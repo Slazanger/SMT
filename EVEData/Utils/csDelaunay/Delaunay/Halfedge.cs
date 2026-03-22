@@ -8,7 +8,7 @@
 
         public static Halfedge Create(Edge edge, LR lr)
         {
-            if (pool.Count > 0)
+            if(pool.Count > 0)
             {
                 return pool.Dequeue().Init(edge, lr);
             }
@@ -44,12 +44,12 @@
 
         public void Dispose()
         {
-            if (edgeListLeftNeighbor != null || edgeListRightNeighbor != null)
+            if(edgeListLeftNeighbor != null || edgeListRightNeighbor != null)
             {
                 // still in EdgeList
                 return;
             }
-            if (nextInPriorityQueue != null)
+            if(nextInPriorityQueue != null)
             {
                 // still in PriorityQueue
                 return;
@@ -68,21 +68,21 @@
 
             topSite = edge.RightSite;
             rightOfSite = p.x > topSite.x;
-            if (rightOfSite && this.leftRight == LR.LEFT)
+            if(rightOfSite && this.leftRight == LR.LEFT)
             {
                 return true;
             }
-            if (!rightOfSite && this.leftRight == LR.RIGHT)
+            if(!rightOfSite && this.leftRight == LR.RIGHT)
             {
                 return false;
             }
 
-            if (edge.a == 1)
+            if(edge.a == 1)
             {
                 dyp = p.y - topSite.y;
                 dxp = p.x - topSite.x;
                 fast = false;
-                if ((!rightOfSite && edge.b < 0) || (rightOfSite && edge.b >= 0))
+                if((!rightOfSite && edge.b < 0) || (rightOfSite && edge.b >= 0))
                 {
                     above = dyp >= edge.b * dxp;
                     fast = above;
@@ -90,20 +90,20 @@
                 else
                 {
                     above = p.x + (p.y * edge.b) > edge.c;
-                    if (edge.b < 0)
+                    if(edge.b < 0)
                     {
                         above = !above;
                     }
-                    if (!above)
+                    if(!above)
                     {
                         fast = true;
                     }
                 }
-                if (!fast)
+                if(!fast)
                 {
                     dxs = topSite.x - edge.LeftSite.x;
                     above = edge.b * ((dxp * dxp) - (dyp * dyp)) < dxs * dyp * (1 + (2 * dxp / dxs) + (edge.b * edge.b));
-                    if (edge.b < 0)
+                    if(edge.b < 0)
                     {
                         above = !above;
                     }

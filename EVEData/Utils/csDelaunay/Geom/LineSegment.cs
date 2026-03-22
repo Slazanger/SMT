@@ -21,11 +21,11 @@
         {
             float length0 = (segment0.p0 - segment0.p1).magnitude;
             float length1 = (segment1.p0 - segment1.p1).magnitude;
-            if (length0 < length1)
+            if(length0 < length1)
             {
                 return 1;
             }
-            if (length0 > length1)
+            if(length0 > length1)
             {
                 return -1;
             }
@@ -36,9 +36,9 @@
         {
             List<LineSegment> segments = new List<LineSegment>();
 
-            foreach (Edge edge in edges)
+            foreach(Edge edge in edges)
             {
-                if (edge.Visible())
+                if(edge.Visible())
                 {
                     Vector2f p1 = edge.ClippedEnds[LR.LEFT];
                     Vector2f p2 = edge.ClippedEnds[LR.RIGHT];

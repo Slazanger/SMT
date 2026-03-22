@@ -321,5 +321,4 @@
     <s:String x:Key="Ctx_ShowInUni">Show In Universe</s:String>
     <s:String x:Key="Ctx_Characters">Characters</s:String>
     <s:String x:Key="Ctx_RemoveAll">Remove All</s:String>
-
 </ResourceDictionary>

@@ -13,7 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Microsoft.IdentityModel.Tokens;
 using SMT.EVEData;
 using SMT.Helpers;
 using static SMT.EVEData.Navigation;
@@ -99,32 +98,32 @@ namespace SMT
         {
             List<UIElement> removedElements = new();
 
-            if (!keepSystem)
+            if(!keepSystem)
             {
                 removedElements.Add(systemCanvasElement);
                 removedElements.Add(systemNameElement);
             }
-            
+
             removedElements.Add(npcKillCanvasElement);
             removedElements.Add(npcKillDeltaCanvasElement);
 
-            foreach (UIElement element in removedElements)
+            foreach(UIElement element in removedElements)
             {
-                if (canvas.Children.Contains(element))
+                if(canvas.Children.Contains(element))
                 {
                     canvas.Children.Remove(element);
                 }
             }
-            
+
             /*
             if(!keepSystem && systemCanvasElement != null && canvas.Children.Contains(systemCanvasElement)) canvas.Children.Remove(systemCanvasElement);
             if(!keepSystem && systemNameElement != null && canvas.Children.Contains(systemNameElement)) canvas.Children.Remove(systemNameElement);
             if(npcKillCanvasElement != null && canvas.Children.Contains(npcKillCanvasElement)) canvas.Children.Remove(npcKillCanvasElement);
             if(npcKillDeltaCanvasElement != null && canvas.Children.Contains(npcKillDeltaCanvasElement)) canvas.Children.Remove(npcKillDeltaCanvasElement);
             */
-            
+
             removedElements.AddRange(CleanUpJumpBridges(canvas));
-            
+
             return removedElements.Where(e => e != null).ToList();
         }
 
@@ -132,13 +131,13 @@ namespace SMT
         {
             List<UIElement> removedElements = new();
 
-            if (jumpBridgePath != null && canvas.Children.Contains(jumpBridgePath))
+            if(jumpBridgePath != null && canvas.Children.Contains(jumpBridgePath))
             {
                 removedElements.Add(jumpBridgePath);
                 canvas.Children.Remove(jumpBridgePath);
             }
             jumpBridgePath = null;
-            
+
             return removedElements.Where(e => e != null).ToList();
         }
     }
@@ -338,7 +337,7 @@ namespace SMT
         private Dictionary<string, bool> regionMirrorVectors = new Dictionary<string, bool>();
 
         public LocalCharacter OverlayCharacter = null;
-        
+
         private ElementPool<Ellipse> _ellipseElementPool = new();
         private ElementPool<Rectangle> _rectangleElementPool = new();
         private ElementPool<Line> _lineElementPool = new();
@@ -506,34 +505,35 @@ namespace SMT
 
         private void ReleaseWithTypeCheck(UIElement element)
         {
-            switch (element)
+            switch(element)
             {
                 case Ellipse e:
                     _ellipseElementPool.Release(overlay_Canvas, e);
                     break;
+
                 case Rectangle r:
                     _rectangleElementPool.Release(overlay_Canvas, r);
                     break;
+
                 case Path p:
                     _pathElementPool.Release(overlay_Canvas, p);
                     break;
+
                 case Line l:
                     _lineElementPool.Release(overlay_Canvas, l);
                     break;
+
                 case TextBlock t:
                     _textBlockElementPool.Release(overlay_Canvas, t);
                     break;
+
                 default:
-                    if (overlay_Canvas.Children.Contains(element))
+                    if(overlay_Canvas.Children.Contains(element))
                     {
-                        overlay_Canvas.Children.Remove(element);   
+                        overlay_Canvas.Children.Remove(element);
                     }
                     break;
             }
-                
-                    
-
-
         }
 
         /// <summary>
@@ -852,7 +852,7 @@ namespace SMT
                     }
                 }
                 if(skipIntel) continue;
-                
+
                 foreach(var deleteEntry in deleteList)
                 {
                     overlay_Canvas.ReleaseChildren(deleteEntry.ellipse, _ellipseElementPool);

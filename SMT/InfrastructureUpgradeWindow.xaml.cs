@@ -24,7 +24,7 @@ namespace SMT
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (EM != null)
+            if(EM != null)
             {
                 // Set up the auto-save file path
                 upgradesFilePath = Path.Combine(EveAppConfig.StorageRoot, "InfrastructureUpgrades.txt");
@@ -42,7 +42,7 @@ namespace SMT
 
         private void AutoSave()
         {
-            if (EM != null && !string.IsNullOrEmpty(upgradesFilePath))
+            if(EM != null && !string.IsNullOrEmpty(upgradesFilePath))
             {
                 EM.SaveInfrastructureUpgrades(upgradesFilePath);
 
@@ -54,7 +54,7 @@ namespace SMT
         private void RefreshOwnerMap()
         {
             // Get the MainWindow owner and refresh its map
-            if (Owner is MainWindow mainWindow && mainWindow.RegionUC != null)
+            if(Owner is MainWindow mainWindow && mainWindow.RegionUC != null)
             {
                 mainWindow.RegionUC.ReDrawMap(false);
             }
@@ -64,7 +64,7 @@ namespace SMT
         {
             selectedSystemName = SystemComboBox.SelectedItem as string;
 
-            if (selectedSystemName != null && EM != null)
+            if(selectedSystemName != null && EM != null)
             {
                 LoadUpgradesForSystem(selectedSystemName);
             }
@@ -74,12 +74,12 @@ namespace SMT
         {
             currentUpgrades.Clear();
 
-            if (EM != null)
+            if(EM != null)
             {
                 EVEData.System sys = EM.GetEveSystem(systemName);
-                if (sys != null)
+                if(sys != null)
                 {
-                    foreach (var upgrade in sys.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
+                    foreach(var upgrade in sys.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
                     {
                         currentUpgrades.Add(upgrade);
                     }
@@ -89,18 +89,17 @@ namespace SMT
 
         private void AddUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(selectedSystemName))
+            if(string.IsNullOrEmpty(selectedSystemName))
             {
                 MessageBox.Show("Please select a system first.", "No System Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (UpgradeTypeComboBox.SelectedItem == null)
+            if(UpgradeTypeComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Please select an upgrade type.", "No Type Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
 
             if(SlotComboBox.SelectedIndex == -1)
             {
@@ -108,8 +107,6 @@ namespace SMT
                 return;
             }
             int slotNumber = SlotComboBox.SelectedIndex + 1;
-
-
 
             if(LevelComboBox.SelectedIndex == -1)
             {
@@ -121,7 +118,7 @@ namespace SMT
             string upgradeName = (UpgradeTypeComboBox.SelectedItem as ComboBoxItem).Content.ToString();
             bool isOnline = OnlineCheckBox.IsChecked ?? false;
 
-            if (EM != null)
+            if(EM != null)
             {
                 EM.SetInfrastructureUpgrade(selectedSystemName, slotNumber, upgradeName, level, isOnline);
                 LoadUpgradesForSystem(selectedSystemName);
@@ -139,9 +136,9 @@ namespace SMT
 
         private void DeleteUpgradeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (UpgradesDataGrid.SelectedItem is InfrastructureUpgrade selectedUpgrade)
+            if(UpgradesDataGrid.SelectedItem is InfrastructureUpgrade selectedUpgrade)
             {
-                if (EM != null && !string.IsNullOrEmpty(selectedSystemName))
+                if(EM != null && !string.IsNullOrEmpty(selectedSystemName))
                 {
                     EM.RemoveInfrastructureUpgrade(selectedSystemName, selectedUpgrade.SlotNumber);
                     LoadUpgradesForSystem(selectedSystemName);

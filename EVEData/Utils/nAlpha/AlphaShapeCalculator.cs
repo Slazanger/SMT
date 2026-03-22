@@ -14,7 +14,7 @@
         {
             SetData(points);
             CalculateShape();
-            if (CloseShape)
+            if(CloseShape)
             {
                 CloseShapeImpl();
             }
@@ -30,7 +30,7 @@
 
         private void AddClosingEdges(int[] vertexIndices)
         {
-            foreach (var vertexIndex in vertexIndices)
+            foreach(var vertexIndex in vertexIndices)
             {
                 var nearestPendingVertex = GetNearestPendingVertex(vertexIndices, vertexIndex);
                 AddEdge(resultingVertices[vertexIndex], resultingVertices[nearestPendingVertex]);
@@ -46,7 +46,7 @@
 
         private void CalculateShape()
         {
-            foreach (var point in points)
+            foreach(var point in points)
             {
                 ProcessPoint(point);
             }
@@ -56,7 +56,7 @@
         {
             VertexCounter counter = new VertexCounter();
 
-            foreach (var edge in resultingEdges)
+            foreach(var edge in resultingEdges)
             {
                 counter.IncreaseForIndex(edge.Item1);
                 counter.IncreaseForIndex(edge.Item2);
@@ -80,11 +80,11 @@
 
         private void ProcessPoint(Point point)
         {
-            foreach (var otherPoint in NearbyPoints(point))
+            foreach(var otherPoint in NearbyPoints(point))
             {
                 Tuple<Point, Point> alphaDiskCenters = CalculateAlphaDiskCenters(point, otherPoint);
 
-                if (!DoOtherPointsFallWithinDisk(alphaDiskCenters.Item1, point, otherPoint)
+                if(!DoOtherPointsFallWithinDisk(alphaDiskCenters.Item1, point, otherPoint)
                     || !DoOtherPointsFallWithinDisk(alphaDiskCenters.Item2, point, otherPoint))
                 {
                     AddEdge(point, otherPoint);
@@ -110,7 +110,7 @@
 
         private void AddEdge(int indexP1, int indexP2)
         {
-            if (!resultingEdges.Contains(new Tuple<int, int>(indexP1, indexP2))
+            if(!resultingEdges.Contains(new Tuple<int, int>(indexP1, indexP2))
                 && !resultingEdges.Contains(new Tuple<int, int>(indexP2, indexP1)))
                 resultingEdges.Add(new Tuple<int, int>(indexP1, indexP2));
         }
@@ -118,7 +118,7 @@
         private int AddVertex(Point p)
         {
             int index;
-            if (!resultingVertices.Contains(p))
+            if(!resultingVertices.Contains(p))
             {
                 resultingVertices.Add(p);
             }

@@ -16,19 +16,19 @@
         public static int Check(Vector2f point, Rectf bounds)
         {
             int value = 0;
-            if (point.x == bounds.left)
+            if(point.x == bounds.left)
             {
                 value |= LEFT;
             }
-            if (point.x == bounds.right)
+            if(point.x == bounds.right)
             {
                 value |= RIGHT;
             }
-            if (point.y == bounds.top)
+            if(point.y == bounds.top)
             {
                 value |= TOP;
             }
-            if (point.y == bounds.bottom)
+            if(point.y == bounds.bottom)
             {
                 value |= BOTTOM;
             }
@@ -82,7 +82,7 @@
 
         public static Site Create(Vector2f p, int index, float weigth)
         {
-            if (pool.Count > 0)
+            if(pool.Count > 0)
             {
                 return pool.Dequeue().Init(p, index, weigth);
             }
@@ -100,18 +100,18 @@
 
                 int tempIndex;
 
-                if (returnValue == -1)
+                if(returnValue == -1)
                 {
-                    if (s0.siteIndex > s1.SiteIndex)
+                    if(s0.siteIndex > s1.SiteIndex)
                     {
                         tempIndex = s0.SiteIndex;
                         s0.SiteIndex = s1.SiteIndex;
                         s1.SiteIndex = tempIndex;
                     }
                 }
-                else if (returnValue == 1)
+                else if(returnValue == 1)
                 {
-                    if (s1.SiteIndex > s0.SiteIndex)
+                    if(s1.SiteIndex > s0.SiteIndex)
                     {
                         tempIndex = s1.SiteIndex;
                         s1.SiteIndex = s0.SiteIndex;
@@ -139,18 +139,18 @@
 
             int tempIndex;
 
-            if (returnValue == -1)
+            if(returnValue == -1)
             {
-                if (this.siteIndex > s1.SiteIndex)
+                if(this.siteIndex > s1.SiteIndex)
                 {
                     tempIndex = this.SiteIndex;
                     this.SiteIndex = s1.SiteIndex;
                     s1.SiteIndex = tempIndex;
                 }
             }
-            else if (returnValue == 1)
+            else if(returnValue == 1)
             {
-                if (s1.SiteIndex > this.SiteIndex)
+                if(s1.SiteIndex > this.SiteIndex)
                 {
                     tempIndex = s1.SiteIndex;
                     s1.SiteIndex = this.SiteIndex;
@@ -180,16 +180,16 @@
 
         public List<Site> NeighborSites()
         {
-            if (edges == null || edges.Count == 0)
+            if(edges == null || edges.Count == 0)
             {
                 return new List<Site>();
             }
-            if (edgeOrientations == null)
+            if(edgeOrientations == null)
             {
                 ReorderEdges();
             }
             List<Site> list = new List<Site>();
-            foreach (Edge edge in edges)
+            foreach(Edge edge in edges)
             {
                 list.Add(NeighborSite(edge));
             }
@@ -198,15 +198,15 @@
 
         public List<Vector2f> Region(Rectf clippingBounds)
         {
-            if (edges == null || edges.Count == 0)
+            if(edges == null || edges.Count == 0)
             {
                 return new List<Vector2f>();
             }
-            if (edgeOrientations == null)
+            if(edgeOrientations == null)
             {
                 ReorderEdges();
                 region = ClipToBounds(clippingBounds);
-                if (new Polygon(region).PolyWinding() == Winding.CLOCKWISE)
+                if(new Polygon(region).PolyWinding() == Winding.CLOCKWISE)
                 {
                     region.Reverse();
                 }
@@ -226,17 +226,17 @@
 
         private void Clear()
         {
-            if (edges != null)
+            if(edges != null)
             {
                 edges.Clear();
                 edges = null;
             }
-            if (edgeOrientations != null)
+            if(edgeOrientations != null)
             {
                 edgeOrientations.Clear();
                 edgeOrientations = null;
             }
-            if (region != null)
+            if(region != null)
             {
                 region.Clear();
                 region = null;
@@ -250,12 +250,12 @@
             int i = 0;
             Edge edge;
 
-            while (i < n && !edges[i].Visible())
+            while(i < n && !edges[i].Visible())
             {
                 i++;
             }
 
-            if (i == n)
+            if(i == n)
             {
                 // No edges visible
                 return new List<Vector2f>();
@@ -265,10 +265,10 @@
             points.Add(edge.ClippedEnds[orientation]);
             points.Add(edge.ClippedEnds[LR.Other(orientation)]);
 
-            for (int j = i + 1; j < n; j++)
+            for(int j = i + 1; j < n; j++)
             {
                 edge = edges[j];
-                if (!edge.Visible())
+                if(!edge.Visible())
                 {
                     continue;
                 }
@@ -289,11 +289,11 @@
             // The point that must be conected to rightPoint:
             Vector2f newPoint = newEdge.ClippedEnds[newOrientation];
 
-            if (!CloseEnough(rightPoint, newPoint))
+            if(!CloseEnough(rightPoint, newPoint))
             {
                 // The points do not coincide, so they must have been clipped at the bounds;
                 // see if they are on the same border of the bounds:
-                if (rightPoint.x != newPoint.x && rightPoint.y != newPoint.y)
+                if(rightPoint.x != newPoint.x && rightPoint.y != newPoint.y)
                 {
                     // They are on different borders of the bounds;
                     // insert one or two corners of bounds as needed to hook them up:
@@ -303,23 +303,23 @@
                     int rightCheck = BoundsCheck.Check(rightPoint, bounds);
                     int newCheck = BoundsCheck.Check(newPoint, bounds);
                     float px, py;
-                    if ((rightCheck & BoundsCheck.RIGHT) != 0)
+                    if((rightCheck & BoundsCheck.RIGHT) != 0)
                     {
                         px = bounds.right;
 
-                        if ((newCheck & BoundsCheck.BOTTOM) != 0)
+                        if((newCheck & BoundsCheck.BOTTOM) != 0)
                         {
                             py = bounds.bottom;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.TOP) != 0)
+                        else if((newCheck & BoundsCheck.TOP) != 0)
                         {
                             py = bounds.top;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.LEFT) != 0)
+                        else if((newCheck & BoundsCheck.LEFT) != 0)
                         {
-                            if (rightPoint.y - bounds.y + newPoint.y - bounds.y < bounds.height)
+                            if(rightPoint.y - bounds.y + newPoint.y - bounds.y < bounds.height)
                             {
                                 py = bounds.top;
                             }
@@ -331,23 +331,23 @@
                             points.Add(new Vector2f(bounds.left, py));
                         }
                     }
-                    else if ((rightCheck & BoundsCheck.LEFT) != 0)
+                    else if((rightCheck & BoundsCheck.LEFT) != 0)
                     {
                         px = bounds.left;
 
-                        if ((newCheck & BoundsCheck.BOTTOM) != 0)
+                        if((newCheck & BoundsCheck.BOTTOM) != 0)
                         {
                             py = bounds.bottom;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.TOP) != 0)
+                        else if((newCheck & BoundsCheck.TOP) != 0)
                         {
                             py = bounds.top;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.RIGHT) != 0)
+                        else if((newCheck & BoundsCheck.RIGHT) != 0)
                         {
-                            if (rightPoint.y - bounds.y + newPoint.y - bounds.y < bounds.height)
+                            if(rightPoint.y - bounds.y + newPoint.y - bounds.y < bounds.height)
                             {
                                 py = bounds.top;
                             }
@@ -359,23 +359,23 @@
                             points.Add(new Vector2f(bounds.right, py));
                         }
                     }
-                    else if ((rightCheck & BoundsCheck.TOP) != 0)
+                    else if((rightCheck & BoundsCheck.TOP) != 0)
                     {
                         py = bounds.top;
 
-                        if ((newCheck & BoundsCheck.RIGHT) != 0)
+                        if((newCheck & BoundsCheck.RIGHT) != 0)
                         {
                             px = bounds.right;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.LEFT) != 0)
+                        else if((newCheck & BoundsCheck.LEFT) != 0)
                         {
                             px = bounds.left;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.BOTTOM) != 0)
+                        else if((newCheck & BoundsCheck.BOTTOM) != 0)
                         {
-                            if (rightPoint.x - bounds.x + newPoint.x - bounds.x < bounds.width)
+                            if(rightPoint.x - bounds.x + newPoint.x - bounds.x < bounds.width)
                             {
                                 px = bounds.left;
                             }
@@ -387,23 +387,23 @@
                             points.Add(new Vector2f(px, bounds.bottom));
                         }
                     }
-                    else if ((rightCheck & BoundsCheck.BOTTOM) != 0)
+                    else if((rightCheck & BoundsCheck.BOTTOM) != 0)
                     {
                         py = bounds.bottom;
 
-                        if ((newCheck & BoundsCheck.RIGHT) != 0)
+                        if((newCheck & BoundsCheck.RIGHT) != 0)
                         {
                             px = bounds.right;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.LEFT) != 0)
+                        else if((newCheck & BoundsCheck.LEFT) != 0)
                         {
                             px = bounds.left;
                             points.Add(new Vector2f(px, py));
                         }
-                        else if ((newCheck & BoundsCheck.TOP) != 0)
+                        else if((newCheck & BoundsCheck.TOP) != 0)
                         {
-                            if (rightPoint.x - bounds.x + newPoint.x - bounds.x < bounds.width)
+                            if(rightPoint.x - bounds.x + newPoint.x - bounds.x < bounds.width)
                             {
                                 px = bounds.left;
                             }
@@ -416,7 +416,7 @@
                         }
                     }
                 }
-                if (closingUp)
+                if(closingUp)
                 {
                     // newEdge's ends have already been added
                     return;
@@ -424,7 +424,7 @@
                 points.Add(newPoint);
             }
             Vector2f newRightPoint = newEdge.ClippedEnds[LR.Other(newOrientation)];
-            if (!CloseEnough(points[0], newRightPoint))
+            if(!CloseEnough(points[0], newRightPoint))
             {
                 points.Add(newRightPoint);
             }
@@ -443,11 +443,11 @@
 
         private Site NeighborSite(Edge edge)
         {
-            if (this == edge.LeftSite)
+            if(this == edge.LeftSite)
             {
                 return edge.RightSite;
             }
-            if (this == edge.RightSite)
+            if(this == edge.RightSite)
             {
                 return edge.LeftSite;
             }

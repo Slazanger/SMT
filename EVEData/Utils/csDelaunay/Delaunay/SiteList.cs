@@ -22,12 +22,12 @@
         public List<Circle> Circles()
         {
             List<Circle> circles = new List<Circle>();
-            foreach (Site site in sites)
+            foreach(Site site in sites)
             {
                 float radius = 0;
                 Edge nearestEdge = site.NearestEdge();
 
-                if (!nearestEdge.IsPartOfConvexHull()) radius = nearestEdge.SitesDistance() * 0.5f;
+                if(!nearestEdge.IsPartOfConvexHull()) radius = nearestEdge.SitesDistance() * 0.5f;
                 circles.Add(new Circle(site.x, site.y, radius));
             }
             return circles;
@@ -45,22 +45,22 @@
 
         public Rectf GetSitesBounds()
         {
-            if (!sorted)
+            if(!sorted)
             {
                 SortList();
                 ResetListIndex();
             }
             float xmin, xmax, ymin, ymax;
-            if (sites.Count == 0)
+            if(sites.Count == 0)
             {
                 return Rectf.zero;
             }
             xmin = float.MaxValue;
             xmax = float.MinValue;
-            foreach (Site site in sites)
+            foreach(Site site in sites)
             {
-                if (site.x < xmin) xmin = site.x;
-                if (site.x > xmax) xmax = site.x;
+                if(site.x < xmin) xmin = site.x;
+                if(site.x > xmax) xmax = site.x;
             }
             // here's where we assume that the sites have been sorted on y:
             ymin = sites[0].y;
@@ -71,11 +71,11 @@
 
         public Site Next()
         {
-            if (!sorted)
+            if(!sorted)
             {
                 throw new Exception("SiteList.Next(): sites have not been sorted");
             }
-            if (currentIndex < sites.Count)
+            if(currentIndex < sites.Count)
             {
                 return sites[currentIndex++];
             }
@@ -88,7 +88,7 @@
         public List<List<Vector2f>> Regions(Rectf plotBounds)
         {
             List<List<Vector2f>> regions = new List<List<Vector2f>>();
-            foreach (Site site in sites)
+            foreach(Site site in sites)
             {
                 regions.Add(site.Region(plotBounds));
             }
@@ -103,7 +103,7 @@
         public List<Vector2f> SiteCoords()
         {
             List<Vector2f> coords = new List<Vector2f>();
-            foreach (Site site in sites)
+            foreach(Site site in sites)
             {
                 coords.Add(site.Coord);
             }

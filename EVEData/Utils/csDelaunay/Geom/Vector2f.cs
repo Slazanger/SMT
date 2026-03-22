@@ -86,7 +86,7 @@ public struct Vector2f
 
     public override bool Equals(object other)
     {
-        if (!(other is Vector2f))
+        if(!(other is Vector2f))
         {
             return false;
         }

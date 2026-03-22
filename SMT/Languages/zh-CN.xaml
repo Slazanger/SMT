@@ -321,5 +321,4 @@
     <s:String x:Key="Ctx_ShowInUni">在宇宙全景中显示</s:String>
     <s:String x:Key="Ctx_Characters">角色</s:String>
     <s:String x:Key="Ctx_RemoveAll">清除所有</s:String>
-
 </ResourceDictionary>

@@ -19,12 +19,12 @@ namespace EVEDataUtils
             bool wasEmpty = reader.IsEmptyElement;
             reader.Read();
 
-            if (wasEmpty)
+            if(wasEmpty)
             {
                 return;
             }
 
-            while (reader.NodeType != System.Xml.XmlNodeType.EndElement)
+            while(reader.NodeType != System.Xml.XmlNodeType.EndElement)
             {
                 reader.ReadStartElement("item");
 
@@ -50,7 +50,7 @@ namespace EVEDataUtils
             XmlSerializer keySerializer = new XmlSerializer(typeof(TKey));
             XmlSerializer valueSerializer = new XmlSerializer(typeof(TValue));
 
-            foreach (TKey key in this.Keys)
+            foreach(TKey key in this.Keys)
             {
                 writer.WriteStartElement("item");
 

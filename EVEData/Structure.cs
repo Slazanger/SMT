@@ -14,7 +14,7 @@
             LastUpdate = DateTime.Now;
             State = PowerState.Unknown;
 
-            switch (StructureID)
+            switch(StructureID)
             {
                 case 35832: // Astra
                     Type = StructureType.Astrahus;

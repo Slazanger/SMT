@@ -8,7 +8,7 @@ namespace SMT.EVEData
     {
         public static bool ValidateESICall<T>(ESIModelDTO<T> esiR)
         {
-            if (esiR == null || esiR.Model == null)
+            if(esiR == null || esiR.Model == null)
             {
                 Debug.WriteLine("ESI data Null");
                 return false;
@@ -23,7 +23,7 @@ namespace SMT.EVEData
         /// </summary>
         public static void TryUpdateEsiRateLimitFromResponse<T>(ESIModelDTO<T> response)
         {
-            if (response == null) return;
+            if(response == null) return;
             try
             {
                 var type = response.GetType();
@@ -34,7 +34,7 @@ namespace SMT.EVEData
                     ?? GetIntProperty(type, response, "RequestLimitReset")
                     ?? GetIntProperty(type, response, "RetryAfter");
 
-                if (remain.HasValue && resetSeconds.HasValue)
+                if(remain.HasValue && resetSeconds.HasValue)
                 {
                     string group = GetStringProperty(type, response, "RateLimitGroup")
                         ?? GetStringProperty(type, response, "ErrorLimitGroup")
@@ -51,20 +51,20 @@ namespace SMT.EVEData
         private static int? GetIntProperty(Type type, object obj, string propertyName)
         {
             var prop = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-            if (prop == null) return null;
+            if(prop == null) return null;
             var pt = prop.PropertyType;
-            if (pt != typeof(int) && pt != typeof(int?) && !(pt.IsGenericType && pt.GetGenericTypeDefinition() == typeof(Nullable<>) && pt.GetGenericArguments()[0] == typeof(int)))
+            if(pt != typeof(int) && pt != typeof(int?) && !(pt.IsGenericType && pt.GetGenericTypeDefinition() == typeof(Nullable<>) && pt.GetGenericArguments()[0] == typeof(int)))
                 return null;
             var value = prop.GetValue(obj);
-            if (value == null) return null;
-            if (value is int i) return i;
+            if(value == null) return null;
+            if(value is int i) return i;
             return null;
         }
 
         private static string GetStringProperty(Type type, object obj, string propertyName)
         {
             var prop = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-            if (prop == null || prop.PropertyType != typeof(string)) return null;
+            if(prop == null || prop.PropertyType != typeof(string)) return null;
             return prop.GetValue(obj) as string;
         }
     }

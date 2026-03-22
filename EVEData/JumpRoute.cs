@@ -26,13 +26,13 @@
         {
             CurrentRoute.Clear();
 
-            if (WayPoints.Count < 2)
+            if(WayPoints.Count < 2)
             {
                 return;
             }
 
             double actualMaxLY = MaxLY;
-            if (JDC != 5)
+            if(JDC != 5)
             {
                 actualMaxLY *= .9;
             }
@@ -46,19 +46,19 @@
             AlternateMids.Clear();
 
             // loop through all the waypoints
-            for (int i = 1; i < WayPoints.Count; i++)
+            for(int i = 1; i < WayPoints.Count; i++)
             {
                 start = end;
                 end = WayPoints[i];
 
                 List<Navigation.RoutePoint> sysList = Navigation.NavigateCapitals(start, end, actualMaxLY, null, avoidSystems);
 
-                if (sysList != null)
+                if(sysList != null)
                 {
-                    foreach (Navigation.RoutePoint s in sysList)
+                    foreach(Navigation.RoutePoint s in sysList)
                     {
                         // for multiple waypoint routes, the first in the new and last item in the list will be the same system, so remove
-                        if (CurrentRoute.Count > 0 && CurrentRoute.Last().SystemName == s.SystemName)
+                        if(CurrentRoute.Count > 0 && CurrentRoute.Last().SystemName == s.SystemName)
                         {
                             CurrentRoute.Last().LY = s.LY;
                         }
@@ -68,9 +68,9 @@
                         }
                     }
 
-                    if (sysList.Count > 2)
+                    if(sysList.Count > 2)
                     {
-                        for (int j = 2; j < sysList.Count; j++)
+                        for(int j = 2; j < sysList.Count; j++)
                         {
                             List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j - 2].SystemName, MaxLY, false, false);
                             List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j].SystemName, MaxLY, false, false);
@@ -78,9 +78,9 @@
                             IEnumerable<string> alternatives = a.AsQueryable().Intersect(b);
 
                             AlternateMids[CurrentRoute[j - 1].SystemName] = new List<string>();
-                            foreach (string mid in alternatives)
+                            foreach(string mid in alternatives)
                             {
-                                if (mid != CurrentRoute[j - 1].SystemName)
+                                if(mid != CurrentRoute[j - 1].SystemName)
                                 {
                                     AlternateMids[CurrentRoute[j - 1].SystemName].Add(mid);
                                 }

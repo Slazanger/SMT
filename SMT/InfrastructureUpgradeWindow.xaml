@@ -10,10 +10,10 @@
 
     <Grid Margin="0" Background="{DynamicResource MenuBackground}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <GroupBox Grid.Row="0" Header="{DynamicResource Infra_SelSys}" Padding="5" Margin="0,0,0,10" BorderThickness="1">
@@ -24,8 +24,8 @@
                   Foreground="LightGray" BorderBrush="#555555" BorderThickness="1">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <DataGrid x:Name="UpgradesDataGrid"
@@ -43,33 +43,33 @@
                         <DataGridTextColumn Header="{DynamicResource Infra_ColSlot}" Binding="{Binding SlotNumber}" Width="60" IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="White"/>
-                                    <Setter Property="Margin" Value="5,0"/>
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Margin" Value="5,0" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="{DynamicResource Infra_ColName}" Binding="{Binding UpgradeName}" Width="*" IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="White"/>
-                                    <Setter Property="Margin" Value="5,0"/>
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Margin" Value="5,0" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="{DynamicResource Infra_ColLevel}" Binding="{Binding Level}" Width="60" IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="White"/>
-                                    <Setter Property="Margin" Value="5,0"/>
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Margin" Value="5,0" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridCheckBoxColumn Header="{DynamicResource Infra_ColOnline}" Binding="{Binding IsOnline}" Width="70" IsReadOnly="True"/>
+                        <DataGridCheckBoxColumn Header="{DynamicResource Infra_ColOnline}" Binding="{Binding IsOnline}" Width="70" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button x:Name="DeleteUpgradeButton" Content="{DynamicResource Infra_BtnDel}" Width="120" Margin="5" Click="DeleteUpgradeButton_Click"/>
+                    <Button x:Name="DeleteUpgradeButton" Content="{DynamicResource Infra_BtnDel}" Width="120" Margin="5" Click="DeleteUpgradeButton_Click" />
                 </StackPanel>
             </Grid>
         </GroupBox>
@@ -78,67 +78,67 @@
                   Foreground="LightGray" BorderBrush="#555555" BorderThickness="1">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Infra_LblSlot}" Margin="5" VerticalAlignment="Center" Foreground="White"/>
+                <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Infra_LblSlot}" Margin="5" VerticalAlignment="Center" Foreground="White" />
                 <ComboBox x:Name="SlotComboBox" Grid.Row="0" Grid.Column="1" Margin="5" VerticalAlignment="Center">
-                    <ComboBoxItem Content="1"/>
-                    <ComboBoxItem Content="2"/>
-                    <ComboBoxItem Content="3"/>
-                    <ComboBoxItem Content="4"/>
-                    <ComboBoxItem Content="5"/>
-                    <ComboBoxItem Content="6"/>
-                    <ComboBoxItem Content="7"/>
-                    <ComboBoxItem Content="8"/>
-                    <ComboBoxItem Content="9"/>
-                    <ComboBoxItem Content="10"/>
+                    <ComboBoxItem Content="1" />
+                    <ComboBoxItem Content="2" />
+                    <ComboBoxItem Content="3" />
+                    <ComboBoxItem Content="4" />
+                    <ComboBoxItem Content="5" />
+                    <ComboBoxItem Content="6" />
+                    <ComboBoxItem Content="7" />
+                    <ComboBoxItem Content="8" />
+                    <ComboBoxItem Content="9" />
+                    <ComboBoxItem Content="10" />
                 </ComboBox>
 
-                <Label Grid.Row="0" Grid.Column="2" Content="{DynamicResource Infra_LblType}" Margin="5" VerticalAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="2" Content="{DynamicResource Infra_LblType}" Margin="5" VerticalAlignment="Center" />
 
                 <ComboBox x:Name="UpgradeTypeComboBox" Grid.Row="0" Grid.Column="3" Margin="5,0" FontSize="12" VerticalAlignment="Center">
-                    <ComboBoxItem Content="Major Threat Detection Array"/>
-                    <ComboBoxItem Content="Minor Threat Detection Array"/>
-                    <ComboBoxItem Content="Power Monitoring Division"/>
-                    <ComboBoxItem Content="Pyerite Prospecting Array"/>
-                    <ComboBoxItem Content="Nocxium Prospecting Array"/>
-                    <ComboBoxItem Content="Mexallon Prospecting Array"/>
+                    <ComboBoxItem Content="Major Threat Detection Array" />
+                    <ComboBoxItem Content="Minor Threat Detection Array" />
+                    <ComboBoxItem Content="Power Monitoring Division" />
+                    <ComboBoxItem Content="Pyerite Prospecting Array" />
+                    <ComboBoxItem Content="Nocxium Prospecting Array" />
+                    <ComboBoxItem Content="Mexallon Prospecting Array" />
                     <ComboBoxItem Content="Isogen Prospecting Array" />
-                    <ComboBoxItem Content="Zydrine Prospecting Array"/>
-                    <ComboBoxItem Content="Megacyte Prospecting Array"/>
-                    <ComboBoxItem Content="Morphite Prospecting Array"/>
-                    <ComboBoxItem Content="Advanced Logistics Network"/>
-                    <ComboBoxItem Content="Cynosural Navigation"/>
-                    <ComboBoxItem Content="Cynosural Suppression"/>
-                    <ComboBoxItem Content="Supercapital Construction Facilities"/>
-                    <ComboBoxItem Content="Clone Vat Bay"/>
+                    <ComboBoxItem Content="Zydrine Prospecting Array" />
+                    <ComboBoxItem Content="Megacyte Prospecting Array" />
+                    <ComboBoxItem Content="Morphite Prospecting Array" />
+                    <ComboBoxItem Content="Advanced Logistics Network" />
+                    <ComboBoxItem Content="Cynosural Navigation" />
+                    <ComboBoxItem Content="Cynosural Suppression" />
+                    <ComboBoxItem Content="Supercapital Construction Facilities" />
+                    <ComboBoxItem Content="Clone Vat Bay" />
                 </ComboBox>
 
-                <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource Infra_LblLevel}" Margin="5" VerticalAlignment="Center" Foreground="White"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource Infra_LblLevel}" Margin="5" VerticalAlignment="Center" Foreground="White" />
                 <ComboBox x:Name="LevelComboBox" Grid.Row="1" Grid.Column="1" Margin="5" Text="0" VerticalAlignment="Center">
-                    <ComboBoxItem Content="0"/>
-                    <ComboBoxItem Content="1"/>
-                    <ComboBoxItem Content="2"/>
-                    <ComboBoxItem Content="3"/>
+                    <ComboBoxItem Content="0" />
+                    <ComboBoxItem Content="1" />
+                    <ComboBoxItem Content="2" />
+                    <ComboBoxItem Content="3" />
                 </ComboBox>
 
-                <CheckBox x:Name="OnlineCheckBox" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="{DynamicResource Infra_ChkOnline}" Margin="15,5,5,5" IsChecked="True" VerticalAlignment="Center" Foreground="White"/>
+                <CheckBox x:Name="OnlineCheckBox" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="{DynamicResource Infra_ChkOnline}" Margin="15,5,5,5" IsChecked="True" VerticalAlignment="Center" Foreground="White" />
 
-                <Button x:Name="AddUpdateButton" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Content="{DynamicResource Infra_BtnAdd}" Width="150" Margin="5" HorizontalAlignment="Left" Click="AddUpdateButton_Click"/>
+                <Button x:Name="AddUpdateButton" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Content="{DynamicResource Infra_BtnAdd}" Width="150" Margin="5" HorizontalAlignment="Left" Click="AddUpdateButton_Click" />
             </Grid>
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="CloseButton" Content="{DynamicResource Infra_BtnClose}" Width="100" Margin="5" Click="CloseButton_Click"/>
+            <Button x:Name="CloseButton" Content="{DynamicResource Infra_BtnClose}" Width="100" Margin="5" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>
 </Window>
