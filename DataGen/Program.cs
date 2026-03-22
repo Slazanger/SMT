@@ -1,38 +1,57 @@
-﻿using SMT.EVEData;
+using SMT.EVEData;
 
 namespace DataGen
 {
     internal static class Program
     {
-        private static SMT.EVEData.EveManager EM { get; set; }
+
+        private static SMT.EVEData.EveManager EM { get; set; } = null!; // Use null-forgiving operator
+
+        // Static constructor ensures the static non-nullable property is initialized
+        static Program()
+        {
+            EM = new(SMT.EVEData.EveAppConfig.SMT_VERSION);
+            EveManager.Instance = EM;
+        }
 
         private static void Main(string[] args)
         {
             // Data Creation
             Console.WriteLine("Creating SMT Data");
 
-            // Initialise the Main Mananger
-            EM = new(SMT.EVEData.EveAppConfig.SMT_VERSION);
-            EveManager.Instance = EM;
+
             string inputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
             string outputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
 
             // Re-Create data
-            EM.CreateFromScratch(inputDataFolder, outputDataFolder);
+            if (EM != null)
+            {
+                EM.CreateFromScratch(inputDataFolder, outputDataFolder);
 
-            // now save off custom SVG's for debug purposes
-            WriteDebugSVGs(outputDataFolder);
+                // now save off custom SVG's for debug purposes
+                WriteDebugSVGs(outputDataFolder);
+            }
+            else
+            {
+                Console.WriteLine("Error: EveManager (EM) is not initialized.");
+            }
         }
 
         private static void WriteDebugSVGs(string outputFolder)
         {
-            foreach(MapRegion mr in EM.Regions)
+            if (EM == null)
+            {
+                Console.WriteLine("Error: EveManager (EM) is not initialized.");
+                return;
+            }
+
+            foreach (MapRegion mr in EM.Regions)
             {
                 SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(1050, 800);
 
                 Dictionary<string, SvgNet.Elements.SvgRectElement> systemElementMap = new Dictionary<string, SvgNet.Elements.SvgRectElement>();
 
-                foreach(MapSystem s in mr.MapSystems.Values)
+                foreach (MapSystem s in mr.MapSystems.Values)
                 {
                     SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)s.Layout.X - 5, (float)s.Layout.Y - 5, 10, 10);
                     sre["Type"] = "system";
@@ -42,7 +61,9 @@ namespace DataGen
 
                     systemElementMap[s.Name] = sre;
 
-                    SvgNet.Elements.SvgTextElement srtText = new(s.Name, (float)s.Layout.X, (float)s.Layout.Y);
+                    SvgNet.Types.SvgLength labelX = new((float)s.Layout.X, SvgNet.Types.SvgLengthType.SVG_LENGTHTYPE_NUMBER);
+                    SvgNet.Types.SvgLength labelY = new((float)s.Layout.Y, SvgNet.Types.SvgLengthType.SVG_LENGTHTYPE_NUMBER);
+                    SvgNet.Elements.SvgTextElement srtText = new SvgNet.Elements.SvgTextElement(s.Name, labelX, labelY);
 
                     svgRootElement.AddChild(sre);
                     svgRootElement.AddChild(srtText);
@@ -50,12 +71,12 @@ namespace DataGen
 
                 // add all the lines
 
-                foreach(MapSystem s in mr.MapSystems.Values)
+                foreach (MapSystem s in mr.MapSystems.Values)
                 {
                     SvgNet.Elements.SvgRectElement from = systemElementMap[s.Name];
-                    foreach(string jumpSys in s.ActualSystem.Jumps)
+                    foreach (string jumpSys in s.ActualSystem.Jumps)
                     {
-                        if(!mr.MapSystems.ContainsKey(jumpSys))
+                        if (!mr.MapSystems.ContainsKey(jumpSys))
                         {
                             continue;
                         }
@@ -76,7 +97,7 @@ namespace DataGen
 
                 string svgStr = svgRootElement.WriteSVGString(false);
                 string filePath = $"{outputFolder}/data/SourceMaps/exported/{mr.DotLanRef}_layout.svg";
-                using(StreamWriter outputFile = new StreamWriter(filePath))
+                using (StreamWriter outputFile = new StreamWriter(filePath))
                 {
                     outputFile.WriteLine(svgStr);
                 }
@@ -86,13 +107,15 @@ namespace DataGen
             {
                 SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(2100, 1600);
 
-                foreach(MapRegion mr in EM.Regions)
+                foreach (MapRegion mr in EM.Regions)
                 {
                     SvgNet.Elements.SvgRectElement sre = new SvgNet.Elements.SvgRectElement((float)mr.UniverseViewX, (float)mr.UniverseViewY, 5, 5);
                     sre["Type"] = "region";
                     sre["Name"] = mr.Name;
 
-                    SvgNet.Elements.SvgTextElement srtText = new(mr.Name, (float)mr.UniverseViewX, (float)mr.UniverseViewY);
+                    SvgNet.Types.SvgLength regionLabelX = new((float)mr.UniverseViewX, SvgNet.Types.SvgLengthType.SVG_LENGTHTYPE_NUMBER);
+                    SvgNet.Types.SvgLength regionLabelY = new((float)mr.UniverseViewY, SvgNet.Types.SvgLengthType.SVG_LENGTHTYPE_NUMBER);
+                    SvgNet.Elements.SvgTextElement srtText = new SvgNet.Elements.SvgTextElement(mr.Name, regionLabelX, regionLabelY);
 
                     svgRootElement.AddChild(sre);
                     svgRootElement.AddChild(srtText);
@@ -100,7 +123,7 @@ namespace DataGen
 
                 string svgStr = svgRootElement.WriteSVGString(false);
                 string filePath = $"{outputFolder}/data/SourceMaps/exported/region_layout.svg";
-                using(StreamWriter outputFile = new StreamWriter(filePath))
+                using (StreamWriter outputFile = new StreamWriter(filePath))
                 {
                     outputFile.WriteLine(svgStr);
                 }

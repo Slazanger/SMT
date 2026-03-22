@@ -807,8 +807,6 @@ namespace SMT.EVEData
 
             public double MinCostToStart;
             public MapNode NearestToStart;
-            public string TheraInSig;
-            public string TheraOutSig;
             public bool Visited;
             public decimal X;
             public decimal Y;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -88,21 +88,14 @@ namespace SMT
             {
                 using(MemoryStream memoryStream = new MemoryStream(xmlBytes))
                 {
-                    object? deserialized = serializer.Deserialize(memoryStream);
-                    if(deserialized is null)
+                    object deserialized = serializer.Deserialize(memoryStream);
+                    if(deserialized is not WINDOWPLACEMENT wp)
                     {
-                        // Deserialization failed, do not proceed.
+                        // Null, wrong type, or deserialization failed — do not proceed.
                         return;
                     }
-                    if(deserialized is WINDOWPLACEMENT wp)
-                    {
-                        placement = wp;
-                    }
-                    else
-                    {
-                        // Unexpected type, do not proceed.
-                        return;
-                    }
+
+                    placement = wp;
                 }
 
                 placement.length = Marshal.SizeOf(typeof(WINDOWPLACEMENT));
