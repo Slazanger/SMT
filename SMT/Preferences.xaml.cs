@@ -108,7 +108,7 @@ namespace SMT
             {
                 System.Diagnostics.Process.Start("explorer.exe", EVEData.EveAppConfig.StorageRoot);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //MessageBox.Show("Error opening folder: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }

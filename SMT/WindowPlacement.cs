@@ -88,7 +88,21 @@ namespace SMT
             {
                 using(MemoryStream memoryStream = new MemoryStream(xmlBytes))
                 {
-                    placement = (WINDOWPLACEMENT)serializer.Deserialize(memoryStream);
+                    object? deserialized = serializer.Deserialize(memoryStream);
+                    if(deserialized is null)
+                    {
+                        // Deserialization failed, do not proceed.
+                        return;
+                    }
+                    if(deserialized is WINDOWPLACEMENT wp)
+                    {
+                        placement = wp;
+                    }
+                    else
+                    {
+                        // Unexpected type, do not proceed.
+                        return;
+                    }
                 }
 
                 placement.length = Marshal.SizeOf(typeof(WINDOWPLACEMENT));

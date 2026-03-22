@@ -177,7 +177,16 @@ namespace SMT
                     FileStream fs = new FileStream(mapConfigFileName, FileMode.Open);
                     XmlReader xmlr = XmlReader.Create(fs);
 
-                    MapConf = (MapConfig)xms.Deserialize(xmlr);
+                    var deserialized = xms.Deserialize(xmlr) as MapConfig;
+                    if(deserialized != null)
+                    {
+                        MapConf = deserialized;
+                    }
+                    else
+                    {
+                        MapConf = new MapConfig();
+                        MapConf.SetDefaultColours();
+                    }
                     fs.Close();
                 }
                 catch
@@ -672,7 +681,7 @@ namespace SMT
                     }
                 }
             }
-            return content;
+            return content!;
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -2174,7 +2183,7 @@ namespace SMT
                         continue;
                     }
 
-                    string[] parts = line.Split(',');
+                    string[] parts = line.Split(",");
 
                     if(parts.Length == 0)
                     {
@@ -2513,8 +2522,9 @@ namespace SMT
             {
                 HotkeyManager.Current.AddOrReplace("Toggle click trough overlay windows.", Key.T, ModifierKeys.Alt | ModifierKeys.Control | ModifierKeys.Shift, OverlayWindows_ToggleClicktrough_HotkeyTrigger);
             }
-            catch(NHotkey.HotkeyAlreadyRegisteredException exception)
+            catch(NHotkey.HotkeyAlreadyRegisteredException)
             {
+                // Hotkey already registered, ignore or log if needed
             }
 
             Overlay newOverlayWindow = new Overlay(this);

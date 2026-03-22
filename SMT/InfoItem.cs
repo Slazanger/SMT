@@ -39,14 +39,14 @@ namespace SMT
 
         public LineType LineStyle;
 
-        public Shape Draw()
+        public Shape? Draw()
         {
             if(FillBrush == null)
             {
                 FillBrush = new SolidColorBrush(Fill);
             }
 
-            Shape infoObject = null;
+            Shape? infoObject = null;
 
             switch(DrawType)
             {

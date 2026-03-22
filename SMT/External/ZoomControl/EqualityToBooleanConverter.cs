@@ -20,9 +20,9 @@ namespace SMT.ZoomControl
             if((bool)value)
                 return parameter;
 
-            return null;
             //it's false, so don't bind it back
-            throw new Exception("EqualityToBooleanConverter: It's false, I won't bind back.");
+            // throw new Exception("EqualityToBooleanConverter: It's false, I won't bind back.");
+            return Binding.DoNothing;
         }
     }
 }
