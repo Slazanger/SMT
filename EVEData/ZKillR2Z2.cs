@@ -184,7 +184,7 @@ public class ZKillR2Z2
             }
         }
 
-        if (AllianceIDs.Count > 0) 
+        if (AllianceIDs.Count > 0)
             EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
 
         if (updatedKillList)

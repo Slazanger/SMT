@@ -1,88 +1,86 @@
-﻿//-----------------------------------------------------------------------
-// EVE Anoms
-//-----------------------------------------------------------------------
+﻿namespace EVEData;
 
-namespace EVEData
+/// <summary>
+/// An Signature / Anom
+/// </summary>
+public class Anom
 {
     /// <summary>
-    /// An Signature / Anom
+    /// Initializes a new instance of the <see cref="Anom" /> class.
     /// </summary>
-    public class Anom
+    public Anom()
+    {
+        Name = string.Empty;
+        Type = string.Empty;
+        TimeFound = DateTime.Now;
+    }
+
+    /// <summary>
+    /// Type of Signature
+    /// </summary>
+    public enum SignatureType
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Anom" /> class.
+        /// Unknown signature type
         /// </summary>
-        public Anom()
-        {
-            Name = string.Empty;
-            Type = string.Empty;
-            TimeFound = DateTime.Now;
-        }
+        Unknown,
 
         /// <summary>
-        /// Type of Signature
+        /// A Combat site
         /// </summary>
-        public enum SignatureType
-        {
-            /// <summary>
-            /// Unknown signature type
-            /// </summary>
-            Unknown,
-
-            /// <summary>
-            /// A Combat site
-            /// </summary>
-            Combat,
-
-            /// <summary>
-            /// An Ore site
-            /// </summary>
-            Ore,
-
-            /// <summary>
-            /// A Gas site
-            /// </summary>
-            Gas,
-
-            /// <summary>
-            /// A Relic site
-            /// </summary>
-            Relic,
-
-            /// <summary>
-            /// A Data site
-            /// </summary>
-            Data,
-
-            /// <summary>
-            /// A wormhole to another place
-            /// </summary>
-            WormHole,
-        }
+        Combat,
 
         /// <summary>
-        /// Gets or sets the name of the signature, eg True Sansha Base XXX
+        /// An Ore site
         /// </summary>
-        public string Name { get; set; }
+        Ore,
 
         /// <summary>
-        /// Gets or sets the Signature ID, eg XYZ
+        /// A Gas site
         /// </summary>
-        public string Signature { get; set; }
+        Gas,
 
         /// <summary>
-        /// Gets or sets the time the signature was first found
+        /// A Relic site
         /// </summary>
-        public DateTime TimeFound { get; set; }
+        Relic,
 
         /// <summary>
-        /// Gets or sets the type of signature
+        /// A Data site
         /// </summary>
-        public string Type { get; set; }
+        Data,
 
         /// <summary>
-        /// Convert to string, keeping the in-game format so that the string can be imported back into SMT
+        /// A wormhole to another place
         /// </summary>
-        public override string ToString() => Signature + "\t" + "Cosmic Signature" + "\t" + Type + "\t" + Name + "\t\t";
+        WormHole
+    }
+
+    /// <summary>
+    /// Gets or sets the name of the signature, eg True Sansha Base XXX
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Signature ID, eg XYZ
+    /// </summary>
+    public string Signature { get; set; }
+
+    /// <summary>
+    /// Gets or sets the time the signature was first found
+    /// </summary>
+    public DateTime TimeFound { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type of signature
+    /// </summary>
+    public string Type { get; set; }
+
+    /// <summary>
+    /// Convert to string, keeping the in-game format so that the string can be imported back into SMT
+    /// </summary>
+    public override string ToString()
+    {
+        return Signature + "\t" + "Cosmic Signature" + "\t" + Type + "\t" + Name + "\t\t";
     }
 }

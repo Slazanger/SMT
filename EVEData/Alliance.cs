@@ -1,31 +1,26 @@
-﻿//-----------------------------------------------------------------------
-// EVE Alliance
-//-----------------------------------------------------------------------
+﻿namespace EVEData;
 
-namespace EVEData
+/// <summary>
+///     A simple container for Alliance items
+/// </summary>
+public class Alliance
 {
     /// <summary>
-    ///     A simple container for Alliance items
+    ///     Initializes a new instance of the <see cref="Alliance" /> class.
     /// </summary>
-    public class Alliance
+    public Alliance()
     {
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Alliance" /> class.
-        /// </summary>
-        public Alliance()
-        {
-            ID = string.Empty;
-            Name = string.Empty;
-        }
-
-        /// <summary>
-        ///     Gets or sets the ID of Alliance
-        /// </summary>
-        public string ID { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the Resolved Name of Alliance
-        /// </summary>
-        public string Name { get; set; }
+        ID = string.Empty;
+        Name = string.Empty;
     }
+
+    /// <summary>
+    ///     Gets or sets the ID of Alliance
+    /// </summary>
+    public string ID { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the Resolved Name of Alliance
+    /// </summary>
+    public string Name { get; set; }
 }

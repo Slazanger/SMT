@@ -1,103 +1,84 @@
 ﻿using System.ComponentModel;
 
-namespace EVEData
+namespace EVEData;
+
+public class SOVCampaign : INotifyPropertyChanged
 {
-    public class SOVCampaign : INotifyPropertyChanged
+    private double m_AttackersScore;
+
+    public double AttackersScore
     {
-        private double m_AttackersScore;
-
-        public double AttackersScore
+        get => m_AttackersScore;
+        set
         {
-            get
-            {
-                return m_AttackersScore;
-            }
-            set
-            {
-                m_AttackersScore = value;
-                OnPropertyChanged("AttackersScore");
-            }
+            m_AttackersScore = value;
+            OnPropertyChanged("AttackersScore");
         }
+    }
 
-        private double m_DefendersScore;
+    private double m_DefendersScore;
 
-        public double DefendersScore
+    public double DefendersScore
+    {
+        get => m_DefendersScore;
+        set
         {
-            get
-            {
-                return m_DefendersScore;
-            }
-            set
-            {
-                m_DefendersScore = value;
-                OnPropertyChanged("DefendersScore");
-            }
+            m_DefendersScore = value;
+            OnPropertyChanged("DefendersScore");
         }
+    }
 
-        public int CampaignID { get; set; }
-        public int DefendingAllianceID { get; set; }
-        public string DefendingAllianceName { get; set; }
-        public string System { get; set; }
-        public string Region { get; set; }
-        public string Type { get; set; }
-        public string State { get; set; }
+    public int CampaignID { get; set; }
+    public int DefendingAllianceID { get; set; }
+    public string DefendingAllianceName { get; set; }
+    public string System { get; set; }
+    public string Region { get; set; }
+    public string Type { get; set; }
+    public string State { get; set; }
 
-        private bool m_isActive;
+    private bool m_isActive;
 
-        public bool IsActive
+    public bool IsActive
+    {
+        get => m_isActive;
+        set
         {
-            get
-            {
-                return m_isActive;
-            }
-            set
-            {
-                m_isActive = value;
-                OnPropertyChanged("IsActive");
-            }
+            m_isActive = value;
+            OnPropertyChanged("IsActive");
         }
+    }
 
-        public DateTime StartTime { get; set; }
+    public DateTime StartTime { get; set; }
 
-        private TimeSpan m_TimeToStart;
+    private TimeSpan m_TimeToStart;
 
-        public TimeSpan TimeToStart
+    public TimeSpan TimeToStart
+    {
+        get => m_TimeToStart;
+        set
         {
-            get
-            {
-                return m_TimeToStart;
-            }
-            set
-            {
-                m_TimeToStart = value;
-                OnPropertyChanged("TimeToStart");
-            }
+            m_TimeToStart = value;
+            OnPropertyChanged("TimeToStart");
         }
+    }
 
-        private bool m_Valid;
+    private bool m_Valid;
 
-        public bool Valid
+    public bool Valid
+    {
+        get => m_Valid;
+        set
         {
-            get
-            {
-                return m_Valid;
-            }
-            set
-            {
-                m_Valid = value;
-                OnPropertyChanged("Valid");
-            }
+            m_Valid = value;
+            OnPropertyChanged("Valid");
         }
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if(handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
-        }
+    protected void OnPropertyChanged(string name)
+    {
+        var handler = PropertyChanged;
+        if (handler != null) handler(this, new PropertyChangedEventArgs(name));
     }
 }

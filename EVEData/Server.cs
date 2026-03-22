@@ -2,82 +2,70 @@
 using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
 using Timer = System.Timers.Timer;
 
-namespace EVEData
+namespace EVEData;
+
+public class Server : INotifyPropertyChanged
 {
-    public class Server : INotifyPropertyChanged
+    private int m_numPlayers;
+    private string m_serverVersion;
+
+    private DateTime m_serverTime;
+
+    public Server()
     {
-        private int m_numPlayers;
-        private string m_serverVersion;
+        // EVE Time is basically UTC time
+        ServerTime = DateTime.UtcNow;
 
-        private DateTime m_serverTime;
+        var timer = new Timer(10000);
+        timer.Elapsed += new ElapsedEventHandler(UpdateServerTime);
+        ;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
 
-        public Server()
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public string Name { get; set; }
+
+    public int NumPlayers
+    {
+        get => m_numPlayers;
+
+        set
         {
-            // EVE Time is basically UTC time
-            ServerTime = DateTime.UtcNow;
-
-            Timer timer = new Timer(10000);
-            timer.Elapsed += new ElapsedEventHandler(UpdateServerTime); ;
-            timer.AutoReset = true;
-            timer.Enabled = true;
+            m_numPlayers = value;
+            OnPropertyChanged("NumPlayers");
         }
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public string Name { get; set; }
-
-        public int NumPlayers
+    public DateTime ServerTime
+    {
+        get => m_serverTime;
+        set
         {
-            get
-            {
-                return m_numPlayers;
-            }
-
-            set
-            {
-                m_numPlayers = value;
-                OnPropertyChanged("NumPlayers");
-            }
+            m_serverTime = value;
+            OnPropertyChanged("ServerTime");
         }
+    }
 
-        public DateTime ServerTime
+    public string ServerVersion
+    {
+        get => m_serverVersion;
+        set
         {
-            get
-            {
-                return m_serverTime;
-            }
-            set
-            {
-                m_serverTime = value;
-                OnPropertyChanged("ServerTime");
-            }
+            m_serverVersion = value;
+            OnPropertyChanged("ServerVersion");
         }
+    }
 
-        public string ServerVersion
-        {
-            get
-            {
-                return m_serverVersion;
-            }
-            set
-            {
-                m_serverVersion = value;
-                OnPropertyChanged("ServerVersion");
-            }
-        }
+    public void UpdateServerTime(object sender, EventArgs e)
+    {
+        ServerTime = DateTime.UtcNow;
+    }
 
-        public void UpdateServerTime(object sender, EventArgs e)
-        {
-            ServerTime = DateTime.UtcNow;
-        }
-
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if(handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
-        }
+    protected void OnPropertyChanged(string name)
+    {
+        var handler = PropertyChanged;
+        if (handler != null) handler(this, new PropertyChangedEventArgs(name));
     }
 }

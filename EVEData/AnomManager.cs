@@ -1,13 +1,6 @@
-﻿//-----------------------------------------------------------------------
-// EVE AnomManager
-//-----------------------------------------------------------------------
-
-#region
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Utils;
 
-#endregion
 
 namespace EVEData;
 

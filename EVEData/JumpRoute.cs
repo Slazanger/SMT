@@ -1,93 +1,74 @@
-﻿namespace EVEData
+﻿namespace EVEData;
+
+public class JumpRoute
 {
-    public class JumpRoute
+    public List<Navigation.RoutePoint> CurrentRoute { get; set; }
+    public List<string> WayPoints { get; set; }
+    public double MaxLY { get; set; }
+    public int JDC { get; set; }
+
+    public List<string> AvoidSystems { get; set; }
+
+    public Dictionary<string, List<string>> AlternateMids { get; set; }
+
+    public JumpRoute()
     {
-        public List<Navigation.RoutePoint> CurrentRoute { get; set; }
-        public List<string> WayPoints { get; set; }
-        public double MaxLY { get; set; }
-        public int JDC { get; set; }
+        MaxLY = 7.0;
+        JDC = 5;
 
-        public List<string> AvoidSystems { get; set; }
+        CurrentRoute = new List<Navigation.RoutePoint>();
+        WayPoints = new List<string>();
+        AvoidSystems = new List<string>();
+        AlternateMids = new Dictionary<string, List<string>>();
+    }
 
-        public Dictionary<string, List<string>> AlternateMids { get; set; }
+    public void Recalculate()
+    {
+        CurrentRoute.Clear();
 
-        public JumpRoute()
+        if (WayPoints.Count < 2) return;
+
+        var actualMaxLY = MaxLY;
+        if (JDC != 5) actualMaxLY *= .9;
+
+        // new routing
+        var start = string.Empty;
+        var end = WayPoints[0];
+
+        var avoidSystems = AvoidSystems;
+
+        AlternateMids.Clear();
+
+        // loop through all the waypoints
+        for (var i = 1; i < WayPoints.Count; i++)
         {
-            MaxLY = 7.0;
-            JDC = 5;
+            start = end;
+            end = WayPoints[i];
 
-            CurrentRoute = new List<Navigation.RoutePoint>();
-            WayPoints = new List<string>();
-            AvoidSystems = new List<string>();
-            AlternateMids = new Dictionary<string, List<string>>();
-        }
+            var sysList = Navigation.NavigateCapitals(start, end, actualMaxLY, null, avoidSystems);
 
-        public void Recalculate()
-        {
-            CurrentRoute.Clear();
-
-            if(WayPoints.Count < 2)
+            if (sysList != null)
             {
-                return;
-            }
+                foreach (var s in sysList)
+                    // for multiple waypoint routes, the first in the new and last item in the list will be the same system, so remove
+                    if (CurrentRoute.Count > 0 && CurrentRoute.Last().SystemName == s.SystemName)
+                        CurrentRoute.Last().LY = s.LY;
+                    else
+                        CurrentRoute.Add(s);
 
-            double actualMaxLY = MaxLY;
-            if(JDC != 5)
-            {
-                actualMaxLY *= .9;
-            }
-
-            // new routing
-            string start = string.Empty;
-            string end = WayPoints[0];
-
-            List<string> avoidSystems = AvoidSystems;
-
-            AlternateMids.Clear();
-
-            // loop through all the waypoints
-            for(int i = 1; i < WayPoints.Count; i++)
-            {
-                start = end;
-                end = WayPoints[i];
-
-                List<Navigation.RoutePoint> sysList = Navigation.NavigateCapitals(start, end, actualMaxLY, null, avoidSystems);
-
-                if(sysList != null)
-                {
-                    foreach(Navigation.RoutePoint s in sysList)
+                if (sysList.Count > 2)
+                    for (var j = 2; j < sysList.Count; j++)
                     {
-                        // for multiple waypoint routes, the first in the new and last item in the list will be the same system, so remove
-                        if(CurrentRoute.Count > 0 && CurrentRoute.Last().SystemName == s.SystemName)
-                        {
-                            CurrentRoute.Last().LY = s.LY;
-                        }
-                        else
-                        {
-                            CurrentRoute.Add(s);
-                        }
+                        var a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j - 2].SystemName, MaxLY, false, false);
+                        var b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j].SystemName, MaxLY, false, false);
+
+                        IEnumerable<string> alternatives = a.AsQueryable().Intersect(b);
+
+                        AlternateMids[CurrentRoute[j - 1].SystemName] = new List<string>();
+                        foreach (var mid in alternatives)
+                            if (mid != CurrentRoute[j - 1].SystemName)
+                                AlternateMids[CurrentRoute[j - 1].SystemName].Add(mid);
                     }
-
-                    if(sysList.Count > 2)
-                    {
-                        for(int j = 2; j < sysList.Count; j++)
-                        {
-                            List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j - 2].SystemName, MaxLY, false, false);
-                            List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j].SystemName, MaxLY, false, false);
-
-                            IEnumerable<string> alternatives = a.AsQueryable().Intersect(b);
-
-                            AlternateMids[CurrentRoute[j - 1].SystemName] = new List<string>();
-                            foreach(string mid in alternatives)
-                            {
-                                if(mid != CurrentRoute[j - 1].SystemName)
-                                {
-                                    AlternateMids[CurrentRoute[j - 1].SystemName].Add(mid);
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }
