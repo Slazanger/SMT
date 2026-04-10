@@ -21,12 +21,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "Welcome to Super-Highsec";
+        public const string SMT_TITLE = "Fight Club!";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_146";
+        public const string SMT_VERSION = "SMT_147";
 
 
         /// <summary>
