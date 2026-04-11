@@ -310,10 +310,10 @@
     <s:String x:Key="Ctx_ClearRoute">Clear Route</s:String>
     <s:String x:Key="Ctx_ShowJumpRange">Show Jump Range</s:String>
     <s:String x:Key="Ctx_None">None</s:String>
-    <s:String x:Key="Ctx_Super">Super/Titan  (6.0LY)</s:String>
+    <s:String x:Key="Ctx_Super">Super/Titan (6.0LY)</s:String>
     <s:String x:Key="Ctx_Carrier">Carriers/Fax (7.0LY)</s:String>
-    <s:String x:Key="Ctx_Blops">Black Ops    (8.0LY)</s:String>
-    <s:String x:Key="Ctx_JF">Header="JF/Rorq     (10.0LY)</s:String>
+    <s:String x:Key="Ctx_Blops">Black Ops (8.0LY)</s:String>
+    <s:String x:Key="Ctx_JF">JF/Rorq (10.0LY)</s:String>
     <s:String x:Key="Ctx_Dotlan">DotLan</s:String>
     <s:String x:Key="Ctx_ZKB">ZKillBoard</s:String>
     <s:String x:Key="Ctx_CopyName">Copy Name</s:String>
