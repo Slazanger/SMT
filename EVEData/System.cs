@@ -264,7 +264,7 @@ namespace SMT.EVEData
 
         public override string ToString()
         {
-            return LocalizedName;
+            return $"{LocalizedName} ({Region})"; ;
         }
 
     }
