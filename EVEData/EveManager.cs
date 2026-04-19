@@ -3763,7 +3763,10 @@ namespace SMT.EVEData
 
                 string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0";
                 hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
-                hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
+                if(LastDotlanUpdate != DateTime.MinValue)
+                {
+                    hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
+                }
 
                 // set the etag if we have one
                 if(LastDotlanETAG != "")
@@ -3789,8 +3792,9 @@ namespace SMT.EVEData
 
                 if(response.StatusCode == HttpStatusCode.NotModified)
                 {
-                    // we shouldn't hit this; the first request should update the request beyond the last-modified expiring
-                    // LastDotlanUpdate = DateTime.Now;
+                    // Data hasn't changed; push next check out by ~1 hour to avoid hammering
+                    Random rndUpdateOffset = new Random();
+                    NextDotlanUpdate = DateTime.Now + TimeSpan.FromMinutes(60) + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300));
                 }
                 else
                 {
