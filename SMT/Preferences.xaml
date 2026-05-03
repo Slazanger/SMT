@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:SMT"
+        xmlns:conv="clr-namespace:SMT.Converters"
         mc:Ignorable="d"
         Name="PrefsWindow"
         Title="{DynamicResource Prefs_Title}" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Window.Resources>
-        <local:JoinStringConverter  x:Key="stringJoiner" />
-        <local:NegateBooleanConverter x:Key="NegateBooleanConverter" />
+        <conv:JoinStringConverter x:Key="stringJoiner" />
+        <conv:NegateBooleanConverter x:Key="NegateBooleanConverter" />
     </Window.Resources>
 
     <Grid Background="{DynamicResource ButtonBorder}" HorizontalAlignment="Stretch" VerticalAlignment="Top">

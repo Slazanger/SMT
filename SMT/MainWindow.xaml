@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:SMT"
+        xmlns:conv="clr-namespace:SMT.Converters"
         xmlns:eveData="clr-namespace:SMT.EVEData;assembly=EVEData"
         xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
         xmlns:xcad="clr-namespace:AvalonDock;assembly=AvalonDock"
@@ -15,10 +16,10 @@
         Title="SMT" Height="850" Width="1124" Icon="smt_bomb_icon.ico" ResizeMode="CanResizeWithGrip" RenderOptions.ClearTypeHint="Enabled" TextOptions.TextFormattingMode="Ideal">
 
     <Window.Resources>
-        <local:ZKBBackgroundConverter x:Key="zkbBGConverter" />
-        <local:ZKBForegroundConverter x:Key="zkbBGFConverter" />
-        <local:TimeSpanConverter x:Key="timeSpanConverter" />
-        <local:TimeSinceConverter x:Key="TimeSinceConverter" />
+        <conv:ZKBBackgroundConverter x:Key="zkbBGConverter" />
+        <conv:ZKBForegroundConverter x:Key="zkbBGFConverter" />
+        <conv:TimeSpanConverter x:Key="timeSpanConverter" />
+        <conv:TimeSinceConverter x:Key="TimeSinceConverter" />
 
         <ObjectDataProvider x:Key="navigationEnumData" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
