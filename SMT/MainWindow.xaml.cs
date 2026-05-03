@@ -2291,38 +2291,6 @@ namespace SMT
             RegionUC.InfoLayer = InfoLayer;
         }
 
-        private void TestMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            string characterName = ActiveCharacter.Name;
-
-            LocalCharacter lc = ActiveCharacter;
-
-            string line = "Your cloak deactivates due to a pulse from a Mobile Observatory deployed by Slazanger.";
-
-            lc.GameLogWarningText = line;
-
-            if(OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763, 0))
-            {
-                ToastContentBuilder tb = new ToastContentBuilder();
-                tb.AddText("SMT Alert");
-                tb.AddText("Character : " + characterName + "(" + lc.Location + ")");
-
-                // add the character portrait if we have one
-                if(lc.PortraitLocation != null)
-                {
-                    tb.AddInlineImage(lc.PortraitLocation);
-                }
-
-                tb.AddText(line);
-                tb.AddArgument("character", characterName);
-                tb.SetToastScenario(ToastScenario.Alarm);
-                tb.SetToastDuration(ToastDuration.Long);
-                Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-                tb.AddAudio(woopUri);
-                tb.Show();
-            }
-        }
-
         private void miResetLayout_Click(object sender, RoutedEventArgs e)
         {
             string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";

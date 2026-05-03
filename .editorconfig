@@ -1,0 +1,26 @@
+# SMT solution — Phase 0: analyzers enabled; dampen legacy noise until fixed incrementally.
+root = true
+
+[*.{cs,csx,vb,vbx}]
+indent_style = space
+indent_size = 4
+
+[*.cs]
+# Nullable reference warnings across pre-nullable WPF / EVEData codebases
+dotnet_diagnostic.CS8618.severity = none
+dotnet_diagnostic.CS8612.severity = none
+dotnet_diagnostic.CS8625.severity = none
+dotnet_diagnostic.CS8603.severity = none
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8605.severity = none
+dotnet_diagnostic.CS8629.severity = none
+dotnet_diagnostic.CS8602.severity = none
+dotnet_diagnostic.CS8601.severity = none
+dotnet_diagnostic.CS8622.severity = none
+dotnet_diagnostic.CS0168.severity = none
+dotnet_diagnostic.CS0169.severity = none
+dotnet_diagnostic.CS8604.severity = none
+# Reserved / incomplete graph fields
+dotnet_diagnostic.CS0649.severity = none
+# Third-party / tool code patterns (address when touching those lines)
+dotnet_diagnostic.CS0618.severity = suggestion

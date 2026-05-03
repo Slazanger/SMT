@@ -198,7 +198,7 @@ namespace SMT.EVEData
             }
             if(AllianceIDs.Count > 0)
             {
-                EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
+                _ = EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
             }
 
             if(updatedKillList)

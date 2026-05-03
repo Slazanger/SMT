@@ -3819,7 +3819,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch(Exception e)
+            catch
             {
             }
         }
@@ -4241,7 +4241,7 @@ namespace SMT.EVEData
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 // Log error if needed
             }
@@ -4273,7 +4273,7 @@ namespace SMT.EVEData
 
                 File.WriteAllLines(filePath, lines);
             }
-            catch (Exception ex)
+            catch
             {
                 // Log error if needed
             }
