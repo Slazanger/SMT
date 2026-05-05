@@ -46,5 +46,17 @@ namespace SMT.Properties {
                 this["OverlayWindow_placement"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ZKBMonitorWindow_placement {
+            get {
+                return ((string)(this["ZKBMonitorWindow_placement"]));
+            }
+            set {
+                this["ZKBMonitorWindow_placement"] = value;
+            }
+        }
     }
 }

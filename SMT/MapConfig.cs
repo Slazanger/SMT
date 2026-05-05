@@ -12,6 +12,9 @@ namespace SMT
         [Browsable(false)]
         public MapColours ActiveColourScheme;
 
+        [Browsable(false)]
+        private string m_Language = "en-US";
+
         [Category("Navigation")]
         private bool m_AlwaysOnTop;
 
@@ -111,12 +114,32 @@ namespace SMT
         private bool m_overlayIndividualCharacterWindows = false;
         private string m_overlayAdditionalCharacterNamesDisplay = "All";
 
+        // ZKB float window settings
+        private float m_zkbFloatBackgroundOpacity = 0.2f;
+        private float m_zkbFloatContentOpacity = 0.85f;
+        private int m_zkbFloatMaxKills = 50;
+        private bool m_zkbFloatFilterByRegion = true;
+
         public MapConfig()
         {
             SetDefaults();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        [Browsable(false)]
+        public string Language
+        {
+            get { return m_Language; }
+            set
+            {
+                if (m_Language != value)
+                {
+                    m_Language = value;
+                    OnPropertyChanged("Language");
+                }
+            }
+        }
 
         [Category("General")]
         [DisplayName("Always on top")]
@@ -1218,6 +1241,38 @@ namespace SMT
                 OnPropertyChanged("IntelHistoricTime");
             }
         }
+
+        [Browsable(false)]
+        public float ZKBFloatBackgroundOpacity
+        {
+            get { return m_zkbFloatBackgroundOpacity; }
+            set { m_zkbFloatBackgroundOpacity = Math.Clamp(value, 0.05f, 1.0f); OnPropertyChanged("ZKBFloatBackgroundOpacity"); }
+        }
+
+        [Browsable(false)]
+        public float ZKBFloatContentOpacity
+        {
+            get { return m_zkbFloatContentOpacity; }
+            set { m_zkbFloatContentOpacity = Math.Clamp(value, 0.1f, 1.0f); OnPropertyChanged("ZKBFloatContentOpacity"); }
+        }
+
+        [Browsable(false)]
+        public int ZKBFloatMaxKills
+        {
+            get { return m_zkbFloatMaxKills; }
+            set { m_zkbFloatMaxKills = Math.Clamp(value, 10, 200); OnPropertyChanged("ZKBFloatMaxKills"); }
+        }
+
+        [Browsable(false)]
+        public bool ZKBFloatFilterByRegion
+        {
+            get { return m_zkbFloatFilterByRegion; }
+            set { m_zkbFloatFilterByRegion = value; OnPropertyChanged("ZKBFloatFilterByRegion"); }
+        }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public bool ZKBFloatWindowOpen { get; set; }
 
         public int ZkillExpireTimeMinutes
         {

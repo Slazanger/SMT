@@ -110,10 +110,18 @@
     <s:String x:Key="Prefs_Ovl_NPCDel">显示 NPC 击杀数量的变化差值</s:String>
     <s:String x:Key="Prefs_Ovl_Route">在悬浮窗上画出设定的自动导航路线</s:String>
     <s:String x:Key="Prefs_Ovl_FullReg">猎手模式下强制显示整个星域地图</s:String>
+
+    <s:String x:Key="Prefs_ZKB_FloatGrp">ZKB 浮动窗口设置</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatBgOp">背景不透明度</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatCtOp">内容不透明度</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatMax">最大显示击杀数</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatReg">仅显示当前星域</s:String>
+
     <s:String x:Key="Prefs_Col_Reset">重置所有颜色为默认</s:String>
 
     <s:String x:Key="Main_Menu_Characters">角色管理</s:String>
     <s:String x:Key="Main_Menu_Overlay">开启雷达悬浮窗</s:String>
+    <s:String x:Key="Main_Menu_ZKBFloat">ZKB 浮动窗口</s:String>
     <s:String x:Key="Main_Menu_Exit">退出程序</s:String>
     <s:String x:Key="Main_Menu_Data">数据工具</s:String>
     <s:String x:Key="Main_Menu_ManageInfra">管理基础设施升级...</s:String>

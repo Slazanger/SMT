@@ -35,6 +35,7 @@ namespace SMT
         public static MainWindow AppWindow;
         private LogonWindow logonBrowserWindow;
         private List<Overlay> overlayWindows = new();
+        private ZKBMonitor zkbMonitorWindow;
         private bool overlayWindowsAreClickTrough = false;
 
         public bool OverlayWindowsAreClickTrough
@@ -141,32 +142,7 @@ namespace SMT
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
 
-            InitializeComponent();
-
-            Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
-
-            // Load the Dock Manager Layout file
-            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
-            if(File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
-            {
-                try
-                {
-                    AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new(dockManager);
-                    using(var sr = new StreamReader(dockManagerLayoutName))
-                    {
-                        ls.Deserialize(sr);
-                    }
-                }
-                catch
-                {
-                }
-            }
-
-            // Due to bugs in the Dock manager patch up the content id's for the 2 main views
-            RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
-            UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
-
-            // load any custom map settings off disk
+            // Load MapConfig BEFORE InitializeComponent so language can be applied
             string mapConfigFileName = Path.Combine(EveAppConfig.StorageRoot, "MapConfig_" + MapConfig.SaveVersion + ".dat");
 
             if(File.Exists(mapConfigFileName))
@@ -191,6 +167,55 @@ namespace SMT
                 MapConf = new MapConfig();
                 MapConf.SetDefaultColours();
             }
+
+            // Apply persisted language before InitializeComponent resolves DynamicResource
+            if (MapConf != null && MapConf.Language == "zh-CN")
+            {
+                ResourceDictionary oldLangDict = null;
+                foreach (var dict in Application.Current.Resources.MergedDictionaries)
+                {
+                    if (dict.Source != null && dict.Source.OriginalString.StartsWith("Languages/"))
+                    {
+                        oldLangDict = dict;
+                        break;
+                    }
+                }
+
+                ResourceDictionary newLangDict = new ResourceDictionary
+                {
+                    Source = new Uri("Languages/zh-CN.xaml", UriKind.Relative)
+                };
+                Application.Current.Resources.MergedDictionaries.Add(newLangDict);
+                if (oldLangDict != null)
+                    Application.Current.Resources.MergedDictionaries.Remove(oldLangDict);
+
+                EVEData.EveManager.CurrentLanguage = "zh-CN";
+            }
+
+            InitializeComponent();
+
+            Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
+
+            // Load the Dock Manager Layout file
+            string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
+            if(File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
+            {
+                try
+                {
+                    AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new(dockManager);
+                    using(var sr = new StreamReader(dockManagerLayoutName))
+                    {
+                        ls.Deserialize(sr);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            // Due to bugs in the Dock manager patch up the content id's for the 2 main views
+            RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
+            UniverseLayoutDoc = FindDocWithContentID(dockManager.Layout, "FullUniverseViewID");
 
             if(MapConf.AlwaysOnTop)
             {
@@ -233,6 +258,18 @@ namespace SMT
             {
                 EVEManager.LoadFromDisk();
             }
+
+            EVEManager.LoadShipTypesCNFromCache();
+            _ = EVEManager.FetchShipTypeChineseNamesAsync().ContinueWith(_ =>
+            {
+                Application.Current?.Dispatcher.Invoke(() =>
+                {
+                    foreach (var item in EVEManager.ZKillFeed.KillStream)
+                    {
+                        item.RefreshShipTypeDisplay();
+                    }
+                });
+            });
 
             EVEManager.SetupIntelWatcher();
             EVEManager.SetupGameLogWatcher();
@@ -2526,6 +2563,20 @@ namespace SMT
             newOverlayWindow.Closing += OnOverlayWindowClosing;
             newOverlayWindow.Show();
             overlayWindows.Add(newOverlayWindow);
+        }
+
+        private void ZKBFloatWindow_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (zkbMonitorWindow != null)
+            {
+                zkbMonitorWindow.Close();
+                zkbMonitorWindow = null;
+                return;
+            }
+
+            zkbMonitorWindow = new ZKBMonitor(this);
+            zkbMonitorWindow.Closing += (s, args) => { zkbMonitorWindow = null; };
+            zkbMonitorWindow.Show();
         }
 
         private void OverlayClickTroughToggle_MenuItem_Click(object sender, RoutedEventArgs e)

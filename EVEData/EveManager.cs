@@ -676,6 +676,11 @@ namespace SMT.EVEData
         public SerializableDictionary<string, string> ShipTypes { get; set; }
 
         /// <summary>
+        /// Gets or sets the Chinese Ship Type ID to Name dictionary (populated from ESI)
+        /// </summary>
+        public SerializableDictionary<string, string> ShipTypesCN { get; set; } = new SerializableDictionary<string, string>();
+
+        /// <summary>
         /// Gets or sets the System ID to Name dictionary
         /// </summary>
         public SerializableDictionary<long, string> SystemIDToName { get; set; }
@@ -2394,6 +2399,76 @@ namespace SMT.EVEData
                         }
                     }
                 }
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Load Chinese ship type names from local cache
+        /// </summary>
+        public void LoadShipTypesCNFromCache()
+        {
+            string cnFile = Path.Combine(SaveDataRootFolder, "ShipTypesCN.dat");
+            if (File.Exists(cnFile))
+            {
+                try
+                {
+                    ShipTypesCN = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(cnFile) ?? new SerializableDictionary<string, string>();
+                }
+                catch { ShipTypesCN = new SerializableDictionary<string, string>(); }
+            }
+        }
+
+        /// <summary>
+        /// Fetch missing Chinese ship type names from ESI
+        /// </summary>
+        public async Task FetchShipTypeChineseNamesAsync(CancellationToken cancellationToken = default)
+        {
+            if (ShipTypes == null || ShipTypesCN == null) return;
+
+            List<int> missingIDs = new List<int>();
+            foreach (var kvp in ShipTypes)
+            {
+                if (!ShipTypesCN.ContainsKey(kvp.Key) && int.TryParse(kvp.Key, out int typeId) && typeId > 0)
+                {
+                    missingIDs.Add(typeId);
+                }
+            }
+
+            if (missingIDs.Count == 0) return;
+
+            try
+            {
+                using (var semaphore = new SemaphoreSlim(5))
+                {
+                    var tasks = missingIDs.Select(async typeId =>
+                    {
+                        await semaphore.WaitAsync(cancellationToken);
+                        try
+                        {
+                            var response = await EveApiClient.Universe.GetTypeInfoAsync(typeId, null, "zh");
+                            if (response != null && response.Model != null && !string.IsNullOrEmpty(response.Model.Name))
+                            {
+                                lock (ShipTypesCN)
+                                {
+                                    ShipTypesCN[typeId.ToString()] = response.Model.Name;
+                                }
+                            }
+                        }
+                        catch { }
+                        finally { semaphore.Release(); }
+                    });
+
+                    await Task.WhenAll(tasks);
+                }
+            }
+            catch { }
+
+            // Save cache
+            try
+            {
+                string cnFile = Path.Combine(SaveDataRootFolder, "ShipTypesCN.dat");
+                Serialization.SerializeToDisk(ShipTypesCN, cnFile);
             }
             catch { }
         }
