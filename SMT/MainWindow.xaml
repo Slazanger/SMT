@@ -54,6 +54,7 @@
                     <MenuItem Header="{DynamicResource Main_Menu_Characters}" Click="Characters_MenuItem_Click" />
                     <MenuItem Header="{DynamicResource Menu_Preferences}" Click="Preferences_MenuItem_Click" />
                     <MenuItem Header="{DynamicResource Main_Menu_Overlay}" Click="OverlayWindow_MenuItem_Click" />
+                    <MenuItem Header="{DynamicResource Main_Menu_ZKBFloat}" Click="ZKBFloatWindow_MenuItem_Click" />
                     <MenuItem Header="{DynamicResource Main_Menu_Exit}" Click="Exit_MenuItem_Click" />
                 </MenuItem>
 
@@ -578,7 +579,7 @@
                                                         </DataGridTextColumn.Header>
                                                     </DataGridTextColumn>
 
-                                                    <DataGridTextColumn Binding="{Binding ShipType}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False">
+                                                    <DataGridTextColumn Binding="{Binding ShipTypeDisplay}" Width="30*" IsReadOnly="True" CanUserReorder="False" CanUserSort="False">
                                                         <DataGridTextColumn.Header>
                                                             <TextBlock Text="{DynamicResource ZKB_Column_ShipType}" />
                                                         </DataGridTextColumn.Header>

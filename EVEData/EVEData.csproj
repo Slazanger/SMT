@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="DecimalMath.DecimalEx" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" /> 
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
 
@@ -32,6 +32,9 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="data\ShipTypes.dat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="data\ShipTypesCN.dat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="data\Systems.dat">

@@ -110,10 +110,18 @@
     <s:String x:Key="Prefs_Ovl_NPCDel">Show NPC kill delta</s:String>
     <s:String x:Key="Prefs_Ovl_Route">Show the current route</s:String>
     <s:String x:Key="Prefs_Ovl_FullReg">Show the full region in hunter mode</s:String>
+
+    <s:String x:Key="Prefs_ZKB_FloatGrp">ZKB Float Window</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatBgOp">Background Opacity</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatCtOp">Content Opacity</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatMax">Max Kills to Display</s:String>
+    <s:String x:Key="Prefs_ZKB_FloatReg">Filter by Selected Region</s:String>
+
     <s:String x:Key="Prefs_Col_Reset">Reset Colours</s:String>
 
     <s:String x:Key="Main_Menu_Characters">Characters</s:String>
     <s:String x:Key="Main_Menu_Overlay">Overlay</s:String>
+    <s:String x:Key="Main_Menu_ZKBFloat">ZKB Float Window</s:String>
     <s:String x:Key="Main_Menu_Exit">Exit</s:String>
     <s:String x:Key="Main_Menu_Data">Data</s:String>
     <s:String x:Key="Main_Menu_ManageInfra">Manage Infrastructure Upgrades...</s:String>

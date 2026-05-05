@@ -132,7 +132,8 @@ namespace SMT.EVEData
                         zs.SystemName = EveManager.Instance.GetEveSystemNameFromID((int)r2z2Data.Esi.SolarSystemId);
                         zs.KillTime = r2z2Data.Esi.KillmailTime.ToLocalTime();
 
-                        string shipID = r2z2Data.Esi.Victim.ShipTypeId.ToString();
+                        zs.ShipTypeID = r2z2Data.Esi.Victim.ShipTypeId;
+                        string shipID = zs.ShipTypeID.ToString();
                         if(EveManager.Instance.ShipTypes.ContainsKey(shipID))
                         {
                             zs.ShipType = EveManager.Instance.ShipTypes[shipID];
@@ -231,9 +232,51 @@ namespace SMT.EVEData
             public DateTimeOffset KillTime { get; set; }
 
             /// <summary>
-            /// Gets or sets the Ship Lost in this kill
+            /// Gets or sets the Ship Type ID from the kill mail
             /// </summary>
-            public string ShipType { get; set; }
+            public int ShipTypeID { get; set; }
+
+            private string m_shipType;
+
+            /// <summary>
+            /// Gets or sets the Ship Lost in this kill (English name)
+            /// </summary>
+            public string ShipType
+            {
+                get => m_shipType;
+                set
+                {
+                    m_shipType = value;
+                    OnPropertyChanged("ShipType");
+                    OnPropertyChanged("ShipTypeDisplay");
+                }
+            }
+
+            /// <summary>
+            /// Gets the ship type name in the current display language
+            /// </summary>
+            public string ShipTypeDisplay
+            {
+                get
+                {
+                    if (EveManager.CurrentLanguage == "zh-CN" &&
+                        EveManager.Instance != null &&
+                        EveManager.Instance.ShipTypesCN != null &&
+                        EveManager.Instance.ShipTypesCN.ContainsKey(ShipTypeID.ToString()))
+                    {
+                        return EveManager.Instance.ShipTypesCN[ShipTypeID.ToString()];
+                    }
+                    return ShipType;
+                }
+            }
+
+            /// <summary>
+            /// Notify that ShipTypeDisplay may have changed (e.g. after language change or CN names loaded)
+            /// </summary>
+            public void RefreshShipTypeDisplay()
+            {
+                OnPropertyChanged("ShipTypeDisplay");
+            }
 
             /// <summary>
             /// Gets or sets the System ID the kill was in

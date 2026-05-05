@@ -482,8 +482,16 @@ namespace SMT
                     Application.Current.Resources.MergedDictionaries.Remove(oldLangDict);
                 }
 
-                // Update app language (static on EveManager; no Instance required)
                 SMT.EVEData.EveManager.CurrentLanguage = langCode;
+
+                if (MapConf != null)
+                    MapConf.Language = langCode;
+
+                // Refresh ZKB ship type display for current language
+                foreach (var item in EVEData.EveManager.Instance.ZKillFeed.KillStream)
+                {
+                    item.RefreshShipTypeDisplay();
+                }
 
                 // Redraw maps so labels use the new language
                 if (MainWindow.AppWindow != null)

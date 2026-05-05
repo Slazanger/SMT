@@ -8,5 +8,8 @@
     <Setting Name="OverlayWindow_placement" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="ZKBMonitorWindow_placement" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
