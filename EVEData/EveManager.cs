@@ -2404,18 +2404,42 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Load Chinese ship type names from local cache
+        /// Load Chinese ship type names from built-in data, then merge user cache
         /// </summary>
         public void LoadShipTypesCNFromCache()
         {
-            string cnFile = Path.Combine(SaveDataRootFolder, "ShipTypesCN.dat");
-            if (File.Exists(cnFile))
+            ShipTypesCN = new SerializableDictionary<string, string>();
+
+            // Load built-in Chinese ship names shipped with the application
+            string builtinFile = Path.Combine(DataRootFolder, "ShipTypesCN.dat");
+            if (File.Exists(builtinFile))
             {
                 try
                 {
-                    ShipTypesCN = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(cnFile) ?? new SerializableDictionary<string, string>();
+                    var builtin = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(builtinFile);
+                    if (builtin != null)
+                    {
+                        foreach (var kvp in builtin)
+                            ShipTypesCN[kvp.Key] = kvp.Value;
+                    }
                 }
-                catch { ShipTypesCN = new SerializableDictionary<string, string>(); }
+                catch { }
+            }
+
+            // Merge user cache (may contain updates or overrides)
+            string userCnFile = Path.Combine(SaveDataRootFolder, "ShipTypesCN.dat");
+            if (File.Exists(userCnFile))
+            {
+                try
+                {
+                    var userCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(userCnFile);
+                    if (userCache != null)
+                    {
+                        foreach (var kvp in userCache)
+                            ShipTypesCN[kvp.Key] = kvp.Value;
+                    }
+                }
+                catch { }
             }
         }
 
