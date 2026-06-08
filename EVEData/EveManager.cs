@@ -1728,18 +1728,12 @@ namespace SMT.EVEData
                 throw new Exception("Data Creation Error");
             }
 
-            // until we build a new jsonline parser for the new SDE format manually add the new ships from Catalyst which are
-            // the Pioneer,
-            // Outrider,
-            // Venture Consortium Issue 
-            // Pioneer Consortium Issue
-            // Odysseus
-
-            ShipTypes.Add("89240", "Pioneer");
-            ShipTypes.Add("89649", "Outrider");
-            ShipTypes.Add("89648", "Venture Consortium Issue");
-            ShipTypes.Add("89647", "Pioneer Consortium Issue");
-            ShipTypes.Add("89607", "Odysseus");
+            // Keep these as a fallback for older cached SDE inputs; current JSONL exports should already include them.
+            ShipTypes.TryAdd("89240", "Pioneer");
+            ShipTypes.TryAdd("89649", "Outrider");
+            ShipTypes.TryAdd("89648", "Venture Consortium Issue");
+            ShipTypes.TryAdd("89647", "Pioneer Consortium Issue");
+            ShipTypes.TryAdd("89607", "Odysseus");
 
 
 

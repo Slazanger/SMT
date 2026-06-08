@@ -6,26 +6,49 @@ namespace DataGen
     {
         private static SMT.EVEData.EveManager EM { get; set; }
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             // Data Creation
             Console.WriteLine("Creating SMT Data");
+            DataGenOptions options = DataGenOptions.Parse(args);
 
             // Initialise the Main Mananger
             EM = new(SMT.EVEData.EveAppConfig.SMT_VERSION);
             EveManager.Instance = EM;
-            string inputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
-            string outputDataFolder = AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\..\EVEData\";
+            string repoRoot = ResolveRepoRoot();
+            string outputDataFolder = Path.Combine(repoRoot, "EVEData");
+            string inputDataFolder = await new SdeDataPreparer(outputDataFolder, options).PrepareAsync();
 
             // Re-Create data
             EM.CreateFromScratch(inputDataFolder, outputDataFolder);
 
             // now save off custom SVG's for debug purposes
-            WriteDebugSVGs(outputDataFolder);
+            if(!options.SkipDebugSvg)
+            {
+                WriteDebugSVGs(outputDataFolder);
+            }
+        }
+
+        private static string ResolveRepoRoot()
+        {
+            DirectoryInfo? directory = new DirectoryInfo(AppContext.BaseDirectory);
+            while(directory != null)
+            {
+                if(File.Exists(Path.Combine(directory.FullName, "SMT.sln")))
+                {
+                    return directory.FullName;
+                }
+
+                directory = directory.Parent;
+            }
+
+            throw new DirectoryNotFoundException("Unable to locate SMT.sln from the DataGen output directory.");
         }
 
         private static void WriteDebugSVGs(string outputFolder)
         {
+            Directory.CreateDirectory(Path.Combine(outputFolder, "data", "SourceMaps", "exported"));
+
             foreach(MapRegion mr in EM.Regions)
             {
                 SvgNet.Elements.SvgSvgElement svgRootElement = new SvgNet.Elements.SvgSvgElement(1050, 800);
