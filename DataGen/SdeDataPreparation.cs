@@ -102,6 +102,7 @@ namespace DataGen
             CopyManualInputs();
 
             SdeExportStats stats = SdeCsvExporter.Export(dataSet, inputDataRoot);
+            int factionWarfareSystemCount = await ExportFactionWarfareSystemsAsync(dataSet);
             ValidateDotlanSystems(dataSet);
             ValidateCatalystTypes(dataSet);
 
@@ -113,6 +114,7 @@ namespace DataGen
             Console.WriteLine($"  NPC station systems: {stats.NpcStationSystemCount}");
             Console.WriteLine($"  Ship/item types: {stats.TypeCount}");
             Console.WriteLine($"  A0 blue-star systems: {stats.A0BlueStarSystemCount}");
+            Console.WriteLine($"  Faction warfare systems: {factionWarfareSystemCount}");
 
             return inputRoot;
         }
@@ -355,12 +357,78 @@ namespace DataGen
 
             CopyOverlay(sourceDataRoot, "mapSolarSystemJumpsExtra.csv");
             CopyOverlay(sourceDataRoot, "iceSystems.csv");
-            CopyOverlay(sourceDataRoot, "factionWarfareSystems.csv");
             CopyOverlay(sourceDataRoot, "trigInvasionSystems.csv");
             CopyOverlay(sourceDataRoot, "JoveSystems.csv");
             CopyOverlay(sourceDataRoot, "joveGates.csv", "JoveGates.csv");
             CopyOverlay(sourceDataRoot, "POI.csv");
             CopyOverlay(sourceDataRoot, "Translation.csv");
+        }
+
+        private async Task<int> ExportFactionWarfareSystemsAsync(SdeDataSet dataSet)
+        {
+            List<EsiFactionWarfareSystem> factionWarfareSystems = await LoadFactionWarfareSystemsAsync();
+            List<string> systemNames = factionWarfareSystems
+                .Select(system => dataSet.SolarSystems.TryGetValue(system.SolarSystemId, out SdeSolarSystem? solarSystem) ? solarSystem.Name.En : null)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Cast<string>()
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToList();
+
+            if(systemNames.Count == 0)
+            {
+                throw new InvalidOperationException("ESI faction warfare systems did not map to any SDE solar systems.");
+            }
+
+            string outputPath = Path.Combine(inputDataRoot, "factionWarfareSystems.csv");
+            await using StreamWriter writer = new StreamWriter(outputPath, append: false);
+            await writer.WriteLineAsync("System");
+
+            foreach(string systemName in systemNames)
+            {
+                await writer.WriteLineAsync(systemName);
+            }
+
+            return systemNames.Count;
+        }
+
+        private async Task<List<EsiFactionWarfareSystem>> LoadFactionWarfareSystemsAsync()
+        {
+            string cachePath = Path.Combine(cacheRoot, "fw-systems.json");
+
+            if(options.Offline)
+            {
+                if(!File.Exists(cachePath))
+                {
+                    throw new InvalidOperationException("No cached ESI faction warfare systems are available. Run DataGen once online.");
+                }
+
+                return await ReadFactionWarfareCacheAsync(cachePath);
+            }
+
+            try
+            {
+                using HttpClient client = CreateHttpClient();
+                await using Stream responseStream = await client.GetStreamAsync("https://esi.evetech.net/latest/fw/systems/?datasource=tranquility");
+                List<EsiFactionWarfareSystem> systems = await JsonSerializer.DeserializeAsync<List<EsiFactionWarfareSystem>>(responseStream)
+                    ?? throw new InvalidOperationException("ESI returned an empty faction warfare systems response.");
+
+                string json = JsonSerializer.Serialize(systems, new JsonSerializerOptions { WriteIndented = true });
+                await File.WriteAllTextAsync(cachePath, json);
+                return systems;
+            }
+            catch(Exception ex) when(File.Exists(cachePath))
+            {
+                Console.WriteLine($"  Warning: failed to refresh ESI faction warfare systems, using cache. {ex.Message}");
+                return await ReadFactionWarfareCacheAsync(cachePath);
+            }
+        }
+
+        private static async Task<List<EsiFactionWarfareSystem>> ReadFactionWarfareCacheAsync(string cachePath)
+        {
+            string json = await File.ReadAllTextAsync(cachePath);
+            return JsonSerializer.Deserialize<List<EsiFactionWarfareSystem>>(json)
+                ?? throw new InvalidOperationException("Cached ESI faction warfare systems file is empty.");
         }
 
         private void CopyOverlay(string sourceDataRoot, string sourceFileName, string? targetFileName = null)
@@ -973,5 +1041,11 @@ namespace DataGen
     {
         [JsonPropertyName("spectralClass")]
         public string SpectralClass { get; set; } = string.Empty;
+    }
+
+    internal sealed class EsiFactionWarfareSystem
+    {
+        [JsonPropertyName("solar_system_id")]
+        public long SolarSystemId { get; set; }
     }
 }
