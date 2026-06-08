@@ -1195,6 +1195,12 @@ namespace SMT.EVEData
                     {
                         AllianceName = esra.Model.Name;
                         AllianceTicker = esra.Model.Ticker;
+
+                        // force update the alliance name for this alliance ID in the manager in case we had to resolve it from standings before
+                        EveManager.Instance.AllianceIDToName[AllianceID] = esra.Model.Name;
+                        EveManager.Instance.AllianceIDToTicker[AllianceID] = esra.Model.Ticker;
+
+
                     }
                 }
                 else

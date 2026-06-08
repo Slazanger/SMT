@@ -193,9 +193,9 @@ namespace SMT.EVEData
                 Directory.CreateDirectory(characterSaveFolder);
             }
 
-            CharacterIDToName = new SerializableDictionary<int, string>();
-            AllianceIDToName = new SerializableDictionary<int, string>();
-            AllianceIDToTicker = new SerializableDictionary<int, string>();
+            CharacterIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToTicker = new SerializableDictionary<long, string>();
             NameToSystem = new Dictionary<string, System>();
             IDToSystem = new Dictionary<long, System>();
 
@@ -371,12 +371,12 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
-        public SerializableDictionary<int, string> AllianceIDToName { get; set; }
+        public SerializableDictionary<long, string> AllianceIDToName { get; set; }
 
         /// <summary>
         /// Gets or sets the Alliance ID to Alliance Ticker dictionary
         /// </summary>
-        public SerializableDictionary<int, string> AllianceIDToTicker { get; set; }
+        public SerializableDictionary<long, string> AllianceIDToTicker { get; set; }
 
         /// <summary>
         /// Gets or sets the character cache
@@ -387,7 +387,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
-        public SerializableDictionary<int, string> CharacterIDToName { get; set; }
+        public SerializableDictionary<long, string> CharacterIDToName { get; set; }
 
         public EVEStandardAPI EveApiClient { get; set; }
         public SSOv2 Sso { get; set; }
@@ -2236,9 +2236,9 @@ namespace SMT.EVEData
                 SystemIDToName[s.ID] = s.Name;
             }
 
-            CharacterIDToName = new SerializableDictionary<int, string>();
-            AllianceIDToName = new SerializableDictionary<int, string>();
-            AllianceIDToTicker = new SerializableDictionary<int, string>();
+            CharacterIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToName = new SerializableDictionary<long, string>();
+            AllianceIDToTicker = new SerializableDictionary<long, string>();
 
             // patch up any links
             foreach(System s in Systems)
