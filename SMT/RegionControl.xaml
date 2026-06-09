@@ -42,6 +42,7 @@
                 <MenuItem Header="{DynamicResource Ctx_None}" DataContext="0" Click="SetJumpRange_Click" />
                 <MenuItem Header="{DynamicResource Ctx_Super}" DataContext="6" Click="SetJumpRange_Click" />
                 <MenuItem Header="{DynamicResource Ctx_Carrier}" DataContext="7" Click="SetJumpRange_Click" />
+                <MenuItem Header="{DynamicResource Ctx_CommandCarrier}" DataContext="7.5" Click="SetJumpRange_Click" />
                 <MenuItem Header="{DynamicResource Ctx_Blops}" DataContext="8" Click="SetJumpRange_Click" />
                 <MenuItem Header="{DynamicResource Ctx_JF}" DataContext="10" Click="SetJumpRange_Click" />
             </MenuItem>

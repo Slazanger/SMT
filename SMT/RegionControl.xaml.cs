@@ -1607,6 +1607,7 @@ namespace SMT
                             case EVEData.EveManager.JumpShip.Dread: { Max = 7.0m; } break;
                             case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0m; } break;
                             case EVEData.EveManager.JumpShip.FAX: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.CommandCarrier: { Max = 7.5m; } break;
                             case EVEData.EveManager.JumpShip.Blops: { Max = 8.0m; } break;
                             case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0m; } break;
                             case EVEData.EveManager.JumpShip.JF: { Max = 10.0m; } break;
@@ -1635,6 +1636,7 @@ namespace SMT
                             case EVEData.EveManager.JumpShip.Dread: { Max = 7.0m; } break;
                             case EVEData.EveManager.JumpShip.Carrier: { Max = 7.0m; } break;
                             case EVEData.EveManager.JumpShip.FAX: { Max = 7.0m; } break;
+                            case EVEData.EveManager.JumpShip.CommandCarrier: { Max = 7.5m; } break;
                             case EVEData.EveManager.JumpShip.Blops: { Max = 8.0m; } break;
                             case EVEData.EveManager.JumpShip.Rorqual: { Max = 10.0m; } break;
                             case EVEData.EveManager.JumpShip.JF: { Max = 10.0m; } break;
@@ -3066,6 +3068,11 @@ namespace SMT
                     js = EveManager.JumpShip.Carrier;
                 }
 
+                if(mi.DataContext as string == "7.5")
+                {
+                    js = EveManager.JumpShip.CommandCarrier;
+                }
+
                 if(mi.DataContext as string == "8")
                 {
                     js = EveManager.JumpShip.Blops;
@@ -3181,6 +3188,12 @@ namespace SMT
                 {
                     js = EveManager.JumpShip.Carrier;
                 }
+
+                if(mi.DataContext as string == "7.5")
+                {
+                    js = EveManager.JumpShip.CommandCarrier;
+                }
+
 
                 if(mi.DataContext as string == "8")
                 {
@@ -3338,6 +3351,13 @@ namespace SMT
                         miARCF.DataContext = "7";
                         miARCF.Click += characterRightClickAutoRange_Clicked;
                         miAutoRange.Items.Add(miARCF);
+
+                        MenuItem miARCC = new MenuItem();
+                        miARCC.Header = "Command Carriers (7.5LY)";
+                        miARCC.DataContext = "7.5";
+                        miARCC.Click += characterRightClickAutoRange_Clicked;
+                        miAutoRange.Items.Add(miARCC);
+
 
                         MenuItem miARBlops = new MenuItem();
                         miARBlops.Header = isZH ? "黑隐特勤舰 (8.0LY)" : "Black Ops    (8.0LY)";

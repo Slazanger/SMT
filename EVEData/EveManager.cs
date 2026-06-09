@@ -294,6 +294,7 @@ namespace SMT.EVEData
             Super,
             Titan,
             Blops,
+            CommandCarrier,
             JF,
             Rorqual
         }

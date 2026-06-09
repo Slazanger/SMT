@@ -185,6 +185,7 @@
     <s:String x:Key="Main_JP_ShipAnsiblex">Ansiblex</s:String>
     <s:String x:Key="Main_JP_ShipSuper">Super/Titan</s:String>
     <s:String x:Key="Main_JP_ShipReg">Regular Caps</s:String>
+    <s:String x:Key="Main_JP_ShipCommandCarrier">Command Carrier</s:String>
     <s:String x:Key="Main_JP_ShipBlops">Blops</s:String>
     <s:String x:Key="Main_JP_ShipJF">JF/Rorqs</s:String>
     <s:String x:Key="Main_JP_LblSkills">Skills</s:String>
@@ -312,7 +313,9 @@
     <s:String x:Key="Ctx_None">None</s:String>
     <s:String x:Key="Ctx_Super">Super/Titan (6.0LY)</s:String>
     <s:String x:Key="Ctx_Carrier">Carriers/Fax (7.0LY)</s:String>
+    <s:String x:Key="Ctx_CommandCarrier">Command Carriers (7.5LY)</s:String>
     <s:String x:Key="Ctx_Blops">Black Ops (8.0LY)</s:String>
+    
     <s:String x:Key="Ctx_JF">JF/Rorq (10.0LY)</s:String>
     <s:String x:Key="Ctx_Dotlan">DotLan</s:String>
     <s:String x:Key="Ctx_ZKB">ZKillBoard</s:String>

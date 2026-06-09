@@ -334,6 +334,7 @@
                                                             <ComboBoxItem DataContext="6.0" Content="{DynamicResource Main_JP_ShipAnsiblex}" />
                                                             <ComboBoxItem DataContext="6.0" Content="{DynamicResource Main_JP_ShipSuper}" />
                                                             <ComboBoxItem DataContext="7.0" IsSelected="True" Content="{DynamicResource Main_JP_ShipReg}" />
+                                                            <ComboBoxItem DataContext="7.5" IsSelected="True" Content="{DynamicResource Main_JP_ShipCommandCarrier}" />
                                                             <ComboBoxItem DataContext="8.0" Content="{DynamicResource Main_JP_ShipBlops}" />
                                                             <ComboBoxItem DataContext="10.0" Content="{DynamicResource Main_JP_ShipJF}" />
                                                         </ComboBox>
