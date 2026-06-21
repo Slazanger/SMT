@@ -3076,7 +3076,7 @@ namespace SMT.EVEData
         private void Init()
         {
             string userAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS;
-            EveApiClient = new EVEStandardAPI(userAgent, DataSource.Tranquility, CompatibilityDate.v2025_12_16, TimeSpan.FromSeconds(30));
+            EveApiClient = new EVEStandardAPI(userAgent, DataSource.Tranquility, CompatibilityDate.v2026_06_09, TimeSpan.FromSeconds(30));
             Sso = new SSOv2(DataSource.Tranquility, EveAppConfig.CallbackURL, EveAppConfig.ClientID, null);
 
             ESIScopes = new List<string>
@@ -4074,29 +4074,43 @@ namespace SMT.EVEData
         {
             try
             {
-                var esr = await EveApiClient.Sovereignty.ListSovereigntyStructuresAsync();
+
+                var esr = await EveApiClient.Sovereignty.GetSovereigntySystemsAsync();
+
                 if (ESIHelpers.ValidateESICall(esr))
                 {
-                    foreach (SovereigntyStructure ss in esr.Model)
+
+
+                    foreach (SovereigntySystem ss in esr.Model.SolarSystems)
                     {
+
+
                         EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
                         if (es != null)
                         {
-                            // structures : Old TCU  : 32226, Old iHub : 32458
-                            es.SOVAllianceID = (int)ss.AllianceId;
-
-                            if (ss.StructureTypeId == 32226)
+                            if(ss.Claim!= null)
                             {
-                                es.TCUVunerabliltyStart = ss.VulnerableStartTime ?? default;
-                                es.TCUVunerabliltyEnd = ss.VulnerableEndTime ?? default;
-                                es.TCUOccupancyLevel = (float)(ss.VulnerabilityOccupancyLevel ?? 0);
-                            }
+                                if(ss.Claim.Alliance != null)
+                                {
+                                    es.SOVAllianceID = (int)ss.Claim.Alliance.AllianceId;
+                                    es.SOVCorp = (int)ss.Claim.Alliance.CorporationId;
+                                    es.SovADM = (float)ss.Claim.Alliance.Development.ActivityDefenseMultiplier;
+                                    es.SovIndustyLevel = (float)ss.Claim.Alliance.Development.IndustrialLevel;
+                                    es.SovMilitaryLevel = (float)ss.Claim.Alliance.Development.MilitaryLevel;
+                                    es.SovStrategyLevel = (float)ss.Claim.Alliance.Development.StrategicLevel;
+                                    es.SovIsCapitalSystem = ss.Claim.Alliance.IsCapitalSystem;
+                                    if(ss.Claim.Alliance.SovereigntyHub != null && ss.Claim.Alliance.SovereigntyHub.VulnerabilityWindow !=null)
+                                    {
+                                        es.SovVunerabliltyStart = ss.Claim.Alliance.SovereigntyHub.VulnerabilityWindow.Start.Value;
+                                        es.SovVunerabliltyEnd = ss.Claim.Alliance.SovereigntyHub.VulnerabilityWindow.End.Value;
+                                    }
+                                    else
+                                    {
+                                        es.SovVunerabliltyEnd = default;
+                                        es.SovVunerabliltyStart = default;
+                                    }
 
-                            if (ss.StructureTypeId == 32458)
-                            {
-                                es.IHubVunerabliltyStart = ss.VulnerableStartTime ?? default;
-                                es.IHubVunerabliltyEnd = ss.VulnerableEndTime ?? default;
-                                es.IHubOccupancyLevel = (float)(ss.VulnerabilityOccupancyLevel ?? 0);
+                                }
                             }
                         }
                     }

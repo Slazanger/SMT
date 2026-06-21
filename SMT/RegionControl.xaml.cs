@@ -1442,15 +1442,15 @@ namespace SMT
                 {
                     DateTime now = DateTime.Now;
 
-                    if(now > sys.ActualSystem.IHubVunerabliltyStart && now < sys.ActualSystem.IHubVunerabliltyEnd)
+                    if(now > sys.ActualSystem.SovVunerabliltyStart && now < sys.ActualSystem.SovVunerabliltyEnd)
                     {
-                        infoValue = (int)sys.ActualSystem.IHubOccupancyLevel;
+                        infoValue = (int)sys.ActualSystem.SovADM;
                         infoSize = 30;
                         infoColour = infoVulnerable;
                     }
-                    else if(now.AddMinutes(30) > sys.ActualSystem.IHubVunerabliltyStart)
+                    else if(now.AddMinutes(30) > sys.ActualSystem.SovVunerabliltyStart)
                     {
-                        infoValue = (int)sys.ActualSystem.IHubOccupancyLevel;
+                        infoValue = (int)sys.ActualSystem.SovADM;
                         infoSize = 27;
                         infoColour = infoVulnerableSoon;
                     }
@@ -2407,9 +2407,9 @@ namespace SMT
                         SystemOutline.Fill = securityColorFill;
                     }
 
-                    if(ShowSystemADM && mapSystem.ActualSystem.IHubOccupancyLevel != 0.0f)
+                    if(ShowSystemADM && mapSystem.ActualSystem.SovADM != 0.0f)
                     {
-                        float SovVal = mapSystem.ActualSystem.IHubOccupancyLevel;
+                        float SovVal = mapSystem.ActualSystem.SovADM;
 
                         float Blend = 1.0f - ((SovVal - 1.0f) / 5.0f);
                         byte r, g;
@@ -2439,13 +2439,13 @@ namespace SMT
                     MainCanvas.Children.Add(SystemOutline);
                 }
 
-                if(ShowSystemADM && mapSystem.ActualSystem.IHubOccupancyLevel != 0.0 && !ShowSystemTimers && !mapSystem.OutOfRegion)
+                if(ShowSystemADM && mapSystem.ActualSystem.SovADM != 0.0 && !ShowSystemTimers && !mapSystem.OutOfRegion)
                 {
                     Label sovADM = new Label();
                     sovADM.Content = "1.0";
                     sovADM.FontSize = 7;
                     sovADM.IsHitTestVisible = false;
-                    sovADM.Content = $"{mapSystem.ActualSystem.IHubOccupancyLevel:f1}";
+                    sovADM.Content = $"{mapSystem.ActualSystem.SovADM:f1}";
                     sovADM.HorizontalContentAlignment = HorizontalAlignment.Center;
                     sovADM.VerticalContentAlignment = VerticalAlignment.Center;
                     sovADM.Width = shapeSize + 2;
@@ -3694,32 +3694,32 @@ namespace SMT
                     }
                 }
 
-                if(selectedSys.ActualSystem.IHubOccupancyLevel != 0.0f || selectedSys.ActualSystem.TCUOccupancyLevel != 0.0f)
+                // update IHubInfo
+                if(selectedSys.ActualSystem.SovADM != 0.0f)
                 {
                     SystemInfoPopupSP.Children.Add(new Separator());
-                }
 
-                // update IHubInfo
-                if(selectedSys.ActualSystem.IHubOccupancyLevel != 0.0f)
-                {
                     Label sov = new Label();
                     sov.Padding = one;
                     sov.Margin = one;
-                    sov.Content = $"IHUB\t:  {selectedSys.ActualSystem.IHubVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.IHubVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.IHubVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.IHubVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.IHubOccupancyLevel}";
+
+                    string SovInfo = $"IHUB\t : {selectedSys.ActualSystem.SovVunerabliltyStart:t} to {selectedSys.ActualSystem.SovVunerabliltyEnd:t}";
+                    SovInfo     += $"\nADM \t : {selectedSys.ActualSystem.SovADM}";
+                    if(selectedSys.ActualSystem.SovIsCapitalSystem)
+                    {
+                        SovInfo += " (Capital)";
+                    }
+                    SovInfo     += $"\n - Stratic \t :  {selectedSys.ActualSystem.SovStrategyLevel}";
+                    SovInfo     += $"\n - Military\t :  {selectedSys.ActualSystem.SovMilitaryLevel}";
+                    SovInfo     += $"\n - Industry\t :  {selectedSys.ActualSystem.SovIndustyLevel}";
+
+
+
+                    sov.Content = SovInfo;
                     sov.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                     SystemInfoPopupSP.Children.Add(sov);
                 }
 
-                // update TCUInfo
-                if(selectedSys.ActualSystem.TCUOccupancyLevel != 0.0f)
-                {
-                    Label sov = new Label();
-                    sov.Padding = one;
-                    sov.Margin = one;
-                    sov.Content = $"TCU\t:  {selectedSys.ActualSystem.TCUVunerabliltyStart.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyStart.Minute:00} to {selectedSys.ActualSystem.TCUVunerabliltyEnd.Hour:00}:{selectedSys.ActualSystem.TCUVunerabliltyEnd.Minute:00}, ADM : {selectedSys.ActualSystem.TCUOccupancyLevel}";
-                    sov.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
-                    SystemInfoPopupSP.Children.Add(sov);
-                }
 
                 // update Infrastructure Upgrades
                 if(selectedSys.ActualSystem.InfrastructureUpgrades.Count > 0)

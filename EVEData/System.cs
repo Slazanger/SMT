@@ -131,14 +131,38 @@ namespace SMT.EVEData
         /// </summary>
         public long ID { get; set; }
 
-        [XmlIgnoreAttribute]
-        public float IHubOccupancyLevel { get; set; }
+
 
         [XmlIgnoreAttribute]
-        public DateTime IHubVunerabliltyEnd { get; set; }
+        public DateTime SovVunerabliltyEnd { get; set; }
 
         [XmlIgnoreAttribute]
-        public DateTime IHubVunerabliltyStart { get; set; }
+        public DateTime SovVunerabliltyStart { get; set; }
+
+
+        [XmlIgnoreAttribute]
+        public bool SovIsCapitalSystem { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the corporation holding sov in this system
+        /// </summary>
+        [XmlIgnoreAttribute]
+        public int SOVCorp { get; set; }
+
+
+        [XmlIgnoreAttribute]
+        public float SovADM { get; set; }
+
+        [XmlIgnoreAttribute]
+        public float SovIndustyLevel { get; set; }
+
+        [XmlIgnoreAttribute]
+        public float SovMilitaryLevel { get; set; }
+
+        [XmlIgnoreAttribute]
+        public float SovStrategyLevel { get; set; }
+
+
 
         /// <summary>
         /// Gets or sets the list of Jumps from this system
@@ -218,20 +242,8 @@ namespace SMT.EVEData
         [XmlIgnoreAttribute]
         public int SOVAllianceID { get; set; }
 
-        /// <summary>
-        /// Gets or sets the name of the corporation holding sov in this system
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public int SOVCorp { get; set; }
 
-        [XmlIgnoreAttribute]
-        public float TCUOccupancyLevel { get; set; }
 
-        [XmlIgnoreAttribute]
-        public DateTime TCUVunerabliltyEnd { get; set; }
-
-        [XmlIgnoreAttribute]
-        public DateTime TCUVunerabliltyStart { get; set; }
 
         /// <summary>
         /// Gets or sets the list of Infrastructure Hub Upgrades for this system
