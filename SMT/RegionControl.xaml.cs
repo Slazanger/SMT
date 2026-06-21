@@ -1438,7 +1438,7 @@ namespace SMT
                     infoSize = infoValue * ESIOverlayScale;
                 }
 
-                if(ShowSystemTimers && MapConf.ShowIhubVunerabilities)
+                if(ShowSystemTimers && MapConf.ShowIhubVunerabilities && sys.ActualSystem.SovVunerabliltyStart != default)
                 {
                     DateTime now = DateTime.Now;
 
@@ -3703,13 +3703,23 @@ namespace SMT
                     sov.Padding = one;
                     sov.Margin = one;
 
-                    string SovInfo = $"IHUB\t : {selectedSys.ActualSystem.SovVunerabliltyStart:t} to {selectedSys.ActualSystem.SovVunerabliltyEnd:t}";
-                    SovInfo     += $"\nADM \t : {selectedSys.ActualSystem.SovADM}";
+                    string SovInfo = "";
+                    
+
+                    if(selectedSys.ActualSystem.SovVunerabliltyStart != default)
+                    {
+                        SovInfo += $"\nIHUB\t : {selectedSys.ActualSystem.SovVunerabliltyStart:t} to {selectedSys.ActualSystem.SovVunerabliltyEnd:t}";
+                    }
+
+                    SovInfo += $"ADM \t : {selectedSys.ActualSystem.SovADM}";
+
                     if(selectedSys.ActualSystem.SovIsCapitalSystem)
                     {
                         SovInfo += " (Capital)";
                     }
-                    SovInfo     += $"\n - Stratic \t :  {selectedSys.ActualSystem.SovStrategyLevel}";
+
+
+                    SovInfo     += $"\n - Strategy\t :  {selectedSys.ActualSystem.SovStrategyLevel}";
                     SovInfo     += $"\n - Military\t :  {selectedSys.ActualSystem.SovMilitaryLevel}";
                     SovInfo     += $"\n - Industry\t :  {selectedSys.ActualSystem.SovIndustyLevel}";
 
