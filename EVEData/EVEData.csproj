@@ -19,7 +19,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="PointyHatGames.EVEStandard" Version="4.0.2" />
+    <PackageReference Include="PointyHatGames.EVEStandard" Version="4.1.0" />
   </ItemGroup>
 	<ItemGroup>
 	  <None Update="data\JumpRangeCache.dat">
