@@ -542,7 +542,7 @@
                                                         <DataTemplate>
                                                             <Grid>
                                                                 <ProgressBar Value="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="1"  Height="13" ToolTipService.ToolTip="{Binding State}" ToolTipService.InitialShowDelay="100" ToolTipService.BetweenShowDelay="100" />
-                                                                <TextBlock Text="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False" />
+                                                                <!--<TextBlock Text="{Binding Path=DefendersScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" IsHitTestVisible="False" />-->
                                                             </Grid>
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
