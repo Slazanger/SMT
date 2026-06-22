@@ -3708,10 +3708,10 @@ namespace SMT
 
                     if(selectedSys.ActualSystem.SovVunerabliltyStart != default)
                     {
-                        SovInfo += $"\nIHUB\t : {selectedSys.ActualSystem.SovVunerabliltyStart:t} to {selectedSys.ActualSystem.SovVunerabliltyEnd:t}";
+                        SovInfo += $"\nIHUB\t :  {selectedSys.ActualSystem.SovVunerabliltyStart:t} to {selectedSys.ActualSystem.SovVunerabliltyEnd:t}";
                     }
 
-                    SovInfo += $"ADM \t : {selectedSys.ActualSystem.SovADM}";
+                    SovInfo += $"\nADM \t\t :  {selectedSys.ActualSystem.SovADM}";
 
                     if(selectedSys.ActualSystem.SovIsCapitalSystem)
                     {
