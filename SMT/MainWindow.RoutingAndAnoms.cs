@@ -417,11 +417,13 @@ namespace SMT
         }
         private void JumpPlannerShipType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(CapitalRoute != null)
+            if(CapitalRoute != null &&
+               sender is ComboBox cb &&
+               cb.SelectedItem is ComboBoxItem cbi &&
+               cbi.DataContext is string maxLYText &&
+               double.TryParse(maxLYText, NumberStyles.Float, CultureInfo.InvariantCulture, out double maxLY))
             {
-                ComboBox cb = sender as ComboBox;
-                ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
-                CapitalRoute.MaxLY = double.Parse(cbi.DataContext as string);
+                CapitalRoute.MaxLY = maxLY;
                 CapitalRoute.Recalculate();
 
                 if(CapitalRoute.CurrentRoute.Count == 0)
