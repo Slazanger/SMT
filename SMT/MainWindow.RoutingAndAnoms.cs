@@ -31,9 +31,12 @@ namespace SMT
 {
     public partial class MainWindow
     {
-        private void btn_UpdateThera_Click(object sender, RoutedEventArgs e)
+        private Point capitalWaypointDragStart;
+        private string draggedCapitalWaypoint;
+
+        private async void btn_UpdateThera_Click(object sender, RoutedEventArgs e)
         {
-            EVEManager.UpdateTheraConnections();
+            await EVEManager.UpdateTheraConnectionsAsync();
         }
 
         private void TheraConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -54,9 +57,9 @@ namespace SMT
             }
         }
 
-        private void btn_UpdateTurnur_Click(object sender, RoutedEventArgs e)
+        private async void btn_UpdateTurnur_Click(object sender, RoutedEventArgs e)
         {
-            EVEManager.UpdateTurnurConnections();
+            await EVEManager.UpdateTurnurConnectionsAsync();
         }
 
         private void TurnurConnectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -76,32 +79,44 @@ namespace SMT
                 }
             }
         }
-        private void refreshJumpRouteUI()
+        private void RefreshJumpRouteUI()
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
+            if(lbAlternateMids.ItemsSource != null)
             {
-                if(capitalRouteWaypointsLB.ItemsSource != null)
-                {
-                    CollectionViewSource.GetDefaultView(capitalRouteWaypointsLB.ItemsSource).Refresh();
-                }
+                CollectionViewSource.GetDefaultView(lbAlternateMids.ItemsSource).Refresh();
+            }
+        }
 
-                if(capitalRouteAvoidLB.ItemsSource != null)
-                {
-                    CollectionViewSource.GetDefaultView(capitalRouteAvoidLB.ItemsSource).Refresh();
-                }
+        private void RecalculateCapitalRouteAndRefresh()
+        {
+            CapitalRoute.Recalculate();
 
-                if(dgCapitalRouteCurrentRoute.ItemsSource != null)
-                {
-                    CollectionViewSource.GetDefaultView(dgCapitalRouteCurrentRoute.ItemsSource).Refresh();
-                }
+            if(CapitalRoute.WayPoints.Count < 2)
+            {
+                lblCapitalRouteSummary.Content = GetResourceText("Main_JP_SummaryNeedWP", "Add at least two waypoints.");
+            }
+            else if(CapitalRoute.CurrentRoute.Count == 0)
+            {
+                string format = GetResourceText("Main_JP_SummaryNoRoute", "No valid route for {0}.");
+                lblCapitalRouteSummary.Content = string.Format(CultureInfo.CurrentCulture, format, CapitalRoute.FailedSegment);
+            }
+            else
+            {
+                string format = GetResourceText("Main_JP_SummaryReady", "{0} jumps, {1} mids, {2:0.##} LY total");
+                lblCapitalRouteSummary.Content = string.Format(
+                    CultureInfo.CurrentCulture,
+                    format,
+                    CapitalRoute.JumpCount,
+                    CapitalRoute.MidCount,
+                    CapitalRoute.TotalDistance);
+            }
 
-                // lbAlternateMids could be null, need to check..
+            RefreshJumpRouteUI();
+        }
 
-                if(lbAlternateMids.ItemsSource != null)
-                {
-                    CollectionViewSource.GetDefaultView(lbAlternateMids.ItemsSource).Refresh();
-                }
-            }), DispatcherPriority.Normal, null);
+        private static string GetResourceText(string key, string fallback)
+        {
+            return Application.Current.TryFindResource(key) as string ?? fallback;
         }
 
         private void AddWaypointsBtn_Click(object sender, RoutedEventArgs e)
@@ -133,19 +148,11 @@ namespace SMT
 
             if(s != null)
             {
-                CapitalRoute.WayPoints.Add(s.Name);
-                CapitalRoute.Recalculate();
-
-                if(CapitalRoute.CurrentRoute.Count == 0)
+                if(!CapitalRoute.WayPoints.Contains(s.Name))
                 {
-                    lblCapitalRouteSummary.Content = "No Valid Route Found";
+                    CapitalRoute.WayPoints.Add(s.Name);
+                    RecalculateCapitalRouteAndRefresh();
                 }
-                else
-                {
-                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
-                }
-
-                refreshJumpRouteUI();
             }
         }
 
@@ -159,19 +166,11 @@ namespace SMT
 
             if(s != null)
             {
-                CapitalRoute.AvoidSystems.Add(s.Name);
-                CapitalRoute.Recalculate();
-
-                if(CapitalRoute.CurrentRoute.Count == 0)
+                if(!CapitalRoute.AvoidSystems.Contains(s.Name))
                 {
-                    lblCapitalRouteSummary.Content = "No Valid Route Found";
+                    CapitalRoute.AvoidSystems.Add(s.Name);
+                    RecalculateCapitalRouteAndRefresh();
                 }
-                else
-                {
-                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
-                }
-
-                refreshJumpRouteUI();
             }
         }
 
@@ -190,14 +189,13 @@ namespace SMT
             CapitalRoute.CurrentRoute.Clear();
             lbAlternateMids.ItemsSource = null;
             lblAlternateMids.Content = "";
-
-            refreshJumpRouteUI();
+            RecalculateCapitalRouteAndRefresh();
         }
 
         private void ClearJumpAvoidSystemsBtn_Click(object sender, RoutedEventArgs e)
         {
             CapitalRoute.AvoidSystems.Clear();
-            refreshJumpRouteUI();
+            RecalculateCapitalRouteAndRefresh();
         }
 
         private void CopyRouteBtn_Click(object sender, RoutedEventArgs e)
@@ -424,18 +422,7 @@ namespace SMT
                double.TryParse(maxLYText, NumberStyles.Float, CultureInfo.InvariantCulture, out double maxLY))
             {
                 CapitalRoute.MaxLY = maxLY;
-                CapitalRoute.Recalculate();
-
-                if(CapitalRoute.CurrentRoute.Count == 0)
-                {
-                    lblCapitalRouteSummary.Content = "No Valid Route Found";
-                }
-                else
-                {
-                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
-                }
-
-                refreshJumpRouteUI();
+                RecalculateCapitalRouteAndRefresh();
             }
         }
 
@@ -448,18 +435,7 @@ namespace SMT
                int.TryParse(jdcText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int jdc))
             {
                 CapitalRoute.JDC = jdc;
-                CapitalRoute.Recalculate();
-
-                if(CapitalRoute.CurrentRoute.Count == 0)
-                {
-                    lblCapitalRouteSummary.Content = "No Valid Route Found";
-                }
-                else
-                {
-                    lblCapitalRouteSummary.Content = $"{CapitalRoute.CurrentRoute.Count - 2} Mids";
-                }
-
-                refreshJumpRouteUI();
+                RecalculateCapitalRouteAndRefresh();
             }
         }
 
@@ -485,28 +461,36 @@ namespace SMT
 
         private void CapitalWaypointsContextMenuMoveUp_Click(object sender, RoutedEventArgs e)
         {
-            if(capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != 0)
+            int selectedIndex = capitalRouteWaypointsLB.SelectedIndex;
+            if(selectedIndex > 0)
             {
-                string sys = CapitalRoute.WayPoints[capitalRouteWaypointsLB.SelectedIndex];
-                CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
-                CapitalRoute.WayPoints.Insert(capitalRouteWaypointsLB.SelectedIndex - 1, sys);
-
-                CapitalRoute.Recalculate();
-                refreshJumpRouteUI();
+                MoveCapitalWaypoint(selectedIndex, selectedIndex - 1);
             }
         }
 
         private void CapitalWaypointsContextMenuMoveDown_Click(object sender, RoutedEventArgs e)
         {
-            if(capitalRouteWaypointsLB.SelectedItem != null && capitalRouteWaypointsLB.SelectedIndex != CapitalRoute.WayPoints.Count - 1)
+            int selectedIndex = capitalRouteWaypointsLB.SelectedIndex;
+            if(selectedIndex >= 0 && selectedIndex < CapitalRoute.WayPoints.Count - 1)
             {
-                string sys = CapitalRoute.WayPoints[capitalRouteWaypointsLB.SelectedIndex];
-                CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
-                CapitalRoute.WayPoints.Insert(capitalRouteWaypointsLB.SelectedIndex + 1, sys);
-
-                CapitalRoute.Recalculate();
-                refreshJumpRouteUI();
+                MoveCapitalWaypoint(selectedIndex, selectedIndex + 1);
             }
+        }
+
+        private void MoveCapitalWaypoint(int sourceIndex, int targetIndex)
+        {
+            if(sourceIndex < 0 || targetIndex < 0 ||
+               sourceIndex >= CapitalRoute.WayPoints.Count || targetIndex >= CapitalRoute.WayPoints.Count ||
+               sourceIndex == targetIndex)
+            {
+                return;
+            }
+
+            string systemName = CapitalRoute.WayPoints[sourceIndex];
+            CapitalRoute.WayPoints.RemoveAt(sourceIndex);
+            CapitalRoute.WayPoints.Insert(targetIndex, systemName);
+            RecalculateCapitalRouteAndRefresh();
+            capitalRouteWaypointsLB.SelectedIndex = targetIndex;
         }
 
         private void CapitalWaypointsContextMenuDelete_Click(object sender, RoutedEventArgs e)
@@ -514,41 +498,104 @@ namespace SMT
             if(capitalRouteWaypointsLB.SelectedItem != null)
             {
                 CapitalRoute.WayPoints.RemoveAt(capitalRouteWaypointsLB.SelectedIndex);
-                CapitalRoute.Recalculate();
-                refreshJumpRouteUI();
+                RecalculateCapitalRouteAndRefresh();
             }
         }
 
         private void CapitalRouteContextMenuUseAlt_Click(object sender, RoutedEventArgs e)
         {
-            if(lbAlternateMids.SelectedItem != null)
+            if(lbAlternateMids.SelectedItem is string selectedAlt &&
+               lblAlternateMids.Content is string currentMid &&
+               !CapitalRoute.WayPoints.Contains(selectedAlt))
             {
-                string selectedAlt = lbAlternateMids.SelectedItem as string;
-
-                // need to find where to insert the new waypoint
-                int waypointIndex = -1;
+                int waypointIndex = 0;
                 foreach(Navigation.RoutePoint rp in CapitalRoute.CurrentRoute)
                 {
-                    if(rp.SystemName == CapitalRoute.WayPoints[waypointIndex + 1])
+                    if(waypointIndex + 1 < CapitalRoute.WayPoints.Count &&
+                       rp.SystemName == CapitalRoute.WayPoints[waypointIndex + 1])
                     {
                         waypointIndex++;
                     }
-                    if(CapitalRoute.AlternateMids.ContainsKey(rp.SystemName))
+
+                    if(rp.SystemName == currentMid)
                     {
-                        foreach(string alt in CapitalRoute.AlternateMids[rp.SystemName])
-                        {
-                            if(alt == selectedAlt)
-                            {
-                                CapitalRoute.WayPoints.Insert(waypointIndex + 1, selectedAlt);
-                                break;
-                            }
-                        }
+                        CapitalRoute.WayPoints.Insert(waypointIndex + 1, selectedAlt);
+                        RecalculateCapitalRouteAndRefresh();
+                        return;
                     }
                 }
-
-                CapitalRoute.Recalculate();
-                refreshJumpRouteUI();
             }
+        }
+
+        private void CopyCapitalRouteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(CapitalRoute.CurrentRoute.Count == 0)
+            {
+                return;
+            }
+
+            var routeText = new System.Text.StringBuilder();
+            routeText.AppendLine("Capital Route");
+            routeText.AppendLine("=============");
+            foreach(Navigation.RoutePoint routePoint in CapitalRoute.CurrentRoute)
+            {
+                routeText.Append(routePoint.SystemName);
+                if(routePoint.LY > 0)
+                {
+                    routeText.Append(CultureInfo.CurrentCulture, $"  ({routePoint.LY:0.##} LY)");
+                }
+                routeText.AppendLine();
+            }
+
+            try
+            {
+                Clipboard.SetText(routeText.ToString());
+                lblCapitalRouteSummary.Content = GetResourceText("Main_JP_CopySuccess", "Route copied to the clipboard.");
+            }
+            catch(Exception exception)
+            {
+                EVEDataUtils.AppLog.Error("Copy capital route", exception);
+            }
+        }
+
+        private void CapitalWaypoints_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            capitalWaypointDragStart = e.GetPosition(capitalRouteWaypointsLB);
+            ListBoxItem item = ItemsControl.ContainerFromElement(capitalRouteWaypointsLB, e.OriginalSource as DependencyObject) as ListBoxItem;
+            draggedCapitalWaypoint = item?.DataContext as string;
+        }
+
+        private void CapitalWaypoints_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if(e.LeftButton != MouseButtonState.Pressed || string.IsNullOrEmpty(draggedCapitalWaypoint))
+            {
+                return;
+            }
+
+            Point currentPosition = e.GetPosition(capitalRouteWaypointsLB);
+            if(Math.Abs(currentPosition.X - capitalWaypointDragStart.X) < SystemParameters.MinimumHorizontalDragDistance &&
+               Math.Abs(currentPosition.Y - capitalWaypointDragStart.Y) < SystemParameters.MinimumVerticalDragDistance)
+            {
+                return;
+            }
+
+            DragDrop.DoDragDrop(capitalRouteWaypointsLB, draggedCapitalWaypoint, DragDropEffects.Move);
+        }
+
+        private void CapitalWaypoints_Drop(object sender, DragEventArgs e)
+        {
+            if(!e.Data.GetDataPresent(typeof(string)))
+            {
+                return;
+            }
+
+            string sourceSystem = e.Data.GetData(typeof(string)) as string;
+            ListBoxItem targetItem = ItemsControl.ContainerFromElement(capitalRouteWaypointsLB, e.OriginalSource as DependencyObject) as ListBoxItem;
+            string targetSystem = targetItem?.DataContext as string;
+            int sourceIndex = CapitalRoute.WayPoints.IndexOf(sourceSystem);
+            int targetIndex = string.IsNullOrEmpty(targetSystem) ? CapitalRoute.WayPoints.Count - 1 : CapitalRoute.WayPoints.IndexOf(targetSystem);
+            MoveCapitalWaypoint(sourceIndex, targetIndex);
+            draggedCapitalWaypoint = null;
         }
         private void btnUnseenFits_Click(object sender, RoutedEventArgs e)
         {

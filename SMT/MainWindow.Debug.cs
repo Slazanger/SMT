@@ -30,9 +30,9 @@ namespace SMT
 {
     public partial class MainWindow
     {
-        private void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)
+        private async void ForceESIUpdate_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            EVEManager.UpdateESIUniverseData();
+            await EVEManager.UpdateESIUniverseDataAsync();
         }
 
         private void ClearOldEVELogs_Click(object sender, RoutedEventArgs e)

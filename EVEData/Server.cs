@@ -4,10 +4,13 @@ using Timer = System.Timers.Timer;
 
 namespace SMT.EVEData
 {
-    public class Server : INotifyPropertyChanged
+    public class Server : INotifyPropertyChanged, IDisposable
     {
+        private readonly Timer timer;
         private int m_numPlayers;
         private string m_serverVersion;
+        private string m_statusMessage = "Ready";
+        private bool m_statusIsError;
 
         private DateTime m_serverTime;
 
@@ -16,8 +19,8 @@ namespace SMT.EVEData
             // EVE Time is basically UTC time
             ServerTime = DateTime.UtcNow;
 
-            Timer timer = new Timer(10000);
-            timer.Elapsed += new ElapsedEventHandler(UpdateServerTime); ;
+            timer = new Timer(10000);
+            timer.Elapsed += new ElapsedEventHandler(UpdateServerTime);
             timer.AutoReset = true;
             timer.Enabled = true;
         }
@@ -64,6 +67,35 @@ namespace SMT.EVEData
                 m_serverVersion = value;
                 OnPropertyChanged("ServerVersion");
             }
+        }
+
+        public string StatusMessage
+        {
+            get => m_statusMessage;
+            set
+            {
+                m_statusMessage = value;
+                OnPropertyChanged(nameof(StatusMessage));
+            }
+        }
+
+        public bool StatusIsError
+        {
+            get => m_statusIsError;
+            set
+            {
+                m_statusIsError = value;
+                OnPropertyChanged(nameof(StatusIsError));
+            }
+        }
+
+        public string LogFilePath => EVEDataUtils.AppLog.CurrentLogFile;
+
+        public void Dispose()
+        {
+            timer.Stop();
+            timer.Elapsed -= UpdateServerTime;
+            timer.Dispose();
         }
 
         public void UpdateServerTime(object sender, EventArgs e)

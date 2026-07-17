@@ -4034,6 +4034,11 @@ namespace SMT
         /// <param name="e"></param>
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
+            if(!IsVisible)
+            {
+                return;
+            }
+
             if(currentJumpCharacter != "")
             {
                 foreach(LocalCharacter c in EM.LocalCharacters)
@@ -4045,10 +4050,7 @@ namespace SMT
                 }
             }
 
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                ReDrawMap(false);
-            }), DispatcherPriority.Normal);
+            ReDrawMap(false);
         }
 
         private struct GateHelper

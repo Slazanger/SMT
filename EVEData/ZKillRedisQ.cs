@@ -2,26 +2,41 @@
 // ZKillboard R2Z2 feed
 //-----------------------------------------------------------------------
 using System.ComponentModel;
-using System.Net.Http;
+using System.Collections.ObjectModel;
 using System.Net;
-using Timer = System.Timers.Timer;
+using EVEDataUtils;
 
 namespace SMT.EVEData
 {
     /// <summary>
     /// The ZKillboard R2Z2 feed representation
     /// </summary>
-    public class ZKillRedisQ
+    public class ZKillRedisQ : IDisposable
     {
-        private BackgroundWorker backgroundWorker;
-
+        private readonly HttpClient httpClient;
+        private readonly object lifecycleLock = new object();
+        private readonly object allianceResolutionLock = new object();
+        private readonly HashSet<int> pendingAllianceResolutions = new HashSet<int>();
+        private CancellationTokenSource cancellationSource;
+        private Task pollingTask = Task.CompletedTask;
         private long currentSequence = 0;
-        private DateTime nextPollTime = DateTime.MinValue;
+        private volatile bool pauseUpdate;
+        private int killExpireTimeMinutes = 30;
+        private bool disposed;
+
+        public ZKillRedisQ()
+        {
+            httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(30),
+            };
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS);
+        }
 
         /// <summary>
         /// Gets or sets the Stream of the last few kills from ZKillBoard
         /// </summary>
-        public List<ZKBDataSimple> KillStream { get; set; }
+        public ObservableCollection<ZKBDataSimple> KillStream { get; } = new ObservableCollection<ZKBDataSimple>();
 
         /// <summary>
         /// Kills Added Event Handler
@@ -33,181 +48,287 @@ namespace SMT.EVEData
         /// </summary>
         public event KillsAddedHandler KillsAddedEvent;
 
-        public int KillExpireTimeMinutes { get; set; }
+        public int KillExpireTimeMinutes
+        {
+            get => Volatile.Read(ref killExpireTimeMinutes);
+            set => Volatile.Write(ref killExpireTimeMinutes, Math.Max(5, value));
+        }
 
         /// <summary>
         ///
         /// </summary>
-        public bool PauseUpdate { get; set; }
+        public bool PauseUpdate
+        {
+            get => pauseUpdate;
+            set => pauseUpdate = value;
+        }
+
+        public Task Completion
+        {
+            get
+            {
+                lock(lifecycleLock)
+                {
+                    return pollingTask;
+                }
+            }
+        }
 
         /// <summary>
         /// Initialise the ZKB feed system
         /// </summary>
         public void Initialise()
         {
-            KillStream = new List<ZKBDataSimple>();
+            lock(lifecycleLock)
+            {
+                ObjectDisposedException.ThrowIf(disposed, this);
+                if(!pollingTask.IsCompleted)
+                {
+                    return;
+                }
 
-            backgroundWorker = new BackgroundWorker();
-            backgroundWorker.WorkerSupportsCancellation = true;
-            backgroundWorker.WorkerReportsProgress = false;
-            backgroundWorker.DoWork += zkb_DoWork;
-            backgroundWorker.RunWorkerCompleted += zkb_DoWorkComplete;
-
-            Timer dp = new Timer(150);
-            dp.Elapsed += Dp_Tick;
-            dp.AutoReset = true;
-            dp.Enabled = true;
+                cancellationSource?.Dispose();
+                cancellationSource = new CancellationTokenSource();
+                currentSequence = 0;
+                RunOnUIThread(() => KillStream.Clear());
+                pollingTask = Task.Run(() => PollLoopAsync(cancellationSource.Token));
+            }
         }
 
         public void ShutDown()
         {
-            backgroundWorker.CancelAsync();
-        }
-
-        private void Dp_Tick(object sender, EventArgs e)
-        {
-            if(!backgroundWorker.IsBusy && !PauseUpdate && DateTime.Now >= nextPollTime)
+            lock(lifecycleLock)
             {
-                backgroundWorker.RunWorkerAsync();
+                cancellationSource?.Cancel();
             }
         }
 
-        private void zkb_DoWork(object sender, DoWorkEventArgs e)
+        public void Dispose()
+        {
+            lock(lifecycleLock)
+            {
+                if(disposed)
+                {
+                    return;
+                }
+
+                disposed = true;
+                cancellationSource?.Cancel();
+                cancellationSource?.Dispose();
+                httpClient.Dispose();
+            }
+        }
+
+        private async Task PollLoopAsync(CancellationToken cancellationToken)
+        {
+            while(!cancellationToken.IsCancellationRequested)
+            {
+                if(PauseUpdate)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(250), cancellationToken).ConfigureAwait(false);
+                    continue;
+                }
+
+                try
+                {
+                    if(currentSequence == 0 && !await LoadCurrentSequenceAsync(cancellationToken).ConfigureAwait(false))
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(6), cancellationToken).ConfigureAwait(false);
+                        continue;
+                    }
+
+                    TimeSpan delay = await PollCurrentSequenceAsync(cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                }
+                catch(OperationCanceledException) when(cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch(Exception exception)
+                {
+                    AppLog.Error("ZKill feed", exception);
+                    await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private async Task<bool> LoadCurrentSequenceAsync(CancellationToken cancellationToken)
+        {
+            using HttpResponseMessage response = await httpClient.GetAsync(
+                "https://r2z2.zkillboard.com/ephemeral/sequence.json",
+                cancellationToken).ConfigureAwait(false);
+
+            if(!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            ZKBData.SequenceData sequenceData = ZKBData.SequenceData.FromJson(content);
+            if(sequenceData == null || sequenceData.Sequence <= 0)
+            {
+                return false;
+            }
+
+            currentSequence = sequenceData.Sequence;
+            AppLog.Info("ZKill feed", "Connected to the live feed.");
+            return true;
+        }
+
+        private async Task<TimeSpan> PollCurrentSequenceAsync(CancellationToken cancellationToken)
+        {
+            string requestUrl = $"https://r2z2.zkillboard.com/ephemeral/{currentSequence}.json";
+            using HttpResponseMessage response = await httpClient.GetAsync(requestUrl, cancellationToken).ConfigureAwait(false);
+
+            if(response.StatusCode == HttpStatusCode.NotFound)
+            {
+                ExpireOldKills();
+                return TimeSpan.FromSeconds(6);
+            }
+
+            if(response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                return response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(60);
+            }
+
+            response.EnsureSuccessStatusCode();
+            string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            ZKBData.R2Z2Data data = ZKBData.R2Z2Data.FromJson(content);
+
+            if(data?.Esi?.Victim != null)
+            {
+                ZKBDataSimple kill = CreateKill(data);
+                RunOnUIThread(() =>
+                {
+                    KillStream.Insert(0, kill);
+                    ExpireOldKillsCore();
+                    NotifyKillsChanged();
+                });
+
+                QueueAllianceResolution(kill.VictimAllianceID, kill.VictimAllianceName);
+            }
+            else
+            {
+                ExpireOldKills();
+            }
+
+            currentSequence++;
+            return TimeSpan.FromMilliseconds(150);
+        }
+
+        private static ZKBDataSimple CreateKill(ZKBData.R2Z2Data data)
+        {
+            string shipID = data.Esi.Victim.ShipTypeId.ToString();
+            string shipType = EveManager.Instance.ShipTypes.TryGetValue(shipID, out string knownShipType)
+                ? knownShipType
+                : "Unknown (" + shipID + ")";
+
+            return new ZKBDataSimple
+            {
+                KillID = data.KillmailId,
+                VictimAllianceID = data.Esi.Victim.AllianceId,
+                VictimCharacterID = data.Esi.Victim.CharacterId,
+                VictimCorpID = data.Esi.Victim.CorporationId,
+                SystemName = EveManager.Instance.GetEveSystemNameFromID((int)data.Esi.SolarSystemId),
+                KillTime = data.Esi.KillmailTime.ToLocalTime(),
+                ShipType = shipType,
+                VictimAllianceName = EveManager.Instance.GetAllianceName(data.Esi.Victim.AllianceId),
+            };
+        }
+
+        private void QueueAllianceResolution(int allianceID, string allianceName)
+        {
+            if(allianceID == 0 || !string.IsNullOrEmpty(allianceName))
+            {
+                return;
+            }
+
+            lock(allianceResolutionLock)
+            {
+                if(!pendingAllianceResolutions.Add(allianceID))
+                {
+                    return;
+                }
+            }
+
+            _ = ResolveAllianceNameAsync(allianceID);
+        }
+
+        private async Task ResolveAllianceNameAsync(int allianceID)
         {
             try
             {
-                HttpClient hc = new HttpClient();
-
-                string userAgent = "SMT/" + EveAppConfig.SMT_VERSION + EveAppConfig.SMT_USERAGENT_DETAILS;
-                hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
-
-                if (currentSequence == 0)
+                await EveManager.Instance.ResolveAllianceIDs(new List<int> { allianceID }).ConfigureAwait(false);
+                string allianceName = EveManager.Instance.GetAllianceName(allianceID);
+                RunOnUIThread(() =>
                 {
-                    string seqUrl = "https://r2z2.zkillboard.com/ephemeral/sequence.json";
-                    var seqResponse = hc.GetAsync(seqUrl).Result;
-                    if (seqResponse.IsSuccessStatusCode)
+                    foreach(ZKBDataSimple kill in KillStream.Where(kill => kill.VictimAllianceID == allianceID))
                     {
-                        string seqContent = seqResponse.Content.ReadAsStringAsync().Result;
-                        ZKBData.SequenceData seqData = ZKBData.SequenceData.FromJson(seqContent);
-                        if (seqData != null)
-                        {
-                            currentSequence = seqData.Sequence;
-                        }
+                        kill.VictimAllianceName = allianceName;
                     }
-                    if (currentSequence == 0)
-                    {
-                        nextPollTime = DateTime.Now.AddSeconds(6);
-                        e.Result = 0;
-                        return;
-                    }
-                }
-
-                string r2z2Url = $"https://r2z2.zkillboard.com/ephemeral/{currentSequence}.json";
-                var response = hc.GetAsync(r2z2Url).Result;
-
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    nextPollTime = DateTime.Now.AddSeconds(6);
-                    e.Result = 0;
-                    return;
-                }
-                else if (response.StatusCode == HttpStatusCode.TooManyRequests)
-                {
-                    nextPollTime = DateTime.Now.AddSeconds(60);
-                    e.Result = 0;
-                    return;
-                }
-                else if (response.IsSuccessStatusCode)
-                {
-                    string strContent = response.Content.ReadAsStringAsync().Result;
-                    ZKBData.R2Z2Data r2z2Data = ZKBData.R2Z2Data.FromJson(strContent);
-
-                    if (r2z2Data != null && r2z2Data.Esi != null && r2z2Data.Esi.Victim != null)
-                    {
-                        ZKBDataSimple zs = new ZKBDataSimple();
-                        zs.KillID = r2z2Data.KillmailId;
-                        zs.VictimAllianceID = r2z2Data.Esi.Victim.AllianceId;
-                        zs.VictimCharacterID = r2z2Data.Esi.Victim.CharacterId;
-                        zs.VictimCorpID = r2z2Data.Esi.Victim.CorporationId;
-                        zs.SystemName = EveManager.Instance.GetEveSystemNameFromID((int)r2z2Data.Esi.SolarSystemId);
-                        zs.KillTime = r2z2Data.Esi.KillmailTime.ToLocalTime();
-
-                        string shipID = r2z2Data.Esi.Victim.ShipTypeId.ToString();
-                        if(EveManager.Instance.ShipTypes.ContainsKey(shipID))
-                        {
-                            zs.ShipType = EveManager.Instance.ShipTypes[shipID];
-                        }
-                        else
-                        {
-                            zs.ShipType = "Unknown (" + shipID + ")";
-                        }
-
-                        zs.VictimAllianceName = EveManager.Instance.GetAllianceName(zs.VictimAllianceID);
-
-                        KillStream.Insert(0, zs);
-
-                        if(KillsAddedEvent != null)
-                        {
-                            KillsAddedEvent();
-                        }
-                    }
-
-                    currentSequence++;
-                    e.Result = 0;
-                }
-                else
-                {
-                    // Any other error, just back off for a bit
-                    nextPollTime = DateTime.Now.AddSeconds(10);
-                    e.Result = -1;
-                }
+                });
             }
-            catch
+            catch(Exception exception)
             {
-                nextPollTime = DateTime.Now.AddSeconds(10);
-                e.Result = -1;
+                AppLog.Error("Resolve zKill alliance", exception);
+            }
+            finally
+            {
+                lock(allianceResolutionLock)
+                {
+                    pendingAllianceResolutions.Remove(allianceID);
+                }
             }
         }
 
-        private void zkb_DoWorkComplete(object sender, RunWorkerCompletedEventArgs e)
+        private void ExpireOldKills()
         {
-            bool updatedKillList = false;
-
-            List<int> AllianceIDs = new List<int>();
-
-            for(int i = KillStream.Count - 1; i >= 0; i--)
+            RunOnUIThread(() =>
             {
-                if(KillStream[i].VictimAllianceName == string.Empty)
+                if(ExpireOldKillsCore())
                 {
-                    if(!EveManager.Instance.AllianceIDToTicker.ContainsKey(KillStream[i].VictimAllianceID) && !AllianceIDs.Contains(KillStream[i].VictimAllianceID) && KillStream[i].VictimAllianceID != 0)
-                    {
-                        AllianceIDs.Add(KillStream[i].VictimAllianceID);
-                    }
-                    else
-                    {
-                        KillStream[i].VictimAllianceName = EveManager.Instance.GetAllianceName(KillStream[i].VictimAllianceID);
-                    }
+                    NotifyKillsChanged();
                 }
+            });
+        }
 
-                if(KillStream[i].KillTime + TimeSpan.FromMinutes(KillExpireTimeMinutes) < DateTimeOffset.Now)
+        private void NotifyKillsChanged()
+        {
+            try
+            {
+                KillsAddedEvent?.Invoke();
+            }
+            catch(Exception exception)
+            {
+                AppLog.Error("Update zKill UI", exception);
+            }
+        }
+
+        private bool ExpireOldKillsCore()
+        {
+            bool changed = false;
+            DateTimeOffset cutoff = DateTimeOffset.Now - TimeSpan.FromMinutes(KillExpireTimeMinutes);
+            for(int index = KillStream.Count - 1; index >= 0; index--)
+            {
+                if(KillStream[index].KillTime < cutoff)
                 {
-                    KillStream.RemoveAt(i);
-
-                    updatedKillList = true;
+                    KillStream.RemoveAt(index);
+                    changed = true;
                 }
             }
-            if(AllianceIDs.Count > 0)
-            {
-                _ = EveManager.Instance.ResolveAllianceIDs(AllianceIDs);
-            }
 
-            if(updatedKillList)
+            return changed;
+        }
+
+        private static void RunOnUIThread(Action action)
+        {
+            if(EveManager.UIThreadInvoker != null)
             {
-                // kills are coming in so fast that this is redundant
-                if(KillsAddedEvent != null)
-                {
-                    KillsAddedEvent();
-                }
+                EveManager.UIThreadInvoker(action);
+            }
+            else
+            {
+                action();
             }
         }
 

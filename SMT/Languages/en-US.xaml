@@ -206,6 +206,10 @@
     <s:String x:Key="Main_JP_GrpAlt">Alternate Mids</s:String>
     <s:String x:Key="Main_JP_LblAltFor">Alternates for :</s:String>
     <s:String x:Key="Main_JP_CtxUseAlt">Use Alt</s:String>
+    <s:String x:Key="Main_JP_SummaryNeedWP">Add at least two waypoints.</s:String>
+    <s:String x:Key="Main_JP_SummaryNoRoute">No valid route for {0}.</s:String>
+    <s:String x:Key="Main_JP_SummaryReady">{0} jumps, {1} mids, {2:0.##} LY total</s:String>
+    <s:String x:Key="Main_JP_CopySuccess">Route copied to the clipboard.</s:String>
 
     <s:String x:Key="Main_WH_TabThera">Thera</s:String>
     <s:String x:Key="Main_WH_TabTurnur">Turnur</s:String>

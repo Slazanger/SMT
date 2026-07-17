@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -29,10 +29,17 @@ namespace SMT
         private AudioFileReader audioFileReader;
 
         private bool isInitialLoad = true; // Flag to track initial load of preferences window
+        private readonly System.Windows.Threading.DispatcherTimer mapRedrawDebounceTimer;
 
         public PreferencesWindow()
         {
             InitializeComponent();
+
+            mapRedrawDebounceTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(120),
+            };
+            mapRedrawDebounceTimer.Tick += MapRedrawDebounceTimer_Tick;
 
             syncESIPositionChk.IsChecked = EveManager.Instance.UseESIForCharacterPositions;
 
@@ -131,8 +138,7 @@ namespace SMT
         {
             MapConf.SetDefaultColours();
             ColoursPropertyGrid.SelectedObject = MapConf.ActiveColourScheme;
-            MainWindow.AppWindow.RegionUC.ReDrawMap(true);
-            MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
+            ScheduleMapRedraw();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -147,6 +153,18 @@ namespace SMT
 
         private void ColoursPropertyGrid_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
         {
+            ScheduleMapRedraw();
+        }
+
+        private void ScheduleMapRedraw()
+        {
+            mapRedrawDebounceTimer.Stop();
+            mapRedrawDebounceTimer.Start();
+        }
+
+        private void MapRedrawDebounceTimer_Tick(object sender, EventArgs e)
+        {
+            mapRedrawDebounceTimer.Stop();
             MainWindow.AppWindow.RegionUC.ReDrawMap(true);
             MainWindow.AppWindow.UniverseUC.ReDrawMap(true, true, true);
         }
@@ -177,18 +195,45 @@ namespace SMT
 
         private void SetLogLocation_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            if(dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            {
+                return;
+            }
+
+            if(EM.ReloadLogWatchers(dialog.SelectedPath))
             {
                 MapConf.CustomEveLogFolderLocation = dialog.SelectedPath;
+                MapConf.CurrentEveLogFolderLocation = EM.EVELogFolder;
+                MessageBox.Show("SMT is now monitoring the selected EVE log folder.", "Log Folder Updated", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            MessageBoxResult result = MessageBox.Show("Restart SMT for the log folder location to take effect", "Please Restart SMT", MessageBoxButton.OK);
+            else
+            {
+                MessageBox.Show("The selected folder must contain both Chatlogs and Gamelogs folders.", "Invalid EVE Log Folder", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void DefaultLogLocation_Click(object sender, RoutedEventArgs e)
         {
-            MapConf.CustomEveLogFolderLocation = string.Empty;
-            MessageBoxResult result = MessageBox.Show("Restart SMT for the log folder location to take effect", "Please Restart SMT", MessageBoxButton.OK);
+            if(EM.ReloadLogWatchers(string.Empty))
+            {
+                MapConf.CustomEveLogFolderLocation = string.Empty;
+                MapConf.CurrentEveLogFolderLocation = EM.EVELogFolder;
+                MessageBox.Show("SMT is now monitoring the default EVE log folder.", "Log Folder Updated", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("The default EVE log folder could not be found.", "EVE Log Folder Not Found", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            mapRedrawDebounceTimer.Stop();
+            mapRedrawDebounceTimer.Tick -= MapRedrawDebounceTimer_Tick;
+            waveOutEvent?.Stop();
+            waveOutEvent?.Dispose();
+            audioFileReader?.Dispose();
         }
 
         private void ClearJumpGatesBtn_Click(object sender, RoutedEventArgs e)
@@ -281,103 +326,65 @@ namespace SMT
             ImportPasteJumpGatesBtn.IsEnabled = false;
             ExportJumpGatesBtn.IsEnabled = false;
 
-            foreach(EVEData.LocalCharacter c in EveManager.Instance.LocalCharacters)
+            try
             {
-                if(c.ESILinked)
+                foreach(EVEData.LocalCharacter character in EveManager.Instance.GetLocalCharactersCopy())
                 {
-                    // This should never be set due to https://developers.eveonline.com/blog/article/the-esi-api-is-a-shared-resource-do-not-abuse-it
-                    if(c.DeepSearchEnabled && GateSearchFilter.Text == " » ")
+                    if(!character.ESILinked)
                     {
-                        string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-                        string basesearch = " » ";
+                        continue;
+                    }
 
-                        foreach(char cc in chars)
+                    // Deep search deliberately remains opt-in because ESI search is a shared resource.
+                    if(character.DeepSearchEnabled && GateSearchFilter.Text == " » ")
+                    {
+                        const string characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+                        const string baseSearch = " » ";
+
+                        foreach(char searchCharacter in characters)
                         {
-                            string search = basesearch + cc;
-                            List<EVEData.JumpBridge> jbl = await c.FindJumpGates(search);
-
-                            foreach(EVEData.JumpBridge jb in jbl)
-                            {
-                                bool found = false;
-
-                                foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
-                                {
-                                    if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
-                                    {
-                                        found = true;
-                                    }
-                                }
-
-                                if(!found)
-                                {
-                                    EveManager.Instance.JumpBridges.Add(jb);
-                                }
-                            }
-
-                            Thread.Sleep(100);
+                            AddDiscoveredJumpBridges(await character.FindJumpGates(baseSearch + searchCharacter));
+                            await Task.Delay(TimeSpan.FromMilliseconds(100));
                         }
 
-                        foreach(char cc in chars)
+                        foreach(char searchCharacter in characters)
                         {
-                            string search = cc + basesearch;
-                            List<EVEData.JumpBridge> jbl = await c.FindJumpGates(search);
-
-                            foreach(EVEData.JumpBridge jb in jbl)
-                            {
-                                bool found = false;
-
-                                foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
-                                {
-                                    if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
-                                    {
-                                        found = true;
-                                    }
-                                }
-
-                                if(!found)
-                                {
-                                    EveManager.Instance.JumpBridges.Add(jb);
-                                }
-                            }
-
-                            Thread.Sleep(100);
+                            AddDiscoveredJumpBridges(await character.FindJumpGates(searchCharacter + baseSearch));
+                            await Task.Delay(TimeSpan.FromMilliseconds(100));
                         }
                     }
                     else
                     {
-                        List<EVEData.JumpBridge> jbl = await c.FindJumpGates(GateSearchFilter.Text);
-
-                        foreach(EVEData.JumpBridge jb in jbl)
-                        {
-                            bool found = false;
-
-                            foreach(EVEData.JumpBridge jbr in EveManager.Instance.JumpBridges)
-                            {
-                                if((jb.From == jbr.From && jb.To == jbr.To) || (jb.From == jbr.To && jb.To == jbr.From))
-                                {
-                                    found = true;
-                                }
-                            }
-
-                            if(!found)
-                            {
-                                EveManager.Instance.JumpBridges.Add(jb);
-                            }
-                        }
+                        AddDiscoveredJumpBridges(await character.FindJumpGates(GateSearchFilter.Text));
                     }
                 }
+
+                EVEData.Navigation.ClearJumpBridges();
+                EVEData.Navigation.UpdateJumpBridges(EveManager.Instance.JumpBridges);
+                UpdateJumpBridgeSummary();
+                CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
             }
+            catch(Exception exception)
+            {
+                EVEDataUtils.AppLog.Error("Find jump gates", exception);
+                MessageBox.Show(this, exception.Message, "Jump gate search", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                ImportJumpGatesBtn.IsEnabled = true;
+                ClearJumpGatesBtn.IsEnabled = true;
+                JumpBridgeList.IsEnabled = true;
+                ImportPasteJumpGatesBtn.IsEnabled = true;
+                ExportJumpGatesBtn.IsEnabled = true;
+            }
+        }
 
-            EVEData.Navigation.ClearJumpBridges();
-            EVEData.Navigation.UpdateJumpBridges(EveManager.Instance.JumpBridges);
-            UpdateJumpBridgeSummary();
-
-            ImportJumpGatesBtn.IsEnabled = true;
-            ClearJumpGatesBtn.IsEnabled = true;
-            JumpBridgeList.IsEnabled = true;
-            ImportPasteJumpGatesBtn.IsEnabled = true;
-            ExportJumpGatesBtn.IsEnabled = true;
-            CollectionViewSource.GetDefaultView(JumpBridgeList.ItemsSource).Refresh();
+        private static void AddDiscoveredJumpBridges(IEnumerable<EVEData.JumpBridge> jumpBridges)
+        {
+            foreach(EVEData.JumpBridge jumpBridge in jumpBridges)
+            {
+                EveManager.Instance.AddUpdateJumpBridge(jumpBridge.From, jumpBridge.To, jumpBridge.FromID);
+            }
         }
 
         private void ImportPasteJumpGatesBtn_Click(object sender, RoutedEventArgs e)

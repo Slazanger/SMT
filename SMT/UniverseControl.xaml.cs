@@ -310,7 +310,6 @@ namespace SMT
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
-        private int uiRefreshTimer_interval = 0;
 
         public void Init()
         {
@@ -541,23 +540,16 @@ namespace SMT
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            uiRefreshTimer_interval++;
-
-            bool FullRedraw = false;
-            bool FastUpdate = true;
-            bool DataRedraw = false;
-
-            if(uiRefreshTimer_interval == 4)
+            if(!IsVisible)
             {
-                uiRefreshTimer_interval = 0;
-                DataRedraw = false;
+                return;
             }
 
             if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 CentreMapOnActiveCharacter();
             }
-            ReDrawMap(FullRedraw, DataRedraw, FastUpdate);
+            ReDrawMap(false, false, true);
         }
 
         private void VHSystems_MouseClicked(object sender, RoutedEventArgs e)

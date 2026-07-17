@@ -100,6 +100,21 @@
             <StatusBarItem>
                 <TextBlock Text="{DynamicResource Main_Players}" />
             </StatusBarItem>
+            <Separator />
+            <StatusBarItem HorizontalAlignment="Stretch">
+                <TextBlock Text="{Binding StatusMessage}" ToolTip="{Binding LogFilePath}" MaxWidth="520" TextTrimming="CharacterEllipsis">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="LightGreen" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                    <Setter Property="Foreground" Value="OrangeRed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StatusBarItem>
         </StatusBar>
 
         <xcad:DockingManager x:Name="dockManager">
@@ -350,7 +365,7 @@
                                             </GroupBox>
                                             <GroupBox Header="{DynamicResource Main_JP_GrpWP}">
                                                 <StackPanel Margin="4">
-                                                    <ListBox x:Name="capitalRouteWaypointsLB" ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" AllowDrop="True">
+                                                    <ListBox x:Name="capitalRouteWaypointsLB" ItemsSource="{Binding CapitalRoute.WayPoints}" MinHeight="50" Margin="2" AllowDrop="True" PreviewMouseLeftButtonDown="CapitalWaypoints_PreviewMouseLeftButtonDown" PreviewMouseMove="CapitalWaypoints_PreviewMouseMove" Drop="CapitalWaypoints_Drop">
                                                         <ListBox.ContextMenu>
                                                             <ContextMenu>
                                                                 <MenuItem Header="{DynamicResource Main_JP_CtxMoveUp}" Click="CapitalWaypointsContextMenuMoveUp_Click" />
@@ -429,6 +444,7 @@
                                                             <DataGridTextColumn Header="{DynamicResource Main_JP_ColDist}" Binding="{Binding LY, StringFormat={}{0:#.##}}" Width="8*" CanUserSort="False" />
                                                         </DataGrid.Columns>
                                                     </DataGrid>
+                                                    <Button x:Name="CopyCapitalRouteBtn" Click="CopyCapitalRouteBtn_Click" Content="{DynamicResource Main_Rte_BtnCopy}" Margin="2" />
                                                 </StackPanel>
                                             </GroupBox>
                                             <GroupBox Header="{DynamicResource Main_JP_GrpAlt}">

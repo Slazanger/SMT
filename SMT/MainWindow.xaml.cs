@@ -25,6 +25,7 @@ using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using static SMT.EVEData.ZKillRedisQ;
+using EVEDataUtils;
 
 namespace SMT
 {
@@ -175,20 +176,7 @@ namespace SMT
 
             // Load the Dock Manager Layout file
             string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
-            if(File.Exists(dockManagerLayoutName) && OperatingSystem.IsWindows())
-            {
-                try
-                {
-                    AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new(dockManager);
-                    using(var sr = new StreamReader(dockManagerLayoutName))
-                    {
-                        ls.Deserialize(sr);
-                    }
-                }
-                catch
-                {
-                }
-            }
+            LoadWindowLayoutWithBackup(dockManagerLayoutName);
 
             // Due to bugs in the Dock manager patch up the content id's for the 2 main views
             RegionLayoutDoc = FindDocWithContentID(dockManager.Layout, "MapRegionContentID");
@@ -199,15 +187,8 @@ namespace SMT
 
             if(File.Exists(mapConfigFileName))
             {
-                try
-                {
-                    XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
-                    using FileStream fs = new FileStream(mapConfigFileName, FileMode.Open);
-                    using XmlReader xmlr = XmlReader.Create(fs);
-
-                    MapConf = (MapConfig)xms.Deserialize(xmlr);
-                }
-                catch
+                MapConf = Serialization.DeserializeFromDisk<MapConfig>(mapConfigFileName);
+                if(MapConf == null)
                 {
                     MapConf = new MapConfig();
                     MapConf.SetDefaultColours();
@@ -227,6 +208,10 @@ namespace SMT
             // Create the main EVE manager
 
             CapitalRoute = new JumpRoute();
+            capitalRouteWaypointsLB.ItemsSource = CapitalRoute.WayPoints;
+            capitalRouteAvoidLB.ItemsSource = CapitalRoute.AvoidSystems;
+            dgCapitalRouteCurrentRoute.ItemsSource = CapitalRoute.CurrentRoute;
+            RecalculateCapitalRouteAndRefresh();
 
             EVEManager = new EVEData.EveManager(EveAppConfig.SMT_VERSION);
             EVEData.EveManager.Instance = EVEManager;
@@ -357,23 +342,18 @@ namespace SMT
                         }
                     }
                 }
-                catch { }
+                catch(Exception exception)
+                {
+                    AppLog.Error("Load custom universe layout", exception);
+                }
             }
 
             // load the anom data
             string anomDataFilename = EVEManager.SaveDataVersionFolder + @"\Anoms.dat";
             if(File.Exists(anomDataFilename))
             {
-                try
-                {
-                    XmlSerializer xms = new XmlSerializer(typeof(EVEData.AnomManager));
-
-                    using FileStream fs = new FileStream(anomDataFilename, FileMode.Open);
-                    using XmlReader xmlr = XmlReader.Create(fs);
-
-                    ANOMManager = (EVEData.AnomManager)xms.Deserialize(xmlr);
-                }
-                catch
+                ANOMManager = Serialization.DeserializeFromDisk<EVEData.AnomManager>(anomDataFilename);
+                if(ANOMManager == null)
                 {
                     ANOMManager = new EVEData.AnomManager();
                 }
@@ -403,6 +383,8 @@ namespace SMT
             RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
 
             AppStatusBar.DataContext = EVEManager.ServerInfo;
+            EVEManager.ServerInfo.StatusMessage = "Ready";
+            AppLog.StatusChanged += AppLog_StatusChanged;
 
             List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
             globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
@@ -503,7 +485,7 @@ namespace SMT
             nIcon.ContextMenuStrip.Items.Add("Show", null, NIcon_DClick);
             nIcon.ContextMenuStrip.Items.Add("Exit", null, NIcon_Exit);
 
-            CheckGitHubVersion();
+            _ = CheckGitHubVersionAsync();
 
             RegionUC.SelectRegion(MapConf.DefaultRegion);
         }
