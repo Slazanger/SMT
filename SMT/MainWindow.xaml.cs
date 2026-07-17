@@ -202,11 +202,10 @@ namespace SMT
                 try
                 {
                     XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
-                    FileStream fs = new FileStream(mapConfigFileName, FileMode.Open);
-                    XmlReader xmlr = XmlReader.Create(fs);
+                    using FileStream fs = new FileStream(mapConfigFileName, FileMode.Open);
+                    using XmlReader xmlr = XmlReader.Create(fs);
 
                     MapConf = (MapConfig)xms.Deserialize(xmlr);
-                    fs.Close();
                 }
                 catch
                 {
@@ -334,15 +333,19 @@ namespace SMT
                 {
                     using(TextReader tr = new StreamReader(customLayoutFile))
                     {
-                        string line = tr.ReadLine();
-
-                        while(line != null)
+                        string line;
+                        while((line = tr.ReadLine()) != null)
                         {
                             string[] bits = line.Split(',');
+                            if(bits.Length < 4 ||
+                               !double.TryParse(bits[2], NumberStyles.Float, CultureInfo.InvariantCulture, out double x) ||
+                               !double.TryParse(bits[3], NumberStyles.Float, CultureInfo.InvariantCulture, out double y))
+                            {
+                                continue;
+                            }
+
                             string region = bits[0];
                             string system = bits[1];
-                            double x = double.Parse(bits[2]);
-                            double y = double.Parse(bits[3]);
 
                             EVEData.System sys = EVEManager.GetEveSystem(system);
                             if(sys != null)
@@ -351,8 +354,6 @@ namespace SMT
                                 sys.UniverseY = y;
                                 sys.CustomUniverseLayout = true;
                             }
-
-                            line = tr.ReadLine();
                         }
                     }
                 }
@@ -367,11 +368,10 @@ namespace SMT
                 {
                     XmlSerializer xms = new XmlSerializer(typeof(EVEData.AnomManager));
 
-                    FileStream fs = new FileStream(anomDataFilename, FileMode.Open);
-                    XmlReader xmlr = XmlReader.Create(fs);
+                    using FileStream fs = new FileStream(anomDataFilename, FileMode.Open);
+                    using XmlReader xmlr = XmlReader.Create(fs);
 
                     ANOMManager = (EVEData.AnomManager)xms.Deserialize(xmlr);
-                    fs.Close();
                 }
                 catch
                 {

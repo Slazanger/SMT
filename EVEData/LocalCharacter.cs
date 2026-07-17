@@ -1041,7 +1041,7 @@ namespace SMT.EVEData
 
                         if (characterIDsToResolve.Count > 0)
                         {
-                            EveManager.Instance.ResolveCharacterIDs(characterIDsToResolve).Wait();
+                            await EveManager.Instance.ResolveCharacterIDs(characterIDsToResolve);
                         }
 
                         foreach (Fleet.FleetMember ff in FleetInfo.Members.ToList())

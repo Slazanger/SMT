@@ -49,7 +49,7 @@ namespace SMT.EVEData
         /// </summary>
         private static EveManager instance;
 
-        private bool BackgroundThreadShouldTerminate;
+        private volatile bool BackgroundThreadShouldTerminate;
 
         /// <summary>
         /// Thread-safe access lock for LocalCharacters collection
@@ -98,7 +98,7 @@ namespace SMT.EVEData
 
         private string VersionStr;
 
-        private bool WatcherThreadShouldTerminate;
+        private volatile bool WatcherThreadShouldTerminate;
 
         private TimeSpan CharacterUpdateRate = TimeSpan.FromSeconds(2);
         private TimeSpan LowFreqUpdateRate = TimeSpan.FromMinutes(20);
@@ -841,7 +841,7 @@ namespace SMT.EVEData
                 {
                     XmlResolver = null
                 };
-                FileStream fs = new FileStream(localSVG, FileMode.Open, FileAccess.Read);
+                using FileStream fs = new FileStream(localSVG, FileMode.Open, FileAccess.Read);
                 xmldoc.Load(fs);
 
                 // get the svg/g/g sys use child nodes
@@ -910,7 +910,7 @@ namespace SMT.EVEData
             string eveStaticDataSolarSystemFile = sourceFolder + @"\data\mapSolarSystems.csv";
             if(File.Exists(eveStaticDataSolarSystemFile))
             {
-                StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
+                using StreamReader file = new StreamReader(eveStaticDataSolarSystemFile);
 
                 // read the headers..
                 string line;
@@ -963,7 +963,7 @@ namespace SMT.EVEData
             string eveStaticDataRegionFile = sourceFolder + @"\data\mapRegions.csv";
             if(File.Exists(eveStaticDataRegionFile))
             {
-                StreamReader file = new StreamReader(eveStaticDataRegionFile);
+                using StreamReader file = new StreamReader(eveStaticDataRegionFile);
 
                 // read the headers..
                 string line;
@@ -994,7 +994,7 @@ namespace SMT.EVEData
             string eveStaticDataJumpsFile = sourceFolder + @"\data\mapSolarSystemJumps.csv";
             if(File.Exists(eveStaticDataJumpsFile))
             {
-                StreamReader file = new StreamReader(eveStaticDataJumpsFile);
+                using StreamReader file = new StreamReader(eveStaticDataJumpsFile);
 
                 // read the headers..
                 string line;
@@ -1034,7 +1034,7 @@ namespace SMT.EVEData
             string eveStaticDataJumpsExtraFile = sourceFolder + @"\data\mapSolarSystemJumpsExtra.csv";
             if(File.Exists(eveStaticDataJumpsExtraFile))
             {
-                StreamReader file = new StreamReader(eveStaticDataJumpsExtraFile);
+                using StreamReader file = new StreamReader(eveStaticDataJumpsExtraFile);
 
                 // read the headers..
                 string line;
@@ -1067,7 +1067,7 @@ namespace SMT.EVEData
             string eveStaticDataStationsFile = sourceFolder + @"\data\staStations.csv";
             if(File.Exists(eveStaticDataStationsFile))
             {
-                StreamReader file = new StreamReader(eveStaticDataStationsFile);
+                using StreamReader file = new StreamReader(eveStaticDataStationsFile);
 
                 // read the headers..
                 string line;
@@ -1094,7 +1094,7 @@ namespace SMT.EVEData
             string eveStaticDataConstellationFile = sourceFolder + @"\data\mapConstellations.csv";
             if(File.Exists(eveStaticDataConstellationFile))
             {
-                StreamReader file = new StreamReader(eveStaticDataConstellationFile);
+                using StreamReader file = new StreamReader(eveStaticDataConstellationFile);
 
                 Dictionary<string, string> constMap = new Dictionary<string, string>();
 
@@ -1128,7 +1128,7 @@ namespace SMT.EVEData
             string iceSystemsFile = sourceFolder + @"\data\iceSystems.csv";
             if(File.Exists(iceSystemsFile))
             {
-                StreamReader file = new StreamReader(iceSystemsFile);
+                using StreamReader file = new StreamReader(iceSystemsFile);
                 // read the headers..
                 string line;
                 line = file.ReadLine();
@@ -1150,7 +1150,7 @@ namespace SMT.EVEData
             string fwSystemsFile = sourceFolder + @"\data\factionWarfareSystems.csv";
             if(File.Exists(fwSystemsFile))
             {
-                StreamReader file = new StreamReader(fwSystemsFile);
+                using StreamReader file = new StreamReader(fwSystemsFile);
                 // read the headers..
                 string line;
                 line = file.ReadLine();
@@ -1172,7 +1172,7 @@ namespace SMT.EVEData
             string blueSunSystemsFile = sourceFolder + @"\data\a0BlueStarSystems.csv";
             if(File.Exists(blueSunSystemsFile))
             {
-                StreamReader file = new StreamReader(blueSunSystemsFile);
+                using StreamReader file = new StreamReader(blueSunSystemsFile);
                 // read the headers..
                 string line;
                 line = file.ReadLine();
@@ -1202,7 +1202,7 @@ namespace SMT.EVEData
             string trigSystemsFile = sourceFolder + @"\data\trigInvasionSystems.csv";
             if(File.Exists(trigSystemsFile))
             {
-                StreamReader file = new StreamReader(trigSystemsFile);
+                using StreamReader file = new StreamReader(trigSystemsFile);
 
                 // read the headers..
                 string line;
@@ -1696,7 +1696,7 @@ namespace SMT.EVEData
                 ValidShipGroupIDs.Add("1876"); //  Engineering Complex
                 ValidShipGroupIDs.Add("1924"); //  Forward Operating Base
 
-                StreamReader file = new StreamReader(eveStaticDataItemTypesFile);
+                using StreamReader file = new StreamReader(eveStaticDataItemTypesFile);
 
                 // read the headers..
                 string line;
@@ -1744,7 +1744,7 @@ namespace SMT.EVEData
             string eveStaticDataJoveObservatories = sourceFolder + @"\data\JoveSystems.csv";
             if(File.Exists(eveStaticDataJoveObservatories))
             {
-                StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
+                using StreamReader file = new StreamReader(eveStaticDataJoveObservatories);
 
                 // read the headers..
                 string line;
@@ -1780,7 +1780,7 @@ namespace SMT.EVEData
             string eveStaticDataJoveGates = sourceFolder + @"\data\JoveGates.csv";
             if(File.Exists(eveStaticDataJoveGates))
             {
-                StreamReader file = new StreamReader(eveStaticDataJoveGates);
+                using StreamReader file = new StreamReader(eveStaticDataJoveGates);
                 string line;
                 while((line = file.ReadLine()) != null)
                 {
@@ -2246,7 +2246,7 @@ namespace SMT.EVEData
             string cynoBeaconsFile = Path.Combine(SaveDataRootFolder, "CynoBeacons.txt");
             if(File.Exists(cynoBeaconsFile))
             {
-                StreamReader file = new StreamReader(cynoBeaconsFile);
+                using StreamReader file = new StreamReader(cynoBeaconsFile);
 
                 string line;
                 while((line = file.ReadLine()) != null)
@@ -2279,13 +2279,11 @@ namespace SMT.EVEData
 
             try
             {
-                List<JumpBridge> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(List<JumpBridge>));
-
-                FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
-                XmlReader xmlr = XmlReader.Create(fs);
-
-                loadList = (List<JumpBridge>)xms.Deserialize(xmlr);
+                List<JumpBridge> loadList = Serialization.DeserializeFromDisk<List<JumpBridge>>(dataFilename);
+                if(loadList == null)
+                {
+                    return;
+                }
 
                 foreach(JumpBridge j in loadList)
                 {
@@ -2459,7 +2457,7 @@ namespace SMT.EVEData
 
             if(File.Exists(intelFileFilter))
             {
-                StreamReader file = new StreamReader(intelFileFilter);
+                using StreamReader file = new StreamReader(intelFileFilter);
                 string line;
                 while((line = file.ReadLine()) != null)
                 {
@@ -2480,7 +2478,7 @@ namespace SMT.EVEData
 
             if(File.Exists(intelClearFileFilter))
             {
-                StreamReader file = new StreamReader(intelClearFileFilter);
+                using StreamReader file = new StreamReader(intelClearFileFilter);
                 string line;
                 while((line = file.ReadLine()) != null)
                 {
@@ -2503,7 +2501,7 @@ namespace SMT.EVEData
 
             if(File.Exists(intelIgnoreFileFilter))
             {
-                StreamReader file = new StreamReader(intelIgnoreFileFilter);
+                using StreamReader file = new StreamReader(intelIgnoreFileFilter);
                 string line;
                 while((line = file.ReadLine()) != null)
                 {
@@ -2525,7 +2523,7 @@ namespace SMT.EVEData
 
             if(File.Exists(intelAlertFileFilter))
             {
-                StreamReader file = new StreamReader(intelAlertFileFilter);
+                using StreamReader file = new StreamReader(intelAlertFileFilter);
                 string line;
                 while((line = file.ReadLine()) != null)
                 {
@@ -2623,7 +2621,7 @@ namespace SMT.EVEData
 
         private void LogFileCacheTrigger(List<string> eveLogFolders)
         {
-            Thread.CurrentThread.IsBackground = false;
+            Thread.CurrentThread.IsBackground = true;
 
             foreach(string dir in eveLogFolders)
             {
@@ -2667,9 +2665,8 @@ namespace SMT.EVEData
                         // only read files from the last day
                         if(file.CreationTime > DateTime.Now.AddDays(-1) && readFile)
                         {
-                            FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                            using FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                             ifs.Seek(0, SeekOrigin.End);
-                            ifs.Close();
                         }
                     }
 
@@ -3144,7 +3141,7 @@ namespace SMT.EVEData
                 string POIcsv = Path.Combine(DataRootFolder, "POI.csv");
                 if(File.Exists(POIcsv))
                 {
-                    StreamReader file = new StreamReader(POIcsv);
+                    using StreamReader file = new StreamReader(POIcsv);
 
                     string line;
                     line = file.ReadLine();
@@ -3271,9 +3268,9 @@ namespace SMT.EVEData
                 try
                 {
                     Encoding fe = Misc.GetEncoding(changedFile);
-                    FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-                    StreamReader file = new StreamReader(ifs, fe);
+                    using StreamReader file = new StreamReader(ifs, fe);
 
                     int fileReadFrom = 0;
 
@@ -3460,8 +3457,6 @@ namespace SMT.EVEData
                         line = file.ReadLine();
                     }
 
-                    ifs.Close();
-
                     intelFileReadPos[changedFile] = fileReadFrom;
                 }
                 catch
@@ -3484,9 +3479,9 @@ namespace SMT.EVEData
             try
             {
                 Encoding fe = EVEDataUtils.Misc.GetEncoding(changedFile);
-                FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-                StreamReader file = new StreamReader(ifs, fe);
+                using StreamReader file = new StreamReader(ifs, fe);
 
                 int fileReadFrom = 0;
 
@@ -3631,8 +3626,6 @@ namespace SMT.EVEData
                     gameFileReadPos[changedFile] = fileReadFrom;
                 }
 
-                ifs.Close();
-
                 gameFileReadPos[changedFile] = fileReadFrom;
             }
             catch
@@ -3653,13 +3646,11 @@ namespace SMT.EVEData
 
             try
             {
-                List<LocalCharacter> loadList;
-                XmlSerializer xms = new XmlSerializer(typeof(List<LocalCharacter>));
-
-                FileStream fs = new FileStream(dataFilename, FileMode.Open, FileAccess.Read);
-                XmlReader xmlr = XmlReader.Create(fs);
-
-                loadList = (List<LocalCharacter>)xms.Deserialize(xmlr);
+                List<LocalCharacter> loadList = Serialization.DeserializeFromDisk<List<LocalCharacter>>(dataFilename);
+                if(loadList == null)
+                {
+                    return;
+                }
 
                 foreach(LocalCharacter c in loadList)
                 {
@@ -3684,7 +3675,7 @@ namespace SMT.EVEData
         {
             new Thread(async () =>
             {
-                Thread.CurrentThread.IsBackground = false;
+                Thread.CurrentThread.IsBackground = true;
 
 
                 // split the intial requests into 3 for a better initialisation

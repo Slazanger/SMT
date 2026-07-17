@@ -441,11 +441,13 @@ namespace SMT
 
         private void JumpPlannerJDC_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(CapitalRoute != null)
+            if(CapitalRoute != null &&
+               sender is ComboBox cb &&
+               cb.SelectedItem is ComboBoxItem cbi &&
+               cbi.DataContext is string jdcText &&
+               int.TryParse(jdcText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int jdc))
             {
-                ComboBox cb = sender as ComboBox;
-                ComboBoxItem cbi = cb.SelectedItem as ComboBoxItem;
-                CapitalRoute.JDC = int.Parse(cbi.DataContext as string);
+                CapitalRoute.JDC = jdc;
                 CapitalRoute.Recalculate();
 
                 if(CapitalRoute.CurrentRoute.Count == 0)
@@ -463,9 +465,8 @@ namespace SMT
 
         private void CurrentCapitalRouteItem_Selected(object sender, RoutedEventArgs e)
         {
-            if(dgCapitalRouteCurrentRoute.SelectedItem != null)
+            if(dgCapitalRouteCurrentRoute.SelectedItem is Navigation.RoutePoint rp)
             {
-                Navigation.RoutePoint rp = dgCapitalRouteCurrentRoute.SelectedItem as Navigation.RoutePoint;
                 string sel = rp.SystemName;
 
                 UniverseUC.ShowSystem(sel);

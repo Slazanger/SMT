@@ -166,7 +166,7 @@ namespace SMT
                     {
                         if(s.CustomUniverseLayout)
                         {
-                            tw.WriteLine($"{s.Region},{s.Name},{s.UniverseX},{s.UniverseY}");
+                            tw.WriteLine($"{s.Region},{s.Name},{s.UniverseX.ToString(CultureInfo.InvariantCulture)},{s.UniverseY.ToString(CultureInfo.InvariantCulture)}");
                         }
                     }
                 }

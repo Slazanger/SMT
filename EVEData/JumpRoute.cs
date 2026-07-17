@@ -72,19 +72,22 @@
                     {
                         for (int j = 2; j < sysList.Count; j++)
                         {
-                            List<string> a = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j - 2].SystemName, MaxLY, false, false);
-                            List<string> b = Navigation.GetSystemsWithinXLYFrom(CurrentRoute[j].SystemName, MaxLY, false, false);
+                            List<string> a = Navigation.GetSystemsWithinXLYFrom(sysList[j - 2].SystemName, actualMaxLY, false, false);
+                            List<string> b = Navigation.GetSystemsWithinXLYFrom(sysList[j].SystemName, actualMaxLY, false, false);
 
-                            IEnumerable<string> alternatives = a.AsQueryable().Intersect(b);
+                            IEnumerable<string> alternatives = a.Intersect(b);
+                            string currentMid = sysList[j - 1].SystemName;
+                            List<string> alternateMids = new List<string>();
 
-                            AlternateMids[CurrentRoute[j - 1].SystemName] = new List<string>();
                             foreach (string mid in alternatives)
                             {
-                                if (mid != CurrentRoute[j - 1].SystemName)
+                                if (mid != currentMid)
                                 {
-                                    AlternateMids[CurrentRoute[j - 1].SystemName].Add(mid);
+                                    alternateMids.Add(mid);
                                 }
                             }
+
+                            AlternateMids[currentMid] = alternateMids;
                         }
                     }
                 }

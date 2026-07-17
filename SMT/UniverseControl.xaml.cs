@@ -441,13 +441,17 @@ namespace SMT
 
         private void SetJumpRange_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.System sys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            if(sender is not MenuItem mi ||
+               mi.Parent is not FrameworkElement parent ||
+               parent.DataContext is not EVEData.System sys ||
+               mi.DataContext is not string rangeText ||
+               !double.TryParse(rangeText, NumberStyles.Float, CultureInfo.InvariantCulture, out double LY))
+            {
+                return;
+            }
 
             VHRangeSpheres.ClearAllChildren();
             VHRangeHighlights.ClearAllChildren();
-
-            MenuItem mi = sender as MenuItem;
-            double LY = double.Parse(mi.DataContext as string);
 
             if(LY == -1.0)
             {
@@ -455,14 +459,7 @@ namespace SMT
                 return;
             }
 
-            foreach(KeyValuePair<string, decimal> kvp in activeJumpSpheres)
-            {
-                if(kvp.Key == sys.Name)
-                {
-                    activeJumpSpheres.Remove(kvp);
-                    break;
-                }
-            }
+            activeJumpSpheres.RemoveAll(kvp => kvp.Key == sys.Name);
 
             if(LY > 0)
             {
