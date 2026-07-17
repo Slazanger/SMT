@@ -2394,9 +2394,9 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Save the Data to disk
+        /// Save the character data to disk.
         /// </summary>
-        public void SaveData()
+        public void SaveCharacters()
         {
             // save off only the ESI authenticated Characters so create a new copy to serialise from..
             List<LocalCharacter> saveList = new List<LocalCharacter>();
@@ -2416,6 +2416,14 @@ namespace SMT.EVEData
             {
                 xms.Serialize(tw, saveList);
             }
+        }
+
+        /// <summary>
+        /// Save the Data to disk
+        /// </summary>
+        public void SaveData()
+        {
+            SaveCharacters();
 
             string jbFileName = Path.Combine(SaveDataRootFolder, "JumpBridges_" + JumpBridge.SaveVersion + ".dat");
             Serialization.SerializeToDisk<List<JumpBridge>>(JumpBridges, jbFileName);
