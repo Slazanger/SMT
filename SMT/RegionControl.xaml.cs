@@ -2735,6 +2735,12 @@ namespace SMT
                         defaultAllianceTickerBrush);
                     systemSubTextLines.Add((content, allianceSubTextBrush));
 
+                    if(mapSystem.ActualSystem.SovIsCapitalSystem)
+                    {
+                        systemSubTextLines.Add(("(Capital)", allianceSubTextBrush));
+                    }
+
+
                     if(!AlliancesKeyList.Contains(SystemAlliance))
                     {
                         AlliancesKeyList.Add(SystemAlliance);
