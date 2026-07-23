@@ -194,8 +194,7 @@ namespace SMT.EVEData
             }
 
             CharacterIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToTicker = new SerializableDictionary<long, string>();
+            IDToAlliance = new SerializableDictionary<long, Alliance>();
             NameToSystem = new Dictionary<string, System>();
             IDToSystem = new Dictionary<long, System>();
 
@@ -372,12 +371,7 @@ namespace SMT.EVEData
         /// <summary>
         /// Gets or sets the Alliance ID to Name dictionary
         /// </summary>
-        public SerializableDictionary<long, string> AllianceIDToName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Alliance ID to Alliance Ticker dictionary
-        /// </summary>
-        public SerializableDictionary<long, string> AllianceIDToTicker { get; set; }
+        public SerializableDictionary<long, Alliance> IDToAlliance { get; set; }
 
         /// <summary>
         /// Gets or sets the character cache
@@ -1980,9 +1974,9 @@ namespace SMT.EVEData
         public string GetAllianceName(int id)
         {
             string name = string.Empty;
-            if(AllianceIDToName.ContainsKey(id))
+            if(IDToAlliance.ContainsKey(id))
             {
-                name = AllianceIDToName[id];
+                name = IDToAlliance[id].Name;
             }
 
             return name;
@@ -1996,9 +1990,9 @@ namespace SMT.EVEData
         public string GetAllianceTicker(int id)
         {
             string ticker = string.Empty;
-            if(AllianceIDToTicker.ContainsKey(id))
+            if(IDToAlliance.ContainsKey(id))
             {
-                ticker = AllianceIDToTicker[id];
+                ticker = IDToAlliance[id].Ticker;
             }
 
             return ticker;
@@ -2232,8 +2226,7 @@ namespace SMT.EVEData
             }
 
             CharacterIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToName = new SerializableDictionary<long, string>();
-            AllianceIDToTicker = new SerializableDictionary<long, string>();
+            IDToAlliance = new SerializableDictionary<long, Alliance>();
 
             // patch up any links
             foreach(System s in Systems)
@@ -2311,7 +2304,7 @@ namespace SMT.EVEData
             List<int> UnknownIDs = new List<int>();
             foreach(int l in IDs)
             {
-                if((!AllianceIDToName.ContainsKey(l) || !AllianceIDToTicker.ContainsKey(l)) && !UnknownIDs.Contains(l))
+                if(!IDToAlliance.ContainsKey(l) && !UnknownIDs.Contains(l))
                 {
                     UnknownIDs.Add(l);
                 }
@@ -2332,16 +2325,19 @@ namespace SMT.EVEData
                     {
                         if (ri.Category == "alliance")
                         {
+                            if(!IDToAlliance.ContainsKey(ri.Id))
+                            {
+                                Alliance a = new Alliance();
+                                a.ID = ri.Id;
+                                IDToAlliance[ri.Id] = a;
+                            }
+
+
                             var esraA = await EveApiClient.Alliance.GetAllianceInfoAsync(ri.Id);
                             if (ESIHelpers.ValidateESICall(esraA))
                             {
-                                AllianceIDToTicker[(int)ri.Id] = esraA.Model.Ticker;
-                                AllianceIDToName[(int)ri.Id] = esraA.Model.Name;
-                            }
-                            else
-                            {
-                                AllianceIDToTicker[(int)ri.Id] = "???????????????";
-                                AllianceIDToName[(int)ri.Id] = "?????";
+                                IDToAlliance[ri.Id].Name = esraA.Model.Name;
+                                IDToAlliance[ri.Id].Ticker = esraA.Model.Ticker;    
                             }
                         }
                     }
@@ -2728,7 +2724,7 @@ namespace SMT.EVEData
 
             foreach(KeyValuePair<string, MapSystem> kvp in r.MapSystems)
             {
-                if(kvp.Value.ActualSystem.SOVAllianceID != 0 && !AllianceIDToName.ContainsKey(kvp.Value.ActualSystem.SOVAllianceID) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceID))
+                if(kvp.Value.ActualSystem.SOVAllianceID != 0 && !IDToAlliance.ContainsKey(kvp.Value.ActualSystem.SOVAllianceID) && !IDToResolve.Contains(kvp.Value.ActualSystem.SOVAllianceID))
                 {
                     IDToResolve.Add(kvp.Value.ActualSystem.SOVAllianceID);
                 }
@@ -3968,9 +3964,9 @@ namespace SMT.EVEData
                         ss.DefendersScore = c.DefenderScore ?? 0;
                         ss.Valid = true;
 
-                        if(AllianceIDToName.ContainsKey(ss.DefendingAllianceID))
+                        if(IDToAlliance.ContainsKey(ss.DefendingAllianceID))
                         {
-                            ss.DefendingAllianceName = AllianceIDToName[ss.DefendingAllianceID];
+                            ss.DefendingAllianceName = IDToAlliance[ss.DefendingAllianceID].Name;
                         }
                         else
                         {
@@ -4004,9 +4000,9 @@ namespace SMT.EVEData
 
                 foreach(SOVCampaign sc in ActiveSovCampaigns.ToList())
                 {
-                    if(string.IsNullOrEmpty(sc.DefendingAllianceName) && AllianceIDToName.ContainsKey(sc.DefendingAllianceID))
+                    if(string.IsNullOrEmpty(sc.DefendingAllianceName) && IDToAlliance.ContainsKey(sc.DefendingAllianceID))
                     {
-                        sc.DefendingAllianceName = AllianceIDToName[sc.DefendingAllianceID];
+                        sc.DefendingAllianceName = IDToAlliance[sc.DefendingAllianceID].Name;
                     }
 
                     if(sc.Valid == false)
@@ -4080,6 +4076,7 @@ namespace SMT.EVEData
                 if (ESIHelpers.ValidateESICall(esr))
                 {
 
+                    List<int> allianceIDToResolve = new List<int>();
 
                     foreach (SovereigntySystem ss in esr.Model.SolarSystems)
                     {
@@ -4088,6 +4085,17 @@ namespace SMT.EVEData
                         EVEData.System es = GetEveSystemFromID(ss.SolarSystemId);
                         if (es != null)
                         {
+                            if(!allianceIDToResolve.Contains(es.SOVAllianceID))
+                            {
+                                allianceIDToResolve.Add(es.SOVAllianceID);
+                                if(!IDToAlliance.ContainsKey(es.SOVAllianceID))
+                                {
+                                    Alliance a = new Alliance();
+                                    a.ID = es.SOVAllianceID;
+                                    IDToAlliance[es.SOVAllianceID] = a;
+                                }
+                            }
+
                             if(ss.Claim!= null)
                             {
                                 if(ss.Claim.Alliance != null)
@@ -4110,9 +4118,15 @@ namespace SMT.EVEData
                                         es.SovVunerabliltyStart = default;
                                     }
 
+                                    if(es.SovIsCapitalSystem)
+                                    {
+                                        IDToAlliance[es.SOVAllianceID].CapitalSystemID = (int)ss.SolarSystemId;
+                                    }
+                                        
                                 }
                             }
                         }
+                        ResolveAllianceIDs(allianceIDToResolve).Wait();
                     }
                 }
             }

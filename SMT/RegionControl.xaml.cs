@@ -2721,7 +2721,7 @@ namespace SMT
                     MainCanvas.Children.Add(poly);
                 }
 
-                if((ShowSovOwner) && SystemAlliance != 0 && EM.AllianceIDToName.Keys.Contains(SystemAlliance))
+                if((ShowSovOwner) && SystemAlliance != 0 && EM.IDToAlliance.Keys.Contains(SystemAlliance))
                 {
                     string allianceName = EM.GetAllianceName(SystemAlliance);
                     string allianceTicker = EM.GetAllianceTicker(SystemAlliance);
@@ -3539,6 +3539,7 @@ namespace SMT
                     Point to = new Point(); ;
                     bool AddJBHighlight = false;
 
+
                     foreach(EVEData.JumpBridge jb in EM.JumpBridges)
                     {
                         if(selectedSys.Name == jb.From)
@@ -3547,7 +3548,6 @@ namespace SMT
                             jbl.Padding = one;
                             jbl.Margin = one;
                             jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
-
                             jbl.Content = $"JB\t: {jb.To}";
 
                             if(!Region.IsSystemOnMap(jb.To))

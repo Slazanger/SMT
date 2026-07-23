@@ -14,18 +14,30 @@ namespace SMT.EVEData
         /// </summary>
         public Alliance()
         {
-            ID = string.Empty;
-            Name = string.Empty;
+            ID = -1;
+            Name = "????";
+            Ticker = "????";
+            CapitalSystemID = -1;
         }
 
         /// <summary>
         /// Gets or sets the ID of Alliance
         /// </summary>
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         /// <summary>
         /// Gets or sets the Resolved Name of Alliance
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Ticker of Alliance
+        /// </summary>
+        public string Ticker { get; set; }
+
+        /// <summary>
+        /// The capital system for the alliance, this is used to determine the location of the alliance headquarters and jump bridge locations
+        /// </summary>
+        public int CapitalSystemID { get; set; }
     }
 }
