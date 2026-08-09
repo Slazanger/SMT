@@ -12,6 +12,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using SMT.EVEData;
+using SMT.Helpers;
 using SMT.ResourceUsage;
 
 namespace SMT
@@ -55,6 +56,7 @@ namespace SMT
         private const int ZINDEX_SYSICON = 100;
         private const int ZINDEX_ADM = 99;
         private const int ZINDEX_POLY = 98;
+        private const double STANDING_REGION_STROKE_THICKNESS = 2.25;
         private const int ZINDEX_JOVE = 105;
 
         private const int THERA_Z_INDEX = 22;
@@ -1333,6 +1335,15 @@ namespace SMT
             SolidColorBrush infoVulnerable = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableColour);
             SolidColorBrush infoVulnerableSoon = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableSoonColour);
 
+            // Group standing Voronoi cells by tier so adjacent same-standing cells can be merged.
+            Dictionary<float, List<List<Vector2>>> standingCellsByTier = null;
+            Dictionary<float, Brush> standingBrushByTier = null;
+            if(ShowStandings && ActiveCharacter != null && ActiveCharacter.ESILinked)
+            {
+                standingCellsByTier = new Dictionary<float, List<List<Vector2>>>();
+                standingBrushByTier = new Dictionary<float, Brush>();
+            }
+
             BridgeInfoStackPanel.Children.Clear();
             if(!string.IsNullOrEmpty(currentJumpCharacter))
             {
@@ -1508,84 +1519,53 @@ namespace SMT
                     DynamicMapElements.Add(infoCircle);
                 }
 
-                if(sys.ActualSystem.SOVAllianceID != 0 && ShowStandings)
+                if(standingCellsByTier != null && sys.ActualSystem.SOVAllianceID != 0)
                 {
-                    bool addToMap = true;
-                    Brush br = null;
+                    float Standing = 0.0f;
 
-                    if(ActiveCharacter != null && ActiveCharacter.ESILinked)
+                    if(ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceID)
                     {
-                        float Standing = 0.0f;
+                        Standing = 10.0f;
+                    }
 
-                        if(ActiveCharacter.AllianceID != 0 && ActiveCharacter.AllianceID == sys.ActualSystem.SOVAllianceID)
-                        {
-                            Standing = 10.0f;
-                        }
+                    if(sys.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
+                    {
+                        Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
+                    }
 
-                        if(sys.ActualSystem.SOVCorp != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVCorp))
-                        {
-                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVCorp];
-                        }
+                    if(sys.ActualSystem.SOVAllianceID != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceID))
+                    {
+                        Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceID];
+                    }
 
-                        if(sys.ActualSystem.SOVAllianceID != 0 && ActiveCharacter.Standings.Keys.Contains(sys.ActualSystem.SOVAllianceID))
-                        {
-                            Standing = ActiveCharacter.Standings[sys.ActualSystem.SOVAllianceID];
-                        }
-
-                        if(Standing == 0.0f)
-                        {
-                            addToMap = false;
-                        }
-
-                        br = StandingNeutBrush;
-
+                    if(Standing != 0.0f && sys.CellPoints != null && sys.CellPoints.Count >= 3)
+                    {
+                        Brush br = StandingNeutBrush;
                         if(Standing == -10.0)
                         {
                             br = StandingVBadBrush;
                         }
-
-                        if(Standing == -5.0)
+                        else if(Standing == -5.0)
                         {
                             br = StandingBadBrush;
                         }
-
-                        if(Standing == 5.0)
+                        else if(Standing == 5.0)
                         {
                             br = StandingGoodBrush;
                         }
-
-                        if(Standing == 10.0)
+                        else if(Standing == 10.0)
                         {
                             br = StandingVGoodBrush;
                         }
-                    }
-                    else
-                    {
-                        // enabled but not linked
-                        addToMap = false;
-                    }
 
-                    if(addToMap)
-                    {
-                        Polygon poly = new Polygon();
-                        poly.Fill = br;
-                        //poly.SnapsToDevicePixels = true;
-                        poly.Stroke = poly.Fill;
-                        poly.StrokeThickness = 0.4;
-                        poly.StrokeDashCap = PenLineCap.Round;
-                        poly.StrokeLineJoin = PenLineJoin.Round;
-                        poly.Stretch = Stretch.None;
-
-                        foreach(Vector2 p in sys.CellPoints)
+                        if(!standingCellsByTier.TryGetValue(Standing, out List<List<Vector2>> cells))
                         {
-                            System.Windows.Point wp = new Point(p.X, p.Y);
-                            poly.Points.Add(wp);
+                            cells = new List<List<Vector2>>();
+                            standingCellsByTier[Standing] = cells;
+                            standingBrushByTier[Standing] = br;
                         }
 
-                        MainCanvas.Children.Add(poly);
-
-                        // save the dynamic map elements
-                        DynamicMapElements.Add(poly);
+                        cells.Add(sys.CellPoints);
                     }
                 }
 
@@ -1712,6 +1692,11 @@ namespace SMT
                 }
             }
 
+            if(standingCellsByTier != null)
+            {
+                AddMergedStandingRegions(standingCellsByTier, standingBrushByTier);
+            }
+
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
             {
                 foreach(EVEData.ZKillRedisQ.ZKBDataSimple zs in EM.ZKillFeed.KillStream.ToList())
@@ -1773,6 +1758,44 @@ namespace SMT
                     DynamicMapElements.Add(UpgradeIndicator);
                 }
             }
+        }
+
+        private void AddMergedStandingRegions(Dictionary<float, List<List<Vector2>>> cellsByTier, Dictionary<float, Brush> brushByTier)
+        {
+            foreach(KeyValuePair<float, List<List<Vector2>>> kvp in cellsByTier)
+            {
+                PathGeometry geometry = PolygonUnion.UnionToPathGeometry(kvp.Value);
+                if(geometry == null)
+                {
+                    continue;
+                }
+
+                Brush fill = brushByTier[kvp.Key];
+                Path regionPath = new Path
+                {
+                    Data = geometry,
+                    Fill = fill,
+                    Stroke = CreateStandingRegionStroke(fill),
+                    StrokeThickness = STANDING_REGION_STROKE_THICKNESS,
+                    StrokeDashCap = PenLineCap.Round,
+                    StrokeLineJoin = PenLineJoin.Round,
+                    Stretch = Stretch.None
+                };
+
+                MainCanvas.Children.Add(regionPath);
+                DynamicMapElements.Add(regionPath);
+            }
+        }
+
+        private static Brush CreateStandingRegionStroke(Brush fill)
+        {
+            if(fill is SolidColorBrush solid)
+            {
+                Color c = solid.Color;
+                return new SolidColorBrush(Color.FromArgb(230, c.R, c.G, c.B));
+            }
+
+            return fill;
         }
 
         private Brush Gallente_FL = new SolidColorBrush(Color.FromArgb(100, 73, 171, 104));

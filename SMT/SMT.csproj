@@ -200,6 +200,7 @@
     <Resource Include="Images\overlay_hunter.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Clipper2" Version="2.0.0" />
     <PackageReference Include="Dirkster.AvalonDock.Themes.Expression">
       <Version>4.74.1</Version>
     </PackageReference>
