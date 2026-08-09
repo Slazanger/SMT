@@ -3033,24 +3033,26 @@ namespace SMT
 
         private void AllianceKeyList_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Label obj = sender as Label;
-            string AllianceIDStr = obj.DataContext as string;
-            long AllianceID = long.Parse(AllianceIDStr);
+            if(sender is not Label { DataContext: string allianceIDText } ||
+               !long.TryParse(allianceIDText, out long allianceID))
+            {
+                return;
+            }
 
             if(e.ClickCount == 2)
             {
-                string AURL = $"https://zkillboard.com/region/{Region.ID}/alliance/{AllianceID}/";
+                string AURL = $"https://zkillboard.com/region/{Region.ID}/alliance/{allianceID}/";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(AURL) { UseShellExecute = true });
             }
             else
             {
-                if(SelectedAlliance == AllianceID)
+                if(SelectedAlliance == allianceID)
                 {
                     SelectedAlliance = 0;
                 }
                 else
                 {
-                    SelectedAlliance = AllianceID;
+                    SelectedAlliance = allianceID;
                 }
                 ReDrawMap(true);
             }
@@ -4038,6 +4040,11 @@ namespace SMT
         /// <param name="e"></param>
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
+            if(!IsVisible)
+            {
+                return;
+            }
+
             if(currentJumpCharacter != "")
             {
                 foreach(LocalCharacter c in EM.LocalCharacters)
@@ -4049,10 +4056,7 @@ namespace SMT
                 }
             }
 
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                ReDrawMap(false);
-            }), DispatcherPriority.Normal);
+            ReDrawMap(false);
         }
 
         private struct GateHelper

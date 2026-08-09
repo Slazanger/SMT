@@ -54,7 +54,10 @@ namespace SMT
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            Redraw(false);
+            if(IsVisible)
+            {
+                Redraw(false);
+            }
         }
 
         public void Redraw(bool redraw)

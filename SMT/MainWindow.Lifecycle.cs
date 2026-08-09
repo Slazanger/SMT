@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,6 +26,7 @@ using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using static SMT.EVEData.ZKillRedisQ;
+using EVEDataUtils;
 
 namespace SMT
 {
@@ -37,29 +39,72 @@ namespace SMT
         }
         private void SaveDefaultLayout()
         {
-            // first delete the existing
             string defaultLayoutFile = AppDomain.CurrentDomain.BaseDirectory + @"\DefaultWindowLayout.dat";
-
-            if(File.Exists(defaultLayoutFile))
-            {
-                File.Delete(defaultLayoutFile);
-            }
 
             try
             {
                 if(OperatingSystem.IsWindows())
                 {
                     AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
-                    using(var sw = new StreamWriter(defaultLayoutFile))
-                    {
-                        ls.Serialize(sw);
-                    }
+                    AtomicFile.WriteText(defaultLayoutFile, writer => ls.Serialize(writer));
                 }
             }
-            catch
+            catch(Exception exception)
             {
+                AppLog.Error("Save default layout", exception);
             }
         }
+
+        private void LoadWindowLayoutWithBackup(string layoutFile)
+        {
+            if(!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            string backupFile = AtomicFile.GetBackupPath(layoutFile);
+            string candidate = File.Exists(layoutFile) ? layoutFile : File.Exists(backupFile) ? backupFile : null;
+            if(candidate == null)
+            {
+                return;
+            }
+
+            try
+            {
+                DeserializeWindowLayout(candidate);
+                if(candidate == backupFile)
+                {
+                    AppLog.Warning("Load window layout", "The backup layout was loaded because the primary file was missing.");
+                }
+            }
+            catch(Exception primaryException)
+            {
+                if(candidate == layoutFile && File.Exists(backupFile))
+                {
+                    try
+                    {
+                        DeserializeWindowLayout(backupFile);
+                        AppLog.Warning("Load window layout", $"Recovered the window layout from backup after: {primaryException.Message}");
+                        return;
+                    }
+                    catch(Exception backupException)
+                    {
+                        AppLog.Error("Load window layout", new AggregateException(primaryException, backupException));
+                        return;
+                    }
+                }
+
+                AppLog.Error("Load window layout", primaryException);
+            }
+        }
+
+        private void DeserializeWindowLayout(string layoutFile)
+        {
+            AvalonDock.Layout.Serialization.XmlLayoutSerializer serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+            using StreamReader reader = new StreamReader(layoutFile);
+            serializer.Deserialize(reader);
+        }
+
         private void Exit_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
@@ -111,6 +156,22 @@ namespace SMT
             Properties.Settings.Default.Save();
 
             EVEManager.ZKillFeed.KillsAddedEvent -= OnZKillsAdded;
+            AppLog.StatusChanged -= AppLog_StatusChanged;
+            EVEManager.BeginShutdown();
+        }
+
+        private void AppLog_StatusChanged(string message, bool isError)
+        {
+            if(Dispatcher.HasShutdownStarted)
+            {
+                return;
+            }
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                EVEManager.ServerInfo.StatusMessage = message;
+                EVEManager.ServerInfo.StatusIsError = isError;
+            });
         }
         private void MainWindow_Closed(object sender, EventArgs e)
         {
@@ -120,13 +181,11 @@ namespace SMT
             try
             {
                 AvalonDock.Layout.Serialization.XmlLayoutSerializer ls = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
-                using(var sw = new StreamWriter(dockManagerLayoutName))
-                {
-                    ls.Serialize(sw);
-                }
+                AtomicFile.WriteText(dockManagerLayoutName, writer => ls.Serialize(writer));
             }
-            catch
+            catch(Exception exception)
             {
+                AppLog.Error("Save window layout", exception);
             }
 
             try
@@ -151,49 +210,55 @@ namespace SMT
                 MapConf.ToolBox_ESIOverlayScale = RegionUC.ESIOverlayScale;
 
                 // now serialise the class to disk
-                XmlSerializer xms = new XmlSerializer(typeof(MapConfig));
-                using(TextWriter tw = new StreamWriter(mapConfigFileName))
-                {
-                    xms.Serialize(tw, MapConf);
-                }
+                Serialization.SerializeToDisk(MapConf, mapConfigFileName);
 
                 // Save any custom map Layout
                 string customLayoutFile = Path.Combine(EveAppConfig.VersionStorage, "CustomUniverseLayout.txt");
 
-                using(TextWriter tw = new StreamWriter(customLayoutFile))
+                AtomicFile.WriteText(customLayoutFile, tw =>
                 {
                     foreach(EVEData.System s in EVEManager.Systems)
                     {
                         if(s.CustomUniverseLayout)
                         {
-                            tw.WriteLine($"{s.Region},{s.Name},{s.UniverseX},{s.UniverseY}");
+                            tw.WriteLine($"{s.Region},{s.Name},{s.UniverseX.ToString(CultureInfo.InvariantCulture)},{s.UniverseY.ToString(CultureInfo.InvariantCulture)}");
                         }
                     }
-                }
+                });
             }
-            catch
+            catch(Exception exception)
             {
+                AppLog.Error("Save map configuration", exception);
             }
 
             try
             {
                 // save the Anom Data
                 // now serialise the class to disk
-                XmlSerializer anomxms = new XmlSerializer(typeof(EVEData.AnomManager));
                 string anomDataFilename = EVEManager.SaveDataVersionFolder + @"\Anoms.dat";
-
-                using(TextWriter tw = new StreamWriter(anomDataFilename))
-                {
-                    anomxms.Serialize(tw, ANOMManager);
-                }
+                Serialization.SerializeToDisk(ANOMManager, anomDataFilename);
             }
-            catch
+            catch(Exception exception)
             {
+                AppLog.Error("Save anomaly data", exception);
             }
 
             // save the character data
-            EVEManager.SaveData();
+            try
+            {
+                EVEManager.SaveData();
+            }
+            catch(Exception exception)
+            {
+                AppLog.Error("Save application data", exception);
+            }
             EVEManager.ShutDown();
+
+            waveOutEvent?.Stop();
+            waveOutEvent?.Dispose();
+            audioFileReader?.Dispose();
+            nIcon.Visible = false;
+            nIcon.Dispose();
         }
         private void MainWindow_StateChanged(object sender, EventArgs e)
         {
@@ -262,41 +327,46 @@ namespace SMT
                 ActiveCharacter.RecalcRoute();
             }
         }
-        private async void CheckGitHubVersion()
+        private async Task CheckGitHubVersionAsync()
         {
             string url = @"https://api.github.com/repos/slazanger/smt/releases/latest";
             string strContent = string.Empty;
 
             try
             {
-                HttpClient hc = new HttpClient();
+                using HttpClient hc = new HttpClient();
                 hc.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("SMT", EveAppConfig.SMT_VERSION));
-                var response = await hc.GetAsync(url);
+                using HttpResponseMessage response = await hc.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 strContent = await response.Content.ReadAsStringAsync();
             }
-            catch
+            catch(Exception exception)
             {
+                AppLog.Error("Check for SMT updates", exception);
                 return;
             }
 
-            GitHubRelease.Release releaseInfo = GitHubRelease.Release.FromJson(strContent);
-
-            if(releaseInfo != null)
+            try
             {
-                if(releaseInfo.TagName != EveAppConfig.SMT_VERSION)
+                GitHubRelease.Release releaseInfo = GitHubRelease.Release.FromJson(strContent);
+
+                if(releaseInfo != null && releaseInfo.TagName != EveAppConfig.SMT_VERSION)
                 {
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         NewVersionWindow nw = new NewVersionWindow();
                         nw.ReleaseInfo = releaseInfo.Body;
                         nw.CurrentVersion = EveAppConfig.SMT_VERSION;
                         nw.NewVersion = releaseInfo.TagName;
-                        nw.ReleaseURL = releaseInfo.HtmlUrl.ToString();
+                        nw.ReleaseURL = releaseInfo.HtmlUrl?.ToString() ?? string.Empty;
                         nw.Owner = this;
                         nw.ShowDialog();
-                    }), DispatcherPriority.Normal);
+                    }, DispatcherPriority.Normal);
                 }
+            }
+            catch(Exception exception)
+            {
+                AppLog.Error("Process SMT update information", exception);
             }
         }
         private void miResetLayout_Click(object sender, RoutedEventArgs e)
@@ -312,8 +382,9 @@ namespace SMT
                         ls.Deserialize(sr);
                     }
                 }
-                catch
+                catch(Exception exception)
                 {
+                    AppLog.Error("Reset window layout", exception);
                 }
             }
 

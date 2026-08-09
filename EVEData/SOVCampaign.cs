@@ -74,6 +74,53 @@ namespace SMT.EVEData
             }
         }
 
+        public void UpdateFrom(SOVCampaign source)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+
+            if(DefendingAllianceID != source.DefendingAllianceID)
+            {
+                DefendingAllianceID = source.DefendingAllianceID;
+                OnPropertyChanged(nameof(DefendingAllianceID));
+            }
+            if(DefendingAllianceName != source.DefendingAllianceName)
+            {
+                DefendingAllianceName = source.DefendingAllianceName;
+                OnPropertyChanged(nameof(DefendingAllianceName));
+            }
+            if(System != source.System)
+            {
+                System = source.System;
+                OnPropertyChanged(nameof(System));
+            }
+            if(Region != source.Region)
+            {
+                Region = source.Region;
+                OnPropertyChanged(nameof(Region));
+            }
+            if(Type != source.Type)
+            {
+                Type = source.Type;
+                OnPropertyChanged(nameof(Type));
+            }
+            if(State != source.State)
+            {
+                State = source.State;
+                OnPropertyChanged(nameof(State));
+            }
+            if(StartTime != source.StartTime)
+            {
+                StartTime = source.StartTime;
+                OnPropertyChanged(nameof(StartTime));
+            }
+
+            AttackersScore = source.AttackersScore;
+            DefendersScore = source.DefendersScore;
+            TimeToStart = source.TimeToStart;
+            IsActive = source.IsActive;
+            Valid = source.Valid;
+        }
+
         private bool m_Valid;
 
         public bool Valid
@@ -99,5 +146,6 @@ namespace SMT.EVEData
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
+
     }
 }

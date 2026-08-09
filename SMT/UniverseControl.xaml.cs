@@ -310,7 +310,6 @@ namespace SMT
         // Timer to Re-draw the map
         private System.Windows.Threading.DispatcherTimer uiRefreshTimer;
 
-        private int uiRefreshTimer_interval = 0;
 
         public void Init()
         {
@@ -441,13 +440,17 @@ namespace SMT
 
         private void SetJumpRange_Click(object sender, RoutedEventArgs e)
         {
-            EVEData.System sys = ((System.Windows.FrameworkElement)((System.Windows.FrameworkElement)sender).Parent).DataContext as EVEData.System;
+            if(sender is not MenuItem mi ||
+               mi.Parent is not FrameworkElement parent ||
+               parent.DataContext is not EVEData.System sys ||
+               mi.DataContext is not string rangeText ||
+               !double.TryParse(rangeText, NumberStyles.Float, CultureInfo.InvariantCulture, out double LY))
+            {
+                return;
+            }
 
             VHRangeSpheres.ClearAllChildren();
             VHRangeHighlights.ClearAllChildren();
-
-            MenuItem mi = sender as MenuItem;
-            double LY = double.Parse(mi.DataContext as string);
 
             if(LY == -1.0)
             {
@@ -455,14 +458,7 @@ namespace SMT
                 return;
             }
 
-            foreach(KeyValuePair<string, decimal> kvp in activeJumpSpheres)
-            {
-                if(kvp.Key == sys.Name)
-                {
-                    activeJumpSpheres.Remove(kvp);
-                    break;
-                }
-            }
+            activeJumpSpheres.RemoveAll(kvp => kvp.Key == sys.Name);
 
             if(LY > 0)
             {
@@ -544,23 +540,16 @@ namespace SMT
 
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
-            uiRefreshTimer_interval++;
-
-            bool FullRedraw = false;
-            bool FastUpdate = true;
-            bool DataRedraw = false;
-
-            if(uiRefreshTimer_interval == 4)
+            if(!IsVisible)
             {
-                uiRefreshTimer_interval = 0;
-                DataRedraw = false;
+                return;
             }
 
             if(FollowCharacterChk.IsChecked.HasValue && (bool)FollowCharacterChk.IsChecked)
             {
                 CentreMapOnActiveCharacter();
             }
-            ReDrawMap(FullRedraw, DataRedraw, FastUpdate);
+            ReDrawMap(false, false, true);
         }
 
         private void VHSystems_MouseClicked(object sender, RoutedEventArgs e)

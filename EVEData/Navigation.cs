@@ -100,16 +100,13 @@ namespace SMT.EVEData
         {
             List<string> inRange = new List<string>();
 
-            MapNode startSys = null;
-
-            foreach (MapNode sys in MapNodes.Values)
+            if(MapNodes == null || LY <= 0 || !MapNodes.TryGetValue(start, out MapNode startSys))
             {
-                if (sys.Name == start)
-                {
-                    startSys = sys;
-                    break;
-                }
+                return inRange;
             }
+
+            decimal maxDistance = (decimal)LY;
+            decimal maxDistanceSquared = maxDistance * maxDistance;
 
             foreach (MapNode sys in MapNodes.Values)
             {
@@ -122,21 +119,15 @@ namespace SMT.EVEData
                 decimal y = startSys.Y - sys.Y;
                 decimal z = startSys.Z - sys.Z;
 
-                decimal length = DecimalMath.DecimalEx.Sqrt((x * x) + (y * y) + (z * z));
+                decimal distanceSquared = (x * x) + (y * y) + (z * z);
+                bool shouldAdd = distanceSquared < maxDistanceSquared;
 
-                bool shouldAdd = false;
-
-                if (length < (decimal)LY)
-                {
-                    shouldAdd = true;
-                }
-
-                if (sys.HighSec & !includeHighSecSystems)
+                if (sys.HighSec && !includeHighSecSystems)
                 {
                     shouldAdd = false;
                 }
 
-                if (sys.Pochven & !includePochvenSystems)
+                if (sys.Pochven && !includePochvenSystems)
                 {
                     shouldAdd = false;
                 }
@@ -601,39 +592,42 @@ namespace SMT.EVEData
                 return null;
             }
 
-            double ExtraJumpFactor = 5.0;
-            double AvoidFactor = 0.0;
+            const double ExtraJumpFactor = 5.0;
+            HashSet<string> avoidSystems = systemsToAvoid == null ? new HashSet<string>() : new HashSet<string>(systemsToAvoid);
 
-            // clear the scores, values and parents from the list
-            foreach (MapNode mapNode in MapNodes.Values)
+            // Reset only nodes touched by the previous route calculation.
+            foreach (MapNode mapNode in LastTouchedNodes)
             {
                 mapNode.NearestToStart = null;
                 mapNode.MinCostToStart = 0;
                 mapNode.Visited = false;
             }
+            LastTouchedNodes.Clear();
 
             MapNode Start = MapNodes[From];
             MapNode End = MapNodes[To];
 
-            List<MapNode> OpenList = new List<MapNode>();
-            List<MapNode> ClosedList = new List<MapNode>();
+            SortedSet<MapNode> OpenList = new SortedSet<MapNode>(new MapNodeComparer());
+            HashSet<MapNode> OpenSet = new HashSet<MapNode>();
 
             MapNode CurrentNode = null;
 
             // add the start to the open list
             OpenList.Add(Start);
+            OpenSet.Add(Start);
+            LastTouchedNodes.Add(Start);
 
             while (OpenList.Count > 0)
             {
-                // get the MapNode with the lowest F score
-                double lowest = OpenList.Min(mn => mn.MinCostToStart);
-                CurrentNode = OpenList.First(mn => mn.MinCostToStart == lowest);
-
-                // add the list to the closed list
-                ClosedList.Add(CurrentNode);
-
-                // remove it from the open list
+                CurrentNode = OpenList.Min;
                 OpenList.Remove(CurrentNode);
+                OpenSet.Remove(CurrentNode);
+
+                // The lowest-cost destination has been found; no remaining nodes need processing.
+                if(CurrentNode == End)
+                {
+                    break;
+                }
 
                 // walk the connections
                 foreach (JumpLink connection in CurrentNode.JumpableSystems)
@@ -648,23 +642,22 @@ namespace SMT.EVEData
                     if (CMN.Visited)
                         continue;
 
-                    if (systemsToAvoid.Contains(connection.System))
-                    {
-                        AvoidFactor = 10000;
-                    }
-                    else
-                    {
-                        AvoidFactor = 0.0;
-                    }
+                    double avoidFactor = avoidSystems.Contains(connection.System) ? 10000.0 : 0.0;
+                    double newCostToStart = CurrentNode.MinCostToStart + (double)connection.RangeLY + ExtraJumpFactor + avoidFactor;
 
-                    if (CMN.MinCostToStart == 0 || CurrentNode.MinCostToStart + (double)connection.RangeLY + ExtraJumpFactor + AvoidFactor < CMN.MinCostToStart)
+                    if (CMN.MinCostToStart == 0 || newCostToStart < CMN.MinCostToStart)
                     {
-                        CMN.MinCostToStart = CurrentNode.MinCostToStart + (double)connection.RangeLY + ExtraJumpFactor + AvoidFactor;
-                        CMN.NearestToStart = CurrentNode;
-                        if (!OpenList.Contains(CMN))
+                        if(OpenSet.Contains(CMN))
                         {
-                            OpenList.Add(CMN);
+                            OpenList.Remove(CMN);
+                            OpenSet.Remove(CMN);
                         }
+
+                        CMN.MinCostToStart = newCostToStart;
+                        CMN.NearestToStart = CurrentNode;
+                        LastTouchedNodes.Add(CMN);
+                        OpenList.Add(CMN);
+                        OpenSet.Add(CMN);
                     }
                 }
 

@@ -689,6 +689,14 @@ namespace SMT
 
         private void Overlay_Closing(object sender, CancelEventArgs e)
         {
+            locationUpdateTimer.Stop();
+            dataUpdateTimer.Stop();
+            locationUpdateTimer.Tick -= UpdatePlayerLocations;
+            dataUpdateTimer.Tick -= UpdateDataOverlay;
+            mainWindow.OnSelectedCharChangedEventHandler -= SelectedCharChanged;
+            mainWindow.MapConf.PropertyChanged -= OverlayConf_PropertyChanged;
+            SizeChanged -= OnSizeChanged;
+            overlay_Canvas.SizeChanged -= OnCanvasSizeChanged;
             StoreOverlayWindowPosition();
         }
 

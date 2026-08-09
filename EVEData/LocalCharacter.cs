@@ -537,49 +537,48 @@ namespace SMT.EVEData
                 return jbl;
 
             await UpdateLock.WaitAsync();
+            try
             {
                 AuthDTO auth = GetAuthDTO();
                 if (auth == null)
                 {
-                    UpdateLock.Release();
                     return jbl;
                 }
 
-                try
+                var esr = await EveManager.Instance.EveApiClient.Search.SearchCharacterAsync(auth, new List<string> { "structure" }, JumpBridgeFilterString);
+                if (!ESIHelpers.ValidateESICall(esr) || esr.Model == null)
                 {
-                    var esr = await EveManager.Instance.EveApiClient.Search.SearchCharacterAsync(auth, new List<string> { "structure" }, JumpBridgeFilterString);
-                    if (!ESIHelpers.ValidateESICall(esr) || esr.Model == null)
+                    return jbl;
+                }
+
+                List<long> structureIds = esr.Model.Structure ?? new List<long>();
+                foreach (long stationID in structureIds)
+                {
+                    var esrs = await EveManager.Instance.EveApiClient.Universe.GetStructureInfoAsync(auth, stationID);
+                    if (ESIHelpers.ValidateESICall(esrs) && esrs.Model != null && esrs.Model.TypeId == 35841)
                     {
-                        UpdateLock.Release();
-                        return jbl;
+                        string[] parts = (esrs.Model.Name ?? string.Empty).Split(' ');
+                        if (parts.Length >= 3)
+                        {
+                            JumpBridge jumpBridge = new JumpBridge(parts[0], parts[2])
+                            {
+                                FromID = stationID,
+                            };
+                            jbl.Add(jumpBridge);
+                        }
                     }
 
-                    List<long> structureIds = esr.Model.Structure ?? new List<long>();
-                    foreach (long stationID in structureIds)
-                    {
-                        var esrs = await EveManager.Instance.EveApiClient.Universe.GetStructureInfoAsync(auth, stationID);
-                        if (ESIHelpers.ValidateESICall(esrs) && esrs.Model != null)
-                        {
-                            if (esrs.Model.TypeId == 35841)
-                            {
-                                string[] parts = (esrs.Model.Name ?? string.Empty).Split(' ');
-                                if (parts.Length >= 3)
-                                {
-                                    string from = parts[0];
-                                    string to = parts[2];
-                                    EveManager.Instance.AddUpdateJumpBridge(from, to, stationID);
-                                }
-                            }
-                        }
-                        Thread.Sleep(100);
-                    }
-                }
-                catch
-                {
-                    // ESI-Search failed
+                    await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
                 }
             }
-            UpdateLock.Release();
+            catch(Exception exception)
+            {
+                EVEDataUtils.AppLog.Error($"Find jump gates for {Name}", exception);
+            }
+            finally
+            {
+                UpdateLock.Release();
+            }
 
             return jbl;
         }
@@ -684,10 +683,10 @@ namespace SMT.EVEData
         public async Task Update()
         {
             await UpdateLock.WaitAsync();
+            try
             {
-
                 TimeSpan ts = ESIAccessTokenExpiry - DateTime.Now;
-                if (ts.Minutes < 1)
+                if (ts.TotalMinutes < 1)
                 {
                     await RefreshAccessToken().ConfigureAwait(false);
                     await UpdateInfoFromESI().ConfigureAwait(false);
@@ -712,7 +711,7 @@ namespace SMT.EVEData
                 if (routeNeedsUpdate)
                 {
                     routeNeedsUpdate = false;
-                    UpdateActiveRoute();
+                    await UpdateActiveRoute().ConfigureAwait(false);
 
                     if (RouteUpdatedEvent != null)
                     {
@@ -726,7 +725,10 @@ namespace SMT.EVEData
                     UpdateWarningSystems();
                 }
             }
-            UpdateLock.Release();
+            finally
+            {
+                UpdateLock.Release();
+            }
         }
 
         protected void OnPropertyChanged(string name)
@@ -754,7 +756,7 @@ namespace SMT.EVEData
                 if (tokenDetails == null || string.IsNullOrEmpty(tokenDetails.AccessToken))
                 {
                     ssoErrorCount++;
-                    Thread.Sleep(20000);
+                    await Task.Delay(TimeSpan.FromSeconds(20)).ConfigureAwait(false);
                     if (ssoErrorCount > 50)
                     {
                         ESIRefreshToken = "";
@@ -783,13 +785,14 @@ namespace SMT.EVEData
                     ESIRefreshToken = "";
                     ESILinked = false;
                 }
+                EVEDataUtils.AppLog.Error($"Refresh ESI token for {Name}", ex);
             }
         }
 
         /// <summary>
         /// Update the active route for the character
         /// </summary>
-        private async void UpdateActiveRoute()
+        private async Task UpdateActiveRoute()
         {
             if (esiSendRouteClear)
             {
@@ -875,70 +878,89 @@ namespace SMT.EVEData
             {
                 esiRouteNeedsUpdate = false;
                 esiRouteUpdating = true;
-
-                List<long> WayPointsToAdd = new List<long>();
-
-                lock (ActiveRouteLock)
+                try
                 {
-                    foreach (Navigation.RoutePoint rp in ActiveRoute)
+                    List<long> WayPointsToAdd = new List<long>();
+
+                    lock (ActiveRouteLock)
                     {
-                        // explicitly add interim waypoints for ansiblex gates or actual waypoints
-                        if (
-                                rp.GateToTake == Navigation.GateType.Ansiblex ||
-                                rp.GateToTake == Navigation.GateType.Thera ||
-                                rp.GateToTake == Navigation.GateType.Turnur ||
-                                rp.GateToTake == Navigation.GateType.Zarzakh ||
-                                Waypoints.Contains(rp.SystemName)
-                            )
+                        foreach (Navigation.RoutePoint rp in ActiveRoute)
                         {
-                            long wayPointSysID = EveManager.Instance.GetEveSystem(rp.SystemName).ID;
-
-                            if (rp.GateToTake == Navigation.GateType.Ansiblex)
+                            // explicitly add interim waypoints for special connections or actual waypoints
+                            if (
+                                    rp.GateToTake == Navigation.GateType.Ansiblex ||
+                                    rp.GateToTake == Navigation.GateType.Thera ||
+                                    rp.GateToTake == Navigation.GateType.Turnur ||
+                                    rp.GateToTake == Navigation.GateType.Zarzakh ||
+                                    Waypoints.Contains(rp.SystemName)
+                                )
                             {
-                                foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
+                                System waypointSystem = EveManager.Instance.GetEveSystem(rp.SystemName);
+                                if(waypointSystem == null)
                                 {
-                                    if (jb.From == rp.SystemName)
-                                    {
-                                        if (jb.FromID != 0)
-                                        {
-                                            wayPointSysID = jb.FromID;
-                                        }
-                                        break;
-                                    }
+                                    continue;
+                                }
 
-                                    if (jb.To == rp.SystemName)
+                                long wayPointSysID = waypointSystem.ID;
+
+                                if (rp.GateToTake == Navigation.GateType.Ansiblex)
+                                {
+                                    foreach (JumpBridge jb in EveManager.Instance.JumpBridges)
                                     {
-                                        if (jb.ToID != 0)
+                                        if (jb.From == rp.SystemName)
                                         {
-                                            wayPointSysID = jb.ToID;
+                                            if (jb.FromID != 0)
+                                            {
+                                                wayPointSysID = jb.FromID;
+                                            }
+                                            break;
                                         }
-                                        break;
+
+                                        if (jb.To == rp.SystemName)
+                                        {
+                                            if (jb.ToID != 0)
+                                            {
+                                                wayPointSysID = jb.ToID;
+                                            }
+                                            break;
+                                        }
                                     }
                                 }
+                                WayPointsToAdd.Add(wayPointSysID);
                             }
-                            WayPointsToAdd.Add(wayPointSysID);
                         }
                     }
-                }
 
-                bool firstRoute = true;
+                    bool firstRoute = true;
+                    Exception firstWaypointError = null;
 
-                AuthDTO auth = GetAuthDTO();
-                if (auth != null)
-                {
-                    foreach (long SysID in WayPointsToAdd)
+                    AuthDTO auth = GetAuthDTO();
+                    if (auth != null)
                     {
-                        try
+                        foreach (long SysID in WayPointsToAdd)
                         {
-                            await EveManager.Instance.EveApiClient.UserInterface.SetAutopilotWaypointAsync(auth, firstRoute, false, SysID);
+                            try
+                            {
+                                await EveManager.Instance.EveApiClient.UserInterface.SetAutopilotWaypointAsync(auth, firstRoute, false, SysID);
+                            }
+                            catch(Exception exception)
+                            {
+                                firstWaypointError ??= exception;
+                            }
+                            firstRoute = false;
+                            await Task.Delay(TimeSpan.FromMilliseconds(200)).ConfigureAwait(false);
                         }
-                        catch { }
-                        firstRoute = false;
-                        Thread.Sleep(200);
+                    }
+
+                    if(firstWaypointError != null)
+                    {
+                        EVEDataUtils.AppLog.Error($"Set autopilot route for {Name}", firstWaypointError);
                     }
                 }
-
-                esiRouteUpdating = false;
+                finally
+                {
+                    esiRouteUpdating = false;
+                }
             }
         }
 
@@ -1041,7 +1063,7 @@ namespace SMT.EVEData
 
                         if (characterIDsToResolve.Count > 0)
                         {
-                            EveManager.Instance.ResolveCharacterIDs(characterIDsToResolve).Wait();
+                            await EveManager.Instance.ResolveCharacterIDs(characterIDsToResolve);
                         }
 
                         foreach (Fleet.FleetMember ff in FleetInfo.Members.ToList())
@@ -1162,14 +1184,19 @@ namespace SMT.EVEData
                     {
                         try
                         {
-                            HttpClient hc = new HttpClient();
-                            var response = await hc.GetAsync(esri.Model.Px128x128);
+                            Directory.CreateDirectory(portraitRoot);
+                            using HttpClient hc = new HttpClient();
+                            using HttpResponseMessage response = await hc.GetAsync(esri.Model.Px128x128);
+                            response.EnsureSuccessStatusCode();
                             using (var fs = new FileStream(characterPortrait, FileMode.CreateNew))
                             {
                                 await response.Content.CopyToAsync(fs);
                             }
                         }
-                        catch { }
+                        catch(Exception exception)
+                        {
+                            EVEDataUtils.AppLog.Error($"Download portrait for {Name}", exception);
+                        }
                     }
                 }
 

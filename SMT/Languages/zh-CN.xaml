@@ -205,6 +205,10 @@
     <s:String x:Key="Main_JP_GrpAlt">备选中转星系</s:String>
     <s:String x:Key="Main_JP_LblAltFor">正在查看谁的备选：</s:String>
     <s:String x:Key="Main_JP_CtxUseAlt">替换为此备选</s:String>
+    <s:String x:Key="Main_JP_SummaryNeedWP">请至少添加两个节点。</s:String>
+    <s:String x:Key="Main_JP_SummaryNoRoute">无法为 {0} 找到有效路线。</s:String>
+    <s:String x:Key="Main_JP_SummaryReady">{0} 次跳跃，{1} 个中转，总计 {2:0.##} 光年</s:String>
+    <s:String x:Key="Main_JP_CopySuccess">路线已复制到剪贴板。</s:String>
 
     <s:String x:Key="Main_WH_TabThera">希拉洞(Thera)</s:String>
     <s:String x:Key="Main_WH_TabTurnur">图尔努尔 (Turnur)</s:String>

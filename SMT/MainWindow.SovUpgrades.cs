@@ -104,7 +104,7 @@ namespace SMT
             string infoObjectsFile = Path.Combine(EveAppConfig.StorageRoot, "InfoObjects.txt");
             if(File.Exists(infoObjectsFile))
             {
-                StreamReader file = new StreamReader(infoObjectsFile);
+                using StreamReader file = new StreamReader(infoObjectsFile);
 
                 string line;
                 while((line = file.ReadLine()) != null)
@@ -117,7 +117,7 @@ namespace SMT
 
                     string[] parts = line.Split(',');
 
-                    if(parts.Length == 0)
+                    if(parts.Length < 2)
                     {
                         continue;
                     }
@@ -169,7 +169,10 @@ namespace SMT
 
                         Color c = (Color)ColorConverter.ConvertFromString(colour);
 
-                        int lineThickness = int.Parse(size);
+                        if(!int.TryParse(size, NumberStyles.Integer, CultureInfo.InvariantCulture, out int lineThickness))
+                        {
+                            continue;
+                        }
 
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Line;
@@ -210,7 +213,10 @@ namespace SMT
 
                         Color c = (Color)ColorConverter.ConvertFromString(colour);
 
-                        int radius = int.Parse(size);
+                        if(!int.TryParse(size, NumberStyles.Integer, CultureInfo.InvariantCulture, out int radius))
+                        {
+                            continue;
+                        }
 
                         InfoItem ii = new InfoItem();
                         ii.DrawType = InfoItem.ShapeType.Circle;

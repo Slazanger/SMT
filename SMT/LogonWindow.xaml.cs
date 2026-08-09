@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using EVEDataUtils;
 
 namespace SMT
 {
@@ -11,39 +13,35 @@ namespace SMT
     public partial class LogonWindow : Window
     {
         private HttpListener listener;
+        private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        private readonly Task serverTask;
 
         public LogonWindow()
         {
             InitializeComponent();
-            new Task(StartServer).Start();
+            serverTask = StartServerAsync(cancellationSource.Token);
         }
 
-        private bool serverDone = false;
-
-        private void StartServer()
+        private async Task StartServerAsync(CancellationToken cancellationToken)
         {
-            // create the http Server
-            listener = new HttpListener();
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            string challengeCode = EVEDataUtils.Misc.RandomString(32);
-            string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
-
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(esiLogonURL) { UseShellExecute = true });
-
             try
             {
+                // Create the local callback server before opening the browser so startup failures are observable.
+                listener = new HttpListener();
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                string challengeCode = EVEDataUtils.Misc.RandomString(32);
+                string esiLogonURL = EVEData.EveManager.Instance.GetESILogonURL(challengeCode);
+
                 listener.Prefixes.Add(EVEData.EveAppConfig.CallbackURL);
                 listener.Start();
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(esiLogonURL) { UseShellExecute = true });
 
-                while (!serverDone)
+                while(!cancellationToken.IsCancellationRequested)
                 {
-                    Console.WriteLine("Listening...");
-
-                    // Note: The GetContext method blocks while waiting for a request.
-                    HttpListenerContext context = listener.GetContext();
+                    HttpListenerContext context = await listener.GetContextAsync().WaitAsync(cancellationToken);
                     HttpListenerRequest request = context.Request;
 
-                    EVEData.EveManager.Instance.HandleEveAuthSMTUri(request.Url, challengeCode);
+                    await EVEData.EveManager.Instance.HandleEveAuthSMTUriAsync(request.Url, challengeCode);
 
                     // Obtain a response object.
                     HttpListenerResponse response = context.Response;
@@ -54,28 +52,42 @@ namespace SMT
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
                     // Get a response stream and write the response to it.
                     response.ContentLength64 = buffer.Length;
-                    System.IO.Stream output = response.OutputStream;
-                    output.Write(buffer, 0, buffer.Length);
+                    await using System.IO.Stream output = response.OutputStream;
+                    await output.WriteAsync(buffer, cancellationToken);
                 }
             }
-            catch
+            catch(OperationCanceledException) when(cancellationToken.IsCancellationRequested)
             {
+            }
+            catch(HttpListenerException) when(cancellationToken.IsCancellationRequested)
+            {
+            }
+            catch(Exception exception)
+            {
+                AppLog.Error("ESI login listener", exception);
             }
         }
 
-        private void Window_Closed(object sender, EventArgs e)
+        private async void Window_Closed(object sender, EventArgs e)
         {
             try
             {
-                serverDone = true;
+                cancellationSource.Cancel();
 
                 if (listener != null && listener.IsListening)
                 {
                     listener.Stop();
                 }
+                listener?.Close();
+                await serverTask;
             }
-            catch
+            catch(Exception exception)
             {
+                AppLog.Error("Close ESI login listener", exception);
+            }
+            finally
+            {
+                cancellationSource.Dispose();
             }
         }
     }

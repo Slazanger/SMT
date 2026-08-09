@@ -45,6 +45,7 @@ namespace SMT
             }
 
             MainWindow mw = Owner as MainWindow;
+            mw.EVEManager.SaveCharacters();
             mw.EVEManager.LocalCharacterUpdateEvent -= EVEManager_LocalCharacterUpdateEvent;
         }
 

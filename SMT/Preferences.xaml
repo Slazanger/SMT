@@ -8,7 +8,7 @@
         xmlns:conv="clr-namespace:SMT.Converters"
         mc:Ignorable="d"
         Name="PrefsWindow"
-        Title="{DynamicResource Prefs_Title}" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded">
+        Title="{DynamicResource Prefs_Title}" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded" Closed="Window_Closed">
     <Window.Resources>
         <conv:JoinStringConverter x:Key="stringJoiner" />
         <conv:NegateBooleanConverter x:Key="NegateBooleanConverter" />
