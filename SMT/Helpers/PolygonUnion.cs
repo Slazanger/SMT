@@ -12,10 +12,13 @@ namespace SMT.Helpers
     /// </summary>
     internal static class PolygonUnion
     {
-        /// <summary>Scale world coords to Clipper integer space. Cells are snapped to 2.5.</summary>
+        /// <summary>Scale world coords to Clipper integer space. Cells are snapped to 1.0.</summary>
         private const double Scale = 100.0;
 
-        public static PathGeometry UnionToPathGeometry(IEnumerable<IReadOnlyList<Vector2>> cellRings)
+        /// <summary>Default inset in map units so adjacent same-standing alliances show a background gap.</summary>
+        public const double DefaultInsetDelta = -1.75;
+
+        public static PathGeometry UnionToPathGeometry(IEnumerable<IReadOnlyList<Vector2>> cellRings, double insetDelta = DefaultInsetDelta)
         {
             if(cellRings == null)
             {
@@ -52,39 +55,53 @@ namespace SMT.Helpers
                 return null;
             }
 
+            Paths64 united = Clipper.PolyTreeToPaths64(tree);
+            if(united == null || united.Count == 0)
+            {
+                return null;
+            }
+
+            if(insetDelta != 0.0)
+            {
+                // InflatePaths delta is in the same integer space as Path64 coordinates.
+                united = Clipper.InflatePaths(united, insetDelta * Scale, JoinType.Round, EndType.Polygon);
+                if(united == null || united.Count == 0)
+                {
+                    return null;
+                }
+            }
+
             PathGeometry geometry = new PathGeometry
             {
                 FillRule = System.Windows.Media.FillRule.EvenOdd
             };
-            AppendPolyTree(tree, geometry);
+            AppendPaths(united, geometry);
 
             return geometry.Figures.Count > 0 ? geometry : null;
         }
 
-        private static void AppendPolyTree(PolyPath64 node, PathGeometry geometry)
+        private static void AppendPaths(Paths64 paths, PathGeometry geometry)
         {
-            for(int i = 0; i < node.Count; i++)
+            foreach(Path64 polygon in paths)
             {
-                PolyPath64 child = node.Child(i);
-                Path64 polygon = child.Polygon;
-                if(polygon != null && polygon.Count >= 3)
+                if(polygon == null || polygon.Count < 3)
                 {
-                    PathFigure figure = new PathFigure
-                    {
-                        IsClosed = true,
-                        IsFilled = true,
-                        StartPoint = ToPoint(polygon[0])
-                    };
-
-                    for(int j = 1; j < polygon.Count; j++)
-                    {
-                        figure.Segments.Add(new LineSegment(ToPoint(polygon[j]), true));
-                    }
-
-                    geometry.Figures.Add(figure);
+                    continue;
                 }
 
-                AppendPolyTree(child, geometry);
+                PathFigure figure = new PathFigure
+                {
+                    IsClosed = true,
+                    IsFilled = true,
+                    StartPoint = ToPoint(polygon[0])
+                };
+
+                for(int j = 1; j < polygon.Count; j++)
+                {
+                    figure.Segments.Add(new LineSegment(ToPoint(polygon[j]), true));
+                }
+
+                geometry.Figures.Add(figure);
             }
         }
 
