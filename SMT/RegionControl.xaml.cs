@@ -1335,13 +1335,13 @@ namespace SMT
             SolidColorBrush infoVulnerable = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableColour);
             SolidColorBrush infoVulnerableSoon = new SolidColorBrush(MapConf.ActiveColourScheme.SOVStructureVulnerableSoonColour);
 
-            // Group standing Voronoi cells by tier so adjacent same-standing cells can be merged.
-            Dictionary<float, List<List<Vector2>>> standingCellsByTier = null;
-            Dictionary<float, Brush> standingBrushByTier = null;
+            // Group standing Voronoi cells by SOV alliance so adjacent same-alliance cells merge.
+            Dictionary<int, List<List<Vector2>>> standingCellsByAlliance = null;
+            Dictionary<int, Brush> standingBrushByAlliance = null;
             if(ShowStandings && ActiveCharacter != null && ActiveCharacter.ESILinked)
             {
-                standingCellsByTier = new Dictionary<float, List<List<Vector2>>>();
-                standingBrushByTier = new Dictionary<float, Brush>();
+                standingCellsByAlliance = new Dictionary<int, List<List<Vector2>>>();
+                standingBrushByAlliance = new Dictionary<int, Brush>();
             }
 
             BridgeInfoStackPanel.Children.Clear();
@@ -1519,7 +1519,7 @@ namespace SMT
                     DynamicMapElements.Add(infoCircle);
                 }
 
-                if(standingCellsByTier != null && sys.ActualSystem.SOVAllianceID != 0)
+                if(standingCellsByAlliance != null && sys.ActualSystem.SOVAllianceID != 0)
                 {
                     float Standing = 0.0f;
 
@@ -1558,11 +1558,12 @@ namespace SMT
                             br = StandingVGoodBrush;
                         }
 
-                        if(!standingCellsByTier.TryGetValue(Standing, out List<List<Vector2>> cells))
+                        int allianceId = sys.ActualSystem.SOVAllianceID;
+                        if(!standingCellsByAlliance.TryGetValue(allianceId, out List<List<Vector2>> cells))
                         {
                             cells = new List<List<Vector2>>();
-                            standingCellsByTier[Standing] = cells;
-                            standingBrushByTier[Standing] = br;
+                            standingCellsByAlliance[allianceId] = cells;
+                            standingBrushByAlliance[allianceId] = br;
                         }
 
                         cells.Add(sys.CellPoints);
@@ -1692,9 +1693,9 @@ namespace SMT
                 }
             }
 
-            if(standingCellsByTier != null)
+            if(standingCellsByAlliance != null)
             {
-                AddMergedStandingRegions(standingCellsByTier, standingBrushByTier);
+                AddMergedStandingRegions(standingCellsByAlliance, standingBrushByAlliance);
             }
 
             Dictionary<string, int> ZKBBaseFeed = new Dictionary<string, int>();
@@ -1760,9 +1761,9 @@ namespace SMT
             }
         }
 
-        private void AddMergedStandingRegions(Dictionary<float, List<List<Vector2>>> cellsByTier, Dictionary<float, Brush> brushByTier)
+        private void AddMergedStandingRegions(Dictionary<int, List<List<Vector2>>> cellsByAlliance, Dictionary<int, Brush> brushByAlliance)
         {
-            foreach(KeyValuePair<float, List<List<Vector2>>> kvp in cellsByTier)
+            foreach(KeyValuePair<int, List<List<Vector2>>> kvp in cellsByAlliance)
             {
                 PathGeometry geometry = PolygonUnion.UnionToPathGeometry(kvp.Value);
                 if(geometry == null)
@@ -1770,7 +1771,7 @@ namespace SMT
                     continue;
                 }
 
-                Brush fill = brushByTier[kvp.Key];
+                Brush fill = brushByAlliance[kvp.Key];
                 Path regionPath = new Path
                 {
                     Data = geometry,

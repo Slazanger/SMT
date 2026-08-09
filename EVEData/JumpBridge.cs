@@ -84,5 +84,6 @@ namespace SMT.EVEData
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
+
     }
 }

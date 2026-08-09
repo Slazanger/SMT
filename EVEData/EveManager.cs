@@ -1258,6 +1258,8 @@ namespace SMT.EVEData
                 throw new Exception("Data Creation Error");
             }
 
+            Console.WriteLine("Building Voronoi region cells...");
+
             // now create the voronoi regions
             foreach(MapRegion mr in Regions)
             {
@@ -1312,9 +1314,10 @@ namespace SMT.EVEData
                 }
 
                 // collect the system points to generate them from
-                List<Vector2f> points = new List<Vector2f>();
+                List<MapSystem> mapSystems = mr.MapSystems.Values.ToList();
+                List<Vector2f> points = new List<Vector2f>(mapSystems.Count);
 
-                foreach(MapSystem ms in mr.MapSystems.Values.ToList())
+                foreach(MapSystem ms in mapSystems)
                 {
                     points.Add(new Vector2f(ms.Layout.X, ms.Layout.Y));
                 }
@@ -1324,6 +1327,8 @@ namespace SMT.EVEData
                 int minDistance = 100;
                 int minDistanceOOR = 70;
                 int margin = 180;
+                // Finer snap than the old 2.5 — softens cell edges without moving system Layouts.
+                const float cellRoundVal = 1.0f;
 
                 List<Vector2f> fillerPoints = new List<Vector2f>();
 
@@ -1333,7 +1338,7 @@ namespace SMT.EVEData
                     {
                         bool add = true;
 
-                        foreach(MapSystem ms in mr.MapSystems.Values.ToList())
+                        foreach(MapSystem ms in mapSystems)
                         {
                             double dx = ms.Layout.X - ix;
                             double dy = ms.Layout.Y - iy;
@@ -1367,12 +1372,14 @@ namespace SMT.EVEData
 
                 Rectf clipRect = new Rectf(-margin, -margin, 1050 + 2 * margin, 800 + 2 * margin);
 
-                // create the voronoi
+                // create the voronoi (no Lloyd — that pulled systems into open-area centroids)
                 csDelaunay.Voronoi v = new csDelaunay.Voronoi(points, clipRect, 0);
+
+                Console.WriteLine($"  Voronoi layout: {mr.Name} ({mapSystems.Count} systems)");
 
                 int i = 0;
                 // extract the points from the graph for each cell
-                foreach(MapSystem ms in mr.MapSystems.Values.ToList())
+                foreach(MapSystem ms in mapSystems)
                 {
                     csDelaunay.Site s = v.SitesIndexedByLocation[points[i]];
                     i++;
@@ -1384,18 +1391,18 @@ namespace SMT.EVEData
 
                     foreach(Vector2f vc in cellList)
                     {
-                        float RoundVal = 2.5f;
-
                         double finalX = vc.x;
                         double finalY = vc.y;
 
-                        int X = (int)(Math.Round(finalX / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal);
-                        int Y = (int)(Math.Round(finalY / RoundVal, 1, MidpointRounding.AwayFromZero) * RoundVal);
+                        int X = (int)(Math.Round(finalX / cellRoundVal, 1, MidpointRounding.AwayFromZero) * cellRoundVal);
+                        int Y = (int)(Math.Round(finalY / cellRoundVal, 1, MidpointRounding.AwayFromZero) * cellRoundVal);
 
                         ms.CellPoints.Add(new Vector2(X, Y));
                     }
                 }
             }
+
+            Console.WriteLine("Linking map systems to EVE systems...");
 
             foreach(MapRegion rr in Regions)
             {
@@ -1403,6 +1410,11 @@ namespace SMT.EVEData
                 foreach(MapSystem ms in rr.MapSystems.Values.ToList())
                 {
                     ms.ActualSystem = GetEveSystem(ms.Name);
+
+                    if(ms.ActualSystem == null)
+                    {
+                        continue;
+                    }
 
                     if(!ms.OutOfRegion)
                     {
@@ -1918,6 +1930,8 @@ namespace SMT.EVEData
             int iteration = 0;
             double minSpread = 19.0;
 
+            Console.WriteLine("Spreading universe system positions...");
+
             while(!done)
             {
                 iteration++;
@@ -1966,6 +1980,8 @@ namespace SMT.EVEData
                 }
             }
 
+            Console.WriteLine("Building navigation jump-range cache...");
+
             // cache the navigation data
             SerializableDictionary<string, List<string>> jumpRangeCache = Navigation.CreateStaticNavigationCache(Systems);
 
@@ -1973,10 +1989,14 @@ namespace SMT.EVEData
 
             string saveDataFolder = outputFolder + @"\data\";
 
+            Console.WriteLine("Writing MapLayout.dat and related data files...");
+
             Serialization.SerializeToDisk<SerializableDictionary<string, List<string>>>(jumpRangeCache, saveDataFolder + @"\JumpRangeCache.dat");
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
+
+            Console.WriteLine("CreateFromScratch complete.");
         }
 
         /// <summary>
