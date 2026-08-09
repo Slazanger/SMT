@@ -2324,6 +2324,15 @@ namespace SMT.EVEData
                 }
             }
 
+            // check any existing that are waiting
+            foreach(Alliance l in IDToAlliance.Values)
+            {
+                if((l.Name == "????" || l.Ticker == "????") && !UnknownIDs.Contains((int)l.ID))
+                {
+                    UnknownIDs.Add((int)l.ID);
+                }
+            }
+
             if(UnknownIDs.Count == 0)
             {
                 return;
@@ -4336,8 +4345,9 @@ namespace SMT.EVEData
                                 }
                             }
                         }
-                        ResolveAllianceIDs(allianceIDToResolve).Wait();
                     }
+
+                    ResolveAllianceIDs(allianceIDToResolve).Wait();
                 }
             }
             catch(Exception exception)

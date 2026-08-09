@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -3540,10 +3541,14 @@ namespace SMT
                     Point from = new Point();
                     Point to = new Point(); ;
                     bool AddJBHighlight = false;
+                    int JBZone = 0;
+                    long targetSystemID = 0;
+
 
 
                     foreach(EVEData.JumpBridge jb in EM.JumpBridges)
                     {
+
                         if(selectedSys.Name == jb.From)
                         {
                             Label jbl = new Label();
@@ -3551,6 +3556,8 @@ namespace SMT
                             jbl.Margin = one;
                             jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
                             jbl.Content = $"JB\t: {jb.To}";
+
+                            targetSystemID = EM.GetEveSystem(jb.To).ID;
 
                             if(!Region.IsSystemOnMap(jb.To))
                             {
@@ -3578,8 +3585,9 @@ namespace SMT
                             jbl.Padding = one;
                             jbl.Margin = one;
                             jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
-
                             jbl.Content = $"JB\t: {jb.From}";
+
+                            targetSystemID = EM.GetEveSystem(jb.From).ID;
 
                             if(!Region.IsSystemOnMap(jb.From))
                             {
@@ -3603,6 +3611,56 @@ namespace SMT
                     }
 
 
+                    if(targetSystemID != 0)
+                    {
+                        EVEData.System targetSystem = EM.GetEveSystemFromID(targetSystemID);
+                        if(targetSystem != null)
+                        {
+                            if(targetSystem.SOVAllianceID != 0)
+                            {
+                                // get the alliance capital
+                                if(EM.IDToAlliance.ContainsKey(targetSystem.SOVAllianceID))
+                                {
+                                    EVEData.Alliance a = EM.IDToAlliance[targetSystem.SOVAllianceID];
+                                    if(a.CapitalSystemID != 0)
+                                    {
+                                        // calculate the distance between the target system and the alliance capital
+                                        EVEData.System capitalSystem = EM.GetEveSystemFromID(a.CapitalSystemID);
+                                        if(capitalSystem != null)
+                                        {
+                                            Decimal distance = EM.GetRangeBetweenSystems(targetSystem.Name, capitalSystem.Name);
+                                            {
+                                                JBZone = 5;
+                                                if(distance <= 20)
+                                                {
+                                                    JBZone = 4;
+                                                }
+                                                if(distance <= 15)
+                                                {
+                                                    JBZone = 3;
+                                                }
+                                                if(distance <= 10)
+                                                {
+                                                    JBZone = 2;
+                                                }
+                                                if(distance <= 5)
+                                                {
+                                                    JBZone = 1;
+                                                }
+
+                                                Label jbzl = new Label();
+                                                jbzl.Padding = one;
+                                                jbzl.Margin = one;
+                                                jbzl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                                                jbzl.Content = $"JB Zone\t: {JBZone}";
+                                                SystemInfoPopupSP.Children.Add(jbzl);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
 
                     if(AddJBHighlight)
