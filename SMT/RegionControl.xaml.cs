@@ -1765,30 +1765,42 @@ namespace SMT
         {
             foreach(KeyValuePair<int, List<List<Vector2>>> kvp in cellsByAlliance)
             {
-                PathGeometry geometry = PolygonUnion.UnionToPathGeometry(kvp.Value);
-                if(geometry == null)
-                {
-                    continue;
-                }
+                AddMergedCellRegion(kvp.Value, brushByAlliance[kvp.Key], STANDING_REGION_STROKE_THICKNESS, trackAsDynamic: true);
+            }
+        }
 
-                Brush fill = brushByAlliance[kvp.Key];
-                Path regionPath = new Path
-                {
-                    Data = geometry,
-                    Fill = fill,
-                    Stroke = CreateStandingRegionStroke(fill),
-                    StrokeThickness = STANDING_REGION_STROKE_THICKNESS,
-                    StrokeDashCap = PenLineCap.Round,
-                    StrokeLineJoin = PenLineJoin.Round,
-                    Stretch = Stretch.None
-                };
+        private void AddMergedCellRegion(IEnumerable<IReadOnlyList<Vector2>> cells, Brush fill, double strokeThickness, int zIndex = -1, bool trackAsDynamic = false)
+        {
+            PathGeometry geometry = PolygonUnion.UnionToPathGeometry(cells);
+            if(geometry == null)
+            {
+                return;
+            }
 
-                MainCanvas.Children.Add(regionPath);
+            Path regionPath = new Path
+            {
+                Data = geometry,
+                Fill = fill,
+                Stroke = CreateMergedRegionStroke(fill),
+                StrokeThickness = strokeThickness,
+                StrokeDashCap = PenLineCap.Round,
+                StrokeLineJoin = PenLineJoin.Round,
+                Stretch = Stretch.None
+            };
+
+            if(zIndex >= 0)
+            {
+                Canvas.SetZIndex(regionPath, zIndex);
+            }
+
+            MainCanvas.Children.Add(regionPath);
+            if(trackAsDynamic)
+            {
                 DynamicMapElements.Add(regionPath);
             }
         }
 
-        private static Brush CreateStandingRegionStroke(Brush fill)
+        private static Brush CreateMergedRegionStroke(Brush fill)
         {
             if(fill is SolidColorBrush solid)
             {
@@ -2307,6 +2319,12 @@ namespace SMT
 
             Random rnd = new Random(4);
 
+            EVEData.System selectedEveSystem = EM.GetEveSystem(SelectedSystem);
+            bool highlightConstellation = selectedEveSystem != null && ShowSystemTimers && MapConf.ShowIhubVunerabilities;
+            List<List<Vector2>> incursionCells = MapConf.ShowActiveIncursions ? new List<List<Vector2>>() : null;
+            List<List<Vector2>> constellationCells = highlightConstellation ? new List<List<Vector2>>() : null;
+            List<List<Vector2>> selectedAllianceCells = (ShowSovOwner && SelectedAlliance != 0) ? new List<List<Vector2>>() : null;
+
             foreach(KeyValuePair<string, EVEData.MapSystem> kvp in Region.MapSystems)
             {
                 EVEData.MapSystem mapSystem = kvp.Value;
@@ -2622,26 +2640,9 @@ namespace SMT
 
                 double regionMarkerOffset = SYSTEM_REGION_TEXT_Y_OFFSET;
 
-                if(MapConf.ShowActiveIncursions && mapSystem.ActualSystem.ActiveIncursion)
+                if(incursionCells != null && mapSystem.ActualSystem.ActiveIncursion && mapSystem.CellPoints != null && mapSystem.CellPoints.Count >= 3)
                 {
-                    {
-                        Polygon poly = new Polygon();
-
-                        foreach(Vector2 p in mapSystem.CellPoints)
-                        {
-                            System.Windows.Point wp = new Point(p.X, p.Y);
-                            poly.Points.Add(wp);
-                        }
-
-                        //poly.Fill
-                        poly.Fill = Incursion;
-                        poly.SnapsToDevicePixels = true;
-                        poly.Stroke = poly.Fill;
-                        poly.StrokeThickness = 3;
-                        poly.StrokeDashCap = PenLineCap.Round;
-                        poly.StrokeLineJoin = PenLineJoin.Round;
-                        MainCanvas.Children.Add(poly);
-                    }
+                    incursionCells.Add(mapSystem.CellPoints);
                 }
 
                 if(MapConf.ShowCynoBeacons && mapSystem.ActualSystem.HasJumpBeacon)
@@ -2678,50 +2679,16 @@ namespace SMT
                     MainCanvas.Children.Add(JoveLogo);
                 }
 
-                EVEData.System es = EM.GetEveSystem(SelectedSystem);
-
-                if(es != null && ShowSystemTimers && MapConf.ShowIhubVunerabilities && mapSystem.ActualSystem.ConstellationID == es.ConstellationID)
+                if(constellationCells != null && mapSystem.ActualSystem.ConstellationID == selectedEveSystem.ConstellationID && mapSystem.CellPoints != null && mapSystem.CellPoints.Count >= 3)
                 {
-                    {
-                        Polygon poly = new Polygon();
-
-                        foreach(Vector2 p in mapSystem.CellPoints)
-                        {
-                            System.Windows.Point wp = new Point(p.X, p.Y);
-                            poly.Points.Add(wp);
-                        }
-
-                        //poly.Fill
-                        poly.Fill = ConstellationHighlight;
-                        poly.SnapsToDevicePixels = true;
-                        poly.Stroke = poly.Fill;
-                        poly.StrokeThickness = 3;
-                        poly.StrokeDashCap = PenLineCap.Round;
-                        poly.StrokeLineJoin = PenLineJoin.Round;
-                        MainCanvas.Children.Add(poly);
-                    }
+                    constellationCells.Add(mapSystem.CellPoints);
                 }
 
                 int SystemAlliance = mapSystem.ActualSystem.SOVAllianceID;
 
-                if(ShowSovOwner && SelectedAlliance != 0 && SystemAlliance == SelectedAlliance)
+                if(selectedAllianceCells != null && SystemAlliance == SelectedAlliance && mapSystem.CellPoints != null && mapSystem.CellPoints.Count >= 3)
                 {
-                    Polygon poly = new Polygon();
-
-                    foreach(Vector2 p in mapSystem.CellPoints)
-                    {
-                        System.Windows.Point wp = new Point(p.X, p.Y);
-                        poly.Points.Add(wp);
-                    }
-
-                    poly.Fill = SelectedAllianceBrush;
-                    poly.SnapsToDevicePixels = true;
-                    poly.Stroke = poly.Fill;
-                    poly.StrokeThickness = 1;
-                    poly.StrokeDashCap = PenLineCap.Round;
-                    poly.StrokeLineJoin = PenLineJoin.Round;
-                    Canvas.SetZIndex(poly, ZINDEX_POLY);
-                    MainCanvas.Children.Add(poly);
+                    selectedAllianceCells.Add(mapSystem.CellPoints);
                 }
 
                 if(isSystemOOR)
@@ -2818,6 +2785,21 @@ namespace SMT
                         sp.Children.Add(sysSubText);
                     }
                 }
+            }
+
+            if(incursionCells != null && incursionCells.Count > 0)
+            {
+                AddMergedCellRegion(incursionCells, Incursion, STANDING_REGION_STROKE_THICKNESS, ZINDEX_POLY);
+            }
+
+            if(constellationCells != null && constellationCells.Count > 0)
+            {
+                AddMergedCellRegion(constellationCells, ConstellationHighlight, STANDING_REGION_STROKE_THICKNESS, ZINDEX_POLY);
+            }
+
+            if(selectedAllianceCells != null && selectedAllianceCells.Count > 0)
+            {
+                AddMergedCellRegion(selectedAllianceCells, SelectedAllianceBrush, STANDING_REGION_STROKE_THICKNESS, ZINDEX_POLY);
             }
 
             // now add the links
