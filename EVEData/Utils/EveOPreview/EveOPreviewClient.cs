@@ -1,5 +1,6 @@
 ﻿using System.IO.Pipes;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace EVEData.Utils.EveOPreview
 {
@@ -8,24 +9,33 @@ namespace EVEData.Utils.EveOPreview
         private static string _pipename = "EVE-O-Preview-Pipe";
         private static void SendCommand(object command)
         {
-            using (var pipe = new NamedPipeClientStream(".", _pipename, PipeDirection.InOut))
+            try
             {
-                pipe.ConnectAsync(500);
+                using (var pipe = new NamedPipeClientStream(".", _pipename, PipeDirection.InOut))
+                {
+                    pipe.Connect(500);
 
-                using (var reader = new StreamReader(pipe))
-                using (var writer = new StreamWriter(pipe)
-                {
-                    AutoFlush = true
-                })
-                {
-                    writer.WriteLineAsync(JsonSerializer.Serialize(command));
-                    reader.ReadLineAsync();
+                    using (var reader = new StreamReader(pipe))
+                    using (var writer = new StreamWriter(pipe)
+                    {
+                        AutoFlush = true
+                    })
+                    {
+                        writer.WriteLineAsync(JsonSerializer.Serialize(command));
+                        reader.ReadLineAsync();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error sending command to EveOPreview: {ex.Message}");
             }
         }
 
         public static void UpdateSystem(string clientName, string systemName)
         {
+            Debug.WriteLine($"EveOPreview UpdateSystem: {clientName} {systemName}");
+
             var systemCommand = new EveOEnvelope(
                 Guid.NewGuid(),
                 EveOSystemUpdate.MessageType,
