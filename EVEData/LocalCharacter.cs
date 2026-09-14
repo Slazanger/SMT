@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Xml.Serialization;
+using EVEData.Utils.EveOPreview;
 using EVEStandard.Models;
 using EVEStandard.Models.API;
 using EVEStandard.Models.SSO;
@@ -1338,6 +1339,8 @@ namespace SMT.EVEData
                     {
                         Region = "";
                     }
+
+                    EveOPreviewClient.UpdateSystem(Name, Location);
                 }
             }
             catch { }
