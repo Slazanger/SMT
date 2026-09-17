@@ -1162,7 +1162,7 @@
     <ConstellationID>20000622</ConstellationID>
     <ConstellationName>Mayonhen</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -2138,7 +2138,7 @@
     <ConstellationID>20000782</ConstellationID>
     <ConstellationName>Okakuola</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>true</FactionWarSystem>
@@ -3151,7 +3151,7 @@
     <ConstellationID>20000784</ConstellationID>
     <ConstellationName>Aokinen</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -4377,7 +4377,7 @@
     <ConstellationID>20000640</ConstellationID>
     <ConstellationName>XPBM-F</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -7080,7 +7080,7 @@
     <ConstellationID>20000092</ConstellationID>
     <ConstellationName>Y-JSM8</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -7156,7 +7156,7 @@
     <ConstellationID>20000092</ConstellationID>
     <ConstellationName>Y-JSM8</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -9015,7 +9015,7 @@
     <ConstellationID>20000169</ConstellationID>
     <ConstellationName>UX3-N2</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -9041,7 +9041,7 @@
     <ConstellationID>20000182</ConstellationID>
     <ConstellationName>U-JTBT</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -9757,7 +9757,7 @@
     <ConstellationID>20000174</ConstellationID>
     <ConstellationName>XR9-LP</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -10010,7 +10010,7 @@
     <ConstellationID>20000173</ConstellationID>
     <ConstellationName>JZV-O6</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -14370,7 +14370,7 @@
     <ConstellationID>20000610</ConstellationID>
     <ConstellationName>HNZF-Z</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -15502,7 +15502,7 @@
     <ConstellationID>20000152</ConstellationID>
     <ConstellationName>Hale</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -15754,7 +15754,7 @@
     <ConstellationID>20000152</ConstellationID>
     <ConstellationName>Hale</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>true</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -16040,7 +16040,7 @@
     <ConstellationID>20000148</ConstellationID>
     <ConstellationName>Paradise</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -16673,7 +16673,7 @@
     <ConstellationID>20000430</ConstellationID>
     <ConstellationName>A21H-Z</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -16928,7 +16928,7 @@
     <ConstellationID>20000431</ConstellationID>
     <ConstellationName>RFY-QB</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -17059,7 +17059,7 @@
     <ConstellationID>20000431</ConstellationID>
     <ConstellationName>RFY-QB</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -18540,7 +18540,7 @@
     <ConstellationID>20000697</ConstellationID>
     <ConstellationName>SG-CTQ</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -19055,7 +19055,7 @@
     <ConstellationID>20000694</ConstellationID>
     <ConstellationName>D5-SOW</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -20757,7 +20757,7 @@
     <ConstellationID>20000695</ConstellationID>
     <ConstellationName>W-4U1E</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -22193,7 +22193,7 @@
     <ConstellationID>20000003</ConstellationID>
     <ConstellationName>Mamouna</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -22550,7 +22550,7 @@
     <ConstellationID>20000005</ConstellationID>
     <ConstellationName>Hevaka</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -24051,7 +24051,7 @@
     <ConstellationID>20000073</ConstellationID>
     <ConstellationName>T875-C</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -24537,7 +24537,7 @@
     <ConstellationID>20000075</ConstellationID>
     <ConstellationName>HOV-VI</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -24911,7 +24911,7 @@
     <ConstellationID>20000067</ConstellationID>
     <ConstellationName>PR-ACX</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -25293,7 +25293,7 @@
     <ConstellationID>20000074</ConstellationID>
     <ConstellationName>4SRW-B</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -26667,7 +26667,7 @@
     <ConstellationID>20000436</ConstellationID>
     <ConstellationName>Jayai</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>true</FactionWarSystem>
@@ -27460,7 +27460,7 @@
     <ConstellationID>20000435</ConstellationID>
     <ConstellationName>Kisana</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -28182,7 +28182,7 @@
     <Name>Neziel</Name>
     <RadiusAU>11.184546095120323</RadiusAU>
     <Region>Domain</Region>
-    <TrueSec>0.449944</TrueSec>
+    <TrueSec>0.448944</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
@@ -28220,7 +28220,7 @@
     <ConstellationID>20000329</ConstellationID>
     <ConstellationName>Mulata</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -30614,7 +30614,7 @@
     <Name>Galeh</Name>
     <RadiusAU>15.353423112378564</RadiusAU>
     <Region>Domain</Region>
-    <TrueSec>0.449164</TrueSec>
+    <TrueSec>0.448164</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
@@ -32829,7 +32829,7 @@
     <ConstellationID>20000461</ConstellationID>
     <ConstellationName>AJG-MV</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -33641,7 +33641,7 @@
     <ConstellationID>20000460</ConstellationID>
     <ConstellationName>E-ILCH</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -34255,7 +34255,7 @@
     <ConstellationID>20000459</ConstellationID>
     <ConstellationName>7ZRW-G</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -35015,7 +35015,7 @@
     <ConstellationID>20000730</ConstellationID>
     <ConstellationName>Balrille</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -35392,7 +35392,7 @@
     <Name>Palmon</Name>
     <RadiusAU>32.74239181587496</RadiusAU>
     <Region>Essence</Region>
-    <TrueSec>0.44971</TrueSec>
+    <TrueSec>0.44871</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
@@ -35506,7 +35506,7 @@
     <ConstellationID>20000733</ConstellationID>
     <ConstellationName>Arand</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -35743,7 +35743,7 @@
     <ConstellationID>20000734</ConstellationID>
     <ConstellationName>Thoulde</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -36157,7 +36157,7 @@
     <ConstellationID>20000728</ConstellationID>
     <ConstellationName>Patrie</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -36621,7 +36621,7 @@
     <ConstellationID>20000346</ConstellationID>
     <ConstellationName>J-78ZG</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -37361,7 +37361,7 @@
     <ConstellationID>20000342</ConstellationID>
     <ConstellationName>RDD-E6</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -38926,7 +38926,7 @@
     <ConstellationID>20000446</ConstellationID>
     <ConstellationName>Elalan</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -39981,7 +39981,7 @@
     <ConstellationID>20000443</ConstellationID>
     <ConstellationName>Ysiette</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -40550,7 +40550,7 @@
     <ConstellationID>20000538</ConstellationID>
     <ConstellationName>7X-X1Y</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -40655,7 +40655,7 @@
     <ConstellationID>20000537</ConstellationID>
     <ConstellationName>UWRZ-2</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -42204,7 +42204,7 @@
     <ConstellationID>20000649</ConstellationID>
     <ConstellationName>JQA8-6</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -42332,7 +42332,7 @@
     <ConstellationID>20000646</ConstellationID>
     <ConstellationName>I-3ODK</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -42561,7 +42561,7 @@
     <ConstellationID>20000654</ConstellationID>
     <ConstellationName>42-WDG</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -43248,7 +43248,7 @@
     <ConstellationID>20000019</ConstellationID>
     <ConstellationName>Ihilakken</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -44077,7 +44077,7 @@
     <ConstellationID>20000017</ConstellationID>
     <ConstellationName>Ruomo</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -44433,7 +44433,7 @@
     <ConstellationID>20000025</ConstellationID>
     <ConstellationName>Otsabaira</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -44565,7 +44565,7 @@
     <ConstellationID>20000027</ConstellationID>
     <ConstellationName>Etsala</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -45717,7 +45717,7 @@
     <ConstellationID>20000681</ConstellationID>
     <ConstellationName>Basilisk</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -46233,7 +46233,7 @@
     <ConstellationID>20000671</ConstellationID>
     <ConstellationName>Satyr</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -47360,7 +47360,7 @@
     <ConstellationID>20000670</ConstellationID>
     <ConstellationName>Unicorn</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -47512,7 +47512,7 @@
     <ConstellationID>20000675</ConstellationID>
     <ConstellationName>Taurus</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -48126,7 +48126,7 @@
     <ConstellationID>20000666</ConstellationID>
     <ConstellationName>Wyvern</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -49989,7 +49989,7 @@
     <ConstellationID>20000361</ConstellationID>
     <ConstellationName>NK-AOZ</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -50453,7 +50453,7 @@
     <ConstellationID>20000362</ConstellationID>
     <ConstellationName>V1G-63</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -51193,7 +51193,7 @@
     <ConstellationID>20000769</ConstellationID>
     <ConstellationName>Makh</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -53311,7 +53311,7 @@
     <ConstellationID>20000141</ConstellationID>
     <ConstellationName>V-4QJC</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -53850,7 +53850,7 @@
     <ConstellationID>20000138</ConstellationID>
     <ConstellationName>Q-PVMK</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -56055,7 +56055,7 @@
     <ConstellationID>20000372</ConstellationID>
     <ConstellationName>Hed</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>true</FactionWarSystem>
@@ -57128,7 +57128,7 @@
     <ConstellationID>20000375</ConstellationID>
     <ConstellationName>Evannater</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -58270,7 +58270,7 @@
     <ConstellationID>20000312</ConstellationID>
     <ConstellationName>MY-QQI</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -58295,7 +58295,7 @@
     <ConstellationID>20000312</ConstellationID>
     <ConstellationName>MY-QQI</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -58843,7 +58843,7 @@
     <ConstellationID>20000310</ConstellationID>
     <ConstellationName>Q-IPAA</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -59047,7 +59047,7 @@
     <ConstellationID>20000317</ConstellationID>
     <ConstellationName>Y46-EN</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -59196,7 +59196,7 @@
     <ConstellationID>20000316</ConstellationID>
     <ConstellationName>4MY-AB</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -60246,7 +60246,7 @@
     <ConstellationID>20000379</ConstellationID>
     <ConstellationName>5J-SSP</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -60472,7 +60472,7 @@
     <ConstellationID>20000380</ConstellationID>
     <ConstellationName>ZYR-NF</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -61107,7 +61107,7 @@
     <ConstellationID>20000382</ConstellationID>
     <ConstellationName>05M-I1</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -61285,7 +61285,7 @@
     <ConstellationID>20000384</ConstellationID>
     <ConstellationName>O6W-QE</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -62124,7 +62124,7 @@
     <ConstellationID>20000123</ConstellationID>
     <ConstellationName>R-CL2W</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -62459,7 +62459,7 @@
     <ConstellationID>20000114</ConstellationID>
     <ConstellationName>UR-HG4</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -62662,7 +62662,7 @@
     <ConstellationID>20000114</ConstellationID>
     <ConstellationName>UR-HG4</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -63425,7 +63425,7 @@
     <ConstellationID>20000109</ConstellationID>
     <ConstellationName>U-EUG7</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -63656,7 +63656,7 @@
     <ConstellationID>20000120</ConstellationID>
     <ConstellationName>V2S-RH</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -65005,7 +65005,7 @@
     <ConstellationID>20000603</ConstellationID>
     <ConstellationName>Araz</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -65135,7 +65135,7 @@
     <ConstellationID>20000603</ConstellationID>
     <ConstellationName>Araz</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -65216,7 +65216,7 @@
     <ConstellationID>20000603</ConstellationID>
     <ConstellationName>Araz</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -65576,7 +65576,7 @@
     <ConstellationID>20000598</ConstellationID>
     <ConstellationName>Febihkin</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -66268,7 +66268,7 @@
     <ConstellationID>20000601</ConstellationID>
     <ConstellationName>Parrosa</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -66967,7 +66967,7 @@
     <ConstellationID>20000417</ConstellationID>
     <ConstellationName>3NA-Z1</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -67147,7 +67147,7 @@
     <ConstellationID>20000417</ConstellationID>
     <ConstellationName>3NA-Z1</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -67583,7 +67583,7 @@
     <ConstellationID>20000416</ConstellationID>
     <ConstellationName>2O-VY7</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -69373,7 +69373,7 @@
     <Name>Rilera</Name>
     <RadiusAU>68.17847072813984</RadiusAU>
     <Region>Khanid</Region>
-    <TrueSec>0.449848</TrueSec>
+    <TrueSec>0.448848</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
@@ -69514,7 +69514,7 @@
     <ConstellationID>20000566</ConstellationID>
     <ConstellationName>Amdimmah</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -69715,7 +69715,7 @@
     <ConstellationID>20000565</ConstellationID>
     <ConstellationName>Finaka</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -70124,7 +70124,7 @@
     <ConstellationID>20000566</ConstellationID>
     <ConstellationName>Amdimmah</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -70925,7 +70925,7 @@
     <Name>Liparer</Name>
     <RadiusAU>17.1856938153599</RadiusAU>
     <Region>Kor-Azor</Region>
-    <TrueSec>0.449136</TrueSec>
+    <TrueSec>0.448136</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
@@ -71673,7 +71673,7 @@
     <ConstellationID>20000738</ConstellationID>
     <ConstellationName>Nimedaz</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -72694,7 +72694,7 @@
     <ConstellationID>20000205</ConstellationID>
     <ConstellationName>Minnen</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -76534,7 +76534,7 @@
     <ConstellationID>20000166</ConstellationID>
     <ConstellationName>MW49-U</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -77621,7 +77621,7 @@
     <ConstellationID>20000305</ConstellationID>
     <ConstellationName>Ani</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -77649,7 +77649,7 @@
     <ConstellationID>20000309</ConstellationID>
     <ConstellationName>Angils</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>true</FactionWarSystem>
@@ -79201,7 +79201,7 @@
     <ConstellationID>20000501</ConstellationID>
     <ConstellationName>Frar</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -79600,7 +79600,7 @@
     <Name>Erstet</Name>
     <RadiusAU>16.71345991103067</RadiusAU>
     <Region>Metropolis</Region>
-    <TrueSec>0.449402</TrueSec>
+    <TrueSec>0.448402</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
@@ -79822,7 +79822,7 @@
     <ConstellationID>20000501</ConstellationID>
     <ConstellationName>Frar</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -81102,7 +81102,7 @@
     <ConstellationID>20000351</ConstellationID>
     <ConstellationName>Tartatven</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -81284,7 +81284,7 @@
     <ConstellationID>20000350</ConstellationID>
     <ConstellationName>Fittakan</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -81539,7 +81539,7 @@
     <ConstellationID>20000352</ConstellationID>
     <ConstellationName>Besateoden</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -81798,7 +81798,7 @@
     <ConstellationID>20000355</ConstellationID>
     <ConstellationName>Elfrard</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -81901,7 +81901,7 @@
     <ConstellationID>20000354</ConstellationID>
     <ConstellationName>Eoldulf</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -82770,7 +82770,7 @@
     <ConstellationID>20000476</ConstellationID>
     <ConstellationName>S-Q02B</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -83177,7 +83177,7 @@
     <ConstellationID>20000477</ConstellationID>
     <ConstellationName>4ZXC-8</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -83695,7 +83695,7 @@
     <ConstellationID>20000470</ConstellationID>
     <ConstellationName>3RU-10</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -85158,7 +85158,7 @@
     <ConstellationID>20000720</ConstellationID>
     <ConstellationName>RL36-K</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -85332,7 +85332,7 @@
     <ConstellationID>20000266</ConstellationID>
     <ConstellationName>6GU-AT</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -85381,7 +85381,7 @@
     <ConstellationID>20000264</ConstellationID>
     <ConstellationName>IM-8S5</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -85692,7 +85692,7 @@
     <ConstellationID>20000266</ConstellationID>
     <ConstellationName>6GU-AT</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -87243,7 +87243,7 @@
     <ConstellationID>20000261</ConstellationID>
     <ConstellationName>AGI1-F</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -88001,7 +88001,7 @@
     <ConstellationID>20000660</ConstellationID>
     <ConstellationName>Sword</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -88562,7 +88562,7 @@
     <ConstellationID>20000661</ConstellationID>
     <ConstellationName>Regalia</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -88766,7 +88766,7 @@
     <ConstellationID>20000656</ConstellationID>
     <ConstellationName>Crown</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -89207,7 +89207,7 @@
     <ConstellationID>20000686</ConstellationID>
     <ConstellationName>GEP-XF</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -89905,7 +89905,7 @@
     <ConstellationID>20000682</ConstellationID>
     <ConstellationName>17K-QM</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -90639,7 +90639,7 @@
     <ConstellationID>20000722</ConstellationID>
     <ConstellationName>N-39FI</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -91329,7 +91329,7 @@
     <ConstellationID>20000746</ConstellationID>
     <ConstellationName>O5PO-O</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -91878,7 +91878,7 @@
     <ConstellationID>20000759</ConstellationID>
     <ConstellationName>TPB-KG</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -95383,7 +95383,7 @@
     <ConstellationID>20000561</ConstellationID>
     <ConstellationName>Amevync</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>true</HasJoveGate>
     <FactionWarSystem>true</FactionWarSystem>
@@ -97013,7 +97013,7 @@
     <ConstellationID>20000543</ConstellationID>
     <ConstellationName>I9B-8X</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -97649,7 +97649,7 @@
     <ConstellationID>20000543</ConstellationID>
     <ConstellationName>I9B-8X</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -98389,7 +98389,7 @@
     <ConstellationID>20000291</ConstellationID>
     <ConstellationName>38G6-L</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -98757,7 +98757,7 @@
     <ConstellationID>20000289</ConstellationID>
     <ConstellationName>MDM8-J</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -101588,7 +101588,7 @@
     <ConstellationID>20000589</ConstellationID>
     <ConstellationName>XLL-Z7</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -103278,7 +103278,7 @@
     <ConstellationID>20000097</ConstellationID>
     <ConstellationName>4YFT-F</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -106054,7 +106054,7 @@
     <ConstellationID>20000396</ConstellationID>
     <ConstellationName>Agiesseson</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -106232,7 +106232,7 @@
     <ConstellationID>20000394</ConstellationID>
     <ConstellationName>Stion</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -106444,7 +106444,7 @@
     <ConstellationID>20000390</ConstellationID>
     <ConstellationName>Firille</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -106518,7 +106518,7 @@
     <ConstellationID>20000387</ConstellationID>
     <ConstellationName>Gallente Border Zone</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -106742,7 +106742,7 @@
     <Name>Egghelende</Name>
     <RadiusAU>31.671136327102815</RadiusAU>
     <Region>Sinq Laison</Region>
-    <TrueSec>0.449268</TrueSec>
+    <TrueSec>0.448268</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
@@ -106858,7 +106858,7 @@
     <ConstellationID>20000398</ConstellationID>
     <ConstellationName>Aeman</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -108746,7 +108746,7 @@
     <ConstellationID>20000229</ConstellationID>
     <ConstellationName>4-0VL9</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -109052,7 +109052,7 @@
     <ConstellationID>20000225</ConstellationID>
     <ConstellationName>Z6T6-B</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -110688,7 +110688,7 @@
     <ConstellationID>20000281</ConstellationID>
     <ConstellationName>Q4IG-S</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -111220,7 +111220,7 @@
     <ConstellationID>20000285</ConstellationID>
     <ConstellationName>SB3-IH</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -111451,7 +111451,7 @@
     <ConstellationID>20000285</ConstellationID>
     <ConstellationName>SB3-IH</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -112411,7 +112411,7 @@
     <ConstellationID>20000275</ConstellationID>
     <ConstellationName>U7L-MQ</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -112435,7 +112435,7 @@
     <ConstellationID>20000274</ConstellationID>
     <ConstellationName>Y-2D6Q</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -113471,7 +113471,7 @@
     <ConstellationID>20000489</ConstellationID>
     <ConstellationName>6-V49K</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -113623,7 +113623,7 @@
     <ConstellationID>20000488</ConstellationID>
     <ConstellationName>QS-FVH</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -113700,7 +113700,7 @@
     <ConstellationID>20000488</ConstellationID>
     <ConstellationName>QS-FVH</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -113875,7 +113875,7 @@
     <ConstellationID>20000487</ConstellationID>
     <ConstellationName>59H-0G</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -114954,7 +114954,7 @@
     <ConstellationID>20000483</ConstellationID>
     <ConstellationName>MK7-AO</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -115203,7 +115203,7 @@
     <ConstellationID>20000483</ConstellationID>
     <ConstellationName>MK7-AO</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -115538,7 +115538,7 @@
     <ConstellationID>20000478</ConstellationID>
     <ConstellationName>Z-6NQ6</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -116191,7 +116191,7 @@
     <ConstellationID>20000250</ConstellationID>
     <ConstellationName>Damadil</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -118609,7 +118609,7 @@
     <ConstellationID>20000244</ConstellationID>
     <ConstellationName>Somi</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -118889,7 +118889,7 @@
     <ConstellationID>20000534</ConstellationID>
     <ConstellationName>1D-65L</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -120209,7 +120209,7 @@
     <ConstellationID>20000528</ConstellationID>
     <ConstellationName>9P57-V</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -121105,7 +121105,7 @@
     <ConstellationID>20000705</ConstellationID>
     <ConstellationName>CL-QB2</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -121307,7 +121307,7 @@
     <ConstellationID>20000707</ConstellationID>
     <ConstellationName>ZQ7-QS</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -122880,7 +122880,7 @@
     <ConstellationID>20000130</ConstellationID>
     <ConstellationName>03C-SU</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -123033,7 +123033,7 @@
     <ConstellationID>20000125</ConstellationID>
     <ConstellationName>X-VN63</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -123420,7 +123420,7 @@
     <ConstellationID>20000126</ConstellationID>
     <ConstellationName>LLAP-1</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -123985,7 +123985,7 @@
     <ConstellationID>20000131</ConstellationID>
     <ConstellationName>W-XBGF</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -124395,7 +124395,7 @@
     <ConstellationID>20000035</ConstellationID>
     <ConstellationName>Z-DO53</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -124704,7 +124704,7 @@
     <ConstellationID>20000031</ConstellationID>
     <ConstellationName>BUG6-X</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -125515,7 +125515,7 @@
     <ConstellationID>20000030</ConstellationID>
     <ConstellationName>U29-0S</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -126126,7 +126126,7 @@
     <ConstellationID>20000042</ConstellationID>
     <ConstellationName>0-8MWQ</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -127103,7 +127103,7 @@
     <ConstellationID>20000184</ConstellationID>
     <ConstellationName>1G-8KY</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -127665,7 +127665,7 @@
     <ConstellationID>20000191</ConstellationID>
     <ConstellationName>XHYS-O</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -128142,7 +128142,7 @@
     <ConstellationID>20000185</ConstellationID>
     <ConstellationName>ST-0EZ</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>true</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -128299,7 +128299,7 @@
     <ConstellationID>20000190</ConstellationID>
     <ConstellationName>W9MQ-1</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -128840,7 +128840,7 @@
     <ConstellationID>20000193</ConstellationID>
     <ConstellationName>Y8HB-U</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -129637,7 +129637,7 @@
     <ConstellationID>20000778</ConstellationID>
     <ConstellationName>Obray</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -129794,7 +129794,7 @@
     <ConstellationID>20000776</ConstellationID>
     <ConstellationName>Anwyns</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -130023,7 +130023,7 @@
     <ConstellationID>20000777</ConstellationID>
     <ConstellationName>Kiartanne</ConstellationName>
     <HasIceBelt>false</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>false</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>
@@ -131670,7 +131670,7 @@
     <ConstellationID>20000080</ConstellationID>
     <ConstellationName>DJ-XCW</ConstellationName>
     <HasIceBelt>true</HasIceBelt>
-    <HasBlueA0Star>false</HasBlueA0Star>
+    <HasBlueA0Star>true</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
     <FactionWarSystem>false</FactionWarSystem>

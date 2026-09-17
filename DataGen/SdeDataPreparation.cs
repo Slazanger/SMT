@@ -854,7 +854,7 @@ namespace DataGen
             writer.WriteLine("System");
 
             List<string> systemNames = dataSet.Stars
-                .Where(star => star.Statistics.SpectralClass.StartsWith("A0", StringComparison.OrdinalIgnoreCase))
+                .Where(star => star.TypeID == 3801)
                 .Select(star => dataSet.SolarSystems.TryGetValue(star.SolarSystemId, out SdeSolarSystem? system) ? system.Name.En : null)
                 .Where(name => !string.IsNullOrWhiteSpace(name))
                 .Cast<string>()
@@ -1035,12 +1035,20 @@ namespace DataGen
 
         [JsonPropertyName("statistics")]
         public SdeStarStatistics Statistics { get; set; } = new SdeStarStatistics();
+
+        [JsonPropertyName("typeID")]
+        public long TypeID { get; set; } = 0;
     }
 
     internal sealed class SdeStarStatistics
     {
         [JsonPropertyName("spectralClass")]
         public string SpectralClass { get; set; } = string.Empty;
+
+
+
+
+
     }
 
     internal sealed class EsiFactionWarfareSystem
