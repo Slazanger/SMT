@@ -863,6 +863,15 @@ namespace SMT.EVEData
                     {
                         lock (ActiveRouteLock)
                         {
+                            // Navigate returns both endpoints, so consecutive legs share the waypoint
+                            // joining them. Drop the copy already in the route and keep the incoming
+                            // one : only that one carries the gate type for the next hop.
+                            if (ActiveRoute.Count > 0 && sysList.Count > 0 &&
+                                ActiveRoute[ActiveRoute.Count - 1].SystemName == sysList[0].SystemName)
+                            {
+                                ActiveRoute.RemoveAt(ActiveRoute.Count - 1);
+                            }
+
                             foreach (Navigation.RoutePoint s in sysList)
                             {
                                 ActiveRoute.Add(s);
@@ -926,6 +935,12 @@ namespace SMT.EVEData
                                         }
                                     }
                                 }
+                                // the client refuses a waypoint that repeats the one before it
+                                if (WayPointsToAdd.Count > 0 && WayPointsToAdd[WayPointsToAdd.Count - 1] == wayPointSysID)
+                                {
+                                    continue;
+                                }
+
                                 WayPointsToAdd.Add(wayPointSysID);
                             }
                         }
