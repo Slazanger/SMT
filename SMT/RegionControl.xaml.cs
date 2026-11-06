@@ -519,6 +519,7 @@ namespace SMT
                     Canvas.SetTop(TheraShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TheraShape, ZINDEX_THERA);
                     MainCanvas.Children.Add(TheraShape);
+                    DynamicMapElements.Add(TheraShape);
                 }
             }
 
@@ -549,6 +550,7 @@ namespace SMT
                     Canvas.SetTop(TurnurShape, ms.Layout.Y - (SYSTEM_SHAPE_OFFSET + 3));
                     Canvas.SetZIndex(TurnurShape, ZINDEX_TURNER);
                     MainCanvas.Children.Add(TurnurShape);
+                    DynamicMapElements.Add(TurnurShape);
                 }
             }
         }
