@@ -3633,8 +3633,11 @@ namespace SMT.EVEData
                             {
                                 EVEData.IntelData id = new EVEData.IntelData(line, channelName);
 
-                                foreach(string s in id.IntelString.Split(' '))
+                                foreach(string word in id.IntelString.Split(' '))
                                 {
+                                    // "T-Q2DD*" from a localised client should match the same as "T-Q2DD"
+                                    string s = IntelData.CleanIntelWord(word);
+
                                     if(s == "" || s.Length < 3)
                                     {
                                         continue;
