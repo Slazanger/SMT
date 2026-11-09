@@ -506,7 +506,7 @@ namespace SMT
             {
                 Rect frame = new Rect(-40, -20, grid.ActualWidth + 80, grid.ActualHeight + 60);
                 byte[] pixels = RenderPixels(grid, frame);
-                hashes.Add(Convert.ToHexString(System.Security.Cryptography.SHA1.HashData(pixels)).Substring(0, 8));
+                hashes.Add(Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(pixels)).Substring(0, 8));
             }
 
             return string.Join(" ", hashes);
