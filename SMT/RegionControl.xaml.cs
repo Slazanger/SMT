@@ -3589,12 +3589,19 @@ namespace SMT
         private void ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
             Shape obj = sender as Shape;
+            UpdateSystemPopup(obj, obj.IsMouseOver && MapConf.ShowSystemPopup);
+        }
 
+        /// <summary>
+        /// Shows the hover popup for a system shape, with its gate and jump bridge highlights, or hides them.
+        /// </summary>
+        private void UpdateSystemPopup(Shape obj, bool show)
+        {
             EVEData.MapSystem selectedSys = obj.DataContext as EVEData.MapSystem;
 
             Thickness one = new Thickness(1);
 
-            if(obj.IsMouseOver && MapConf.ShowSystemPopup)
+            if(show)
             {
                 SystemInfoPopup.PlacementTarget = obj;
                 SystemInfoPopup.VerticalOffset = 5;

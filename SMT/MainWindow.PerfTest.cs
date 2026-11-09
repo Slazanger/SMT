@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -90,6 +91,9 @@ namespace SMT
                 // left-clicks on 20 systems through the system shapes' own MouseDown handler
                 List<Shape> systemShapes = RegionUC.MainCanvas.Children.OfType<Shape>().Where(s => s.DataContext is EVEData.MapSystem).Take(20).ToList();
                 results["systemClick"] = await MeasureAsync(systemShapes, 1, ClickShape);
+
+                // hovering systems: the popup and highlights, then leaving, with a full intel list
+                results["systemHover"] = await MeasureHoverAsync(systemShapes);
 
                 // a data overlay toggle (an even number of toggles leaves it as it was)
                 results["dataOverlayToggle"] = await MeasureAsync(Enumerable.Range(0, 6).ToList(), 1, _ => RegionUC.ShowNPCKills = !RegionUC.ShowNPCKills);
@@ -343,6 +347,113 @@ namespace SMT
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Hovers each system through the region map's own popup code: entering (the popup with the gate and jump
+        /// bridge highlights) and leaving. Every hover checks each intel row, so the intel list is first filled to its
+        /// 250-row limit with test rows, some naming the hovered systems; they are removed afterwards.
+        /// </summary>
+        private async Task<Dictionary<string, object>> MeasureHoverAsync(List<Shape> systemShapes)
+        {
+            MethodInfo updatePopup = typeof(RegionControl).GetMethod("UpdateSystemPopup", BindingFlags.Instance | BindingFlags.NonPublic);
+            if(updatePopup == null || systemShapes.Count == 0)
+            {
+                return null;
+            }
+
+            List<string> names = systemShapes.Select(s => ((EVEData.MapSystem)s.DataContext).Name).ToList();
+            List<EVEData.IntelData> testRows = new List<EVEData.IntelData>();
+            for(int i = IntelCache.Count; i < 250; i++)
+            {
+                EVEData.IntelData row = new EVEData.IntelData("[ 2026.11.09 12:00:00 ] SMT perftest > test", "perftest");
+                row.IntelString = "perftest row " + i;
+                if(i % 5 == 0)
+                {
+                    row.Systems.Add(names[i % names.Count]);
+                }
+
+                testRows.Add(row);
+                IntelCache.Add(row);
+            }
+
+            int intelRowCount = IntelCache.Count;
+            await WaitForIdleAsync();
+
+            List<double> enterMs = new List<double>();
+            List<double> enterSettledMs = new List<double>();
+            List<double> leaveMs = new List<double>();
+            List<double> leaveSettledMs = new List<double>();
+            List<double> intelRowsMs = new List<double>();
+            List<string> popupSizes = new List<string>();
+            int realizedIntelRows = 0;
+            double allocatedMBPerHover = 0;
+            try
+            {
+                long allocatedBefore = GC.GetTotalAllocatedBytes();
+                foreach(Shape shape in systemShapes)
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    updatePopup.Invoke(RegionUC, new object[] { shape, true });
+                    UpdateLayout();
+                    enterMs.Add(sw.Elapsed.TotalMilliseconds);
+                    popupSizes.Add(string.Format(CultureInfo.InvariantCulture, "{0:0.#}x{1:0.#}", RegionUC.SystemInfoPopupSP.ActualWidth, RegionUC.SystemInfoPopupSP.ActualHeight));
+                    await WaitForIdleAsync();
+                    enterSettledMs.Add(sw.Elapsed.TotalMilliseconds);
+
+                    sw.Restart();
+                    updatePopup.Invoke(RegionUC, new object[] { shape, false });
+                    UpdateLayout();
+                    leaveMs.Add(sw.Elapsed.TotalMilliseconds);
+                    await WaitForIdleAsync();
+                    leaveSettledMs.Add(sw.Elapsed.TotalMilliseconds);
+                }
+
+                allocatedMBPerHover = (GC.GetTotalAllocatedBytes() - allocatedBefore) / 1048576.0 / systemShapes.Count;
+
+                // the intel row highlight on its own (it runs on entering and on leaving)
+                foreach(string name in names)
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    RegionUC_SystemHoverEvent(name);
+                    intelRowsMs.Add(sw.Elapsed.TotalMilliseconds);
+                }
+
+                for(int i = 0; i < IntelCache.Count; i++)
+                {
+                    if(RawIntelBox.ItemContainerGenerator.ContainerFromIndex(i) != null)
+                    {
+                        realizedIntelRows++;
+                    }
+                }
+
+                RegionUC_SystemHoverEvent(string.Empty);
+            }
+            finally
+            {
+                foreach(EVEData.IntelData row in testRows)
+                {
+                    IntelCache.Remove(row);
+                }
+            }
+
+            return new Dictionary<string, object>
+            {
+                ["count"] = enterMs.Count,
+                ["popupOnInProfile"] = MapConf.ShowSystemPopup,
+                ["jumpBridgesShown"] = RegionUC.ShowJumpBridges,
+                ["enterMedianMs"] = Median(enterMs),
+                ["enterSettledMedianMs"] = Median(enterSettledMs),
+                ["enterMaxMs"] = Math.Round(enterMs.Max(), 2),
+                ["leaveMedianMs"] = Median(leaveMs),
+                ["leaveSettledMedianMs"] = Median(leaveSettledMs),
+                ["allocatedMBPerHover"] = Math.Round(allocatedMBPerHover, 3),
+                ["intelRows"] = intelRowCount,
+                ["realizedIntelRows"] = realizedIntelRows,
+                ["intelRowHighlightMedianMs"] = Median(intelRowsMs),
+                // the popup's laid-out size per hovered system, to compare its content between builds
+                ["popupSizes"] = string.Join(" ", popupSizes),
+            };
         }
 
         private async Task<Dictionary<string, object>> MeasureIdleAsync(TimeSpan duration)
