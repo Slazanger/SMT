@@ -134,16 +134,9 @@ namespace SMT.EVEData
         /// <returns></returns>
         public bool IsSystemOnMap(string name)
         {
-            // to catch out of region systems on the current map, ie region boundaries or strange intra-region settings
-            foreach (KeyValuePair<string, MapSystem> kvp in MapSystems)
-            {
-                if (kvp.Value.Name == name)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            // MapSystems is keyed by system name and includes out of region systems drawn on this map,
+            // ie region boundaries or strange intra-region settings
+            return name != null && MapSystems.ContainsKey(name);
         }
         public override string ToString()
         {
