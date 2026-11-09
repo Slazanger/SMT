@@ -306,6 +306,23 @@
                     (long)Math.Floor(node.PositionZ / MaxJumpRangeLY));
         }
 
+        /// <summary>
+        /// The systems a capital can jump to from a system, with the range to each in light years (for the tests).
+        /// </summary>
+        internal static Dictionary<string, double> GetJumpableSystems(string system)
+        {
+            Dictionary<string, double> ranges = new Dictionary<string, double>();
+            if (MapNodes != null && MapNodes.TryGetValue(system, out MapNode node))
+            {
+                foreach (JumpLink link in node.JumpableSystems)
+                {
+                    ranges.Add(link.System, link.RangeLY);
+                }
+            }
+
+            return ranges;
+        }
+
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, bool UseZarzakh, bool UseTurnur, RoutingMode routingMode)
         {
             if (!(MapNodes.ContainsKey(From)) || !(MapNodes.ContainsKey(To)) || From == "" || To == "")
