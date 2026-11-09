@@ -429,9 +429,7 @@ namespace SMT
             }
 
             PerfMetrics.MarkStartup("universe map: gate list");
-            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
-            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
-            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+            GlobalSystemDropDownAC.ItemsSource = EM.SystemsByName;
             PerfMetrics.MarkStartup("universe map: system dropdown");
 
             ReDrawMap(true);

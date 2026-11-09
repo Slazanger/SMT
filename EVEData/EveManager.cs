@@ -679,6 +679,25 @@ namespace SMT.EVEData
         /// </summary>
         public List<System> Systems { get; set; }
 
+        private List<System> systemsByName;
+
+        /// <summary>
+        /// All systems sorted by name, for the system pickers to share instead of each sorting its own copy.
+        /// </summary>
+        public List<System> SystemsByName
+        {
+            get
+            {
+                if(systemsByName == null)
+                {
+                    systemsByName = new List<System>(Systems);
+                    systemsByName.Sort((a, b) => string.Compare(a.Name, b.Name));
+                }
+
+                return systemsByName;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the current list of thera connections
         /// </summary>

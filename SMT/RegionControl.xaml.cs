@@ -803,10 +803,8 @@ namespace SMT
             EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
 
-            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
-            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.SelectedItem = null;
-            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+            GlobalSystemDropDownAC.ItemsSource = EM.SystemsByName;
 
             DynamicMapElements = new List<UIElement>();
             DynamicMapElementsRangeMarkers = new List<UIElement>();

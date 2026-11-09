@@ -403,11 +403,9 @@ namespace SMT
             EVEManager.ServerInfo.StatusMessage = "Ready";
             AppLog.StatusChanged += AppLog_StatusChanged;
 
-            List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
-            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
-            RouteSystemDropDownAC.ItemsSource = globalSystemList;
-            JumpRouteSystemDropDownAC.ItemsSource = globalSystemList;
-            JumpRouteAvoidSystemDropDownAC.ItemsSource = globalSystemList;
+            RouteSystemDropDownAC.ItemsSource = EVEManager.SystemsByName;
+            JumpRouteSystemDropDownAC.ItemsSource = EVEManager.SystemsByName;
+            JumpRouteAvoidSystemDropDownAC.ItemsSource = EVEManager.SystemsByName;
 
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
