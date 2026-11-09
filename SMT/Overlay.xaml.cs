@@ -267,7 +267,8 @@ namespace SMT
     public partial class Overlay : Window
     {
         private MainWindow mainWindow;
-        private Dictionary<string, OverlaySystemData> systemData = new Dictionary<string, OverlaySystemData>();
+        // internal, like RefreshCurrentView, for a --perftest run to measure the overlay
+        internal Dictionary<string, OverlaySystemData> systemData = new Dictionary<string, OverlaySystemData>();
         private List<(EVEData.IntelData data, List<Ellipse> ellipse)> intelData = new List<(EVEData.IntelData, List<Ellipse>)>();
         private List<Line> jumpLines = new List<Line>();
         private List<OverlaySystemData> bridgeSystems = new List<OverlaySystemData>();
@@ -581,7 +582,7 @@ namespace SMT
         /// Cleans up and then redraws the current overlay map.
         /// This is called whenever significant data changes.
         /// </summary>
-        private void RefreshCurrentView()
+        internal void RefreshCurrentView()
         {
             viewVersion++;
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);

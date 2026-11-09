@@ -471,8 +471,9 @@ namespace SMT
 
         /// <summary>
         /// The system drawn under a point of the systems layer (each is drawn 4 units across), the nearest if several.
+        /// Internal for a --perftest run to check it against every system.
         /// </summary>
-        private object FindSystemAt(Point point)
+        internal object FindSystemAt(Point point)
         {
             EVEData.System nearest = null;
             double nearestDistance = double.MaxValue;

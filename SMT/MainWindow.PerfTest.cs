@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -21,6 +20,8 @@ namespace SMT
     /// --perftest[=results.json]: once the main window has rendered, drive the region map through a fixed script,
     /// write the timings as JSON and close. The run changes the region, toggles and layout on purpose, so in this
     /// mode SMT saves nothing on exit except the characters (refreshed ESI tokens must not be lost).
+    /// To see what a change did, run it on the build before and the build after, a few times each, and give the two
+    /// folders of results to tools/PerfBench: "PerfBench compare before after".
     /// </summary>
     public partial class MainWindow
     {
@@ -62,13 +63,14 @@ namespace SMT
 
         private async Task RunPerfTestAsync()
         {
-            Dictionary<string, object> results = new Dictionary<string, object>
-            {
-                ["startupMs"] = PerfMetrics.StartupMarks.ToDictionary(m => m.Key, m => Math.Round(m.Value)),
-            };
+            Dictionary<string, object> results = new Dictionary<string, object>();
 
             try
             {
+                // timings taken with the JIT's tiering switched off don't compare with timings taken with it on
+                results["tieredCompilation"] = Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") != "0";
+                results["startupMs"] = PerfMetrics.StartupMarks.ToDictionary(m => m.Key, m => Math.Round(m.Value));
+
                 // let the startup background work (ESI, zKillboard connection, storms) settle
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
@@ -153,23 +155,18 @@ namespace SMT
                 }
 
                 // the universe map's right-click lookup: a point just off each system's centre must find that system
-                MethodInfo findSystem = typeof(UniverseControl).GetMethod("FindSystemAt", BindingFlags.Instance | BindingFlags.NonPublic);
-                if(findSystem != null)
+                int probed = 0;
+                int found = 0;
+                foreach(EVEData.System sys in EVEManager.Systems)
                 {
-                    int probed = 0;
-                    int found = 0;
-                    foreach(EVEData.System sys in EVEManager.Systems)
+                    probed++;
+                    if(UniverseUC.FindSystemAt(new Point(sys.UniverseX + 0.6, sys.UniverseY - 0.6)) == sys)
                     {
-                        probed++;
-                        object hit = findSystem.Invoke(UniverseUC, new object[] { new Point(sys.UniverseX + 0.6, sys.UniverseY - 0.6) });
-                        if(hit == sys)
-                        {
-                            found++;
-                        }
+                        found++;
                     }
-
-                    results["universeRightClickLookup"] = new Dictionary<string, object> { ["probed"] = probed, ["foundItsSystem"] = found };
                 }
+
+                results["universeRightClickLookup"] = new Dictionary<string, object> { ["probed"] = probed, ["foundItsSystem"] = found };
             }
             catch(Exception exception)
             {
@@ -307,12 +304,11 @@ namespace SMT
                 await Task.Delay(TimeSpan.FromSeconds(1));
                 await WaitForIdleAsync();
 
-                MethodInfo refresh = typeof(Overlay).GetMethod("RefreshCurrentView", BindingFlags.Instance | BindingFlags.NonPublic);
                 List<double> refreshMs = new List<double>();
                 for(int i = 0; i < 30; i++)
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    refresh.Invoke(overlay, null);
+                    overlay.RefreshCurrentView();
                     overlay.UpdateLayout();
                     refreshMs.Add(sw.Elapsed.TotalMilliseconds);
                     await WaitForIdleAsync();
@@ -323,16 +319,19 @@ namespace SMT
                 result["refreshLast5MedianMs"] = Median(refreshMs.Skip(25).ToList());
 
                 // the test character's own system shape
-                IDictionary systemData = (IDictionary)typeof(Overlay).GetField("systemData", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(overlay);
-                object pilotSystem = systemData.Contains("1DQ1-A") ? systemData["1DQ1-A"] : null;
-                Shape shape = pilotSystem?.GetType().GetField("systemCanvasElement").GetValue(pilotSystem) as Shape;
-                result["systemsOnOverlay"] = systemData.Count;
+                overlay.systemData.TryGetValue("1DQ1-A", out OverlaySystemData pilotSystem);
+                Shape shape = pilotSystem?.systemCanvasElement;
+                result["systemsOnOverlay"] = overlay.systemData.Count;
                 if(shape != null)
                 {
-                    object store = typeof(UIElement).GetProperty("EventHandlersStore", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(shape);
+                    // WPF keeps a shape's handlers to itself; if this way in ever stops working, the value is left
+                    // out, which PerfBench compare shows, and not reported as no handlers
+                    object store = typeof(UIElement).GetProperty("EventHandlersStore", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(shape);
                     MethodInfo getHandlers = store?.GetType().GetMethod("GetRoutedEventHandlers", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    Array handlers = getHandlers?.Invoke(store, new object[] { ToolTipService.ToolTipOpeningEvent }) as Array;
-                    result["tooltipOpeningHandlersOnOneSystem"] = handlers?.Length ?? 0;
+                    if(getHandlers?.Invoke(store, new object[] { ToolTipService.ToolTipOpeningEvent }) is Array handlers)
+                    {
+                        result["tooltipOpeningHandlersOnOneSystem"] = handlers.Length;
+                    }
 
                     // what opening that system's tooltip costs now (each handler runs)
                     ConstructorInfo openingArgs = typeof(ToolTipEventArgs).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
@@ -368,8 +367,7 @@ namespace SMT
         /// </summary>
         private async Task<Dictionary<string, object>> MeasureHoverAsync(List<Shape> systemShapes)
         {
-            MethodInfo updatePopup = typeof(RegionControl).GetMethod("UpdateSystemPopup", BindingFlags.Instance | BindingFlags.NonPublic);
-            if(updatePopup == null || systemShapes.Count == 0)
+            if(systemShapes.Count == 0)
             {
                 return null;
             }
@@ -406,7 +404,7 @@ namespace SMT
                 foreach(Shape shape in systemShapes)
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    updatePopup.Invoke(RegionUC, new object[] { shape, true });
+                    RegionUC.UpdateSystemPopup(shape, true);
                     UpdateLayout();
                     enterMs.Add(sw.Elapsed.TotalMilliseconds);
                     popupSizes.Add(string.Format(CultureInfo.InvariantCulture, "{0:0.#}x{1:0.#}", RegionUC.SystemInfoPopupSP.ActualWidth, RegionUC.SystemInfoPopupSP.ActualHeight));
@@ -414,7 +412,7 @@ namespace SMT
                     enterSettledMs.Add(sw.Elapsed.TotalMilliseconds);
 
                     sw.Restart();
-                    updatePopup.Invoke(RegionUC, new object[] { shape, false });
+                    RegionUC.UpdateSystemPopup(shape, false);
                     UpdateLayout();
                     leaveMs.Add(sw.Elapsed.TotalMilliseconds);
                     await WaitForIdleAsync();

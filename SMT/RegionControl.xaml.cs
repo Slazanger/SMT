@@ -3594,8 +3594,9 @@ namespace SMT
 
         /// <summary>
         /// Shows the hover popup for a system shape, with its gate and jump bridge highlights, or hides them.
+        /// Internal for a --perftest run to time it.
         /// </summary>
-        private void UpdateSystemPopup(Shape obj, bool show)
+        internal void UpdateSystemPopup(Shape obj, bool show)
         {
             EVEData.MapSystem selectedSys = obj.DataContext as EVEData.MapSystem;
 
