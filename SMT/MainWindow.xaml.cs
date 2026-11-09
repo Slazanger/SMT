@@ -282,7 +282,8 @@ namespace SMT
             EVEManager.LoadJumpBridgeData();
             EVEManager.InitNavigation();
 
-            EVEManager.UpdateMetaliminalStorms();
+            // downloads in the background; the storm list and maps update when it arrives (StormsUpdateEvent)
+            _ = EVEManager.UpdateMetaliminalStormsAsync();
 
             EVEManager.LocalCharacterUpdateEvent += LocalCharacters_CollectionChanged;
 

@@ -3084,40 +3084,54 @@ namespace SMT.EVEData
             });
         }
 
-        public void UpdateMetaliminalStorms()
+        /// <summary>
+        /// Download the metaliminal storms and work out the areas they affect. Storm.GetStorms is a blocking
+        /// web request (HtmlWeb, 100 s default timeout), so it runs on a worker thread instead of holding up
+        /// startup; the maps read MetaliminalStorms while drawing, so the list is swapped on the UI thread.
+        /// </summary>
+        public async Task UpdateMetaliminalStormsAsync()
         {
-            MetaliminalStorms.Clear();
-
-            List<Storm> ls = Storm.GetStorms();
-            foreach(Storm s in ls)
+            try
             {
-                System sys = GetEveSystem(s.System);
-                if(sys != null)
+                List<Storm> refreshedStorms = await Task.Run(() =>
                 {
-                    MetaliminalStorms.Add(s);
-                }
+                    List<Storm> storms = new List<Storm>();
+                    foreach(Storm s in Storm.GetStorms())
+                    {
+                        if(GetEveSystem(s.System) == null)
+                        {
+                            continue;
+                        }
+
+                        // The Strong area is 1 jump out from the centre
+                        List<string> strongArea = Navigation.GetSystemsXJumpsFrom(new List<string>(), s.System, 1);
+
+                        // The weak area is 3 jumps out from the centre
+                        List<string> weakArea = Navigation.GetSystemsXJumpsFrom(new List<string>(), s.System, 3);
+
+                        // strip the strong area out of the weak so we dont have overlapping icons
+                        s.WeakArea = weakArea.Except(strongArea).ToList();
+
+                        // strip the centre out of the strong area
+                        strongArea.Remove(s.Name);
+
+                        s.StrongArea = strongArea;
+                        storms.Add(s);
+                    }
+
+                    return storms;
+                }).ConfigureAwait(false);
+
+                RunOnUIThread(() =>
+                {
+                    MetaliminalStorms.Clear();
+                    MetaliminalStorms.AddRange(refreshedStorms);
+                    StormsUpdateEvent?.Invoke();
+                });
             }
-
-            // now update the Strong and weak areas around the storm
-            foreach(Storm s in MetaliminalStorms)
+            catch(Exception exception)
             {
-                // The Strong area is 1 jump out from the centre
-                List<string> strongArea = Navigation.GetSystemsXJumpsFrom(new List<string>(), s.System, 1);
-
-                // The weak area is 3 jumps out from the centre
-                List<string> weakArea = Navigation.GetSystemsXJumpsFrom(new List<string>(), s.System, 3);
-
-                // strip the strong area out of the weak so we dont have overlapping icons
-                s.WeakArea = weakArea.Except(strongArea).ToList();
-
-                // strip the centre out of the strong area
-                strongArea.Remove(s.Name);
-
-                s.StrongArea = strongArea;
-            }
-            if(StormsUpdateEvent != null)
-            {
-                StormsUpdateEvent();
+                AppLog.Error("Update metaliminal storms", exception);
             }
         }
 
