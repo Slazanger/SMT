@@ -577,6 +577,7 @@ namespace SMT
         /// </summary>
         private void RefreshCurrentView()
         {
+            viewVersion++;
             canvasData.SetDimensions(overlay_Canvas.RenderSize.Width, overlay_Canvas.RenderSize.Height);
             canvasData.mapBorderBottomExtension = showSystemNames;
             UpdatePlayerInformationText();
@@ -607,9 +608,11 @@ namespace SMT
 
             foreach(var line in routeLines)
             {
+                line.BeginAnimation(Shape.StrokeDashOffsetProperty, null);
                 ReleaseWithTypeCheck(line);
             }
             routeLines.Clear();
+            drawnRouteKey = null;
         }
 
         /// <summary>
@@ -946,21 +949,37 @@ namespace SMT
         /// <summary>
         /// Displays the current route in the hunter mode overlay.
         /// </summary>
+        // what the route lines were last drawn for: the view (bumped by every refresh) and the route itself
+        private int viewVersion;
+        private string drawnRouteKey;
+
         private void UpdateRouteData()
         {
             UpdateCharacterData();
 
-            // clear all
-            while(routeLines.Count > 0)
+            bool showRoute = !gathererMode && mainWindow.MapConf.OverlayShowRoute && OverlayCharacter != null && OverlayCharacter.Waypoints.Count > 0;
+            List<RoutePoint> routePoints = showRoute ? OverlayCharacter.ActiveRoute.ToList() : new List<RoutePoint>();
+
+            // this runs every second: leave the lines (and their running dash animations) alone if nothing changed
+            string routeKey = viewVersion + "|" + string.Join(",", routePoints.Select(p => p.SystemName + ":" + (int)p.GateToTake));
+            if(routeKey == drawnRouteKey)
             {
-                overlay_Canvas.Children.Remove(routeLines[^1]);
-                routeLines.Remove(routeLines[^1]);
+                return;
             }
 
-            if(!gathererMode && mainWindow.MapConf.OverlayShowRoute && OverlayCharacter != null && OverlayCharacter.Waypoints.Count > 0)
-            {
-                List<RoutePoint> routePoints = OverlayCharacter.ActiveRoute.ToList();
+            drawnRouteKey = routeKey;
 
+            // clear all: back to their pools, with their animation stopped
+            foreach(Shape routeLine in routeLines)
+            {
+                routeLine.BeginAnimation(Shape.StrokeDashOffsetProperty, null);
+                ReleaseWithTypeCheck(routeLine);
+            }
+
+            routeLines.Clear();
+
+            if(showRoute)
+            {
                 if(routePoints.Count < 2) return;
 
                 for(int i = 1; i < routePoints.Count; i++)
@@ -1073,13 +1092,35 @@ namespace SMT
         /// Updates the tooltip content of a specific system.
         /// </summary>
         /// <param name="systemData"></param>
+        private static readonly Dictionary<Color, Brush> securityFillBrushes = new Dictionary<Color, Brush>();
+
+        /// <summary>
+        /// A shared, frozen brush per security colour instead of a new brush for every system on every refresh.
+        /// </summary>
+        private static Brush SecurityFillBrush(Color colour)
+        {
+            if(!securityFillBrushes.TryGetValue(colour, out Brush brush))
+            {
+                brush = new SolidColorBrush(colour);
+                brush.Freeze();
+                securityFillBrushes[colour] = brush;
+            }
+
+            return brush;
+        }
+
+        private void EnsureSystemTooltip(Shape systemShape)
+        {
+            if(systemShape.ToolTip == null)
+            {
+                systemShape.ToolTip = new ToolTip();
+                ToolTipService.SetInitialShowDelay(systemShape, 0);
+            }
+        }
+
         public void UpdateSystemTooltip(OverlaySystemData systemData)
         {
-            if(systemData.systemCanvasElement.ToolTip == null)
-            {
-                systemData.systemCanvasElement.ToolTip = new ToolTip();
-                ToolTipService.SetInitialShowDelay(systemData.systemCanvasElement, 0);
-            }
+            EnsureSystemTooltip(systemData.systemCanvasElement);
 
             // Todo: NPC Kills == 0, delta == 0, jumps, hunter/gatherer
             string toolTipText = $"{systemData.system.Name} ({systemData.system.TrueSec.ToString("n2")})";
@@ -1605,8 +1646,7 @@ namespace SMT
                     trueSecVal = 0.4;
                 }
 
-                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, false));
-                systemData[sysData.system.Name].systemCanvasElement.Fill = securityColorFill;
+                systemData[sysData.system.Name].systemCanvasElement.Fill = SecurityFillBrush(MapColours.GetSecStatusColour(trueSecVal, false));
             }
 
             if(!gathererMode && sysData.system.Region != currentPlayersSystemData[OverlayCharacter].system.Region)
@@ -1621,15 +1661,22 @@ namespace SMT
                 systemData[sysData.system.Name].systemCanvasElement.StrokeThickness = gathererMode ? 3 : 5;
             }
 
-            UpdateSystemTooltip(systemData[sysData.system.Name]); // Tooltip needs to be populated for ToolTipOpening event to occur.
-            systemData[sysData.system.Name].systemCanvasElement.ToolTipOpening += UpdateSystemTooltipOnOpeningTooltip;
+            // The shapes are pooled and redrawn on every refresh, so anything attached to them here must be attached
+            // once: handlers added on each refresh piled up (two more per refresh, all run on every tooltip).
+            Shape systemShape = systemData[sysData.system.Name].systemCanvasElement;
+            EnsureSystemTooltip(systemShape); // ToolTipOpening only fires for a shape with a tooltip; its text is filled in on opening
+            systemShape.ToolTipOpening -= UpdateSystemTooltipOnOpeningTooltip;
+            systemShape.ToolTipOpening += UpdateSystemTooltipOnOpeningTooltip;
+            systemShape.ToolTipOpening -= StartSystemHighlight;
+            systemShape.ToolTipOpening += StartSystemHighlight;
+            systemShape.ToolTipClosing -= StopSystemHighlight;
+            systemShape.ToolTipClosing += StopSystemHighlight;
 
-            systemData[sysData.system.Name].systemCanvasElement.ToolTipOpening += StartSystemHighlight;
-            systemData[sysData.system.Name].systemCanvasElement.ToolTipClosing += StopSystemHighlight;
-
-            if(!gathererMode)
+            // the menu depends only on the system and whether the character is ESI-linked
+            string contextMenuKey = sysData.system.Name + (OverlayCharacter.ESILinked ? "|ESI" : string.Empty);
+            if(!gathererMode && !(systemShape.ContextMenu?.Tag is string builtFor && builtFor == contextMenuKey))
             {
-                ContextMenu systemContextMenu = new ContextMenu();
+                ContextMenu systemContextMenu = new ContextMenu { Tag = contextMenuKey };
 
                 if(OverlayCharacter.ESILinked)
                 {
