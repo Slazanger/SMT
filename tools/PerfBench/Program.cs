@@ -39,6 +39,9 @@ internal static class Program
             case "universe-gates": UniverseGates(); break;
             case "nav-check": NavCheck(args[1]); break;
             case "zkb-check": ZkbCheck(); break;
+            case "stat-check": StatCheck(); break;
+            case "log-check": LogCheck(); break;
+            case "log-latency": LogLatency(args.Length > 1 ? int.Parse(args[1]) : 40); break;
             default: Console.WriteLine("modes: startup nav-alt nav-check <baselineDir> json-export json-load logs dirscan [n] intel zkb fsw-quiet [thresholdSeconds] universe-gates"); return 1;
         }
         return 0;
@@ -769,6 +772,245 @@ internal static class Program
                 return list;
             });
             Console.WriteLine($"  gates: current={cache.Count:N0} hashset={alt.Count:N0}");
+        }
+    }
+
+    // ---------------------------------------------------------------- EVE-like log writers
+    private sealed class EveLogWriter : IDisposable
+    {
+        private readonly StreamWriter writer;
+        private readonly bool chat;
+        public EveLogWriter(string path, bool chat, string listener, bool header = true)
+        {
+            this.chat = chat;
+            // held open with sharing, like the client; chat logs are UTF-16 with a BOM, game logs UTF-8 without
+            writer = new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete),
+                                      chat ? new UnicodeEncoding(false, true) : new UTF8Encoding(false)) { AutoFlush = true };
+            if(header) WriteHeader(listener);
+        }
+        public void WriteHeader(string listener)
+        {
+            if(chat)
+                writer.Write("﻿\r\n﻿\r\n        ---------------------------------------------------------------\r\n﻿\r\n          Channel ID:      -1\r\n          Channel Name:    Bench\r\n" +
+                             $"          Listener:        {listener}\r\n          Session started: 2026.11.09 12:00:00\r\n        ---------------------------------------------------------------\r\n");
+            else
+                writer.Write($"------------------------------------------------------------\r\n  Gamelog\r\n  Listener: {listener}\r\n  Session Started: 2026.11.09 12:00:00\r\n------------------------------------------------------------\r\n");
+        }
+        public void Line(string text) => writer.Write((chat ? "﻿" : "") + text + "\r\n");
+        public void Raw(string text) => writer.Write(text);
+        public void Truncate() { writer.Flush(); writer.BaseStream.SetLength(0); writer.BaseStream.Position = 0; }
+        public void Dispose() => writer.Dispose();
+    }
+
+    private static string StampedName(string prefix) => $"{prefix}{DateTime.UtcNow:yyyyMMdd_HHmmss}_123456789.txt";
+
+    // ---------------------------------------------------------------- LogFileTail / LogFolderMonitor behaviour
+    private static void LogCheck()
+    {
+        string dir = Path.Combine(Work, "logcheck");
+        if(Directory.Exists(dir)) Directory.Delete(dir, true);
+        Directory.CreateDirectory(dir);
+        int failures = 0;
+        var got = new List<string>();
+        using var monitor = new LogFolderMonitor(dir, name => true);
+        void Poll() => monitor.Poll(DateTime.UtcNow, (tail, lines) => got.AddRange(lines));
+        void Expect(string step, params string[] expected)
+        {
+            Poll();
+            bool ok = got.SequenceEqual(expected);
+            if(!ok) failures++;
+            Console.WriteLine($"  {(ok ? "PASS" : "FAIL")} {step}" + (ok ? "" : $"  got [{string.Join(" | ", got)}]"));
+            got.Clear();
+        }
+
+        using var chat = new EveLogWriter(Path.Combine(dir, StampedName("Intel_")), chat: true, "Bench Pilot");
+        chat.Line("[ 2026.11.09 12:00:01 ] Pilot > written before the monitor started");
+        Expect("existing content is skipped");
+        chat.Line("[ 2026.11.09 12:00:02 ] Pilot > one");
+        chat.Line("[ 2026.11.09 12:00:02 ] Pilot > two");
+        Expect("appended lines, in order, without BOM or CR", "[ 2026.11.09 12:00:02 ] Pilot > one", "[ 2026.11.09 12:00:02 ] Pilot > two");
+        chat.Raw("﻿[ 2026.11.09 12:00:03 ] Pilot > half");
+        Expect("a half-written line is held back");
+        chat.Raw(" and the rest\r\n");
+        Expect("the line once complete", "[ 2026.11.09 12:00:03 ] Pilot > half and the rest");
+        Thread.Sleep(3000);
+        chat.Line("[ 2026.11.09 12:00:07 ] Pilot > after a quiet spell");
+        Expect("a line after a quiet spell", "[ 2026.11.09 12:00:07 ] Pilot > after a quiet spell");
+
+        using var game = new EveLogWriter(Path.Combine(dir, StampedName("")), chat: false, "Game Pilot");
+        game.Line("[ 2026.11.09 12:00:08 ] (combat) first hit");
+        Thread.Sleep(1100); // next folder scan
+        Expect("a file that appears later: header skipped, first line read", "[ 2026.11.09 12:00:08 ] (combat) first hit");
+        LogFileTail gameTail = monitor.Files.First(f => !f.FileName.StartsWith("Intel_"));
+        bool header = LogFileTail.TryReadHeader(gameTail.FilePath, out string listener, out long headerEnd);
+        Console.WriteLine($"  {(header && listener == "Game Pilot" ? "PASS" : "FAIL")} header read: listener '{listener}', header ends at byte {headerEnd}");
+        if(!(header && listener == "Game Pilot")) failures++;
+
+        string emptyPath = Path.Combine(dir, StampedName("Local_"));
+        using var local = new EveLogWriter(emptyPath, chat: true, "Local Pilot", header: false);
+        Thread.Sleep(1100);
+        Expect("a file found while still empty");
+        local.WriteHeader("Local Pilot");
+        local.Line("[ 2026.11.09 12:00:10 ] EVE System > Channel changed to Local : Jita");
+        Expect("its header is skipped once written", "[ 2026.11.09 12:00:10 ] EVE System > Channel changed to Local : Jita");
+        string localListener = monitor.Files.First(f => f.FileName.StartsWith("Local_")).Listener;
+        Console.WriteLine($"  {(localListener == "Local Pilot" ? "PASS" : "FAIL")} listener taken from the skipped header: '{localListener}'");
+        if(localListener != "Local Pilot") failures++;
+
+        string longText = "[ 2026.11.09 12:00:11 ] Pilot > " + new string('x', 40000);
+        chat.Line(longText);
+        Expect("a 40 KB line", longText);
+
+        chat.Truncate();
+        chat.WriteHeader("Bench Pilot");
+        chat.Line("[ 2026.11.09 12:00:12 ] Pilot > after truncation");
+        Expect("truncated file: picks up from its new end");
+        chat.Line("[ 2026.11.09 12:00:13 ] Pilot > next");
+        Expect("and reads on from there", "[ 2026.11.09 12:00:13 ] Pilot > next");
+
+        File.WriteAllText(Path.Combine(dir, "Old_20200101_120000_1.txt"), "x");
+        Thread.Sleep(1100);
+        Poll();
+        bool ignored = monitor.Files.All(f => !f.FileName.StartsWith("Old_"));
+        Console.WriteLine($"  {(ignored ? "PASS" : "FAIL")} a session older than 26 h is not followed");
+        if(!ignored) failures++;
+
+        Console.WriteLine(failures == 0 ? "log-check: all passed" : $"log-check: {failures} FAILED");
+    }
+
+    // ---------------------------------------------------------------- old vs new reader on the same synthetic traffic
+    // 8 intel channels and 4 game logs, each written by a held-open writer at random 0.5-4 s intervals for the given
+    // seconds. "old" replicates SMT before this change: FileSystemWatcher (LastWrite|Size) + the 1.5 s touch loop
+    // (files whose enumerated last write is under 10 minutes old) + re-reading each changed file from the start.
+    // "new" is LogFolderMonitor polled every 250 ms. Each line carries an id; latency = write to handling.
+    private static void LogLatency(int seconds)
+    {
+        foreach(string mode in new[] { "old", "new" })
+        {
+            string dir = Path.Combine(Work, "loglatency-" + mode);
+            if(Directory.Exists(dir)) Directory.Delete(dir, true);
+            Directory.CreateDirectory(dir);
+            var writers = new List<EveLogWriter>();
+            for(int i = 0; i < 8; i++) writers.Add(new EveLogWriter(Path.Combine(dir, StampedName($"Intel{i}_")), chat: true, "Bench Pilot"));
+            for(int i = 0; i < 4; i++) writers.Add(new EveLogWriter(Path.Combine(dir, $"{DateTime.UtcNow:yyyyMMdd_HHmmss}_12345{i}.txt"), chat: false, "Bench Pilot"));
+            var written = new System.Collections.Concurrent.ConcurrentDictionary<long, long>();
+            var latencies = new System.Collections.Concurrent.ConcurrentBag<double>();
+            void Handle(string line)
+            {
+                int at = line.LastIndexOf('#');
+                if(at >= 0 && long.TryParse(line.AsSpan(at + 1), out long id) && written.TryRemove(id, out long t0))
+                    latencies.Add(Stopwatch.GetElapsedTime(t0).TotalMilliseconds);
+            }
+
+            using var cts = new CancellationTokenSource();
+            Task reader;
+            FileSystemWatcher fsw = null;
+            if(mode == "old")
+            {
+                var lineCounts = new Dictionary<string, int>();
+                var gate = new object();
+                fsw = new FileSystemWatcher(dir) { Filter = "*.txt", NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size, InternalBufferSize = 32 * 1024 };
+                fsw.Changed += (s, e) =>
+                {
+                    lock(gate)
+                    {
+                        try
+                        {
+                            Encoding fe = Misc.GetEncoding(e.FullPath);
+                            using var sr = new StreamReader(new FileStream(e.FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), fe);
+                            lineCounts.TryGetValue(e.FullPath, out int skip);
+                            int n = 0;
+                            string l;
+                            while((l = sr.ReadLine()) != null) { if(n++ >= skip) Handle(l); }
+                            lineCounts[e.FullPath] = n;
+                        }
+                        catch(IOException) { }
+                    }
+                };
+                fsw.EnableRaisingEvents = true;
+                reader = Task.Run(async () =>
+                {
+                    while(!cts.IsCancellationRequested)
+                    {
+                        DateTime recent = DateTime.UtcNow.AddMinutes(-10);
+                        foreach(FileInfo f in new DirectoryInfo(dir).EnumerateFiles("*.txt").Where(f => f.LastWriteTimeUtc >= recent))
+                        {
+                            try { using var ifs = new FileStream(f.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); ifs.Seek(0, SeekOrigin.End); } catch(IOException) { }
+                        }
+                        try { await Task.Delay(1500, cts.Token); } catch(OperationCanceledException) { }
+                    }
+                });
+            }
+            else
+            {
+                reader = Task.Run(async () =>
+                {
+                    using var monitor = new LogFolderMonitor(dir, name => true);
+                    while(!cts.IsCancellationRequested)
+                    {
+                        monitor.Poll(DateTime.UtcNow, (tail, lines) => { foreach(string l in lines) Handle(l); });
+                        try { await Task.Delay(250, cts.Token); } catch(OperationCanceledException) { }
+                    }
+                });
+            }
+
+            Thread.Sleep(1500); // let both readers take in the existing files
+            using Process self = Process.GetCurrentProcess();
+            TimeSpan cpu0 = self.TotalProcessorTime;
+            long alloc0 = GC.GetTotalAllocatedBytes();
+            var rnd = new Random(2026);
+            var next = writers.Select(_ => rnd.Next(500, 4000)).ToArray();
+            var clock = Stopwatch.StartNew();
+            long id = 0;
+            while(clock.Elapsed.TotalSeconds < seconds)
+            {
+                Thread.Sleep(50);
+                for(int w = 0; w < writers.Count; w++)
+                {
+                    if(clock.ElapsedMilliseconds < next[w]) continue;
+                    long lineId = ++id;
+                    written[lineId] = Stopwatch.GetTimestamp();
+                    writers[w].Line(w < 8 ? $"[ 2026.11.09 12:00:00 ] Pilot > D-PNP9 red +3 #{lineId}" : $"[ 2026.11.09 12:00:00 ] (combat) <b>250</b> to Pith Usurper #{lineId}");
+                    next[w] = (int)clock.ElapsedMilliseconds + rnd.Next(500, 4000);
+                }
+            }
+            Thread.Sleep(3000); // grace for the last lines
+            self.Refresh();
+            double cpuMs = (self.TotalProcessorTime - cpu0).TotalMilliseconds;
+            double allocMb = (GC.GetTotalAllocatedBytes() - alloc0) / 1048576.0;
+            cts.Cancel();
+            reader.Wait();
+            fsw?.Dispose();
+            foreach(var w in writers) w.Dispose();
+
+            var sorted = latencies.OrderBy(x => x).ToList();
+            double P(double q) => sorted.Count == 0 ? double.NaN : sorted[Math.Min(sorted.Count - 1, (int)(q * sorted.Count))];
+            Console.WriteLine($"  {mode}: {id} lines written, {sorted.Count} seen, {written.Count} never seen; latency p50 {P(0.5):F0} ms, p95 {P(0.95):F0} ms, max {(sorted.Count > 0 ? sorted[^1] : double.NaN):F0} ms; process CPU {cpuMs / (seconds + 3):F1} ms/s, allocated {allocMb / (seconds + 3):F2} MB/s");
+        }
+    }
+
+    // ---------------------------------------------------------------- which size queries see a held-open file grow
+    // A writer keeps the file open (as the EVE client does) and appends; nothing else opens it. Compare the size
+    // from directory enumeration, from a path query (FileInfo -> GetFileAttributesEx) and from a read handle.
+    private static void StatCheck()
+    {
+        string dir = Path.Combine(Work, "statcheck");
+        if(Directory.Exists(dir)) Directory.Delete(dir, true);
+        Directory.CreateDirectory(dir);
+        string path = Path.Combine(dir, "Local_20261109_120000_123456789.txt");
+        using var writer = new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete), new UnicodeEncoding(false, true)) { AutoFlush = true };
+        writer.WriteLine("[ 2026.11.09 12:00:00 ] EVE System > Channel changed to Local : Jita");
+        Thread.Sleep(1500);
+        for(int i = 1; i <= 3; i++)
+        {
+            writer.WriteLine($"[ 2026.11.09 12:00:0{i} ] Pilot > line {i}");
+            Thread.Sleep(2000);
+            long enumerated = new DirectoryInfo(dir).EnumerateFiles().First().Length;
+            long pathQuery = new FileInfo(path).Length;
+            long handle;
+            using(var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)) handle = fs.Length;
+            long enumeratedAfterOpen = new DirectoryInfo(dir).EnumerateFiles().First().Length;
+            Console.WriteLine($"after line {i}: enumerated {enumerated}, path query {pathQuery}, read handle {handle}, enumerated after the handle was opened {enumeratedAfterOpen}");
         }
     }
 
