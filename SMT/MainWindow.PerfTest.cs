@@ -102,6 +102,39 @@ namespace SMT
 
                 // an overlay window for a test character: 30 refreshes
                 results["overlay"] = await MeasureOverlayAsync();
+
+                // where idle time goes: the region map without a selected system (no highlight animation), then the universe map
+                RegionUC.SelectedSystem = string.Empty;
+                RegionUC.ReDrawMap(false);
+                await WaitForIdleAsync();
+                results["idleRegionMapNoSelection"] = await MeasureIdleAsync(TimeSpan.FromSeconds(15));
+
+                // a region with jump bridges (from this profile's list), nothing selected
+                string bridgeRegion = EVEManager.JumpBridges
+                    .SelectMany(jb => new[] { EVEManager.GetEveSystem(jb.From)?.Region, EVEManager.GetEveSystem(jb.To)?.Region })
+                    .Where(region => region != null)
+                    .GroupBy(region => region)
+                    .OrderByDescending(g => g.Count())
+                    .Select(g => g.Key)
+                    .FirstOrDefault();
+                if(bridgeRegion != null)
+                {
+                    RegionUC.SelectRegion(bridgeRegion);
+                    RegionUC.SelectedSystem = string.Empty;
+                    RegionUC.ReDrawMap(false);
+                    await WaitForIdleAsync();
+                    Dictionary<string, object> bridgeIdle = await MeasureIdleAsync(TimeSpan.FromSeconds(15));
+                    bridgeIdle["region"] = bridgeRegion;
+                    bridgeIdle["animatedLines"] = RegionUC.MainCanvas.Children.OfType<Shape>().Count(s => s.HasAnimatedProperties);
+                    results["idleJumpBridgeRegion"] = bridgeIdle;
+                }
+
+                if(UniverseLayoutDoc != null)
+                {
+                    UniverseLayoutDoc.IsSelected = true;
+                    await WaitForIdleAsync();
+                    results["idleUniverseMap"] = await MeasureIdleAsync(TimeSpan.FromSeconds(15));
+                }
             }
             catch(Exception exception)
             {
