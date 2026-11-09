@@ -2492,6 +2492,18 @@ namespace SMT
             Brush ConstellationGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
             Brush RegionGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionGateColour);
 
+            // Shared by hundreds of elements: frozen, WPF doesn't have to watch them for changes.
+            foreach(Brush sharedBrush in new[]
+            {
+                SysOutlineBrush, SysInRegionBrush, SysOutRegionBrush, SysInRegionDarkBrush, SysOutRegionDarkBrush, HasIceBrush,
+                SysInRegionTextBrush, SysOutRegionTextBrush, FriendlyJumpBridgeBrush, DisabledJumpBridgeBrush, JumpInRange,
+                JumpInRangeMulti, Incursion, ConstellationHighlight, DarkTextColourBrush, SysTextBackgroundBrush,
+                MapBackgroundBrushDarkend, NormalGateBrush, ConstellationGateBrush, RegionGateBrush,
+            })
+            {
+                sharedBrush.Freeze();
+            }
+
             // cache all system links
             List<GateHelper> systemLinks = new List<GateHelper>();
 
@@ -2535,15 +2547,7 @@ namespace SMT
                     }
                 }
 
-                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
-
-
-
                 var systemSubTextLines = new List<(string Text, Brush Foreground)>();
-
-                // add circle for system
-                Polygon systemShape = new Polygon();
-                systemShape.StrokeThickness = 1.5;
 
                 bool needsOutline = true;
                 bool drawNPCStation = mapSystem.ActualSystem.HasNPCStation;
@@ -2574,12 +2578,11 @@ namespace SMT
                         icons += "❄";
                     }
 
-                    Label sysIcons = new Label();
+                    TextBlock sysIcons = new TextBlock();
                     sysIcons.FontSize = 8;
                     sysIcons.IsHitTestVisible = false;
-                    sysIcons.Content = icons;
-                    sysIcons.HorizontalContentAlignment = HorizontalAlignment.Center;
-                    sysIcons.VerticalContentAlignment = VerticalAlignment.Center;
+                    sysIcons.Text = icons;
+                    sysIcons.Padding = new Thickness(5);
                     sysIcons.Foreground = HasIceBrush;
 
                     Canvas.SetLeft(sysIcons, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 11);
@@ -2625,6 +2628,8 @@ namespace SMT
                     // override with sec status colours
                     if(ShowSystemSecurity)
                     {
+                        Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
+                        securityColorFill.Freeze();
                         SystemOutline.Fill = securityColorFill;
                     }
 
@@ -2691,8 +2696,10 @@ namespace SMT
                     Orientation = Orientation.Vertical,
                 };
 
-                Label sysText = new Label();
-                sysText.Content = mapSystem.LocalizedName;
+                // A TextBlock rather than a Label, whose template would add four more elements per system. It is aligned
+                // by layout, as the Label's content was, so the name lands on the same pixels as before.
+                TextBlock sysText = new TextBlock();
+                sysText.Text = mapSystem.LocalizedName;
 
 
                 if (MapConf.ActiveColourScheme.SystemTextSize > 0)
@@ -2727,8 +2734,7 @@ namespace SMT
                             Canvas.SetLeft(sysTextGrid, spLeft);
                             Canvas.SetTop(sysTextGrid, spTop);
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Center;
                             sp.VerticalAlignment = VerticalAlignment.Bottom;
                             sp.HorizontalAlignment = HorizontalAlignment.Center;
 
@@ -2743,8 +2749,7 @@ namespace SMT
                             Canvas.SetLeft(sysTextGrid, spLeft);
                             Canvas.SetTop(sysTextGrid, spTop);
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Center;
 
                             sp.VerticalAlignment = VerticalAlignment.Top;
                             sp.HorizontalAlignment = HorizontalAlignment.Center;
@@ -2760,8 +2765,7 @@ namespace SMT
                             Canvas.SetLeft(sysTextGrid, spLeft);
                             Canvas.SetTop(sysTextGrid, spTop);
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Right;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Right;
                             sp.VerticalAlignment = VerticalAlignment.Center;
                             sp.HorizontalAlignment = HorizontalAlignment.Right;
                             sysTextGrid.Children.Add(sp);
@@ -2777,8 +2781,7 @@ namespace SMT
                             sp.VerticalAlignment = VerticalAlignment.Center;
                             sp.HorizontalAlignment = HorizontalAlignment.Left;
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Left;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Left;
                             sysTextGrid.Children.Add(sp);
                         }
                         break;
