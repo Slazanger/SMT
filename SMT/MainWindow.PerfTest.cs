@@ -50,7 +50,7 @@ namespace SMT
         private void MainWindow_ContentRendered(object sender, EventArgs e)
         {
             ContentRendered -= MainWindow_ContentRendered;
-            PerfMetrics.MarkStartup("first frame");
+            PerfMetrics.MarkStartup(PerfMetrics.FirstFrame);
             AppLog.Metrics("Startup", PerfMetrics.StartupSummary());
 
             if(IsPerfTestRun)
@@ -135,6 +135,25 @@ namespace SMT
                     await WaitForIdleAsync();
                     results["idleUniverseMap"] = await MeasureIdleAsync(TimeSpan.FromSeconds(15));
                 }
+
+                // the universe map's right-click lookup: a point just off each system's centre must find that system
+                MethodInfo findSystem = typeof(UniverseControl).GetMethod("FindSystemAt", BindingFlags.Instance | BindingFlags.NonPublic);
+                if(findSystem != null)
+                {
+                    int probed = 0;
+                    int found = 0;
+                    foreach(EVEData.System sys in EVEManager.Systems)
+                    {
+                        probed++;
+                        object hit = findSystem.Invoke(UniverseUC, new object[] { new Point(sys.UniverseX + 0.6, sys.UniverseY - 0.6) });
+                        if(hit == sys)
+                        {
+                            found++;
+                        }
+                    }
+
+                    results["universeRightClickLookup"] = new Dictionary<string, object> { ["probed"] = probed, ["foundItsSystem"] = found };
+                }
             }
             catch(Exception exception)
             {
@@ -143,6 +162,26 @@ namespace SMT
 
             File.WriteAllText(perfTestOutputPath, JsonConvert.SerializeObject(results, Formatting.Indented));
             Close();
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+        private const uint SWP_NOZORDER = 0x0004;
+        private const uint SWP_NOACTIVATE = 0x0010;
+
+        /// <summary>
+        /// Puts a --perftest window in the middle of a secondary monitor when there is one, out of the way of the main
+        /// screen, at the same size (physical pixels) on every run so results compare.
+        /// </summary>
+        private static void PlaceOnPerfTestScreen(Window window, int width, int height)
+        {
+            System.Windows.Forms.Screen screen = System.Windows.Forms.Screen.AllScreens.FirstOrDefault(s => !s.Primary) ?? System.Windows.Forms.Screen.PrimaryScreen;
+            System.Drawing.Rectangle area = screen.WorkingArea;
+            width = Math.Min(width, area.Width);
+            height = Math.Min(height, area.Height);
+            IntPtr handle = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+            SetWindowPos(handle, IntPtr.Zero, area.Left + ((area.Width - width) / 2), area.Top + ((area.Height - height) / 2), width, height, SWP_NOZORDER | SWP_NOACTIVATE);
         }
 
         private void ClosePerfTestRun()
@@ -234,6 +273,7 @@ namespace SMT
             EVEData.LocalCharacter pilot = new EVEData.LocalCharacter("SMT perftest pilot", string.Empty, "1DQ1-A");
             EVEData.LocalCharacter previousCharacter = ActiveCharacter;
             Overlay.SuppressPlacementSaving = true;
+            Overlay.PlacementOverride = window => PlaceOnPerfTestScreen(window, 500, 500);
             EVEManager.AddCharacter(pilot);
             ActiveCharacter = pilot;
             Overlay overlay = new Overlay(this);

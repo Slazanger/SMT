@@ -35,6 +35,13 @@ namespace SMT
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
+            if(IsPerfTestRun)
+            {
+                // a --perftest run leaves the saved placement alone and opens on a secondary monitor
+                PlaceOnPerfTestScreen(this, 1280, 900);
+                return;
+            }
+
             WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, Properties.Settings.Default.MainWindow_placement);
         }
         private void SaveDefaultLayout()

@@ -497,7 +497,13 @@ namespace SMT
         {
             base.OnInitialized(e);
             LoadOverlayWindowPosition();
+            PlacementOverride?.Invoke(this);
         }
+
+        /// <summary>
+        /// Set by a --perftest run to put its test overlay somewhere else than the stored placement.
+        /// </summary>
+        internal static Action<Window> PlacementOverride { get; set; }
 
         private void ReleaseWithTypeCheck(List<UIElement> elements)
         {

@@ -26,12 +26,26 @@ namespace SMT
         public static IReadOnlyList<KeyValuePair<string, double>> StartupMarks => StartupMarkList;
 
         /// <summary>
-        /// Records that a startup phase has just finished.
+        /// Records that a startup phase has just finished. Ignored once the first frame has been recorded, so code
+        /// that also runs later (a full map redraw) can mark its steps.
         /// </summary>
         public static void MarkStartup(string phase)
         {
+            if(startupComplete)
+            {
+                return;
+            }
+
             StartupMarkList.Add(new KeyValuePair<string, double>(phase, (DateTime.Now - ProcessStart).TotalMilliseconds));
+            if(phase == FirstFrame)
+            {
+                startupComplete = true;
+            }
         }
+
+        public const string FirstFrame = "first frame";
+
+        private static bool startupComplete;
 
         /// <summary>
         /// "4312 ms to the first frame (MainWindow constructor 512, InitializeComponent 650, ... ms)", each phase with its own duration.
