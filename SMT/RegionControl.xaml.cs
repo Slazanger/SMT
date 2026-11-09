@@ -222,6 +222,11 @@ namespace SMT
             }
             set
             {
+                if(m_ActiveCharacter == value)
+                {
+                    return;
+                }
+
                 m_ActiveCharacter = value;
                 OnPropertyChanged("ActiveCharacter");
             }
@@ -239,6 +244,11 @@ namespace SMT
             }
             set
             {
+                if(m_ESIOverlayScale == value)
+                {
+                    return;
+                }
+
                 m_ESIOverlayScale = value;
                 OnPropertyChanged("ESIOverlayScale");
             }
@@ -270,6 +280,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowJumpBridges == value)
+                {
+                    return;
+                }
+
                 m_ShowJumpBridges = value;
                 OnPropertyChanged("ShowJumpBridges");
             }
@@ -284,6 +299,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowNPCKills == value)
+                {
+                    return;
+                }
+
                 m_ShowNPCKills = value;
 
                 if(m_ShowNPCKills)
@@ -306,6 +326,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowPodKills == value)
+                {
+                    return;
+                }
+
                 m_ShowPodKills = value;
                 if(m_ShowPodKills)
                 {
@@ -327,6 +352,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowShipJumps == value)
+                {
+                    return;
+                }
+
                 m_ShowShipJumps = value;
                 if(m_ShowShipJumps)
                 {
@@ -348,6 +378,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowShipKills == value)
+                {
+                    return;
+                }
+
                 m_ShowShipKills = value;
                 if(m_ShowShipKills)
                 {
@@ -368,6 +403,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSovOwner == value)
+                {
+                    return;
+                }
+
                 m_ShowSovOwner = value;
                 OnPropertyChanged("ShowSovOwner");
             }
@@ -381,6 +421,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowStandings == value)
+                {
+                    return;
+                }
+
                 m_ShowStandings = value;
 
                 OnPropertyChanged("ShowStandings");
@@ -395,6 +440,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSystemADM == value)
+                {
+                    return;
+                }
+
                 m_ShowSystemADM = value;
                 if(m_ShowSystemADM)
                 {
@@ -412,6 +462,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSystemSecurity == value)
+                {
+                    return;
+                }
+
                 m_ShowSystemSecurity = value;
                 if(m_ShowSystemSecurity)
                 {
@@ -429,6 +484,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSystemTimers == value)
+                {
+                    return;
+                }
+
                 m_ShowSystemTimers = value;
                 OnPropertyChanged("ShowSystemTimers");
             }
@@ -784,6 +844,7 @@ namespace SMT
             SystemDropDownAC.ItemsSource = newList;
 
             PropertyChanged += MapObjectChanged;
+            IsVisibleChanged += RegionControl_IsVisibleChanged;
         }
 
         /// <summary>
@@ -792,10 +853,86 @@ namespace SMT
         /// <param name="FullRedraw">Clear all the static items or not</param>
         public void ReDrawMap(bool FullRedraw = false)
         {
+            // this redraw satisfies any request still waiting (see RequestRedraw)
+            if(FullRedraw || !fullRedrawRequested)
+            {
+                redrawRequested = false;
+                fullRedrawRequested = false;
+            }
+
             long redrawStart = System.Diagnostics.Stopwatch.GetTimestamp();
             ReDrawMapCore(FullRedraw);
             PerfMetrics.RecordRegionRedraw(FullRedraw, redrawStart);
         }
+
+        private bool redrawRequested;
+        private bool fullRedrawRequested;
+        private bool redrawPosted;
+
+        /// <summary>
+        /// Redraw on the next dispatcher pass, before the next frame. Several requests before then (a setter that
+        /// turns other toggles off, a settings change) cost one redraw, a full one if any asked for it, and a redraw
+        /// that happens in between satisfies them. While the map is hidden the redraw waits until it is shown.
+        /// </summary>
+        public void RequestRedraw(bool fullRedraw)
+        {
+            redrawRequested = true;
+            fullRedrawRequested |= fullRedraw;
+            if(redrawPosted)
+            {
+                return;
+            }
+
+            redrawPosted = true;
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(RedrawIfRequested));
+        }
+
+        private void RedrawIfRequested()
+        {
+            redrawPosted = false;
+            if(!redrawRequested || !IsVisible)
+            {
+                // still requested while hidden: RegionControl_IsVisibleChanged posts it again
+                return;
+            }
+
+            ReDrawMap(fullRedrawRequested);
+        }
+
+        private void RegionControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(IsVisible && redrawRequested)
+            {
+                RequestRedraw(fullRedrawRequested);
+            }
+        }
+
+        /// <summary>
+        /// Whether a change to this MapConfig property needs the region map redrawn: everything except settings the
+        /// region map never reads (overlay, universe and regions views, sounds, window behaviour, zoom behaviour).
+        /// Unknown properties redraw, so a new visual setting can't be missed.
+        /// </summary>
+        public static bool RedrawsOnMapConfigChange(string propertyName)
+        {
+            if(string.IsNullOrEmpty(propertyName))
+            {
+                return true;
+            }
+
+            return !(propertyName.StartsWith("Overlay", StringComparison.Ordinal) || NonRegionMapSettings.Contains(propertyName));
+        }
+
+        private static readonly HashSet<string> NonRegionMapSettings = new HashSet<string>
+        {
+            // SelectRegion redraws itself when it changes the default region
+            "DefaultRegion",
+            "AlwaysOnTop", "CloseToTray", "MinimizeToTray", "CustomEveLogFolderLocation", "SyncActiveCharacterBasedOnActiveEVEClient",
+            "FlashWindow", "FlashWindowOnlyInDangerZone", "PlayIntelSound", "PlayIntelSoundOnAlert", "PlaySoundOnlyInDangerZone",
+            "ShowZKillData", "ZkillExpireTimeMinutes",
+            "ShowUniverseKills", "ShowUniversePods", "ShowUniverseRats", "ShowRegionStandings",
+            "UniverseDataScale", "UniverseMaxZoomDisplaySystems", "UniverseMaxZoomDisplaySystemsText",
+            "FollowOnZoom", "ResetZoomOnRegionChange", "ShowToolBox",
+        };
 
         private void ReDrawMapCore(bool FullRedraw)
         {
@@ -919,12 +1056,9 @@ namespace SMT
             //                ActiveCharacter.UpdateStructureInfoForRegion2(regionName);
             //            }
 
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                ReDrawMap(true);
-            }), DispatcherPriority.Normal);
+            ReDrawMap(true);
 
-            // reset the zoom / export 
+            // reset the zoom / export
             MainZoomControl.ZoomToFill();
 
             // select the item in the dropdown
@@ -961,8 +1095,18 @@ namespace SMT
                         MainZoomControl.Show(kvp.Value.Layout.X, kvp.Value.Layout.Y, MainZoomControl.Zoom);
                     }
 
-                    SystemDropDownAC.SelectedItem = kvp.Value;
+                    // set first: the dropdown's SelectionChanged would otherwise select and redraw a second time
                     SelectedSystem = kvp.Value.Name;
+                    selectingSystemFromCode = true;
+                    try
+                    {
+                        SystemDropDownAC.SelectedItem = kvp.Value;
+                    }
+                    finally
+                    {
+                        selectingSystemFromCode = false;
+                    }
+
                     AddHighlightToSystem(name);
 
                     break;
@@ -3171,10 +3315,7 @@ namespace SMT
 
         private void MapObjectChanged(object sender, PropertyChangedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                ReDrawMap(true);
-            }), DispatcherPriority.Normal);
+            RequestRedraw(true);
         }
 
         /// <summary>
@@ -4095,8 +4236,16 @@ namespace SMT
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
         }
 
+        private bool selectingSystemFromCode;
+
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if(selectingSystemFromCode)
+            {
+                // SelectSystem set the dropdown; its caller redraws
+                return;
+            }
+
             EVEData.MapSystem sd = SystemDropDownAC.SelectedItem as EVEData.MapSystem;
 
             if(sd != null)

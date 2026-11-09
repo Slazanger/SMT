@@ -96,7 +96,20 @@ namespace SMT
         private EVEData.LocalCharacter activeCharacter;
 
         public EVEData.LocalCharacter ActiveCharacter
-        { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty); } }
+        {
+            get => activeCharacter;
+            set
+            {
+                // listeners (each open overlay) redraw on this event, so only raise it for a real change
+                if(activeCharacter == value)
+                {
+                    return;
+                }
+
+                activeCharacter = value;
+                OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty);
+            }
+        }
         public void UpdateTabTitles()
         {
             try

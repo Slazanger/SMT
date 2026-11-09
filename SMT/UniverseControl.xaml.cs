@@ -160,6 +160,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowJumpBridges == value)
+                {
+                    return;
+                }
+
                 m_ShowJumpBridges = value;
                 OnPropertyChanged("ShowJumpBridges");
             }
@@ -173,6 +178,11 @@ namespace SMT
             }
             set
             {
+                if(m_ESIOverlayScale == value)
+                {
+                    return;
+                }
+
                 m_ESIOverlayScale = value;
                 OnPropertyChanged("ESIOverlayScale");
             }
@@ -187,6 +197,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowNPCKills == value)
+                {
+                    return;
+                }
+
                 m_ShowNPCKills = value;
 
                 if(m_ShowNPCKills)
@@ -209,6 +224,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowPodKills == value)
+                {
+                    return;
+                }
+
                 m_ShowPodKills = value;
                 if(m_ShowPodKills)
                 {
@@ -230,6 +250,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowShipKills == value)
+                {
+                    return;
+                }
+
                 m_ShowShipKills = value;
                 if(m_ShowShipKills)
                 {
@@ -251,6 +276,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowShipJumps == value)
+                {
+                    return;
+                }
+
                 m_ShowShipJumps = value;
                 if(m_ShowShipJumps)
                 {

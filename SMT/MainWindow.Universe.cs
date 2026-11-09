@@ -145,7 +145,11 @@ namespace SMT
                 EVEManager.ZKillFeed.PauseUpdate = !MapConf.ShowZKillData;
             }
 
-            RegionUC.ReDrawMap(true);
+            // only for settings the region map draws with, and at most once per burst of changes
+            if(RegionControl.RedrawsOnMapConfigChange(e.PropertyName))
+            {
+                RegionUC.RequestRedraw(true);
+            }
 
             if(e.PropertyName == "ShowRegionStandings")
             {
