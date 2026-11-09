@@ -682,20 +682,18 @@ namespace SMT.EVEData
         private List<System> systemsByName;
 
         /// <summary>
-        /// All systems sorted by name, for the system pickers to share instead of each sorting its own copy.
+        /// A new list of all systems sorted by name; the sort is done once. Each system picker needs a list of its
+        /// own: controls given the same list share its view, so typing in one picker would filter the others.
         /// </summary>
-        public List<System> SystemsByName
+        public List<System> GetSystemsByName()
         {
-            get
+            if(systemsByName == null)
             {
-                if(systemsByName == null)
-                {
-                    systemsByName = new List<System>(Systems);
-                    systemsByName.Sort((a, b) => string.Compare(a.Name, b.Name));
-                }
-
-                return systemsByName;
+                systemsByName = new List<System>(Systems);
+                systemsByName.Sort((a, b) => string.Compare(a.Name, b.Name));
             }
+
+            return new List<System>(systemsByName);
         }
 
         /// <summary>

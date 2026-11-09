@@ -804,7 +804,7 @@ namespace SMT
             SelectedSystem = string.Empty;
 
             GlobalSystemDropDownAC.SelectedItem = null;
-            GlobalSystemDropDownAC.ItemsSource = EM.SystemsByName;
+            GlobalSystemDropDownAC.ItemsSource = EM.GetSystemsByName();
 
             DynamicMapElements = new List<UIElement>();
             DynamicMapElementsRangeMarkers = new List<UIElement>();

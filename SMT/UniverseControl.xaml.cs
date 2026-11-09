@@ -429,7 +429,7 @@ namespace SMT
             }
 
             PerfMetrics.MarkStartup("universe map: gate list");
-            GlobalSystemDropDownAC.ItemsSource = EM.SystemsByName;
+            GlobalSystemDropDownAC.ItemsSource = EM.GetSystemsByName();
             PerfMetrics.MarkStartup("universe map: system dropdown");
 
             ReDrawMap(true);

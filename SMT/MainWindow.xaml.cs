@@ -403,9 +403,9 @@ namespace SMT
             EVEManager.ServerInfo.StatusMessage = "Ready";
             AppLog.StatusChanged += AppLog_StatusChanged;
 
-            RouteSystemDropDownAC.ItemsSource = EVEManager.SystemsByName;
-            JumpRouteSystemDropDownAC.ItemsSource = EVEManager.SystemsByName;
-            JumpRouteAvoidSystemDropDownAC.ItemsSource = EVEManager.SystemsByName;
+            RouteSystemDropDownAC.ItemsSource = EVEManager.GetSystemsByName();
+            JumpRouteSystemDropDownAC.ItemsSource = EVEManager.GetSystemsByName();
+            JumpRouteAvoidSystemDropDownAC.ItemsSource = EVEManager.GetSystemsByName();
 
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
