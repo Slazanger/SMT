@@ -85,6 +85,8 @@ namespace SMT
                 await WaitForIdleAsync();
                 results["regionCanvasChildren"] = RegionUC.MainCanvas.Children.Count;
                 results["regionCanvasVisuals"] = CountVisuals(RegionUC.MainCanvas);
+                results["systemNamePixels"] = SystemNamePixelHashes();
+                SaveRegionMapImage(System.IO.Path.ChangeExtension(perfTestOutputPath, ".png"));
                 results["fullRedraw"] = await MeasureAsync(Enumerable.Range(0, 10).ToList(), 1, _ => RegionUC.ReDrawMap(true));
                 results["partialRedraw"] = await MeasureAsync(Enumerable.Range(0, 20).ToList(), 1, _ => RegionUC.ReDrawMap(false));
                 results["regionCanvasChildrenAfterPartialRedraws"] = RegionUC.MainCanvas.Children.Count;
@@ -491,6 +493,69 @@ namespace SMT
                 ["partialRedraws"] = PerfMetrics.RegionPartialRedraws - partialRedraws,
                 ["partialRedrawMsPerSecond"] = Math.Round((PerfMetrics.RegionPartialRedrawMs - partialRedrawMs) / seconds, 2),
             };
+        }
+
+        /// <summary>
+        /// Renders each system name block on the region map (a Grid on the canvas, with a margin for text that overflows
+        /// it) and hashes its pixels, so two builds' text can be compared name by name.
+        /// </summary>
+        private string SystemNamePixelHashes()
+        {
+            List<string> hashes = new List<string>();
+            foreach(Grid grid in RegionUC.MainCanvas.Children.OfType<Grid>())
+            {
+                Rect frame = new Rect(-40, -20, grid.ActualWidth + 80, grid.ActualHeight + 60);
+                byte[] pixels = RenderPixels(grid, frame);
+                hashes.Add(Convert.ToHexString(System.Security.Cryptography.SHA1.HashData(pixels)).Substring(0, 8));
+            }
+
+            return string.Join(" ", hashes);
+        }
+
+        /// <summary>
+        /// The region map's canvas as a PNG, to look at after a rendering change.
+        /// </summary>
+        private void SaveRegionMapImage(string path)
+        {
+            Rect frame = new Rect(0, 0, RegionUC.MainCanvas.ActualWidth, RegionUC.MainCanvas.ActualHeight);
+            System.Windows.Media.Imaging.RenderTargetBitmap bitmap = RenderBitmap(RegionUC.MainCanvas, frame);
+            System.Windows.Media.Imaging.PngBitmapEncoder encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+            using FileStream file = File.Create(path);
+            encoder.Save(file);
+        }
+
+        private static byte[] RenderPixels(System.Windows.Media.Visual visual, Rect frame)
+        {
+            System.Windows.Media.Imaging.RenderTargetBitmap bitmap = RenderBitmap(visual, frame);
+            byte[] pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
+            bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
+            return pixels;
+        }
+
+        /// <summary>
+        /// Renders the part of a visual inside frame (in its own coordinates) at 96 dpi, through a VisualBrush, since
+        /// RenderTargetBitmap.Render would apply the visual's offset in its parent.
+        /// </summary>
+        private static System.Windows.Media.Imaging.RenderTargetBitmap RenderBitmap(System.Windows.Media.Visual visual, Rect frame)
+        {
+            int width = Math.Max(1, (int)Math.Ceiling(frame.Width));
+            int height = Math.Max(1, (int)Math.Ceiling(frame.Height));
+            System.Windows.Media.VisualBrush brush = new System.Windows.Media.VisualBrush(visual)
+            {
+                ViewboxUnits = System.Windows.Media.BrushMappingMode.Absolute,
+                Viewbox = frame,
+                Stretch = System.Windows.Media.Stretch.Fill,
+            };
+            System.Windows.Media.DrawingVisual drawing = new System.Windows.Media.DrawingVisual();
+            using(System.Windows.Media.DrawingContext context = drawing.RenderOpen())
+            {
+                context.DrawRectangle(brush, null, new Rect(0, 0, frame.Width, frame.Height));
+            }
+
+            System.Windows.Media.Imaging.RenderTargetBitmap bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(width, height, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+            bitmap.Render(drawing);
+            return bitmap;
         }
 
         /// <summary>
