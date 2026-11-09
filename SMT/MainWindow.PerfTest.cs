@@ -71,6 +71,15 @@ namespace SMT
             {
                 // let the startup background work (ESI, zKillboard connection, storms) settle
                 await Task.Delay(TimeSpan.FromSeconds(5));
+
+                // the characters found in the Local logs (or from ESI) by then, and how many have a known system
+                List<EVEData.LocalCharacter> characters = EVEManager.LocalCharacters.ToList();
+                results["charactersAfterStartup"] = new Dictionary<string, object>
+                {
+                    ["count"] = characters.Count,
+                    ["withSystem"] = characters.Count(c => !string.IsNullOrEmpty(c.Location)),
+                };
+
                 if(RegionLayoutDoc != null)
                 {
                     RegionLayoutDoc.IsSelected = true;
