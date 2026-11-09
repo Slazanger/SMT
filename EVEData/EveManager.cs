@@ -1980,18 +1980,12 @@ namespace SMT.EVEData
                 }
             }
 
-            Console.WriteLine("Building navigation jump-range cache...");
-
-            // cache the navigation data
-            SerializableDictionary<string, List<string>> jumpRangeCache = Navigation.CreateStaticNavigationCache(Systems);
-
-            // now serialise the classes to disk
+            // now serialise the classes to disk; the jump-range table is built at startup (Navigation.InitNavigation)
 
             string saveDataFolder = outputFolder + @"\data\";
 
             Console.WriteLine("Writing MapLayout.dat and related data files...");
 
-            Serialization.SerializeToDisk<SerializableDictionary<string, List<string>>>(jumpRangeCache, saveDataFolder + @"\JumpRangeCache.dat");
             Serialization.SerializeToDisk<SerializableDictionary<string, string>>(ShipTypes, saveDataFolder + @"\ShipTypes.dat");
             Serialization.SerializeToDisk<List<MapRegion>>(Regions, saveDataFolder + @"\MapLayout.dat");
             Serialization.SerializeToDisk<List<System>>(Systems, saveDataFolder + @"\Systems.dat");
@@ -2224,18 +2218,7 @@ namespace SMT.EVEData
 
         public void InitNavigation()
         {
-            SerializableDictionary<string, List<string>> jumpRangeCache;
-
-            string DataRootPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
-
-            string JRC = Path.Combine(DataRootPath, "JumpRangeCache.dat");
-
-            if(!File.Exists(JRC))
-            {
-                throw new NotImplementedException();
-            }
-            jumpRangeCache = Serialization.DeserializeFromDisk<SerializableDictionary<string, List<string>>>(JRC);
-            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges, jumpRangeCache);
+            Navigation.InitNavigation(NameToSystem.Values.ToList(), JumpBridges);
 
             InitZarzakhConnections();
         }

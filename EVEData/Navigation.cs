@@ -1,6 +1,4 @@
-﻿using EVEDataUtils;
-
-namespace SMT.EVEData
+﻿namespace SMT.EVEData
 {
     public enum RoutingMode
     {
@@ -11,6 +9,11 @@ namespace SMT.EVEData
 
     public class Navigation
     {
+        /// <summary>
+        /// Longest jump range, in light years, that capital routing considers.
+        /// </summary>
+        private const double MaxJumpRangeLY = 10.0;
+
         public enum GateType
         {
             StarGate,
@@ -177,56 +180,7 @@ namespace SMT.EVEData
             return sysList;
         }
 
-        public static SerializableDictionary<string, List<string>> CreateStaticNavigationCache(List<System> eveSystems)
-        {
-            SerializableDictionary<string, List<string>> rangeCache = new SerializableDictionary<string, List<string>>();
-
-            decimal maxRange = 10;
-
-            // now create the jumpable system links
-            foreach (System sysa in eveSystems)
-            {
-                foreach (System sysb in eveSystems)
-                {
-                    if (sysa == sysb)
-                    {
-                        continue;
-                    }
-                    // cant jump into highsec systems
-                    if (sysb.TrueSec > 0.45)
-                    {
-                        continue;
-                    }
-
-                    // cant jump into Pochven systems
-                    if (sysb.Region == "Pochven")
-                    {
-                        continue;
-                    }
-
-                    // cant jump into Zarzakh
-                    if (sysb.Name == "Zarzakh")
-                    {
-                        continue;
-                    }
-
-                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysa.Name, sysb.Name);
-                    if (Distance < maxRange && Distance > 0)
-                    {
-                        if (!rangeCache.ContainsKey(sysa.Name))
-                        {
-                            rangeCache[sysa.Name] = new List<string>();
-                        }
-
-                        rangeCache[sysa.Name].Add(sysb.Name);
-                    }
-                }
-            }
-
-            return rangeCache;
-        }
-
-        public static void InitNavigation(List<System> eveSystems, List<JumpBridge> jumpBridges, SerializableDictionary<string, List<string>> jumpRangeCache)
+        public static void InitNavigation(List<System> eveSystems, List<JumpBridge> jumpBridges)
         {
             MapNodes = new Dictionary<string, MapNode>();
 
@@ -249,6 +203,9 @@ namespace SMT.EVEData
                     X = sys.ActualX,
                     Y = sys.ActualY,
                     Z = sys.ActualZ,
+                    PositionX = (double)sys.ActualX,
+                    PositionY = (double)sys.ActualY,
+                    PositionZ = (double)sys.ActualZ,
                     F = 0,
                     ActualSystem = sys
                 };
@@ -263,23 +220,77 @@ namespace SMT.EVEData
 
             UpdateJumpBridges(jumpBridges);
 
-            decimal MaxRange = 10;
+            BuildJumpableSystems();
+        }
 
-            foreach (string s in jumpRangeCache.Keys)
+        /// <summary>
+        /// Links every system to each system within MaxJumpRangeLY that a capital can jump into
+        /// (not highsec, Pochven or Zarzakh). Destinations are bucketed into cubes MaxJumpRangeLY
+        /// on a side, so each system is only measured against the 27 cubes around it. This
+        /// replaces the JumpRangeCache.dat table, which took over a second to load.
+        /// </summary>
+        private static void BuildJumpableSystems()
+        {
+            Dictionary<(long, long, long), List<MapNode>> cells = new Dictionary<(long, long, long), List<MapNode>>();
+
+            foreach (MapNode node in MapNodes.Values)
             {
-                MapNode sysMN = MapNodes[s];
-                foreach (string t in jumpRangeCache[s])
+                if (node.HighSec || node.Pochven || node.Name == "Zarzakh")
                 {
-                    decimal Distance = EveManager.Instance.GetRangeBetweenSystems(sysMN.Name, t);
-                    if (Distance < MaxRange && Distance > 0)
+                    continue;
+                }
+
+                (long, long, long) cell = GetJumpRangeCell(node);
+                if (!cells.TryGetValue(cell, out List<MapNode> members))
+                {
+                    members = new List<MapNode>();
+                    cells[cell] = members;
+                }
+
+                members.Add(node);
+            }
+
+            const double maxRangeSquared = MaxJumpRangeLY * MaxJumpRangeLY;
+
+            foreach (MapNode node in MapNodes.Values)
+            {
+                (long cellX, long cellY, long cellZ) = GetJumpRangeCell(node);
+
+                for (long dx = -1; dx <= 1; dx++)
+                {
+                    for (long dy = -1; dy <= 1; dy++)
                     {
-                        JumpLink jl = new JumpLink();
-                        jl.System = t;
-                        jl.RangeLY = Distance;
-                        sysMN.JumpableSystems.Add(jl);
+                        for (long dz = -1; dz <= 1; dz++)
+                        {
+                            if (!cells.TryGetValue((cellX + dx, cellY + dy, cellZ + dz), out List<MapNode> members))
+                            {
+                                continue;
+                            }
+
+                            foreach (MapNode target in members)
+                            {
+                                double x = node.PositionX - target.PositionX;
+                                double y = node.PositionY - target.PositionY;
+                                double z = node.PositionZ - target.PositionZ;
+                                double distanceSquared = (x * x) + (y * y) + (z * z);
+
+                                // zero distance is the system itself
+                                if (distanceSquared > 0 && distanceSquared < maxRangeSquared)
+                                {
+                                    node.JumpableSystems.Add(new JumpLink { System = target.Name, RangeLY = Math.Sqrt(distanceSquared) });
+                                }
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        private static (long, long, long) GetJumpRangeCell(MapNode node)
+        {
+            return ((long)Math.Floor(node.PositionX / MaxJumpRangeLY),
+                    (long)Math.Floor(node.PositionY / MaxJumpRangeLY),
+                    (long)Math.Floor(node.PositionZ / MaxJumpRangeLY));
         }
 
         public static List<RoutePoint> Navigate(string From, string To, bool UseJumpGates, bool UseThera, bool UseZarzakh, bool UseTurnur, RoutingMode routingMode)
@@ -632,7 +643,7 @@ namespace SMT.EVEData
                 // walk the connections
                 foreach (JumpLink connection in CurrentNode.JumpableSystems)
                 {
-                    if (connection.RangeLY > (decimal)MaxLY)
+                    if (connection.RangeLY > MaxLY)
                     {
                         continue;
                     }
@@ -643,7 +654,7 @@ namespace SMT.EVEData
                         continue;
 
                     double avoidFactor = avoidSystems.Contains(connection.System) ? 10000.0 : 0.0;
-                    double newCostToStart = CurrentNode.MinCostToStart + (double)connection.RangeLY + ExtraJumpFactor + avoidFactor;
+                    double newCostToStart = CurrentNode.MinCostToStart + connection.RangeLY + ExtraJumpFactor + avoidFactor;
 
                     if (CMN.MinCostToStart == 0 || newCostToStart < CMN.MinCostToStart)
                     {
@@ -732,7 +743,7 @@ namespace SMT.EVEData
 
         private struct JumpLink
         {
-            public decimal RangeLY;
+            public double RangeLY;
             public string System;
         }
 
@@ -806,6 +817,11 @@ namespace SMT.EVEData
             public decimal X;
             public decimal Y;
             public decimal Z;
+
+            // the same position in light years as double, for the jump range build
+            public double PositionX;
+            public double PositionY;
+            public double PositionZ;
             public List<string> Connections { get; set; }
             public bool HighSec { get; set; }
             public bool Pochven { get; set; }
