@@ -96,7 +96,8 @@ namespace SMT
                 await WaitForIdleAsync();
                 results["regionCanvasChildren"] = RegionUC.MainCanvas.Children.Count;
                 results["regionCanvasVisuals"] = CountVisuals(RegionUC.MainCanvas);
-                results["systemNamePixels"] = SystemNamePixelHashes();
+                results["systemNamePixels"] = SystemNamePixelHashes(out int namesDrawn);
+                results["systemNamesDrawn"] = namesDrawn;
                 SaveRegionMapImage(System.IO.Path.ChangeExtension(perfTestOutputPath, ".png"));
                 results["fullRedraw"] = await MeasureAsync(Enumerable.Range(0, 10).ToList(), 1, _ => RegionUC.ReDrawMap(true));
                 results["partialRedraw"] = await MeasureAsync(Enumerable.Range(0, 20).ToList(), 1, _ => RegionUC.ReDrawMap(false));
@@ -504,15 +505,24 @@ namespace SMT
 
         /// <summary>
         /// Renders each system name block on the region map (a Grid on the canvas, with a margin for text that overflows
-        /// it) and hashes its pixels, so two builds' text can be compared name by name.
+        /// it) and hashes its pixels, so two builds' text can be compared name by name. <paramref name="drawn"/> is
+        /// how many of the renders show anything at all: all of them, unless the capture itself has stopped working.
         /// </summary>
-        private string SystemNamePixelHashes()
+        private string SystemNamePixelHashes(out int drawn)
         {
+            drawn = 0;
             List<string> hashes = new List<string>();
             foreach(Grid grid in RegionUC.MainCanvas.Children.OfType<Grid>())
             {
-                Rect frame = new Rect(-40, -20, grid.ActualWidth + 80, grid.ActualHeight + 60);
+                // the frame is given in the canvas's coordinates (see RenderBitmap): the block's place on it, and a margin
+                Vector position = System.Windows.Media.VisualTreeHelper.GetOffset(grid);
+                Rect frame = new Rect(position.X - 40, position.Y - 20, grid.ActualWidth + 80, grid.ActualHeight + 60);
                 byte[] pixels = RenderPixels(grid, frame);
+                if(pixels.Any(value => value != 0))
+                {
+                    drawn++;
+                }
+
                 hashes.Add(Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(pixels)).Substring(0, 8));
             }
 
@@ -541,8 +551,9 @@ namespace SMT
         }
 
         /// <summary>
-        /// Renders the part of a visual inside frame (in its own coordinates) at 96 dpi, through a VisualBrush, since
-        /// RenderTargetBitmap.Render would apply the visual's offset in its parent.
+        /// Renders what a visual draws inside frame at 96 dpi, through a VisualBrush, which leaves out everything else
+        /// on the canvas. The frame is in the coordinates of the visual's parent: the brush draws a visual where it
+        /// sits in its parent, so a frame at the visual's own origin shows nothing of a visual placed elsewhere.
         /// </summary>
         private static System.Windows.Media.Imaging.RenderTargetBitmap RenderBitmap(System.Windows.Media.Visual visual, Rect frame)
         {
