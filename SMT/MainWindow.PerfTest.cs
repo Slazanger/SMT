@@ -1,10 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -96,6 +99,9 @@ namespace SMT
 
                 // sitting idle with the region map in view
                 results["idleRegionMap"] = await MeasureIdleAsync(TimeSpan.FromSeconds(20));
+
+                // an overlay window for a test character: 30 refreshes
+                results["overlay"] = await MeasureOverlayAsync();
             }
             catch(Exception exception)
             {
@@ -154,6 +160,7 @@ namespace SMT
             List<double> settledMs = new List<double>();
             long fullBefore = PerfMetrics.RegionFullRedraws;
             long partialBefore = PerfMetrics.RegionPartialRedraws;
+            double fullMsBefore = PerfMetrics.RegionFullRedrawMs;
 
             for(int pass = 0; pass < passes; pass++)
             {
@@ -178,7 +185,83 @@ namespace SMT
                 ["settledMedianMs"] = Median(settledMs),
                 ["fullRedrawsPerAction"] = Math.Round((PerfMetrics.RegionFullRedraws - fullBefore) / count, 2),
                 ["partialRedrawsPerAction"] = Math.Round((PerfMetrics.RegionPartialRedraws - partialBefore) / count, 2),
+                // time inside ReDrawMap(true) itself, without the layout pass and rendering that follow
+                ["fullRedrawOwnMsPerAction"] = Math.Round((PerfMetrics.RegionFullRedrawMs - fullMsBefore) / count, 2),
             };
+        }
+
+        /// <summary>
+        /// Opens an overlay for a test character in 1DQ1-A and refreshes it 30 times. Reports the refresh time, how
+        /// many ToolTipOpening handlers one system shape carries afterwards, and what opening its tooltip costs.
+        /// The test character isn't ESI-linked, so it is never saved; the overlay's placement isn't stored.
+        /// </summary>
+        private async Task<Dictionary<string, object>> MeasureOverlayAsync()
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            EVEData.LocalCharacter pilot = new EVEData.LocalCharacter("SMT perftest pilot", string.Empty, "1DQ1-A");
+            EVEData.LocalCharacter previousCharacter = ActiveCharacter;
+            Overlay.SuppressPlacementSaving = true;
+            EVEManager.AddCharacter(pilot);
+            ActiveCharacter = pilot;
+            Overlay overlay = new Overlay(this);
+            try
+            {
+                overlay.Show();
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                await WaitForIdleAsync();
+
+                MethodInfo refresh = typeof(Overlay).GetMethod("RefreshCurrentView", BindingFlags.Instance | BindingFlags.NonPublic);
+                List<double> refreshMs = new List<double>();
+                for(int i = 0; i < 30; i++)
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    refresh.Invoke(overlay, null);
+                    overlay.UpdateLayout();
+                    refreshMs.Add(sw.Elapsed.TotalMilliseconds);
+                    await WaitForIdleAsync();
+                }
+
+                result["refreshes"] = refreshMs.Count;
+                result["refreshFirst5MedianMs"] = Median(refreshMs.Take(5).ToList());
+                result["refreshLast5MedianMs"] = Median(refreshMs.Skip(25).ToList());
+
+                // the test character's own system shape
+                IDictionary systemData = (IDictionary)typeof(Overlay).GetField("systemData", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(overlay);
+                object pilotSystem = systemData.Contains("1DQ1-A") ? systemData["1DQ1-A"] : null;
+                Shape shape = pilotSystem?.GetType().GetField("systemCanvasElement").GetValue(pilotSystem) as Shape;
+                result["systemsOnOverlay"] = systemData.Count;
+                if(shape != null)
+                {
+                    object store = typeof(UIElement).GetProperty("EventHandlersStore", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(shape);
+                    MethodInfo getHandlers = store?.GetType().GetMethod("GetRoutedEventHandlers", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    Array handlers = getHandlers?.Invoke(store, new object[] { ToolTipService.ToolTipOpeningEvent }) as Array;
+                    result["tooltipOpeningHandlersOnOneSystem"] = handlers?.Length ?? 0;
+
+                    // what opening that system's tooltip costs now (each handler runs)
+                    ConstructorInfo openingArgs = typeof(ToolTipEventArgs).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
+                    if(openingArgs != null)
+                    {
+                        Stopwatch sw = Stopwatch.StartNew();
+                        for(int i = 0; i < 10; i++)
+                        {
+                            ToolTipEventArgs args = (ToolTipEventArgs)openingArgs.Invoke(new object[] { true });
+                            args.RoutedEvent = ToolTipService.ToolTipOpeningEvent;
+                            args.Source = shape;
+                            shape.RaiseEvent(args);
+                        }
+
+                        result["tooltipOpenMs"] = Math.Round(sw.Elapsed.TotalMilliseconds / 10, 3);
+                    }
+                }
+            }
+            finally
+            {
+                overlay.Close();
+                ActiveCharacter = previousCharacter;
+                EVEManager.RemoveCharacter(pilot);
+            }
+
+            return result;
         }
 
         private static async Task<Dictionary<string, object>> MeasureIdleAsync(TimeSpan duration)

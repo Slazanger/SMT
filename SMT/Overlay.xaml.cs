@@ -644,8 +644,18 @@ namespace SMT
             }
         }
 
+        /// <summary>
+        /// Set by a --perftest run, which opens an overlay for a test character: don't store its placement.
+        /// </summary>
+        internal static bool SuppressPlacementSaving { get; set; }
+
         private void CleanupAndUpdateOverlayWindowPosition(string characterName)
         {
+            if(SuppressPlacementSaving)
+            {
+                return;
+            }
+
             string currentPlacementString = Properties.Settings.Default.OverlayWindow_placement;
             string[] currentCharacterPlacements = currentPlacementString.Split("|CHAR|");
             List<string> validCharacterPlacements = new List<string>();
