@@ -84,6 +84,7 @@ namespace SMT
                 RegionUC.SelectRegion("Delve");
                 await WaitForIdleAsync();
                 results["regionCanvasChildren"] = RegionUC.MainCanvas.Children.Count;
+                results["regionCanvasVisuals"] = CountVisuals(RegionUC.MainCanvas);
                 results["fullRedraw"] = await MeasureAsync(Enumerable.Range(0, 10).ToList(), 1, _ => RegionUC.ReDrawMap(true));
                 results["partialRedraw"] = await MeasureAsync(Enumerable.Range(0, 20).ToList(), 1, _ => RegionUC.ReDrawMap(false));
                 results["regionCanvasChildrenAfterPartialRedraws"] = RegionUC.MainCanvas.Children.Count;
@@ -490,6 +491,21 @@ namespace SMT
                 ["partialRedraws"] = PerfMetrics.RegionPartialRedraws - partialRedraws,
                 ["partialRedrawMsPerSecond"] = Math.Round((PerfMetrics.RegionPartialRedrawMs - partialRedrawMs) / seconds, 2),
             };
+        }
+
+        /// <summary>
+        /// Every visual below root: the elements layout and rendering have to visit, templates included.
+        /// </summary>
+        private static int CountVisuals(DependencyObject root)
+        {
+            int count = 0;
+            int children = System.Windows.Media.VisualTreeHelper.GetChildrenCount(root);
+            for(int i = 0; i < children; i++)
+            {
+                count += 1 + CountVisuals(System.Windows.Media.VisualTreeHelper.GetChild(root, i));
+            }
+
+            return count;
         }
 
         private static double Median(List<double> values)
