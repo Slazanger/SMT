@@ -48,7 +48,7 @@ namespace SMT
         {
             ContentRendered -= MainWindow_ContentRendered;
             PerfMetrics.MarkStartup("first frame");
-            AppLog.Info("Startup", PerfMetrics.StartupSummary());
+            AppLog.Metrics("Startup", PerfMetrics.StartupSummary());
 
             if(IsPerfTestRun)
             {

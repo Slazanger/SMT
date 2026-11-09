@@ -52,7 +52,7 @@ namespace SMT.EVEData
         private readonly CancellationTokenSource backgroundCancellation = new CancellationTokenSource();
         private CancellationTokenSource watcherCancellation = new CancellationTokenSource();
         private Task backgroundUpdateTask = Task.CompletedTask;
-        private Task logFileCacheTask = Task.CompletedTask;
+        private Task logMonitorTask = Task.CompletedTask;
         private readonly HttpClient httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
         private int shutdownRequested;
         private int shutdownCleanupScheduled;
@@ -71,19 +71,9 @@ namespace SMT.EVEData
         private readonly ObservableCollection<LocalCharacter> _localCharacters = new ObservableCollection<LocalCharacter>();
 
         /// <summary>
-        /// Read position map for the intel files
+        /// How long EVE log lines took to reach SMT, reported to the log every few minutes
         /// </summary>
-        private Dictionary<string, int> intelFileReadPos;
-
-        /// <summary>
-        /// Read position map for the intel files
-        /// </summary>
-        private Dictionary<string, int> gameFileReadPos;
-
-        /// <summary>
-        /// Read position map for the intel files
-        /// </summary>
-        private Dictionary<string, string> gamelogFileCharacterMap;
+        private readonly LogReadDelays logReadDelays = new LogReadDelays();
 
         /// <summary>
         /// Lock for ESI rate-limit bucket updates and reads.
@@ -94,16 +84,6 @@ namespace SMT.EVEData
         /// Per-group ESI token bucket state (e.g. ErrorLimit). Updated from response headers.
         /// </summary>
         private Dictionary<string, EsiRateLimitBucketState> _esiRateLimitBuckets = new Dictionary<string, EsiRateLimitBucketState>();
-
-        /// <summary>
-        /// File system watcher
-        /// </summary>
-        private FileSystemWatcher intelFileWatcher;
-
-        /// <summary>
-        /// File system watcher
-        /// </summary>
-        private FileSystemWatcher gameLogFileWatcher;
 
         private string VersionStr;
 
@@ -2488,13 +2468,12 @@ namespace SMT.EVEData
         }
 
         /// <summary>
-        /// Setup the intel watcher;  Loads the intel channel filter list and creates the file system watchers
+        /// Setup the intel watcher;  Loads the intel channel filter list (the chat logs are followed by the log monitor, see SetupLogFileTriggers)
         /// </summary>
         public void SetupIntelWatcher(bool resetState = true)
         {
             lock(intelLogLock)
             {
-                DisposeIntelFileWatcher();
                 if(resetState)
                 {
                     IntelDataList = new FixedQueue<IntelData>();
@@ -2591,162 +2570,121 @@ namespace SMT.EVEData
 
                 }
 
-                intelFileReadPos = new Dictionary<string, int>();
-
-            if(string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
-            {
-                string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
-                EVELogFolder = Path.Combine(logFolderLoc);
-            }
-
-            string chatlogFolder = Path.Combine(EVELogFolder, "Chatlogs");
-
-                if(Directory.Exists(chatlogFolder))
-                {
-                    intelFileWatcher = new FileSystemWatcher(chatlogFolder)
-                    {
-                        Filter = "*.txt",
-                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
-                        InternalBufferSize = 32 * 1024,
-                    };
-                    intelFileWatcher.Changed += IntelFileWatcher_Changed;
-                    intelFileWatcher.Error += LogFileWatcher_Error;
-                    intelFileWatcher.EnableRaisingEvents = true;
-                }
+                EnsureEveLogFolder();
             }
         }
 
         /// <summary>
-        /// Setup the game log0 watcher
+        /// Setup the game log state (the game logs are followed by the log monitor, see SetupLogFileTriggers)
         /// </summary>
         public void SetupGameLogWatcher(bool resetState = true)
         {
             lock(gameLogLock)
             {
-                DisposeGameLogFileWatcher();
-                gameFileReadPos = new Dictionary<string, int>();
-                gamelogFileCharacterMap = new Dictionary<string, string>();
-
                 if(resetState)
                 {
                     GameLogList = new FixedQueue<GameLogData>();
                     GameLogList.SetSizeLimit(50);
                 }
 
+                EnsureEveLogFolder();
+            }
+        }
+
+        private void EnsureEveLogFolder()
+        {
             if(string.IsNullOrEmpty(EVELogFolder) || !Directory.Exists(EVELogFolder))
             {
                 string[] logFolderLoc = { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EVE", "Logs" };
                 EVELogFolder = Path.Combine(logFolderLoc);
             }
-
-            string gameLogFolder = Path.Combine(EVELogFolder, "Gamelogs");
-
-                if(Directory.Exists(gameLogFolder))
-                {
-                    gameLogFileWatcher = new FileSystemWatcher(gameLogFolder)
-                    {
-                        Filter = "*.txt",
-                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
-                        InternalBufferSize = 32 * 1024,
-                    };
-                    gameLogFileWatcher.Changed += GameLogFileWatcher_Changed;
-                    gameLogFileWatcher.Error += LogFileWatcher_Error;
-                    gameLogFileWatcher.EnableRaisingEvents = true;
-                }
-            }
         }
 
+        /// <summary>
+        /// Start following the EVE chat and game logs on a background task (stopping any earlier one first)
+        /// </summary>
         public void SetupLogFileTriggers()
         {
-            // -----------------------------------------------------------------
-            // SUPER HACK WARNING....
-            //
-            // Start up a thread which just reads the text files in the eve log folder
-            // by opening and closing them it updates the sytem meta files which
-            // causes the file watcher to operate correctly otherwise this data
-            // doesnt get updated until something other than the eve client reads these files
-
-            List<string> logFolders = new List<string>();
             string chatLogFolder = Path.Combine(EVELogFolder, "Chatlogs");
             string gameLogFolder = Path.Combine(EVELogFolder, "Gamelogs");
 
-            logFolders.Add(chatLogFolder);
-            logFolders.Add(gameLogFolder);
-
-            Task previousCacheTask = logFileCacheTask;
+            Task previousMonitorTask = logMonitorTask;
             CancellationToken cancellationToken = watcherCancellation.Token;
-            logFileCacheTask = Task.Run(async () =>
+            logMonitorTask = Task.Run(async () =>
             {
                 try
                 {
-                    await previousCacheTask.ConfigureAwait(false);
+                    await previousMonitorTask.ConfigureAwait(false);
                 }
                 catch(OperationCanceledException)
                 {
                 }
 
-                await LogFileCacheTriggerAsync(logFolders, cancellationToken).ConfigureAwait(false);
+                await LogMonitorLoopAsync(chatLogFolder, gameLogFolder, cancellationToken).ConfigureAwait(false);
             });
-
-            // END SUPERHACK
-            // -----------------------------------------------------------------
         }
 
-        private async Task LogFileCacheTriggerAsync(List<string> eveLogFolders, CancellationToken cancellationToken)
-        {
-            foreach(string dir in eveLogFolders)
-            {
-                if(!Directory.Exists(dir))
-                {
-                    return;
-                }
-            }
+        /// <summary>
+        /// How often the followed log files are checked for new lines
+        /// </summary>
+        private static readonly TimeSpan LogPollInterval = TimeSpan.FromMilliseconds(250);
 
-            // loop forever
+        /// <summary>
+        /// Follows the Local and intel chat logs and the game logs. EVE keeps its logs open, and NTFS updates the
+        /// directory entry of such a file only when someone opens it, so a FileSystemWatcher stays silent and a
+        /// directory listing shows a stale size. The monitor checks each followed file's real size four times a
+        /// second and reads only what was appended (see LogFolderMonitor).
+        /// </summary>
+        private async Task LogMonitorLoopAsync(string chatLogFolder, string gameLogFolder, CancellationToken cancellationToken)
+        {
+            using LogFolderMonitor chatLogs = new LogFolderMonitor(chatLogFolder, IsFollowedChatLog);
+            using LogFolderMonitor gameLogs = new LogFolderMonitor(gameLogFolder, _ => true);
+
             try
             {
                 while(!cancellationToken.IsCancellationRequested)
                 {
-                    DateTime recentThreshold = DateTime.UtcNow.AddMinutes(-10);
-                    foreach(string folder in eveLogFolders)
+                    DateTime nowUtc = DateTime.UtcNow;
+                    bool intelAdded = false;
+                    bool gameLogAdded = false;
+
+                    try
                     {
-                        DirectoryInfo di = new DirectoryInfo(folder);
-                        IEnumerable<FileInfo> files = di.EnumerateFiles("*.txt")
-                            .Where(file => file.LastWriteTimeUtc >= recentThreshold);
-
-                        foreach(FileInfo file in files)
+                        chatLogs.Poll(nowUtc, (tail, lines) =>
                         {
-                            bool readFile = false;
-                            foreach(string intelFilterStr in IntelFilters)
+                            lock(intelLogLock)
                             {
-                                if(file.Name.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    readFile = true;
-                                    break;
-                                }
+                                intelAdded |= ProcessChatLogLines(tail, lines, nowUtc);
                             }
+                        });
 
-                            // local files
-                            if(file.Name.Contains("Local_", StringComparison.OrdinalIgnoreCase))
+                        gameLogs.Poll(nowUtc, (tail, lines) =>
+                        {
+                            lock(gameLogLock)
                             {
-                                readFile = true;
+                                gameLogAdded |= ProcessGameLogLines(tail, lines, nowUtc);
                             }
-
-                            // gamelogs
-                            if(folder.Contains("Gamelogs", StringComparison.OrdinalIgnoreCase))
-                            {
-                                readFile = true;
-                            }
-
-                            if(readFile)
-                            {
-                                using FileStream ifs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                                ifs.Seek(0, SeekOrigin.End);
-                            }
-                        }
+                        });
+                    }
+                    catch(Exception exception) when(exception is not OperationCanceledException)
+                    {
+                        AppLog.Error("EVE log monitor", exception);
                     }
 
-                    await Task.Delay(TimeSpan.FromMilliseconds(1500), cancellationToken).ConfigureAwait(false);
+                    // once per poll and outside the locks: the UI handlers wait for the UI thread
+                    if(intelAdded)
+                    {
+                        IntelUpdatedEvent?.Invoke(IntelDataList);
+                    }
+
+                    if(gameLogAdded)
+                    {
+                        GameLogAddedEvent?.Invoke(GameLogList);
+                    }
+
+                    logReadDelays.ReportIfDue(nowUtc);
+
+                    await Task.Delay(LogPollInterval, cancellationToken).ConfigureAwait(false);
                 }
             }
             catch(OperationCanceledException) when(cancellationToken.IsCancellationRequested)
@@ -2754,8 +2692,37 @@ namespace SMT.EVEData
             }
             catch(Exception exception)
             {
-                AppLog.Error("EVE log cache watcher", exception);
+                AppLog.Error("EVE log monitor", exception);
             }
+            finally
+            {
+                logReadDelays.Report();
+            }
+        }
+
+        /// <summary>
+        /// Local chat and the intel channels; filters are checked by file name.
+        /// </summary>
+        private bool IsFollowedChatLog(string fileName)
+        {
+            if(fileName.Contains("Local_", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            List<string> filters = IntelFilters;
+            if(filters != null)
+            {
+                foreach(string intelFilterStr in filters)
+                {
+                    if(fileName.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public bool ReloadLogWatchers(string logFolder)
@@ -2775,7 +2742,7 @@ namespace SMT.EVEData
             CancellationTokenSource previousCancellation = watcherCancellation;
             StopLogWatchers();
             watcherCancellation = new CancellationTokenSource();
-            _ = logFileCacheTask.ContinueWith(
+            _ = logMonitorTask.ContinueWith(
                 _ => previousCancellation.Dispose(),
                 CancellationToken.None,
                 TaskContinuationOptions.ExecuteSynchronously,
@@ -2792,41 +2759,6 @@ namespace SMT.EVEData
         private void StopLogWatchers()
         {
             watcherCancellation.Cancel();
-            DisposeIntelFileWatcher();
-            DisposeGameLogFileWatcher();
-        }
-
-        private void DisposeIntelFileWatcher()
-        {
-            if(intelFileWatcher == null)
-            {
-                return;
-            }
-
-            intelFileWatcher.EnableRaisingEvents = false;
-            intelFileWatcher.Changed -= IntelFileWatcher_Changed;
-            intelFileWatcher.Error -= LogFileWatcher_Error;
-            intelFileWatcher.Dispose();
-            intelFileWatcher = null;
-        }
-
-        private void DisposeGameLogFileWatcher()
-        {
-            if(gameLogFileWatcher == null)
-            {
-                return;
-            }
-
-            gameLogFileWatcher.EnableRaisingEvents = false;
-            gameLogFileWatcher.Changed -= GameLogFileWatcher_Changed;
-            gameLogFileWatcher.Error -= LogFileWatcher_Error;
-            gameLogFileWatcher.Dispose();
-            gameLogFileWatcher = null;
-        }
-
-        private void LogFileWatcher_Error(object sender, ErrorEventArgs e)
-        {
-            AppLog.Error("EVE log watcher", e.GetException());
         }
 
         public void BeginShutdown()
@@ -2849,7 +2781,7 @@ namespace SMT.EVEData
                 return;
             }
 
-            _ = Task.WhenAll(backgroundUpdateTask, logFileCacheTask, ZKillFeed?.Completion ?? Task.CompletedTask)
+            _ = Task.WhenAll(backgroundUpdateTask, logMonitorTask, ZKillFeed?.Completion ?? Task.CompletedTask)
                 .ContinueWith(_ =>
                 {
                     ZKillFeed?.Dispose();
@@ -3435,427 +3367,285 @@ namespace SMT.EVEData
             ZKillFeed.Initialise();
         }
 
-        /// <summary>
-        /// Intel File watcher changed handler
-        /// </summary>
-        private void IntelFileWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            lock(intelLogLock)
-            {
-                ProcessIntelFileChange(e);
-            }
-        }
-
-        private void ProcessIntelFileChange(FileSystemEventArgs e)
-        {
-            string changedFile = e.FullPath;
-
-            string[] channelParts = e.Name.Split("_");
-            string channelName = string.Join("_", channelParts, 0, channelParts.Length - 3);
-
-            bool processFile = false;
-            bool localChat = false;
-
-            // check if the changed file path contains the name of a channel we're looking for
-            foreach(string intelFilterStr in IntelFilters)
-            {
-                if(changedFile.Contains(intelFilterStr, StringComparison.OrdinalIgnoreCase))
-                {
-                    processFile = true;
-                    break;
-                }
-            }
-
-            if(changedFile.Contains("Local_"))
-            {
-                localChat = true;
-                processFile = true;
-            }
-
-            if(processFile)
-            {
-                try
-                {
-                    Encoding fe = Misc.GetEncoding(changedFile);
-                    using FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-                    using StreamReader file = new StreamReader(ifs, fe);
-
-                    int fileReadFrom = 0;
-
-                    // have we seen this file before
-                    if(intelFileReadPos.ContainsKey(changedFile))
-                    {
-                        fileReadFrom = intelFileReadPos[changedFile];
-                    }
-                    else
-                    {
-                        if(localChat)
-                        {
-                            string system = string.Empty;
-                            string characterName = string.Empty;
-
-                            // read the iniital block
-                            while(!file.EndOfStream)
-                            {
-                                string l = file.ReadLine();
-                                fileReadFrom++;
-
-                                // explicitly skip just "local"
-                                if(l.Contains("Channel Name:    Local"))
-                                {
-                                    // now can read the next line
-                                    l = file.ReadLine(); // should be the "Listener : <CharName>"
-                                    fileReadFrom++;
-
-                                    characterName = l.Split(':')[1].Trim();
-
-                                    bool addChar = true;
-                                    foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
-                                    {
-                                        if(characterName == c.Name)
-                                        {
-                                            c.Location = system;
-                                            c.LocalChatFile = changedFile;
-
-                                            System s = GetEveSystem(system);
-                                            if(s != null)
-                                            {
-                                                c.Region = s.Region;
-                                            }
-                                            else
-                                            {
-                                                c.Region = "";
-                                            }
-
-                                            addChar = false;
-                                        }
-                                    }
-
-                                    if(addChar)
-                                    {
-                                        AddCharacter(new EVEData.LocalCharacter(characterName, changedFile, system));
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-
-                        while(file.ReadLine() != null)
-                        {
-                            fileReadFrom++;
-                        }
-
-                        fileReadFrom--;
-                        file.BaseStream.Seek(0, SeekOrigin.Begin);
-                    }
-
-                    for(int i = 0; i < fileReadFrom; i++)
-                    {
-                        file.ReadLine();
-                    }
-
-                    string line = file.ReadLine();
-
-                    while(line != null)
-                    {                    // trim any items off the front
-                        if(line.Contains('[') && line.Contains(']'))
-                        {
-                            line = line.Substring(line.IndexOf("["));
-                        }
-
-                        if(line == "")
-                        {
-                            line = file.ReadLine();
-                            continue;
-                        }
-
-                        fileReadFrom++;
-
-                        if(localChat)
-                        {
-                            if(line.StartsWith("[") && line.Contains("EVE System > Channel changed to Local"))
-                            {
-                                string system = line.Split(':').Last().Trim();
-
-                                foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
-                                {
-                                    if(c.LocalChatFile == changedFile)
-                                    {
-                                        c.Location = system;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // check if it is in the intel list already (ie if you have multiple clients running)
-                            bool addToIntel = true;
-
-                            int start = line.IndexOf('>') + 1;
-                            string newIntelString = line.Substring(start);
-
-                            if(newIntelString != null)
-                            {
-                                foreach(EVEData.IntelData idl in IntelDataList)
-                                {
-                                    if(idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).TotalSeconds < 5)
-                                    {
-                                        addToIntel = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                addToIntel = false;
-                            }
-
-                            if(line.Contains("Channel MOTD:"))
-                            {
-                                addToIntel = false;
-                            }
-
-                            foreach(String ignoreMarker in IntelIgnoreFilters)
-                            {
-                                if(line.IndexOf(ignoreMarker, StringComparison.OrdinalIgnoreCase) != -1)
-                                {
-                                    addToIntel = false;
-                                    break;
-                                }
-                            }
-
-                            if(addToIntel)
-                            {
-                                EVEData.IntelData id = new EVEData.IntelData(line, channelName);
-
-                                foreach(string word in id.IntelString.Split(' '))
-                                {
-                                    // "T-Q2DD*" from a localised client should match the same as "T-Q2DD"
-                                    string s = IntelData.CleanIntelWord(word);
-
-                                    if(s == "" || s.Length < 3)
-                                    {
-                                        continue;
-                                    }
-
-                                    foreach(String clearMarker in IntelClearFilters)
-                                    {
-                                        if(clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            id.ClearNotification = true;
-                                        }
-                                    }
-
-                                    foreach(System sys in Systems)
-                                    {
-                                        if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                                        {
-                                            id.Systems.Add(sys.Name);
-                                        }
-                                    }
-                                }
-
-                                IntelDataList.Enqueue(id);
-
-                                if(IntelUpdatedEvent != null)
-                                {
-                                    IntelUpdatedEvent(IntelDataList);
-                                }
-                            }
-                        }
-
-                        line = file.ReadLine();
-                    }
-
-                    intelFileReadPos[changedFile] = fileReadFrom;
-                }
-                catch(IOException)
-                {
-                }
-                catch(Exception exception)
-                {
-                    AppLog.Error("Parse intel log", exception);
-                }
-            }
-            else
-            {
-            }
-        }
+        private static readonly Regex GameLogMarkup = new Regex("<.*?>", RegexOptions.Compiled);
 
         /// <summary>
-        /// GameLog File watcher changed handler
+        /// Handles the new lines of a Local or intel channel log. Returns whether intel was added.
         /// </summary>
-        private void GameLogFileWatcher_Changed(object sender, FileSystemEventArgs e)
+        private bool ProcessChatLogLines(LogFileTail tail, List<string> lines, DateTime nowUtc)
         {
-            lock(gameLogLock)
+            if(!IsFollowedChatLog(tail.FileName))
             {
-                ProcessGameLogFileChange(e);
+                // the channel was taken off the intel list
+                return false;
             }
-        }
 
-        private void ProcessGameLogFileChange(FileSystemEventArgs e)
-        {
-            string changedFile = e.FullPath;
-            string characterName = string.Empty;
+            bool localChat = tail.FileName.Contains("Local_", StringComparison.Ordinal);
+            string[] channelParts = tail.FileName.Split("_");
+            string channelName = channelParts.Length > 3 ? string.Join("_", channelParts, 0, channelParts.Length - 3) : Path.GetFileNameWithoutExtension(tail.FileName);
 
-            try
+            if(localChat && !tail.Activated)
             {
-                Encoding fe = EVEDataUtils.Misc.GetEncoding(changedFile);
-                using FileStream ifs = new FileStream(changedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                ActivateLocalChatLog(tail);
+            }
 
-                using StreamReader file = new StreamReader(ifs, fe);
+            tail.Activated = true;
 
-                int fileReadFrom = 0;
+            bool intelAdded = false;
+            foreach(string rawLine in lines)
+            {
+                string line = rawLine;
 
-                // have we seen this file before
-                if(gameFileReadPos.ContainsKey(changedFile))
+                // trim any items off the front
+                if(line.Contains('[') && line.Contains(']'))
                 {
-                    fileReadFrom = gameFileReadPos[changedFile];
+                    line = line.Substring(line.IndexOf("["));
+                }
+
+                if(line == "")
+                {
+                    continue;
+                }
+
+                if(localChat)
+                {
+                    if(line.StartsWith("[") && line.Contains("EVE System > Channel changed to Local"))
+                    {
+                        string system = line.Split(':').Last().Trim();
+
+                        foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
+                        {
+                            if(c.LocalChatFile == tail.FilePath)
+                            {
+                                c.Location = system;
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    // read the iniital block
-                    while(!file.EndOfStream)
+                    logReadDelays.Add(true, line, nowUtc);
+
+                    // check if it is in the intel list already (ie if you have multiple clients running)
+                    bool addToIntel = true;
+
+                    int start = line.IndexOf('>') + 1;
+                    string newIntelString = line.Substring(start);
+
+                    foreach(EVEData.IntelData idl in IntelDataList)
                     {
-                        string l = file.ReadLine();
-                        fileReadFrom++;
-
-                        // explicitly skip just "local"
-                        if(l.Contains("Gamelog"))
+                        if(idl.IntelString == newIntelString && (DateTime.Now - idl.IntelTime).TotalSeconds < 5)
                         {
-                            // now can read the next line
-                            l = file.ReadLine(); // should be the "Listener : <CharName>"
-
-                            // something wrong with the log file; clear
-                            if(!l.Contains("Listener"))
-                            {
-                                if(gameFileReadPos.ContainsKey(changedFile))
-                                {
-                                    gameFileReadPos.Remove(changedFile);
-                                }
-
-                                return;
-                            }
-
-                            fileReadFrom++;
-
-                            gamelogFileCharacterMap[changedFile] = l.Split(':')[1].Trim();
-
-                            // session started
-                            l = file.ReadLine();
-                            fileReadFrom++;
-
-                            // header end
-                            l = file.ReadLine();
-                            fileReadFrom++;
-
-                            // as its new; skip the entire file -1
+                            addToIntel = false;
                             break;
                         }
                     }
 
-                    while(!file.EndOfStream)
+                    if(line.Contains("Channel MOTD:"))
                     {
-                        string l = file.ReadLine();
-                        fileReadFrom++;
+                        addToIntel = false;
                     }
 
-                    // back one line
-                    fileReadFrom--;
-
-                    file.BaseStream.Seek(0, SeekOrigin.Begin);
-                }
-
-                characterName = gamelogFileCharacterMap[changedFile];
-
-                for(int i = 0; i < fileReadFrom; i++)
-                {
-                    file.ReadLine();
-                }
-
-                string line = file.ReadLine();
-
-                while(line != null)
-                {                    // trim any items off the front
-                    if(line == "" || !line.StartsWith("["))
+                    foreach(string ignoreMarker in IntelIgnoreFilters)
                     {
-                        line = file.ReadLine();
-                        fileReadFrom++;
-                        continue;
-                    }
-
-                    fileReadFrom++;
-
-                    int typeStartPos = line.IndexOf("(") + 1;
-                    int typeEndPos = line.IndexOf(")");
-
-                    // file corrupt
-                    if(typeStartPos < 1 || typeEndPos < 1)
-                    {
-                        continue;
-                    }
-
-                    string type = line.Substring(typeStartPos, typeEndPos - typeStartPos);
-
-                    line = line.Substring(typeEndPos + 1);
-
-                    // strip the formatting from the log
-                    line = Regex.Replace(line, "<.*?>", String.Empty);
-
-                    GameLogData gd = new GameLogData()
-                    {
-                        Character = characterName,
-                        Text = line,
-                        Severity = type,
-                        Time = DateTime.Now,
-                    };
-
-                    GameLogList.Enqueue(gd);
-                    if(GameLogAddedEvent != null)
-                    {
-                        GameLogAddedEvent(GameLogList);
-                    }
-
-                    foreach(LocalCharacter lc in GetLocalCharactersCopy())
-                    {
-                        if(lc.Name == characterName)
+                        if(line.IndexOf(ignoreMarker, StringComparison.OrdinalIgnoreCase) != -1)
                         {
-                            if(type == "combat")
-                            {
-                                if(CombatEvent != null)
-                                {
-                                    lc.GameLogWarningText = line;
-                                    CombatEvent(characterName, line);
-                                }
-                            }
-
-                            if(
-                                line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") ||
-                                line.Contains("Your cloak deactivates due to proximity to") ||
-                                line.Contains("Your cloak deactivates due to a pulse from a Dazh Liminality Locus")
-                                )
-                            {
-                                if(ShipDecloakedEvent != null)
-                                {
-                                    ShipDecloakedEvent(characterName, line);
-                                    lc.GameLogWarningText = line;
-                                }
-                            }
+                            addToIntel = false;
+                            break;
                         }
                     }
 
-                    line = file.ReadLine();
-                    gameFileReadPos[changedFile] = fileReadFrom;
+                    if(addToIntel)
+                    {
+                        EVEData.IntelData id = new EVEData.IntelData(line, channelName);
+
+                        foreach(string word in id.IntelString.Split(' '))
+                        {
+                            // "T-Q2DD*" from a localised client should match the same as "T-Q2DD"
+                            string s = IntelData.CleanIntelWord(word);
+
+                            if(s == "" || s.Length < 3)
+                            {
+                                continue;
+                            }
+
+                            foreach(string clearMarker in IntelClearFilters)
+                            {
+                                if(clearMarker.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0)
+                                {
+                                    id.ClearNotification = true;
+                                }
+                            }
+
+                            foreach(System sys in Systems)
+                            {
+                                if(sys.Name.IndexOf(s, StringComparison.OrdinalIgnoreCase) == 0 || s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                                {
+                                    id.Systems.Add(sys.Name);
+                                }
+                            }
+                        }
+
+                        IntelDataList.Enqueue(id);
+                        intelAdded = true;
+                    }
+                }
+            }
+
+            return intelAdded;
+        }
+
+        /// <summary>
+        /// The first lines from a Local chat log: whose log it is (from the header) and where that character is,
+        /// from the newest "Channel changed to Local" line written before SMT started following the file.
+        /// </summary>
+        private void ActivateLocalChatLog(LogFileTail tail)
+        {
+            string characterName = tail.Listener;
+            long headerEnd = 0;
+            if(string.IsNullOrEmpty(characterName) && LogFileTail.TryReadHeader(tail.FilePath, out string listener, out headerEnd))
+            {
+                characterName = listener;
+            }
+
+            if(string.IsNullOrEmpty(characterName))
+            {
+                return;
+            }
+
+            tail.Listener = characterName;
+
+            string system = string.Empty;
+            if(headerEnd > 0)
+            {
+                foreach(string line in LogFileTail.ReadLines(tail.FilePath, headerEnd, tail.StartOffset))
+                {
+                    if(line.Contains("EVE System > Channel changed to Local"))
+                    {
+                        system = line.Split(':').Last().Trim();
+                    }
+                }
+            }
+
+            bool addChar = true;
+            foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
+            {
+                if(characterName == c.Name)
+                {
+                    c.Location = system;
+                    c.LocalChatFile = tail.FilePath;
+
+                    System s = GetEveSystem(system);
+                    if(s != null)
+                    {
+                        c.Region = s.Region;
+                    }
+                    else
+                    {
+                        c.Region = "";
+                    }
+
+                    addChar = false;
+                }
+            }
+
+            if(addChar)
+            {
+                AddCharacter(new EVEData.LocalCharacter(characterName, tail.FilePath, system));
+            }
+        }
+
+        /// <summary>
+        /// Handles the new lines of a game log. Returns whether any were added to the game log list.
+        /// </summary>
+        private bool ProcessGameLogLines(LogFileTail tail, List<string> lines, DateTime nowUtc)
+        {
+            if(!tail.Activated)
+            {
+                tail.Activated = true;
+                if(string.IsNullOrEmpty(tail.Listener) && LogFileTail.TryReadHeader(tail.FilePath, out string listener, out _))
+                {
+                    tail.Listener = listener;
+                }
+            }
+
+            // something wrong with the log file: no listener in its header
+            string characterName = tail.Listener;
+            if(string.IsNullOrEmpty(characterName))
+            {
+                return false;
+            }
+
+            List<LocalCharacter> characters = GetLocalCharactersCopy();
+            bool added = false;
+            foreach(string rawLine in lines)
+            {
+                string line = rawLine;
+
+                if(line == "" || !line.StartsWith("["))
+                {
+                    continue;
                 }
 
-                gameFileReadPos[changedFile] = fileReadFrom;
+                int typeStartPos = line.IndexOf("(") + 1;
+                int typeEndPos = line.IndexOf(")");
+
+                // file corrupt
+                if(typeStartPos < 1 || typeEndPos < typeStartPos)
+                {
+                    continue;
+                }
+
+                logReadDelays.Add(false, line, nowUtc);
+
+                string type = line.Substring(typeStartPos, typeEndPos - typeStartPos);
+
+                line = line.Substring(typeEndPos + 1);
+
+                // strip the formatting from the log
+                line = GameLogMarkup.Replace(line, string.Empty);
+
+                GameLogData gd = new GameLogData()
+                {
+                    Character = characterName,
+                    Text = line,
+                    Severity = type,
+                    Time = DateTime.Now,
+                };
+
+                GameLogList.Enqueue(gd);
+                added = true;
+
+                foreach(LocalCharacter lc in characters)
+                {
+                    if(lc.Name == characterName)
+                    {
+                        if(type == "combat")
+                        {
+                            if(CombatEvent != null)
+                            {
+                                lc.GameLogWarningText = line;
+                                CombatEvent(characterName, line);
+                            }
+                        }
+
+                        if(
+                            line.Contains("cloak deactivates due to a pulse from a Mobile Observatory") ||
+                            line.Contains("Your cloak deactivates due to proximity to") ||
+                            line.Contains("Your cloak deactivates due to a pulse from a Dazh Liminality Locus")
+                            )
+                        {
+                            if(ShipDecloakedEvent != null)
+                            {
+                                ShipDecloakedEvent(characterName, line);
+                                lc.GameLogWarningText = line;
+                            }
+                        }
+                    }
+                }
             }
-            catch(Exception exception)
-            {
-                AppLog.Error("Parse game log", exception);
-            }
+
+            return added;
         }
 
         /// <summary>
