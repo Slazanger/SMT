@@ -143,6 +143,10 @@ namespace SMT
         }
         public MainWindow()
         {
+            PerfMetrics.MarkStartup("process start to MainWindow");
+            ReadPerfTestArguments();
+            ContentRendered += MainWindow_ContentRendered;
+
             AppWindow = this;
             DataContext = this;
 
@@ -169,8 +173,10 @@ namespace SMT
 
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
+            PerfMetrics.MarkStartup("audio");
 
             InitializeComponent();
+            PerfMetrics.MarkStartup("InitializeComponent");
 
             Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
 
@@ -204,6 +210,8 @@ namespace SMT
             {
                 this.Topmost = true;
             }
+
+            PerfMetrics.MarkStartup("window layout and settings");
 
             // Create the main EVE manager
 
@@ -246,9 +254,12 @@ namespace SMT
                 EVEManager.LoadFromDisk();
             }
 
+            PerfMetrics.MarkStartup("EVE data");
+
             EVEManager.SetupIntelWatcher();
             EVEManager.SetupGameLogWatcher();
             EVEManager.SetupLogFileTriggers();
+            PerfMetrics.MarkStartup("log watchers");
 
             IntelCache = new ObservableCollection<IntelData>();
             RawIntelBox.ItemsSource = IntelCache;
@@ -281,6 +292,7 @@ namespace SMT
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.InitNavigation();
+            PerfMetrics.MarkStartup("navigation");
 
             // downloads in the background; the storm list and maps update when it arrives (StormsUpdateEvent)
             _ = EVEManager.UpdateMetaliminalStormsAsync();
@@ -364,10 +376,13 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
+            PerfMetrics.MarkStartup("lists, info objects and anoms");
+
             RegionUC.MapConf = MapConf;
             RegionUC.ANOMManager = ANOMManager;
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
+            PerfMetrics.MarkStartup("region map");
 
             RegionUC.RegionChanged += RegionUC_RegionChanged;
             RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
@@ -378,10 +393,12 @@ namespace SMT
             UniverseUC.CapitalRoute = CapitalRoute;
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+            PerfMetrics.MarkStartup("universe map");
 
             RegionsViewUC.MapConf = MapConf;
             RegionsViewUC.Init();
             RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
+            PerfMetrics.MarkStartup("regions view");
 
             AppStatusBar.DataContext = EVEManager.ServerInfo;
             EVEManager.ServerInfo.StatusMessage = "Ready";
@@ -477,9 +494,14 @@ namespace SMT
             nIcon.ContextMenuStrip.Items.Add("Show", null, NIcon_DClick);
             nIcon.ContextMenuStrip.Items.Add("Exit", null, NIcon_Exit);
 
-            _ = CheckGitHubVersionAsync();
+            // a --perftest run must not stop on the new-version dialog
+            if(!IsPerfTestRun)
+            {
+                _ = CheckGitHubVersionAsync();
+            }
 
             RegionUC.SelectRegion(MapConf.DefaultRegion);
+            PerfMetrics.MarkStartup("rest of constructor");
         }
     }
 }

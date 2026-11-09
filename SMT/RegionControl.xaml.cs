@@ -792,6 +792,13 @@ namespace SMT
         /// <param name="FullRedraw">Clear all the static items or not</param>
         public void ReDrawMap(bool FullRedraw = false)
         {
+            long redrawStart = System.Diagnostics.Stopwatch.GetTimestamp();
+            ReDrawMapCore(FullRedraw);
+            PerfMetrics.RecordRegionRedraw(FullRedraw, redrawStart);
+        }
+
+        private void ReDrawMapCore(bool FullRedraw)
+        {
             if(ActiveCharacter != null && FollowCharacter == true)
             {
                 UpdateActiveCharacter();
