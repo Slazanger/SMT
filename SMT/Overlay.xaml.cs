@@ -952,13 +952,13 @@ namespace SMT
             }
         }
 
-        /// <summary>
-        /// Displays the current route in the hunter mode overlay.
-        /// </summary>
         // what the route lines were last drawn for: the view (bumped by every refresh) and the route itself
         private int viewVersion;
         private string drawnRouteKey;
 
+        /// <summary>
+        /// Displays the current route in the hunter mode overlay.
+        /// </summary>
         private void UpdateRouteData()
         {
             UpdateCharacterData();
@@ -1094,10 +1094,6 @@ namespace SMT
             }
         }
 
-        /// <summary>
-        /// Updates the tooltip content of a specific system.
-        /// </summary>
-        /// <param name="systemData"></param>
         private static readonly Dictionary<Color, Brush> securityFillBrushes = new Dictionary<Color, Brush>();
 
         /// <summary>
@@ -1124,6 +1120,10 @@ namespace SMT
             }
         }
 
+        /// <summary>
+        /// Updates the tooltip content of a specific system.
+        /// </summary>
+        /// <param name="systemData"></param>
         public void UpdateSystemTooltip(OverlaySystemData systemData)
         {
             EnsureSystemTooltip(systemData.systemCanvasElement);

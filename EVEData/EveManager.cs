@@ -2220,9 +2220,6 @@ namespace SMT.EVEData
             InitZarzakhConnections();
         }
 
-        /// <summary>
-        /// Load the EVE Manager Data from Disk
-        /// </summary>
         private static string staticDataFolder;
         private static Task<(List<MapRegion> Regions, List<System> Systems, SerializableDictionary<string, string> ShipTypes)> staticDataLoad;
 
@@ -2245,6 +2242,9 @@ namespace SMT.EVEData
                 Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(Path.Combine(folder, "ShipTypes.dat"))));
         }
 
+        /// <summary>
+        /// Load the EVE Manager Data from Disk
+        /// </summary>
         public void LoadFromDisk()
         {
             SystemIDToName = new SerializableDictionary<long, string>();
