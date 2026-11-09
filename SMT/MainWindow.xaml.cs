@@ -414,17 +414,8 @@ namespace SMT
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
             manualZKillFilterRefreshRequired = true;
 
-            // Define your existing filter logic
-            Predicate<object> initialFilter = item => ZKBFeedFilter(item);
-
-            // Apply the both filters
-            zKBFeedview.Filter = item =>
-            {
-                // copy the list before checking
-                var listToFilter = EVEManager.ZKillFeed.KillStream.ToList();
-                var filteredItems = listToFilter.Where(initialFilter.Invoke).Take(30).ToList();
-                return filteredItems.Contains((ZKBDataSimple)item);
-            };
+            // newest kills that pass ZKBFeedFilter (region filter), capped at ZKBFeedMaxKills
+            zKBFeedview.Filter = ZKBFeedViewFilter;
 
             EVEManager.ZKillFeed.KillsAddedEvent += OnZKillsAdded;
 

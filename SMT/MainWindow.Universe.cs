@@ -94,6 +94,8 @@ namespace SMT
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
+                        // the region or the region filter may have changed, not just the kill stream
+                        InvalidateZKBVisibleKills();
                         CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource).Refresh();
                     }), DispatcherPriority.Normal);
                 }
@@ -183,6 +185,7 @@ namespace SMT
                 RegionLayoutDoc.Title = RegionUC.Region.LocalizedName;
             }
 
+            InvalidateZKBVisibleKills();
             manualZKillFilterRefreshRequired = true;
 
             if(SovCampaignList != null && SovCampaignList.ItemsSource != null)
