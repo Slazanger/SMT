@@ -297,7 +297,15 @@ namespace SMT
             return result;
         }
 
-        private static async Task<Dictionary<string, object>> MeasureIdleAsync(TimeSpan duration)
+        private async Task<Dictionary<string, object>> MeasureIdleAsync(TimeSpan duration)
+        {
+            Dictionary<string, object> idle = await MeasureIdleCoreAsync(duration);
+            idle["animatedShapesOnRegionMap"] = RegionUC.MainCanvas.Children.OfType<Shape>()
+                .Count(s => s.HasAnimatedProperties || (s.RenderTransform?.HasAnimatedProperties ?? false));
+            return idle;
+        }
+
+        private static async Task<Dictionary<string, object>> MeasureIdleCoreAsync(TimeSpan duration)
         {
             using Process process = Process.GetCurrentProcess();
             int gen0 = GC.CollectionCount(0);
