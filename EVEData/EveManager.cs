@@ -2708,6 +2708,8 @@ namespace SMT.EVEData
                             }
                         });
 
+                        ActivateQuietLocalChatLogs(chatLogs.Files, nowUtc);
+
                         gameLogs.Poll(nowUtc, (tail, lines) =>
                         {
                             lock(gameLogLock)
@@ -2748,6 +2750,73 @@ namespace SMT.EVEData
             {
                 logReadDelays.Report();
             }
+        }
+
+        /// <summary>
+        /// Lists the character of every Local log found, with the system from its last "Channel changed" line, without
+        /// waiting for Local to get a new line. The monitor starts reading existing logs at their end, so a character
+        /// sitting in a quiet system would otherwise never be listed, and the active character couldn't be picked.
+        /// Only each character's newest session counts (an older one would put the character back where it was hours
+        /// ago), and only if it started after the last daily downtime, which logs everyone out.
+        /// </summary>
+        private void ActivateQuietLocalChatLogs(IReadOnlyCollection<LogFileTail> tails, DateTime nowUtc)
+        {
+            bool anyWaiting = false;
+            foreach(LogFileTail tail in tails)
+            {
+                if(!tail.Activated && tail.FileName.Contains("Local_", StringComparison.Ordinal))
+                {
+                    anyWaiting = true;
+                    break;
+                }
+            }
+
+            if(!anyWaiting)
+            {
+                return;
+            }
+
+            // EVE's daily downtime is at 11:00 UTC
+            DateTime lastDowntimeUtc = nowUtc.Date.AddHours(11);
+            if(nowUtc < lastDowntimeUtc)
+            {
+                lastDowntimeUtc = lastDowntimeUtc.AddDays(-1);
+            }
+
+            lock(intelLogLock)
+            {
+                IEnumerable<LogFileTail> localLogs = tails.Where(t => t.FileName.Contains("Local_", StringComparison.Ordinal));
+                foreach(IGrouping<string, LogFileTail> sessions in localLogs.GroupBy(t => CharacterIdFromLogFileName(t.FileName)))
+                {
+                    LogFileTail newest = sessions.OrderBy(t => LogFileTail.SessionStartFromFileName(t.FileName) ?? DateTime.MinValue).Last();
+                    DateTime? newestStarted = LogFileTail.SessionStartFromFileName(newest.FileName);
+
+                    // a newest session already read from its new lines knows better than this, and one from before
+                    // the downtime is over: that character shows up again when it logs in (a new file)
+                    bool activateNewest = !newest.Activated && (!newestStarted.HasValue || newestStarted.Value >= lastDowntimeUtc);
+                    foreach(LogFileTail tail in sessions)
+                    {
+                        // EVE never writes to an older session again: nothing to read from it
+                        tail.Activated = true;
+                    }
+
+                    if(activateNewest)
+                    {
+                        ActivateLocalChatLog(newest);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The character ID a chat log's name ends with (Local_yyyyMMdd_HHmmss_characterID.txt), or the whole name
+        /// for a log without one
+        /// </summary>
+        private static string CharacterIdFromLogFileName(string fileName)
+        {
+            string[] parts = Path.GetFileNameWithoutExtension(fileName).Split('_');
+            string last = parts[parts.Length - 1];
+            return parts.Length >= 4 && last.Length > 0 && last.All(char.IsDigit) ? last : fileName;
         }
 
         /// <summary>
