@@ -2044,13 +2044,7 @@ namespace SMT
             dashes.Add(1.0);
             dashes.Add(3.0);
 
-            DoubleAnimation da = new DoubleAnimation();
-            da.From = 20;
-            da.To = 0;
-            da.By = 2;
-            da.Duration = new Duration(TimeSpan.FromSeconds(10));
-            da.RepeatBehavior = RepeatBehavior.Forever;
-            Timeline.SetDesiredFrameRate(da, 20);
+            DoubleAnimation da = FactionWarfareDashAnimation;
 
             foreach(EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
@@ -2182,9 +2176,40 @@ namespace SMT
             }
         }
 
+        // The jump bridge and faction warfare dashes creep 2 units a second, 0.1 a frame at the 20 frames a second they
+        // used to ask for: 5 frames a second looks the same and renders a quarter as often. One frozen timeline each.
+        private static readonly DoubleAnimation JumpBridgeDashAnimation = CreateDashAnimation(0, 200, TimeSpan.FromSeconds(100));
+        private static readonly DoubleAnimation FactionWarfareDashAnimation = CreateDashAnimation(20, 0, TimeSpan.FromSeconds(10));
+
+        private static DoubleAnimation CreateDashAnimation(double from, double to, TimeSpan duration)
+        {
+            DoubleAnimation animation = new DoubleAnimation(from, to, new Duration(duration)) { RepeatBehavior = RepeatBehavior.Forever };
+            Timeline.SetDesiredFrameRate(animation, 5);
+            animation.Freeze();
+            return animation;
+        }
+
+        // The selected system's highlight stays on the map across the 2 s partial redraws. Rebuilding it there
+        // restarted its one 6 s turn every 2 s, so it never stopped turning: ~17 ms of CPU a second while the map
+        // sat idle with a system selected. A full redraw clears the canvas, and the highlight is made again.
+        private Shape selectionHighlight;
+        private string selectionHighlightSystem;
+
         private void AddHighlightToSystem(string name)
         {
-            if(!Region.MapSystems.Keys.Contains(name))
+            if(selectionHighlight != null)
+            {
+                if(name == selectionHighlightSystem && selectionHighlight.Parent == MainCanvas)
+                {
+                    return;
+                }
+
+                MainCanvas.Children.Remove(selectionHighlight);
+                selectionHighlight = null;
+                selectionHighlightSystem = null;
+            }
+
+            if(string.IsNullOrEmpty(name) || !Region.MapSystems.ContainsKey(name))
             {
                 return;
             }
@@ -2216,8 +2241,10 @@ namespace SMT
                 Canvas.SetTop(highlightSystemCircle, selectedSys.Layout.Y - circleOffset);
                 Canvas.SetZIndex(highlightSystemCircle, 19);
 
+                // not a DynamicMapElement: the partial redraws leave it alone
                 MainCanvas.Children.Add(highlightSystemCircle);
-                DynamicMapElements.Add(highlightSystemCircle);
+                selectionHighlight = highlightSystemCircle;
+                selectionHighlightSystem = name;
 
                 DoubleAnimation da = new DoubleAnimation();
                 da.From = 0;
@@ -3080,17 +3107,9 @@ namespace SMT
                         jbLine.StrokeDashArray = dashes;
 
                         // animate the jump bridges
-                        DoubleAnimation da = new DoubleAnimation();
-                        da.From = 0;
-                        da.To = 200;
-                        da.By = 2;
-                        da.Duration = new Duration(TimeSpan.FromSeconds(100));
-                        da.RepeatBehavior = RepeatBehavior.Forever;
-                        Timeline.SetDesiredFrameRate(da, 20);
-
                         if(!MapConf.DisableJumpBridgesPathAnimation)
                         {
-                            jbLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                            jbLine.BeginAnimation(Shape.StrokeDashOffsetProperty, JumpBridgeDashAnimation);
                         }
 
                         Canvas.SetZIndex(jbLine, 19);
