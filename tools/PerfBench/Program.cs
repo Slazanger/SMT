@@ -42,7 +42,8 @@ internal static class Program
             case "stat-check": StatCheck(); break;
             case "log-check": LogCheck(); break;
             case "log-latency": LogLatency(args.Length > 1 ? int.Parse(args[1]) : 40); break;
-            default: Console.WriteLine("modes: startup nav-alt nav-check <baselineDir> json-export json-load logs dirscan [n] intel zkb fsw-quiet [thresholdSeconds] universe-gates"); return 1;
+            case "danger-check": DangerCheck(); break;
+            default: Console.WriteLine("modes: startup nav-alt nav-check <baselineDir> json-export json-load logs dirscan [n] intel zkb fsw-quiet [thresholdSeconds] universe-gates danger-check"); return 1;
         }
         return 0;
     }
@@ -729,6 +730,89 @@ internal static class Program
 
     // ---------------------------------------------------------------- UniverseControl.Init gate de-duplication
     private struct GateHelper { public EveSystem from; public EveSystem to; }
+
+    // ---------------------------------------------------------------- danger zones
+    // Navigation.GetSystemsXJumpsFrom (danger zones at 1-6 jumps, 5 by default; storms at 1 and 3) against the
+    // recursive walk it replaced: the same systems from each start system, and the time per call. The old walk is
+    // slow at long range, so each range checks start systems spread over the universe for at most 15 s.
+    private static void DangerCheck()
+    {
+        List<EveSystem> systems = LoadSystems();
+        InstallFakeEveManager(systems);
+        Navigation.InitNavigation(systems, new List<JumpBridge>());
+        Dictionary<string, List<string>> gates = systems.ToDictionary(s => s.Name, s => s.Jumps);
+
+        // every 7th system first, so a range cut short by the time limit still samples the whole universe
+        List<EveSystem> order = Enumerable.Range(0, 7).SelectMany(offset => systems.Where((s, i) => i % 7 == offset)).ToList();
+        for(int range = 1; range <= 6; range++)
+        {
+            List<double> oldMs = new List<double>();
+            List<double> newMs = new List<double>();
+            int checkedCount = 0;
+            int mismatches = 0;
+            long found = 0;
+            Stopwatch budget = Stopwatch.StartNew();
+            foreach(EveSystem sys in order)
+            {
+                if(budget.Elapsed.TotalSeconds > 15)
+                {
+                    break;
+                }
+
+                Stopwatch sw = Stopwatch.StartNew();
+                List<string> before = OldSystemsXJumpsFrom(gates, new List<string>(), sys.Name, range);
+                oldMs.Add(sw.Elapsed.TotalMilliseconds);
+                sw.Restart();
+                List<string> after = Navigation.GetSystemsXJumpsFrom(new List<string>(), sys.Name, range);
+                newMs.Add(sw.Elapsed.TotalMilliseconds);
+                checkedCount++;
+                found += after.Count;
+                if(after.Count != before.Count || !after.ToHashSet().SetEquals(before))
+                {
+                    mismatches++;
+                }
+            }
+
+            Console.WriteLine($"  {range} jumps: {checkedCount,5} of {systems.Count} start systems, {mismatches} different, {found / (double)checkedCount,4:F0} systems on average; old walk median {Median(oldMs),9:F3} ms (max {oldMs.Max(),8:F1}), new {Median(newMs),6:F3} ms (max {newMs.Max(),5:F2})");
+        }
+    }
+
+    // GetSystemsXJumpsFrom before 2026-11-09: it follows every path of up to X jumps (no visited set), and after each
+    // step rescans the whole list with List.Contains.
+    private static List<string> OldSystemsXJumpsFrom(Dictionary<string, List<string>> gates, List<string> sysList, string start, int X)
+    {
+        if(!gates.ContainsKey(start))
+        {
+            return sysList;
+        }
+
+        if(X != 0)
+        {
+            if(!sysList.Contains(start))
+            {
+                sysList.Add(start);
+            }
+
+            foreach(string mm in gates[start])
+            {
+                if(!sysList.Contains(mm))
+                {
+                    sysList.Add(mm);
+                }
+
+                List<string> connected = OldSystemsXJumpsFrom(gates, sysList, mm, X - 1);
+                foreach(string s in connected)
+                {
+                    if(!sysList.Contains(s))
+                    {
+                        sysList.Add(s);
+                    }
+                }
+            }
+        }
+
+        return sysList;
+    }
 
     private static void UniverseGates()
     {

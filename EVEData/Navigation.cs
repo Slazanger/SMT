@@ -144,39 +144,52 @@
             return inRange;
         }
 
+        /// <summary>
+        /// Adds every system within X gate jumps of start, start included, to sysList and returns it. Nothing is added
+        /// for X &lt;= 0 or an unknown start. Breadth-first, so each system is expanded once.
+        /// </summary>
         public static List<string> GetSystemsXJumpsFrom(List<string> sysList, string start, int X)
         {
-            if (MapNodes == null || !MapNodes.ContainsKey(start))
+            if (MapNodes == null || !MapNodes.ContainsKey(start) || X <= 0)
             {
                 return sysList;
             }
 
-            if (X != 0)
+            HashSet<string> listed = new HashSet<string>(sysList);
+            if (listed.Add(start))
             {
-                if (!sysList.Contains(start))
-                {
-                    sysList.Add(start);
-                }
+                sysList.Add(start);
+            }
 
-                MapNode mn = MapNodes[start];
-
-                foreach (string mm in mn.Connections)
+            HashSet<string> reached = new HashSet<string> { start };
+            List<string> frontier = new List<string> { start };
+            for (int jumps = 0; jumps < X && frontier.Count > 0; jumps++)
+            {
+                List<string> next = new List<string>();
+                foreach (string name in frontier)
                 {
-                    if (!sysList.Contains(mm))
+                    if (!MapNodes.TryGetValue(name, out MapNode node))
                     {
-                        sysList.Add(mm);
+                        continue;
                     }
 
-                    List<string> connected = GetSystemsXJumpsFrom(sysList, mm, X - 1);
-                    foreach (string s in connected)
+                    foreach (string connection in node.Connections)
                     {
-                        if (!sysList.Contains(s))
+                        if (listed.Add(connection))
                         {
-                            sysList.Add(s);
+                            sysList.Add(connection);
+                        }
+
+                        if (reached.Add(connection))
+                        {
+                            next.Add(connection);
                         }
                     }
                 }
+
+                frontier = next;
             }
+
             return sysList;
         }
 
