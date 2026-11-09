@@ -419,7 +419,7 @@ namespace SMT.EVEData
                 line = line.Substring(0, line.Length - 1);
             }
 
-            if(line.Length > 0 && line[0] == '﻿')
+            if(line.Length > 0 && line[0] == '\uFEFF')
             {
                 line = line.Substring(1);
             }
