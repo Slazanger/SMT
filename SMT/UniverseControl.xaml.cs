@@ -406,7 +406,7 @@ namespace SMT
 
             DataContext = this;
 
-            // each gate once, in the direction first seen (a linear scan per jump made this 60 ms instead of ~4)
+            // each gate once, in the direction first seen
             HashSet<(long, long)> gatesSeen = new HashSet<(long, long)>();
             foreach(EVEData.System sys in EM.Systems)
             {
@@ -938,7 +938,7 @@ namespace SMT
                 Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
                 Pen SysOutlinePen = new Pen(SystemColourOutlineBrush, 0.3);
                 Pen PochvenGatePen = new Pen(PochvenGateColourBrush, 0.3);
-                // frozen: drawing thousands of shapes with an unfrozen pen made each call ~0.1 ms
+                // frozen: thousands of shapes are drawn with these, and an unfrozen pen slows every draw call
                 GatePen.Freeze();
                 ConstGatePen.Freeze();
                 RegionGatePen.Freeze();
@@ -1009,8 +1009,8 @@ namespace SMT
                     VHLinks.AddChild(jbDrawingVisual, "JB");
                 }
 
-                // All systems go into one visual. One visual (and one text layout) per system made building the
-                // universe map the slowest step of startup; a right click finds its system with FindSystemAt.
+                // All systems go into one visual, which is far quicker to build than a visual per system; a right
+                // click finds its system with FindSystemAt.
                 System.Windows.Media.DrawingVisual systemsVisual = new System.Windows.Media.DrawingVisual();
                 using(DrawingContext drawingContext = systemsVisual.RenderOpen())
                 {

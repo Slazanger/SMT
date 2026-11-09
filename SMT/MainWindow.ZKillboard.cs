@@ -127,8 +127,8 @@ namespace SMT
 
         // The feed shows the newest ZKBFeedMaxKills kills that pass ZKBFeedFilter. The view calls its filter
         // once per item, so the visible set is worked out once and reused until the kill stream changes or
-        // InvalidateZKBVisibleKills is called. Recomputing it per item made one refresh cost
-        // O(kills² × region systems): around 100 ms on the UI thread with a 30 minute kill window.
+        // InvalidateZKBVisibleKills is called. Working it out for every item would make one refresh
+        // quadratic in the number of kills.
         private const int ZKBFeedMaxKills = 30;
         private HashSet<ZKBDataSimple> zkbVisibleKills = new HashSet<ZKBDataSimple>();
         private int zkbVisibleKillsCount = -1;

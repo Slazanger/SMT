@@ -1668,7 +1668,7 @@ namespace SMT
             }
 
             // The shapes are pooled and redrawn on every refresh, so anything attached to them here must be attached
-            // once: handlers added on each refresh piled up (two more per refresh, all run on every tooltip).
+            // once: a handler added on each refresh would pile up, and every copy would run on every tooltip.
             Shape systemShape = systemData[sysData.system.Name].systemCanvasElement;
             EnsureSystemTooltip(systemShape); // ToolTipOpening only fires for a shape with a tooltip; its text is filled in on opening
             systemShape.ToolTipOpening -= UpdateSystemTooltipOnOpeningTooltip;

@@ -239,8 +239,8 @@
         /// <summary>
         /// Links every system to each system within MaxJumpRangeLY that a capital can jump into
         /// (not highsec, Pochven or Zarzakh). Destinations are bucketed into cubes MaxJumpRangeLY
-        /// on a side, so each system is only measured against the 27 cubes around it. This
-        /// replaces the JumpRangeCache.dat table, which took over a second to load.
+        /// on a side, so each system is only measured against the 27 cubes around it. Building
+        /// the table this way at startup is quicker than loading it from a data file.
         /// </summary>
         private static void BuildJumpableSystems()
         {

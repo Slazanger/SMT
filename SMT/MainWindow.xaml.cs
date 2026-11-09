@@ -169,8 +169,6 @@ namespace SMT
 
             this.FontFamily = new FontFamily(new Uri("pack://application:,,,/External/AtkinsonHyperlegible/"), "./#Atkinson Hyperlegible");
 
-            // the intel sound player is created when it is first needed (EnsureIntelSoundPlayer)
-
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
 

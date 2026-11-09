@@ -2174,8 +2174,8 @@ namespace SMT
             }
         }
 
-        // The jump bridge and faction warfare dashes creep 2 units a second, 0.1 a frame at the 20 frames a second they
-        // used to ask for: 5 frames a second looks the same and renders a quarter as often. One frozen timeline each.
+        // The jump bridge and faction warfare dashes creep 2 units a second, slow enough that 5 frames a second looks
+        // no different from a higher rate and renders far less often. One frozen timeline each, shared by every line.
         private static readonly DoubleAnimation JumpBridgeDashAnimation = CreateDashAnimation(0, 200, TimeSpan.FromSeconds(100));
         private static readonly DoubleAnimation FactionWarfareDashAnimation = CreateDashAnimation(20, 0, TimeSpan.FromSeconds(10));
 
@@ -2187,9 +2187,9 @@ namespace SMT
             return animation;
         }
 
-        // The selected system's highlight stays on the map across the 2 s partial redraws. Rebuilding it there
-        // restarted its one 6 s turn every 2 s, so it never stopped turning: ~17 ms of CPU a second while the map
-        // sat idle with a system selected. A full redraw clears the canvas, and the highlight is made again.
+        // The selected system's highlight stays on the map across the 2 s partial redraws: rebuilding it there would
+        // restart its one 6 s turn every 2 s, so it would never stop animating while the map sits idle. A full
+        // redraw clears the canvas, and the highlight is made again.
         private Shape selectionHighlight;
         private string selectionHighlightSystem;
 
@@ -2696,8 +2696,7 @@ namespace SMT
                     Orientation = Orientation.Vertical,
                 };
 
-                // A TextBlock rather than a Label, whose template would add four more elements per system. It is aligned
-                // by layout, as the Label's content was, so the name lands on the same pixels as before.
+                // A TextBlock rather than a Label, whose template would add four more elements per system.
                 TextBlock sysText = new TextBlock();
                 sysText.Text = mapSystem.LocalizedName;
 

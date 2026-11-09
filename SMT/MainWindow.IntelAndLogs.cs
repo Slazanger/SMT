@@ -98,7 +98,7 @@ namespace SMT
             }), DispatcherPriority.Normal);
         }
         /// <summary>
-        /// Opens the audio output and the alert sound on first use rather than at startup (40-75 ms).
+        /// Opens the audio output and the alert sound on first use, so startup doesn't wait for the audio device.
         /// </summary>
         private void EnsureIntelSoundPlayer()
         {
