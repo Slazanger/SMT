@@ -97,6 +97,31 @@ namespace SMT
                 }
             }), DispatcherPriority.Normal);
         }
+        /// <summary>
+        /// Opens the audio output and the alert sound on first use rather than at startup (40-75 ms).
+        /// </summary>
+        private void EnsureIntelSoundPlayer()
+        {
+            if(waveOutEvent != null)
+            {
+                return;
+            }
+
+            audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+            waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
+
+            try
+            {
+                waveOutEvent.Init(audioFileReader);
+            }
+            catch
+            {
+                // wave output fails on some devices; try falling back to dsound
+                waveOutEvent = new DirectSoundOut();
+                waveOutEvent.Init(audioFileReader);
+            }
+        }
+
         private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEManager.IntelDataList.ClearAll();
@@ -210,6 +235,7 @@ namespace SMT
                 {
                     try
                     {
+                        EnsureIntelSoundPlayer();
                         waveOutEvent.Stop();
                         waveOutEvent.Volume = MapConf.IntelSoundVolume;
                         audioFileReader.Position = 0;

@@ -2206,14 +2206,45 @@ namespace SMT.EVEData
         /// <summary>
         /// Load the EVE Manager Data from Disk
         /// </summary>
+        private static string staticDataFolder;
+        private static Task<(List<MapRegion> Regions, List<System> Systems, SerializableDictionary<string, string> ShipTypes)> staticDataLoad;
+
+        /// <summary>
+        /// Starts reading the static map data (MapLayout.dat, Systems.dat and ShipTypes.dat, ~15 MB of XML) from the
+        /// application's data folder on a worker thread, so it overlaps building the UI. LoadFromDisk takes the result.
+        /// </summary>
+        public static void StartLoadingStaticData()
+        {
+            if(staticDataLoad != null)
+            {
+                return;
+            }
+
+            staticDataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
+            string folder = staticDataFolder;
+            staticDataLoad = Task.Run(() => (
+                Serialization.DeserializeFromDisk<List<MapRegion>>(Path.Combine(folder, "MapLayout.dat")),
+                Serialization.DeserializeFromDisk<List<System>>(Path.Combine(folder, "Systems.dat")),
+                Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(Path.Combine(folder, "ShipTypes.dat"))));
+        }
+
         public void LoadFromDisk()
         {
             SystemIDToName = new SerializableDictionary<long, string>();
 
-            Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(Path.Combine(DataRootFolder, "MapLayout.dat"));
-            Systems = Serialization.DeserializeFromDisk<List<System>>(Path.Combine(DataRootFolder, "Systems.dat"));
+            if(staticDataLoad != null && staticDataFolder == DataRootFolder)
+            {
+                // read ahead by StartLoadingStaticData
+                (Regions, Systems, ShipTypes) = staticDataLoad.GetAwaiter().GetResult();
+                staticDataLoad = null;
+            }
+            else
+            {
+                Regions = Serialization.DeserializeFromDisk<List<MapRegion>>(Path.Combine(DataRootFolder, "MapLayout.dat"));
+                Systems = Serialization.DeserializeFromDisk<List<System>>(Path.Combine(DataRootFolder, "Systems.dat"));
 
-            ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(Path.Combine(DataRootFolder, "ShipTypes.dat"));
+                ShipTypes = Serialization.DeserializeFromDisk<SerializableDictionary<string, string>>(Path.Combine(DataRootFolder, "ShipTypes.dat"));
+            }
 
             foreach(System s in Systems)
             {

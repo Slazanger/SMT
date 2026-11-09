@@ -157,6 +157,10 @@ namespace SMT
         public MainWindow()
         {
             PerfMetrics.MarkStartup("process start to MainWindow");
+
+            // the static map data needs nothing from the UI: read it while the window is built
+            EVEData.EveManager.StartLoadingStaticData();
+
             ReadPerfTestArguments();
             ContentRendered += MainWindow_ContentRendered;
 
@@ -165,28 +169,10 @@ namespace SMT
 
             this.FontFamily = new FontFamily(new Uri("pack://application:,,,/External/AtkinsonHyperlegible/"), "./#Atkinson Hyperlegible");
 
-            Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-
-
-            waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
-
-            audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-
-            try
-            {
-                waveOutEvent.Init(audioFileReader);
-            }
-            catch
-            {
-                // wave output fails on some devices; try falling back to dsound
-                waveOutEvent = new DirectSoundOut();
-                waveOutEvent.Init(audioFileReader);
-            }
-
+            // the intel sound player is created when it is first needed (EnsureIntelSoundPlayer)
 
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
-            PerfMetrics.MarkStartup("audio");
 
             InitializeComponent();
             PerfMetrics.MarkStartup("InitializeComponent");
