@@ -21,8 +21,9 @@ internal static class Program
         "\n" +
         "PerfBench compare <before> <after>\n" +
         "    Compares the results of \"SMT.exe --perftest=<file>.json\" from two builds. Each side is one\n" +
-        "    result file, or a folder of result files from several runs of the same build: timings differ\n" +
-        "    by up to a quarter from run to run, and several runs show which differences are larger than that.";
+        "    result file, or a folder of result files from several runs of the same build. Counts (redraws,\n" +
+        "    elements on the map) are compared from any number of runs. Timings differ from run to run and\n" +
+        "    are only judged from 4 runs a side.";
 
     // EVEData copies its data\*.dat files next to the build output
     private static readonly string DataDir = Path.Combine(AppContext.BaseDirectory, "data");
@@ -298,9 +299,13 @@ internal static class Program
     }
 
     // ---------------------------------------------------------------- compare
-    // One line per value in the results. A value that repeats exactly needs no comment. For the rest, several runs per
-    // side give a spread: values whose spreads don't overlap have moved, the others haven't. Timings, CPU, allocation
-    // and GC counts are expected to wander, so with a single run per side they only count as moved beyond a quarter.
+    // One line per value in the results. Counts (redraws per action, elements on the map, what was found) repeat exactly
+    // from run to run, so a count that differs has changed. Timings, CPU, allocation and GC counts wander: two runs of
+    // the same build can differ by half in the small ones. Those are judged by the spread over several runs, and only
+    // from RunsToJudgeMeasurements runs a side: with n runs a side, two builds that perform the same still show
+    // spreads that don't overlap 2 in C(2n, n) times, which is a third of the time for 2 runs, a tenth for 3, 3% for 4.
+    private const int RunsToJudgeMeasurements = 4;
+
     private static int Compare(string before, string after)
     {
         List<Dictionary<string, object>> beforeRuns = LoadRuns(before);
@@ -330,6 +335,7 @@ internal static class Program
         int lower = 0;
         int higher = 0;
         int changed = 0;
+        int unjudged = 0;
         foreach(string key in keys)
         {
             List<object> beforeValues = beforeRuns.Where(run => run.ContainsKey(key)).Select(run => run[key]).ToList();
@@ -355,22 +361,23 @@ internal static class Program
                 double ratio = beforeMedian == 0 ? double.NaN : (afterMedian - beforeMedian) / Math.Abs(beforeMedian);
                 bool identical = b[0] == a[0] && b[b.Count - 1] == a[a.Count - 1] && b[0] == b[b.Count - 1];
                 bool apart = a[0] > b[b.Count - 1] || a[a.Count - 1] < b[0];
-                bool singleRuns = b.Count == 1 && a.Count == 1;
+                bool measurement = IsMeasurement(key);
                 if(!identical)
                 {
                     change = double.IsNaN(ratio) ? string.Empty : ratio.ToString("+0%;-0%;0%");
-                    if(!apart)
+                    if(measurement && Math.Min(b.Count, a.Count) < RunsToJudgeMeasurements)
+                    {
+                        // too few runs to tell a change from the spread: the numbers are shown without a verdict
+                        unjudged++;
+                    }
+                    else if(!apart)
                     {
                         verdict = "within the spread between runs";
                     }
-                    else if(!IsMeasurement(key))
+                    else if(!measurement)
                     {
                         verdict = "CHANGED";
                         changed++;
-                    }
-                    else if(singleRuns && Math.Abs(ratio) < 0.25)
-                    {
-                        verdict = "one run each: within the usual quarter";
                     }
                     else if(afterMedian < beforeMedian)
                     {
@@ -395,9 +402,10 @@ internal static class Program
 
         Console.WriteLine();
         Console.WriteLine($"{changed} values changed, {higher} measurements higher, {lower} lower.");
-        if(beforeRuns.Count == 1 || afterRuns.Count == 1)
+        if(unjudged > 0)
         {
-            Console.WriteLine("With one run on a side the spread between runs is unknown: give folders of several runs to be sure.");
+            Console.WriteLine($"{unjudged} timings and other measurements differ and are shown without a verdict: they also differ between runs of");
+            Console.WriteLine($"one build, and it takes {RunsToJudgeMeasurements} runs a side to tell a change from that. Give two folders of runs.");
         }
 
         return 0;
