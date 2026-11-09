@@ -233,6 +233,10 @@ namespace SMT
             long fullBefore = PerfMetrics.RegionFullRedraws;
             long partialBefore = PerfMetrics.RegionPartialRedraws;
             double fullMsBefore = PerfMetrics.RegionFullRedrawMs;
+            int gen0Before = GC.CollectionCount(0);
+            int gen1Before = GC.CollectionCount(1);
+            int gen2Before = GC.CollectionCount(2);
+            long allocatedBefore = GC.GetTotalAllocatedBytes();
 
             for(int pass = 0; pass < passes; pass++)
             {
@@ -259,6 +263,10 @@ namespace SMT
                 ["partialRedrawsPerAction"] = Math.Round((PerfMetrics.RegionPartialRedraws - partialBefore) / count, 2),
                 // time inside ReDrawMap(true) itself, without the layout pass and rendering that follow
                 ["fullRedrawOwnMsPerAction"] = Math.Round((PerfMetrics.RegionFullRedrawMs - fullMsBefore) / count, 2),
+                ["allocatedMBPerAction"] = Math.Round((GC.GetTotalAllocatedBytes() - allocatedBefore) / 1048576.0 / count, 2),
+                ["gcGen0"] = GC.CollectionCount(0) - gen0Before,
+                ["gcGen1"] = GC.CollectionCount(1) - gen1Before,
+                ["gcGen2"] = GC.CollectionCount(2) - gen2Before,
             };
         }
 
