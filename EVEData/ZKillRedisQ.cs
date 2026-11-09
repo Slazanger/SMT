@@ -121,6 +121,8 @@ namespace SMT.EVEData
 
         private async Task PollLoopAsync(CancellationToken cancellationToken)
         {
+            // an error stays in the status bar until something else is logged: say when the feed works again
+            bool failed = false;
             while(!cancellationToken.IsCancellationRequested)
             {
                 if(PauseUpdate)
@@ -131,13 +133,25 @@ namespace SMT.EVEData
 
                 try
                 {
-                    if(currentSequence == 0 && !await LoadCurrentSequenceAsync(cancellationToken).ConfigureAwait(false))
+                    if(currentSequence == 0)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(6), cancellationToken).ConfigureAwait(false);
-                        continue;
+                        if(!await LoadCurrentSequenceAsync(cancellationToken).ConfigureAwait(false))
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(6), cancellationToken).ConfigureAwait(false);
+                            continue;
+                        }
+
+                        // "Connected to the live feed" has replaced the error
+                        failed = false;
                     }
 
                     TimeSpan delay = await PollCurrentSequenceAsync(cancellationToken).ConfigureAwait(false);
+                    if(failed)
+                    {
+                        AppLog.Info("ZKill feed", "Reconnected to the live feed.");
+                        failed = false;
+                    }
+
                     await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 }
                 catch(OperationCanceledException) when(cancellationToken.IsCancellationRequested)
@@ -147,6 +161,7 @@ namespace SMT.EVEData
                 catch(Exception exception)
                 {
                     AppLog.Error("ZKill feed", exception);
+                    failed = true;
                     await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken).ConfigureAwait(false);
                 }
             }
