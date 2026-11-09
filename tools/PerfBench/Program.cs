@@ -897,7 +897,7 @@ internal static class Program
         int failures = 0;
         var got = new List<string>();
         using var monitor = new LogFolderMonitor(dir, name => true);
-        void Poll() => monitor.Poll(DateTime.UtcNow, (tail, lines) => got.AddRange(lines));
+        void Poll() => monitor.Poll(DateTime.UtcNow, (tail, lines) => got.AddRange(lines), (tail, exception) => got.Add($"ERROR {tail.FileName}: {exception.Message}"));
         void Expect(string step, params string[] expected)
         {
             Poll();
@@ -1032,7 +1032,7 @@ internal static class Program
                     using var monitor = new LogFolderMonitor(dir, name => true);
                     while(!cts.IsCancellationRequested)
                     {
-                        monitor.Poll(DateTime.UtcNow, (tail, lines) => { foreach(string l in lines) Handle(l); });
+                        monitor.Poll(DateTime.UtcNow, (tail, lines) => { foreach(string l in lines) Handle(l); }, (tail, exception) => Console.WriteLine($"  ERROR {tail.FileName}: {exception.Message}"));
                         try { await Task.Delay(250, cts.Token); } catch(OperationCanceledException) { }
                     }
                 });

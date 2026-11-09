@@ -129,7 +129,8 @@ namespace SMT.EVEData
         public long StartOffset { get; }
 
         /// <summary>
-        /// Set by the owner once it has handled the file's first lines, e.g. read its header.
+        /// For the owner to set once it has done what it does with a newly followed file, e.g. listed the character
+        /// a Local chat log belongs to.
         /// </summary>
         public bool Activated { get; set; }
 
@@ -479,6 +480,7 @@ namespace SMT.EVEData
     {
         private readonly Dictionary<string, LogFileTail> tails = new Dictionary<string, LogFileTail>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> tooOld = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> failing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly Func<string, bool> follow;
         private readonly List<string> lines = new List<string>();
         private DateTime nextScanUtc = DateTime.MinValue;
@@ -506,23 +508,38 @@ namespace SMT.EVEData
 
         /// <summary>
         /// Scans for new files when due and calls <paramref name="onNewLines"/> for every followed file that grew.
-        /// The list passed in is reused: copy what you keep.
+        /// The list passed in is reused: copy what you keep. A file that can't be read, or whose lines
+        /// <paramref name="onNewLines"/> throws on, doesn't keep the other files from being read. Polls come several
+        /// times a second, so <paramref name="onError"/> hears of a failing file once, and again only after the file
+        /// has worked in between. Lines that <paramref name="onNewLines"/> threw on are not handed over again.
         /// </summary>
-        public void Poll(DateTime nowUtc, Action<LogFileTail, List<string>> onNewLines)
+        public void Poll(DateTime nowUtc, Action<LogFileTail, List<string>> onNewLines, Action<LogFileTail, Exception> onError)
         {
             if(nowUtc >= nextScanUtc)
             {
-                Scan(nowUtc);
                 nextScanUtc = nowUtc + ScanInterval;
+                Scan(nowUtc);
             }
 
             List<string> retired = null;
             foreach(LogFileTail tail in tails.Values)
             {
                 lines.Clear();
-                if(tail.ReadNewLines(lines, nowUtc) > 0)
+                try
                 {
-                    onNewLines(tail, lines);
+                    if(tail.ReadNewLines(lines, nowUtc) > 0)
+                    {
+                        onNewLines(tail, lines);
+                    }
+
+                    failing.Remove(tail.FileName);
+                }
+                catch(Exception exception)
+                {
+                    if(failing.Add(tail.FileName))
+                    {
+                        onError(tail, exception);
+                    }
                 }
 
                 if(tail.IsGone)
@@ -535,8 +552,7 @@ namespace SMT.EVEData
             {
                 foreach(string name in retired)
                 {
-                    tails[name].Dispose();
-                    tails.Remove(name);
+                    Forget(name);
                 }
             }
         }
@@ -549,6 +565,13 @@ namespace SMT.EVEData
             }
 
             tails.Clear();
+        }
+
+        private void Forget(string name)
+        {
+            tails[name].Dispose();
+            tails.Remove(name);
+            failing.Remove(name);
         }
 
         private void Scan(DateTime nowUtc)
@@ -568,8 +591,7 @@ namespace SMT.EVEData
             {
                 foreach(string name in aged)
                 {
-                    tails[name].Dispose();
-                    tails.Remove(name);
+                    Forget(name);
                     tooOld.Add(name);
                 }
             }
@@ -617,9 +639,9 @@ namespace SMT.EVEData
 
                     tails[name] = new LogFileTail(path, start);
                 }
-                catch(IOException)
+                catch(Exception exception) when(exception is IOException || exception is UnauthorizedAccessException)
                 {
-                    // gone again or locked; the next scan tries again
+                    // gone again, locked or not readable; the next scan tries again
                 }
             }
 

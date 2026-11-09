@@ -2704,21 +2704,29 @@ namespace SMT.EVEData
                             {
                                 intelAdded |= ProcessChatLogLines(tail, lines, nowUtc);
                             }
-                        });
+                        }, ReportLogFileError);
 
                         ActivateQuietLocalChatLogs(chatLogs.Files, nowUtc);
+                    }
+                    catch(Exception exception) when(exception is not OperationCanceledException)
+                    {
+                        ReportLogMonitorError(exception, nowUtc);
+                    }
 
+                    // on their own, so a failure in the chat logs doesn't keep the game logs from being read
+                    try
+                    {
                         gameLogs.Poll(nowUtc, (tail, lines) =>
                         {
                             lock(gameLogLock)
                             {
                                 gameLogAdded |= ProcessGameLogLines(tail, lines, nowUtc);
                             }
-                        });
+                        }, ReportLogFileError);
                     }
                     catch(Exception exception) when(exception is not OperationCanceledException)
                     {
-                        AppLog.Error("EVE log monitor", exception);
+                        ReportLogMonitorError(exception, nowUtc);
                     }
 
                     // once per poll and outside the locks: the UI handlers wait for the UI thread
@@ -2748,6 +2756,34 @@ namespace SMT.EVEData
             {
                 logReadDelays.Report();
             }
+        }
+
+        /// <summary>
+        /// One log file that can't be read or handled; LogFolderMonitor reports it once, not on every poll
+        /// </summary>
+        private static void ReportLogFileError(LogFileTail tail, Exception exception)
+        {
+            AppLog.Error("EVE log monitor", $"{tail.FileName}: {exception}");
+        }
+
+        private string lastLogMonitorError;
+        private DateTime lastLogMonitorErrorUtc;
+
+        /// <summary>
+        /// A failure outside a single file. The monitor polls four times a second, so one that keeps coming back is
+        /// logged once a minute at most.
+        /// </summary>
+        private void ReportLogMonitorError(Exception exception, DateTime nowUtc)
+        {
+            string error = exception.ToString();
+            if(error == lastLogMonitorError && nowUtc - lastLogMonitorErrorUtc < TimeSpan.FromMinutes(1))
+            {
+                return;
+            }
+
+            lastLogMonitorError = error;
+            lastLogMonitorErrorUtc = nowUtc;
+            AppLog.Error("EVE log monitor", exception);
         }
 
         /// <summary>
@@ -2787,21 +2823,26 @@ namespace SMT.EVEData
                 foreach(IGrouping<string, LogFileTail> sessions in localLogs.GroupBy(t => CharacterIdFromLogFileName(t.FileName)))
                 {
                     LogFileTail newest = sessions.OrderBy(t => LogFileTail.SessionStartFromFileName(t.FileName) ?? DateTime.MinValue).Last();
-                    DateTime? newestStarted = LogFileTail.SessionStartFromFileName(newest.FileName);
-
-                    // a newest session already read from its new lines knows better than this, and one from before
-                    // the downtime is over: that character shows up again when it logs in (a new file)
-                    bool activateNewest = !newest.Activated && (!newestStarted.HasValue || newestStarted.Value >= lastDowntimeUtc);
                     foreach(LogFileTail tail in sessions)
                     {
                         // EVE never writes to an older session again: nothing to read from it
-                        tail.Activated = true;
+                        if(tail != newest)
+                        {
+                            tail.Activated = true;
+                        }
                     }
 
-                    if(activateNewest)
+                    // a newest session already read from its new lines knows better than this
+                    if(newest.Activated)
                     {
-                        ActivateLocalChatLog(newest);
+                        continue;
                     }
+
+                    // One from before the downtime is over: that character shows up again when it logs in (a new file).
+                    // Otherwise list its character; a log whose header can't be read yet waits for the next poll.
+                    DateTime? newestStarted = LogFileTail.SessionStartFromFileName(newest.FileName);
+                    bool ended = newestStarted.HasValue && newestStarted.Value < lastDowntimeUtc;
+                    newest.Activated = ended || ActivateLocalChatLog(newest);
                 }
             }
         }
@@ -3503,10 +3544,8 @@ namespace SMT.EVEData
 
             if(localChat && !tail.Activated)
             {
-                ActivateLocalChatLog(tail);
+                tail.Activated = ActivateLocalChatLog(tail);
             }
-
-            tail.Activated = true;
 
             bool intelAdded = false;
             foreach(string rawLine in lines)
@@ -3615,34 +3654,42 @@ namespace SMT.EVEData
         /// <summary>
         /// The first lines from a Local chat log: whose log it is (from the header) and where that character is,
         /// from the newest "Channel changed to Local" line written before SMT started following the file.
+        /// False, with nothing changed, if the header isn't complete or the file can't be read right now.
         /// </summary>
-        private void ActivateLocalChatLog(LogFileTail tail)
+        private bool ActivateLocalChatLog(LogFileTail tail)
         {
             string characterName = tail.Listener;
-            long headerEnd = 0;
-            if(string.IsNullOrEmpty(characterName) && LogFileTail.TryReadHeader(tail.FilePath, out string listener, out headerEnd))
-            {
-                characterName = listener;
-            }
-
-            if(string.IsNullOrEmpty(characterName))
-            {
-                return;
-            }
-
-            tail.Listener = characterName;
-
             string system = string.Empty;
-            if(headerEnd > 0)
+            try
             {
-                foreach(string line in LogFileTail.ReadLines(tail.FilePath, headerEnd, tail.StartOffset))
+                long headerEnd = 0;
+                if(string.IsNullOrEmpty(characterName) && LogFileTail.TryReadHeader(tail.FilePath, out string listener, out headerEnd))
                 {
-                    if(line.Contains("EVE System > Channel changed to Local"))
+                    characterName = listener;
+                }
+
+                if(string.IsNullOrEmpty(characterName))
+                {
+                    return false;
+                }
+
+                if(headerEnd > 0)
+                {
+                    foreach(string line in LogFileTail.ReadLines(tail.FilePath, headerEnd, tail.StartOffset))
                     {
-                        system = line.Split(':').Last().Trim();
+                        if(line.Contains("EVE System > Channel changed to Local"))
+                        {
+                            system = line.Split(':').Last().Trim();
+                        }
                     }
                 }
             }
+            catch(Exception exception) when(exception is IOException || exception is UnauthorizedAccessException)
+            {
+                return false;
+            }
+
+            tail.Listener = characterName;
 
             bool addChar = true;
             foreach(EVEData.LocalCharacter c in GetLocalCharactersCopy())
@@ -3670,6 +3717,8 @@ namespace SMT.EVEData
             {
                 AddCharacter(new EVEData.LocalCharacter(characterName, tail.FilePath, system));
             }
+
+            return true;
         }
 
         /// <summary>
@@ -3677,13 +3726,10 @@ namespace SMT.EVEData
         /// </summary>
         private bool ProcessGameLogLines(LogFileTail tail, List<string> lines, DateTime nowUtc)
         {
-            if(!tail.Activated)
+            // a header that couldn't be read is tried again with the next lines
+            if(string.IsNullOrEmpty(tail.Listener) && LogFileTail.TryReadHeader(tail.FilePath, out string listener, out _))
             {
-                tail.Activated = true;
-                if(string.IsNullOrEmpty(tail.Listener) && LogFileTail.TryReadHeader(tail.FilePath, out string listener, out _))
-                {
-                    tail.Listener = listener;
-                }
+                tail.Listener = listener;
             }
 
             // something wrong with the log file: no listener in its header
