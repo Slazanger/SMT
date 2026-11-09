@@ -23,6 +23,7 @@ using EVEStandard.Models.API;
 using EVEStandard.Models.SSO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using EVEData.Utils.EveOPreview;
 
 namespace SMT.EVEData
 {
@@ -3530,7 +3531,7 @@ namespace SMT.EVEData
                                             {
                                                 c.Region = "";
                                             }
-
+                                            EveOPreviewClient.UpdateSystem(c.Name, c.Location);
                                             addChar = false;
                                         }
                                     }
@@ -3538,6 +3539,7 @@ namespace SMT.EVEData
                                     if(addChar)
                                     {
                                         AddCharacter(new EVEData.LocalCharacter(characterName, changedFile, system));
+                                        EveOPreviewClient.UpdateSystem(characterName, system);
                                     }
 
                                     break;
@@ -3587,6 +3589,7 @@ namespace SMT.EVEData
                                     if(c.LocalChatFile == changedFile)
                                     {
                                         c.Location = system;
+                                        EveOPreviewClient.UpdateSystem(c.Name, c.Location);
                                     }
                                 }
                             }

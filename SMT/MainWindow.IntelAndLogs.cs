@@ -4,6 +4,7 @@ using NAudio.Wave;
 using NHotkey;
 using NHotkey.Wpf;
 using SMT.EVEData;
+using EVEData.Utils.EveOPreview;
 using SMT.Interop;
 using System;
 using System.Collections.Generic;
@@ -159,8 +160,9 @@ namespace SMT
                 flashWindow = true;
             }
 
+            var alertEveOCharacters = new HashSet<string>();
 
-            if(MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
+            if (MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
             {
                 if(MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                 {
@@ -176,6 +178,7 @@ namespace SMT
                                     {
                                         playSound = playSound || MapConf.PlaySoundOnlyInDangerZone;
                                         flashWindow = flashWindow || MapConf.FlashWindowOnlyInDangerZone;
+                                        alertEveOCharacters.Add(lc.Name);
                                         break;
                                     }
                                 }
@@ -196,6 +199,7 @@ namespace SMT
                         }
                     }
                 }
+
             }
 
             Application.Current.Dispatcher.Invoke((Action)(() =>
@@ -220,6 +224,20 @@ namespace SMT
                 {
                     FlashWindow.Flash(AppWindow, 5);
                 }
+
+                if (alertEveOCharacters.Count > 0 )
+                {
+                    foreach (var character in alertEveOCharacters)
+                    {
+                        EveOPreviewClient.AlertClient(new EveOAlertClient
+                        {
+                            Client = character,
+                            AlertType = EveOAlertClient.AlertTypeIntel
+                        });
+                    }
+                }
+
+
             }), DispatcherPriority.Normal);
         }
         private void OnShipDecloaked(string character, string text)
@@ -266,6 +284,9 @@ namespace SMT
                                     Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
                                     tb.AddAudio(woopUri);
                                     tb.Show();
+
+                                    EveOPreviewClient.AlertClient(new EveOAlertClient() { Client = character, AlertType = EveOAlertClient.AlertTypeDecloak, });
+
                                 }
                                 catch
                                 {
@@ -321,6 +342,8 @@ namespace SMT
                             }), DispatcherPriority.Normal, null);
                         }
                     }
+
+                    EveOPreviewClient.Agression(character, true);
 
                     break;
                 }
