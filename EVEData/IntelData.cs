@@ -62,6 +62,18 @@ namespace SMT.EVEData
         /// </summary>
         public List<string> Systems { get; set; }
 
+        /// <summary>
+        /// Strips '*' markers from a word of intel text so it can be matched against system names.
+        /// Localised EVE clients can mark "important names" (systems, ships, items) with a trailing '*',
+        /// and that marker ends up in the chat log when a name is dragged into chat (e.g. "T-Q2DD*");
+        /// pilots also type a '*' by hand to flag a correction.
+        /// </summary>
+        /// <param name="word">a single space separated word from the intel text</param>
+        public static string CleanIntelWord(string word)
+        {
+            return word.Trim('*');
+        }
+
         // public override string ToString() => "[" + IntelTime.ToString("HH:mm") + "] " + IntelString;
     }
 }

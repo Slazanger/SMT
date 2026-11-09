@@ -359,16 +359,20 @@ namespace SMT
                 // only select the first system
                 if(!selectedSystem)
                 {
+                    // drop any '*' marker (e.g. "T-Q2DD*" from a localised client) before matching
+                    string word = IntelData.CleanIntelWord(s);
+
                     foreach(EVEData.System sys in EVEManager.Systems)
                     {
-                        if(s.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                        if(word.IndexOf(sys.Name, StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             if(RegionUC.Region.Name != sys.Region)
                             {
                                 RegionUC.SelectRegion(sys.Region);
                             }
 
-                            RegionUC.SelectSystem(s, true);
+                            // select by the real system name, not the raw word from the chat line
+                            RegionUC.SelectSystem(sys.Name, true);
                             selectedSystem = true;
                         }
                     }
