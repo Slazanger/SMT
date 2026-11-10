@@ -222,6 +222,11 @@ namespace SMT
             }
             set
             {
+                if(m_ActiveCharacter == value)
+                {
+                    return;
+                }
+
                 m_ActiveCharacter = value;
                 OnPropertyChanged("ActiveCharacter");
             }
@@ -239,6 +244,11 @@ namespace SMT
             }
             set
             {
+                if(m_ESIOverlayScale == value)
+                {
+                    return;
+                }
+
                 m_ESIOverlayScale = value;
                 OnPropertyChanged("ESIOverlayScale");
             }
@@ -270,6 +280,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowJumpBridges == value)
+                {
+                    return;
+                }
+
                 m_ShowJumpBridges = value;
                 OnPropertyChanged("ShowJumpBridges");
             }
@@ -284,6 +299,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowNPCKills == value)
+                {
+                    return;
+                }
+
                 m_ShowNPCKills = value;
 
                 if(m_ShowNPCKills)
@@ -306,6 +326,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowPodKills == value)
+                {
+                    return;
+                }
+
                 m_ShowPodKills = value;
                 if(m_ShowPodKills)
                 {
@@ -327,6 +352,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowShipJumps == value)
+                {
+                    return;
+                }
+
                 m_ShowShipJumps = value;
                 if(m_ShowShipJumps)
                 {
@@ -348,6 +378,11 @@ namespace SMT
 
             set
             {
+                if(m_ShowShipKills == value)
+                {
+                    return;
+                }
+
                 m_ShowShipKills = value;
                 if(m_ShowShipKills)
                 {
@@ -368,6 +403,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSovOwner == value)
+                {
+                    return;
+                }
+
                 m_ShowSovOwner = value;
                 OnPropertyChanged("ShowSovOwner");
             }
@@ -381,6 +421,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowStandings == value)
+                {
+                    return;
+                }
+
                 m_ShowStandings = value;
 
                 OnPropertyChanged("ShowStandings");
@@ -395,6 +440,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSystemADM == value)
+                {
+                    return;
+                }
+
                 m_ShowSystemADM = value;
                 if(m_ShowSystemADM)
                 {
@@ -412,6 +462,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSystemSecurity == value)
+                {
+                    return;
+                }
+
                 m_ShowSystemSecurity = value;
                 if(m_ShowSystemSecurity)
                 {
@@ -429,6 +484,11 @@ namespace SMT
             }
             set
             {
+                if(m_ShowSystemTimers == value)
+                {
+                    return;
+                }
+
                 m_ShowSystemTimers = value;
                 OnPropertyChanged("ShowSystemTimers");
             }
@@ -743,10 +803,8 @@ namespace SMT
             EM = EVEData.EveManager.Instance;
             SelectedSystem = string.Empty;
 
-            List<EVEData.System> globalSystemList = new List<EVEData.System>(EM.Systems);
-            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
             GlobalSystemDropDownAC.SelectedItem = null;
-            GlobalSystemDropDownAC.ItemsSource = globalSystemList;
+            GlobalSystemDropDownAC.ItemsSource = EM.GetSystemsByName();
 
             DynamicMapElements = new List<UIElement>();
             DynamicMapElementsRangeMarkers = new List<UIElement>();
@@ -784,6 +842,7 @@ namespace SMT
             SystemDropDownAC.ItemsSource = newList;
 
             PropertyChanged += MapObjectChanged;
+            IsVisibleChanged += RegionControl_IsVisibleChanged;
         }
 
         /// <summary>
@@ -791,6 +850,89 @@ namespace SMT
         /// </summary>
         /// <param name="FullRedraw">Clear all the static items or not</param>
         public void ReDrawMap(bool FullRedraw = false)
+        {
+            // this redraw satisfies any request still waiting (see RequestRedraw)
+            if(FullRedraw || !fullRedrawRequested)
+            {
+                redrawRequested = false;
+                fullRedrawRequested = false;
+            }
+
+            long redrawStart = System.Diagnostics.Stopwatch.GetTimestamp();
+            ReDrawMapCore(FullRedraw);
+            PerfMetrics.RecordRegionRedraw(FullRedraw, redrawStart);
+        }
+
+        private bool redrawRequested;
+        private bool fullRedrawRequested;
+        private bool redrawPosted;
+
+        /// <summary>
+        /// Redraw on the next dispatcher pass, before the next frame. Several requests before then (a setter that
+        /// turns other toggles off, a settings change) cost one redraw, a full one if any asked for it, and a redraw
+        /// that happens in between satisfies them. While the map is hidden the redraw waits until it is shown.
+        /// </summary>
+        public void RequestRedraw(bool fullRedraw)
+        {
+            redrawRequested = true;
+            fullRedrawRequested |= fullRedraw;
+            if(redrawPosted)
+            {
+                return;
+            }
+
+            redrawPosted = true;
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(RedrawIfRequested));
+        }
+
+        private void RedrawIfRequested()
+        {
+            redrawPosted = false;
+            if(!redrawRequested || !IsVisible)
+            {
+                // still requested while hidden: RegionControl_IsVisibleChanged posts it again
+                return;
+            }
+
+            ReDrawMap(fullRedrawRequested);
+        }
+
+        private void RegionControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(IsVisible && redrawRequested)
+            {
+                RequestRedraw(fullRedrawRequested);
+            }
+        }
+
+        /// <summary>
+        /// Whether a change to this MapConfig property needs the region map redrawn: everything except settings the
+        /// region map never reads (overlay, universe and regions views, sounds, window behaviour, zoom behaviour).
+        /// Unknown properties redraw, so a new visual setting can't be missed.
+        /// </summary>
+        public static bool RedrawsOnMapConfigChange(string propertyName)
+        {
+            if(string.IsNullOrEmpty(propertyName))
+            {
+                return true;
+            }
+
+            return !(propertyName.StartsWith("Overlay", StringComparison.Ordinal) || NonRegionMapSettings.Contains(propertyName));
+        }
+
+        private static readonly HashSet<string> NonRegionMapSettings = new HashSet<string>
+        {
+            // SelectRegion redraws itself when it changes the default region
+            "DefaultRegion",
+            "AlwaysOnTop", "CloseToTray", "MinimizeToTray", "CustomEveLogFolderLocation", "SyncActiveCharacterBasedOnActiveEVEClient",
+            "FlashWindow", "FlashWindowOnlyInDangerZone", "PlayIntelSound", "PlayIntelSoundOnAlert", "PlaySoundOnlyInDangerZone",
+            "ShowZKillData", "ZkillExpireTimeMinutes",
+            "ShowUniverseKills", "ShowUniversePods", "ShowUniverseRats", "ShowRegionStandings",
+            "UniverseDataScale", "UniverseMaxZoomDisplaySystems", "UniverseMaxZoomDisplaySystemsText",
+            "FollowOnZoom", "ResetZoomOnRegionChange", "ShowToolBox",
+        };
+
+        private void ReDrawMapCore(bool FullRedraw)
         {
             if(ActiveCharacter != null && FollowCharacter == true)
             {
@@ -912,12 +1054,9 @@ namespace SMT
             //                ActiveCharacter.UpdateStructureInfoForRegion2(regionName);
             //            }
 
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                ReDrawMap(true);
-            }), DispatcherPriority.Normal);
+            ReDrawMap(true);
 
-            // reset the zoom / export 
+            // reset the zoom / export
             MainZoomControl.ZoomToFill();
 
             // select the item in the dropdown
@@ -954,8 +1093,18 @@ namespace SMT
                         MainZoomControl.Show(kvp.Value.Layout.X, kvp.Value.Layout.Y, MainZoomControl.Zoom);
                     }
 
-                    SystemDropDownAC.SelectedItem = kvp.Value;
+                    // set first: the dropdown's SelectionChanged would otherwise select and redraw a second time
                     SelectedSystem = kvp.Value.Name;
+                    selectingSystemFromCode = true;
+                    try
+                    {
+                        SystemDropDownAC.SelectedItem = kvp.Value;
+                    }
+                    finally
+                    {
+                        selectingSystemFromCode = false;
+                    }
+
                     AddHighlightToSystem(name);
 
                     break;
@@ -1893,13 +2042,7 @@ namespace SMT
             dashes.Add(1.0);
             dashes.Add(3.0);
 
-            DoubleAnimation da = new DoubleAnimation();
-            da.From = 20;
-            da.To = 0;
-            da.By = 2;
-            da.Duration = new Duration(TimeSpan.FromSeconds(10));
-            da.RepeatBehavior = RepeatBehavior.Forever;
-            Timeline.SetDesiredFrameRate(da, 20);
+            DoubleAnimation da = FactionWarfareDashAnimation;
 
             foreach(EVEData.MapSystem sys in Region.MapSystems.Values.ToList())
             {
@@ -2031,9 +2174,40 @@ namespace SMT
             }
         }
 
+        // The jump bridge and faction warfare dashes creep 2 units a second, slow enough that 5 frames a second looks
+        // no different from a higher rate and renders far less often. One frozen timeline each, shared by every line.
+        private static readonly DoubleAnimation JumpBridgeDashAnimation = CreateDashAnimation(0, 200, TimeSpan.FromSeconds(100));
+        private static readonly DoubleAnimation FactionWarfareDashAnimation = CreateDashAnimation(20, 0, TimeSpan.FromSeconds(10));
+
+        private static DoubleAnimation CreateDashAnimation(double from, double to, TimeSpan duration)
+        {
+            DoubleAnimation animation = new DoubleAnimation(from, to, new Duration(duration)) { RepeatBehavior = RepeatBehavior.Forever };
+            Timeline.SetDesiredFrameRate(animation, 5);
+            animation.Freeze();
+            return animation;
+        }
+
+        // The selected system's highlight stays on the map across the 2 s partial redraws: rebuilding it there would
+        // restart its one 6 s turn every 2 s, so it would never stop animating while the map sits idle. A full
+        // redraw clears the canvas, and the highlight is made again.
+        private Shape selectionHighlight;
+        private string selectionHighlightSystem;
+
         private void AddHighlightToSystem(string name)
         {
-            if(!Region.MapSystems.Keys.Contains(name))
+            if(selectionHighlight != null)
+            {
+                if(name == selectionHighlightSystem && selectionHighlight.Parent == MainCanvas)
+                {
+                    return;
+                }
+
+                MainCanvas.Children.Remove(selectionHighlight);
+                selectionHighlight = null;
+                selectionHighlightSystem = null;
+            }
+
+            if(string.IsNullOrEmpty(name) || !Region.MapSystems.ContainsKey(name))
             {
                 return;
             }
@@ -2065,8 +2239,10 @@ namespace SMT
                 Canvas.SetTop(highlightSystemCircle, selectedSys.Layout.Y - circleOffset);
                 Canvas.SetZIndex(highlightSystemCircle, 19);
 
+                // not a DynamicMapElement: the partial redraws leave it alone
                 MainCanvas.Children.Add(highlightSystemCircle);
-                DynamicMapElements.Add(highlightSystemCircle);
+                selectionHighlight = highlightSystemCircle;
+                selectionHighlightSystem = name;
 
                 DoubleAnimation da = new DoubleAnimation();
                 da.From = 0;
@@ -2316,6 +2492,18 @@ namespace SMT
             Brush ConstellationGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
             Brush RegionGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionGateColour);
 
+            // Shared by hundreds of elements: frozen, WPF doesn't have to watch them for changes.
+            foreach(Brush sharedBrush in new[]
+            {
+                SysOutlineBrush, SysInRegionBrush, SysOutRegionBrush, SysInRegionDarkBrush, SysOutRegionDarkBrush, HasIceBrush,
+                SysInRegionTextBrush, SysOutRegionTextBrush, FriendlyJumpBridgeBrush, DisabledJumpBridgeBrush, JumpInRange,
+                JumpInRangeMulti, Incursion, ConstellationHighlight, DarkTextColourBrush, SysTextBackgroundBrush,
+                MapBackgroundBrushDarkend, NormalGateBrush, ConstellationGateBrush, RegionGateBrush,
+            })
+            {
+                sharedBrush.Freeze();
+            }
+
             // cache all system links
             List<GateHelper> systemLinks = new List<GateHelper>();
 
@@ -2359,15 +2547,7 @@ namespace SMT
                     }
                 }
 
-                Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
-
-
-
                 var systemSubTextLines = new List<(string Text, Brush Foreground)>();
-
-                // add circle for system
-                Polygon systemShape = new Polygon();
-                systemShape.StrokeThickness = 1.5;
 
                 bool needsOutline = true;
                 bool drawNPCStation = mapSystem.ActualSystem.HasNPCStation;
@@ -2398,12 +2578,11 @@ namespace SMT
                         icons += "❄";
                     }
 
-                    Label sysIcons = new Label();
+                    TextBlock sysIcons = new TextBlock();
                     sysIcons.FontSize = 8;
                     sysIcons.IsHitTestVisible = false;
-                    sysIcons.Content = icons;
-                    sysIcons.HorizontalContentAlignment = HorizontalAlignment.Center;
-                    sysIcons.VerticalContentAlignment = VerticalAlignment.Center;
+                    sysIcons.Text = icons;
+                    sysIcons.Padding = new Thickness(5);
                     sysIcons.Foreground = HasIceBrush;
 
                     Canvas.SetLeft(sysIcons, mapSystem.Layout.X - SYSTEM_SHAPE_OFFSET + 11);
@@ -2449,6 +2628,8 @@ namespace SMT
                     // override with sec status colours
                     if(ShowSystemSecurity)
                     {
+                        Brush securityColorFill = new SolidColorBrush(MapColours.GetSecStatusColour(trueSecVal, MapConf.ShowTrueSec));
+                        securityColorFill.Freeze();
                         SystemOutline.Fill = securityColorFill;
                     }
 
@@ -2515,8 +2696,9 @@ namespace SMT
                     Orientation = Orientation.Vertical,
                 };
 
-                Label sysText = new Label();
-                sysText.Content = mapSystem.LocalizedName;
+                // A TextBlock rather than a Label, whose template would add four more elements per system.
+                TextBlock sysText = new TextBlock();
+                sysText.Text = mapSystem.LocalizedName;
 
 
                 if (MapConf.ActiveColourScheme.SystemTextSize > 0)
@@ -2551,8 +2733,7 @@ namespace SMT
                             Canvas.SetLeft(sysTextGrid, spLeft);
                             Canvas.SetTop(sysTextGrid, spTop);
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Center;
                             sp.VerticalAlignment = VerticalAlignment.Bottom;
                             sp.HorizontalAlignment = HorizontalAlignment.Center;
 
@@ -2567,8 +2748,7 @@ namespace SMT
                             Canvas.SetLeft(sysTextGrid, spLeft);
                             Canvas.SetTop(sysTextGrid, spTop);
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Center;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Center;
 
                             sp.VerticalAlignment = VerticalAlignment.Top;
                             sp.HorizontalAlignment = HorizontalAlignment.Center;
@@ -2584,8 +2764,7 @@ namespace SMT
                             Canvas.SetLeft(sysTextGrid, spLeft);
                             Canvas.SetTop(sysTextGrid, spTop);
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Right;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Right;
                             sp.VerticalAlignment = VerticalAlignment.Center;
                             sp.HorizontalAlignment = HorizontalAlignment.Right;
                             sysTextGrid.Children.Add(sp);
@@ -2601,8 +2780,7 @@ namespace SMT
                             sp.VerticalAlignment = VerticalAlignment.Center;
                             sp.HorizontalAlignment = HorizontalAlignment.Left;
 
-                            sysText.HorizontalContentAlignment = HorizontalAlignment.Left;
-                            sysText.VerticalContentAlignment = VerticalAlignment.Center;
+                            sysText.HorizontalAlignment = HorizontalAlignment.Left;
                             sysTextGrid.Children.Add(sp);
                         }
                         break;
@@ -2929,17 +3107,9 @@ namespace SMT
                         jbLine.StrokeDashArray = dashes;
 
                         // animate the jump bridges
-                        DoubleAnimation da = new DoubleAnimation();
-                        da.From = 0;
-                        da.To = 200;
-                        da.By = 2;
-                        da.Duration = new Duration(TimeSpan.FromSeconds(100));
-                        da.RepeatBehavior = RepeatBehavior.Forever;
-                        Timeline.SetDesiredFrameRate(da, 20);
-
                         if(!MapConf.DisableJumpBridgesPathAnimation)
                         {
-                            jbLine.BeginAnimation(Shape.StrokeDashOffsetProperty, da);
+                            jbLine.BeginAnimation(Shape.StrokeDashOffsetProperty, JumpBridgeDashAnimation);
                         }
 
                         Canvas.SetZIndex(jbLine, 19);
@@ -3164,10 +3334,7 @@ namespace SMT
 
         private void MapObjectChanged(object sender, PropertyChangedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                ReDrawMap(true);
-            }), DispatcherPriority.Normal);
+            RequestRedraw(true);
         }
 
         /// <summary>
@@ -3422,29 +3589,44 @@ namespace SMT
         private void ShapeMouseOverHandler(object sender, MouseEventArgs e)
         {
             Shape obj = sender as Shape;
+            UpdateSystemPopup(obj, obj.IsMouseOver && MapConf.ShowSystemPopup);
+        }
 
+        /// <summary>
+        /// Shows the hover popup for a system shape, with its gate and jump bridge highlights, or hides them.
+        /// Internal for a --perftest run to time it.
+        /// </summary>
+        internal void UpdateSystemPopup(Shape obj, bool show)
+        {
             EVEData.MapSystem selectedSys = obj.DataContext as EVEData.MapSystem;
 
             Thickness one = new Thickness(1);
 
-            if(obj.IsMouseOver && MapConf.ShowSystemPopup)
+            if(show)
             {
                 SystemInfoPopup.PlacementTarget = obj;
                 SystemInfoPopup.VerticalOffset = 5;
                 SystemInfoPopup.HorizontalOffset = 15;
                 SystemInfoPopup.DataContext = selectedSys.ActualSystem;
 
-                SystemInfoPopupSP.Background = new SolidColorBrush(MapConf.ActiveColourScheme.PopupBackground);
+                SolidColorBrush popupBackground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupBackground);
+                popupBackground.Freeze();
+                SystemInfoPopupSP.Background = popupBackground;
+
+                // The popup is built and laid out again on every hover: one frozen brush for its text, and plain
+                // TextBlocks, since each Label's template adds four more elements to lay out.
+                SolidColorBrush popupText = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                popupText.Freeze();
 
                 SystemInfoPopupSP.Children.Clear();
 
-                Label header = new Label();
-                header.Content = selectedSys.LocalizedName;
+                TextBlock header = new TextBlock();
+                header.Text = selectedSys.LocalizedName;
                 header.FontWeight = FontWeights.Bold;
                 header.FontSize = 14;
                 header.Padding = one;
                 header.Margin = one;
-                header.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                header.Foreground = popupText;
 
                 SystemInfoPopupSP.Children.Add(header);
                 SystemInfoPopupSP.Children.Add(new Separator());
@@ -3456,7 +3638,6 @@ namespace SMT
                     if(c.Location == selectedSys.Name)
                     {
                         needSeperator = true;
-                        Label characterlabel = new Label();
                         string cname = c.Name;
                         if(!c.IsOnline)
                         {
@@ -3470,12 +3651,12 @@ namespace SMT
 
                 foreach(string s in charNames)
                 {
-                    Label characterlabel = new Label();
+                    TextBlock characterlabel = new TextBlock();
                     characterlabel.Padding = one;
                     characterlabel.Margin = one;
-                    characterlabel.Content = s;
+                    characterlabel.Text = s;
 
-                    characterlabel.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    characterlabel.Foreground = popupText;
                     SystemInfoPopupSP.Children.Add(characterlabel);
                 }
 
@@ -3487,60 +3668,60 @@ namespace SMT
                 // Use zh-CN popup labels when that UI language is active
                 bool isZH = SMT.EVEData.EveManager.CurrentLanguage == "zh-CN";
 
-                Label constellation = new Label();
+                TextBlock constellation = new TextBlock();
                 constellation.Padding = one;
                 constellation.Margin = one;
-                constellation.Content = (isZH ? "星座\t:  " : "Const\t:  ") + selectedSys.ActualSystem.ConstellationName;
-                constellation.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                constellation.Text = (isZH ? "星座\t:  " : "Const\t:  ") + selectedSys.ActualSystem.ConstellationName;
+                constellation.Foreground = popupText;
                 SystemInfoPopupSP.Children.Add(constellation);
 
-                Label secstatus = new Label();
+                TextBlock secstatus = new TextBlock();
                 secstatus.Padding = one;
                 secstatus.Margin = one;
-                secstatus.Content = (isZH ? "安全等级\t:  " : "Security\t:  ") + string.Format("{0:0.00}", selectedSys.ActualSystem.TrueSec) + " (" + selectedSys.ActualSystem.SecType + ")";
-                secstatus.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                secstatus.Text = (isZH ? "安全等级\t:  " : "Security\t:  ") + string.Format("{0:0.00}", selectedSys.ActualSystem.TrueSec) + " (" + selectedSys.ActualSystem.SecType + ")";
+                secstatus.Foreground = popupText;
                 SystemInfoPopupSP.Children.Add(secstatus);
 
                 SystemInfoPopupSP.Children.Add(new Separator());
 
                 if (selectedSys.ActualSystem.ShipKillsLastHour != 0)
                 {
-                    Label data = new Label();
+                    TextBlock data = new TextBlock();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = isZH ? $"舰船击杀\t:  {selectedSys.ActualSystem.ShipKillsLastHour}" : $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
-                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    data.Text = isZH ? $"舰船击杀\t:  {selectedSys.ActualSystem.ShipKillsLastHour}" : $"Ship Kills\t:  {selectedSys.ActualSystem.ShipKillsLastHour}";
+                    data.Foreground = popupText;
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
                 if (selectedSys.ActualSystem.PodKillsLastHour != 0)
                 {
-                    Label data = new Label();
+                    TextBlock data = new TextBlock();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = isZH ? $"太空舱击杀\t:  {selectedSys.ActualSystem.PodKillsLastHour}" : $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
-                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    data.Text = isZH ? $"太空舱击杀\t:  {selectedSys.ActualSystem.PodKillsLastHour}" : $"Pod Kills\t:  {selectedSys.ActualSystem.PodKillsLastHour}";
+                    data.Foreground = popupText;
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
                 if (selectedSys.ActualSystem.NPCKillsLastHour != 0)
                 {
-                    Label data = new Label();
+                    TextBlock data = new TextBlock();
                     data.Padding = one;
                     data.Margin = one;
-                    data.Content = isZH ? $"NPC 击杀\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, 变化 ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})" : $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, Delta ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})";
-                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    data.Text = isZH ? $"NPC 击杀\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, 变化 ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})" : $"NPC Kills\t:  {selectedSys.ActualSystem.NPCKillsLastHour}, Delta ({selectedSys.ActualSystem.NPCKillsDeltaLastHour})";
+                    data.Foreground = popupText;
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
                 if (selectedSys.ActualSystem.JumpsLastHour != 0)
                 {
-                    Label data = new Label();
+                    TextBlock data = new TextBlock();
                     data.Padding = one;
                     data.Margin = one;
 
-                    data.Content = isZH ? $"跳跃数\t:  {selectedSys.ActualSystem.JumpsLastHour}" : $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
-                    data.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    data.Text = isZH ? $"跳跃数\t:  {selectedSys.ActualSystem.JumpsLastHour}" : $"Jumps\t:  {selectedSys.ActualSystem.JumpsLastHour}";
+                    data.Foreground = popupText;
                     SystemInfoPopupSP.Children.Add(data);
                 }
 
@@ -3559,18 +3740,18 @@ namespace SMT
 
                         if(selectedSys.Name == jb.From)
                         {
-                            Label jbl = new Label();
+                            TextBlock jbl = new TextBlock();
                             jbl.Padding = one;
                             jbl.Margin = one;
-                            jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
-                            jbl.Content = $"JB\t: {jb.To}";
+                            jbl.Foreground = popupText;
+                            jbl.Text = $"JB\t: {jb.To}";
 
                             targetSystemID = EM.GetEveSystem(jb.To).ID;
 
                             if(!Region.IsSystemOnMap(jb.To))
                             {
                                 EVEData.System sys = EM.GetEveSystem(jb.To);
-                                jbl.Content += $" ({sys.Region})";
+                                jbl.Text += $" ({sys.Region})";
                             }
 
                             SystemInfoPopupSP.Children.Add(jbl);
@@ -3589,18 +3770,18 @@ namespace SMT
 
                         if(selectedSys.Name == jb.To)
                         {
-                            Label jbl = new Label();
+                            TextBlock jbl = new TextBlock();
                             jbl.Padding = one;
                             jbl.Margin = one;
-                            jbl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
-                            jbl.Content = $"JB\t: {jb.From}";
+                            jbl.Foreground = popupText;
+                            jbl.Text = $"JB\t: {jb.From}";
 
                             targetSystemID = EM.GetEveSystem(jb.From).ID;
 
                             if(!Region.IsSystemOnMap(jb.From))
                             {
                                 EVEData.System sys = EM.GetEveSystem(jb.From);
-                                jbl.Content += $" ({sys.Region})";
+                                jbl.Text += $" ({sys.Region})";
                             }
 
                             SystemInfoPopupSP.Children.Add(jbl);
@@ -3656,11 +3837,11 @@ namespace SMT
                                                     JBZone = 1;
                                                 }
 
-                                                Label jbzl = new Label();
+                                                TextBlock jbzl = new TextBlock();
                                                 jbzl.Padding = one;
                                                 jbzl.Margin = one;
-                                                jbzl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
-                                                jbzl.Content = $"JB Zone\t: {JBZone}";
+                                                jbzl.Foreground = popupText;
+                                                jbzl.Text = $"JB Zone\t: {JBZone}";
                                                 SystemInfoPopupSP.Children.Add(jbzl);
                                             }
                                         }
@@ -3675,7 +3856,7 @@ namespace SMT
                     {
                         Line jbHighlight = new Line();
 
-                        Brush highlightBrush = new SolidColorBrush(Colors.Yellow);
+                        Brush highlightBrush = Brushes.Yellow;
 
                         jbHighlight.X1 = from.X;
                         jbHighlight.Y1 = from.Y;
@@ -3726,6 +3907,9 @@ namespace SMT
                     Brush NormalGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.NormalGateColour);
                     Brush ConstellationGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.ConstellationGateColour);
                     Brush RegionGateBrush = new SolidColorBrush(MapConf.ActiveColourScheme.RegionGateColour);
+                    NormalGateBrush.Freeze();
+                    ConstellationGateBrush.Freeze();
+                    RegionGateBrush.Freeze();
 
                     foreach(string connection in selectedSys.ActualSystem.Jumps)
                     {
@@ -3773,7 +3957,7 @@ namespace SMT
                 {
                     SystemInfoPopupSP.Children.Add(new Separator());
 
-                    Label sov = new Label();
+                    TextBlock sov = new TextBlock();
                     sov.Padding = one;
                     sov.Margin = one;
 
@@ -3799,8 +3983,8 @@ namespace SMT
 
 
 
-                    sov.Content = SovInfo;
-                    sov.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    sov.Text = SovInfo;
+                    sov.Foreground = popupText;
                     SystemInfoPopupSP.Children.Add(sov);
                 }
 
@@ -3808,21 +3992,21 @@ namespace SMT
                 // update Infrastructure Upgrades
                 if(selectedSys.ActualSystem.InfrastructureUpgrades.Count > 0)
                 {
-                    Label upgradeHeader = new Label();
+                    TextBlock upgradeHeader = new TextBlock();
                     upgradeHeader.Padding = one;
                     upgradeHeader.Margin = one;
-                    upgradeHeader.Content = "Infrastructure Upgrades:";
-                    upgradeHeader.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    upgradeHeader.Text = "Infrastructure Upgrades:";
+                    upgradeHeader.Foreground = popupText;
                     upgradeHeader.FontWeight = FontWeights.Bold;
                     SystemInfoPopupSP.Children.Add(upgradeHeader);
 
                     foreach(EVEData.InfrastructureUpgrade upgrade in selectedSys.ActualSystem.InfrastructureUpgrades.OrderBy(u => u.SlotNumber))
                     {
-                        Label upgradeLabel = new Label();
+                        TextBlock upgradeLabel = new TextBlock();
                         upgradeLabel.Padding = new Thickness(15, 1, 1, 1);
                         upgradeLabel.Margin = one;
-                        upgradeLabel.Content = $"{upgrade.SlotNumber}. {upgrade.DisplayName} - {upgrade.Status}";
-                        upgradeLabel.Foreground = new SolidColorBrush(upgrade.IsOnline ? Colors.LightGreen : Colors.Gray);
+                        upgradeLabel.Text = $"{upgrade.SlotNumber}. {upgrade.DisplayName} - {upgrade.Status}";
+                        upgradeLabel.Foreground = upgrade.IsOnline ? Brushes.LightGreen : Brushes.Gray;
                         SystemInfoPopupSP.Children.Add(upgradeLabel);
                     }
                 }
@@ -3835,18 +4019,18 @@ namespace SMT
                     {
                         SystemInfoPopupSP.Children.Add(new Separator());
 
-                        Label tl = new Label();
+                        TextBlock tl = new TextBlock();
                         tl.Padding = one;
                         tl.Margin = one;
-                        tl.Content = $"Thera\t: in {tc.InSignatureID}";
-                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        tl.Text = $"Thera\t: in {tc.InSignatureID}";
+                        tl.Foreground = popupText;
                         SystemInfoPopupSP.Children.Add(tl);
 
-                        tl = new Label();
+                        tl = new TextBlock();
                         tl.Padding = one;
                         tl.Margin = one;
-                        tl.Content = $"Thera\t: out {tc.OutSignatureID}";
-                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        tl.Text = $"Thera\t: out {tc.OutSignatureID}";
+                        tl.Foreground = popupText;
                         SystemInfoPopupSP.Children.Add(tl);
                     }
                 }
@@ -3859,18 +4043,18 @@ namespace SMT
                     {
                         SystemInfoPopupSP.Children.Add(new Separator());
 
-                        Label tl = new Label();
+                        TextBlock tl = new TextBlock();
                         tl.Padding = one;
                         tl.Margin = one;
-                        tl.Content = $"Turnur\t: in {tc.InSignatureID}";
-                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        tl.Text = $"Turnur\t: in {tc.InSignatureID}";
+                        tl.Foreground = popupText;
                         SystemInfoPopupSP.Children.Add(tl);
 
-                        tl = new Label();
+                        tl = new TextBlock();
                         tl.Padding = one;
                         tl.Margin = one;
-                        tl.Content = $"Turnur\t: out {tc.OutSignatureID}";
-                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        tl.Text = $"Turnur\t: out {tc.OutSignatureID}";
+                        tl.Foreground = popupText;
                         SystemInfoPopupSP.Children.Add(tl);
                     }
                 }
@@ -3882,11 +4066,11 @@ namespace SMT
                     {
                         SystemInfoPopupSP.Children.Add(new Separator());
 
-                        Label tl = new Label();
+                        TextBlock tl = new TextBlock();
                         tl.Padding = one;
                         tl.Margin = one;
-                        tl.Content = $"Storm\t: {s.Type}";
-                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        tl.Text = $"Storm\t: {s.Type}";
+                        tl.Foreground = popupText;
                         SystemInfoPopupSP.Children.Add(tl);
                     }
                 }
@@ -3898,22 +4082,22 @@ namespace SMT
                 {
                     if(selectedSys.Name == p.System)
                     {
-                        Label tl = new Label();
+                        TextBlock tl = new TextBlock();
                         tl.Padding = one;
                         tl.Margin = one;
-                        tl.Content = $"{p.Type} : {p.ShortDesc}";
-                        tl.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                        tl.Text = $"{p.Type} : {p.ShortDesc}";
+                        tl.Foreground = popupText;
                         SystemInfoPopupSP.Children.Add(tl);
                     }
                 }
 
                 if(MapConf.ShowTrigInvasions && selectedSys.ActualSystem.TrigInvasionStatus != EVEData.System.EdenComTrigStatus.None)
                 {
-                    Label trigInfo = new Label();
+                    TextBlock trigInfo = new TextBlock();
                     trigInfo.Padding = one;
                     trigInfo.Margin = one;
-                    trigInfo.Content = $"Invasion : {selectedSys.ActualSystem.TrigInvasionStatus}";
-                    trigInfo.Foreground = new SolidColorBrush(MapConf.ActiveColourScheme.PopupText);
+                    trigInfo.Text = $"Invasion : {selectedSys.ActualSystem.TrigInvasionStatus}";
+                    trigInfo.Foreground = popupText;
                     SystemInfoPopupSP.Children.Add(trigInfo);
                 }
 
@@ -4088,8 +4272,16 @@ namespace SMT
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uRL) { UseShellExecute = true });
         }
 
+        private bool selectingSystemFromCode;
+
         private void SystemDropDownAC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if(selectingSystemFromCode)
+            {
+                // SelectSystem set the dropdown; its caller redraws
+                return;
+            }
+
             EVEData.MapSystem sd = SystemDropDownAC.SelectedItem as EVEData.MapSystem;
 
             if(sd != null)

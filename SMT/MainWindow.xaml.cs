@@ -96,7 +96,20 @@ namespace SMT
         private EVEData.LocalCharacter activeCharacter;
 
         public EVEData.LocalCharacter ActiveCharacter
-        { get => activeCharacter; set { activeCharacter = value; OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty); } }
+        {
+            get => activeCharacter;
+            set
+            {
+                // listeners (each open overlay) redraw on this event, so only raise it for a real change
+                if(activeCharacter == value)
+                {
+                    return;
+                }
+
+                activeCharacter = value;
+                OnSelectedCharChangedEventHandler?.Invoke(this, EventArgs.Empty);
+            }
+        }
         public void UpdateTabTitles()
         {
             try
@@ -143,34 +156,24 @@ namespace SMT
         }
         public MainWindow()
         {
+            PerfMetrics.MarkStartup("process start to MainWindow");
+
+            // the static map data needs nothing from the UI: read it while the window is built
+            EVEData.EveManager.StartLoadingStaticData();
+
+            ReadPerfTestArguments();
+            ContentRendered += MainWindow_ContentRendered;
+
             AppWindow = this;
             DataContext = this;
 
             this.FontFamily = new FontFamily(new Uri("pack://application:,,,/External/AtkinsonHyperlegible/"), "./#Atkinson Hyperlegible");
 
-            Uri woopUri = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-
-
-            waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
-
-            audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
-
-            try
-            {
-                waveOutEvent.Init(audioFileReader);
-            }
-            catch
-            {
-                // wave output fails on some devices; try falling back to dsound
-                waveOutEvent = new DirectSoundOut();
-                waveOutEvent.Init(audioFileReader);
-            }
-
-
             CharacterNameIDCache = new Dictionary<string, long>();
             CharacterIDNameCache = new Dictionary<long, string>();
 
             InitializeComponent();
+            PerfMetrics.MarkStartup("InitializeComponent");
 
             Title = $"SMT : {EveAppConfig.SMT_TITLE} ({EveAppConfig.SMT_VERSION})";
 
@@ -204,6 +207,8 @@ namespace SMT
             {
                 this.Topmost = true;
             }
+
+            PerfMetrics.MarkStartup("window layout and settings");
 
             // Create the main EVE manager
 
@@ -246,9 +251,12 @@ namespace SMT
                 EVEManager.LoadFromDisk();
             }
 
+            PerfMetrics.MarkStartup("EVE data");
+
             EVEManager.SetupIntelWatcher();
             EVEManager.SetupGameLogWatcher();
             EVEManager.SetupLogFileTriggers();
+            PerfMetrics.MarkStartup("log watchers");
 
             IntelCache = new ObservableCollection<IntelData>();
             RawIntelBox.ItemsSource = IntelCache;
@@ -281,8 +289,10 @@ namespace SMT
             // load jump bridge data
             EVEManager.LoadJumpBridgeData();
             EVEManager.InitNavigation();
+            PerfMetrics.MarkStartup("navigation");
 
-            EVEManager.UpdateMetaliminalStorms();
+            // downloads in the background; the storm list and maps update when it arrives (StormsUpdateEvent)
+            _ = EVEManager.UpdateMetaliminalStormsAsync();
 
             EVEManager.LocalCharacterUpdateEvent += LocalCharacters_CollectionChanged;
 
@@ -363,10 +373,13 @@ namespace SMT
                 ANOMManager = new EVEData.AnomManager();
             }
 
+            PerfMetrics.MarkStartup("lists, info objects and anoms");
+
             RegionUC.MapConf = MapConf;
             RegionUC.ANOMManager = ANOMManager;
             RegionUC.Init();
             RegionUC.SelectRegion(MapConf.DefaultRegion);
+            PerfMetrics.MarkStartup("region map");
 
             RegionUC.RegionChanged += RegionUC_RegionChanged;
             RegionUC.UniverseSystemSelect += RegionUC_UniverseSystemSelect;
@@ -377,20 +390,20 @@ namespace SMT
             UniverseUC.CapitalRoute = CapitalRoute;
             UniverseUC.Init();
             UniverseUC.RequestRegionSystem += UniverseUC_RequestRegionSystem;
+            PerfMetrics.MarkStartup("universe map");
 
             RegionsViewUC.MapConf = MapConf;
             RegionsViewUC.Init();
             RegionsViewUC.RequestRegion += RegionsViewUC_RequestRegion;
+            PerfMetrics.MarkStartup("regions view");
 
             AppStatusBar.DataContext = EVEManager.ServerInfo;
             EVEManager.ServerInfo.StatusMessage = "Ready";
             AppLog.StatusChanged += AppLog_StatusChanged;
 
-            List<EVEData.System> globalSystemList = new List<EVEData.System>(EVEManager.Systems);
-            globalSystemList.Sort((a, b) => string.Compare(a.Name, b.Name));
-            RouteSystemDropDownAC.ItemsSource = globalSystemList;
-            JumpRouteSystemDropDownAC.ItemsSource = globalSystemList;
-            JumpRouteAvoidSystemDropDownAC.ItemsSource = globalSystemList;
+            RouteSystemDropDownAC.ItemsSource = EVEManager.GetSystemsByName();
+            JumpRouteSystemDropDownAC.ItemsSource = EVEManager.GetSystemsByName();
+            JumpRouteAvoidSystemDropDownAC.ItemsSource = EVEManager.GetSystemsByName();
 
             MapConf.PropertyChanged += MapConf_PropertyChanged;
 
@@ -413,17 +426,8 @@ namespace SMT
             CollectionView zKBFeedview = (CollectionView)CollectionViewSource.GetDefaultView(ZKBFeed.ItemsSource);
             manualZKillFilterRefreshRequired = true;
 
-            // Define your existing filter logic
-            Predicate<object> initialFilter = item => ZKBFeedFilter(item);
-
-            // Apply the both filters
-            zKBFeedview.Filter = item =>
-            {
-                // copy the list before checking
-                var listToFilter = EVEManager.ZKillFeed.KillStream.ToList();
-                var filteredItems = listToFilter.Where(initialFilter.Invoke).Take(30).ToList();
-                return filteredItems.Contains((ZKBDataSimple)item);
-            };
+            // newest kills that pass ZKBFeedFilter (region filter), capped at ZKBFeedMaxKills
+            zKBFeedview.Filter = ZKBFeedViewFilter;
 
             EVEManager.ZKillFeed.KillsAddedEvent += OnZKillsAdded;
 
@@ -485,9 +489,14 @@ namespace SMT
             nIcon.ContextMenuStrip.Items.Add("Show", null, NIcon_DClick);
             nIcon.ContextMenuStrip.Items.Add("Exit", null, NIcon_Exit);
 
-            _ = CheckGitHubVersionAsync();
+            // a --perftest run must not stop on the new-version dialog
+            if(!IsPerfTestRun)
+            {
+                _ = CheckGitHubVersionAsync();
+            }
 
             RegionUC.SelectRegion(MapConf.DefaultRegion);
+            PerfMetrics.MarkStartup("rest of constructor");
         }
     }
 }

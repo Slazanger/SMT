@@ -151,16 +151,21 @@ namespace SMT
                 {
                     if(lc.Name == characterName)
                     {
-                        ActiveCharacter = lc;
-                        CurrentActiveCharacterCombo.SelectedItem = lc;
-                        FleetMembersList.ItemsSource = lc.FleetInfo.Members;
-                        CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
-                        lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
-                        lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
+                        // this runs every second while an EVE client has focus: switch only when it is another character
+                        if(lc != ActiveCharacter)
+                        {
+                            ActiveCharacter = lc;
+                            CurrentActiveCharacterCombo.SelectedItem = lc;
+                            FleetMembersList.ItemsSource = lc.FleetInfo.Members;
+                            CollectionViewSource.GetDefaultView(FleetMembersList.ItemsSource).Refresh();
+                            lc.FleetUpdatedEvent -= OnFleetMemebersUpdate;
+                            lc.FleetUpdatedEvent += OnFleetMemebersUpdate;
 
-                        lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
-                        lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
+                            lc.RouteUpdatedEvent -= OnCharacterRouteUpdate;
+                            lc.RouteUpdatedEvent += OnCharacterRouteUpdate;
+                        }
 
+                        // still called every time: they follow the character to its current system
                         RegionUC.UpdateActiveCharacter(lc);
                         UniverseUC.UpdateActiveCharacter(lc);
 

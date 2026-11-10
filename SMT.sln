@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataGen", "DataGen\DataGen.
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{9F3D6EC2-A182-4C10-87CB-D7091BE1231C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EVEData.Tests", "EVEData.Tests\EVEData.Tests.csproj", "{C20F78D1-7E81-4737-8D0F-F9B581AA6EBF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfBench", "tools\PerfBench\PerfBench.csproj", "{7B0E5D63-2C4A-4F0B-9E57-6C1D8A3F92B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +35,14 @@ Global
 		{B2323ED5-1B76-4E01-9B13-AC79600EF8EA}.Release|x64.Build.0 = Release|x64
 		{9F3D6EC2-A182-4C10-87CB-D7091BE1231C}.Debug|x64.ActiveCfg = Debug
 		{9F3D6EC2-A182-4C10-87CB-D7091BE1231C}.Release|x64.ActiveCfg = Release
+		{C20F78D1-7E81-4737-8D0F-F9B581AA6EBF}.Debug|x64.ActiveCfg = Debug|x64
+		{C20F78D1-7E81-4737-8D0F-F9B581AA6EBF}.Debug|x64.Build.0 = Debug|x64
+		{C20F78D1-7E81-4737-8D0F-F9B581AA6EBF}.Release|x64.ActiveCfg = Release|x64
+		{C20F78D1-7E81-4737-8D0F-F9B581AA6EBF}.Release|x64.Build.0 = Release|x64
+		{7B0E5D63-2C4A-4F0B-9E57-6C1D8A3F92B4}.Debug|x64.ActiveCfg = Debug|x64
+		{7B0E5D63-2C4A-4F0B-9E57-6C1D8A3F92B4}.Debug|x64.Build.0 = Debug|x64
+		{7B0E5D63-2C4A-4F0B-9E57-6C1D8A3F92B4}.Release|x64.ActiveCfg = Release|x64
+		{7B0E5D63-2C4A-4F0B-9E57-6C1D8A3F92B4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

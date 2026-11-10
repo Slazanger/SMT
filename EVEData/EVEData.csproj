@@ -21,10 +21,11 @@
   <ItemGroup>
     <PackageReference Include="PointyHatGames.EVEStandard" Version="4.1.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EVEData.Tests" />
+  </ItemGroup>
 	<ItemGroup>
-	  <None Update="data\JumpRangeCache.dat">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	  <None Update="data\MapLayout.dat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

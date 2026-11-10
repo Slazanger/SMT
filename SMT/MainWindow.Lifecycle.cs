@@ -35,6 +35,13 @@ namespace SMT
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
+            if(IsPerfTestRun)
+            {
+                // a --perftest run leaves the saved placement alone and opens on a secondary monitor
+                PlaceOnPerfTestScreen(this, 1280, 900);
+                return;
+            }
+
             WindowPlacement.SetPlacement(new WindowInteropHelper(this).Handle, Properties.Settings.Default.MainWindow_placement);
         }
         private void SaveDefaultLayout()
@@ -141,7 +148,7 @@ namespace SMT
         }
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            if(MapConf.CloseToTray && MapConf.MinimizeToTray && AppWindow.ShowInTaskbar != false)
+            if(MapConf.CloseToTray && MapConf.MinimizeToTray && AppWindow.ShowInTaskbar != false && !IsPerfTestRun)
             {
                 e.Cancel = true;
                 AppWindow.Hide();
@@ -152,8 +159,11 @@ namespace SMT
 
             // Store the main window position and size
 
-            Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
-            Properties.Settings.Default.Save();
+            if(!IsPerfTestRun)
+            {
+                Properties.Settings.Default.MainWindow_placement = WindowPlacement.GetPlacement(new WindowInteropHelper(AppWindow).Handle);
+                Properties.Settings.Default.Save();
+            }
 
             EVEManager.ZKillFeed.KillsAddedEvent -= OnZKillsAdded;
             AppLog.StatusChanged -= AppLog_StatusChanged;
@@ -175,6 +185,12 @@ namespace SMT
         }
         private void MainWindow_Closed(object sender, EventArgs e)
         {
+            if(IsPerfTestRun)
+            {
+                ClosePerfTestRun();
+                return;
+            }
+
             // save off the dockmanager layout
             string dockManagerLayoutName = Path.Combine(EveAppConfig.StorageRoot, "Layout_" + WindowLayoutVersion + ".dat");
 

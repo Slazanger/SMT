@@ -86,9 +86,10 @@ namespace SMT
                     }
                 }
 
-                // add new
-                foreach(GameLogData gl in gll)
+                // add new: the log monitor reports once per poll, so add oldest first to keep the newest on top
+                for(int i = gll.Count - 1; i >= 0; i--)
                 {
+                    GameLogData gl = gll[i];
                     if(!GameLogCache.Contains(gl))
                     {
                         GameLogCache.Insert(0, gl);
@@ -96,6 +97,31 @@ namespace SMT
                 }
             }), DispatcherPriority.Normal);
         }
+        /// <summary>
+        /// Opens the audio output and the alert sound on first use, so startup doesn't wait for the audio device.
+        /// </summary>
+        private void EnsureIntelSoundPlayer()
+        {
+            if(waveOutEvent != null)
+            {
+                return;
+            }
+
+            audioFileReader = new AudioFileReader(AppDomain.CurrentDomain.BaseDirectory + @"\Sounds\woop.mp3");
+            waveOutEvent = new WaveOutEvent { DeviceNumber = -1 };
+
+            try
+            {
+                waveOutEvent.Init(audioFileReader);
+            }
+            catch
+            {
+                // wave output fails on some devices; try falling back to dsound
+                waveOutEvent = new DirectSoundOut();
+                waveOutEvent.Init(audioFileReader);
+            }
+        }
+
         private void ClearIntelBtn_Click(object sender, RoutedEventArgs e)
         {
             EVEManager.IntelDataList.ClearAll();
@@ -112,10 +138,12 @@ namespace SMT
             bool playSound = false;
             bool flashWindow = false;
 
+            // the log monitor reports once per poll, so idl (newest first) can hold several new lines
+            List<IntelData> added = new List<IntelData>();
+
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 List<IntelData> removeList = new List<IntelData>();
-                List<IntelData> addList = new List<IntelData>();
 
                 // remove old
 
@@ -135,64 +163,67 @@ namespace SMT
                     }
                 }
 
-                // add new
-                foreach(IntelData id in idl)
+                // add new, oldest first so the newest ends up on top
+                for(int i = idl.Count - 1; i >= 0; i--)
                 {
+                    IntelData id = idl[i];
                     if(!IntelCache.Contains(id))
                     {
                         IntelCache.Insert(0, id);
+                        added.Add(id);
                     }
                 }
             }), DispatcherPriority.Normal);
 
-            IntelData id = IntelCache[0];
-
-            if(id.ClearNotification)
+            // clear notifications don't alert (do nothing for now)
+            List<IntelData> alertable = added.Where(id => !id.ClearNotification).ToList();
+            if(alertable.Count == 0)
             {
-                // do nothing for now
                 return;
             }
 
-            if(MapConf.PlayIntelSoundOnUnknown && id.Systems.Count == 0)
+            foreach(IntelData id in alertable)
             {
-                playSound = true;
-                flashWindow = true;
-            }
-
-
-            if(MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
-            {
-                if(MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
+                if(MapConf.PlayIntelSoundOnUnknown && id.Systems.Count == 0)
                 {
-                    foreach(string s in id.Systems)
+                    playSound = true;
+                    flashWindow = true;
+                }
+
+                if(MapConf.PlayIntelSound || MapConf.FlashWindow || MapConf.PlayIntelSoundOnAlert)
+                {
+                    if(MapConf.PlaySoundOnlyInDangerZone || MapConf.FlashWindowOnlyInDangerZone)
                     {
-                        foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
+                        foreach(string s in id.Systems)
                         {
-                            if(lc.WarningSystems != null && lc.DangerZoneActive)
+                            foreach(EVEData.LocalCharacter lc in EVEManager.LocalCharacters)
                             {
-                                foreach(string ls in lc.WarningSystems)
+                                if(lc.WarningSystems != null && lc.DangerZoneActive)
                                 {
-                                    if(ls == s)
+                                    foreach(string ls in lc.WarningSystems)
                                     {
-                                        playSound = playSound || MapConf.PlaySoundOnlyInDangerZone;
-                                        flashWindow = flashWindow || MapConf.FlashWindowOnlyInDangerZone;
-                                        break;
+                                        if(ls == s)
+                                        {
+                                            playSound = playSound || MapConf.PlaySoundOnlyInDangerZone;
+                                            flashWindow = flashWindow || MapConf.FlashWindowOnlyInDangerZone;
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                if(MapConf.PlayIntelSoundOnAlert)
-                {
-                    // Check if the intel contains a text we should explicitly alert on
-                    foreach(string alertName in EVEManager.IntelAlertFilters)
+                    if(MapConf.PlayIntelSoundOnAlert)
                     {
-                        if(id.RawIntelString.Contains(alertName))
+                        // Check if the intel contains a text we should explicitly alert on
+                        foreach(string alertName in EVEManager.IntelAlertFilters)
                         {
-                            playSound = playSound || MapConf.PlayIntelSoundOnAlert;
-                            break;
+                            if(id.RawIntelString.Contains(alertName))
+                            {
+                                playSound = playSound || MapConf.PlayIntelSoundOnAlert;
+                                break;
+                            }
                         }
                     }
                 }
@@ -204,6 +235,7 @@ namespace SMT
                 {
                     try
                     {
+                        EnsureIntelSoundPlayer();
                         waveOutEvent.Stop();
                         waveOutEvent.Volume = MapConf.IntelSoundVolume;
                         audioFileReader.Position = 0;

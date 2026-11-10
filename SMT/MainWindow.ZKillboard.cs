@@ -125,9 +125,48 @@ namespace SMT
             return false;
         }
 
+        // The feed shows the newest ZKBFeedMaxKills kills that pass ZKBFeedFilter. The view calls its filter
+        // once per item, so the visible set is worked out once and reused until the kill stream changes or
+        // InvalidateZKBVisibleKills is called. Working it out for every item would make one refresh
+        // quadratic in the number of kills.
+        private const int ZKBFeedMaxKills = 30;
+        private HashSet<ZKBDataSimple> zkbVisibleKills = new HashSet<ZKBDataSimple>();
+        private int zkbVisibleKillsCount = -1;
+        private ZKBDataSimple zkbVisibleKillsFirst;
+        private ZKBDataSimple zkbVisibleKillsLast;
+
+        private bool ZKBFeedViewFilter(object item)
+        {
+            ObservableCollection<ZKBDataSimple> killStream = EVEManager.ZKillFeed.KillStream;
+            int count = killStream.Count;
+            ZKBDataSimple first = count > 0 ? killStream[0] : null;
+            ZKBDataSimple last = count > 0 ? killStream[count - 1] : null;
+
+            // kills are inserted at the front and expire from the back, so any change to the stream
+            // changes its count, its first kill or its last kill
+            if(count != zkbVisibleKillsCount || first != zkbVisibleKillsFirst || last != zkbVisibleKillsLast)
+            {
+                zkbVisibleKills = new HashSet<ZKBDataSimple>(killStream.Where(kill => ZKBFeedFilter(kill)).Take(ZKBFeedMaxKills));
+                zkbVisibleKillsCount = count;
+                zkbVisibleKillsFirst = first;
+                zkbVisibleKillsLast = last;
+            }
+
+            return item is ZKBDataSimple zkbItem && zkbVisibleKills.Contains(zkbItem);
+        }
+
+        /// <summary>
+        /// Forces the next filter call to rebuild the visible kills, e.g. after the region or the region filter changed.
+        /// </summary>
+        private void InvalidateZKBVisibleKills()
+        {
+            zkbVisibleKillsCount = -1;
+        }
+
         private void ZKBFeedFilterViewChk_Checked(object sender, RoutedEventArgs e)
         {
             zkbFilterByRegion = (bool)ZKBFeedFilterViewChk.IsChecked;
+            InvalidateZKBVisibleKills();
 
             if(ZKBFeed != null)
             {

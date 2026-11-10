@@ -38,6 +38,14 @@ namespace EVEDataUtils
             Write("WARN", operation, message, true);
         }
 
+        /// <summary>
+        /// Measurements (timings, delays) for the log file only; unlike Info they don't replace the status bar text.
+        /// </summary>
+        public static void Metrics(string operation, string message)
+        {
+            Write("PERF", operation, message, false, notifyStatus: false);
+        }
+
         public static void Error(string operation, Exception exception)
         {
             string message = exception == null ? "Unknown error" : exception.ToString();
@@ -49,7 +57,7 @@ namespace EVEDataUtils
             Write("ERROR", operation, message, true);
         }
 
-        private static void Write(string level, string operation, string message, bool isError)
+        private static void Write(string level, string operation, string message, bool isError, bool notifyStatus = true)
         {
             string statusMessage = $"{operation}: {FirstLine(message)}";
 
@@ -67,6 +75,11 @@ namespace EVEDataUtils
             catch
             {
                 // Logging must never cause an application failure.
+            }
+
+            if(!notifyStatus)
+            {
+                return;
             }
 
             try
