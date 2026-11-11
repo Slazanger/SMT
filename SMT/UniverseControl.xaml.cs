@@ -438,6 +438,7 @@ namespace SMT
         private const double SystemNameTextSize = 5;
         private const double SystemNameYOffset = 3;
         private bool systemNamesStale;
+        private bool zoomBandsApplied;
 
         /// <summary>
         /// The system names, one small visual each, so that WPF can leave out the names that are off screen and no
@@ -934,7 +935,13 @@ namespace SMT
                 VHRegionShapes.ClearAllChildren();
                 VHRoute.ClearAllChildren();
 
-                ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
+                // with this redraw's brushes, in the style the current zoom calls for; at startup the first zoom
+                // change creates them
+                if(zoomBandsApplied)
+                {
+                    ReCreateRegionMarkers(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems, true);
+                }
+
                 PerfMetrics.MarkStartup("universe map: region markers");
 
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
@@ -1047,16 +1054,10 @@ namespace SMT
                 VHSystems.AddChild(systemsVisual, null);
                 PerfMetrics.MarkStartup("universe map: systems");
 
-                // The names only show when zoomed in: lay them out once they are first shown, or once the UI is idle.
+                // The names only show when zoomed in: they are laid out when ApplyZoomBands first shows them, or once
+                // the UI is idle.
                 systemNamesStale = true;
-                if(VHNames.Visibility == Visibility.Visible && MainZoomControl.Zoom >= MapConf.UniverseMaxZoomDisplaySystemsText)
-                {
-                    DrawSystemNamesIfStale();
-                }
-                else
-                {
-                    Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, new Action(DrawSystemNamesIfStale));
-                }
+                Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, new Action(DrawSystemNamesIfStale));
 
                 // region shapes
                 {
@@ -1085,6 +1086,14 @@ namespace SMT
                 }
 
                 PerfMetrics.MarkStartup("universe map: region shapes");
+
+                // The zoom bands are otherwise only applied on a zoom change, so a redraw for new band settings
+                // (closing Preferences) would not show them until the next one. At startup the first zoom change
+                // applies them.
+                if(zoomBandsApplied)
+                {
+                    ApplyZoomBands();
+                }
             }
 
             if(DataRedraw)
@@ -1431,6 +1440,17 @@ namespace SMT
 
         private void MainZoomControl_ZoomChanged(object sender, RoutedEventArgs e)
         {
+            ApplyZoomBands();
+        }
+
+        /// <summary>
+        /// Shows the layers the current zoom calls for: the region shapes below UniverseMaxZoomDisplaySystems, the
+        /// systems and gates from it, and the system names from UniverseMaxZoomDisplaySystemsText.
+        /// </summary>
+        private void ApplyZoomBands()
+        {
+            zoomBandsApplied = true;
+
             if(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystemsText)
             {
                 VHNames.Visibility = Visibility.Hidden;
@@ -1461,9 +1481,9 @@ namespace SMT
 
         private bool RegionZoomed = false;
 
-        private void ReCreateRegionMarkers(bool ZoomedOut)
+        private void ReCreateRegionMarkers(bool ZoomedOut, bool force = false)
         {
-            if(RegionZoomed == ZoomedOut)
+            if(RegionZoomed == ZoomedOut && !force)
             {
                 return;
             }
