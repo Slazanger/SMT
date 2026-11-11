@@ -440,8 +440,10 @@ namespace SMT
         private bool systemNamesStale;
 
         /// <summary>
-        /// All system names in one visual. Laid out when they are first shown or the UI goes idle, whichever comes
-        /// first, so startup doesn't wait for 5,000 text layouts that are hidden until the map is zoomed in.
+        /// The system names, one small visual each, so that WPF can leave out the names that are off screen and no
+        /// single visual of text spans the whole universe at the highest zoom. Laid out when they are first shown or
+        /// the UI goes idle, whichever comes first, so startup doesn't wait for 5,000 text layouts that are hidden
+        /// until the map is zoomed in.
         /// </summary>
         private void DrawSystemNamesIfStale()
         {
@@ -455,18 +457,19 @@ namespace SMT
 
             double pixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
             CultureInfo ci = CultureInfo.GetCultureInfo("en-us");
-            System.Windows.Media.DrawingVisual namesVisual = new System.Windows.Media.DrawingVisual();
-            using(DrawingContext drawingContext = namesVisual.RenderOpen())
+            foreach(EVEData.System sys in EM.Systems)
             {
-                foreach(EVEData.System sys in EM.Systems)
+                FormattedText ft = new FormattedText(sys.LocalizedName, ci, FlowDirection.LeftToRight, MainTF, SystemNameTextSize, SystemTextColourBrush, pixelsPerDip);
+                ft.TextAlignment = TextAlignment.Center;
+
+                System.Windows.Media.DrawingVisual nameVisual = new System.Windows.Media.DrawingVisual();
+                using(DrawingContext drawingContext = nameVisual.RenderOpen())
                 {
-                    FormattedText ft = new FormattedText(sys.LocalizedName, ci, FlowDirection.LeftToRight, MainTF, SystemNameTextSize, SystemTextColourBrush, pixelsPerDip);
-                    ft.TextAlignment = TextAlignment.Center;
                     drawingContext.DrawText(ft, new Point(sys.UniverseX, sys.UniverseY + SystemNameYOffset));
                 }
-            }
 
-            VHNames.AddChild(namesVisual, null);
+                VHNames.AddChild(nameVisual, null);
+            }
         }
 
         /// <summary>
