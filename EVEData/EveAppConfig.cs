@@ -21,12 +21,12 @@ namespace SMT.EVEData
         /// <summary>
         /// SMT Version Tagline
         /// </summary>
-        public const string SMT_TITLE = "Command those carriers!";
+        public const string SMT_TITLE = "Defragmented Skies";
 
         /// <summary>
         /// SMT Version
         /// </summary>
-        public const string SMT_VERSION = "SMT_149";
+        public const string SMT_VERSION = "SMT_150";
 
 
         /// <summary>
