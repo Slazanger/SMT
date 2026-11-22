@@ -5442,6 +5442,166 @@
   </item>
   <item>
     <key>
+      <string>95629</string>
+    </key>
+    <value>
+      <string>Oracle Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95630</string>
+    </key>
+    <value>
+      <string>Naga Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95631</string>
+    </key>
+    <value>
+      <string>Talos Navy Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95632</string>
+    </key>
+    <value>
+      <string>Tornado Fleet Issue</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95741</string>
+    </key>
+    <value>
+      <string>Akoman</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95859</string>
+    </key>
+    <value>
+      <string>Academy Merlin</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95860</string>
+    </key>
+    <value>
+      <string>Academy Incursus</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95861</string>
+    </key>
+    <value>
+      <string>Academy Probe</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>95862</string>
+    </key>
+    <value>
+      <string>Academy Venture</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97266</string>
+    </key>
+    <value>
+      <string>Academy Kestrel</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97267</string>
+    </key>
+    <value>
+      <string>Academy Tristan</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97268</string>
+    </key>
+    <value>
+      <string>Academy Rifter</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97269</string>
+    </key>
+    <value>
+      <string>Academy Breacher</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97270</string>
+    </key>
+    <value>
+      <string>Academy Punisher</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97271</string>
+    </key>
+    <value>
+      <string>Academy Tormentor</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97272</string>
+    </key>
+    <value>
+      <string>Academy Heron</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97273</string>
+    </key>
+    <value>
+      <string>Academy Imicus</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97274</string>
+    </key>
+    <value>
+      <string>Academy Magnate</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97793</string>
+    </key>
+    <value>
+      <string>Herald</string>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>97904</string>
+    </key>
+    <value>
+      <string>Penitence</string>
+    </value>
+  </item>
+  <item>
+    <key>
       <string>89607</string>
     </key>
     <value>

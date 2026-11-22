@@ -9305,6 +9305,7 @@
       <string>Lonetrek</string>
       <string>The Citadel</string>
       <string>Essence</string>
+      <string>Syndicate</string>
       <string>Cloud Ring</string>
       <string>Placid</string>
     </RegionLinks>
@@ -72375,7 +72376,7 @@
     <Faction>Amarr</Faction>
     <HasHighSecSystems>true</HasHighSecSystems>
     <HasLowSecSystems>true</HasLowSecSystems>
-    <HasNullSecSystems>false</HasNullSecSystems>
+    <HasNullSecSystems>true</HasNullSecSystems>
     <ID>10000036</ID>
     <MetaRegion>false</MetaRegion>
     <MapSystems>
@@ -305111,6 +305112,7 @@
       <string>Cloud Ring</string>
       <string>Placid</string>
       <string>Verge Vendor</string>
+      <string>Black Rise</string>
     </RegionLinks>
     <RegionX>979.4211670188408</RegionX>
     <RegionY>2082.4006189823704</RegionY>
@@ -356948,7 +356950,7 @@
             </Layout>
             <Name>Arzad</Name>
             <TextPos>Bottom</TextPos>
-            <OutOfRegion>false</OutOfRegion>
+            <OutOfRegion>true</OutOfRegion>
             <Region>Devoid</Region>
           </MapSystem>
         </value>

@@ -1126,7 +1126,15 @@ namespace SMT.EVEData
 
                 foreach(System s in Systems)
                 {
-                    s.ConstellationName = constMap[s.ConstellationID];
+                    if(s.ConstellationID != null)
+                    {
+                        s.ConstellationName = constMap[s.ConstellationID];
+
+                    }
+                    else
+                    {
+                        s.ConstellationName = string.Empty;
+                    }
                 }
             }
             else

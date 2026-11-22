@@ -2301,6 +2301,7 @@
     <HasNPCStation>true</HasNPCStation>
     <ID>30045313</ID>
     <Jumps>
+      <string>T-LIWS</string>
       <string>Okagaiken</string>
       <string>Ashitsu</string>
     </Jumps>
@@ -26947,18 +26948,17 @@
   </System>
   <System>
     <TrigInvasionStatus>None</TrigInvasionStatus>
-    <ActualX>-15.414598190735861522198731501</ActualX>
-    <ActualY>2.1482626246597124735729386892</ActualY>
-    <ActualZ>-2.5785108916889780126849894292</ActualZ>
-    <UniverseX>1895.5235490518435</UniverseX>
-    <UniverseY>2597.1278062948263</UniverseY>
-    <ConstellationID>20000433</ConstellationID>
-    <ConstellationName>Semou</ConstellationName>
+    <ActualX>0</ActualX>
+    <ActualY>0</ActualY>
+    <ActualZ>0</ActualZ>
+    <UniverseX>2657.145436628057</UniverseX>
+    <UniverseY>2469.7258261611983</UniverseY>
+    <ConstellationName />
     <HasIceBelt>false</HasIceBelt>
     <HasBlueA0Star>false</HasBlueA0Star>
     <HasJoveObservatory>true</HasJoveObservatory>
     <HasJoveGate>false</HasJoveGate>
-    <FactionWarSystem>true</FactionWarSystem>
+    <FactionWarSystem>false</FactionWarSystem>
     <HasNPCStation>true</HasNPCStation>
     <ID>30002960</ID>
     <Jumps>
@@ -26967,9 +26967,9 @@
       <string>Tararan</string>
     </Jumps>
     <Name>Arzad</Name>
-    <RadiusAU>11.875672478859688</RadiusAU>
+    <RadiusAU>0</RadiusAU>
     <Region>Devoid</Region>
-    <TrueSec>0.22043</TrueSec>
+    <TrueSec>0</TrueSec>
   </System>
   <System>
     <TrigInvasionStatus>Fortress</TrigInvasionStatus>
@@ -35597,6 +35597,7 @@
       <string>Duripant</string>
       <string>Algogille</string>
       <string>Pakhshi</string>
+      <string>Jufvitte</string>
     </Jumps>
     <Name>Renyn</Name>
     <RadiusAU>7.54676881598155</RadiusAU>
@@ -116022,6 +116023,7 @@
     <Jumps>
       <string>V4-L0X</string>
       <string>UM-Q7F</string>
+      <string>Ienakkamon</string>
     </Jumps>
     <Name>T-LIWS</Name>
     <RadiusAU>25.826284553821527</RadiusAU>
@@ -129952,6 +129954,7 @@
     <HasNPCStation>true</HasNPCStation>
     <ID>30005308</ID>
     <Jumps>
+      <string>Renyn</string>
       <string>Ouelletta</string>
       <string>Ansalle</string>
       <string>Scheenins</string>
