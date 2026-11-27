@@ -95,6 +95,7 @@ namespace SMT.ZoomControl
 
         private const string PART_Presenter = "PART_Presenter";
         private bool _isZooming;
+        private double _targetZoom;
 
         private Point _mouseDownPos;
 
@@ -472,6 +473,7 @@ namespace SMT.ZoomControl
         private void DoZoomAnimation(double targetZoom, double transformX, double transformY)
         {
             _isZooming = true;
+            _targetZoom = targetZoom;
             var duration = new Duration(AnimationLength);
 
             StartAnimation(TranslateXProperty, transformX, duration);
@@ -711,6 +713,13 @@ namespace SMT.ZoomControl
                 return;
 
             e.Handled = true;
+            // An opposite detent can cancel an inward animation before its first frame.
+            bool beyondLimit = e.Delta < 0 ? Zoom < MinZoom : Zoom > MaxZoom;
+            bool atLimit = e.Delta < 0 ? Zoom == MinZoom : Zoom == MaxZoom;
+            bool movingInward = _isZooming && (e.Delta < 0 ? _targetZoom > Zoom : _targetZoom < Zoom);
+            if(e.Delta == 0 || beyondLimit || (atLimit && !movingInward))
+                return;
+
             var origoPosition = new Point(ActualWidth / 2, ActualHeight / 2);
             var mousePosition = e.GetPosition(this);
 
