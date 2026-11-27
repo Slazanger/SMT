@@ -13,7 +13,7 @@ using System.Windows.Media.Animation;
 namespace SMT.ZoomControl
 {
     [TemplatePart(Name = PART_Presenter, Type = typeof(ZoomContentPresenter))]
-    public class ZoomControl : ContentControl
+    public class ZoomControl : ContentControl, INotifyPropertyChanged
     {
         public static readonly DependencyProperty AllowAltZoomBoxProperty =
             DependencyProperty.Register("AllowAltZoomBox", typeof(bool), typeof(ZoomControl),
@@ -259,6 +259,35 @@ namespace SMT.ZoomControl
             set { SetValue(ZoomBoxProperty, value); }
         }
 
+        private static readonly PropertyChangedEventArgs SliderZoomChanged = new(nameof(SliderZoom));
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // Slider edits must take precedence over a wheel or Fit animation already in flight.
+        public double SliderZoom
+        {
+            get { return Zoom; }
+            set
+            {
+                if(!_isZooming)
+                {
+                    Zoom = value;
+                    return;
+                }
+
+                var ratio = value / Zoom;
+                var translateX = TranslateX * ratio;
+                var translateY = TranslateY * ratio;
+                // Removing the clock exposes this base value immediately.
+                SetValue(ZoomProperty, value);
+                BeginAnimation(ZoomProperty, null);
+                TranslateX = translateX;
+                TranslateY = translateY;
+                _isZooming = false;
+                Mode = ZoomControlModes.Custom;
+            }
+        }
+
         public Brush ZoomBoxBackground
         {
             get { return (Brush)GetValue(ZoomBoxBackgroundProperty); }
@@ -444,6 +473,7 @@ namespace SMT.ZoomControl
                 zc.Mode = ZoomControlModes.Custom;
             }
 
+            zc.PropertyChanged?.Invoke(zc, SliderZoomChanged);
             RoutedEventArgs newEventArgs = new RoutedEventArgs(ZoomChangedEvent);
             zc.RaiseEvent(newEventArgs);
         }
@@ -651,6 +681,7 @@ namespace SMT.ZoomControl
             var animation = new DoubleAnimation(toValue, duration);
             if(dp == ZoomProperty)
             {
+                animation.From = Zoom;
                 _zoomAnimCount++;
                 animation.Completed += (s, args) =>
                 {
