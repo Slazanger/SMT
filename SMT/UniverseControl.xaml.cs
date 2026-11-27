@@ -161,6 +161,13 @@ namespace SMT
         {
             InitializeComponent();
             DataContext = this;
+            IsVisibleChanged += (_, _) =>
+            {
+                if(IsVisible && !RegionZoomed.HasValue)
+                {
+                    ApplyZoomBands();
+                }
+            };
         }
 
         private struct GateHelper
@@ -438,7 +445,6 @@ namespace SMT
         private const double SystemNameTextSize = 5;
         private const double SystemNameYOffset = 3;
         private bool systemNamesStale;
-        private bool zoomBandsApplied;
 
         /// <summary>
         /// The system names, one small visual each, so that WPF can leave out the names that are off screen and no
@@ -935,15 +941,6 @@ namespace SMT
                 VHRegionShapes.ClearAllChildren();
                 VHRoute.ClearAllChildren();
 
-                // with this redraw's brushes, in the style the current zoom calls for; at startup the first zoom
-                // change creates them
-                if(zoomBandsApplied)
-                {
-                    ReCreateRegionMarkers(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems, true);
-                }
-
-                PerfMetrics.MarkStartup("universe map: region markers");
-
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
                 Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
@@ -1087,13 +1084,12 @@ namespace SMT
 
                 PerfMetrics.MarkStartup("universe map: region shapes");
 
-                // The zoom bands are otherwise only applied on a zoom change, so a redraw for new band settings
-                // (closing Preferences) would not show them until the next one. At startup the first zoom change
-                // applies them.
-                if(zoomBandsApplied)
+                // Defer the first set of labels until the Universe tab is displayed.
+                if(IsVisible || RegionZoomed.HasValue)
                 {
-                    ApplyZoomBands();
+                    ApplyZoomBands(redrawRegionNames: true);
                 }
+                PerfMetrics.MarkStartup("universe map: region markers");
             }
 
             if(DataRedraw)
@@ -1447,9 +1443,12 @@ namespace SMT
         /// Shows the layers the current zoom calls for: the region shapes below UniverseMaxZoomDisplaySystems, the
         /// systems and gates from it, and the system names from UniverseMaxZoomDisplaySystemsText.
         /// </summary>
-        private void ApplyZoomBands()
+        private void ApplyZoomBands(bool redrawRegionNames = false)
         {
-            zoomBandsApplied = true;
+            if(VHSystems == null)
+            {
+                return;
+            }
 
             if(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystemsText)
             {
@@ -1466,7 +1465,7 @@ namespace SMT
             if(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems)
             {
                 VHSystems.Visibility = Visibility.Hidden;
-                ReCreateRegionMarkers(true);
+                ReCreateRegionMarkers(true, redrawRegionNames);
                 VHRegionShapes.Visibility = Visibility.Visible;
                 VHLinks.Visibility = Visibility.Hidden;
             }
@@ -1475,13 +1474,13 @@ namespace SMT
                 VHSystems.Visibility = Visibility.Visible;
                 VHRegionShapes.Visibility = Visibility.Hidden;
                 VHLinks.Visibility = Visibility.Visible;
-                ReCreateRegionMarkers(false);
+                ReCreateRegionMarkers(false, redrawRegionNames);
             }
         }
 
-        private bool RegionZoomed = false;
+        private bool? RegionZoomed;
 
-        private void ReCreateRegionMarkers(bool ZoomedOut, bool force = false)
+        private void ReCreateRegionMarkers(bool ZoomedOut, bool force)
         {
             if(RegionZoomed == ZoomedOut && !force)
             {

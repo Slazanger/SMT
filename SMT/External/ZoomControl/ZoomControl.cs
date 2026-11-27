@@ -311,8 +311,8 @@ namespace SMT.ZoomControl
 
                 //add the ScaleTransform to the presenter
                 _transformGroup = new TransformGroup();
-                _scaleTransform = new ScaleTransform();
-                _translateTransform = new TranslateTransform();
+                _scaleTransform = new ScaleTransform(Zoom, Zoom);
+                _translateTransform = new TranslateTransform(TranslateX, TranslateY);
                 _transformGroup.Children.Add(_scaleTransform);
                 _transformGroup.Children.Add(_translateTransform);
                 _presenter.RenderTransform = _transformGroup;
