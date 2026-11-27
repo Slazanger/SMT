@@ -8,6 +8,8 @@ namespace SMT
     public class MapConfig : INotifyPropertyChanged
     {
         public static readonly string SaveVersion = "05";
+        private const float DefaultUniverseSystemsZoom = 1.3f;
+        private const float DefaultUniverseSystemTextZoom = 2.0f;
 
         [Browsable(false)]
         public MapColours ActiveColourScheme;
@@ -905,7 +907,7 @@ namespace SMT
 
             set
             {
-                m_UniverseMaxZoomDisplaySystems = Math.Min(Math.Max(value, 0.5f), 10.0f);
+                m_UniverseMaxZoomDisplaySystems = float.IsNaN(value) ? DefaultUniverseSystemsZoom : Math.Clamp(value, 0.5f, 10.0f);
                 OnPropertyChanged("UniverseMaxZoomDisplaySystems");
             }
         }
@@ -921,7 +923,7 @@ namespace SMT
 
             set
             {
-                m_UniverseMaxZoomDisplaySystemsText = Math.Min(Math.Max(value, 0.5f), 10.0f);
+                m_UniverseMaxZoomDisplaySystemsText = float.IsNaN(value) ? DefaultUniverseSystemTextZoom : Math.Clamp(value, 0.5f, 10.0f);
                 OnPropertyChanged("UniverseMaxZoomDisplaySystemsText");
             }
         }
@@ -1335,8 +1337,8 @@ namespace SMT
             LimitESIDataToRegion = false;
             ClampMaxESIOverlayValue = true;
             MaxESIOverlayValue = 120;
-            UniverseMaxZoomDisplaySystems = 1.3f;
-            UniverseMaxZoomDisplaySystemsText = 2.0f;
+            UniverseMaxZoomDisplaySystems = DefaultUniverseSystemsZoom;
+            UniverseMaxZoomDisplaySystemsText = DefaultUniverseSystemTextZoom;
 
             IntelSoundVolume = 0.5f;
 

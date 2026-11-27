@@ -13,7 +13,7 @@ using System.Windows.Media.Animation;
 namespace SMT.ZoomControl
 {
     [TemplatePart(Name = PART_Presenter, Type = typeof(ZoomContentPresenter))]
-    public class ZoomControl : ContentControl
+    public class ZoomControl : ContentControl, INotifyPropertyChanged
     {
         public static readonly DependencyProperty AllowAltZoomBoxProperty =
             DependencyProperty.Register("AllowAltZoomBox", typeof(bool), typeof(ZoomControl),
@@ -94,7 +94,7 @@ namespace SMT.ZoomControl
                 new UIPropertyMetadata(1.0, Zoom_PropertyChanged));
 
         private const string PART_Presenter = "PART_Presenter";
-        private bool _isZooming;
+        private DoubleAnimation _activeZoomAnimation;
 
         private Point _mouseDownPos;
 
@@ -113,8 +113,6 @@ namespace SMT.ZoomControl
         ///     Applied to the scrollviewer.
         /// </summary>
         private TranslateTransform _translateTransform;
-
-        private int _zoomAnimCount;
 
         static ZoomControl()
         {
@@ -245,10 +243,8 @@ namespace SMT.ZoomControl
             }
             set
             {
-                if(Math.Abs(value - (double)GetValue(ZoomProperty)) < double.Epsilon)
-                    return;
-                BeginAnimation(ZoomProperty, null);
-                SetValue(ZoomProperty, value);
+                if(_activeZoomAnimation != null || Math.Abs(value - Zoom) >= double.Epsilon)
+                    SetManualZoom(value);
             }
         }
 
@@ -256,6 +252,37 @@ namespace SMT.ZoomControl
         {
             get { return (Rect)GetValue(ZoomBoxProperty); }
             set { SetValue(ZoomBoxProperty, value); }
+        }
+
+        private static readonly PropertyChangedEventArgs SliderZoomChanged = new(nameof(SliderZoom));
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // Slider edits must take precedence over a wheel or Fit animation already in flight.
+        public double SliderZoom
+        {
+            get { return Zoom; }
+            set { Zoom = value; }
+        }
+
+        private void SetManualZoom(double value)
+        {
+            if(_activeZoomAnimation == null)
+            {
+                BeginAnimation(ZoomProperty, null);
+                SetValue(ZoomProperty, value);
+                return;
+            }
+
+            var ratio = value / Zoom;
+            var translateX = TranslateX * ratio;
+            var translateY = TranslateY * ratio;
+            SetValue(ZoomProperty, value);
+            BeginAnimation(ZoomProperty, null);
+            TranslateX = translateX;
+            TranslateY = translateY;
+            _activeZoomAnimation = null;
+            Mode = ZoomControlModes.Custom;
         }
 
         public Brush ZoomBoxBackground
@@ -311,8 +338,8 @@ namespace SMT.ZoomControl
 
                 //add the ScaleTransform to the presenter
                 _transformGroup = new TransformGroup();
-                _scaleTransform = new ScaleTransform();
-                _translateTransform = new TranslateTransform();
+                _scaleTransform = new ScaleTransform(Zoom, Zoom);
+                _translateTransform = new TranslateTransform(TranslateX, TranslateY);
                 _transformGroup.Children.Add(_scaleTransform);
                 _transformGroup.Children.Add(_translateTransform);
                 _presenter.RenderTransform = _transformGroup;
@@ -405,7 +432,7 @@ namespace SMT.ZoomControl
             if(zc._translateTransform == null)
                 return;
             zc._translateTransform.X = (double)e.NewValue;
-            if(!zc._isZooming)
+            if(zc._activeZoomAnimation == null)
                 zc.Mode = ZoomControlModes.Custom;
         }
 
@@ -421,7 +448,7 @@ namespace SMT.ZoomControl
             if(zc._translateTransform == null)
                 return;
             zc._translateTransform.Y = (double)e.NewValue;
-            if(!zc._isZooming)
+            if(zc._activeZoomAnimation == null)
                 zc.Mode = ZoomControlModes.Custom;
         }
 
@@ -435,7 +462,7 @@ namespace SMT.ZoomControl
             var zoom = (double)e.NewValue;
             zc._scaleTransform.ScaleX = zoom;
             zc._scaleTransform.ScaleY = zoom;
-            if(!zc._isZooming)
+            if(zc._activeZoomAnimation == null)
             {
                 var delta = (double)e.NewValue / (double)e.OldValue;
                 zc.TranslateX *= delta;
@@ -443,6 +470,7 @@ namespace SMT.ZoomControl
                 zc.Mode = ZoomControlModes.Custom;
             }
 
+            zc.PropertyChanged?.Invoke(zc, SliderZoomChanged);
             RoutedEventArgs newEventArgs = new RoutedEventArgs(ZoomChangedEvent);
             zc.RaiseEvent(newEventArgs);
         }
@@ -471,12 +499,25 @@ namespace SMT.ZoomControl
 
         private void DoZoomAnimation(double targetZoom, double transformX, double transformY)
         {
-            _isZooming = true;
-            var duration = new Duration(AnimationLength);
+            if(!double.IsFinite(targetZoom))
+                return;
 
-            StartAnimation(TranslateXProperty, transformX, duration);
-            StartAnimation(TranslateYProperty, transformY, duration);
-            StartAnimation(ZoomProperty, targetZoom, duration);
+            var duration = new Duration(AnimationLength);
+            var zoomAnimation = new DoubleAnimation(Zoom, targetZoom, duration);
+            _activeZoomAnimation = zoomAnimation;
+            zoomAnimation.Completed += (s, args) =>
+            {
+                if(_activeZoomAnimation != zoomAnimation)
+                    return;
+
+                CommitAnimatedValue(TranslateXProperty);
+                CommitAnimatedValue(TranslateYProperty);
+                CommitAnimatedValue(ZoomProperty);
+                _activeZoomAnimation = null;
+            };
+            StartTranslationAnimation(TranslateXProperty, transformX, duration);
+            StartTranslationAnimation(TranslateYProperty, transformY, duration);
+            BeginAnimation(ZoomProperty, zoomAnimation, HandoffBehavior.SnapshotAndReplace);
         }
 
         private void DoZoomToFill()
@@ -636,32 +677,19 @@ namespace SMT.ZoomControl
             PreviewMouseMove += ZoomControl_PreviewMouseMove;
         }
 
-        private void StartAnimation(DependencyProperty dp, double toValue, Duration duration)
+        private void StartTranslationAnimation(DependencyProperty property, double target, Duration duration)
         {
-            if(double.IsNaN(toValue) || double.IsInfinity(toValue))
+            if(double.IsFinite(target))
             {
-                if(dp == ZoomProperty)
-                {
-                    _isZooming = false;
-                }
-                return;
+                var animation = new DoubleAnimation((double)GetValue(property), target, duration);
+                BeginAnimation(property, animation, HandoffBehavior.SnapshotAndReplace);
             }
-            var animation = new DoubleAnimation(toValue, duration);
-            if(dp == ZoomProperty)
-            {
-                _zoomAnimCount++;
-                animation.Completed += (s, args) =>
-                {
-                    _zoomAnimCount--;
-                    if(_zoomAnimCount > 0)
-                        return;
-                    var zoom = Zoom;
-                    BeginAnimation(ZoomProperty, null);
-                    SetValue(ZoomProperty, zoom);
-                    _isZooming = false;
-                };
-            }
-            BeginAnimation(dp, animation, HandoffBehavior.Compose);
+        }
+
+        private void CommitAnimatedValue(DependencyProperty property)
+        {
+            SetValue(property, GetValue(property));
+            BeginAnimation(property, null);
         }
 
         private void ZoomControl_MouseDown(object sender, MouseButtonEventArgs e)
@@ -711,6 +739,14 @@ namespace SMT.ZoomControl
                 return;
 
             e.Handled = true;
+            // An opposite detent can cancel an inward animation before its first frame.
+            bool beyondLimit = e.Delta < 0 ? Zoom < MinZoom : Zoom > MaxZoom;
+            bool atLimit = e.Delta < 0 ? Zoom == MinZoom : Zoom == MaxZoom;
+            var targetZoom = _activeZoomAnimation?.To;
+            bool movingInward = e.Delta < 0 ? targetZoom > Zoom : targetZoom < Zoom;
+            if(e.Delta == 0 || beyondLimit || (atLimit && !movingInward))
+                return;
+
             var origoPosition = new Point(ActualWidth / 2, ActualHeight / 2);
             var mousePosition = e.GetPosition(this);
 

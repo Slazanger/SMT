@@ -161,6 +161,13 @@ namespace SMT
         {
             InitializeComponent();
             DataContext = this;
+            IsVisibleChanged += (_, _) =>
+            {
+                if(IsVisible && !RegionZoomed.HasValue)
+                {
+                    ApplyZoomBands();
+                }
+            };
         }
 
         private struct GateHelper
@@ -440,8 +447,10 @@ namespace SMT
         private bool systemNamesStale;
 
         /// <summary>
-        /// All system names in one visual. Laid out when they are first shown or the UI goes idle, whichever comes
-        /// first, so startup doesn't wait for 5,000 text layouts that are hidden until the map is zoomed in.
+        /// The system names, one small visual each, so that WPF can leave out the names that are off screen and no
+        /// single visual of text spans the whole universe at the highest zoom. Laid out when they are first shown or
+        /// the UI goes idle, whichever comes first, so startup doesn't wait for 5,000 text layouts that are hidden
+        /// until the map is zoomed in.
         /// </summary>
         private void DrawSystemNamesIfStale()
         {
@@ -455,18 +464,19 @@ namespace SMT
 
             double pixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
             CultureInfo ci = CultureInfo.GetCultureInfo("en-us");
-            System.Windows.Media.DrawingVisual namesVisual = new System.Windows.Media.DrawingVisual();
-            using(DrawingContext drawingContext = namesVisual.RenderOpen())
+            foreach(EVEData.System sys in EM.Systems)
             {
-                foreach(EVEData.System sys in EM.Systems)
+                FormattedText ft = new FormattedText(sys.LocalizedName, ci, FlowDirection.LeftToRight, MainTF, SystemNameTextSize, SystemTextColourBrush, pixelsPerDip);
+                ft.TextAlignment = TextAlignment.Center;
+
+                System.Windows.Media.DrawingVisual nameVisual = new System.Windows.Media.DrawingVisual();
+                using(DrawingContext drawingContext = nameVisual.RenderOpen())
                 {
-                    FormattedText ft = new FormattedText(sys.LocalizedName, ci, FlowDirection.LeftToRight, MainTF, SystemNameTextSize, SystemTextColourBrush, pixelsPerDip);
-                    ft.TextAlignment = TextAlignment.Center;
                     drawingContext.DrawText(ft, new Point(sys.UniverseX, sys.UniverseY + SystemNameYOffset));
                 }
-            }
 
-            VHNames.AddChild(namesVisual, null);
+                VHNames.AddChild(nameVisual, null);
+            }
         }
 
         /// <summary>
@@ -931,9 +941,6 @@ namespace SMT
                 VHRegionShapes.ClearAllChildren();
                 VHRoute.ClearAllChildren();
 
-                ReCreateRegionMarkers(MainZoomControl.Zoom > MapConf.UniverseMaxZoomDisplaySystems);
-                PerfMetrics.MarkStartup("universe map: region markers");
-
                 Pen GatePen = new Pen(GateColourBrush, 0.6);
                 Pen ConstGatePen = new Pen(ConstellationColourBrush, 0.6);
                 Pen RegionGatePen = new Pen(RegionGateColourBrush, 0.8);
@@ -1044,16 +1051,10 @@ namespace SMT
                 VHSystems.AddChild(systemsVisual, null);
                 PerfMetrics.MarkStartup("universe map: systems");
 
-                // The names only show when zoomed in: lay them out once they are first shown, or once the UI is idle.
+                // The names only show when zoomed in: they are laid out when ApplyZoomBands first shows them, or once
+                // the UI is idle.
                 systemNamesStale = true;
-                if(VHNames.Visibility == Visibility.Visible && MainZoomControl.Zoom >= MapConf.UniverseMaxZoomDisplaySystemsText)
-                {
-                    DrawSystemNamesIfStale();
-                }
-                else
-                {
-                    Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, new Action(DrawSystemNamesIfStale));
-                }
+                Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, new Action(DrawSystemNamesIfStale));
 
                 // region shapes
                 {
@@ -1082,6 +1083,13 @@ namespace SMT
                 }
 
                 PerfMetrics.MarkStartup("universe map: region shapes");
+
+                // Defer the first set of labels until the Universe tab is displayed.
+                if(IsVisible || RegionZoomed.HasValue)
+                {
+                    ApplyZoomBands(redrawRegionNames: true);
+                }
+                PerfMetrics.MarkStartup("universe map: region markers");
             }
 
             if(DataRedraw)
@@ -1428,6 +1436,20 @@ namespace SMT
 
         private void MainZoomControl_ZoomChanged(object sender, RoutedEventArgs e)
         {
+            ApplyZoomBands();
+        }
+
+        /// <summary>
+        /// Shows the layers the current zoom calls for: the region shapes below UniverseMaxZoomDisplaySystems, the
+        /// systems and gates from it, and the system names from UniverseMaxZoomDisplaySystemsText.
+        /// </summary>
+        private void ApplyZoomBands(bool redrawRegionNames = false)
+        {
+            if(VHSystems == null)
+            {
+                return;
+            }
+
             if(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystemsText)
             {
                 VHNames.Visibility = Visibility.Hidden;
@@ -1443,7 +1465,7 @@ namespace SMT
             if(MainZoomControl.Zoom < MapConf.UniverseMaxZoomDisplaySystems)
             {
                 VHSystems.Visibility = Visibility.Hidden;
-                ReCreateRegionMarkers(true);
+                ReCreateRegionMarkers(true, redrawRegionNames);
                 VHRegionShapes.Visibility = Visibility.Visible;
                 VHLinks.Visibility = Visibility.Hidden;
             }
@@ -1452,15 +1474,15 @@ namespace SMT
                 VHSystems.Visibility = Visibility.Visible;
                 VHRegionShapes.Visibility = Visibility.Hidden;
                 VHLinks.Visibility = Visibility.Visible;
-                ReCreateRegionMarkers(false);
+                ReCreateRegionMarkers(false, redrawRegionNames);
             }
         }
 
-        private bool RegionZoomed = false;
+        private bool? RegionZoomed;
 
-        private void ReCreateRegionMarkers(bool ZoomedOut)
+        private void ReCreateRegionMarkers(bool ZoomedOut, bool force)
         {
-            if(RegionZoomed == ZoomedOut)
+            if(RegionZoomed == ZoomedOut && !force)
             {
                 return;
             }

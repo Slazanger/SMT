@@ -295,11 +295,11 @@
                                     <GroupBox Header="{DynamicResource Prefs_Msc_UniGrp}" Margin="4" Height="auto">
                                         <StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="0,0">
-                                                <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
+                                                <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystems}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="10" Minimum="0.5" ClipValueToMinMax="True" FormatString="F1" Background="Transparent"  Foreground="White" />
                                                 <Label Content="{DynamicResource Prefs_Msc_SysZom}" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="0,0">
-                                                <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="5" Minimum="0.1" FormatString="F1" Background="Transparent"  Foreground="White" />
+                                                <xctk:DoubleUpDown Value="{Binding Path=UniverseMaxZoomDisplaySystemsText}" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Width="80" Increment="0.1" Maximum="10" Minimum="0.5" ClipValueToMinMax="True" FormatString="F1" Background="Transparent"  Foreground="White" />
                                                 <Label Content="{DynamicResource Prefs_Msc_TxtZom}" />
                                             </StackPanel>
                                         </StackPanel>
